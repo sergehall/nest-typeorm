@@ -91,7 +91,6 @@ export class BBlogsService {
     );
     const pageNumber = queryPagination.pageNumber;
     const pageSize = pagination.pageSize;
-    ///
     return {
       pagesCount: pagesCount,
       page: pageNumber,
