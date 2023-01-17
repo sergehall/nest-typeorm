@@ -19,6 +19,7 @@ export class NoneStatusGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     if (!request.headers || !request.headers.authorization) {
+      request.user = null;
       return true;
     }
     const accessToken = request.headers.authorization.split(' ')[1];
