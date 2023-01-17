@@ -21,10 +21,10 @@ import { CurrentUserDto } from '../auth/dto/currentUser.dto';
 import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
 import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { UpdatePostBBlogDto } from "./dto/update-post-bblog.dto";
+import { UpdatePostBBlogDto } from './dto/update-post-bblog.dto';
 
 @SkipThrottle()
-@Controller('bblogger/blogs')
+@Controller('blogger/blogs')
 export class BBlogsController {
   constructor(private readonly bBloggerService: BBlogsService) {}
   @UseGuards(JwtAuthGuard)
@@ -90,6 +90,7 @@ export class BBlogsController {
     @Param('id') id: string,
     @Body() updateBlogDto: CreateBBlogsDto,
   ) {
+    console.log(req.user);
     const currentUser: CurrentUserDto = req.user;
     return this.bBloggerService.updateBlogById(id, updateBlogDto, currentUser);
   }

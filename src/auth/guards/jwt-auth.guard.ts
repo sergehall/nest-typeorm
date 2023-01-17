@@ -5,16 +5,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  jwtIncorrect,
-} from '../../exception-filter/errors-messages';
-import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
+import { jwtIncorrect } from '../../exception-filter/errors-messages';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private blacklistJwtRepository: BlacklistJwtRepository) {
-    super();
-  }
+  // constructor(private blacklistJwtRepository: BlacklistJwtRepository) {
+  //   super();
+  // }
   canActivate(context: ExecutionContext) {
     return super.canActivate(context);
   }
