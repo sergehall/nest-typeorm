@@ -10,7 +10,7 @@ import { Action } from './roles/action.enum';
 import { UserIdEntity } from '../comments/entities/userId.entity';
 import { PostsIdEntity } from '../posts/entities/postsId.entity';
 import { UsersEntity } from '../users/entities/users.entity';
-import { BBlogIdEntity } from "../bblogger/entities/bblogId.entity";
+import { BBlogIdEntity } from '../bblogger/entities/bblogId.entity';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;
 const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
