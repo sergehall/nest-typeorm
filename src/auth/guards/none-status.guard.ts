@@ -36,6 +36,7 @@ export class NoneStatusGuard implements CanActivate {
         };
       }
     }
+    request.user = null;
     return true;
   }
 }

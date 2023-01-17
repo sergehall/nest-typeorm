@@ -20,6 +20,7 @@ import { Action } from '../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../ability/casl-ability.factory';
 import { LikeStatusCommentsRepository } from './infrastructure/like-status-comments.repository';
 import { PostsService } from '../posts/posts.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CommentsService {
@@ -29,6 +30,7 @@ export class CommentsService {
     private readonly postsService: PostsService,
     protected caslAbilityFactory: CaslAbilityFactory,
     protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
+    private usersService: UsersService,
   ) {}
   async createComment(
     postId: string,
@@ -55,10 +57,12 @@ export class CommentsService {
     return await this.commentsRepository.createComment(postId, newComment);
   }
   async findCommentById(commentId: string, currentUser: UsersEntity | null) {
-    // console.log(currentUser, 'currentUser');
-    // if (currentUser?.banInfo?.isBanned) throw new NotFoundException();
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
+    const verifyUserBan = await this.usersService.findUserByUserId(
+      comment.userId,
+    );
+    if (verifyUserBan?.banInfo?.isBanned) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
         [comment],
