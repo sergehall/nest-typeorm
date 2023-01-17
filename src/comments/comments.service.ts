@@ -55,10 +55,10 @@ export class CommentsService {
     return await this.commentsRepository.createComment(postId, newComment);
   }
   async findCommentById(commentId: string, currentUser: UsersEntity | null) {
+    // console.log(currentUser, 'currentUser');
+    // if (currentUser?.banInfo?.isBanned) throw new NotFoundException();
     const comment = await this.commentsRepository.findCommentById(commentId);
-    if (!comment) {
-      throw new NotFoundException();
-    }
+    if (!comment) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
         [comment],
