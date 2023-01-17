@@ -24,7 +24,8 @@ import { appProviders } from './app.providers';
 import { BBlogsModule } from './bblogger/bblogs.module';
 import { SaModule } from './sa/sa.module';
 import * as process from 'process';
-import { BBlogsController } from "./bblogger/bblogs.controller";
+import { BBlogsController } from './bblogger/bblogs.controller';
+import { SaController } from './sa/sa.controller';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware)
       .forRoutes(
         AuthController,
+        SaController,
         CommentsController,
         PostsController,
         UsersController,
