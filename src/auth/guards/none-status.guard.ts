@@ -30,6 +30,7 @@ export class NoneStatusGuard implements CanActivate {
           banInfo: { isBanned: user.banInfo.isBanned },
         };
       }
+      return true;
     }
     request.user = null;
     return true;

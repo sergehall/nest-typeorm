@@ -38,9 +38,7 @@ export class CommentsService {
     user: UsersEntity,
   ): Promise<CommentsEntity> {
     const post = await this.postsService.checkPostInDB(postId);
-    if (!post) {
-      throw new NotFoundException();
-    }
+    if (!post) throw new NotFoundException();
     const newComment: CommentsEntity = {
       id: uuid4().toString(),
       content: createCommentDto.content,

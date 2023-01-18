@@ -225,14 +225,13 @@ export class UsersService {
     commentsArr: CommentsEntity[],
   ): Promise<CommentsEntity[]> {
     const commentsWithoutBannedUser: CommentsEntity[] = [];
-    for (let i = commentsArr.length; i > 0; i--) {
+    for (let i = 0; i < commentsArr.length; i++) {
       const user = await this.usersRepository.findUserByUserId(
         commentsArr[i].userId,
       );
       if (user && !user.banInfo.isBanned) {
         commentsWithoutBannedUser.push(commentsArr[i]);
       }
-      console.log(commentsArr[i]);
     }
     return commentsWithoutBannedUser;
   }

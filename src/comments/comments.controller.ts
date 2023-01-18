@@ -27,8 +27,8 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get(':id')
-  @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
+  @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async findComment(@Request() req: any, @Param('id') id: string) {
     return this.commentsService.findCommentById(id, req.user);
