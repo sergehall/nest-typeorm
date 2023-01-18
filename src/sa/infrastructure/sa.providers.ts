@@ -11,10 +11,6 @@ import {
   EmailsConfirmCodeSchema,
 } from '../../mails/infrastructure/schemas/email-confirm-code.schema';
 import {
-  BBlogSchema,
-  BBlogsDocument,
-} from '../../blogger/infrastructure/schemas/blogs.schema';
-import {
   PostsDocument,
   PostsSchema,
 } from '../../posts/infrastructure/schemas/posts.schema';
@@ -34,6 +30,10 @@ import {
   LikeStatusCommentDocument,
   LikeStatusCommentSchema,
 } from '../../comments/infrastructure/schemas/like-status-comments.schema';
+import {
+  BBlogsSchema,
+  BBlogsDocument,
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogsr.schema';
 
 export const saProviders = [
   {
@@ -61,7 +61,7 @@ export const saProviders = [
     useFactory: (mongoose: Mongoose) =>
       mongoose.model<BBlogsDocument>(
         NamesCollectionsEnums.BBLOGS,
-        BBlogSchema,
+        BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 
-export class CreateBBlogsDto {
+export class CreateBloggerBlogsDto {
   @IsNotEmpty()
   @IsString()
   @Length(0, 15, {

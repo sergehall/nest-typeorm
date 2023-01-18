@@ -1,43 +1,46 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
-import { BlogsEntity } from '../entities/blogs.entity';
+import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { ProvidersEnums } from '../../infrastructure/database/enums/providers.enums';
 import { Model } from 'mongoose';
-import { BBlogsDocument } from './schemas/blogs.schema';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../infrastructure/common/pagination/types/pagination.types';
+import { BBlogsDocument } from './schemas/blogger-blogsr.schema';
 
 @Injectable()
-export class BlogsRepository {
+export class BloggerBlogsRepository {
   constructor(
     @Inject(ProvidersEnums.BBLOG_MODEL)
-    private BBlogsModel: Model<BBlogsDocument>,
+    private BlogsModel: Model<BBlogsDocument>,
   ) {}
-  async createBBlogs(blogsEntity: BlogsEntity): Promise<BlogsEntity> {
+  async createBlogs(
+    blogsEntity: BloggerBlogsEntity,
+  ): Promise<BloggerBlogsEntity> {
     try {
-      return await this.BBlogsModel.create(blogsEntity);
+      return await this.BlogsModel.create(blogsEntity);
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
   }
   async countDocuments(searchFilters: QueryArrType): Promise<number> {
-    return await this.BBlogsModel.countDocuments({
+    return await this.BlogsModel.countDocuments({
       $and: searchFilters,
     });
   }
-  async findBlogById(blogId: string): Promise<BlogsEntity | null> {
-    return await this.BBlogsModel.findOne(
+  async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    return await this.BlogsModel.findOne(
       { id: blogId },
       {
         _id: false,
         __v: false,
+        blogOwnerInfo: false,
       },
     );
   }
   async findBlogsByUserId(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BlogsEntity[]> {
-    return await this.BBlogsModel.find(
+  ): Promise<BloggerBlogsEntity[]> {
+    return await this.BlogsModel.find(
       {
         $or: searchFilters,
       },
@@ -55,8 +58,8 @@ export class BlogsRepository {
   async findBlogs(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BlogsEntity[]> {
-    return await this.BBlogsModel.find(
+  ): Promise<BloggerBlogsEntity[]> {
+    return await this.BlogsModel.find(
       {
         $or: searchFilters,
       },
@@ -72,8 +75,8 @@ export class BlogsRepository {
       .sort({ [pagination.field]: pagination.direction })
       .lean();
   }
-  async updatedBlogById(blogEntity: BlogsEntity): Promise<boolean> {
-    return await this.BBlogsModel.findOneAndUpdate(
+  async updatedBlogById(blogEntity: BloggerBlogsEntity): Promise<boolean> {
+    return await this.BlogsModel.findOneAndUpdate(
       { id: blogEntity.id },
       {
         $set: {
@@ -92,7 +95,7 @@ export class BlogsRepository {
     ).lean();
   }
   async removeBlogById(id: string): Promise<boolean> {
-    const result = await this.BBlogsModel.deleteOne({ id: id });
+    const result = await this.BlogsModel.deleteOne({ id: id });
     return result.acknowledged && result.deletedCount === 1;
   }
 }

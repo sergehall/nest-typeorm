@@ -14,19 +14,19 @@ import {
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { BlogsService } from './blogs.service';
-import { CreateBBlogsDto } from './dto/create-bblogs.dto';
-import { CreatePostBBlogsDto } from './dto/create-post-bblogs.dto';
+import { BloggerBlogsService } from './blogger-blogs.service';
+import { CreateBloggerBlogsDto } from './dto/create-blogger-blogs.dto';
+import { CreatePostBloggerBlogsDto } from './dto/create-post-blogger-blogs.dto';
 import { CurrentUserDto } from '../auth/dto/currentUser.dto';
 import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
 import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { UpdatePostBBlogDto } from './dto/update-post-bblog.dto';
+import { UpdatePostBloggerBlogsDto } from './dto/update-post-blogger-blogs.dto';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
-export class BlogsController {
-  constructor(private readonly bBloggerService: BlogsService) {}
+export class BloggerBlogsController {
+  constructor(private readonly bBloggerService: BloggerBlogsService) {}
   @UseGuards(JwtAuthGuard)
   @Get()
   async findBlogsByUserId(
@@ -52,7 +52,7 @@ export class BlogsController {
   @UseGuards(JwtAuthGuard)
   async createBlog(
     @Request() req: any,
-    @Body() createBBlogsDto: CreateBBlogsDto,
+    @Body() createBBlogsDto: CreateBloggerBlogsDto,
   ) {
     const currentUser = req.user;
     const blogsOwnerDto = {
@@ -72,7 +72,7 @@ export class BlogsController {
   async createPostByBlogId(
     @Request() req: any,
     @Param('blogId') blogId: string,
-    @Body() createPostBBlogsDto: CreatePostBBlogsDto,
+    @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
     const createPostDto = {
@@ -89,7 +89,7 @@ export class BlogsController {
   async updateBlogById(
     @Request() req: any,
     @Param('id') id: string,
-    @Body() updateBlogDto: CreateBBlogsDto,
+    @Body() updateBlogDto: CreateBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
     return this.bBloggerService.updateBlogById(id, updateBlogDto, currentUser);
@@ -108,7 +108,7 @@ export class BlogsController {
     @Request() req: any,
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
-    @Body() updatePostBBlogDto: UpdatePostBBlogDto,
+    @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
     return await this.bBloggerService.updatePostByPostId(

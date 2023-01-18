@@ -21,11 +21,12 @@ import { MailsModule } from './mails/mails.module';
 import { TestingController } from './testing/testing.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { appProviders } from './app.providers';
-import { BlogsModule } from './blogger/blogs.module';
 import { SaModule } from './sa/sa.module';
 import * as process from 'process';
-import { BlogsController } from './blogger/blogs.controller';
+import { BloggerBlogsController } from './blogger-blogs/blogger-blogs.controller';
 import { SaController } from './sa/sa.controller';
+import { BlogsModule } from './blogs/blogs.module';
+import { BBlogsModule } from './blogger-blogs/blogger-blogs.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { SaController } from './sa/sa.controller';
     MailsModule,
     BlogsModule,
     SaModule,
+    BBlogsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],
@@ -65,7 +67,7 @@ export class AppModule implements NestModule {
         PostsController,
         UsersController,
         SecurityDevicesController,
-        BlogsController,
+        BloggerBlogsController,
         TestingController,
       );
   }

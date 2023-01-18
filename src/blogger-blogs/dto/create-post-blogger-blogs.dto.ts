@@ -1,6 +1,6 @@
 import { IsNotEmpty, Length } from 'class-validator';
 
-export class UpdatePostBBlogDto {
+export class CreatePostBloggerBlogsDto {
   @IsNotEmpty()
   @Length(0, 30, {
     message: 'Incorrect title length! Must be max 100 ch.',

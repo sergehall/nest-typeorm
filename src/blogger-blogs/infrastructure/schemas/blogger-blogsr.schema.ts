@@ -27,4 +27,4 @@ export class BBlog {
   blogOwnerInfo: BlogOwnerInfo;
 }
 
-export const BBlogSchema = SchemaFactory.createForClass(BBlog);
+export const BBlogsSchema = SchemaFactory.createForClass(BBlog);

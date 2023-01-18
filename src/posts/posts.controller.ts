@@ -29,8 +29,8 @@ import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BlogsService } from '../blogger/blogs.service';
-import { BlogsEntity } from '../blogger/entities/blogs.entity';
+import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
 
 @SkipThrottle()
@@ -39,7 +39,7 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly commentsService: CommentsService,
-    private readonly bBlogsService: BlogsService,
+    private readonly bBlogsService: BloggerBlogsService,
   ) {}
   @Get()
   @UseGuards(AbilitiesGuard)
@@ -80,9 +80,8 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const currentUser = req.user;
-    const blog: BlogsEntity | null = await this.bBlogsService.findBlogById(
-      createPostDto.blogId,
-    );
+    const blog: BloggerBlogsEntity | null =
+      await this.bBlogsService.findBlogById(createPostDto.blogId);
     if (!blog) throw new NotFoundException();
     const createPost = {
       title: createPostDto.title,

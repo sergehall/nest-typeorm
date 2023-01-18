@@ -35,9 +35,9 @@ import {
   RefreshTokenBlacklistSchema,
 } from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
 import {
-  BBlogSchema,
+  BBlogsSchema,
   BBlogsDocument,
-} from '../../blogger/infrastructure/schemas/blogs.schema';
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogsr.schema';
 
 export const testingProviders = [
   {
@@ -125,7 +125,7 @@ export const testingProviders = [
     useFactory: (mongoose: Mongoose) =>
       mongoose.model<BBlogsDocument>(
         NamesCollectionsEnums.BBLOGS,
-        BBlogSchema,
+        BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
