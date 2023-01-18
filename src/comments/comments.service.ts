@@ -106,8 +106,10 @@ export class CommentsService {
     ) {
       field = queryPagination.sortBy;
     }
-    const totalCount = comments.length;
-    const allComments = comments.sort(await byField(field, asc, desc));
+    const totalCount = commentsNotBannedUser.length;
+    const allComments = commentsNotBannedUser.sort(
+      await byField(field, asc, desc),
+    );
 
     async function byField(
       field: 'userId' | 'userLogin' | 'content' | 'createdAt',
