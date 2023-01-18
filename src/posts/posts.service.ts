@@ -176,7 +176,6 @@ export class PostsService {
   ) {
     const post = await this.postsRepository.findPostById(postId);
     if (!post) throw new NotFoundException();
-    console.log(currentUser);
     const likeStatusPostEntity: LikeStatusPostEntity = {
       postId: postId,
       userId: currentUser.id,

@@ -61,6 +61,19 @@ export class PostsController {
       currentUser,
     );
   }
+  @Get(':postId')
+  @UseGuards(AbilitiesGuard)
+  @UseGuards(NoneStatusGuard)
+  @CheckAbilities({ action: Action.READ, subject: User })
+  async findPostById(
+    @Request() req: any,
+    @Param('postId') postId: string,
+  ): Promise<PostsWithoutOwnersInfoEntity> {
+    const currentUser: UsersEntity | null = req.user;
+    const post = await this.postsService.findPostById(postId, currentUser);
+    if (!post) throw new NotFoundException();
+    return post;
+  }
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
@@ -121,19 +134,6 @@ export class PostsController {
       currentUser,
     );
   }
-  @Get(':postId')
-  @UseGuards(AbilitiesGuard)
-  @UseGuards(NoneStatusGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
-  async findPostById(
-    @Request() req: any,
-    @Param('postId') postId: string,
-  ): Promise<PostsWithoutOwnersInfoEntity> {
-    const currentUser: UsersEntity | null = req.user;
-    const post = await this.postsService.findPostById(postId, currentUser);
-    if (!post) throw new NotFoundException();
-    return post;
-  }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Put(':id')
@@ -154,7 +154,7 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Put(':postId/like-status')
-  async changeLikeStatusComment(
+  async changeLikeStatusPost(
     @Request() req: any,
     @Param('postId') postId: string,
     @Body() likeStatusDto: LikeStatusDto,
