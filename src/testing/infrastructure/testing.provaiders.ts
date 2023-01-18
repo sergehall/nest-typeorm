@@ -37,7 +37,7 @@ import {
 import {
   BBlogSchema,
   BBlogsDocument,
-} from '../../bblogger/infrastructure/schemas/bblogs.schema';
+} from '../../blogger/infrastructure/schemas/blogs.schema';
 
 export const testingProviders = [
   {

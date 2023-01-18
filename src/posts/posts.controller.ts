@@ -30,8 +30,8 @@ import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BBlogsService } from '../bblogger/bblogs.service';
-import { BBlogsEntity } from '../bblogger/entities/bblogs.entity';
+import { BlogsService } from '../blogger/blogs.service';
+import { BlogsEntity } from '../blogger/entities/blogs.entity';
 
 @SkipThrottle()
 @Controller('posts')
@@ -39,7 +39,7 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly commentsService: CommentsService,
-    private readonly bBlogsService: BBlogsService,
+    private readonly bBlogsService: BlogsService,
   ) {}
   @Get()
   @UseGuards(AbilitiesGuard)
@@ -66,7 +66,7 @@ export class PostsController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async createPost(@Body() createPostDto: CreatePostDto) {
-    const blog: BBlogsEntity | null = await this.bBlogsService.findBlogById(
+    const blog: BlogsEntity | null = await this.bBlogsService.findBlogById(
       createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();

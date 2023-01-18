@@ -10,7 +10,7 @@ import { Action } from './roles/action.enum';
 import { UserIdEntity } from '../comments/entities/userId.entity';
 import { PostsIdEntity } from '../posts/entities/postsId.entity';
 import { UsersEntity } from '../users/entities/users.entity';
-import { BBlogIdEntity } from '../bblogger/entities/bblogId.entity';
+import { BlogIdEntity } from '../blogger/entities/blogId.entity';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;
 const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
@@ -52,7 +52,7 @@ export class CaslAbilityFactory {
     can(Action.DELETE, 'all', ({ id }) => id === user.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForBBlogger(blogger: BBlogIdEntity) {
+  createForBBlogger(blogger: BlogIdEntity) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
     can(Action.CREATE, 'all', ({ id }) => id === blogger.id);

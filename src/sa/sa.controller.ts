@@ -26,7 +26,7 @@ import { Role } from '../ability/roles/role.enum';
 import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
-import { BBlogsService } from '../bblogger/bblogs.service';
+import { BlogsService } from '../blogger/blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UpdateBanDto } from './dto/update-sa.dto';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
@@ -38,7 +38,7 @@ export class SaController {
   constructor(
     private saService: SaService,
     private usersService: UsersService,
-    private bBlogsService: BBlogsService,
+    private bBlogsService: BlogsService,
     private securityDevicesService: SecurityDevicesService,
     private commentsService: CommentsService,
   ) {}

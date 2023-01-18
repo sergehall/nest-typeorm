@@ -27,7 +27,10 @@ import {
   refreshTokenBlackListDocument,
   RefreshTokenBlacklistSchema,
 } from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
-import { BBlogSchema, BBlogsDocument } from "../../bblogger/infrastructure/schemas/bblogs.schema";
+import {
+  BBlogSchema,
+  BBlogsDocument,
+} from '../../blogger/infrastructure/schemas/blogs.schema';
 
 export const postsProviders = [
   {

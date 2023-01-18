@@ -7,8 +7,8 @@ import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { saProviders } from './infrastructure/sa.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { CaslModule } from '../ability/casl.module';
-import { BBlogsService } from '../bblogger/bblogs.service';
-import { BBlogsRepository } from '../bblogger/infrastructure/bblogs.repository';
+import { BlogsService } from '../blogger/blogs.service';
+import { BlogsRepository } from '../blogger/infrastructure/blogs.repository';
 import { PostsService } from '../posts/posts.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
@@ -26,12 +26,12 @@ import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-st
   providers: [
     SaService,
     UsersService,
-    BBlogsService,
+    BlogsService,
     SecurityDevicesService,
     SecurityDevicesRepository,
     ConvertFiltersForDB,
     PostsService,
-    BBlogsRepository,
+    BlogsRepository,
     Pagination,
     UsersRepository,
     MailsRepository,

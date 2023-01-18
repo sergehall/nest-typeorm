@@ -2,7 +2,7 @@ import { ProvidersEnums } from '../../infrastructure/database/enums/providers.en
 import { Mongoose } from 'mongoose';
 import { NamesCollectionsEnums } from '../../infrastructure/database/enums/names-collections.enums';
 import { ConnectionEnums } from '../../infrastructure/database/enums/connection.enums';
-import { BBlogSchema, BBlogsDocument } from './schemas/bblogs.schema';
+import { BBlogSchema, BBlogsDocument } from './schemas/blogs.schema';
 import {
   PostsDocument,
   PostsSchema,
@@ -12,7 +12,7 @@ import {
   LikeStatusPostsDocument,
 } from '../../posts/infrastructure/schemas/like-status-posts.schemas';
 
-export const bBlogsProviders = [
+export const blogsProviders = [
   {
     provide: ProvidersEnums.LIKE_STATUS_POSTS_MODEL,
     useFactory: (mongoose: Mongoose) =>

@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
-import { BBlogsEntity } from './entities/bblogs.entity';
-import { BBlogsRepository } from './infrastructure/bblogs.repository';
+import { BlogsEntity } from './entities/blogs.entity';
+import { BlogsRepository } from './infrastructure/blogs.repository';
 import { PostsService } from '../posts/posts.service';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { CurrentUserDto } from '../auth/dto/currentUser.dto';
@@ -19,15 +19,15 @@ import { PaginationTypes } from '../infrastructure/common/pagination/types/pagin
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { UpdateBBlogsDto } from './dto/update-bblogs.dto';
-import { BBlogsOwnerDto } from './dto/bblogs-owner.dto';
-import { UpdatePostBBlogDto } from "./dto/update-post-bblog.dto";
+import { BlogsOwnerDto } from './dto/blogs-owner.dto';
+import { UpdatePostBBlogDto } from './dto/update-post-bblog.dto';
 
 @Injectable()
-export class BBlogsService {
+export class BlogsService {
   constructor(
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
-    private bBlogsRepository: BBlogsRepository,
+    private bBlogsRepository: BlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
     private postsService: PostsService,
   ) {}
@@ -51,7 +51,7 @@ export class BBlogsService {
       convertedFilters,
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    const blogs: BBlogsEntity[] = await this.bBlogsRepository.findBlogs(
+    const blogs: BlogsEntity[] = await this.bBlogsRepository.findBlogs(
       pagination,
       convertedFilters,
     );
@@ -85,7 +85,7 @@ export class BBlogsService {
       convertedFilters,
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    const blogs: BBlogsEntity[] = await this.bBlogsRepository.findBlogsByUserId(
+    const blogs: BlogsEntity[] = await this.bBlogsRepository.findBlogsByUserId(
       pagination,
       convertedFilters,
     );
@@ -100,13 +100,13 @@ export class BBlogsService {
     };
   }
 
-  async createBlog(bBlogsOwnerDto: BBlogsOwnerDto) {
+  async createBlog(bBlogsOwnerDto: BlogsOwnerDto) {
     const blogsEntity = {
       ...bBlogsOwnerDto,
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),
     };
-    const newBlog: BBlogsEntity = await this.bBlogsRepository.createBBlogs(
+    const newBlog: BlogsEntity = await this.bBlogsRepository.createBBlogs(
       blogsEntity,
     );
     return {
@@ -117,11 +117,11 @@ export class BBlogsService {
       createdAt: newBlog.createdAt,
     };
   }
-  async findBlogById(id: string): Promise<BBlogsEntity | null> {
+  async findBlogById(id: string): Promise<BlogsEntity | null> {
     return this.bBlogsRepository.findBlogById(id);
   }
   async createPost(createPostDto: CreatePostDto, currentUser: CurrentUserDto) {
-    const blog: BBlogsEntity | null = await this.bBlogsRepository.findBlogById(
+    const blog: BlogsEntity | null = await this.bBlogsRepository.findBlogById(
       createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();
@@ -152,7 +152,7 @@ export class BBlogsService {
     updateBlogDto: UpdateBBlogsDto,
     currentUser: CurrentUserDto,
   ) {
-    const blogToUpdate: BBlogsEntity | null =
+    const blogToUpdate: BlogsEntity | null =
       await this.bBlogsRepository.findBlogById(id);
     if (!blogToUpdate) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
@@ -162,7 +162,7 @@ export class BBlogsService {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: currentUser.id,
       });
-      const blogEntity: BBlogsEntity = {
+      const blogEntity: BlogsEntity = {
         id: blogToUpdate.id,
         name: updateBlogDto.name,
         description: updateBlogDto.description,
@@ -203,7 +203,7 @@ export class BBlogsService {
     updatePostBBlogDto: UpdatePostBBlogDto,
     currentUser: CurrentUserDto,
   ) {
-    const blog: BBlogsEntity | null = await this.bBlogsRepository.findBlogById(
+    const blog: BlogsEntity | null = await this.bBlogsRepository.findBlogById(
       blogId,
     );
     if (!blog) throw new NotFoundException();

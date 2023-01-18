@@ -17,8 +17,8 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
-import { BBlogsService } from '../bblogger/bblogs.service';
-import { BBlogsRepository } from '../bblogger/infrastructure/bblogs.repository';
+import { BlogsService } from '../blogger/blogs.service';
+import { BlogsRepository } from '../blogger/infrastructure/blogs.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule],
@@ -34,10 +34,10 @@ import { BBlogsRepository } from '../bblogger/infrastructure/bblogs.repository';
     ConvertFiltersForDB,
     UsersService,
     UsersRepository,
-    BBlogsService,
+    BlogsService,
     Pagination,
     PostsRepository,
-    BBlogsRepository,
+    BlogsRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
     ...postsProviders,

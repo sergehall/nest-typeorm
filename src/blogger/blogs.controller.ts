@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { BBlogsService } from './bblogs.service';
+import { BlogsService } from './blogs.service';
 import { CreateBBlogsDto } from './dto/create-bblogs.dto';
 import { CreatePostBBlogsDto } from './dto/create-post-bblogs.dto';
 import { CurrentUserDto } from '../auth/dto/currentUser.dto';
@@ -25,8 +25,8 @@ import { UpdatePostBBlogDto } from './dto/update-post-bblog.dto';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
-export class BBlogsController {
-  constructor(private readonly bBloggerService: BBlogsService) {}
+export class BlogsController {
+  constructor(private readonly bBloggerService: BlogsService) {}
   @UseGuards(JwtAuthGuard)
   @Get()
   async findBlogsByUserId(

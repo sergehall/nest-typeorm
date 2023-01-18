@@ -1,18 +1,18 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
-import { BBlogsEntity } from '../entities/bblogs.entity';
+import { BlogsEntity } from '../entities/blogs.entity';
 import { ProvidersEnums } from '../../infrastructure/database/enums/providers.enums';
 import { Model } from 'mongoose';
-import { BBlogsDocument } from './schemas/bblogs.schema';
+import { BBlogsDocument } from './schemas/blogs.schema';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../infrastructure/common/pagination/types/pagination.types';
 
 @Injectable()
-export class BBlogsRepository {
+export class BlogsRepository {
   constructor(
     @Inject(ProvidersEnums.BBLOG_MODEL)
     private BBlogsModel: Model<BBlogsDocument>,
   ) {}
-  async createBBlogs(blogsEntity: BBlogsEntity): Promise<BBlogsEntity> {
+  async createBBlogs(blogsEntity: BlogsEntity): Promise<BlogsEntity> {
     try {
       return await this.BBlogsModel.create(blogsEntity);
     } catch (error) {
@@ -24,7 +24,7 @@ export class BBlogsRepository {
       $and: searchFilters,
     });
   }
-  async findBlogById(blogId: string): Promise<BBlogsEntity | null> {
+  async findBlogById(blogId: string): Promise<BlogsEntity | null> {
     return await this.BBlogsModel.findOne(
       { id: blogId },
       {
@@ -36,7 +36,7 @@ export class BBlogsRepository {
   async findBlogsByUserId(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BBlogsEntity[]> {
+  ): Promise<BlogsEntity[]> {
     return await this.BBlogsModel.find(
       {
         $or: searchFilters,
@@ -55,7 +55,7 @@ export class BBlogsRepository {
   async findBlogs(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BBlogsEntity[]> {
+  ): Promise<BlogsEntity[]> {
     return await this.BBlogsModel.find(
       {
         $or: searchFilters,
@@ -71,7 +71,7 @@ export class BBlogsRepository {
       .sort({ [pagination.field]: pagination.direction })
       .lean();
   }
-  async updatedBlogById(blogEntity: BBlogsEntity): Promise<boolean> {
+  async updatedBlogById(blogEntity: BlogsEntity): Promise<boolean> {
     return await this.BBlogsModel.findOneAndUpdate(
       { id: blogEntity.id },
       {

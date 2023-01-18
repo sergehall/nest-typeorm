@@ -13,7 +13,7 @@ import {
 import {
   BBlogSchema,
   BBlogsDocument,
-} from '../../bblogger/infrastructure/schemas/bblogs.schema';
+} from '../../blogger/infrastructure/schemas/blogs.schema';
 import {
   PostsDocument,
   PostsSchema,

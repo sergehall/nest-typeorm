@@ -21,10 +21,10 @@ import { MailsModule } from './mails/mails.module';
 import { TestingController } from './testing/testing.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { appProviders } from './app.providers';
-import { BBlogsModule } from './bblogger/bblogs.module';
+import { BlogsModule } from './blogger/blogs.module';
 import { SaModule } from './sa/sa.module';
 import * as process from 'process';
-import { BBlogsController } from './bblogger/bblogs.controller';
+import { BlogsController } from './blogger/blogs.controller';
 import { SaController } from './sa/sa.controller';
 
 @Module({
@@ -48,7 +48,7 @@ import { SaController } from './sa/sa.controller';
     SecurityDevicesModule,
     DemonsModule,
     MailsModule,
-    BBlogsModule,
+    BlogsModule,
     SaModule,
   ],
   controllers: [AppController],
@@ -65,7 +65,7 @@ export class AppModule implements NestModule {
         PostsController,
         UsersController,
         SecurityDevicesController,
-        BBlogsController,
+        BlogsController,
         TestingController,
       );
   }
