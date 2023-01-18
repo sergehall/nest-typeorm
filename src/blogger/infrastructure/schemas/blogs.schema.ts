@@ -5,9 +5,11 @@ export type BBlogsDocument = HydratedDocument<BBlog>;
 @Schema()
 export class BlogOwnerInfo {
   @Prop({ required: true })
-  id: string;
+  userId: string;
   @Prop({ required: true })
-  login: string;
+  userLogin: string;
+  @Prop({ required: true })
+  isBanned: boolean;
 }
 @Schema()
 export class BBlog {

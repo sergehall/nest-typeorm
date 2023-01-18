@@ -45,8 +45,8 @@ export class PostsService {
       blogName: createPostDto.name,
       createdAt: new Date().toISOString(),
       postOwnerInfo: {
-        id: ownerInfoDto.id,
-        login: ownerInfoDto.login,
+        userId: ownerInfoDto.userId,
+        userLogin: ownerInfoDto.userLogin,
         isBanned: false,
       },
       extendedLikesInfo: {

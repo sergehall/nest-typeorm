@@ -50,21 +50,22 @@ export class BlogsController {
   }
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createBlogger(
+  async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBBlogsDto,
   ) {
     const currentUser = req.user;
-    const bBlogsOwnerDto = {
+    const blogsOwnerDto = {
       name: createBBlogsDto.name,
       description: createBBlogsDto.description,
       websiteUrl: createBBlogsDto.websiteUrl,
       blogOwnerInfo: {
-        id: currentUser.id,
-        login: currentUser.login,
+        userId: currentUser.id,
+        userLogin: currentUser.login,
+        isBanned: currentUser.banInfo.isBanned,
       },
     };
-    return await this.bBloggerService.createBlog(bBlogsOwnerDto);
+    return await this.bBloggerService.createBlog(blogsOwnerDto);
   }
   @Post(':blogId/posts')
   @UseGuards(JwtAuthGuard)

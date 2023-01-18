@@ -64,6 +64,7 @@ export class BlogsRepository {
         _id: false,
         __v: false,
         'blogOwnerInfo._id': false,
+        'blogOwnerInfo.isBanned': false,
       },
     )
       .limit(pagination.pageSize)
@@ -82,8 +83,8 @@ export class BlogsRepository {
           websiteUrl: blogEntity.websiteUrl,
           createdAt: blogEntity.createdAt,
           blogOwnerInfo: {
-            id: blogEntity.blogOwnerInfo.id,
-            login: blogEntity.blogOwnerInfo.login,
+            userId: blogEntity.blogOwnerInfo.userId,
+            userLogin: blogEntity.blogOwnerInfo.userLogin,
           },
         },
       },

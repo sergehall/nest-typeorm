@@ -7,9 +7,9 @@ export type PostsDocument = HydratedDocument<Post>;
 @Schema()
 export class PostOwnerInfo {
   @Prop({ required: true })
-  id: string;
+  userId: string;
   @Prop({ required: true })
-  login: string;
+  userLogin: string;
   @Prop({ required: true })
   isBanned: boolean;
 }

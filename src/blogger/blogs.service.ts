@@ -27,7 +27,7 @@ export class BlogsService {
   constructor(
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
-    private bBlogsRepository: BlogsRepository,
+    private blogsRepository: BlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
     private postsService: PostsService,
   ) {}
@@ -47,11 +47,11 @@ export class BlogsService {
       searchFilters,
     );
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.bBlogsRepository.countDocuments(
+    const totalCount = await this.blogsRepository.countDocuments(
       convertedFilters,
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    const blogs: BlogsEntity[] = await this.bBlogsRepository.findBlogs(
+    const blogs: BlogsEntity[] = await this.blogsRepository.findBlogs(
       pagination,
       convertedFilters,
     );
@@ -81,11 +81,11 @@ export class BlogsService {
       searchFilters,
     );
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.bBlogsRepository.countDocuments(
+    const totalCount = await this.blogsRepository.countDocuments(
       convertedFilters,
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    const blogs: BlogsEntity[] = await this.bBlogsRepository.findBlogsByUserId(
+    const blogs: BlogsEntity[] = await this.blogsRepository.findBlogsByUserId(
       pagination,
       convertedFilters,
     );
@@ -100,13 +100,13 @@ export class BlogsService {
     };
   }
 
-  async createBlog(bBlogsOwnerDto: BlogsOwnerDto) {
+  async createBlog(blogsOwnerDto: BlogsOwnerDto) {
     const blogsEntity = {
-      ...bBlogsOwnerDto,
+      ...blogsOwnerDto,
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),
     };
-    const newBlog: BlogsEntity = await this.bBlogsRepository.createBBlogs(
+    const newBlog: BlogsEntity = await this.blogsRepository.createBBlogs(
       blogsEntity,
     );
     return {
@@ -118,16 +118,16 @@ export class BlogsService {
     };
   }
   async findBlogById(id: string): Promise<BlogsEntity | null> {
-    return this.bBlogsRepository.findBlogById(id);
+    return this.blogsRepository.findBlogById(id);
   }
   async createPost(createPostDto: CreatePostDto, currentUser: CurrentUserDto) {
-    const blog: BlogsEntity | null = await this.bBlogsRepository.findBlogById(
+    const blog: BlogsEntity | null = await this.blogsRepository.findBlogById(
       createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();
 
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blog.blogOwnerInfo.id,
+      id: blog.blogOwnerInfo.userId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
@@ -141,8 +141,9 @@ export class BlogsService {
         name: blog.name,
       };
       const blogOwnerInfo = {
-        id: blog.blogOwnerInfo.id,
-        login: blog.blogOwnerInfo.login,
+        userId: blog.blogOwnerInfo.userId,
+        userLogin: blog.blogOwnerInfo.userLogin,
+        isBanned: blog.blogOwnerInfo.isBanned,
       };
       return await this.postsService.createPost(createPost, blogOwnerInfo);
     } catch (error) {
@@ -157,10 +158,10 @@ export class BlogsService {
     currentUser: CurrentUserDto,
   ) {
     const blogToUpdate: BlogsEntity | null =
-      await this.bBlogsRepository.findBlogById(id);
+      await this.blogsRepository.findBlogById(id);
     if (!blogToUpdate) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToUpdate.blogOwnerInfo.id,
+      id: blogToUpdate.blogOwnerInfo.userId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
@@ -173,11 +174,12 @@ export class BlogsService {
         websiteUrl: updateBlogDto.websiteUrl,
         createdAt: blogToUpdate.createdAt,
         blogOwnerInfo: {
-          id: blogToUpdate.blogOwnerInfo.id,
-          login: blogToUpdate.blogOwnerInfo.login,
+          userId: blogToUpdate.blogOwnerInfo.userId,
+          userLogin: blogToUpdate.blogOwnerInfo.userLogin,
+          isBanned: blogToUpdate.blogOwnerInfo.isBanned,
         },
       };
-      return await this.bBlogsRepository.updatedBlogById(blogEntity);
+      return await this.blogsRepository.updatedBlogById(blogEntity);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
@@ -185,16 +187,16 @@ export class BlogsService {
     }
   }
   async removeBlogById(id: string, currentUser: CurrentUserDto) {
-    const blogToDelete = await this.bBlogsRepository.findBlogById(id);
+    const blogToDelete = await this.blogsRepository.findBlogById(id);
     if (!blogToDelete) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToDelete.blogOwnerInfo.id,
+      id: blogToDelete.blogOwnerInfo.userId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: currentUser.id,
       });
-      return await this.bBlogsRepository.removeBlogById(id);
+      return await this.blogsRepository.removeBlogById(id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
@@ -207,13 +209,13 @@ export class BlogsService {
     updatePostBBlogDto: UpdatePostBBlogDto,
     currentUser: CurrentUserDto,
   ) {
-    const blog: BlogsEntity | null = await this.bBlogsRepository.findBlogById(
+    const blog: BlogsEntity | null = await this.blogsRepository.findBlogById(
       blogId,
     );
     if (!blog) throw new NotFoundException();
 
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blog.blogOwnerInfo.id,
+      id: blog.blogOwnerInfo.userId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
@@ -235,10 +237,10 @@ export class BlogsService {
     postId: string,
     currentUser: CurrentUserDto,
   ): Promise<boolean | undefined> {
-    const blogToDelete = await this.bBlogsRepository.findBlogById(blogId);
+    const blogToDelete = await this.blogsRepository.findBlogById(blogId);
     if (!blogToDelete) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToDelete.blogOwnerInfo.id,
+      id: blogToDelete.blogOwnerInfo.userId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {

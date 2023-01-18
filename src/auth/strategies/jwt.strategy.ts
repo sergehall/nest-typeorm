@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         login: user.login,
         email: user.email,
         banInfo: { isBanned: user.banInfo.isBanned },
-        payloadExp: payload.exp,
+        payloadExp: new Date(payload.exp * 1000).toISOString(),
       };
     }
     return false;
