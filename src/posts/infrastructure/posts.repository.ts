@@ -40,6 +40,7 @@ export class PostsRepository {
         __v: false,
         'extendedLikesInfo._id': false,
         'extendedLikesInfo.newestLikes._id': false,
+        postOwnerInfo: false,
       },
     );
   }
@@ -86,6 +87,7 @@ export class PostsRepository {
             __v: false,
             'extendedLikesInfo._id': false,
             'extendedLikesInfo.newestLikes._id': false,
+            postOwnerInfo: false,
           },
         },
       )
@@ -94,5 +96,21 @@ export class PostsRepository {
   async removePost(id: string): Promise<boolean> {
     const result = await this.postsModel.deleteOne({ id: id });
     return result.acknowledged && result.deletedCount === 1;
+  }
+  async changeBanStatusPostRepo(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const changeBanStatus = await this.postsModel
+      .findOneAndUpdate(
+        { 'postOwnerInfo.id': userId },
+        {
+          $set: {
+            'postOwnerInfo.isBanned': isBanned,
+          },
+        },
+      )
+      .lean();
+    return changeBanStatus !== null;
   }
 }

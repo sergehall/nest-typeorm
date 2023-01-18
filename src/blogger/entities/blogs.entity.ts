@@ -5,13 +5,13 @@ export class BlogOwnerInfo {
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 15 ch.',
   })
-  userId: string;
+  id: string;
   @IsNotEmpty()
   @Length(3, 10, {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })
   @Matches('^[a-zA-Z0-9_-]*$')
-  userLogin: string;
+  login: string;
 }
 export class BlogsEntity {
   @IsNotEmpty()

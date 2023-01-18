@@ -20,6 +20,8 @@ import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepository } from './infrastructure/like-status-posts.repository';
 import { UpdatePostsEntity } from './entities/update-posts.entity';
 import { CreatePostAndNameDto } from './dto/create-post-and-name.dto';
+import { OwnerInfoDto } from './dto/ownerInfo.dto';
+import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
 
 @Injectable()
 export class PostsService {
@@ -30,7 +32,10 @@ export class PostsService {
     protected likeStatusPostsRepository: LikeStatusPostsRepository,
   ) {}
 
-  async createPost(createPostDto: CreatePostAndNameDto) {
+  async createPost(
+    createPostDto: CreatePostAndNameDto,
+    ownerInfoDto: OwnerInfoDto,
+  ) {
     const newPost = {
       id: uuid4().toString(),
       title: createPostDto.title,
@@ -39,6 +44,11 @@ export class PostsService {
       blogId: createPostDto.blogId,
       blogName: createPostDto.name,
       createdAt: new Date().toISOString(),
+      postOwnerInfo: {
+        id: ownerInfoDto.id,
+        login: ownerInfoDto.login,
+        isBanned: false,
+      },
       extendedLikesInfo: {
         likesCount: 0,
         dislikesCount: 0,
@@ -46,7 +56,6 @@ export class PostsService {
         newestLikes: [],
       },
     };
-
     const result = await this.postsRepository.createPost(newPost);
     return {
       id: result.id,
@@ -105,7 +114,7 @@ export class PostsService {
   async findPostById(
     postId: string,
     currentUser: UsersEntity | null,
-  ): Promise<PostsEntity | null> {
+  ): Promise<PostsWithoutOwnersInfoEntity | null> {
     const post = await this.postsRepository.findPostById(postId);
     if (!post) throw new NotFoundException();
     const filledPost =
@@ -167,15 +176,28 @@ export class PostsService {
   ) {
     const post = await this.postsRepository.findPostById(postId);
     if (!post) throw new NotFoundException();
+    console.log(currentUser);
     const likeStatusPostEntity: LikeStatusPostEntity = {
       postId: postId,
       userId: currentUser.id,
       login: currentUser.login,
+      isBanned: currentUser.banInfo.isBanned,
       likeStatus: likeStatusDto.likeStatus,
       addedAt: new Date().toISOString(),
     };
     return await this.likeStatusPostsRepository.updateLikeStatusPost(
       likeStatusPostEntity,
     );
+  }
+  async changeBanStatusPosts(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    await this.postsRepository.changeBanStatusPostRepo(userId, isBanned);
+    await this.likeStatusPostsRepository.changeBanStatusPostsInLikeStatusRepo(
+      userId,
+      isBanned,
+    );
+    return true;
   }
 }

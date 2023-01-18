@@ -82,8 +82,8 @@ export class BlogsRepository {
           websiteUrl: blogEntity.websiteUrl,
           createdAt: blogEntity.createdAt,
           blogOwnerInfo: {
-            userId: blogEntity.blogOwnerInfo.userId,
-            userLogin: blogEntity.blogOwnerInfo.userLogin,
+            id: blogEntity.blogOwnerInfo.id,
+            login: blogEntity.blogOwnerInfo.login,
           },
         },
       },

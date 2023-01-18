@@ -31,6 +31,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { UpdateBanDto } from './dto/update-sa.dto';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { CommentsService } from '../comments/comments.service';
+import { PostsService } from '../posts/posts.service';
 
 @SkipThrottle()
 @Controller('sa')
@@ -38,9 +39,10 @@ export class SaController {
   constructor(
     private saService: SaService,
     private usersService: UsersService,
-    private bBlogsService: BlogsService,
+    private blogsService: BlogsService,
     private securityDevicesService: SecurityDevicesService,
     private commentsService: CommentsService,
+    private postsService: PostsService,
   ) {}
   @Get('users')
   @UseGuards(BaseAuthGuard)
@@ -118,6 +120,7 @@ export class SaController {
       id,
       updateSaBanDto.isBanned,
     );
+    await this.postsService.changeBanStatusPosts(id, updateSaBanDto.isBanned);
     return await this.usersService.banUser(id, updateSaBanDto, currentUser);
   }
   @Get('blogs')
@@ -134,6 +137,6 @@ export class SaController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    return await this.bBlogsService.findBlogs(queryPagination, [searchFilters]);
+    return await this.blogsService.findBlogs(queryPagination, [searchFilters]);
   }
 }

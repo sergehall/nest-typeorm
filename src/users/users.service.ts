@@ -32,6 +32,7 @@ import { OrgIdEnums } from '../infrastructure/database/enums/org-id.enums';
 import { userNotExists } from '../exception-filter/errors-messages';
 import { UpdateBanDto } from '../sa/dto/update-sa.dto';
 import { CommentsEntity } from '../comments/entities/comments.entity';
+import { PostsEntity } from '../posts/entities/posts.entity';
 
 @Injectable()
 export class UsersService {
@@ -234,6 +235,20 @@ export class UsersService {
       }
     }
     return commentsWithoutBannedUser;
+  }
+  async postsWithoutBannedUser(
+    commentsArr: PostsEntity[],
+  ): Promise<PostsEntity[]> {
+    const postsWithoutBannedUser: PostsEntity[] = [];
+    for (let i = 0; i < commentsArr.length; i++) {
+      const user = await this.usersRepository.findUserByUserId(
+        commentsArr[i].blogId,
+      );
+      if (user && !user.banInfo.isBanned) {
+        postsWithoutBannedUser.push(commentsArr[i]);
+      }
+    }
+    return postsWithoutBannedUser;
   }
   async banUser(
     id: string,

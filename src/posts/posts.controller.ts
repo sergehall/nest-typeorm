@@ -18,7 +18,6 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { CommentsService } from '../comments/comments.service';
 import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { PostsEntity } from './entities/posts.entity';
 import { UsersEntity } from '../users/entities/users.entity';
 import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../ability/abilities.guard';
@@ -32,6 +31,7 @@ import { NoneStatusGuard } from '../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BlogsService } from '../blogger/blogs.service';
 import { BlogsEntity } from '../blogger/entities/blogs.entity';
+import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
 
 @SkipThrottle()
 @Controller('posts')
@@ -65,7 +65,8 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async createPost(@Body() createPostDto: CreatePostDto) {
+  async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
+    const currentUser = req.user;
     const blog: BlogsEntity | null = await this.bBlogsService.findBlogById(
       createPostDto.blogId,
     );
@@ -77,7 +78,7 @@ export class PostsController {
       blogId: createPostDto.blogId,
       name: blog.name,
     };
-    return this.postsService.createPost(createPost);
+    return this.postsService.createPost(createPost, currentUser);
   }
   @Post(':postId/comments')
   @UseGuards(JwtAuthGuard)
@@ -127,7 +128,7 @@ export class PostsController {
   async findPostById(
     @Request() req: any,
     @Param('postId') postId: string,
-  ): Promise<PostsEntity> {
+  ): Promise<PostsWithoutOwnersInfoEntity> {
     const currentUser: UsersEntity | null = req.user;
     const post = await this.postsService.findPostById(postId, currentUser);
     if (!post) throw new NotFoundException();

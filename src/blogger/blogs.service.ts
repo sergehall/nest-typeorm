@@ -127,7 +127,7 @@ export class BlogsService {
     if (!blog) throw new NotFoundException();
 
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blog.blogOwnerInfo.userId,
+      id: blog.blogOwnerInfo.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
@@ -140,7 +140,11 @@ export class BlogsService {
         blogId: blog.id,
         name: blog.name,
       };
-      return await this.postsService.createPost(createPost);
+      const blogOwnerInfo = {
+        id: blog.blogOwnerInfo.id,
+        login: blog.blogOwnerInfo.login,
+      };
+      return await this.postsService.createPost(createPost, blogOwnerInfo);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
@@ -156,7 +160,7 @@ export class BlogsService {
       await this.bBlogsRepository.findBlogById(id);
     if (!blogToUpdate) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToUpdate.blogOwnerInfo.userId,
+      id: blogToUpdate.blogOwnerInfo.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
@@ -169,8 +173,8 @@ export class BlogsService {
         websiteUrl: updateBlogDto.websiteUrl,
         createdAt: blogToUpdate.createdAt,
         blogOwnerInfo: {
-          userId: blogToUpdate.blogOwnerInfo.userId,
-          userLogin: blogToUpdate.blogOwnerInfo.userLogin,
+          id: blogToUpdate.blogOwnerInfo.id,
+          login: blogToUpdate.blogOwnerInfo.login,
         },
       };
       return await this.bBlogsRepository.updatedBlogById(blogEntity);
@@ -184,7 +188,7 @@ export class BlogsService {
     const blogToDelete = await this.bBlogsRepository.findBlogById(id);
     if (!blogToDelete) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToDelete.blogOwnerInfo.userId,
+      id: blogToDelete.blogOwnerInfo.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
@@ -209,7 +213,7 @@ export class BlogsService {
     if (!blog) throw new NotFoundException();
 
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blog.blogOwnerInfo.userId,
+      id: blog.blogOwnerInfo.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
@@ -234,7 +238,7 @@ export class BlogsService {
     const blogToDelete = await this.bBlogsRepository.findBlogById(blogId);
     if (!blogToDelete) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
-      id: blogToDelete.blogOwnerInfo.userId,
+      id: blogToDelete.blogOwnerInfo.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {

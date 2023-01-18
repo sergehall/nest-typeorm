@@ -37,6 +37,7 @@ import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-st
     MailsRepository,
     PostsRepository,
     LikeStatusPostsRepository,
+    PostsService,
     CommentsService,
     CommentsRepository,
     LikeStatusCommentsRepository,

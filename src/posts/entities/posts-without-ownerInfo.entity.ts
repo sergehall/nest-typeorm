@@ -1,5 +1,4 @@
 import {
-  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -8,21 +7,6 @@ import {
 } from 'class-validator';
 import { StatusLike } from '../../infrastructure/database/enums/like-status.enums';
 
-class PostOwnerInfo {
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect id! Must be max 15 ch.',
-  })
-  id: string;
-  @IsNotEmpty()
-  @Length(3, 10, {
-    message: 'Incorrect login length! Must be min 3, max 10 ch.',
-  })
-  @Matches('^[a-zA-Z0-9_-]*$')
-  login: string;
-  @IsBoolean()
-  isBanned: boolean;
-}
 class NewestLikes {
   @IsNotEmpty()
   @Length(0, 100, {
@@ -65,7 +49,7 @@ export class ExtendedLikesInfo {
   newestLikes: NewestLikes[];
 }
 
-export class PostsEntity {
+export class PostsWithoutOwnersInfoEntity {
   @IsNotEmpty()
   @Length(1, 100, {
     message: 'Incorrect id length! Must be min 1, max 100 ch.',
@@ -106,5 +90,4 @@ export class PostsEntity {
   )
   createdAt: string;
   extendedLikesInfo: ExtendedLikesInfo;
-  postOwnerInfo: PostOwnerInfo;
 }

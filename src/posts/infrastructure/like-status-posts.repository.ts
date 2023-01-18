@@ -6,6 +6,7 @@ import { ProvidersEnums } from '../../infrastructure/database/enums/providers.en
 import { PostsEntity } from '../entities/posts.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { StatusLike } from '../../infrastructure/database/enums/like-status.enums';
+import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 
 @Injectable()
 export class LikeStatusPostsRepository {
@@ -27,6 +28,7 @@ export class LikeStatusPostsRepository {
         {
           postId: dtoLikeStatusPost.postId,
           userId: dtoLikeStatusPost.userId,
+          isBanned: dtoLikeStatusPost.isBanned,
           login: dtoLikeStatusPost.login,
           likeStatus: dtoLikeStatusPost.likeStatus,
           addedAt: dtoLikeStatusPost.addedAt,
@@ -40,54 +42,70 @@ export class LikeStatusPostsRepository {
   async preparationPostsForReturn(
     postArray: PostsEntity[],
     currentUser: UsersEntity | null,
-  ): Promise<PostsEntity[]> {
-    const filledPosts: PostsEntity[] = [];
+  ): Promise<PostsWithoutOwnersInfoEntity[]> {
+    const filledPosts: PostsWithoutOwnersInfoEntity[] = [];
     for (const i in postArray) {
       const postId = postArray[i].id;
       const currentPost: PostsEntity = postArray[i];
-
+      if (postArray[i].postOwnerInfo.isBanned) {
+        continue;
+      }
       // getting likes count
       const likesCount = await this.likeStatusPostModel
         .countDocuments({
-          $and: [{ postId: postId }, { likeStatus: StatusLike.LIKE }],
+          $and: [
+            { postId: postId },
+            { likeStatus: StatusLike.LIKE },
+            { isBanned: false },
+          ],
         })
         .lean();
 
       // getting dislikes count
       const dislikesCount = await this.likeStatusPostModel
         .countDocuments({
-          $and: [{ postId: postId }, { likeStatus: StatusLike.DISLIKE }],
+          $and: [
+            { postId: postId },
+            { likeStatus: StatusLike.DISLIKE },
+            { isBanned: false },
+          ],
         })
         .lean();
       // getting the status of the post owner
       let ownLikeStatus = StatusLike.NONE;
       if (currentUser) {
         const findOwnPost = await this.likeStatusPostModel.findOne({
-          $and: [{ postId: postId }, { userId: currentUser.id }],
+          $and: [
+            { postId: postId },
+            { userId: currentUser.id },
+            { isBanned: false },
+          ],
         });
         if (findOwnPost) {
           ownLikeStatus = findOwnPost.likeStatus;
         }
       }
-
       // getting 3 last likes
       const newestLikes = await this.likeStatusPostModel
         .find(
           {
-            $and: [{ postId: postId }, { likeStatus: StatusLike.LIKE }],
+            $and: [
+              { postId: postId },
+              { likeStatus: StatusLike.LIKE },
+              { isBanned: false },
+            ],
           },
           {
             _id: false,
             __v: false,
             postId: false,
             likeStatus: false,
-            'extendedLikesInfo.newestLikes._id': false,
+            isBanned: false,
           },
         )
         .sort({ addedAt: -1 })
         .limit(3)
         .lean();
-
       const currentPostWithLastThreeLikes = {
         id: currentPost.id,
         title: currentPost.title,
@@ -107,5 +125,17 @@ export class LikeStatusPostsRepository {
       filledPosts.push(currentPostWithLastThreeLikes);
     }
     return filledPosts;
+  }
+  async changeBanStatusPostsInLikeStatusRepo(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusPostModel.updateMany(
+      {
+        userId: userId,
+      },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
   }
 }

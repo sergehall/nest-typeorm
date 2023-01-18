@@ -11,6 +11,8 @@ export class LikeStatusPost {
   @Prop({ required: true })
   userId: string;
   @Prop({ required: true })
+  isBanned: boolean;
+  @Prop({ required: true })
   login: string;
   @Prop({ required: true, enum: StatusLike })
   likeStatus: StatusLike;

@@ -60,8 +60,8 @@ export class BlogsController {
       description: createBBlogsDto.description,
       websiteUrl: createBBlogsDto.websiteUrl,
       blogOwnerInfo: {
-        userId: currentUser.id,
-        userLogin: currentUser.login,
+        id: currentUser.id,
+        login: currentUser.login,
       },
     };
     return await this.bBloggerService.createBlog(bBlogsOwnerDto);

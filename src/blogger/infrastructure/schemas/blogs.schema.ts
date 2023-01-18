@@ -5,9 +5,9 @@ export type BBlogsDocument = HydratedDocument<BBlog>;
 @Schema()
 export class BlogOwnerInfo {
   @Prop({ required: true })
-  userId: string;
+  id: string;
   @Prop({ required: true })
-  userLogin: string;
+  login: string;
 }
 @Schema()
 export class BBlog {

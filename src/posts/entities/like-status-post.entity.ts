@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   Length,
@@ -24,6 +25,8 @@ export class LikeStatusPostEntity {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })
   @Matches('^[a-zA-Z0-9_-]*$')
+  @IsBoolean()
+  isBanned: boolean;
   login: string;
   @IsNotEmpty()
   @Length(4, 7, {

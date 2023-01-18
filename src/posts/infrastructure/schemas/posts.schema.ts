@@ -5,6 +5,16 @@ import { StatusLike } from '../../../infrastructure/database/enums/like-status.e
 export type PostsDocument = HydratedDocument<Post>;
 
 @Schema()
+export class PostOwnerInfo {
+  @Prop({ required: true })
+  id: string;
+  @Prop({ required: true })
+  login: string;
+  @Prop({ required: true })
+  isBanned: boolean;
+}
+
+@Schema()
 export class NewestLikes {
   @Prop({ required: true })
   addedAt: string;
@@ -42,6 +52,8 @@ export class Post {
   blogName: string;
   @Prop({ required: true })
   createdAt: string;
+  @Prop({ required: true })
+  postOwnerInfo: PostOwnerInfo;
   @Prop({ required: true })
   extendedLikesInfo: ExtendedLikesInfo;
 }
