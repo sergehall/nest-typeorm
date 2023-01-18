@@ -1,8 +1,8 @@
 import { UsersEntity } from '../../../../users/entities/users.entity';
 import { SortOrder } from '../../parse-query/types/sort-order.types';
 import { PostsEntity } from '../../../../posts/entities/posts.entity';
-import { CommentsEntity } from '../../../../comments/entities/comment.entity';
 import { BBlogsEntity } from '../../../../bblogger/entities/bblogs.entity';
+import { CommentsEntity } from '../../../../comments/entities/comments.entity';
 
 export type PaginationTypes = {
   pagesCount: number;

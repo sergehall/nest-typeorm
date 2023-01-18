@@ -31,6 +31,7 @@ import { EmailConfimCodeEntity } from '../mails/entities/email-confim-code.entit
 import { OrgIdEnums } from '../infrastructure/database/enums/org-id.enums';
 import { userNotExists } from '../exception-filter/errors-messages';
 import { UpdateBanDto } from '../sa/dto/update-sa.dto';
+import { CommentsEntity } from '../comments/entities/comments.entity';
 
 @Injectable()
 export class UsersService {
@@ -219,6 +220,21 @@ export class UsersService {
   }
   async changeRole(newUser: UsersEntity): Promise<UsersEntity | null> {
     return await this.usersRepository.changeRole(newUser);
+  }
+  async commentsWithoutBannedUser(
+    commentsArr: CommentsEntity[],
+  ): Promise<CommentsEntity[]> {
+    const commentsWithoutBannedUser: CommentsEntity[] = [];
+    for (let i = commentsArr.length; i > 0; i--) {
+      const user = await this.usersRepository.findUserByUserId(
+        commentsArr[i].userId,
+      );
+      if (user && !user.banInfo.isBanned) {
+        commentsWithoutBannedUser.push(commentsArr[i]);
+      }
+      console.log(commentsArr[i]);
+    }
+    return commentsWithoutBannedUser;
   }
   async banUser(
     id: string,

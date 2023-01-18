@@ -11,7 +11,6 @@ import { UsersEntity } from '../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../infrastructure/database/enums/like-status.enums';
 import { CommentsRepository } from './infrastructure/comments.repository';
-import { CommentsEntity } from './entities/comment.entity';
 import { LikeStatusDto } from './dto/like-status.dto';
 import { LikeStatusCommentEntity } from './entities/like-status-comment.entity';
 import { User } from '../users/infrastructure/schemas/user.schema';
@@ -21,6 +20,7 @@ import { CaslAbilityFactory } from '../ability/casl-ability.factory';
 import { LikeStatusCommentsRepository } from './infrastructure/like-status-comments.repository';
 import { PostsService } from '../posts/posts.service';
 import { UsersService } from '../users/users.service';
+import { CommentsEntity } from './entities/comments.entity';
 
 @Injectable()
 export class CommentsService {
@@ -59,10 +59,9 @@ export class CommentsService {
   async findCommentById(commentId: string, currentUser: UsersEntity | null) {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
-    const verifyUserBan = await this.usersService.findUserByUserId(
-      comment.userId,
-    );
-    if (verifyUserBan?.banInfo?.isBanned) throw new NotFoundException();
+    const commentNotBannedUser =
+      await this.usersService.commentsWithoutBannedUser([comment]);
+    if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
         [comment],
@@ -77,13 +76,9 @@ export class CommentsService {
     currentUser: UsersEntity | null,
   ) {
     const post = await this.postsService.checkPostInDB(postId);
-    if (!post) {
-      throw new NotFoundException();
-    }
-    const commentsDoc = await this.commentsRepository.findCommentsByPostId(
-      postId,
-    );
-    if (!commentsDoc || commentsDoc.comments.length === 0) {
+    if (!post) throw new NotFoundException();
+    const comments = await this.commentsRepository.findCommentsByPostId(postId);
+    if (!comments || comments.length === 0) {
       return {
         pagesCount: 1,
         page: 1,
@@ -92,6 +87,8 @@ export class CommentsService {
         items: [],
       };
     }
+    const commentsNotBannedUser =
+      await this.usersService.commentsWithoutBannedUser(comments);
     let desc = 1;
     let asc = -1;
     let field: 'userId' | 'userLogin' | 'content' | 'createdAt' = 'createdAt';
@@ -109,10 +106,8 @@ export class CommentsService {
     ) {
       field = queryPagination.sortBy;
     }
-    const totalCount = commentsDoc.comments.length;
-    const allComments = commentsDoc.comments.sort(
-      await byField(field, asc, desc),
-    );
+    const totalCount = comments.length;
+    const allComments = comments.sort(await byField(field, asc, desc));
 
     async function byField(
       field: 'userId' | 'userLogin' | 'content' | 'createdAt',

@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 import { AuthService } from '../auth.service';
 import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
@@ -27,8 +22,7 @@ export class NoneStatusGuard implements CanActivate {
     const payload = await this.authService.validAccessJWT(accessToken);
     if (!checkInBL && payload) {
       const user = await this.usersService.findUserByUserId(payload.userId);
-      if (user?.banInfo?.isBanned) throw new NotFoundException();
-      if (user) {
+      if (user && !user.banInfo?.isBanned) {
         request.user = {
           id: user.id,
           login: user.login,

@@ -2,8 +2,8 @@ import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { ProvidersEnums } from '../../infrastructure/database/enums/providers.enums';
 import { Comment, CommentsDocument } from './schemas/comments.schema';
-import { CommentsEntity } from '../entities/comment.entity';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { CommentsEntity } from '../entities/comments.entity';
 
 @Injectable()
 export class CommentsRepository {
@@ -39,13 +39,17 @@ export class CommentsRepository {
         },
       )
       .then((c) => c?.comments.filter((i) => i.id === commentId)[0]);
+
     return result ? result : null;
   }
-  async findCommentsByPostId(postId: string): Promise<CommentsDocument | null> {
-    return await this.commentsModel.findOne(
-      { postId: postId },
-      { _id: false, 'comments._id': false },
-    );
+  async findCommentsByPostId(postId: string): Promise<CommentsEntity[] | null> {
+    const comments = await this.commentsModel
+      .findOne({ postId: postId }, { _id: false, 'comments._id': false })
+      .lean();
+
+    return comments && comments.comments.length !== 0
+      ? comments.comments
+      : null;
   }
   async updateComment(
     commentId: string,

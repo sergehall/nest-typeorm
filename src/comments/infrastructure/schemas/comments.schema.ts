@@ -1,7 +1,7 @@
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { CommentsEntity } from '../../entities/comment.entity';
+import { CommentsEntity } from '../../entities/comments.entity';
 
 export type CommentsDocument = HydratedDocument<Comments>;
 
@@ -35,11 +35,11 @@ export class Comments {
   postId: string;
   @Prop({ required: true, default: [] })
   comments: Comment[];
-  async addComment(comment: CommentsEntity) {
+  async addComments(comment: CommentsEntity) {
     this.comments.push(comment);
   }
 }
 export const CommentsSchema = SchemaFactory.createForClass(Comments);
 CommentsSchema.methods = {
-  addComment: Comments.prototype.addComment,
+  addComments: Comments.prototype.addComments,
 };

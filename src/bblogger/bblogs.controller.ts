@@ -90,7 +90,6 @@ export class BBlogsController {
     @Param('id') id: string,
     @Body() updateBlogDto: CreateBBlogsDto,
   ) {
-    console.log(req.user);
     const currentUser: CurrentUserDto = req.user;
     return this.bBloggerService.updateBlogById(id, updateBlogDto, currentUser);
   }

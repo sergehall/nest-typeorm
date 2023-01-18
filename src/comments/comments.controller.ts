@@ -31,7 +31,6 @@ export class CommentsController {
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async findComment(@Request() req: any, @Param('id') id: string) {
-    console.log(req.user, '-----------------findComment--------------');
     return this.commentsService.findCommentById(id, req.user);
   }
   @HttpCode(HttpStatus.NO_CONTENT)

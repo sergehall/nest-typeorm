@@ -20,7 +20,7 @@ export class LikesInfo {
   @IsEnum(StatusLike, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  myStatus: StatusLike.NONE;
+  myStatus: StatusLike;
 }
 
 export class CommentsEntity {
