@@ -29,7 +29,7 @@ export class BloggerBlogsController {
   constructor(private readonly bBloggerService: BloggerBlogsService) {}
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findBlogsByUserId(
+  async findBlogsCurrentUser(
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
@@ -43,7 +43,7 @@ export class BloggerBlogsController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    return await this.bBloggerService.findBlogsByUserId(queryPagination, [
+    return await this.bBloggerService.findBlogsCurrentUser(queryPagination, [
       searchFilter,
       userIdFilter,
     ]);

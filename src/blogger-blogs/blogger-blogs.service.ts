@@ -63,7 +63,7 @@ export class BloggerBlogsService {
       items: blogs,
     };
   }
-  async findBlogsByUserId(
+  async findBlogsCurrentUser(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
@@ -84,7 +84,7 @@ export class BloggerBlogsService {
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const blogs: BloggerBlogsEntity[] =
-      await this.bloggerBlogsRepository.findBlogsByUserId(
+      await this.bloggerBlogsRepository.findBlogsCurrentUser(
         pagination,
         convertedFilters,
       );
@@ -125,8 +125,6 @@ export class BloggerBlogsService {
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepository.findBlogById(createPostDto.blogId);
     if (!blog) throw new NotFoundException();
-
-    console.log(blog);
     const ability = this.caslAbilityFactory.createForBBlogger({
       id: blog.blogOwnerInfo.userId,
     });

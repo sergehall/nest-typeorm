@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type BBlogsDocument = HydratedDocument<BBlog>;
+export type BBlogsDocument = HydratedDocument<BBlogs>;
 @Schema()
-export class BlogOwnerInfo {
+export class BlogsOwnerInfo {
   @Prop({ required: true })
   userId: string;
   @Prop({ required: true })
@@ -12,7 +12,7 @@ export class BlogOwnerInfo {
   isBanned: boolean;
 }
 @Schema()
-export class BBlog {
+export class BBlogs {
   @Prop({ required: true, unique: true })
   id: string;
   @Prop({ required: true })
@@ -24,7 +24,7 @@ export class BBlog {
   @Prop({ required: true })
   createdAt: string;
   @Prop({ required: true })
-  blogOwnerInfo: BlogOwnerInfo;
+  blogOwnerInfo: BlogsOwnerInfo;
 }
 
-export const BBlogsSchema = SchemaFactory.createForClass(BBlog);
+export const BBlogsSchema = SchemaFactory.createForClass(BBlogs);

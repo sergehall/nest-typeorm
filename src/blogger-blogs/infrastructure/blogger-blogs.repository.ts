@@ -47,13 +47,13 @@ export class BloggerBlogsRepository {
       },
     );
   }
-  async findBlogsByUserId(
+  async findBlogsCurrentUser(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity[]> {
     return await this.BlogsModel.find(
       {
-        $or: searchFilters,
+        $and: searchFilters,
       },
       {
         _id: false,

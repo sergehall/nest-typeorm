@@ -20,6 +20,7 @@ export class ConvertFiltersForDB {
           rawFilters[i][key].length !== 0
         ) {
           const convertedFilter = {};
+          console.log(rawFilters[i][key], 'rawFilters[i][key]');
           if (rawFilters[i][key] === 'true') {
             rawFilters[i][key] = true;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
