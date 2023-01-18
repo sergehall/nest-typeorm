@@ -62,10 +62,19 @@ export class CommentsService {
     if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
-        [comment],
+        commentNotBannedUser,
         currentUser,
       );
     return filledComments[0];
+  }
+  async changeBanStatusComments(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    return await this.likeStatusCommentsRepository.changeBanStatusComments(
+      userId,
+      isBanned,
+    );
   }
 
   async findCommentsByPostId(
@@ -142,17 +151,16 @@ export class CommentsService {
   async changeLikeStatusComment(
     commentId: string,
     likeStatusDto: LikeStatusDto,
-    currentUser: User,
+    currentUser: UsersEntity,
   ): Promise<boolean> {
     const findComment = await this.commentsRepository.findCommentById(
       commentId,
     );
-    if (!findComment) {
-      throw new NotFoundException();
-    }
+    if (!findComment) throw new NotFoundException();
     const likeStatusCommEntity: LikeStatusCommentEntity = {
       commentId: commentId,
       userId: currentUser.id,
+      isBanned: currentUser.banInfo.isBanned,
       likeStatus: likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),
     };

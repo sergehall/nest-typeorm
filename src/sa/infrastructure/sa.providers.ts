@@ -26,6 +26,14 @@ import {
   DevicesDocument,
   DevicesSchema,
 } from '../../security-devices/infrastructure/schemas/devices.schema';
+import {
+  CommentsDocument,
+  CommentsSchema,
+} from '../../comments/infrastructure/schemas/comments.schema';
+import {
+  LikeStatusCommentDocument,
+  LikeStatusCommentSchema,
+} from '../../comments/infrastructure/schemas/like-status-comments.schema';
 
 export const saProviders = [
   {
@@ -85,6 +93,26 @@ export const saProviders = [
         NamesCollectionsEnums.DEVICES,
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.COMMENT_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<CommentsDocument>(
+        NamesCollectionsEnums.COMMENTS,
+        CommentsSchema,
+        NamesCollectionsEnums.COMMENTS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.LIKE_STATUS_COMMENTS_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<LikeStatusCommentDocument>(
+        NamesCollectionsEnums.LIKE_STATUS_COMMENTS,
+        LikeStatusCommentSchema,
+        NamesCollectionsEnums.LIKE_STATUS_COMMENTS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },

@@ -10,6 +10,8 @@ export class LikeStatusComment {
   commentId: string;
   @Prop({ required: true })
   userId: string;
+  @Prop({ required: true })
+  isBanned: boolean;
   @Prop({ required: true, enum: StatusLike })
   likeStatus: StatusLike;
   @Prop({ required: true })

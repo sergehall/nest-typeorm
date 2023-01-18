@@ -16,6 +16,9 @@ import { SaController } from './sa.controller';
 import { SaService } from './sa.service';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
+import { CommentsService } from '../comments/comments.service';
+import { CommentsRepository } from '../comments/infrastructure/comments.repository';
+import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule],
@@ -34,6 +37,9 @@ import { SecurityDevicesRepository } from '../security-devices/infrastructure/se
     MailsRepository,
     PostsRepository,
     LikeStatusPostsRepository,
+    CommentsService,
+    CommentsRepository,
+    LikeStatusCommentsRepository,
     ...saProviders,
   ],
 })

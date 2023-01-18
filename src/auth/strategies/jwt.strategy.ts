@@ -17,13 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: PayloadDto) {
     const user = await this.usersService.findUserByUserId(payload.userId);
-    // console.log(user?.banInfo?.isBanned, '1----');
     if (user) {
       return {
         id: user.id,
         login: user.login,
         email: user.email,
-        isBanned: user.banInfo.isBanned || false,
+        banInfo: { isBanned: user.banInfo.isBanned },
         payloadExp: payload.exp,
       };
     }

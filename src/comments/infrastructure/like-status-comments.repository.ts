@@ -28,6 +28,7 @@ export class LikeStatusCommentsRepository {
           $set: {
             commentId: likeStatusCommEntity.commentId,
             userId: likeStatusCommEntity.userId,
+            isBanned: likeStatusCommEntity.isBanned,
             likeStatus: likeStatusCommEntity.likeStatus,
             createdAt: likeStatusCommEntity.createdAt,
           },
@@ -51,7 +52,11 @@ export class LikeStatusCommentsRepository {
       if (currentUser) {
         const currentComment = await this.likeStatusCommentModel.findOne(
           {
-            $and: [{ userId: currentUser.id }, { commentId: commentId }],
+            $and: [
+              { userId: currentUser.id },
+              { commentId: commentId },
+              { isBanned: false },
+            ],
           },
           {
             _id: false,
@@ -65,12 +70,20 @@ export class LikeStatusCommentsRepository {
 
       // getting likes count
       const likesCount = await this.likeStatusCommentModel.countDocuments({
-        $and: [{ commentId: commentId }, { likeStatus: 'Like' }],
+        $and: [
+          { commentId: commentId },
+          { isBanned: false },
+          { likeStatus: 'Like' },
+        ],
       });
 
       // getting dislikes count
       const dislikesCount = await this.likeStatusCommentModel.countDocuments({
-        $and: [{ commentId: commentId }, { likeStatus: 'Dislike' }],
+        $and: [
+          { commentId: commentId },
+          { likeStatus: 'Dislike' },
+          { isBanned: false },
+        ],
       });
 
       const filledComment = {
@@ -88,5 +101,17 @@ export class LikeStatusCommentsRepository {
       filledComments.push(filledComment);
     }
     return filledComments;
+  }
+  async changeBanStatusComments(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusCommentModel.updateMany(
+      {
+        userId: userId,
+      },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
   }
 }

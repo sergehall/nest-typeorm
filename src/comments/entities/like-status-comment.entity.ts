@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsNotEmpty,
   Length,
   Matches,
@@ -18,6 +19,8 @@ export class LikeStatusCommentEntity {
     message: 'Incorrect userId length! Must be min 0, max 100 ch.',
   })
   userId: string;
+  @IsBoolean()
+  isBanned: boolean;
   @IsNotEmpty()
   @Length(4, 7, {
     message:

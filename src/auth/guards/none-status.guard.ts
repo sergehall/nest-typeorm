@@ -28,6 +28,7 @@ export class NoneStatusGuard implements CanActivate {
           login: user.login,
           email: user.email,
           banInfo: { isBanned: user.banInfo.isBanned },
+          payloadExp: payload.exp,
         };
       }
       return true;
