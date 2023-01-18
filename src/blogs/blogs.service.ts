@@ -6,6 +6,6 @@ import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 export class BlogsService {
   constructor(protected bloggerBlogsService: BloggerBlogsService) {}
   async findBlogs(id: string): Promise<BloggerBlogsEntity | null> {
-    return await this.bloggerBlogsService.findBlogById(id);
+    return await this.bloggerBlogsService.findBlogByIdForBlogs(id);
   }
 }

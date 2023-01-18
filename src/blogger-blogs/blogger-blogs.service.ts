@@ -118,11 +118,15 @@ export class BloggerBlogsService {
   async findBlogById(id: string): Promise<BloggerBlogsEntity | null> {
     return this.bloggerBlogsRepository.findBlogById(id);
   }
+  async findBlogByIdForBlogs(id: string): Promise<BloggerBlogsEntity | null> {
+    return this.bloggerBlogsRepository.findBlogByIdForBlogs(id);
+  }
   async createPost(createPostDto: CreatePostDto, currentUser: CurrentUserDto) {
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepository.findBlogById(createPostDto.blogId);
     if (!blog) throw new NotFoundException();
 
+    console.log(blog);
     const ability = this.caslAbilityFactory.createForBBlogger({
       id: blog.blogOwnerInfo.userId,
     });

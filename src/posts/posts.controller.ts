@@ -39,7 +39,7 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly commentsService: CommentsService,
-    private readonly bBlogsService: BloggerBlogsService,
+    private readonly bloggerBlogsService: BloggerBlogsService,
   ) {}
   @Get()
   @UseGuards(AbilitiesGuard)
@@ -81,7 +81,7 @@ export class PostsController {
   async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const currentUser = req.user;
     const blog: BloggerBlogsEntity | null =
-      await this.bBlogsService.findBlogById(createPostDto.blogId);
+      await this.bloggerBlogsService.findBlogById(createPostDto.blogId);
     if (!blog) throw new NotFoundException();
     const createPost = {
       title: createPostDto.title,

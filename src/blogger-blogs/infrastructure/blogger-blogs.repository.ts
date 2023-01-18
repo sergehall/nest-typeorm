@@ -32,6 +32,17 @@ export class BloggerBlogsRepository {
       {
         _id: false,
         __v: false,
+      },
+    );
+  }
+  async findBlogByIdForBlogs(
+    blogId: string,
+  ): Promise<BloggerBlogsEntity | null> {
+    return await this.BlogsModel.findOne(
+      { id: blogId },
+      {
+        _id: false,
+        __v: false,
         blogOwnerInfo: false,
       },
     );
