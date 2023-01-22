@@ -10,7 +10,7 @@ export class ConvertFiltersForDB {
   async convert([...rawFilters]: QueryArrType) {
     return this._forMongo([...rawFilters], PathFilterEnum);
   }
-
+  // Takes the field name from query and creates a filter for searching in the database
   async _forMongo([...rawFilters], pathFilterEnum: PatternConvertFilterType) {
     const convertedFilters = [];
     for (let i = 0, l = Object.keys(rawFilters).length; i < l; i++) {
