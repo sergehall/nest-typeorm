@@ -28,4 +28,4 @@ import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repositor
     ...bloggerBlogsProviders,
   ],
 })
-export class BBlogsModule {}
+export class BloggerBlogsModule {}

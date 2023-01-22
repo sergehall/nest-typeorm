@@ -26,7 +26,7 @@ import * as process from 'process';
 import { BloggerBlogsController } from './blogger-blogs/blogger-blogs.controller';
 import { SaController } from './sa/sa.controller';
 import { BlogsModule } from './blogs/blogs.module';
-import { BBlogsModule } from './blogger-blogs/blogger-blogs.module';
+import { BloggerBlogsModule } from './blogger-blogs/blogger-blogs.module';
 
 @Module({
   imports: [
@@ -51,7 +51,7 @@ import { BBlogsModule } from './blogger-blogs/blogger-blogs.module';
     MailsModule,
     BlogsModule,
     SaModule,
-    BBlogsModule,
+    BloggerBlogsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],
