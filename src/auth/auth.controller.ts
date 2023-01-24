@@ -29,7 +29,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
 import { AccessToken } from './dto/accessToken.dto';
 import { CookiesJwtVerificationGuard } from './guards/cookies-jwt.verification.guard';
-import { ConfigService } from '@nestjs/config';
 
 @SkipThrottle()
 @Controller('auth')
@@ -38,7 +37,6 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService,
     private securityDevicesService: SecurityDevicesService,
-    private configService: ConfigService,
   ) {}
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
@@ -48,9 +46,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessToken> {
-    console.log('++++++++');
-    const db = this.configService.get('mongoose.URI_DATABASE');
-    console.log(db, '---------');
     const token = await this.authService.signRefreshJWT(req.user);
     const newPayload: PayloadDto = await this.authService.decode(
       token.refreshToken,
@@ -61,7 +56,6 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-    console.log('++++++++2');
     return await this.authService.signAccessJWT(req.user);
   }
   @HttpCode(HttpStatus.NO_CONTENT)

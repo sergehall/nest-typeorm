@@ -7,35 +7,32 @@ import { QueryArrType } from './types/convert-filter.types';
 
 @Injectable()
 export class ConvertFiltersForDB {
-  async convert([...rawFilters]: QueryArrType) {
-    return this._forMongo([...rawFilters], PathFilterEnum);
+  async convert(queryFilters: QueryArrType) {
+    return this._forMongo(queryFilters, PathFilterEnum);
   }
-  // Takes the field name from query and creates a filter for searching in the database
-  async _forMongo([...rawFilters], pathFilterEnum: PatternConvertFilterType) {
+
+  async _forMongo(queryFilters: any, pathFilterEnum: PatternConvertFilterType) {
     const convertedFilters = [];
-    for (let i = 0, l = Object.keys(rawFilters).length; i < l; i++) {
-      for (const key in rawFilters[i]) {
-        if (
-          pathFilterEnum.hasOwnProperty(key) &&
-          rawFilters[i][key].length !== 0
-        ) {
+    for (let i = 0, l = Object.keys(queryFilters).length; i < l; i++) {
+      for (const key in queryFilters[i]) {
+        if (pathFilterEnum.hasOwnProperty(key) && queryFilters[i][key]) {
           const convertedFilter = {};
-          if (rawFilters[i][key] === 'true') {
-            rawFilters[i][key] = true;
+          if (key === 'banStatus' && queryFilters[i][key] === 'true') {
+            queryFilters[i][key] = true;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             convertedFilter[pathFilterEnum[key]] = {
-              $eq: rawFilters[i][key],
+              $eq: queryFilters[i][key],
             };
             convertedFilters.push(convertedFilter);
             continue;
           }
-          if (rawFilters[i][key] === 'false') {
-            rawFilters[i][key] = false;
+          if (key === 'banStatus' && queryFilters[i][key] === 'false') {
+            queryFilters[i][key] = false;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             convertedFilter[pathFilterEnum[key]] = {
-              $eq: rawFilters[i][key],
+              $eq: queryFilters[i][key],
             };
             convertedFilters.push(convertedFilter);
             continue;
@@ -43,7 +40,7 @@ export class ConvertFiltersForDB {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           convertedFilter[pathFilterEnum[key]] = {
-            $regex: rawFilters[i][key].toLowerCase(),
+            $regex: queryFilters[i][key].toLowerCase(),
             $options: 'i',
           };
           convertedFilters.push(convertedFilter);
