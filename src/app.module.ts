@@ -1,3 +1,4 @@
+import { configModule } from './config/configModule';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,7 +12,6 @@ import { CommentsController } from './comments/comments.controller';
 import { PostsController } from './posts/posts.controller';
 import { UsersController } from './users/users.controller';
 import { CaslModule } from './ability/casl.module';
-import { ConfigModule } from '@nestjs/config';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
 import { SecurityDevicesController } from './security-devices/security-devices.controller';
 import { AuthController } from './auth/auth.controller';
@@ -30,11 +30,7 @@ import { BloggerBlogsModule } from './blogger-blogs/blogger-blogs.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-      load: [],
-    }),
+    configModule,
     ThrottlerModule.forRoot({
       ttl: Number(process.env.THROTTLE_TTL),
       limit: Number(process.env.THROTTLE_LIMIT),

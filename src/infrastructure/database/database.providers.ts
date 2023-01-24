@@ -1,6 +1,5 @@
 import { createConnection } from 'mongoose';
 import { ConnectionEnums } from './enums/connection.enums';
-
 export const databaseProviders = [
   {
     provide: ConnectionEnums.ASYNC_CONNECTION,
