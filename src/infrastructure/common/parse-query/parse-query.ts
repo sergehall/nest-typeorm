@@ -14,11 +14,11 @@ export class ParseQuery {
     let searchTitle: string = query.searchTitle?.toString();
     let code: string = query.sode?.toString();
     let confirmationCode: string = query.sonfirmationCode?.toString();
-    let sortBy: string = query.sortBy?.toString();
-    let banStatus: string = query.banStatus?.toString();
+    const querySortBy: string = query.sortBy?.toString();
+    let sortBy = 'createdAt';
     const querySortDirection: SortOrder = query?.sortDirection;
     let sortDirection: SortOrder = 'desc';
-
+    let banStatus: string = query.banStatus?.toString();
     if (banStatus === 'banned') {
       banStatus = 'true';
     } else if (banStatus === 'notBanned') {
@@ -56,8 +56,18 @@ export class ParseQuery {
     if (isNaN(pageSize)) {
       pageSize = 10;
     }
-    if (!sortBy) {
-      sortBy = '';
+    if (
+      querySortBy === 'login' ||
+      querySortBy === 'email' ||
+      querySortBy === 'name' ||
+      querySortBy === 'websiteUrl' ||
+      querySortBy === 'description' ||
+      sortBy === 'shortDescription' ||
+      sortBy === 'title' ||
+      sortBy === 'blogName' ||
+      sortBy === 'content'
+    ) {
+      sortBy = querySortBy;
     }
     if (
       [-1, 1, 'descending', 'desc', 'ascending', 'asc'].includes(

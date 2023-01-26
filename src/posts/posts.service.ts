@@ -79,15 +79,7 @@ export class PostsService {
     searchFilters: QueryArrType,
     currentUser: UsersEntity | null,
   ) {
-    let field = 'createdAt';
-    if (
-      queryPagination.sortBy === 'title' ||
-      queryPagination.sortBy === 'shortDescription' ||
-      queryPagination.sortBy === 'blogName' ||
-      queryPagination.sortBy === 'content'
-    ) {
-      field = queryPagination.sortBy;
-    }
+    const field = queryPagination.sortBy;
     const pagination = await this.pagination.convert(queryPagination, field);
     const totalCount = await this.postsRepository.countDocuments(searchFilters);
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);

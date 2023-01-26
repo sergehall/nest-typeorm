@@ -124,13 +124,7 @@ export class UsersService {
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
-    let field = 'createdAt';
-    if (
-      queryPagination.sortBy === 'login' ||
-      queryPagination.sortBy === 'email'
-    ) {
-      field = queryPagination.sortBy;
-    }
+    const field = queryPagination.sortBy;
     const pageNumber = queryPagination.pageNumber;
     const pageSize = queryPagination.pageSize;
 

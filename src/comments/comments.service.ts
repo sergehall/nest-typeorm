@@ -98,7 +98,11 @@ export class CommentsService {
       await this.usersService.commentsWithoutBannedUser(comments);
     let desc = 1;
     let asc = -1;
-    let field: 'userId' | 'userLogin' | 'content' | 'createdAt' = 'createdAt';
+    const field: 'userLogin' | 'content' | 'createdAt' =
+      queryPagination.sortBy === 'userLogin' ||
+      queryPagination.sortBy === 'content'
+        ? queryPagination.sortBy
+        : 'createdAt';
     if (
       queryPagination.sortDirection === 'asc' ||
       queryPagination.sortDirection === 'ascending' ||
@@ -107,19 +111,13 @@ export class CommentsService {
       desc = -1;
       asc = 1;
     }
-    if (
-      queryPagination.sortBy === 'content' ||
-      queryPagination.sortBy === 'userLogin'
-    ) {
-      field = queryPagination.sortBy;
-    }
     const totalCount = commentsNotBannedUser.length;
     const allComments = commentsNotBannedUser.sort(
       await byField(field, asc, desc),
     );
 
     async function byField(
-      field: 'userId' | 'userLogin' | 'content' | 'createdAt',
+      field: 'userLogin' | 'content' | 'createdAt',
       asc: number,
       desc: number,
     ) {

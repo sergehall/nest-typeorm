@@ -35,14 +35,7 @@ export class BloggerBlogsService {
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
-    let field = 'createdAt';
-    if (
-      queryPagination.sortBy === 'name' ||
-      queryPagination.sortBy === 'websiteUrl' ||
-      queryPagination.sortBy === 'description'
-    ) {
-      field = queryPagination.sortBy;
-    }
+    const field = queryPagination.sortBy;
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );
@@ -67,14 +60,7 @@ export class BloggerBlogsService {
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
-    let field = 'createdAt';
-    if (
-      queryPagination.sortBy === 'name' ||
-      queryPagination.sortBy === 'websiteUrl' ||
-      queryPagination.sortBy === 'description'
-    ) {
-      field = queryPagination.sortBy;
-    }
+    const field = queryPagination.sortBy;
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );
