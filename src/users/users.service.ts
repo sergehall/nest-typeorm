@@ -173,8 +173,6 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
     currentUser: UsersEntity,
   ) {
-    // const userToUpdate = await this.usersService.findOne(id);
-    // const userToUpdate = await this.findOne(id);
     const userToUpdate = currentUser;
     userToUpdate.id = currentUser.id;
     userToUpdate.orgId = currentUser.orgId;

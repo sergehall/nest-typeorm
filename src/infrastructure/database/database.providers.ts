@@ -1,21 +1,18 @@
 import { createConnection } from 'mongoose';
 import { ConnectionEnums } from './enums/connection.enums';
+import { BadGatewayException } from '@nestjs/common';
 import { getConfiguration } from '../../config/configuration';
-import { InternalServerErrorException } from '@nestjs/common';
 export const databaseProviders = [
   {
     provide: ConnectionEnums.ASYNC_CONNECTION,
     useFactory: async () => {
-      // const connection = await createConnection(
-      //   process.env.ATLAS_URI + '/' + process.env.NEST_DATABASE,
-      // );
       const uri_database = getConfiguration().mongoose.URI_DATABASE;
-      if (!uri_database) {
-        throw new InternalServerErrorException();
+      if (uri_database) {
+        const connection = await createConnection(uri_database);
+        console.log('Mongoose connected.');
+        return connection;
       }
-      const connection = await createConnection(uri_database);
-      console.log('Mongoose connected.');
-      return connection;
+      throw new BadGatewayException();
     },
   },
 
