@@ -1,10 +1,10 @@
 let envFilePath = '.env';
 switch (process.env.NODE_ENV) {
   case 'development':
-    envFilePath = 'dev.env';
+    envFilePath = '.env.dev';
     break;
   case 'testing':
-    envFilePath = '.env.testing';
+    envFilePath = '.env.test';
     break;
 }
 export { envFilePath };

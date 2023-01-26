@@ -26,6 +26,7 @@ import { User } from './infrastructure/schemas/user.schema';
 import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import * as process from 'process';
 
 @SkipThrottle()
 @Controller('users')
@@ -63,6 +64,7 @@ export class UsersController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async findAll(@Query() query: any) {
+    console.log(process.env.THROTTLE_LIMIT);
     const queryData = ParseQuery.getPaginationData(query);
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
     const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
