@@ -62,10 +62,10 @@ export class ParseQuery {
       querySortBy === 'name' ||
       querySortBy === 'websiteUrl' ||
       querySortBy === 'description' ||
-      sortBy === 'shortDescription' ||
-      sortBy === 'title' ||
-      sortBy === 'blogName' ||
-      sortBy === 'content'
+      querySortBy === 'shortDescription' ||
+      querySortBy === 'title' ||
+      querySortBy === 'blogName' ||
+      querySortBy === 'content'
     ) {
       sortBy = querySortBy;
     }
