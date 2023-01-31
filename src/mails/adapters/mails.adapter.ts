@@ -13,7 +13,10 @@ export class MailsAdapter {
     emailAndCode: EmailConfimCodeEntity,
   ): Promise<void> {
     const appUrl = this.configService.get('appUrl.NEST_API_URL');
-    const fullURL = `${appUrl} + /auth/confirm-registration?code=${emailAndCode.confirmationCode}`;
+    const fullURL =
+      appUrl +
+      '/auth/confirm-registration?code=' +
+      emailAndCode.confirmationCode;
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
@@ -22,8 +25,8 @@ export class MailsAdapter {
         template: 'index',
         text: 'Welcome', // plaintext body
         html: `
-      <h1 style="color: dimgrey">Click on the link below to confirm your email address</h1>
-       <div><a style="font-size: 20px; text-decoration-line: underline" href=\`${fullURL}> Push to confirm.</a></div>`,
+      <h1 style="color: dimgrey">Click on the link below to confirm your ${emailAndCode.email} address.</h1>
+       <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm.</a></div>`,
         context: {
           name: emailAndCode.createdAt,
           fullURL,
