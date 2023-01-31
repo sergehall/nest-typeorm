@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EmailConfimCodeEntity } from '../entities/email-confim-code.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { DomainNamesEnums } from '../../infrastructure/database/enums/domain-names.enums';
 
 @Injectable()
 export class MailsAdapter {
@@ -12,9 +13,10 @@ export class MailsAdapter {
   async sendCodeByRegistration(
     emailAndCode: EmailConfimCodeEntity,
   ): Promise<void> {
-    const domainName = this.configService.get('domainName.NEST_API_URL');
-    const path = '/auth/confirm-registration?code=';
-    const fullURL = domainName + path + emailAndCode.confirmationCode;
+    const domainName = DomainNamesEnums.NEST_API_URL;
+    const path = '/auth/confirm-registration';
+    const parameter = '?code=' + emailAndCode.confirmationCode;
+    const fullURL = domainName + path + parameter;
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
