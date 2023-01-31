@@ -11,6 +11,7 @@ export const getConfiguration = () => {
       NEST_DATABASE: process.env.NEST_DATABASE,
       TEST_DATABASE: process.env.TEST_DATABASE,
       DEV_DATABASE: process.env.DEV_DATABASE,
+      PROD_NEST_DATABASE: process.env.PROD_NEST_DATABASE,
     },
     mail: {
       NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,
