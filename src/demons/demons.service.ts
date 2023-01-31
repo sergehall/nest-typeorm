@@ -3,7 +3,6 @@ import { Cron } from '@nestjs/schedule';
 import { MailsService } from '../mails/mails.service';
 import { UsersService } from '../users/users.service';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
-import { getConfiguration } from '../config/configuration';
 
 @Injectable()
 export class DemonsService {
@@ -16,7 +15,6 @@ export class DemonsService {
   async sendAndDeleteConfirmationCode() {
     const emailAndCode = await this.mailService.findEmailByOldestDate();
     if (emailAndCode) {
-      console.log(emailAndCode, 'emailAndCode', getConfiguration().ENV, 'ENV');
       await this.mailService.sendCodeByRegistration(emailAndCode);
       await this.usersService.addSentEmailTime(emailAndCode.email);
       await this.mailService.removeEmailById(emailAndCode.id);
