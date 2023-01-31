@@ -1,19 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { EmailConfimCodeEntity } from '../entities/email-confim-code.entity';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailsAdapter {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    private mailerService: MailerService,
+    private configService: ConfigService,
+  ) {}
   async sendCodeByRegistration(
     emailAndCode: EmailConfimCodeEntity,
   ): Promise<void> {
-    const url = `https://it-express-api.herokuapp.com/auth/confirm-registration?code=${emailAndCode.confirmationCode}`;
-
+    const appUrl = this.configService.get('appUrl.NEST_API_URL');
+    const URL = `${appUrl} + /auth/confirm-registration?code=${emailAndCode.confirmationCode}`;
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
-        from: process.env.NODEMAILER_EMAIL,
+        from: this.configService.get('mail.NODEMAILER_EMAIL'),
         subject: 'Registration by confirmation code',
         template: 'index',
         text: 'welcome', // plaintext body
@@ -22,9 +26,8 @@ export class MailsAdapter {
        <div><a style="font-size: 20px; text-decoration-line: underline" href=\"https://it-express-api.herokuapp.com/auth/confirm-registration?code=${emailAndCode.confirmationCode}\"> Push to confirm. /registration-confirmation?code=${emailAndCode.confirmationCode}</a></div>
       `,
         context: {
-          // ✏️ filling curly brackets with content
           name: emailAndCode.createdAt,
-          url,
+          URL,
         },
       })
       .then((success) => {

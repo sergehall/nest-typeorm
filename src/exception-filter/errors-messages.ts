@@ -21,7 +21,7 @@ export const moAnyAuthHeaders = {
   field: 'headers.authorization',
 };
 export const userAlreadyExists = {
-  message: 'No any auth headers',
+  message: 'Login or password invalid',
   field: 'headers.authorization',
 };
 export const loginOrEmailInvalid = {

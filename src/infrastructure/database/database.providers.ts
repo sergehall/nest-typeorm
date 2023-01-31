@@ -2,6 +2,7 @@ import { createConnection } from 'mongoose';
 import { ConnectionEnums } from './enums/connection.enums';
 import { BadGatewayException } from '@nestjs/common';
 import { getConfiguration } from '../../config/configuration';
+
 export const databaseProviders = [
   {
     provide: ConnectionEnums.ASYNC_CONNECTION,
