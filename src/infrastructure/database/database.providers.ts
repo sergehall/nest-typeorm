@@ -8,7 +8,7 @@ export const databaseProviders = [
     provide: ConnectionEnums.ASYNC_CONNECTION,
     useFactory: async () => {
       const uri = getConfiguration().mongoose.uri.ATLAS_URI;
-      const database = getConfiguration().database.NEST_DATABASE;
+      const database = getConfiguration().database.DEV_DATABASE;
       if (uri && database) {
         const connection = await createConnection(uri + '/' + database);
         console.log('Mongoose connected.');
