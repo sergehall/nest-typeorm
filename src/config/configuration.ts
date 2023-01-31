@@ -1,6 +1,8 @@
+import { EnvNamesEnums } from '../infrastructure/database/enums/env-names.enums';
+
 export const getConfiguration = () => {
   return {
-    ENV: process.env.NODE_ENV || 'development',
+    ENV: process.env.NODE_ENV || EnvNamesEnums.DEVELOPMENT,
     mongoose: {
       uri: {
         ATLAS_URI: process.env.ATLAS_URI,
