@@ -7,5 +7,4 @@ switch (process.env.NODE_ENV) {
     envFilePath = '.env.test';
     break;
 }
-console.log(envFilePath, 'envFilePath');
 export { envFilePath };

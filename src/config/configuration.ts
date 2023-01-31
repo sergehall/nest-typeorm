@@ -18,7 +18,7 @@ export const getConfiguration = () => {
     mail: {
       NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,
     },
-    appUrl: {
+    domainName: {
       NEST_API_URL: process.env.NEST_API_URL,
     },
   };

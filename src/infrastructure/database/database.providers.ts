@@ -15,8 +15,6 @@ export const databaseProviders = [
       }
       if (uri && database) {
         const connection = await createConnection(uri + '/' + database);
-        console.log(getConfiguration().ENV, 'ENV');
-        console.log(database, 'database');
         console.log('Mongoose connected.');
         return connection;
       }

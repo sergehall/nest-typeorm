@@ -12,11 +12,9 @@ export class MailsAdapter {
   async sendCodeByRegistration(
     emailAndCode: EmailConfimCodeEntity,
   ): Promise<void> {
-    const appUrl = this.configService.get('appUrl.NEST_API_URL');
-    const fullURL =
-      appUrl +
-      '/auth/confirm-registration?code=' +
-      emailAndCode.confirmationCode;
+    const domainName = this.configService.get('domainName.NEST_API_URL');
+    const path = '/auth/confirm-registration?code=';
+    const fullURL = domainName + path + emailAndCode.confirmationCode;
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
@@ -25,8 +23,8 @@ export class MailsAdapter {
         template: 'index',
         text: 'Welcome', // plaintext body
         html: `
-      <h1 style="color: dimgrey">Click on the link below to confirm your ${emailAndCode.email} address.</h1>
-       <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm.</a></div>`,
+      <h1 style="color: dimgrey">Click on the link below to confirm your email address.</h1>
+       <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm email.</a></div>`,
         context: {
           name: emailAndCode.createdAt,
           fullURL,
@@ -61,7 +59,7 @@ export class MailsAdapter {
   //     subject: 'Recover password',
   //     html: `
   //       Hello, to recover your password, please enter the following link:
-  //       <div><a style="font-size: 20px; text-decoration-line: underline" href=\"https://it-express-api.herokuapp.com/auth/resend-registration-email?code=${token}\"> сode </a></div>
+  //       <div><a style="font-size: 20px; text-decoration-line: underline" href=\"https://it-express-api.herokuapp.com/auth/resend-registration-email?code=${token}\">code </a></div>
   //       `,
   //   });
   // }

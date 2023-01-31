@@ -12,7 +12,7 @@ export class DemonsService {
     private usersService: UsersService,
     private blacklistJwtRepository: BlacklistJwtRepository,
   ) {}
-  @Cron('*/3 * * * * *')
+  @Cron('*/2 * * * * *')
   async sendAndDeleteConfirmationCode() {
     const emailAndCode = await this.mailService.findEmailByOldestDate();
     if (emailAndCode) {
