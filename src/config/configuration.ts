@@ -1,4 +1,4 @@
-import { EnvNamesEnums } from '../infrastructure/database/enums/env-names.enums';
+import { EnvNamesEnums } from './enums/env-names.enums';
 
 export const getConfiguration = () => {
   return {

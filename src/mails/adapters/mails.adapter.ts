@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EmailConfimCodeEntity } from '../entities/email-confim-code.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { DomainNamesEnums } from '../../infrastructure/database/enums/domain-names.enums';
+import { DomainNamesEnums } from '../enums/domain-names.enums';
 
 @Injectable()
 export class MailsAdapter {

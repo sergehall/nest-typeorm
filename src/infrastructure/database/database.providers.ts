@@ -2,7 +2,7 @@ import { createConnection } from 'mongoose';
 import { ConnectionEnums } from './enums/connection.enums';
 import { BadGatewayException } from '@nestjs/common';
 import { getConfiguration } from '../../config/configuration';
-import { EnvNamesEnums } from './enums/env-names.enums';
+import { EnvNamesEnums } from '../../config/enums/env-names.enums';
 
 export const databaseProviders = [
   {
