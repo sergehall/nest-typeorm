@@ -10,11 +10,12 @@ export const databaseProviders = [
     useFactory: async () => {
       const uri = getConfiguration().mongoose.uri.ATLAS_URI;
       let database = getConfiguration().database.DEV_DATABASE;
-      if (getConfiguration().ENV === EnvNamesEnums.DEVELOPMENT) {
-        database = getConfiguration().database.DEV_DATABASE;
+      if (getConfiguration().ENV === EnvNamesEnums.PRODUCTION) {
+        database = getConfiguration().database.PROD_NEST_DATABASE;
       }
       if (uri && database) {
         const connection = await createConnection(uri + '/' + database);
+        console.log(getConfiguration().ENV, 'ENV');
         console.log(database, 'database');
         console.log('Mongoose connected.');
         return connection;
