@@ -11,12 +11,11 @@ export class DemonsService {
     private usersService: UsersService,
     private blacklistJwtRepository: BlacklistJwtRepository,
   ) {}
-  @Cron('*/2 * * * * *')
+  @Cron('*/3 * * * * *')
   async sendAndDeleteConfirmationCode() {
     const emailAndCode = await this.mailService.findEmailByOldestDate();
     if (emailAndCode) {
       await this.mailService.sendCodeByRegistration(emailAndCode);
-      console.log(`send confirmation code to email:  ${emailAndCode.email}`);
       await this.usersService.addSentEmailTime(emailAndCode.email);
       await this.mailService.removeEmailById(emailAndCode.id);
     }

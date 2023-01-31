@@ -13,21 +13,20 @@ export class MailsAdapter {
     emailAndCode: EmailConfimCodeEntity,
   ): Promise<void> {
     const appUrl = this.configService.get('appUrl.NEST_API_URL');
-    const URL = `${appUrl} + /auth/confirm-registration?code=${emailAndCode.confirmationCode}`;
+    const fullURL = `${appUrl} + /auth/confirm-registration?code=${emailAndCode.confirmationCode}`;
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
-        from: this.configService.get('mail.NODEMAILER_EMAIL'),
+        from: this.configService.get('NODEMAILER_EMAIL'),
         subject: 'Registration by confirmation code',
         template: 'index',
-        text: 'welcome', // plaintext body
+        text: 'Welcome', // plaintext body
         html: `
       <h1 style="color: dimgrey">Click on the link below to confirm your email address</h1>
-       <div><a style="font-size: 20px; text-decoration-line: underline" href=\"https://it-express-api.herokuapp.com/auth/confirm-registration?code=${emailAndCode.confirmationCode}\"> Push to confirm. /registration-confirmation?code=${emailAndCode.confirmationCode}</a></div>
-      `,
+       <div><a style="font-size: 20px; text-decoration-line: underline" href=\`${fullURL}> Push to confirm.</a></div>`,
         context: {
           name: emailAndCode.createdAt,
-          URL,
+          fullURL,
         },
       })
       .then((success) => {

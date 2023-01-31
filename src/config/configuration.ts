@@ -1,5 +1,3 @@
-import * as process from 'process';
-
 export const getConfiguration = () => {
   return {
     ENV: process.env.NODE_ENV || 'development',
