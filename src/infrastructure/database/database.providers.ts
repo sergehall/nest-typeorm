@@ -9,9 +9,8 @@ export const databaseProviders = [
     provide: ConnectionEnums.ASYNC_CONNECTION,
     useFactory: async () => {
       const uri = getConfiguration().mongoose.uri.ATLAS_URI;
-      const ENV = getConfiguration().ENV;
       let database = getConfiguration().database.DEV_DATABASE;
-      if (ENV === EnvNamesEnums.DEVELOPMENT) {
+      if (getConfiguration().ENV === EnvNamesEnums.DEVELOPMENT) {
         database = getConfiguration().database.DEV_DATABASE;
       }
       if (uri && database) {
