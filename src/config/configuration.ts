@@ -7,10 +7,10 @@ export const getConfiguration = () => {
     db: {
       mongo: {
         local: {
-          MONGO_URI: process.env.MONGO_URI || 'localhost',
+          MONGO_URI: process.env.MONGO_URI || 'localhost://0.0.0.0',
         },
         atlas: {
-          ATLAS_URI: process.env.ATLAS_URI || 'localhost',
+          ATLAS_URI: process.env.ATLAS_URI || 'localhost://0.0.0.0',
         },
       },
       nameDatabase: {
@@ -34,16 +34,19 @@ export const getConfiguration = () => {
     },
     throttle: {
       THROTTLE_TTL:
-        Number(process.env.THROTTLE_TTL) ?? NumThrottle.THROTTLE_TTL,
+        Number(process.env.THROTTLE_TTL) || NumThrottle.THROTTLE_TTL,
       THROTTLE_LIMIT:
-        Number(process.env.THROTTLE_LIMIT) ?? NumThrottle.THROTTLE_LIMIT,
+        Number(process.env.THROTTLE_LIMIT) || NumThrottle.THROTTLE_LIMIT,
     },
   };
 };
 
 export type ConfigurationConfigType = ReturnType<typeof getConfiguration>;
 export type ConfigType = ConfigurationConfigType & {
-  ENV: 'production' | 'development';
+  ENV:
+    | EnvNamesEnums.DEVELOPMENT
+    | EnvNamesEnums.PRODUCTION
+    | EnvNamesEnums.TEST;
   MONGO_URI: string;
   ATLAS_URI: string;
   NEST_DATABASE: string;

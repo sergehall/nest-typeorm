@@ -16,16 +16,17 @@ import { User } from '../../users/infrastructure/schemas/user.schema';
 import { OrgIdEnums } from '../../infrastructure/database/enums/org-id.enums';
 import { Role } from '../../ability/roles/role.enum';
 import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../../config/configuration';
 
 @Injectable()
 export class BaseAuthGuard implements CanActivate {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService<ConfigType, true>) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const exceptedAuthInput =
-      'Basic ' + this.configService.get<string>('auth.BASIC_AUTH');
+      'Basic ' + this.configService.get('auth').BASIC_AUTH;
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([moAnyAuthHeaders]);
     } else {
