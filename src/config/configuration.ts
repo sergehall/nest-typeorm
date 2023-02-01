@@ -1,5 +1,5 @@
 import { EnvNamesEnums } from './enums/env-names.enums';
-import { NumThrottle } from './constants/numThrottle';
+import { NumberThrottlerEnums } from './enums/number-throttler.enums';
 
 export const getConfiguration = () => {
   return {
@@ -34,9 +34,10 @@ export const getConfiguration = () => {
     },
     throttle: {
       THROTTLE_TTL:
-        Number(process.env.THROTTLE_TTL) || NumThrottle.THROTTLE_TTL,
+        Number(process.env.THROTTLE_TTL) || NumberThrottlerEnums.THROTTLE_TTL,
       THROTTLE_LIMIT:
-        Number(process.env.THROTTLE_LIMIT) || NumThrottle.THROTTLE_LIMIT,
+        Number(process.env.THROTTLE_LIMIT) ||
+        NumberThrottlerEnums.THROTTLE_LIMIT,
     },
   };
 };
