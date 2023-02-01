@@ -16,8 +16,8 @@ export const configModule = ConfigModule.forRoot({
         EnvNamesEnums.TEST,
       )
       .required(),
-    MONGO_URI: Joi.string().min(10).max(23).required(),
-    ATLAS_URI: Joi.string().min(10).max(63).required(),
+    MONGO_URI: Joi.string().uri().min(10).max(23).required(),
+    ATLAS_URI: Joi.string().uri().min(10).max(63).required(),
     TEST_DATABASE: Joi.string()
       .pattern(new RegExp('^[-a-zA-Z0-9]{7}$'))
       .required(),

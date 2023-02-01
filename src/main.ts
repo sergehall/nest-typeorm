@@ -6,9 +6,12 @@ import * as cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from './exception-filter/http-exception.filter';
 import { TrimPipe } from './pipes/trim-pipe';
 import { useContainer } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService<ConfigType, true>);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.set('trust proxy', true);
   app.useGlobalPipes(
@@ -27,7 +30,8 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
-  await app.listen(process.env.PORT || 5000, () => {
+  const port = configService.get('PORT') || 5000;
+  await app.listen(port, () => {
     console.log(`Example app listening on port: ${process.env.PORT || 5000}`);
   });
   console.log(`Application is running on: ${await app.getUrl()}`);

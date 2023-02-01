@@ -4,6 +4,7 @@ import { NumberThrottlerEnums } from './enums/number-throttler.enums';
 export const getConfiguration = () => {
   return {
     ENV: process.env.NODE_ENV || EnvNamesEnums.DEVELOPMENT,
+    PORT: Number(process.env.PORT) || 5000,
     db: {
       mongo: {
         local: {
