@@ -8,10 +8,10 @@ export const databaseProviders = [
   {
     provide: ConnectionEnums.ASYNC_CONNECTION,
     useFactory: async () => {
-      const uri = getConfiguration().mongoose.uri.ATLAS_URI;
-      let nameDatabase = getConfiguration().database.DEV_DATABASE;
+      const uri = getConfiguration().db.mongo.atlas.ATLAS_URI;
+      let nameDatabase = getConfiguration().db.nameDatabase.DEV_DATABASE;
       if (getConfiguration().ENV === EnvNamesEnums.PRODUCTION) {
-        nameDatabase = getConfiguration().database.PROD_NEST_DATABASE;
+        nameDatabase = getConfiguration().db.nameDatabase.PROD_NEST_DATABASE;
       }
       if (uri && nameDatabase) {
         const connection = await createConnection(uri + '/' + nameDatabase);
