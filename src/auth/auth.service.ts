@@ -10,6 +10,7 @@ import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repositor
 import { PayloadDto } from './dto/payload.dto';
 import { AccessToken } from './dto/accessToken.dto';
 import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../config/configuration';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private blacklistJwtRepository: BlacklistJwtRepository,
-    private configService: ConfigService,
+    private configService: ConfigService<ConfigType, true>,
   ) {}
   async validatePassword(
     loginOrEmail: string,
@@ -39,8 +40,12 @@ export class AuthService {
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt.ACCESS_SECRET_KEY'),
-        expiresIn: this.configService.get('jwt.EXP_ACC_TIME'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).ACCESS_SECRET_KEY,
+        expiresIn: this.configService.get('jwt', {
+          infer: true,
+        }).EXP_ACC_TIME,
       }),
     };
   }
@@ -51,8 +56,12 @@ export class AuthService {
     };
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt.ACCESS_SECRET_KEY'),
-        expiresIn: this.configService.get('jwt.EXP_ACC_TIME'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).ACCESS_SECRET_KEY,
+        expiresIn: this.configService.get('jwt', {
+          infer: true,
+        }).EXP_ACC_TIME,
       }),
     };
   }
@@ -62,8 +71,12 @@ export class AuthService {
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
-        expiresIn: this.configService.get('jwt.EXP_REF_TIME'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).REFRESH_SECRET_KEY,
+        expiresIn: this.configService.get('jwt', {
+          infer: true,
+        }).EXP_REF_TIME,
       }),
     };
   }
@@ -74,15 +87,21 @@ export class AuthService {
     };
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
-        expiresIn: this.configService.get('jwt.EXP_REF_TIME'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).REFRESH_SECRET_KEY,
+        expiresIn: this.configService.get('jwt', {
+          infer: true,
+        }).EXP_REF_TIME,
       }),
     };
   }
   async validAccessJWT(accessToken: string): Promise<PayloadDto | null> {
     try {
       const result = await this.jwtService.verify(accessToken, {
-        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).REFRESH_SECRET_KEY,
       });
       return result;
     } catch (err) {
@@ -92,7 +111,9 @@ export class AuthService {
   async validRefreshJWT(refreshToken: string): Promise<PayloadDto | null> {
     try {
       const result = await this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
+        secret: this.configService.get('jwt', {
+          infer: true,
+        }).REFRESH_SECRET_KEY,
       });
       return result;
     } catch (err) {

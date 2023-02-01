@@ -32,8 +32,8 @@ import { getConfiguration } from './config/configuration';
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: Number(getConfiguration().throttle.THROTTLE_TTL),
-      limit: Number(getConfiguration().throttle.THROTTLE_LIMIT),
+      ttl: getConfiguration().throttle.THROTTLE_TTL,
+      limit: getConfiguration().throttle.THROTTLE_LIMIT,
     }),
     ScheduleModule.forRoot(),
     UsersModule,
