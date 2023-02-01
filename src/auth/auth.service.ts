@@ -9,6 +9,7 @@ import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { PayloadDto } from './dto/payload.dto';
 import { AccessToken } from './dto/accessToken.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private blacklistJwtRepository: BlacklistJwtRepository,
+    private configService: ConfigService,
   ) {}
   async validatePassword(
     loginOrEmail: string,
@@ -37,8 +39,8 @@ export class AuthService {
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: process.env.ACCESS_SECRET_KEY,
-        expiresIn: process.env.EXP_ACC_TIME,
+        secret: this.configService.get('jwt.ACCESS_SECRET_KEY'),
+        expiresIn: this.configService.get('jwt.EXP_ACC_TIME'),
       }),
     };
   }
@@ -49,8 +51,8 @@ export class AuthService {
     };
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: process.env.ACCESS_SECRET_KEY,
-        expiresIn: process.env.EXP_ACC_TIME,
+        secret: this.configService.get('jwt.ACCESS_SECRET_KEY'),
+        expiresIn: this.configService.get('jwt.EXP_ACC_TIME'),
       }),
     };
   }
@@ -60,8 +62,8 @@ export class AuthService {
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: process.env.REFRESH_SECRET_KEY,
-        expiresIn: process.env.EXP_REF_TIME,
+        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
+        expiresIn: this.configService.get('jwt.EXP_REF_TIME'),
       }),
     };
   }
@@ -72,15 +74,15 @@ export class AuthService {
     };
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: process.env.REFRESH_SECRET_KEY,
-        expiresIn: process.env.EXP_REF_TIME,
+        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
+        expiresIn: this.configService.get('jwt.EXP_REF_TIME'),
       }),
     };
   }
   async validAccessJWT(accessToken: string): Promise<PayloadDto | null> {
     try {
       const result = await this.jwtService.verify(accessToken, {
-        secret: process.env.ACCESS_SECRET_KEY,
+        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
       });
       return result;
     } catch (err) {
@@ -90,7 +92,7 @@ export class AuthService {
   async validRefreshJWT(refreshToken: string): Promise<PayloadDto | null> {
     try {
       const result = await this.jwtService.verify(refreshToken, {
-        secret: process.env.REFRESH_SECRET_KEY,
+        secret: this.configService.get('jwt.REFRESH_SECRET_KEY'),
       });
       return result;
     } catch (err) {

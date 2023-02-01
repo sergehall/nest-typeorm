@@ -18,5 +18,18 @@ export const getConfiguration = () => {
     mail: {
       NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,
     },
+    jwt: {
+      ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY,
+      REFRESH_SECRET_KEY: process.env.REFRESH_SECRET_KEY,
+      EXP_ACC_TIME: process.env.EXP_ACC_TIME,
+      EXP_REF_TIME: process.env.EXP_REF_TIME,
+    },
+    auth: {
+      BASIC_AUTH: process.env.BASIC_AUTH,
+    },
+    throttle: {
+      THROTTLE_TTL: process.env.THROTTLE_TTL,
+      THROTTLE_LIMIT: process.env.THROTTLE_LIMIT,
+    },
   };
 };

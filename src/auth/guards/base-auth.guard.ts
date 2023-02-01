@@ -7,7 +7,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import * as process from 'process';
+
 import {
   loginOrPassInvalid,
   moAnyAuthHeaders,
@@ -15,14 +15,17 @@ import {
 import { User } from '../../users/infrastructure/schemas/user.schema';
 import { OrgIdEnums } from '../../infrastructure/database/enums/org-id.enums';
 import { Role } from '../../ability/roles/role.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BaseAuthGuard implements CanActivate {
+  constructor(private configService: ConfigService) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const exceptedAuthInput = 'Basic ' + process.env.BASIC_AUTH;
+    const exceptedAuthInput =
+      'Basic ' + this.configService.get('auth.BASIC_AUTH');
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([moAnyAuthHeaders]);
     } else {

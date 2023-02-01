@@ -26,13 +26,14 @@ import { BloggerBlogsController } from './blogger-blogs/blogger-blogs.controller
 import { SaController } from './sa/sa.controller';
 import { BlogsModule } from './blogs/blogs.module';
 import { BloggerBlogsModule } from './blogger-blogs/blogger-blogs.module';
+import { getConfiguration } from './config/configuration';
 
 @Module({
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: Number(process.env.THROTTLE_TTL),
-      limit: Number(process.env.THROTTLE_LIMIT),
+      ttl: Number(getConfiguration().throttle.THROTTLE_TTL),
+      limit: Number(getConfiguration().throttle.THROTTLE_LIMIT),
     }),
     ScheduleModule.forRoot(),
     UsersModule,

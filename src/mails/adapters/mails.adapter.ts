@@ -20,7 +20,7 @@ export class MailsAdapter {
     await this.mailerService
       .sendMail({
         to: emailAndCode.email,
-        from: this.configService.get('NODEMAILER_EMAIL'),
+        from: this.configService.get('mail.NODEMAILER_EMAIL'),
         subject: 'Registration by confirmation code',
         template: 'index',
         text: 'Welcome', // plaintext body
