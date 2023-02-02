@@ -13,6 +13,7 @@ import { CaslAbilityFactory } from '../ability/casl-ability.factory';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { JwtService } from '@nestjs/jwt';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Module({
   imports: [DatabaseModule],
@@ -20,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
   providers: [
     ConvertFiltersForDB,
     JwtService,
+    JwtConfig,
     Pagination,
     CaslAbilityFactory,
     UsersRepository,

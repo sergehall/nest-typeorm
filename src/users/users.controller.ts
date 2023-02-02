@@ -62,7 +62,7 @@ export class UsersController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async findAll(@Query() query: any) {
+  async findUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
     const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
@@ -72,7 +72,7 @@ export class UsersController {
       sortBy: queryData.sortBy,
       sortDirection: queryData.sortDirection,
     };
-    return this.usersService.findAll(queryPagination, [
+    return this.usersService.findUsers(queryPagination, [
       searchLoginTerm,
       searchEmailTerm,
     ]);

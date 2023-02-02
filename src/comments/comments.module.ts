@@ -17,6 +17,7 @@ import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/co
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Module({
   imports: [DatabaseModule, CaslModule],
@@ -24,6 +25,7 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
   providers: [
     CommentsService,
     BlacklistJwtRepository,
+    JwtConfig,
     JwtService,
     CommentsRepository,
     PostsService,

@@ -59,7 +59,7 @@ export class SaController {
       sortBy: queryData.sortBy,
       sortDirection: queryData.sortDirection,
     };
-    return this.usersService.findAll(queryPagination, [
+    return this.usersService.findUsers(queryPagination, [
       searchLoginTerm,
       searchEmailTerm,
       banStatus,

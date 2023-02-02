@@ -1,5 +1,5 @@
-import { EnvNamesEnums } from './enums/env-names.enums';
-import { NumberThrottlerEnums } from './enums/number-throttler.enums';
+import { EnvNamesEnums } from './throttle/enums/env-names.enums';
+import { NumberThrottlerEnums } from './throttle/enums/number-throttler.enums';
 
 export const getConfiguration = () => {
   return {
@@ -23,6 +23,9 @@ export const getConfiguration = () => {
     },
     mail: {
       NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL || 'test@gmail.com',
+      NODEMAILER_APP_PASSWORD: process.env.NODEMAILER_APP_PASSWORD || 'test',
+      MAIL_HOST: process.env.MAIL_HOST || 'test.gmail.com',
+      EMAIL_PORT: Number(process.env.EMAIL_PORT) || 465,
     },
     jwt: {
       ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY || 'ACCESS_SECRET',
@@ -56,6 +59,9 @@ export type ConfigType = ConfigurationConfigType & {
   DEV_DATABASE: string;
   PROD_NEST_DATABASE: string;
   NODEMAILER_EMAIL: string;
+  NODEMAILER_APP_PASSWORD: string;
+  MAIL_HOST: string;
+  EMAIL_PORT: number;
   ACCESS_SECRET_KEY: string;
   REFRESH_SECRET_KEY: string;
   EXP_ACC_TIME: string;

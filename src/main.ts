@@ -11,9 +11,11 @@ import { ConfigType } from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const configService = app.get(ConfigService<ConfigType, true>);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.set('trust proxy', true);
+  const configService = app.get(ConfigService<ConfigType>);
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
   app.useGlobalPipes(
     new TrimPipe(),
     new ValidationPipe({
@@ -28,10 +30,7 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.use(cookieParser());
-  const port = configService.get('PORT') || 5000;
-  await app.listen(port, () => {
+  await app.listen(configService.get('PORT') || 5000, () => {
     console.log(`Example app listening on port: ${process.env.PORT || 5000}`);
   });
   console.log(`Application is running on: ${await app.getUrl()}`);

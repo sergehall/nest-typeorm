@@ -2,20 +2,18 @@ import { ConfigModule } from '@nestjs/config';
 import { envFilePath } from '../detect-env';
 import { getConfiguration } from './configuration';
 import * as Joi from 'joi';
-import { EnvNamesEnums } from './enums/env-names.enums';
+import { EnvNamesEnums } from './throttle/enums/env-names.enums';
 
 export const configModule = ConfigModule.forRoot({
   cache: true,
   isGlobal: true,
   envFilePath: envFilePath,
   validationSchema: Joi.object({
-    NODE_ENV: Joi.string()
-      .valid(
-        EnvNamesEnums.DEVELOPMENT,
-        EnvNamesEnums.PRODUCTION,
-        EnvNamesEnums.TEST,
-      )
-      .required(),
+    NODE_ENV: Joi.string().valid(
+      EnvNamesEnums.DEVELOPMENT,
+      EnvNamesEnums.PRODUCTION,
+      EnvNamesEnums.TEST,
+    ),
     MONGO_URI: Joi.string().uri().min(10).max(23).required(),
     ATLAS_URI: Joi.string().uri().min(10).max(63).required(),
     TEST_DATABASE: Joi.string()
@@ -33,6 +31,9 @@ export const configModule = ConfigModule.forRoot({
         tlds: { allow: ['com', 'net'] },
       })
       .required(),
+    NODEMAILER_APP_PASSWORD: Joi.string().min(8).max(35).required(),
+    MAIL_HOST: Joi.string().min(10).max(20).required(),
+    EMAIL_PORT: Joi.number().required(),
     ACCESS_SECRET_KEY: Joi.string()
       .pattern(new RegExp('^[a-zA-Z0-9]{15,100}$'))
       .required(),

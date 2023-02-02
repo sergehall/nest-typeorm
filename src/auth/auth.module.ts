@@ -12,6 +12,7 @@ import { authProviders } from './infrastructure/auth.providers';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Module({
   imports: [DatabaseModule, UsersModule, PassportModule, JwtModule],
@@ -19,6 +20,7 @@ import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repositor
   providers: [
     BlacklistJwtRepository,
     SecurityDevicesRepository,
+    JwtConfig,
     UsersRepository,
     AuthService,
     SecurityDevicesService,

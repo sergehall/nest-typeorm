@@ -11,6 +11,7 @@ import { usersProviders } from './infrastructure/users.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Module({
   imports: [DatabaseModule, CaslModule],
@@ -18,6 +19,7 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
   providers: [
     UsersService,
     Pagination,
+    JwtConfig,
     BlacklistJwtRepository,
     AuthService,
     UsersRepository,

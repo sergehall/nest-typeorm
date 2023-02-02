@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -9,8 +9,7 @@ import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { PayloadDto } from './dto/payload.dto';
 import { AccessToken } from './dto/accessToken.dto';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../config/configuration';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private blacklistJwtRepository: BlacklistJwtRepository,
-    private configService: ConfigService<ConfigType, true>,
+    private jwtConfig: JwtConfig,
   ) {}
   async validatePassword(
     loginOrEmail: string,
@@ -38,14 +37,14 @@ export class AuthService {
   async signAccessJWT(user: UsersEntity): Promise<AccessToken> {
     const deviceId = uuid4().toString();
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
+      throw new InternalServerErrorException();
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).ACCESS_SECRET_KEY,
-        expiresIn: this.configService.get('jwt', {
-          infer: true,
-        }).EXP_ACC_TIME,
+        secret: ACCESS_SECRET_KEY,
+        expiresIn: EXP_ACC_TIME,
       }),
     };
   }
@@ -54,14 +53,14 @@ export class AuthService {
       userId: currentPayload.userId,
       deviceId: currentPayload.deviceId,
     };
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
+      throw new InternalServerErrorException();
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).ACCESS_SECRET_KEY,
-        expiresIn: this.configService.get('jwt', {
-          infer: true,
-        }).EXP_ACC_TIME,
+        secret: ACCESS_SECRET_KEY,
+        expiresIn: EXP_ACC_TIME,
       }),
     };
   }
@@ -69,14 +68,14 @@ export class AuthService {
   async signRefreshJWT(user: UsersEntity) {
     const deviceId = uuid4().toString();
     const payload = { userId: user.id, email: user.email, deviceId: deviceId };
+    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+    const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
+    if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
+      throw new InternalServerErrorException();
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).REFRESH_SECRET_KEY,
-        expiresIn: this.configService.get('jwt', {
-          infer: true,
-        }).EXP_REF_TIME,
+        secret: REFRESH_SECRET_KEY,
+        expiresIn: EXP_REF_TIME,
       }),
     };
   }
@@ -85,23 +84,23 @@ export class AuthService {
       userId: currentPayload.userId,
       deviceId: currentPayload.deviceId,
     };
+    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+    const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
+    if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
+      throw new InternalServerErrorException();
     return {
       refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).REFRESH_SECRET_KEY,
-        expiresIn: this.configService.get('jwt', {
-          infer: true,
-        }).EXP_REF_TIME,
+        secret: REFRESH_SECRET_KEY,
+        expiresIn: EXP_REF_TIME,
       }),
     };
   }
   async validAccessJWT(accessToken: string): Promise<PayloadDto | null> {
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    if (!ACCESS_SECRET_KEY) throw new InternalServerErrorException();
     try {
       const result = await this.jwtService.verify(accessToken, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).REFRESH_SECRET_KEY,
+        secret: ACCESS_SECRET_KEY,
       });
       return result;
     } catch (err) {
@@ -109,11 +108,11 @@ export class AuthService {
     }
   }
   async validRefreshJWT(refreshToken: string): Promise<PayloadDto | null> {
+    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+    if (!REFRESH_SECRET_KEY) throw new InternalServerErrorException();
     try {
       const result = await this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('jwt', {
-          infer: true,
-        }).REFRESH_SECRET_KEY,
+        secret: REFRESH_SECRET_KEY,
       });
       return result;
     } catch (err) {

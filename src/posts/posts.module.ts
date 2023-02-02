@@ -19,6 +19,7 @@ import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
+import { JwtConfig } from '../config/jwt/jwt-config';
 
 @Module({
   imports: [DatabaseModule, CaslModule],
@@ -26,6 +27,7 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
   providers: [
     AuthService,
     BlacklistJwtRepository,
+    JwtConfig,
     JwtService,
     PostsService,
     CommentsService,

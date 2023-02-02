@@ -120,7 +120,7 @@ export class UsersService {
     }
   }
 
-  async findAll(
+  async findUsers(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {

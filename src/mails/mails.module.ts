@@ -6,24 +6,22 @@ import { MailsRepository } from './infrastructure/mails.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailsAdapter } from './adapters/mails.adapter';
+import { getConfiguration } from '../config/configuration';
 
 @Module({
   imports: [
-    ConfigModule,
     DatabaseModule,
     MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         transport: {
-          host: configService.get('MAIL_HOST'),
-          port: configService.get('EMAIL_PORT'),
+          host: getConfiguration().mail.MAIL_HOST,
+          port: getConfiguration().mail.EMAIL_PORT,
           ignoreTLS: true,
           secure: true,
           auth: {
-            user: configService.get('NODEMAILER_EMAIL'),
-            pass: configService.get('NODEMAILER_APP_PASSWORD'),
+            user: getConfiguration().mail.NODEMAILER_EMAIL,
+            pass: getConfiguration().mail.NODEMAILER_APP_PASSWORD,
           },
         },
         defaults: {
@@ -37,7 +35,6 @@ import { MailsAdapter } from './adapters/mails.adapter';
           },
         },
       }),
-      inject: [ConfigService],
     }),
   ],
   providers: [MailsService, MailsRepository, MailsAdapter, ...mailsProviders],
