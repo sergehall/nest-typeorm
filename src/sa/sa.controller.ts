@@ -18,7 +18,7 @@ import { SaService } from './sa.service';
 import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
 import { AbilitiesGuard } from '../ability/abilities.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { CheckAbilities } from '../ability/abilities.decorator';
 import { Action } from '../ability/roles/action.enum';
 import { User } from '../users/infrastructure/schemas/user.schema';
@@ -32,6 +32,8 @@ import { UpdateBanDto } from './dto/update-sa.dto';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { CommentsService } from '../comments/comments.service';
 import { PostsService } from '../posts/posts.service';
+import { RegistrationUserCommand } from '../users/application/use-cases/registrationUserUseCaser';
+import { CommandBus } from '@nestjs/cqrs';
 
 @SkipThrottle()
 @Controller('sa')
@@ -43,6 +45,7 @@ export class SaController {
     private securityDevicesService: SecurityDevicesService,
     private commentsService: CommentsService,
     private postsService: PostsService,
+    private commandBus: CommandBus,
   ) {}
   @Get('users')
   @UseGuards(BaseAuthGuard)
@@ -79,9 +82,9 @@ export class SaController {
       ip: ip,
       userAgent: userAgent,
     };
-    const newUser = await this.usersService.createUser(
-      createUserDto,
-      registrationData,
+
+    const newUser = await this.commandBus.execute(
+      new RegistrationUserCommand(createUserDto, registrationData),
     );
     newUser.roles = Role.SA;
     const saUser = await this.usersService.changeRole(newUser);

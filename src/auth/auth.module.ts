@@ -13,9 +13,15 @@ import { SecurityDevicesService } from '../security-devices/security-devices.ser
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';
+import { CreateUserByInstanceUseCase } from '../users/application/use-cases/createUserByInstanceUseCase';
+import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { CqrsModule } from '@nestjs/cqrs';
+import { RegistrationUserUseCase } from '../users/application/use-cases/registrationUserUseCaser';
+
+const authCases = [CreateUserByInstanceUseCase, RegistrationUserUseCase];
 
 @Module({
-  imports: [DatabaseModule, UsersModule, PassportModule, JwtModule],
+  imports: [DatabaseModule, UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
     BlacklistJwtRepository,
@@ -26,6 +32,8 @@ import { JwtConfig } from '../config/jwt/jwt-config';
     SecurityDevicesService,
     LocalStrategy,
     JwtStrategy,
+    MailsRepository,
+    ...authCases,
     ...authProviders,
   ],
   exports: [AuthService],

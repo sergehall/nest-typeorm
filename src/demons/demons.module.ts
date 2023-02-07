@@ -5,7 +5,7 @@ import { demonsProviders } from './infrastructure/demons.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { MailsModule } from '../mails/mails.module';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { CaslModule } from '../ability/casl.module';

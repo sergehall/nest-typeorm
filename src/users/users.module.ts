@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { UsersService } from './application/users.service';
+import { UsersController } from './application/users.controller';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { AuthService } from '../auth/auth.service';
@@ -12,9 +12,17 @@ import { DatabaseModule } from '../infrastructure/database/database.module';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';
+import { CreateUserByInstanceUseCase } from './application/use-cases/createUserByInstanceUseCase';
+import { CreateUserByMongooseModelUseCase } from './application/use-cases/createUserByMongooseModelUseCase';
+import { CqrsModule } from '@nestjs/cqrs';
+
+const useCases = [
+  CreateUserByMongooseModelUseCase,
+  CreateUserByInstanceUseCase,
+];
 
 @Module({
-  imports: [DatabaseModule, CaslModule],
+  imports: [DatabaseModule, CaslModule, CqrsModule],
   controllers: [UsersController],
   providers: [
     UsersService,
@@ -26,6 +34,7 @@ import { JwtConfig } from '../config/jwt/jwt-config';
     JwtService,
     ConvertFiltersForDB,
     MailsRepository,
+    ...useCases,
     ...usersProviders,
   ],
   exports: [UsersService],

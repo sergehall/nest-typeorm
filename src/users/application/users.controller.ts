@@ -15,22 +15,28 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { Action } from '../ability/roles/action.enum';
-import { CheckAbilities } from '../ability/abilities.decorator';
-import { AbilitiesGuard } from '../ability/abilities.guard';
-import { User } from './infrastructure/schemas/user.schema';
-import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { Action } from '../../ability/roles/action.enum';
+import { CheckAbilities } from '../../ability/abilities.decorator';
+import { AbilitiesGuard } from '../../ability/abilities.guard';
+import { User } from '../infrastructure/schemas/user.schema';
+import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './use-cases/createUserByInstanceUseCase';
+import { RegDataDto } from '../dto/reg-data.dto';
 
 @SkipThrottle()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private commandBus: CommandBus,
+  ) {}
 
   @Post()
   @UseGuards(BaseAuthGuard)
@@ -41,14 +47,12 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
   ) {
-    const userAgent = req.get('user-agent') || 'None user-agent';
-    const registrationData = {
+    const registrationData: RegDataDto = {
       ip: ip,
-      userAgent: userAgent,
+      userAgent: req.get('user-agent') || 'None',
     };
-    const newUser = await this.usersService.createUser(
-      createUserDto,
-      registrationData,
+    const newUser = await this.commandBus.execute(
+      new CreateUserCommand(createUserDto, registrationData),
     );
     return {
       id: newUser.id,

@@ -10,7 +10,7 @@ import { TestingModule } from './testing/testing.module';
 import { LoggerMiddleware } from './logger/middleware';
 import { CommentsController } from './comments/comments.controller';
 import { PostsController } from './posts/posts.controller';
-import { UsersController } from './users/users.controller';
+import { UsersController } from './users/application/users.controller';
 import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
 import { SecurityDevicesController } from './security-devices/security-devices.controller';

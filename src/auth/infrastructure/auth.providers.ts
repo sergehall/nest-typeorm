@@ -15,6 +15,10 @@ import {
   refreshTokenBlackListDocument,
   RefreshTokenBlacklistSchema,
 } from './schemas/refreshToken-blacklist.schema';
+import {
+  EmailsConfirmCodeDocument,
+  EmailsConfirmCodeSchema,
+} from '../../mails/infrastructure/schemas/email-confirm-code.schema';
 
 export const authProviders = [
   {
@@ -44,6 +48,16 @@ export const authProviders = [
         NamesCollectionsEnums.DEVICES,
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.CONFIRM_CODE_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<EmailsConfirmCodeDocument>(
+        'EmailsConfirmCodes',
+        EmailsConfirmCodeSchema,
+        NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },

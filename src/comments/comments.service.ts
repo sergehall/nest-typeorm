@@ -19,7 +19,7 @@ import { Action } from '../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../ability/casl-ability.factory';
 import { LikeStatusCommentsRepository } from './infrastructure/like-status-comments.repository';
 import { PostsService } from '../posts/posts.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { CommentsEntity } from './entities/comments.entity';
 
 @Injectable()

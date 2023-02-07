@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { UsersRepository } from '../users/infrastructure/users.repository';
@@ -19,9 +19,13 @@ import { CommentsService } from '../comments/comments.service';
 import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CreateUserByInstanceUseCase } from '../users/application/use-cases/createUserByInstanceUseCase';
+
+const saCases = [CreateUserByInstanceUseCase];
 
 @Module({
-  imports: [DatabaseModule, CaslModule],
+  imports: [DatabaseModule, CaslModule, CqrsModule],
   controllers: [SaController],
   providers: [
     SaService,
@@ -41,6 +45,7 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
     CommentsService,
     CommentsRepository,
     LikeStatusCommentsRepository,
+    ...saCases,
     ...saProviders,
   ],
 })

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { MailsService } from '../mails/mails.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 
 @Injectable()

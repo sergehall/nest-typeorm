@@ -15,7 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/application/users.service';
 import { EmailDto } from './dto/email.dto';
 import { CodeDto } from './dto/code.dto';
 import { Response } from 'express';
@@ -29,6 +29,9 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
 import { AccessToken } from './dto/accessToken.dto';
 import { CookiesJwtVerificationGuard } from './guards/cookies-jwt.verification.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { RegDataDto } from '../users/dto/reg-data.dto';
+import { RegistrationUserCommand } from '../users/application/use-cases/registrationUserUseCaser';
 
 @SkipThrottle()
 @Controller('auth')
@@ -37,6 +40,7 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService,
     private securityDevicesService: SecurityDevicesService,
+    private commandBus: CommandBus,
   ) {}
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
@@ -58,6 +62,7 @@ export class AuthController {
     });
     return await this.authService.signAccessJWT(req.user);
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async registration(
@@ -77,21 +82,21 @@ export class AuthController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const userAgent = req.get('user-agent') || 'None';
-    const registrationData = {
+    const registrationData: RegDataDto = {
       ip: ip,
-      userAgent: userAgent,
+      userAgent: req.get('user-agent') || 'None',
     };
-    const newUser = await this.usersService.createUserRegistration(
-      loginDto,
-      registrationData,
+    const newUser = await this.commandBus.execute(
+      new RegistrationUserCommand(loginDto, registrationData),
     );
+
     return {
       id: newUser.id,
       login: newUser.login,
       email: newUser.email,
     };
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async registrationEmailResending(@Body() emailDto: EmailDto) {
@@ -99,6 +104,7 @@ export class AuthController {
       emailDto.email,
     );
   }
+
   @SkipThrottle()
   @HttpCode(HttpStatus.OK)
   @UseGuards(CookiesJwtVerificationGuard)
@@ -153,6 +159,7 @@ export class AuthController {
     res.clearCookie('refreshToken');
     return true;
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
@@ -165,6 +172,7 @@ export class AuthController {
     }
     return true;
   }
+
   @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
