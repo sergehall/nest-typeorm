@@ -5,7 +5,7 @@ import { Action } from '../../../ability/roles/action.enum';
 import { ForbiddenException } from '@nestjs/common';
 import { CaslAbilityFactory } from '../../../ability/casl-ability.factory';
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class UpdateUserCommand {
   constructor(
@@ -14,7 +14,7 @@ export class UpdateUserCommand {
     public currentUser: UsersEntity,
   ) {}
 }
-
+@CommandHandler(UpdateUserCommand)
 export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,

@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
 import { ConvertFiltersForDB } from '../../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../../infrastructure/common/pagination/pagination';
@@ -67,26 +66,6 @@ export class UsersService {
 
   async findUserByUserId(userId: string): Promise<UsersEntity | null> {
     return await this.usersRepository.findUserByUserId(userId);
-  }
-
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-    currentUser: UsersEntity,
-  ) {
-    const userToUpdate = await this.usersRepository.findUserByUserId(id);
-    if (!userToUpdate || userToUpdate.id !== currentUser.id)
-      throw new ForbiddenException();
-    const ability = this.caslAbilityFactory.createForUser(currentUser);
-    try {
-      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);
-      //Update call DB
-      return `This action update a #${id} user`;
-    } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
-    }
   }
 
   async addSentEmailTime(email: string) {

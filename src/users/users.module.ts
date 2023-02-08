@@ -15,10 +15,14 @@ import { JwtConfig } from '../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserByMongooseModelUseCase } from './application/use-cases/create-user-byMongooseModel.use-case';
 import { CreateUserByInstanceUseCase } from './application/use-cases/create-user-byInstance.use-case';
+import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
+import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 
 const useCases = [
   CreateUserByMongooseModelUseCase,
   CreateUserByInstanceUseCase,
+  UpdateUserUseCase,
+  RemoveUserByIdUseCase,
 ];
 
 @Module({

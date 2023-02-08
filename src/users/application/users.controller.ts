@@ -30,6 +30,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../dto/reg-data.dto';
 import { CreateUserCommand } from './use-cases/create-user-byInstance.use-case';
 import { UpdateUserCommand } from './use-cases/update-user.use-case';
+import { RemoveUserByIdCommand } from './use-cases/remove-user-byId.use-case';
 
 @SkipThrottle()
 @Controller('users')
@@ -109,6 +110,8 @@ export class UsersController {
   @Delete(':id')
   async removeUserById(@Request() req: any, @Param('id') id: string) {
     const currentUser = req.user;
-    return await this.usersService.removeUserById(id, currentUser);
+    return await this.commandBus.execute(
+      new RemoveUserByIdCommand(id, currentUser),
+    );
   }
 }

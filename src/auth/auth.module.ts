@@ -17,8 +17,15 @@ import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
+import { ConfirmUserByCodeInParamUseCase } from './application/use-cases/confirm-user-byCode-inParam.use-case';
+import { UpdateSentConfirmationCodeUseCase } from './application/use-cases/update-sent-confirmation-code.use-case';
 
-const authCases = [CreateUserByInstanceUseCase, RegistrationUserUseCase];
+const authCases = [
+  CreateUserByInstanceUseCase,
+  RegistrationUserUseCase,
+  ConfirmUserByCodeInParamUseCase,
+  UpdateSentConfirmationCodeUseCase,
+];
 
 @Module({
   imports: [DatabaseModule, UsersModule, PassportModule, JwtModule, CqrsModule],
