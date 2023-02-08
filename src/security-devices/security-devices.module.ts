@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SecurityDevicesService } from './security-devices.service';
-import { SecurityDevicesController } from './security-devices.controller';
+import { SecurityDevicesService } from './application/security-devices.service';
+import { SecurityDevicesController } from './application/security-devices.controller';
 import { SecurityDevicesRepository } from './infrastructure/security-devices.repository';
 import { devicesProviders } from './infrastructure/devices.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
@@ -14,9 +14,23 @@ import { UsersRepository } from '../users/infrastructure/users.repository';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../config/jwt/jwt-config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { RemoveDevicesBannedUserUseCase } from './application/use-cases/remove-devices-bannedUser.use-case';
+import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
+import { RemoveDevicesAfterLogoutUseCase } from './application/use-cases/remove-devices-after-logout.use-case';
+import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-exceptCurrent.use-case';
+import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-byDeviceId.use-case';
+
+const securityDevicesCases = [
+  CreateDeviceUseCase,
+  RemoveDevicesAfterLogoutUseCase,
+  RemoveDevicesBannedUserUseCase,
+  RemoveDevicesByDeviceIdUseCase,
+  RemoveDevicesExceptCurrentUseCase,
+];
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, CqrsModule],
   controllers: [SecurityDevicesController],
   providers: [
     ConvertFiltersForDB,
@@ -31,6 +45,7 @@ import { JwtConfig } from '../config/jwt/jwt-config';
     AuthService,
     SecurityDevicesRepository,
     SecurityDevicesService,
+    ...securityDevicesCases,
     ...devicesProviders,
   ],
 })

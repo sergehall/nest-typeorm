@@ -26,10 +26,10 @@ import { Role } from '../../ability/roles/role.enum';
 import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
-import { BloggerBlogsService } from '../../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UpdateBanDto } from '../dto/update-sa.dto';
-import { SecurityDevicesService } from '../../security-devices/security-devices.service';
+import { SecurityDevicesService } from '../../security-devices/application/security-devices.service';
 import { CommentsService } from '../../comments/application/comments.service';
 import { PostsService } from '../../posts/application/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
@@ -40,6 +40,7 @@ import { CreateUserCommand } from '../../users/application/use-cases/create-user
 import { BanUserCommand } from '../../users/application/use-cases/ban-user.use-case';
 import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-cases/change-banStatus-comments.use-case';
 import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
+import { RemoveDevicesBannedUserCommand } from '../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -147,7 +148,7 @@ export class SaController {
     @Body() updateSaBanDto: UpdateBanDto,
   ) {
     const currentUser = req.user;
-    await this.securityDevicesService.removeDevicesBannedUser(id);
+    await this.commandBus.execute(new RemoveDevicesBannedUserCommand(id));
     await this.commandBus.execute(
       new ChangeBanStatusCommentsCommand(id, updateSaBanDto.isBanned),
     );

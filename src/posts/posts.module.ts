@@ -17,7 +17,7 @@ import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
-import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';

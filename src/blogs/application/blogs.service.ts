@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
-import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 
 @Injectable()
 export class BlogsService {

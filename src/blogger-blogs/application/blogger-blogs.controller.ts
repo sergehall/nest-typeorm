@@ -13,15 +13,15 @@ import {
   Delete,
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BloggerBlogsService } from './blogger-blogs.service';
-import { CreateBloggerBlogsDto } from './dto/create-blogger-blogs.dto';
-import { CreatePostBloggerBlogsDto } from './dto/create-post-blogger-blogs.dto';
-import { CurrentUserDto } from '../auth/dto/currentUser.dto';
-import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
-import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { UpdatePostBloggerBlogsDto } from './dto/update-post-blogger-blogs.dto';
+import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
+import { CreatePostBloggerBlogsDto } from '../dto/create-post-blogger-blogs.dto';
+import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
+import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { UpdatePostBloggerBlogsDto } from '../dto/update-post-blogger-blogs.dto';
 
 @SkipThrottle()
 @Controller('blogger/blogs')

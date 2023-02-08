@@ -4,23 +4,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
-import { BloggerBlogsEntity } from './entities/blogger-blogs.entity';
-import { PostsService } from '../posts/application/posts.service';
-import { CreatePostDto } from '../posts/dto/create-post.dto';
-import { CurrentUserDto } from '../auth/dto/currentUser.dto';
-import { CaslAbilityFactory } from '../ability/casl-ability.factory';
+import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
+import { PostsService } from '../../posts/application/posts.service';
+import { CreatePostDto } from '../../posts/dto/create-post.dto';
+import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
-import { Action } from '../ability/roles/action.enum';
-import { CreatePostAndNameDto } from '../posts/dto/create-post-and-name.dto';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { QueryArrType } from '../infrastructure/common/convert-filters/types/convert-filter.types';
-import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
-import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
-import { Pagination } from '../infrastructure/common/pagination/pagination';
-import { BloggerBlogsOwnerDto } from './dto/blogger-blogs-owner.dto';
-import { UpdatePostBloggerBlogsDto } from './dto/update-post-blogger-blogs.dto';
-import { UpdateBBlogsDto } from './dto/update-blogger-blogs.dto';
-import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repository';
+import { Action } from '../../ability/roles/action.enum';
+import { CreatePostAndNameDto } from '../../posts/dto/create-post-and-name.dto';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
+import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
+import { ConvertFiltersForDB } from '../../infrastructure/common/convert-filters/convertFiltersForDB';
+import { Pagination } from '../../infrastructure/common/pagination/pagination';
+import { BloggerBlogsOwnerDto } from '../dto/blogger-blogs-owner.dto';
+import { UpdatePostBloggerBlogsDto } from '../dto/update-post-blogger-blogs.dto';
+import { UpdateBBlogsDto } from '../dto/update-blogger-blogs.dto';
+import { BloggerBlogsRepository } from '../infrastructure/blogger-blogs.repository';
 
 @Injectable()
 export class BloggerBlogsService {

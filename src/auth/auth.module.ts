@@ -9,7 +9,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { authProviders } from './infrastructure/auth.providers';
-import { SecurityDevicesService } from '../security-devices/security-devices.service';
+import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';

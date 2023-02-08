@@ -19,7 +19,7 @@ import { UsersService } from '../../users/application/users.service';
 import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
-import { SecurityDevicesService } from '../../security-devices/security-devices.service';
+import { SecurityDevicesService } from '../../security-devices/application/security-devices.service';
 import { PayloadDto } from '../dto/payload.dto';
 import {
   codeIncorrect,
@@ -34,6 +34,8 @@ import { RegDataDto } from '../../users/dto/reg-data.dto';
 import { RegistrationUserCommand } from './use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from './use-cases/update-sent-confirmation-code.use-case';
 import { ConfirmUserByCodeInParamCommand } from './use-cases/confirm-user-byCode-inParam.use-case';
+import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
+import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -57,7 +59,9 @@ export class AuthController {
       token.refreshToken,
     );
     const userAgent = req.get('user-agent') || 'None';
-    await this.securityDevicesService.createDevices(newPayload, ip, userAgent);
+    await this.commandBus.execute(
+      new CreateDeviceCommand(newPayload, ip, userAgent),
+    );
     res.cookie('refreshToken', token.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -132,7 +136,9 @@ export class AuthController {
       newRefreshToken.refreshToken,
     );
     const userAgent = req.get('user-agent');
-    await this.securityDevicesService.createDevices(newPayload, ip, userAgent);
+    await this.commandBus.execute(
+      new CreateDeviceCommand(newPayload, ip, userAgent),
+    );
     res.cookie('refreshToken', newRefreshToken.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -155,9 +161,7 @@ export class AuthController {
       expirationDate: new Date(payload.exp * 1000).toISOString(),
     };
     await this.authService.addRefreshTokenToBl(currentJwt);
-    await this.securityDevicesService.deleteDeviceByDeviceIdAfterLogout(
-      payload,
-    );
+    await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
     return true;
   }

@@ -6,16 +6,27 @@ import * as uuid4 from 'uuid4';
 import { OrgIdEnums } from '../../../infrastructure/database/enums/org-id.enums';
 import { Role } from '../../../ability/roles/role.enum';
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class CreateUserByMongooseModelUseCase {
+export class CreateUserByMongooseModelCommand {
+  constructor(
+    public createUserDto: CreateUserDto,
+    public registrationData: RegDataDto,
+  ) {}
+}
+
+@CommandHandler(CreateUserByMongooseModelCommand)
+export class CreateUserByMongooseModelUseCase
+  implements ICommandHandler<CreateUserByMongooseModelCommand>
+{
   constructor(private usersRepository: UsersRepository) {}
   async execute(
-    createUserDto: CreateUserDto,
-    registrationData: RegDataDto,
+    command: CreateUserByMongooseModelCommand,
   ): Promise<UsersEntity> {
-    const user = await this._createNewUser(createUserDto, registrationData);
+    const user = await this._createNewUser(
+      command.createUserDto,
+      command.registrationData,
+    );
     return await this.usersRepository.createUser(user);
   }
   private async _createNewUser(

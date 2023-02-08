@@ -11,10 +11,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SecurityDevicesService } from './security-devices.service';
-import { CookiesJwtVerificationGuard } from '../auth/guards/cookies-jwt.verification.guard';
-import { AuthService } from '../auth/application/auth.service';
-import { PayloadDto } from '../auth/dto/payload.dto';
+import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
+import { AuthService } from '../../auth/application/auth.service';
+import { PayloadDto } from '../../auth/dto/payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { RemoveDevicesExceptCurrentCommand } from './use-cases/remove-devices-exceptCurrent.use-case';
+import { CommandBus } from '@nestjs/cqrs';
+import { RemoveDevicesByDeviceIdCommand } from './use-cases/remove-devices-byDeviceId.use-case';
 
 @SkipThrottle()
 @Controller('security')
@@ -22,6 +25,7 @@ export class SecurityDevicesController {
   constructor(
     private readonly securityDevicesService: SecurityDevicesService,
     private authService: AuthService,
+    private commandBus: CommandBus,
   ) {}
   @UseGuards(CookiesJwtVerificationGuard)
   @Get('devices')
@@ -40,8 +44,8 @@ export class SecurityDevicesController {
     const currentPayload: PayloadDto = await this.authService.decode(
       refreshToken,
     );
-    return this.securityDevicesService.removeDevicesExceptCurrent(
-      currentPayload,
+    return await this.commandBus.execute(
+      new RemoveDevicesExceptCurrentCommand(currentPayload),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -54,9 +58,8 @@ export class SecurityDevicesController {
     const currentPayload: PayloadDto = await this.authService.decode(
       req.cookies.refreshToken,
     );
-    const result = await this.securityDevicesService.removeDeviceByDeviceId(
-      deviceId,
-      currentPayload,
+    const result = await this.commandBus.execute(
+      new RemoveDevicesByDeviceIdCommand(deviceId, currentPayload),
     );
     if (result === '404') throw new NotFoundException();
     if (result === '403') {

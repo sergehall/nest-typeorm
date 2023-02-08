@@ -29,7 +29,7 @@ import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BloggerBlogsService } from '../../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { OwnerInfoDto } from '../dto/ownerInfo.dto';

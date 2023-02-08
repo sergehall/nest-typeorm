@@ -94,8 +94,8 @@ export class UsersController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Request() req: any,
     @Param('id') id: string,
+    @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const currentUser = req.user;

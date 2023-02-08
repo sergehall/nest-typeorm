@@ -67,16 +67,6 @@ export class CommentsService {
       );
     return filledComments[0];
   }
-  async changeBanStatusComments(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    return await this.likeStatusCommentsRepository.changeBanStatusComments(
-      userId,
-      isBanned,
-    );
-  }
-
   async findCommentsByPostId(
     queryPagination: PaginationDto,
     postId: string,

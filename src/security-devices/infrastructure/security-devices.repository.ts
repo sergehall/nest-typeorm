@@ -12,7 +12,7 @@ export class SecurityDevicesRepository {
     @Inject(ProvidersEnums.DEVICES_MODEL)
     private MyModelDevicesSchema: Model<DevicesDocument>,
   ) {}
-  async createOrUpdateDevices(
+  async createOrUpdateDevice(
     filter: FiltersDevicesEntity,
     newDevices: SessionDevicesEntity,
   ): Promise<boolean> {
@@ -29,7 +29,7 @@ export class SecurityDevicesRepository {
       return false;
     }
   }
-  async deleteDeviceByDeviceIdAfterLogout(
+  async removeDeviceByDeviceIdAfterLogout(
     payload: PayloadDto,
   ): Promise<boolean> {
     try {

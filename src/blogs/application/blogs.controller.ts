@@ -1,7 +1,7 @@
 import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 
 @SkipThrottle()
 @Controller('blogs')
