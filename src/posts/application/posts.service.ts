@@ -3,25 +3,25 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto } from '../dto/create-post.dto';
 import * as uuid4 from 'uuid4';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { Pagination } from '../infrastructure/common/pagination/pagination';
-import { PostsRepository } from './infrastructure/posts.repository';
-import { PostsEntity } from './entities/posts.entity';
-import { CaslAbilityFactory } from '../ability/casl-ability.factory';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { Pagination } from '../../infrastructure/common/pagination/pagination';
+import { PostsRepository } from '../infrastructure/posts.repository';
+import { PostsEntity } from '../entities/posts.entity';
+import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
-import { Action } from '../ability/roles/action.enum';
-import { QueryArrType } from '../infrastructure/common/convert-filters/types/convert-filter.types';
-import { StatusLike } from '../infrastructure/database/enums/like-status.enums';
-import { LikeStatusDto } from '../comments/dto/like-status.dto';
-import { LikeStatusPostEntity } from './entities/like-status-post.entity';
-import { UsersEntity } from '../users/entities/users.entity';
-import { LikeStatusPostsRepository } from './infrastructure/like-status-posts.repository';
-import { UpdatePostsEntity } from './entities/update-posts.entity';
-import { CreatePostAndNameDto } from './dto/create-post-and-name.dto';
-import { OwnerInfoDto } from './dto/ownerInfo.dto';
-import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
+import { Action } from '../../ability/roles/action.enum';
+import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
+import { StatusLike } from '../../infrastructure/database/enums/like-status.enums';
+import { LikeStatusDto } from '../../comments/dto/like-status.dto';
+import { LikeStatusPostEntity } from '../entities/like-status-post.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { LikeStatusPostsRepository } from '../infrastructure/like-status-posts.repository';
+import { UpdatePostsEntity } from '../entities/update-posts.entity';
+import { CreatePostAndNameDto } from '../dto/create-post-and-name.dto';
+import { OwnerInfoDto } from '../dto/ownerInfo.dto';
+import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 
 @Injectable()
 export class PostsService {
@@ -179,16 +179,5 @@ export class PostsService {
     return await this.likeStatusPostsRepository.updateLikeStatusPost(
       likeStatusPostEntity,
     );
-  }
-  async changeBanStatusPosts(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    await this.postsRepository.changeBanStatusPostRepo(userId, isBanned);
-    await this.likeStatusPostsRepository.changeBanStatusPostsInLikeStatusRepo(
-      userId,
-      isBanned,
-    );
-    return true;
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { PostsController } from './posts.controller';
-import { CommentsService } from '../comments/comments.service';
+import { PostsService } from './application/posts.service';
+import { PostsController } from './application/posts.controller';
+import { CommentsService } from '../comments/application/comments.service';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { CaslModule } from '../ability/casl.module';
@@ -20,9 +20,13 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
 import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banStatus-posts.use-case';
+
+const postsCases = [ChangeBanStatusPostsUseCase];
 
 @Module({
-  imports: [DatabaseModule, CaslModule],
+  imports: [DatabaseModule, CaslModule, CqrsModule],
   controllers: [PostsController],
   providers: [
     AuthService,
@@ -42,6 +46,7 @@ import { JwtConfig } from '../config/jwt/jwt-config';
     BloggerBlogsRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
+    ...postsCases,
     ...postsProviders,
   ],
 })

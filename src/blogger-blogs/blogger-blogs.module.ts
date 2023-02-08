@@ -3,7 +3,7 @@ import { bloggerBlogsProviders } from './infrastructure/blogger-blogs.providers'
 import { BloggerBlogsController } from './blogger-blogs.controller';
 import { BloggerBlogsService } from './blogger-blogs.service';
 import { DatabaseModule } from '../infrastructure/database/database.module';
-import { PostsService } from '../posts/posts.service';
+import { PostsService } from '../posts/application/posts.service';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { CaslAbilityFactory } from '../ability/casl-ability.factory';

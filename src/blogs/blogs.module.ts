@@ -9,7 +9,7 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
 import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';
-import { PostsService } from '../posts/posts.service';
+import { PostsService } from '../posts/application/posts.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
 

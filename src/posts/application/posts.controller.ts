@@ -14,25 +14,25 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { CommentsService } from '../comments/comments.service';
-import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { UsersEntity } from '../users/entities/users.entity';
-import { CreateCommentDto } from '../comments/dto/create-comment.dto';
-import { AbilitiesGuard } from '../ability/abilities.guard';
-import { CheckAbilities } from '../ability/abilities.decorator';
-import { Action } from '../ability/roles/action.enum';
-import { User } from '../users/infrastructure/schemas/user.schema';
-import { LikeStatusDto } from './dto/like-status.dto';
-import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { NoneStatusGuard } from '../auth/guards/none-status.guard';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { CommentsService } from '../../comments/application/comments.service';
+import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
+import { AbilitiesGuard } from '../../ability/abilities.guard';
+import { CheckAbilities } from '../../ability/abilities.decorator';
+import { Action } from '../../ability/roles/action.enum';
+import { User } from '../../users/infrastructure/schemas/user.schema';
+import { LikeStatusDto } from '../dto/like-status.dto';
+import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
-import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
-import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
-import { OwnerInfoDto } from './dto/ownerInfo.dto';
+import { BloggerBlogsService } from '../../blogger-blogs/blogger-blogs.service';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
+import { OwnerInfoDto } from '../dto/ownerInfo.dto';
 
 @SkipThrottle()
 @Controller('posts')

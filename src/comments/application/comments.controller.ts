@@ -11,14 +11,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { UpdateCommentDto } from './dto/update-comment.dto';
-import { LikeStatusDto } from './dto/like-status.dto';
-import { User } from '../users/infrastructure/schemas/user.schema';
-import { AbilitiesGuard } from '../ability/abilities.guard';
-import { CheckAbilities } from '../ability/abilities.decorator';
-import { Action } from '../ability/roles/action.enum';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { NoneStatusGuard } from '../auth/guards/none-status.guard';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { LikeStatusDto } from '../dto/like-status.dto';
+import { User } from '../../users/infrastructure/schemas/user.schema';
+import { AbilitiesGuard } from '../../ability/abilities.guard';
+import { CheckAbilities } from '../../ability/abilities.decorator';
+import { Action } from '../../ability/roles/action.enum';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()

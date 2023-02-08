@@ -3,24 +3,24 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { Pagination } from '../infrastructure/common/pagination/pagination';
-import { UsersEntity } from '../users/entities/users.entity';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { Pagination } from '../../infrastructure/common/pagination/pagination';
+import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
-import { StatusLike } from '../infrastructure/database/enums/like-status.enums';
-import { CommentsRepository } from './infrastructure/comments.repository';
-import { LikeStatusDto } from './dto/like-status.dto';
-import { LikeStatusCommentEntity } from './entities/like-status-comment.entity';
-import { User } from '../users/infrastructure/schemas/user.schema';
+import { StatusLike } from '../../infrastructure/database/enums/like-status.enums';
+import { CommentsRepository } from '../infrastructure/comments.repository';
+import { LikeStatusDto } from '../dto/like-status.dto';
+import { LikeStatusCommentEntity } from '../entities/like-status-comment.entity';
+import { User } from '../../users/infrastructure/schemas/user.schema';
 import { ForbiddenError } from '@casl/ability';
-import { Action } from '../ability/roles/action.enum';
-import { CaslAbilityFactory } from '../ability/casl-ability.factory';
-import { LikeStatusCommentsRepository } from './infrastructure/like-status-comments.repository';
-import { PostsService } from '../posts/posts.service';
-import { UsersService } from '../users/application/users.service';
-import { CommentsEntity } from './entities/comments.entity';
+import { Action } from '../../ability/roles/action.enum';
+import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
+import { LikeStatusCommentsRepository } from '../infrastructure/like-status-comments.repository';
+import { PostsService } from '../../posts/application/posts.service';
+import { UsersService } from '../../users/application/users.service';
+import { CommentsEntity } from '../entities/comments.entity';
 
 @Injectable()
 export class CommentsService {

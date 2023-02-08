@@ -30,14 +30,16 @@ import { BloggerBlogsService } from '../../blogger-blogs/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UpdateBanDto } from '../dto/update-sa.dto';
 import { SecurityDevicesService } from '../../security-devices/security-devices.service';
-import { CommentsService } from '../../comments/comments.service';
-import { PostsService } from '../../posts/posts.service';
+import { CommentsService } from '../../comments/application/comments.service';
+import { PostsService } from '../../posts/application/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
 import { BanUserCommand } from '../../users/application/use-cases/ban-user.use-case';
+import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-cases/change-banStatus-comments.use-case';
+import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -146,11 +148,12 @@ export class SaController {
   ) {
     const currentUser = req.user;
     await this.securityDevicesService.removeDevicesBannedUser(id);
-    await this.commentsService.changeBanStatusComments(
-      id,
-      updateSaBanDto.isBanned,
+    await this.commandBus.execute(
+      new ChangeBanStatusCommentsCommand(id, updateSaBanDto.isBanned),
     );
-    await this.postsService.changeBanStatusPosts(id, updateSaBanDto.isBanned);
+    await this.commandBus.execute(
+      new ChangeBanStatusPostsCommand(id, updateSaBanDto.isBanned),
+    );
     return await this.commandBus.execute(
       new BanUserCommand(id, updateSaBanDto, currentUser),
     );

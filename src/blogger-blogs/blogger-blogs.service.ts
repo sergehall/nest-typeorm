@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
 import { BloggerBlogsEntity } from './entities/blogger-blogs.entity';
-import { PostsService } from '../posts/posts.service';
+import { PostsService } from '../posts/application/posts.service';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { CurrentUserDto } from '../auth/dto/currentUser.dto';
 import { CaslAbilityFactory } from '../ability/casl-ability.factory';
