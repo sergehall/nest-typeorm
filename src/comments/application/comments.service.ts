@@ -21,6 +21,8 @@ import { LikeStatusCommentsRepository } from '../infrastructure/like-status-comm
 import { PostsService } from '../../posts/application/posts.service';
 import { UsersService } from '../../users/application/users.service';
 import { CommentsEntity } from '../entities/comments.entity';
+import { FilteringCommentsNoBannedUserCommand } from '../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class CommentsService {
@@ -31,6 +33,7 @@ export class CommentsService {
     protected caslAbilityFactory: CaslAbilityFactory,
     protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
     private usersService: UsersService,
+    private commandBus: CommandBus,
   ) {}
   async createComment(
     postId: string,
@@ -57,8 +60,9 @@ export class CommentsService {
   async findCommentById(commentId: string, currentUser: UsersEntity | null) {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
-    const commentNotBannedUser =
-      await this.usersService.filteringCommentsNoBannedUser([comment]);
+    const commentNotBannedUser = await this.commandBus.execute(
+      new FilteringCommentsNoBannedUserCommand([comment]),
+    );
     if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
@@ -84,8 +88,9 @@ export class CommentsService {
         items: [],
       };
     }
-    const commentsNotBannedUser =
-      await this.usersService.filteringCommentsNoBannedUser(comments);
+    const commentsNotBannedUser = await this.commandBus.execute(
+      new FilteringCommentsNoBannedUserCommand(comments),
+    );
     let desc = 1;
     let asc = -1;
     const field: 'userLogin' | 'content' | 'createdAt' =

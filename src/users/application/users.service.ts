@@ -6,7 +6,6 @@ import { UsersRepository } from '../infrastructure/users.repository';
 import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
 import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
-import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 
 @Injectable()
@@ -58,20 +57,6 @@ export class UsersService {
     return await this.usersRepository.findUserByUserId(userId);
   }
 
-  async filteringCommentsNoBannedUser(
-    commentsArr: CommentsEntity[],
-  ): Promise<CommentsEntity[]> {
-    const commentsWithoutBannedUser: CommentsEntity[] = [];
-    for (let i = 0; i < commentsArr.length; i++) {
-      const user = await this.usersRepository.findUserByUserId(
-        commentsArr[i].userId,
-      );
-      if (user && !user.banInfo.isBanned) {
-        commentsWithoutBannedUser.push(commentsArr[i]);
-      }
-    }
-    return commentsWithoutBannedUser;
-  }
   async postsWithoutBannedUser(
     commentsArr: PostsEntity[],
   ): Promise<PostsEntity[]> {

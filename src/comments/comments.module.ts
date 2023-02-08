@@ -19,11 +19,12 @@ import { MailsRepository } from '../mails/infrastructure/mails.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../config/jwt/jwt-config';
 import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-banStatus-comments.use-case';
+import { CqrsModule } from '@nestjs/cqrs';
 
 const commentsCases = [ChangeBanStatusCommentsUseCase];
 
 @Module({
-  imports: [DatabaseModule, CaslModule],
+  imports: [DatabaseModule, CaslModule, CqrsModule],
   controllers: [CommentsController],
   providers: [
     CommentsService,
