@@ -3,7 +3,7 @@ import { RegDataDto } from '../../dto/reg-data.dto';
 import { UsersDocument } from '../../infrastructure/schemas/user.schema';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { RegistrationUserCommand } from './registrationUserUseCaser';
+import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
 
 export class CreateUserCommand {
   constructor(

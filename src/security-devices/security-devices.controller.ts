@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { SecurityDevicesService } from './security-devices.service';
 import { CookiesJwtVerificationGuard } from '../auth/guards/cookies-jwt.verification.guard';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/application/auth.service';
 import { PayloadDto } from '../auth/dto/payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 

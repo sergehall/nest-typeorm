@@ -1,15 +1,15 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UsersService } from '../users/application/users.service';
+import { UsersService } from '../../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UsersEntity } from '../users/entities/users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import jwt_decode from 'jwt-decode';
-import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
-import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
-import { PayloadDto } from './dto/payload.dto';
-import { AccessToken } from './dto/accessToken.dto';
-import { JwtConfig } from '../config/jwt/jwt-config';
+import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
+import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
+import { PayloadDto } from '../dto/payload.dto';
+import { AccessToken } from '../dto/accessToken.dto';
+import { JwtConfig } from '../../config/jwt/jwt-config';
 
 @Injectable()
 export class AuthService {

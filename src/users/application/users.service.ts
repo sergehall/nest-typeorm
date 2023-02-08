@@ -1,14 +1,11 @@
 import {
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
 import { ConvertFiltersForDB } from '../../infrastructure/common/convert-filters/convertFiltersForDB';
-import * as uuid4 from 'uuid4';
 import { Pagination } from '../../infrastructure/common/pagination/pagination';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../ability/roles/action.enum';
@@ -18,8 +15,6 @@ import { BanInfo, User } from '../infrastructure/schemas/user.schema';
 import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
 import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
-import { MailsRepository } from '../../mails/infrastructure/mails.repository';
-import { userNotExists } from '../../exception-filter/errors-messages';
 import { UpdateBanDto } from '../../sa/dto/update-sa.dto';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
@@ -31,7 +26,6 @@ export class UsersService {
     protected pagination: Pagination,
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepository: UsersRepository,
-    protected mailsRepository: MailsRepository,
   ) {}
   async findUserByLoginOrEmail(
     loginOrEmail: string,
@@ -40,36 +34,6 @@ export class UsersService {
   }
   async userAlreadyExist(login: string, email: string): Promise<string | null> {
     return await this.usersRepository.userAlreadyExist(login, email);
-  }
-
-  async updateAndSentConfirmationCodeByEmail(email: string): Promise<boolean> {
-    const user = await this.findUserByLoginOrEmail(email);
-    const expirationDate = new Date(Date.now() + 65 * 60 * 1000).toISOString();
-    if (user && !user.emailConfirmation.isConfirmed) {
-      if (user.emailConfirmation.expirationDate > new Date().toISOString()) {
-        user.emailConfirmation.confirmationCode = uuid4().toString();
-        user.emailConfirmation.expirationDate = expirationDate;
-        // update user
-        await this.usersRepository.updateUserConfirmationCode(user);
-
-        const newEmailConfirmationCode = {
-          id: uuid4().toString(),
-          email: user.email,
-          confirmationCode: user.emailConfirmation.confirmationCode,
-          createdAt: new Date().toISOString(),
-        };
-        // add Email to emailsToSentRepository
-        await this.mailsRepository.createEmailConfirmCode(
-          newEmailConfirmationCode,
-        );
-      }
-      return true;
-    } else {
-      throw new HttpException(
-        { message: [userNotExists] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
   }
 
   async findUsers(
@@ -105,31 +69,14 @@ export class UsersService {
     return await this.usersRepository.findUserByUserId(userId);
   }
 
-  async confirmByCodeInParams(code: string): Promise<boolean> {
-    const user = await this.usersRepository.findUserByConfirmationCode(code);
-    if (user) {
-      if (!user.emailConfirmation.isConfirmed) {
-        if (user.emailConfirmation.expirationDate > new Date().toISOString()) {
-          user.emailConfirmation.isConfirmed = true;
-          user.emailConfirmation.isConfirmedDate = new Date().toISOString();
-          await this.usersRepository.updateUser(user);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,
     currentUser: UsersEntity,
   ) {
-    const userToUpdate = currentUser;
-    userToUpdate.id = currentUser.id;
-    userToUpdate.orgId = currentUser.orgId;
-    userToUpdate.roles = currentUser.roles;
-
+    const userToUpdate = await this.usersRepository.findUserByUserId(id);
+    if (!userToUpdate || userToUpdate.id !== currentUser.id)
+      throw new ForbiddenException();
     const ability = this.caslAbilityFactory.createForUser(currentUser);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);

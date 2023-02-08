@@ -1,11 +1,11 @@
-import { CreateUserDto } from '../../dto/create-user.dto';
-import { RegDataDto } from '../../dto/reg-data.dto';
-import { UsersDocument } from '../../infrastructure/schemas/user.schema';
+import { CreateUserDto } from '../../../users/dto/create-user.dto';
+import { RegDataDto } from '../../../users/dto/reg-data.dto';
+import { UsersDocument } from '../../../users/infrastructure/schemas/user.schema';
 import { EmailConfimCodeEntity } from '../../../mails/entities/email-confim-code.entity';
 import * as uuid4 from 'uuid4';
 import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateUserCommand } from './createUserByInstanceUseCase';
+import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
 
 export class RegistrationUserCommand {
   constructor(

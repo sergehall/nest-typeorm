@@ -10,7 +10,7 @@ import { LikeStatusCommentsRepository } from './infrastructure/like-status-comme
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { PostsService } from '../posts/posts.service';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';

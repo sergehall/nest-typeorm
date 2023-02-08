@@ -14,7 +14,7 @@ import { UsersController } from './users/application/users.controller';
 import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
 import { SecurityDevicesController } from './security-devices/security-devices.controller';
-import { AuthController } from './auth/auth.controller';
+import { AuthController } from './auth/application/auth.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DemonsModule } from './demons/demons.module';
 import { MailsModule } from './mails/mails.module';

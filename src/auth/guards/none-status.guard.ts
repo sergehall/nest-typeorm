@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
-import { AuthService } from '../auth.service';
+import { AuthService } from '../application/auth.service';
 import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
 import { UsersService } from '../../users/application/users.service';
 

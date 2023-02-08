@@ -1,7 +1,7 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../application/auth.service';
 import { UsersEntity } from '../../users/entities/users.entity';
 import {
   loginOrEmailInvalid,

@@ -12,7 +12,7 @@ import { CommentsRepository } from '../comments/infrastructure/comments.reposito
 import { LikeStatusPostsRepository } from './infrastructure/like-status-posts.repository';
 import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 import { UsersRepository } from '../users/infrastructure/users.repository';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailsRepository } from '../mails/infrastructure/mails.repository';

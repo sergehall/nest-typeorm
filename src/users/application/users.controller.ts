@@ -27,8 +27,9 @@ import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateUserCommand } from './use-cases/createUserByInstanceUseCase';
 import { RegDataDto } from '../dto/reg-data.dto';
+import { CreateUserCommand } from './use-cases/create-user-byInstance.use-case';
+import { UpdateUserCommand } from './use-cases/update-user.use-case';
 
 @SkipThrottle()
 @Controller('users')
@@ -97,7 +98,9 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const currentUser = req.user;
-    const result = this.usersService.updateUser(id, updateUserDto, currentUser);
+    const result = await this.commandBus.execute(
+      new UpdateUserCommand(id, updateUserDto, currentUser),
+    );
     if (!result) throw new NotFoundException();
     return result;
   }

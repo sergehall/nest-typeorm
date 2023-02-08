@@ -11,27 +11,29 @@ import {
   HttpStatus,
   Res,
 } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { LoginDto } from './dto/login.dto';
-import { UsersService } from '../users/application/users.service';
-import { EmailDto } from './dto/email.dto';
-import { CodeDto } from './dto/code.dto';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
+import { LoginDto } from '../dto/login.dto';
+import { UsersService } from '../../users/application/users.service';
+import { EmailDto } from '../dto/email.dto';
+import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
-import { SecurityDevicesService } from '../security-devices/security-devices.service';
-import { PayloadDto } from './dto/payload.dto';
+import { SecurityDevicesService } from '../../security-devices/security-devices.service';
+import { PayloadDto } from '../dto/payload.dto';
 import {
   codeIncorrect,
   userAlreadyExists,
-} from '../exception-filter/errors-messages';
+} from '../../exception-filter/errors-messages';
 import { SkipThrottle } from '@nestjs/throttler';
-import { JwtBlacklistDto } from './dto/jwt-blacklist.dto';
-import { AccessToken } from './dto/accessToken.dto';
-import { CookiesJwtVerificationGuard } from './guards/cookies-jwt.verification.guard';
+import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
+import { AccessToken } from '../dto/accessToken.dto';
+import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegDataDto } from '../users/dto/reg-data.dto';
-import { RegistrationUserCommand } from '../users/application/use-cases/registrationUserUseCaser';
+import { RegDataDto } from '../../users/dto/reg-data.dto';
+import { RegistrationUserCommand } from './use-cases/registration-user.use-case';
+import { UpdateSentConfirmationCodeCommand } from './use-cases/update-sent-confirmation-code.use-case';
+import { ConfirmUserByCodeInParamCommand } from './use-cases/confirm-user-byCode-inParam.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -100,8 +102,8 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async registrationEmailResending(@Body() emailDto: EmailDto) {
-    return await this.usersService.updateAndSentConfirmationCodeByEmail(
-      emailDto.email,
+    return await this.commandBus.execute(
+      new UpdateSentConfirmationCodeCommand(emailDto.email),
     );
   }
 
@@ -163,7 +165,9 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
-    const result = await this.usersService.confirmByCodeInParams(codeDto.code);
+    const result = await this.commandBus.execute(
+      new ConfirmUserByCodeInParamCommand(codeDto.code),
+    );
     if (!result) {
       throw new HttpException(
         { message: [codeIncorrect] },

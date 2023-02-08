@@ -5,7 +5,7 @@ import { SecurityDevicesRepository } from './infrastructure/security-devices.rep
 import { devicesProviders } from './infrastructure/devices.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../infrastructure/common/pagination/pagination';

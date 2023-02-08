@@ -20,7 +20,7 @@ import { CommentsRepository } from '../comments/infrastructure/comments.reposito
 import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CreateUserByInstanceUseCase } from '../users/application/use-cases/createUserByInstanceUseCase';
+import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
 
 const saCases = [CreateUserByInstanceUseCase];
 

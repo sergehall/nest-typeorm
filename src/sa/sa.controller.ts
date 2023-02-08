@@ -32,8 +32,8 @@ import { UpdateBanDto } from './dto/update-sa.dto';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { CommentsService } from '../comments/comments.service';
 import { PostsService } from '../posts/posts.service';
-import { RegistrationUserCommand } from '../users/application/use-cases/registrationUserUseCaser';
 import { CommandBus } from '@nestjs/cqrs';
+import { RegistrationUserCommand } from '../auth/application/use-cases/registration-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
