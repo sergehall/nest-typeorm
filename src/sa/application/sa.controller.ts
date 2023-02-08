@@ -15,25 +15,29 @@ import {
   Put,
 } from '@nestjs/common';
 import { SaService } from './sa.service';
-import { BaseAuthGuard } from '../auth/guards/base-auth.guard';
-import { AbilitiesGuard } from '../ability/abilities.guard';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UsersService } from '../users/application/users.service';
-import { CheckAbilities } from '../ability/abilities.decorator';
-import { Action } from '../ability/roles/action.enum';
-import { User } from '../users/infrastructure/schemas/user.schema';
-import { Role } from '../ability/roles/role.enum';
-import { ParseQuery } from '../infrastructure/common/parse-query/parse-query';
-import { PaginationDto } from '../infrastructure/common/pagination/dto/pagination.dto';
-import { PaginationTypes } from '../infrastructure/common/pagination/types/pagination.types';
-import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
+import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
+import { AbilitiesGuard } from '../../ability/abilities.guard';
+import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { UsersService } from '../../users/application/users.service';
+import { CheckAbilities } from '../../ability/abilities.decorator';
+import { Action } from '../../ability/roles/action.enum';
+import { User } from '../../users/infrastructure/schemas/user.schema';
+import { Role } from '../../ability/roles/role.enum';
+import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
+import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
+import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
+import { BloggerBlogsService } from '../../blogger-blogs/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { UpdateBanDto } from './dto/update-sa.dto';
-import { SecurityDevicesService } from '../security-devices/security-devices.service';
-import { CommentsService } from '../comments/comments.service';
-import { PostsService } from '../posts/posts.service';
+import { UpdateBanDto } from '../dto/update-sa.dto';
+import { SecurityDevicesService } from '../../security-devices/security-devices.service';
+import { CommentsService } from '../../comments/comments.service';
+import { PostsService } from '../../posts/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegistrationUserCommand } from '../auth/application/use-cases/registration-user.use-case';
+import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
+import { ChangeRoleCommand } from './use-cases/change-role.use-case';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
+import { BanUserCommand } from '../../users/application/use-cases/ban-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -47,6 +51,7 @@ export class SaController {
     private postsService: PostsService,
     private commandBus: CommandBus,
   ) {}
+
   @Get('users')
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
@@ -68,6 +73,24 @@ export class SaController {
       banStatus,
     ]);
   }
+
+  @Get('blogs')
+  @UseGuards(BaseAuthGuard)
+  async findBlogs(
+    @Request() req: any,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
+    const paginationData = ParseQuery.getPaginationData(query);
+    const searchFilters = { searchNameTerm: paginationData.searchNameTerm };
+    const queryPagination: PaginationDto = {
+      pageNumber: paginationData.pageNumber,
+      pageSize: paginationData.pageSize,
+      sortBy: paginationData.sortBy,
+      sortDirection: paginationData.sortDirection,
+    };
+    return await this.blogsService.findBlogs(queryPagination, [searchFilters]);
+  }
+
   @Post('users')
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
@@ -84,10 +107,12 @@ export class SaController {
     };
 
     const newUser = await this.commandBus.execute(
-      new RegistrationUserCommand(createUserDto, registrationData),
+      new CreateUserCommand(createUserDto, registrationData),
     );
     newUser.roles = Role.SA;
-    const saUser = await this.usersService.changeRole(newUser);
+    const saUser: UsersEntity | null = await this.commandBus.execute(
+      new ChangeRoleCommand(newUser),
+    );
     if (!saUser) throw new NotFoundException();
     return {
       id: saUser.id,
@@ -107,7 +132,9 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   async removeUserById(@Request() req: any, @Param('id') id: string) {
     const currentUser = req.user;
-    return await this.usersService.removeUserById(id, currentUser);
+    return await this.commandBus.execute(
+      new RemoveUserByIdCommand(id, currentUser),
+    );
   }
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -124,22 +151,8 @@ export class SaController {
       updateSaBanDto.isBanned,
     );
     await this.postsService.changeBanStatusPosts(id, updateSaBanDto.isBanned);
-    return await this.usersService.banUser(id, updateSaBanDto, currentUser);
-  }
-  @Get('blogs')
-  @UseGuards(BaseAuthGuard)
-  async findBlogs(
-    @Request() req: any,
-    @Query() query: any,
-  ): Promise<PaginationTypes> {
-    const paginationData = ParseQuery.getPaginationData(query);
-    const searchFilters = { searchNameTerm: paginationData.searchNameTerm };
-    const queryPagination: PaginationDto = {
-      pageNumber: paginationData.pageNumber,
-      pageSize: paginationData.pageSize,
-      sortBy: paginationData.sortBy,
-      sortDirection: paginationData.sortDirection,
-    };
-    return await this.blogsService.findBlogs(queryPagination, [searchFilters]);
+    return await this.commandBus.execute(
+      new BanUserCommand(id, updateSaBanDto, currentUser),
+    );
   }
 }

@@ -1,20 +1,11 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
 import { ConvertFiltersForDB } from '../../infrastructure/common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../../infrastructure/common/pagination/pagination';
-import { ForbiddenError } from '@casl/ability';
-import { Action } from '../../ability/roles/action.enum';
-import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { BanInfo, User } from '../infrastructure/schemas/user.schema';
 import { PaginationTypes } from '../../infrastructure/common/pagination/types/pagination.types';
 import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
-import { UpdateBanDto } from '../../sa/dto/update-sa.dto';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 
@@ -23,7 +14,6 @@ export class UsersService {
   constructor(
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
-    protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepository: UsersRepository,
   ) {}
   async findUserByLoginOrEmail(
@@ -68,31 +58,7 @@ export class UsersService {
     return await this.usersRepository.findUserByUserId(userId);
   }
 
-  async addSentEmailTime(email: string) {
-    const currentTime = new Date().toISOString();
-    return await this.usersRepository.addSentEmailTime(email, currentTime);
-  }
-
-  async removeUserById(id: string, currentUser: User) {
-    const userToDelete = await this.usersRepository.findUserByUserId(id);
-    if (!userToDelete) throw new NotFoundException();
-    try {
-      const ability = this.caslAbilityFactory.createForUser(currentUser);
-      ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToDelete);
-      return this.usersRepository.removeUserById(id);
-    } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
-    }
-  }
-  async changeRole(newUser: UsersEntity): Promise<UsersEntity | null> {
-    return await this.usersRepository.changeRole(newUser);
-  }
-  async commentsWithoutBannedUser(
+  async filteringCommentsNoBannedUser(
     commentsArr: CommentsEntity[],
   ): Promise<CommentsEntity[]> {
     const commentsWithoutBannedUser: CommentsEntity[] = [];
@@ -119,37 +85,5 @@ export class UsersService {
       }
     }
     return postsWithoutBannedUser;
-  }
-  async banUser(
-    id: string,
-    updateBanDto: UpdateBanDto,
-    currentUser: User,
-  ): Promise<boolean | undefined> {
-    const userToBan = await this.usersRepository.findUserByUserId(id);
-    if (!userToBan) throw new NotFoundException();
-    let updateBan: BanInfo = {
-      isBanned: updateBanDto.isBanned,
-      banDate: null,
-      banReason: null,
-    };
-    if (updateBanDto.isBanned) {
-      updateBan = {
-        isBanned: updateBanDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: updateBanDto.banReason,
-      };
-    }
-    try {
-      const ability = this.caslAbilityFactory.createForUser(currentUser);
-      ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToBan);
-      return this.usersRepository.banUser(userToBan, updateBan);
-    } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
-    }
   }
 }

@@ -58,7 +58,7 @@ export class CommentsService {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
     const commentNotBannedUser =
-      await this.usersService.commentsWithoutBannedUser([comment]);
+      await this.usersService.filteringCommentsNoBannedUser([comment]);
     if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments =
       await this.likeStatusCommentsRepository.preparationCommentsForReturn(
@@ -95,7 +95,7 @@ export class CommentsService {
       };
     }
     const commentsNotBannedUser =
-      await this.usersService.commentsWithoutBannedUser(comments);
+      await this.usersService.filteringCommentsNoBannedUser(comments);
     let desc = 1;
     let asc = -1;
     const field: 'userLogin' | 'content' | 'createdAt' =

@@ -11,8 +11,8 @@ import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 import { PostsService } from '../posts/posts.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
-import { SaController } from './sa.controller';
-import { SaService } from './sa.service';
+import { SaController } from './application/sa.controller';
+import { SaService } from './application/sa.service';
 import { SecurityDevicesService } from '../security-devices/security-devices.service';
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
 import { CommentsService } from '../comments/comments.service';
@@ -21,8 +21,14 @@ import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-st
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
+import { ChangeRoleUseCase } from './application/use-cases/change-role.use-case';
+import { BanUserUseCase } from '../users/application/use-cases/ban-user.use-case';
 
-const saCases = [CreateUserByInstanceUseCase];
+const saCases = [
+  CreateUserByInstanceUseCase,
+  ChangeRoleUseCase,
+  BanUserUseCase,
+];
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],

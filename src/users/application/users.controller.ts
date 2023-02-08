@@ -40,30 +40,6 @@ export class UsersController {
     private commandBus: CommandBus,
   ) {}
 
-  @Post()
-  @UseGuards(BaseAuthGuard)
-  @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.CREATE, subject: User })
-  async createUser(
-    @Request() req: any,
-    @Body() createUserDto: CreateUserDto,
-    @Ip() ip: string,
-  ) {
-    const registrationData: RegDataDto = {
-      ip: ip,
-      userAgent: req.get('user-agent') || 'None',
-    };
-    const newUser = await this.commandBus.execute(
-      new CreateUserCommand(createUserDto, registrationData),
-    );
-    return {
-      id: newUser.id,
-      login: newUser.login,
-      email: newUser.email,
-      createdAt: newUser.createdAt,
-    };
-  }
-
   @Get()
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
@@ -89,6 +65,30 @@ export class UsersController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findUserByUserId(@Param('id') id: string) {
     return this.usersService.findUserByUserId(id);
+  }
+
+  @Post()
+  @UseGuards(BaseAuthGuard)
+  @UseGuards(AbilitiesGuard)
+  @CheckAbilities({ action: Action.CREATE, subject: User })
+  async createUser(
+    @Request() req: any,
+    @Body() createUserDto: CreateUserDto,
+    @Ip() ip: string,
+  ) {
+    const registrationData: RegDataDto = {
+      ip: ip,
+      userAgent: req.get('user-agent') || 'None',
+    };
+    const newUser = await this.commandBus.execute(
+      new CreateUserCommand(createUserDto, registrationData),
+    );
+    return {
+      id: newUser.id,
+      login: newUser.login,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    };
   }
 
   @Put(':id')

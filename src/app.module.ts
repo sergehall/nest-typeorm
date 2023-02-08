@@ -23,7 +23,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { appProviders } from './app.providers';
 import { SaModule } from './sa/sa.module';
 import { BloggerBlogsController } from './blogger-blogs/blogger-blogs.controller';
-import { SaController } from './sa/sa.controller';
+import { SaController } from './sa/application/sa.controller';
 import { BlogsModule } from './blogs/blogs.module';
 import { BloggerBlogsModule } from './blogger-blogs/blogger-blogs.module';
 import { getConfiguration } from './config/configuration';

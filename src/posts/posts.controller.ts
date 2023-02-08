@@ -32,6 +32,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { BloggerBlogsService } from '../blogger-blogs/blogger-blogs.service';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsWithoutOwnersInfoEntity } from './entities/posts-without-ownerInfo.entity';
+import { OwnerInfoDto } from './dto/ownerInfo.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -77,7 +78,7 @@ export class PostsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.CREATE, subject: User })
   async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const currentUser = req.user;
     const blog: BloggerBlogsEntity | null =
@@ -90,7 +91,12 @@ export class PostsController {
       blogId: createPostDto.blogId,
       name: blog.name,
     };
-    return this.postsService.createPost(createPost, currentUser);
+    const ownerInfoDto: OwnerInfoDto = {
+      userId: currentUser.id,
+      userLogin: currentUser.login,
+      isBanned: currentUser.banInfo.isBanned,
+    };
+    return this.postsService.createPost(createPost, ownerInfoDto);
   }
   @Post(':postId/comments')
   @UseGuards(JwtAuthGuard)
