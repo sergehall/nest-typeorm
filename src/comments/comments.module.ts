@@ -20,8 +20,20 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
 import { JwtConfig } from '../config/jwt/jwt-config';
 import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-banStatus-comments.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
+import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
+import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
+import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use-case';
+import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
 
-const commentsCases = [ChangeBanStatusCommentsUseCase];
+const commentsCases = [
+  CreateCommentUseCase,
+  UpdateCommentUseCase,
+  RemoveCommentUseCase,
+  ChangeBanStatusCommentsUseCase,
+  ChangeLikeStatusCommentUseCase,
+  FillingCommentsDataUseCase,
+];
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],

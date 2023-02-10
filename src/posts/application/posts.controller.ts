@@ -33,6 +33,9 @@ import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blo
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { OwnerInfoDto } from '../dto/ownerInfo.dto';
+import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
+import { CommandBus } from '@nestjs/cqrs';
+import { ChangeLikeStatusCommentCommand } from '../../comments/application/use-cases/change-likeStatus-comment.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -41,6 +44,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly commentsService: CommentsService,
     private readonly bloggerBlogsService: BloggerBlogsService,
+    protected commandBus: CommandBus,
   ) {}
   @Get()
   @UseGuards(AbilitiesGuard)
@@ -106,12 +110,8 @@ export class PostsController {
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const currentUser: UsersEntity = req.user;
-    const post = await this.postsService.checkPostInDB(postId);
-    if (!post) throw new NotFoundException();
-    return await this.commentsService.createComment(
-      postId,
-      createCommentDto,
-      currentUser,
+    return await this.commandBus.execute(
+      new CreateCommentCommand(postId, createCommentDto, currentUser),
     );
   }
   @Get(':postId/comments')
@@ -165,10 +165,8 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUser = req.user;
-    return this.postsService.changeLikeStatusPost(
-      postId,
-      likeStatusDto,
-      currentUser,
+    return await this.commandBus.execute(
+      new ChangeLikeStatusCommentCommand(postId, likeStatusDto, currentUser),
     );
   }
 }
