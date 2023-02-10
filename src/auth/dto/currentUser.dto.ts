@@ -6,6 +6,11 @@ import {
   Matches,
 } from 'class-validator';
 
+export class BanInfo {
+  @IsNotEmpty()
+  @IsBoolean()
+  isBanned: boolean;
+}
 export class CurrentUserDto {
   @IsNotEmpty()
   @Length(0, 50, {
@@ -25,8 +30,8 @@ export class CurrentUserDto {
   @Matches('^[a-zA-Z0-9_-]*$')
   login: string;
   @IsNotEmpty()
-  @IsBoolean()
-  isBanned: boolean;
+  @Object()
+  banInfo: BanInfo;
   @IsNotEmpty()
   @IsNumber()
   payloadExp: number;

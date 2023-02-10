@@ -4,8 +4,8 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../ability/roles/action.enum';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../ability/casl-ability.factory';
-import { PostsService } from '../posts.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class RemovePostByPostIdCommand {
   constructor(
@@ -22,7 +22,7 @@ export class RemovePostByPostIdUseCase
   constructor(
     protected bloggerBlogsRepository: BloggerBlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsService: PostsService,
+    protected postsRepository: PostsRepository,
   ) {}
   async execute(
     command: RemovePostByPostIdCommand,
@@ -39,7 +39,7 @@ export class RemovePostByPostIdUseCase
         id: command.currentUser.id,
       });
 
-      return await this.postsService.removePost(command.postId);
+      return await this.postsRepository.removePost(command.postId);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

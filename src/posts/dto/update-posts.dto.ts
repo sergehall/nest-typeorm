@@ -1,11 +1,6 @@
 import { IsNotEmpty, Length } from 'class-validator';
 
-export class UpdatePostsEntity {
-  @IsNotEmpty()
-  @Length(0, 50, {
-    message: 'Incorrect id length! Must be max 50 ch.',
-  })
-  id: string;
+export class UpdatePostsDto {
   @IsNotEmpty()
   @Length(0, 30, {
     message: 'Incorrect title length! Must be max 30 ch.',

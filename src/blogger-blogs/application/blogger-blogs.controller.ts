@@ -26,9 +26,11 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateBloggerBlogCommand } from './use-cases/create-blogger-blog.use-case';
 import { UpdateBlogByIdCommand } from './use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdCommand } from './use-cases/remove-blog-byId.use-case';
-import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-byPostId.use-case';
 import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
+import { OwnerInfoDto } from '../../posts/dto/ownerInfo.dto';
+import { UpdatePostPlusIdDto } from '../../posts/dto/update-post-plusId.dto';
+import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -87,6 +89,11 @@ export class BloggerBlogsController {
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
+    const ownerInfoDto: OwnerInfoDto = {
+      userId: currentUser.id,
+      userLogin: currentUser.login,
+      isBanned: currentUser.banInfo.isBanned,
+    };
     const createPostDto = {
       title: createPostBBlogsDto.title,
       shortDescription: createPostBBlogsDto.shortDescription,
@@ -94,7 +101,7 @@ export class BloggerBlogsController {
       blogId: blogId,
     };
     return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, currentUser),
+      new CreatePostCommand(createPostDto, ownerInfoDto),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -128,14 +135,21 @@ export class BloggerBlogsController {
     @Param('postId') postId: string,
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
-    const currentUser: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+    const ownerInfoDto: OwnerInfoDto = {
+      userId: currentUserDto.id,
+      userLogin: currentUserDto.login,
+      isBanned: currentUserDto.banInfo.isBanned,
+    };
+    const updatePostPlusIdDto: UpdatePostPlusIdDto = {
+      id: postId,
+      title: updatePostBBlogDto.title,
+      shortDescription: updatePostBBlogDto.shortDescription,
+      content: updatePostBBlogDto.content,
+      blogId: blogId,
+    };
     return await this.commandBus.execute(
-      new UpdatePostByPostIdCommand(
-        blogId,
-        postId,
-        updatePostBBlogDto,
-        currentUser,
-      ),
+      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)

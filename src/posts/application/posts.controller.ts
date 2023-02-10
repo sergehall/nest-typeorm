@@ -29,21 +29,23 @@ import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
-import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { OwnerInfoDto } from '../dto/ownerInfo.dto';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChangeLikeStatusCommentCommand } from '../../comments/application/use-cases/change-likeStatus-comment.use-case';
-
+import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { CreatePostCommand } from './use-cases/create-post.use-case';
+import { UpdatePostDto } from '../dto/update-post.dto';
+import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
+import { UpdatePostCommand } from './use-cases/update-post.use-case';
+import { RemovePostByIdOldCommand } from './use-cases/remove-post-byId-old.use-case';
+import { ChangeLikeStatusPostCommand } from './use-cases/change-likeStatus-post.use-case';
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
-    private readonly postsService: PostsService,
-    private readonly commentsService: CommentsService,
-    private readonly bloggerBlogsService: BloggerBlogsService,
+    protected postsService: PostsService,
+    protected commentsService: CommentsService,
     protected commandBus: CommandBus,
   ) {}
   @Get()
@@ -66,6 +68,7 @@ export class PostsController {
       currentUser,
     );
   }
+
   @Get(':postId')
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
@@ -79,28 +82,21 @@ export class PostsController {
     if (!post) throw new NotFoundException();
     return post;
   }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
-    const currentUser = req.user;
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsService.findBlogById(createPostDto.blogId);
-    if (!blog) throw new NotFoundException();
-    const createPost = {
-      title: createPostDto.title,
-      shortDescription: createPostDto.shortDescription,
-      content: createPostDto.content,
-      blogId: createPostDto.blogId,
-      name: blog.name,
-    };
+    const currentUserDto: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUser.id,
-      userLogin: currentUser.login,
-      isBanned: currentUser.banInfo.isBanned,
+      userId: currentUserDto.id,
+      userLogin: currentUserDto.login,
+      isBanned: currentUserDto.banInfo.isBanned,
     };
-    return this.postsService.createPost(createPost, ownerInfoDto);
+    return await this.commandBus.execute(
+      new CreatePostCommand(createPostDto, ownerInfoDto),
+    );
   }
   @Post(':postId/comments')
   @UseGuards(JwtAuthGuard)
@@ -118,7 +114,7 @@ export class PostsController {
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async findComments(
+  async findCommentsByPostId(
     @Request() req: any,
     @Param('postId') postId: string,
     @Query() query: any,
@@ -139,22 +135,33 @@ export class PostsController {
       currentUser,
     );
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Put(':id')
   async updatePost(
+    @Request() req: any,
     @Param('id') id: string,
-    @Body() updatePostDto: CreatePostDto,
+    @Body() updatePostDto: UpdatePostDto,
   ) {
-    const post = await this.postsService.updatePost(id, updatePostDto);
-    if (!post) throw new NotFoundException();
-    return post;
+    const currentUserDto = req.user;
+    const ownerInfoDto: OwnerInfoDto = {
+      userId: currentUserDto.id,
+      userLogin: currentUserDto.login,
+      isBanned: currentUserDto.banInfo.isBanned,
+    };
+    const updatePostPlusIdDto: UpdatePostPlusIdDto = { ...updatePostDto, id };
+    const updatePost = await this.commandBus.execute(
+      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
+    );
+    if (!updatePost) throw new NotFoundException();
+    return updatePost;
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
   async removePost(@Param('id') id: string) {
-    return await this.postsService.removePost(id);
+    return await this.commandBus.execute(new RemovePostByIdOldCommand(id));
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -165,8 +172,9 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUser = req.user;
+
     return await this.commandBus.execute(
-      new ChangeLikeStatusCommentCommand(postId, likeStatusDto, currentUser),
+      new ChangeLikeStatusPostCommand(postId, likeStatusDto, currentUser),
     );
   }
 }

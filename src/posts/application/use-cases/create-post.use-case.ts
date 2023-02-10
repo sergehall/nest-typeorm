@@ -1,19 +1,21 @@
 import { CreatePostDto } from '../../dto/create-post.dto';
-import { CurrentUserDto } from '../../../auth/dto/currentUser.dto';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../ability/roles/action.enum';
-import { CreatePostAndNameDto } from '../../dto/create-post-and-name.dto';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../ability/casl-ability.factory';
 import { PostsService } from '../posts.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { OwnerInfoDto } from '../../dto/ownerInfo.dto';
+import * as uuid4 from 'uuid4';
+import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class CreatePostCommand {
   constructor(
     public createPostDto: CreatePostDto,
-    public currentUser: CurrentUserDto,
+    public ownerInfoDto: OwnerInfoDto,
   ) {}
 }
 
@@ -23,6 +25,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     protected bloggerBlogsRepository: BloggerBlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsService: PostsService,
+    protected postsRepository: PostsRepository,
   ) {}
   async execute(command: CreatePostCommand) {
     const blog: BloggerBlogsEntity | null =
@@ -35,21 +38,44 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
-        id: command.currentUser.id,
+        id: command.ownerInfoDto.userId,
       });
-      const createPost: CreatePostAndNameDto = {
+      const newPost = {
+        id: uuid4().toString(),
         title: command.createPostDto.title,
         shortDescription: command.createPostDto.shortDescription,
         content: command.createPostDto.content,
-        blogId: blog.id,
-        name: blog.name,
+        blogId: command.createPostDto.blogId,
+        blogName: blog.name,
+        createdAt: new Date().toISOString(),
+        postOwnerInfo: {
+          userId: command.ownerInfoDto.userId,
+          userLogin: command.ownerInfoDto.userLogin,
+          isBanned: false,
+        },
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: StatusLike.NONE,
+          newestLikes: [],
+        },
       };
-      const blogOwnerInfo = {
-        userId: blog.blogOwnerInfo.userId,
-        userLogin: blog.blogOwnerInfo.userLogin,
-        isBanned: blog.blogOwnerInfo.isBanned,
+      const result = await this.postsRepository.createPost(newPost);
+      return {
+        id: result.id,
+        title: result.title,
+        shortDescription: result.shortDescription,
+        content: result.content,
+        blogId: result.blogId,
+        blogName: result.blogName,
+        createdAt: result.createdAt,
+        extendedLikesInfo: {
+          likesCount: result.extendedLikesInfo.likesCount,
+          dislikesCount: result.extendedLikesInfo.dislikesCount,
+          myStatus: result.extendedLikesInfo.myStatus,
+          newestLikes: result.extendedLikesInfo.newestLikes,
+        },
       };
-      return await this.postsService.createPost(createPost, blogOwnerInfo);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

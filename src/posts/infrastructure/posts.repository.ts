@@ -5,7 +5,7 @@ import { PostsDocument } from './schemas/posts.schema';
 import { QueryArrType } from '../../infrastructure/common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../infrastructure/common/pagination/types/pagination.types';
 import { ProvidersEnums } from '../../infrastructure/database/enums/providers.enums';
-import { UpdatePostsEntity } from '../entities/update-posts.entity';
+import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -66,17 +66,19 @@ export class PostsRepository {
       $or: searchFilters,
     });
   }
-  async updatePost(postsEntity: UpdatePostsEntity): Promise<PostsEntity> {
+  async updatePost(
+    updatePostPlusIdDto: UpdatePostPlusIdDto,
+  ): Promise<PostsEntity> {
     return await this.postsModel
       .findOneAndUpdate(
-        { id: postsEntity.id },
+        { id: updatePostPlusIdDto.id },
         {
           $set: {
-            id: postsEntity.id,
-            title: postsEntity.title,
-            shortDescription: postsEntity.shortDescription,
-            content: postsEntity.content,
-            blogId: postsEntity.blogId,
+            id: updatePostPlusIdDto.id,
+            title: updatePostPlusIdDto.title,
+            shortDescription: updatePostPlusIdDto.shortDescription,
+            content: updatePostPlusIdDto.content,
+            blogId: updatePostPlusIdDto.blogId,
           },
         },
         {

@@ -54,7 +54,7 @@ export class User {
   orgId: OrgIdEnums;
   @Prop({ required: true })
   roles: Role;
-  @Prop({ required: true })
+  @Prop({ required: true, type: BanInfo })
   banInfo: BanInfo;
   @Prop({ required: true })
   emailConfirmation: UserEmailConfirmation;

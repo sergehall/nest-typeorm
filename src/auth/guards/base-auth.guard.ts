@@ -39,9 +39,13 @@ export class BaseAuthGuard implements CanActivate {
         );
       }
       const saUser = new User();
+      saUser.id = 'saUser';
+      saUser.login = 'saUser-login';
+      saUser.email = 'saUser@email.com';
       saUser.orgId = OrgIdEnums.IT_INCUBATOR;
       saUser.roles = Role.SA;
-      request.user = saUser;
+      const banInfo = { isBanned: false };
+      request.user = { ...saUser, banInfo };
       return true;
     }
   }
