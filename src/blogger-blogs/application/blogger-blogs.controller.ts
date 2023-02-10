@@ -22,11 +22,21 @@ import { PaginationTypes } from '../../infrastructure/common/pagination/types/pa
 import { ParseQuery } from '../../infrastructure/common/parse-query/parse-query';
 import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagination.dto';
 import { UpdatePostBloggerBlogsDto } from '../dto/update-post-blogger-blogs.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateBloggerBlogCommand } from './use-cases/create-blogger-blog.use-case';
+import { UpdateBlogByIdCommand } from './use-cases/update-blog-byId.use-case';
+import { RemoveBlogByIdCommand } from './use-cases/remove-blog-byId.use-case';
+import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-byPostId.use-case';
+import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
+import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
-  constructor(private readonly bBloggerService: BloggerBlogsService) {}
+  constructor(
+    private readonly bBloggerService: BloggerBlogsService,
+    protected commandBus: CommandBus,
+  ) {}
   @UseGuards(JwtAuthGuard)
   @Get()
   async findBlogsCurrentUser(
@@ -65,7 +75,9 @@ export class BloggerBlogsController {
         isBanned: currentUser.banInfo.isBanned,
       },
     };
-    return await this.bBloggerService.createBlog(blogsOwnerDto);
+    return await this.commandBus.execute(
+      new CreateBloggerBlogCommand(blogsOwnerDto),
+    );
   }
   @Post(':blogId/posts')
   @UseGuards(JwtAuthGuard)
@@ -81,7 +93,9 @@ export class BloggerBlogsController {
       content: createPostBBlogsDto.content,
       blogId: blogId,
     };
-    return await this.bBloggerService.createPost(createPostDto, currentUser);
+    return await this.commandBus.execute(
+      new CreatePostCommand(createPostDto, currentUser),
+    );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -92,14 +106,18 @@ export class BloggerBlogsController {
     @Body() updateBlogDto: CreateBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
-    return this.bBloggerService.updateBlogById(id, updateBlogDto, currentUser);
+    return await this.commandBus.execute(
+      new UpdateBlogByIdCommand(id, updateBlogDto, currentUser),
+    );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async removeBlogById(@Request() req: any, @Param('id') id: string) {
     const currentUser: CurrentUserDto = req.user;
-    return await this.bBloggerService.removeBlogById(id, currentUser);
+    return await this.commandBus.execute(
+      new RemoveBlogByIdCommand(id, currentUser),
+    );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -111,11 +129,13 @@ export class BloggerBlogsController {
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
-    return await this.bBloggerService.updatePostByPostId(
-      blogId,
-      postId,
-      updatePostBBlogDto,
-      currentUser,
+    return await this.commandBus.execute(
+      new UpdatePostByPostIdCommand(
+        blogId,
+        postId,
+        updatePostBBlogDto,
+        currentUser,
+      ),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -127,11 +147,8 @@ export class BloggerBlogsController {
     @Param('postId') postId: string,
   ) {
     const currentUser: CurrentUserDto = req.user;
-    //
-    return await this.bBloggerService.removePostByPostId(
-      blogId,
-      postId,
-      currentUser,
+    return await this.commandBus.execute(
+      new RemovePostByPostIdCommand(blogId, postId, currentUser),
     );
   }
 }

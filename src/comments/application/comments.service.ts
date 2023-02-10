@@ -3,7 +3,6 @@ import { PaginationDto } from '../../infrastructure/common/pagination/dto/pagina
 import { Pagination } from '../../infrastructure/common/pagination/pagination';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CommentsRepository } from '../infrastructure/comments.repository';
-import { LikeStatusCommentsRepository } from '../infrastructure/like-status-comments.repository';
 import { PostsService } from '../../posts/application/posts.service';
 import { CommentsEntity } from '../entities/comments.entity';
 import { FilteringCommentsNoBannedUserCommand } from '../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
@@ -16,7 +15,6 @@ export class CommentsService {
     protected pagination: Pagination,
     protected commentsRepository: CommentsRepository,
     protected postsService: PostsService,
-    protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
     protected commandBus: CommandBus,
   ) {}
 

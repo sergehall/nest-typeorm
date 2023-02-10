@@ -22,8 +22,16 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
 import { JwtConfig } from '../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banStatus-posts.use-case';
+import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-byPostId.use-case';
+import { RemovePostByPostIdUseCase } from './application/use-cases/remove-post-byPostId.use-case';
+import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 
-const postsCases = [ChangeBanStatusPostsUseCase];
+const postsCases = [
+  CreatePostUseCase,
+  ChangeBanStatusPostsUseCase,
+  UpdatePostByPostIdUseCase,
+  RemovePostByPostIdUseCase,
+];
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],

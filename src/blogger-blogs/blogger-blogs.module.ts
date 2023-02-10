@@ -11,9 +11,19 @@ import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-p
 import { ConvertFiltersForDB } from '../infrastructure/common/convert-filters/convertFiltersForDB';
 import { BlogExistsRule } from '../pipes/blog-exist-validation';
 import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repository';
+import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger-blog.use-case';
+import { CqrsModule } from '@nestjs/cqrs';
+import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
+import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
+
+const bloggersBlogCases = [
+  CreateBloggerBlogUseCase,
+  UpdateBlogByIdUseCase,
+  RemoveBlogByIdUseCase,
+];
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
     BloggerBlogsService,
@@ -25,6 +35,7 @@ import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repositor
     LikeStatusPostsRepository,
     ConvertFiltersForDB,
     BlogExistsRule,
+    ...bloggersBlogCases,
     ...bloggerBlogsProviders,
   ],
 })
