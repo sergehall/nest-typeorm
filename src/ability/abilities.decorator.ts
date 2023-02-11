@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 import { Action } from './roles/action.enum';
-import { User } from '../users/infrastructure/schemas/user.schema';
+import { User } from '../features/users/infrastructure/schemas/user.schema';
 import { Subject } from '@casl/ability';
 
 export interface RequiredRule {

@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
+import { BloggerBlogsRepository } from '../features/blogger-blogs/infrastructure/blogger-blogs.repository';
 
 @ValidatorConstraint({ name: 'UserExists', async: true })
 @Injectable()

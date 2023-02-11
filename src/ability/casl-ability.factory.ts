@@ -7,10 +7,10 @@ import {
 } from '@casl/ability';
 import { Role } from './roles/role.enum';
 import { Action } from './roles/action.enum';
-import { UserIdEntity } from '../comments/entities/userId.entity';
-import { PostsIdEntity } from '../posts/entities/postsId.entity';
-import { UsersEntity } from '../users/entities/users.entity';
-import { BloggerBlogsBlogIdEntity } from '../blogger-blogs/entities/blogger-blogs-blogId.entity';
+import { UserIdEntity } from '../features/comments/entities/userId.entity';
+import { PostsIdEntity } from '../features/posts/entities/postsId.entity';
+import { UsersEntity } from '../features/users/entities/users.entity';
+import { BloggerBlogsBlogIdEntity } from '../features/blogger-blogs/entities/blogger-blogs-blogId.entity';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;
 const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
