@@ -8,15 +8,10 @@ import { saProviders } from './infrastructure/sa.providers';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import { CaslModule } from '../ability/casl.module';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
-import { PostsService } from '../posts/application/posts.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
 import { SaController } from './application/sa.controller';
 import { SaService } from './application/sa.service';
-import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
-import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
-import { CommentsService } from '../comments/application/comments.service';
-import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -37,19 +32,13 @@ const saUseCases = [
     SaService,
     UsersService,
     BloggerBlogsService,
-    SecurityDevicesService,
-    SecurityDevicesRepository,
     ConvertFiltersForDB,
-    PostsService,
     BloggerBlogsRepository,
     Pagination,
     UsersRepository,
     MailsRepository,
     PostsRepository,
     LikeStatusPostsRepository,
-    PostsService,
-    CommentsService,
-    CommentsRepository,
     LikeStatusCommentsRepository,
     ...saUseCases,
     ...saProviders,

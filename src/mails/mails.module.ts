@@ -10,7 +10,7 @@ import { MailsAdapter } from './adapters/mails.adapter';
 import { getConfiguration } from '../config/configuration';
 import { SendCodeByRegistrationUseCase } from './adapters/use-case/send-code-by-registration.use-case';
 
-const mailsUseCases = [SendCodeByRegistrationUseCase];
+const mailsAdapterUseCases = [SendCodeByRegistrationUseCase];
 
 @Module({
   imports: [
@@ -44,7 +44,7 @@ const mailsUseCases = [SendCodeByRegistrationUseCase];
     MailsService,
     MailsRepository,
     MailsAdapter,
-    ...mailsUseCases,
+    ...mailsAdapterUseCases,
     ...mailsProviders,
   ],
   exports: [MailsService],

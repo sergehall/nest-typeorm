@@ -29,9 +29,6 @@ import { PaginationTypes } from '../../infrastructure/common/pagination/types/pa
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UpdateBanDto } from '../dto/update-sa.dto';
-import { SecurityDevicesService } from '../../security-devices/application/security-devices.service';
-import { CommentsService } from '../../comments/application/comments.service';
-import { PostsService } from '../../posts/application/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
@@ -48,10 +45,7 @@ export class SaController {
   constructor(
     private saService: SaService,
     private usersService: UsersService,
-    private blogsService: BloggerBlogsService,
-    private securityDevicesService: SecurityDevicesService,
-    private commentsService: CommentsService,
-    private postsService: PostsService,
+    private bloggerBlogsService: BloggerBlogsService,
     private commandBus: CommandBus,
   ) {}
 
@@ -91,7 +85,9 @@ export class SaController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    return await this.blogsService.findBlogs(queryPagination, [searchFilters]);
+    return await this.bloggerBlogsService.findBlogs(queryPagination, [
+      searchFilters,
+    ]);
   }
 
   @Post('users')
