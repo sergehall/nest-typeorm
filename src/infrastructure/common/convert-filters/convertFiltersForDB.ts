@@ -11,7 +11,10 @@ export class ConvertFiltersForDB {
     return this._forMongo(queryFilters, PathFilterEnum);
   }
 
-  async _forMongo(queryFilters: any, pathFilterEnum: PatternConvertFilterType) {
+  private async _forMongo(
+    queryFilters: any,
+    pathFilterEnum: PatternConvertFilterType,
+  ) {
     const convertedFilters = [];
     try {
       for (let i = 0, l = Object.keys(queryFilters).length; i < l; i++) {

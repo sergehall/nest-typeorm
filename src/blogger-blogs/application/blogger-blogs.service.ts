@@ -70,9 +70,6 @@ export class BloggerBlogsService {
     };
   }
 
-  async findBlogById(id: string): Promise<BloggerBlogsEntity | null> {
-    return this.bloggerBlogsRepository.findBlogById(id);
-  }
   async findBlogByIdForBlogs(id: string): Promise<BloggerBlogsEntity | null> {
     return this.bloggerBlogsRepository.findBlogByIdForBlogs(id);
   }

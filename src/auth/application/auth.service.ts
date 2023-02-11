@@ -5,8 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import jwt_decode from 'jwt-decode';
-import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
-import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
 import { PayloadDto } from '../dto/payload.dto';
 import { AccessToken } from '../dto/accessToken.dto';
 import { JwtConfig } from '../../config/jwt/jwt-config';
@@ -16,7 +14,6 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private blacklistJwtRepository: BlacklistJwtRepository,
     private jwtConfig: JwtConfig,
   ) {}
   async validatePassword(
@@ -119,10 +116,8 @@ export class AuthService {
       return null;
     }
   }
+
   async decode(JWT: string): Promise<PayloadDto> {
     return jwt_decode(JWT);
-  }
-  async addRefreshTokenToBl(currentToken: JwtBlacklistDto): Promise<boolean> {
-    return await this.blacklistJwtRepository.addJWT(currentToken);
   }
 }

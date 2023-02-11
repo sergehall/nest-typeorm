@@ -19,12 +19,14 @@ import { RegistrationUserUseCase } from './application/use-cases/registration-us
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
 import { ConfirmUserByCodeInParamUseCase } from './application/use-cases/confirm-user-byCode-inParam.use-case';
 import { UpdateSentConfirmationCodeUseCase } from './application/use-cases/update-sent-confirmation-code.use-case';
+import { AddRefreshTokenToBlackListUseCase } from './application/use-cases/add-refresh-token-to-blackList.use-case';
 
 const authCases = [
   CreateUserByInstanceUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeInParamUseCase,
   UpdateSentConfirmationCodeUseCase,
+  AddRefreshTokenToBlackListUseCase,
 ];
 
 @Module({

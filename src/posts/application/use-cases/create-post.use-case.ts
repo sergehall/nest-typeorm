@@ -5,7 +5,6 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../ability/roles/action.enum';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../ability/casl-ability.factory';
-import { PostsService } from '../posts.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { OwnerInfoDto } from '../../dto/ownerInfo.dto';
 import * as uuid4 from 'uuid4';
@@ -24,7 +23,6 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
     protected bloggerBlogsRepository: BloggerBlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsService: PostsService,
     protected postsRepository: PostsRepository,
   ) {}
   async execute(command: CreatePostCommand) {

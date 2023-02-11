@@ -36,6 +36,7 @@ import { UpdateSentConfirmationCodeCommand } from './use-cases/update-sent-confi
 import { ConfirmUserByCodeInParamCommand } from './use-cases/confirm-user-byCode-inParam.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
 import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
+import { AddRefreshTokenToBlackListCommand } from './use-cases/add-refresh-token-to-blackList.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -124,11 +125,13 @@ export class AuthController {
     const currentPayload: PayloadDto = await this.authService.decode(
       refreshToken,
     );
-    const jwtBlackList = {
+    const jwtToBlackList = {
       refreshToken: refreshToken,
       expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
     };
-    await this.authService.addRefreshTokenToBl(jwtBlackList);
+    await this.commandBus.execute(
+      new AddRefreshTokenToBlackListCommand(jwtToBlackList),
+    );
     const newRefreshToken = await this.authService.updateRefreshJWT(
       currentPayload,
     );
@@ -160,7 +163,9 @@ export class AuthController {
       refreshToken: refreshToken,
       expirationDate: new Date(payload.exp * 1000).toISOString(),
     };
-    await this.authService.addRefreshTokenToBl(currentJwt);
+    await this.commandBus.execute(
+      new AddRefreshTokenToBlackListCommand(currentJwt),
+    );
     await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
     return true;
