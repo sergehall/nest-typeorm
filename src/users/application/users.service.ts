@@ -15,13 +15,11 @@ export class UsersService {
     protected pagination: Pagination,
     protected usersRepository: UsersRepository,
   ) {}
+
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UsersEntity | null> {
     return await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
-  }
-  async userAlreadyExist(login: string, email: string): Promise<string | null> {
-    return await this.usersRepository.userAlreadyExist(login, email);
   }
 
   async findUsers(

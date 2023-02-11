@@ -12,38 +12,31 @@ import {
 } from '@nestjs/common';
 import { SecurityDevicesService } from './security-devices.service';
 import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
-import { AuthService } from '../../auth/application/auth.service';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { RemoveDevicesExceptCurrentCommand } from './use-cases/remove-devices-exceptCurrent.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveDevicesByDeviceIdCommand } from './use-cases/remove-devices-byDeviceId.use-case';
+import jwt_decode from 'jwt-decode';
 
 @SkipThrottle()
 @Controller('security')
 export class SecurityDevicesController {
   constructor(
     private readonly securityDevicesService: SecurityDevicesService,
-    private authService: AuthService,
     private commandBus: CommandBus,
   ) {}
   @UseGuards(CookiesJwtVerificationGuard)
   @Get('devices')
   async findDevices(@Request() req: any) {
-    const refreshToken = req.cookies.refreshToken;
-    const currentPayload: PayloadDto = await this.authService.decode(
-      refreshToken,
-    );
+    const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     return this.securityDevicesService.findDevices(currentPayload);
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
   @Delete('devices')
   async removeDevicesExceptCurrent(@Request() req: any) {
-    const refreshToken = req.cookies.refreshToken;
-    const currentPayload: PayloadDto = await this.authService.decode(
-      refreshToken,
-    );
+    const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     return await this.commandBus.execute(
       new RemoveDevicesExceptCurrentCommand(currentPayload),
     );
@@ -55,9 +48,7 @@ export class SecurityDevicesController {
     @Request() req: any,
     @Param('deviceId') deviceId: string,
   ) {
-    const currentPayload: PayloadDto = await this.authService.decode(
-      req.cookies.refreshToken,
-    );
+    const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     const result = await this.commandBus.execute(
       new RemoveDevicesByDeviceIdCommand(deviceId, currentPayload),
     );

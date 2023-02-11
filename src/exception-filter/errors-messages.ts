@@ -40,7 +40,7 @@ export const userNotExists = {
   message: 'User does not exist',
   field: 'email',
 };
-export const forBanNotFound = {
-  message: 'ForBanNotFound does not exist',
-  field: 'forBanNotFound',
+export const canNotDecodeJwt = {
+  message: 'Incorrect JWT. Unable to decode JWT.',
+  field: 'JWT',
 };

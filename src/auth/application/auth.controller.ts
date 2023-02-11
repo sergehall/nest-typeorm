@@ -19,7 +19,6 @@ import { UsersService } from '../../users/application/users.service';
 import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
-import { SecurityDevicesService } from '../../security-devices/application/security-devices.service';
 import { PayloadDto } from '../dto/payload.dto';
 import {
   codeIncorrect,
@@ -41,6 +40,8 @@ import { SignAccessJwtUseCommand } from './use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from './use-cases/update-access-jwt.use-case';
 import { SineRefreshJwtCommand } from './use-cases/sine-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from './use-cases/update-refresh-jwt.use-case';
+import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
+import jwt_decode from 'jwt-decode';
 
 @SkipThrottle()
 @Controller('auth')
@@ -48,7 +49,6 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-    private securityDevicesService: SecurityDevicesService,
     private commandBus: CommandBus,
   ) {}
   @HttpCode(HttpStatus.OK)
@@ -59,16 +59,16 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessToken> {
+    const userAgent = req.get('user-agent') || 'None';
     const signedToken = await this.commandBus.execute(
       new SineRefreshJwtCommand(req.user),
     );
-    const newPayload: PayloadDto = await this.authService.decode(
-      signedToken.refreshToken,
-    );
-    const userAgent = req.get('user-agent') || 'None';
-    await this.commandBus.execute(
-      new CreateDeviceCommand(newPayload, ip, userAgent),
-    );
+    const newPayload: PayloadDto = jwt_decode(signedToken.refreshToken);
+    if (newPayload) {
+      await this.commandBus.execute(
+        new CreateDeviceCommand(newPayload, ip, userAgent),
+      );
+    }
     res.cookie('refreshToken', signedToken.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -83,9 +83,8 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
   ) {
-    const userExist = await this.usersService.userAlreadyExist(
-      loginDto.login,
-      loginDto.email,
+    const userExist = await this.commandBus.execute(
+      new CheckingUserExistenceCommand(loginDto.login, loginDto.email),
     );
     if (userExist) {
       throw new HttpException(
@@ -128,9 +127,7 @@ export class AuthController {
     @Ip() ip: string,
   ): Promise<AccessToken> {
     const refreshToken = req.cookies.refreshToken;
-    const currentPayload: PayloadDto = await this.authService.decode(
-      refreshToken,
-    );
+    const currentPayload: PayloadDto = jwt_decode(refreshToken);
     const jwtToBlackList = {
       refreshToken: refreshToken,
       expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
@@ -141,9 +138,7 @@ export class AuthController {
     const newRefreshToken = await this.commandBus.execute(
       new UpdateRefreshJwtCommand(currentPayload),
     );
-    const newPayload: PayloadDto = await this.authService.decode(
-      newRefreshToken.refreshToken,
-    );
+    const newPayload: PayloadDto = jwt_decode(newRefreshToken.refreshToken);
     const userAgent = req.get('user-agent');
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),
@@ -166,7 +161,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
     const refreshToken = req.cookies.refreshToken;
-    const payload: PayloadDto = await this.authService.decode(refreshToken);
+    const payload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     const currentJwt: JwtBlacklistDto = {
       refreshToken: refreshToken,
       expirationDate: new Date(payload.exp * 1000).toISOString(),
