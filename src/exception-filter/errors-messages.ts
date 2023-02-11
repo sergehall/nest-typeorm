@@ -40,7 +40,3 @@ export const userNotExists = {
   message: 'User does not exist',
   field: 'email',
 };
-export const canNotDecodeJwt = {
-  message: 'Incorrect JWT. Unable to decode JWT.',
-  field: 'JWT',
-};
