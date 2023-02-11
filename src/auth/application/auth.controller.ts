@@ -32,11 +32,15 @@ import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.
 import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../../users/dto/reg-data.dto';
 import { RegistrationUserCommand } from './use-cases/registration-user.use-case';
-import { UpdateSentConfirmationCodeCommand } from './use-cases/update-sent-confirmation-code.use-case';
+import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { ConfirmUserByCodeInParamCommand } from './use-cases/confirm-user-byCode-inParam.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
 import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
 import { AddRefreshTokenToBlackListCommand } from './use-cases/add-refresh-token-to-blackList.use-case';
+import { SignAccessJwtUseCommand } from './use-cases/sign-access-jwt.use-case';
+import { UpdateAccessJwtCommand } from './use-cases/update-access-jwt.use-case';
+import { SineRefreshJwtCommand } from './use-cases/sine-refresh-jwt.use-case';
+import { UpdateRefreshJwtCommand } from './use-cases/update-refresh-jwt.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -55,19 +59,21 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessToken> {
-    const token = await this.authService.signRefreshJWT(req.user);
+    const signedToken = await this.commandBus.execute(
+      new SineRefreshJwtCommand(req.user),
+    );
     const newPayload: PayloadDto = await this.authService.decode(
-      token.refreshToken,
+      signedToken.refreshToken,
     );
     const userAgent = req.get('user-agent') || 'None';
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),
     );
-    res.cookie('refreshToken', token.refreshToken, {
+    res.cookie('refreshToken', signedToken.refreshToken, {
       httpOnly: true,
       secure: true,
     });
-    return await this.authService.signAccessJWT(req.user);
+    return await this.commandBus.execute(new SignAccessJwtUseCommand(req.user));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -132,8 +138,8 @@ export class AuthController {
     await this.commandBus.execute(
       new AddRefreshTokenToBlackListCommand(jwtToBlackList),
     );
-    const newRefreshToken = await this.authService.updateRefreshJWT(
-      currentPayload,
+    const newRefreshToken = await this.commandBus.execute(
+      new UpdateRefreshJwtCommand(currentPayload),
     );
     const newPayload: PayloadDto = await this.authService.decode(
       newRefreshToken.refreshToken,
@@ -146,7 +152,9 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-    return await this.authService.updateAccessJWT(currentPayload);
+    return await this.commandBus.execute(
+      new UpdateAccessJwtCommand(currentPayload),
+    );
   }
 
   @SkipThrottle()

@@ -1,7 +1,7 @@
 import * as uuid4 from 'uuid4';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { userNotExists } from '../../../exception-filter/errors-messages';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { UsersRepository } from '../../infrastructure/users.repository';
 import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 

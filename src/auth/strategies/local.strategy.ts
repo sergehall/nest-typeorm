@@ -1,17 +1,18 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AuthService } from '../application/auth.service';
 import { UsersEntity } from '../../users/entities/users.entity';
 import {
   loginOrEmailInvalid,
   passwordInvalid,
   validatePasswordFailed,
 } from '../../exception-filter/errors-messages';
+import { CommandBus } from '@nestjs/cqrs';
+import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(protected commandBus: CommandBus) {
     super({
       usernameField: 'loginOrEmail',
     });
@@ -39,9 +40,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const user = await this.authService.validatePassword(
-      loginOrEmail,
-      password,
+    const user = await this.commandBus.execute(
+      new ValidatePasswordCommand(loginOrEmail, password),
     );
     if (!user) {
       throw new HttpException(
