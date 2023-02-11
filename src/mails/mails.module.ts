@@ -8,6 +8,9 @@ import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailsAdapter } from './adapters/mails.adapter';
 import { getConfiguration } from '../config/configuration';
+import { SendCodeByRegistrationUseCase } from './adapters/use-case/send-code-by-registration.use-case';
+
+const mailsUseCases = [SendCodeByRegistrationUseCase];
 
 @Module({
   imports: [
@@ -37,7 +40,13 @@ import { getConfiguration } from '../config/configuration';
       }),
     }),
   ],
-  providers: [MailsService, MailsRepository, MailsAdapter, ...mailsProviders],
+  providers: [
+    MailsService,
+    MailsRepository,
+    MailsAdapter,
+    ...mailsUseCases,
+    ...mailsProviders,
+  ],
   exports: [MailsService],
 })
 export class MailsModule {}

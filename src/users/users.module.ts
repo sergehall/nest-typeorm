@@ -20,7 +20,7 @@ import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.
 import { FilteringCommentsNoBannedUserUseCase } from './application/use-cases/filtering-comments-noBannedUser.use-case';
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 
-const useCases = [
+const usersUseCases = [
   CreateUserByMongooseModelUseCase,
   CreateUserByInstanceUseCase,
   UpdateUserUseCase,
@@ -42,7 +42,7 @@ const useCases = [
     JwtService,
     ConvertFiltersForDB,
     MailsRepository,
-    ...useCases,
+    ...usersUseCases,
     ...usersProviders,
   ],
   exports: [UsersService],

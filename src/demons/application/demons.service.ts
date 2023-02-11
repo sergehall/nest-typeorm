@@ -4,8 +4,8 @@ import { MailsService } from '../../mails/application/mails.service';
 import { BlacklistJwtRepository } from '../../auth/infrastructure/blacklist-jwt.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-sent-email-time.use-case';
-import { SentCodeByRegistrationCommand } from '../../mails/application/use-cases/sent-code-byRegistration.use-case';
 import { RemoveEmailByIdCommand } from '../../mails/application/use-cases/remove-email-byId.use-case';
+import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/send-code-by-registration.use-case';
 
 @Injectable()
 export class DemonsService {
@@ -22,7 +22,7 @@ export class DemonsService {
         new RemoveEmailByIdCommand(emailAndCode.id),
       );
       await this.commandBus.execute(
-        new SentCodeByRegistrationCommand(emailAndCode),
+        new SendCodeByRegistrationCommand(emailAndCode),
       );
       await this.commandBus.execute(
         new AddSentEmailTimeCommand(emailAndCode.email),

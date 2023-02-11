@@ -28,7 +28,7 @@ import { CreatePostUseCase } from './application/use-cases/create-post.use-case'
 import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 
-const postsCases = [
+const postsUseCases = [
   CreatePostUseCase,
   ChangeBanStatusPostsUseCase,
   UpdatePostUseCase,
@@ -58,7 +58,7 @@ const postsCases = [
     BloggerBlogsRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
-    ...postsCases,
+    ...postsUseCases,
     ...postsProviders,
   ],
 })

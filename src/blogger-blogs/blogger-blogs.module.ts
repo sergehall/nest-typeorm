@@ -16,7 +16,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
 
-const bloggersBlogCases = [
+const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,
@@ -35,7 +35,7 @@ const bloggersBlogCases = [
     LikeStatusPostsRepository,
     ConvertFiltersForDB,
     BlogExistsRule,
-    ...bloggersBlogCases,
+    ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,
   ],
 })

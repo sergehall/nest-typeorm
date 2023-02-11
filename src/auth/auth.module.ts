@@ -28,7 +28,7 @@ import { UpdateRefreshJwtUseCase } from './application/use-cases/update-refresh-
 import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.use-case';
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
 
-const authCases = [
+const authUseCases = [
   CreateUserByInstanceUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeInParamUseCase,
@@ -56,7 +56,7 @@ const authCases = [
     LocalStrategy,
     JwtStrategy,
     MailsRepository,
-    ...authCases,
+    ...authUseCases,
     ...authProviders,
   ],
   exports: [AuthService],

@@ -24,7 +24,7 @@ import { CreateUserByInstanceUseCase } from '../users/application/use-cases/crea
 import { ChangeRoleUseCase } from './application/use-cases/change-role.use-case';
 import { BanUserUseCase } from '../users/application/use-cases/ban-user.use-case';
 
-const saCases = [
+const saUseCases = [
   CreateUserByInstanceUseCase,
   ChangeRoleUseCase,
   BanUserUseCase,
@@ -51,7 +51,7 @@ const saCases = [
     CommentsService,
     CommentsRepository,
     LikeStatusCommentsRepository,
-    ...saCases,
+    ...saUseCases,
     ...saProviders,
   ],
 })

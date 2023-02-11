@@ -14,14 +14,9 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
 import { CqrsModule } from '@nestjs/cqrs';
 import { AddSentEmailTimeUseCase } from '../mails/application/use-cases/add-sent-email-time.use-case';
 import { RemoveEmailByIdUseCase } from '../mails/application/use-cases/remove-email-byId.use-case';
-import { SentCodeByRegistrationUseCase } from '../mails/application/use-cases/sent-code-byRegistration.use-case';
 import { MailsAdapter } from '../mails/adapters/mails.adapter';
 
-const demonCases = [
-  AddSentEmailTimeUseCase,
-  SentCodeByRegistrationUseCase,
-  RemoveEmailByIdUseCase,
-];
+const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
 
 @Module({
   imports: [DatabaseModule, MailsModule, CaslModule, CqrsModule],
@@ -35,7 +30,7 @@ const demonCases = [
     ConvertFiltersForDB,
     UsersRepository,
     BlacklistJwtRepository,
-    ...demonCases,
+    ...demonsUseCases,
     ...demonsProviders,
   ],
 })

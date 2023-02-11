@@ -26,7 +26,7 @@ import { UpdateCommentUseCase } from './application/use-cases/update-comment.use
 import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use-case';
 import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
 
-const commentsCases = [
+const commentsUseCases = [
   CreateCommentUseCase,
   UpdateCommentUseCase,
   RemoveCommentUseCase,
@@ -54,7 +54,7 @@ const commentsCases = [
     UsersService,
     UsersRepository,
     MailsRepository,
-    ...commentsCases,
+    ...commentsUseCases,
     ...commentsProviders,
   ],
 })
