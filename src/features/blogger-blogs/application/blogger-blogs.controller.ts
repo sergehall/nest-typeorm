@@ -91,9 +91,6 @@ export class BloggerBlogsController {
     @Param() params: BlogIdParams,
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
-    console.log('---------createPostByBlogId----------');
-    console.log(params.blogId);
-    console.log('-------------------');
     const currentUser: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUser.id,
@@ -167,6 +164,9 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
   ) {
+    console.log('---------removePostByPostId-----------');
+    console.log(params.blogId, params.postId);
+    console.log('--------------------------------------');
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
