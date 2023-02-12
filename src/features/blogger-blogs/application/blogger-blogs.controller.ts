@@ -31,9 +31,9 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { OwnerInfoDto } from '../../posts/dto/ownerInfo.dto';
 import { UpdatePostPlusIdDto } from '../../posts/dto/update-post-plusId.dto';
 import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
-import { ParamsBlogIdPostIdDto } from '../dto/params-blogId-postId.dto';
-import { ParamsIdDto } from '../dto/params-id.dto';
-import { ParamsBlogIdDto } from '../dto/params-blogId.dto';
+import { BlogIdParams } from '../../common/params/blogId.params';
+import { IdParams } from '../../common/params/id.params';
+import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -88,7 +88,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtAuthGuard)
   async createPostByBlogId(
     @Request() req: any,
-    @Param() params: ParamsBlogIdDto,
+    @Param() params: BlogIdParams,
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
@@ -112,7 +112,7 @@ export class BloggerBlogsController {
   @Put(':id')
   async updateBlogById(
     @Request() req: any,
-    @Param() params: ParamsIdDto,
+    @Param() params: IdParams,
     @Body() updateBlogDto: CreateBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
@@ -123,7 +123,7 @@ export class BloggerBlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async removeBlogById(@Request() req: any, @Param() params: ParamsIdDto) {
+  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new RemoveBlogByIdCommand(params.id, currentUser),
@@ -134,9 +134,10 @@ export class BloggerBlogsController {
   @Put(':blogId/posts/:postId')
   async updatePostByPostId(
     @Request() req: any,
-    @Param() params: ParamsBlogIdPostIdDto,
+    @Param() params: BlogIdPostIdParams,
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
+    // =========-===================
     console.log(params.blogId);
     console.log(params.postId);
     const currentUserDto: CurrentUserDto = req.user;
@@ -161,7 +162,7 @@ export class BloggerBlogsController {
   @Delete(':blogId/posts/:postId')
   async removePostByPostId(
     @Request() req: any,
-    @Param() params: ParamsBlogIdPostIdDto,
+    @Param() params: BlogIdPostIdParams,
   ) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(

@@ -24,6 +24,8 @@ import { ChangeLikeStatusCommentCommand } from './use-cases/change-likeStatus-co
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from './use-cases/update-comment.use-case';
 import { RemoveCommentCommand } from './use-cases/remove-comment.use-case';
+import { IdParams } from '../../common/params/id.params';
+import { CommentIdParams } from '../../common/params/commentId.params';
 
 @SkipThrottle()
 @Controller('comments')
@@ -37,8 +39,8 @@ export class CommentsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
-  async findComment(@Request() req: any, @Param('id') id: string) {
-    return this.commentsService.findCommentById(id, req.user);
+  async findComment(@Request() req: any, @Param() params: IdParams) {
+    return this.commentsService.findCommentById(params.id, req.user);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -46,23 +48,20 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   async updateComment(
     @Request() req: any,
-    @Param('commentId') commentId: string,
+    @Param() params: CommentIdParams,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     return await this.commandBus.execute(
-      new UpdateCommentCommand(commentId, updateCommentDto, req.user),
+      new UpdateCommentCommand(params.commentId, updateCommentDto, req.user),
     );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':commentId')
-  async removeComment(
-    @Request() req: any,
-    @Param('commentId') commentId: string,
-  ) {
+  async removeComment(@Request() req: any, @Param() params: CommentIdParams) {
     return await this.commandBus.execute(
-      new RemoveCommentCommand(commentId, req.user),
+      new RemoveCommentCommand(params.commentId, req.user),
     );
   }
 
@@ -71,11 +70,15 @@ export class CommentsController {
   @Put(':commentId/like-status')
   async changeLikeStatusComment(
     @Request() req: any,
-    @Param('commentId') commentId: string,
+    @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     return await this.commandBus.execute(
-      new ChangeLikeStatusCommentCommand(commentId, likeStatusDto, req.user),
+      new ChangeLikeStatusCommentCommand(
+        params.commentId,
+        likeStatusDto,
+        req.user,
+      ),
     );
   }
 }

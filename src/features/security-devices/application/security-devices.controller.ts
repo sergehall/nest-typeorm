@@ -18,6 +18,7 @@ import { RemoveDevicesExceptCurrentCommand } from './use-cases/remove-devices-ex
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveDevicesByDeviceIdCommand } from './use-cases/remove-devices-byDeviceId.use-case';
 import jwt_decode from 'jwt-decode';
+import { DeviceIdParams } from '../../common/params/deviceId.params';
 
 @SkipThrottle()
 @Controller('security')
@@ -46,11 +47,11 @@ export class SecurityDevicesController {
   @Delete('/devices/:deviceId')
   async removeDeviceByDeviceId(
     @Request() req: any,
-    @Param('deviceId') deviceId: string,
+    @Param() params: DeviceIdParams,
   ) {
     const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     const result = await this.commandBus.execute(
-      new RemoveDevicesByDeviceIdCommand(deviceId, currentPayload),
+      new RemoveDevicesByDeviceIdCommand(params.deviceId, currentPayload),
     );
     if (result === '404') throw new NotFoundException();
     if (result === '403') {

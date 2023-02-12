@@ -40,6 +40,9 @@ import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
 import { UpdatePostCommand } from './use-cases/update-post.use-case';
 import { RemovePostByIdOldCommand } from './use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostCommand } from './use-cases/change-likeStatus-post.use-case';
+import { PostIdParams } from '../../common/params/postId.params';
+import { IdParams } from '../../common/params/id.params';
+
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
@@ -75,10 +78,13 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findPostById(
     @Request() req: any,
-    @Param('postId') postId: string,
+    @Param() params: PostIdParams,
   ): Promise<PostsWithoutOwnersInfoEntity> {
     const currentUser: UsersEntity | null = req.user;
-    const post = await this.postsService.findPostById(postId, currentUser);
+    const post = await this.postsService.findPostById(
+      params.postId,
+      currentUser,
+    );
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -102,12 +108,12 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   async createComment(
     @Request() req: any,
-    @Param('postId') postId: string,
+    @Param() params: PostIdParams,
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const currentUser: UsersEntity = req.user;
     return await this.commandBus.execute(
-      new CreateCommentCommand(postId, createCommentDto, currentUser),
+      new CreateCommentCommand(params.postId, createCommentDto, currentUser),
     );
   }
   @Get(':postId/comments')
@@ -116,7 +122,7 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findCommentsByPostId(
     @Request() req: any,
-    @Param('postId') postId: string,
+    @Param() params: PostIdParams,
     @Query() query: any,
   ) {
     const currentUser: UsersEntity | null = req.user;
@@ -127,11 +133,11 @@ export class PostsController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    const post = await this.postsService.checkPostInDB(postId);
+    const post = await this.postsService.checkPostInDB(params.postId);
     if (!post) throw new NotFoundException();
     return await this.commentsService.findCommentsByPostId(
       queryPagination,
-      postId,
+      params.postId,
       currentUser,
     );
   }
@@ -141,7 +147,7 @@ export class PostsController {
   @Put(':id')
   async updatePost(
     @Request() req: any,
-    @Param('id') id: string,
+    @Param() params: IdParams,
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const currentUserDto = req.user;
@@ -150,7 +156,10 @@ export class PostsController {
       userLogin: currentUserDto.login,
       isBanned: currentUserDto.banInfo.isBanned,
     };
-    const updatePostPlusIdDto: UpdatePostPlusIdDto = { ...updatePostDto, id };
+    const updatePostPlusIdDto: UpdatePostPlusIdDto = {
+      ...updatePostDto,
+      id: params.id,
+    };
     const updatePost = await this.commandBus.execute(
       new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
     );
@@ -160,21 +169,27 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
-  async removePost(@Param('id') id: string) {
-    return await this.commandBus.execute(new RemovePostByIdOldCommand(id));
+  async removePost(@Param() params: IdParams) {
+    return await this.commandBus.execute(
+      new RemovePostByIdOldCommand(params.id),
+    );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Put(':postId/like-status')
   async changeLikeStatusPost(
     @Request() req: any,
-    @Param('postId') postId: string,
+    @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUser = req.user;
 
     return await this.commandBus.execute(
-      new ChangeLikeStatusPostCommand(postId, likeStatusDto, currentUser),
+      new ChangeLikeStatusPostCommand(
+        params.postId,
+        likeStatusDto,
+        currentUser,
+      ),
     );
   }
 }

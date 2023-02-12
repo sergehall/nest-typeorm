@@ -31,6 +31,7 @@ import { RegDataDto } from '../dto/reg-data.dto';
 import { CreateUserCommand } from './use-cases/create-user-byInstance.use-case';
 import { UpdateUserCommand } from './use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from './use-cases/remove-user-byId.use-case';
+import { IdParams } from '../../common/params/id.params';
 
 @SkipThrottle()
 @Controller('users')
@@ -63,8 +64,8 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async findUserByUserId(@Param('id') id: string) {
-    return this.usersService.findUserByUserId(id);
+  async findUserByUserId(@Param() params: IdParams) {
+    return this.usersService.findUserByUserId(params.id);
   }
 
   @Post()
@@ -94,13 +95,13 @@ export class UsersController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Param('id') id: string,
+    @Param() params: IdParams,
     @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const currentUser = req.user;
     const result = await this.commandBus.execute(
-      new UpdateUserCommand(id, updateUserDto, currentUser),
+      new UpdateUserCommand(params.id, updateUserDto, currentUser),
     );
     if (!result) throw new NotFoundException();
     return result;
@@ -108,10 +109,10 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
-  async removeUserById(@Request() req: any, @Param('id') id: string) {
+  async removeUserById(@Request() req: any, @Param() params: IdParams) {
     const currentUser = req.user;
     return await this.commandBus.execute(
-      new RemoveUserByIdCommand(id, currentUser),
+      new RemoveUserByIdCommand(params.id, currentUser),
     );
   }
 }

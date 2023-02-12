@@ -38,6 +38,7 @@ import { BanUserCommand } from '../../users/application/use-cases/ban-user.use-c
 import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-cases/change-banStatus-comments.use-case';
 import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { RemoveDevicesBannedUserCommand } from '../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
+import { IdParams } from '../../common/params/id.params';
 
 @SkipThrottle()
 @Controller('sa')
@@ -129,10 +130,10 @@ export class SaController {
   @Delete('users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async removeUserById(@Request() req: any, @Param('id') id: string) {
+  async removeUserById(@Request() req: any, @Param() params: IdParams) {
     const currentUser = req.user;
     return await this.commandBus.execute(
-      new RemoveUserByIdCommand(id, currentUser),
+      new RemoveUserByIdCommand(params.id, currentUser),
     );
   }
   @Put('users/:id/ban')
@@ -140,19 +141,21 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   async banUser(
     @Request() req: any,
-    @Param('id') id: string,
+    @Param() params: IdParams,
     @Body() updateSaBanDto: UpdateBanDto,
   ) {
     const currentUser = req.user;
-    await this.commandBus.execute(new RemoveDevicesBannedUserCommand(id));
     await this.commandBus.execute(
-      new ChangeBanStatusCommentsCommand(id, updateSaBanDto.isBanned),
+      new RemoveDevicesBannedUserCommand(params.id),
     );
     await this.commandBus.execute(
-      new ChangeBanStatusPostsCommand(id, updateSaBanDto.isBanned),
+      new ChangeBanStatusCommentsCommand(params.id, updateSaBanDto.isBanned),
+    );
+    await this.commandBus.execute(
+      new ChangeBanStatusPostsCommand(params.id, updateSaBanDto.isBanned),
     );
     return await this.commandBus.execute(
-      new BanUserCommand(id, updateSaBanDto, currentUser),
+      new BanUserCommand(params.id, updateSaBanDto, currentUser),
     );
   }
 }
