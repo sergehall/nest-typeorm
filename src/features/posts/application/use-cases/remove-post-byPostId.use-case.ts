@@ -39,7 +39,9 @@ export class RemovePostByPostIdUseCase
         id: command.currentUser.id,
       });
 
-      return await this.postsRepository.removePost(command.postId);
+      const removePost = await this.postsRepository.removePost(command.postId);
+      if (!removePost) throw new NotFoundException();
+      return removePost;
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

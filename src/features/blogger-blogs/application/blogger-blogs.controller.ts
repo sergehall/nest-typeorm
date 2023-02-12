@@ -110,6 +110,7 @@ export class BloggerBlogsController {
       new CreatePostCommand(createPostDto, ownerInfoDto),
     );
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Put(':id')
@@ -123,6 +124,7 @@ export class BloggerBlogsController {
       new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUser),
     );
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
@@ -132,6 +134,7 @@ export class BloggerBlogsController {
       new RemoveBlogByIdCommand(params.id, currentUser),
     );
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Put(':blogId/posts/:postId')
@@ -140,11 +143,6 @@ export class BloggerBlogsController {
     @Param() params: BlogIdPostIdParams,
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
-    // =========-===================
-    console.log('---------updatePostByPostId----------');
-    console.log(params.blogId);
-    console.log(params.postId);
-    console.log('-------------------');
     const currentUserDto: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUserDto.id,
