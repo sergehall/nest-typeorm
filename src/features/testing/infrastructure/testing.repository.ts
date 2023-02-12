@@ -27,23 +27,23 @@ export class TestingRepository {
     @Inject(ProvidersEnums.CONFIRM_CODE_MODEL)
     private EmailsConfirmModel: Model<EmailsConfirmCodeDocument>,
     @Inject(ProvidersEnums.BL_REFRESH_JWT_MODEL)
-    private JwtRefreshBlacklist: Model<refreshTokenBlackListDocument>,
+    private JwtRefreshBlacklistModel: Model<refreshTokenBlackListDocument>,
     @Inject(ProvidersEnums.DEVICES_MODEL)
-    private MyModelDevicesSchema: Model<DevicesDocument>,
+    private MyModelDevicesModel: Model<DevicesDocument>,
     @Inject(ProvidersEnums.BBLOG_MODEL)
     private BBlogsModel: Model<BBlogsDocument>,
   ) {}
   async removeAllCollections(): Promise<boolean> {
     // delete all Collections
     await this.UsersModel.deleteMany({});
+    await this.BBlogsModel.deleteMany({});
     await this.PostsModel.deleteMany({});
     await this.CommentsModel.deleteMany({});
     await this.LikeStatusPostModel.deleteMany({});
     await this.LikeStatusCommentModel.deleteMany({});
     await this.EmailsConfirmModel.deleteMany({});
-    await this.JwtRefreshBlacklist.deleteMany({});
-    await this.MyModelDevicesSchema.deleteMany({});
-    await this.BBlogsModel.deleteMany({});
+    await this.JwtRefreshBlacklistModel.deleteMany({});
+    await this.MyModelDevicesModel.deleteMany({});
     return true;
   }
 }

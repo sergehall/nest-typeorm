@@ -10,14 +10,14 @@ import { PayloadDto } from '../../auth/dto/payload.dto';
 export class SecurityDevicesRepository {
   constructor(
     @Inject(ProvidersEnums.DEVICES_MODEL)
-    private MyModelDevicesSchema: Model<DevicesDocument>,
+    private MyModelDevicesModel: Model<DevicesDocument>,
   ) {}
   async createOrUpdateDevice(
     filter: FiltersDevicesEntity,
     newDevices: SessionDevicesEntity,
   ): Promise<boolean> {
     try {
-      return await this.MyModelDevicesSchema.findOneAndUpdate(
+      return await this.MyModelDevicesModel.findOneAndUpdate(
         filter,
         {
           $set: newDevices,
@@ -33,7 +33,7 @@ export class SecurityDevicesRepository {
     payload: PayloadDto,
   ): Promise<boolean> {
     try {
-      const result = await this.MyModelDevicesSchema.deleteOne({
+      const result = await this.MyModelDevicesModel.deleteOne({
         $and: [{ userId: payload.userId }, { deviceId: payload.deviceId }],
       });
       return result.deletedCount === 1;
@@ -43,7 +43,7 @@ export class SecurityDevicesRepository {
   }
   async findDevices(payload: PayloadDto): Promise<SessionDevicesEntity[]> {
     try {
-      return await this.MyModelDevicesSchema.find(
+      return await this.MyModelDevicesModel.find(
         {
           $and: [
             { userId: payload.userId },
@@ -64,7 +64,7 @@ export class SecurityDevicesRepository {
   }
   async removeDevicesExceptCurrent(payload: PayloadDto): Promise<boolean> {
     try {
-      return await this.MyModelDevicesSchema.deleteMany({
+      return await this.MyModelDevicesModel.deleteMany({
         $and: [
           { userId: payload.userId },
           { deviceId: { $ne: payload.deviceId } },
@@ -80,7 +80,7 @@ export class SecurityDevicesRepository {
     payload: PayloadDto,
   ): Promise<string> {
     try {
-      const findByDeviceId = await this.MyModelDevicesSchema.findOne({
+      const findByDeviceId = await this.MyModelDevicesModel.findOne({
         deviceId: deviceId,
       }).lean();
       if (!findByDeviceId) {
@@ -88,17 +88,17 @@ export class SecurityDevicesRepository {
       } else if (findByDeviceId && findByDeviceId.userId !== payload.userId) {
         return '403';
       }
-      await this.MyModelDevicesSchema.deleteOne({ deviceId: deviceId });
+      await this.MyModelDevicesModel.deleteOne({ deviceId: deviceId });
       return '204';
     } catch (e: any) {
       return e.toString();
     }
   }
   async removeDevicesBannedUser(userId: string) {
-    const remove = await this.MyModelDevicesSchema.deleteMany({
+    const remove = await this.MyModelDevicesModel.deleteMany({
       userId: userId,
     });
     remove.acknowledged;
-    return await this.MyModelDevicesSchema.deleteMany({ userId: userId });
+    return await this.MyModelDevicesModel.deleteMany({ userId: userId });
   }
 }

@@ -91,6 +91,9 @@ export class BloggerBlogsController {
     @Param() params: BlogIdParams,
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
+    console.log('---------createPostByBlogId----------');
+    console.log(params.blogId);
+    console.log('-------------------');
     const currentUser: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUser.id,
@@ -138,8 +141,10 @@ export class BloggerBlogsController {
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
     // =========-===================
+    console.log('---------updatePostByPostId----------');
     console.log(params.blogId);
     console.log(params.postId);
+    console.log('-------------------');
     const currentUserDto: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUserDto.id,
