@@ -9,11 +9,11 @@ import { BloggerBlogsRepository } from '../features/blogger-blogs/infrastructure
 @ValidatorConstraint({ name: 'BlogExists', async: true })
 @Injectable()
 export class BlogExistsRule implements ValidatorConstraintInterface {
-  constructor(private blogsRepository: BloggerBlogsRepository) {}
+  constructor(private bloggerBlogsRepository: BloggerBlogsRepository) {}
 
   async validate(value: string) {
     try {
-      if (await this.blogsRepository.findBlogById(value)) {
+      if (await this.bloggerBlogsRepository.findBlogById(value)) {
         return true;
       }
     } catch (e) {

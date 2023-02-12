@@ -18,9 +18,9 @@ export class CreatePostDto {
   })
   content: string;
   @IsNotEmpty()
-  @Validate(BlogExistsRule)
   @Length(0, 100, {
     message: 'Incorrect blogId length! Must be max 100 ch.',
   })
+  @Validate(BlogExistsRule)
   blogId: string;
 }
