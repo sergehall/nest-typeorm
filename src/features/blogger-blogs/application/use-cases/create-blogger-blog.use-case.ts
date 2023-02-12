@@ -18,6 +18,7 @@ export class CreateBloggerBlogUseCase
       ...command.blogsOwnerDto,
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),
+      isMembership: true,
     };
     const newBlog: BloggerBlogsEntity =
       await this.bloggerBlogsRepository.createBlogs(blogsEntity);
@@ -27,6 +28,7 @@ export class CreateBloggerBlogUseCase
       description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
       createdAt: newBlog.createdAt,
+      isMembership: newBlog.isMembership,
     };
   }
 }

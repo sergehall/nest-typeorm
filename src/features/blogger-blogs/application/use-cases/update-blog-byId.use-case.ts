@@ -40,6 +40,7 @@ export class UpdateBlogByIdUseCase
         description: command.updateBlogDto.description,
         websiteUrl: command.updateBlogDto.websiteUrl,
         createdAt: blogToUpdate.createdAt,
+        isMembership: blogToUpdate.isMembership,
         blogOwnerInfo: {
           userId: blogToUpdate.blogOwnerInfo.userId,
           userLogin: blogToUpdate.blogOwnerInfo.userLogin,

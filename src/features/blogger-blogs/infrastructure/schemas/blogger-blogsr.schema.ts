@@ -24,6 +24,8 @@ export class BBlogs {
   @Prop({ required: true })
   createdAt: string;
   @Prop({ required: true })
+  isMembership: boolean;
+  @Prop({ required: true })
   blogOwnerInfo: BlogsOwnerInfo;
 }
 
