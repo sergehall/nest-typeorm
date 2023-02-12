@@ -31,6 +31,9 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { OwnerInfoDto } from '../../posts/dto/ownerInfo.dto';
 import { UpdatePostPlusIdDto } from '../../posts/dto/update-post-plusId.dto';
 import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
+import { ParamsBlogIdPostIdDto } from '../dto/params-blogId-postId.dto';
+import { ParamsIdDto } from '../dto/params-id.dto';
+import { ParamsBlogIdDto } from '../dto/params-blogId.dto';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -85,7 +88,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtAuthGuard)
   async createPostByBlogId(
     @Request() req: any,
-    @Param('blogId') blogId: string,
+    @Param() params: ParamsBlogIdDto,
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
@@ -98,7 +101,7 @@ export class BloggerBlogsController {
       title: createPostBBlogsDto.title,
       shortDescription: createPostBBlogsDto.shortDescription,
       content: createPostBBlogsDto.content,
-      blogId: blogId,
+      blogId: params.blogId,
     };
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, ownerInfoDto),
@@ -109,21 +112,21 @@ export class BloggerBlogsController {
   @Put(':id')
   async updateBlogById(
     @Request() req: any,
-    @Param('id') id: string,
+    @Param() params: ParamsIdDto,
     @Body() updateBlogDto: CreateBloggerBlogsDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new UpdateBlogByIdCommand(id, updateBlogDto, currentUser),
+      new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUser),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async removeBlogById(@Request() req: any, @Param('id') id: string) {
+  async removeBlogById(@Request() req: any, @Param() params: ParamsIdDto) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemoveBlogByIdCommand(id, currentUser),
+      new RemoveBlogByIdCommand(params.id, currentUser),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -131,10 +134,11 @@ export class BloggerBlogsController {
   @Put(':blogId/posts/:postId')
   async updatePostByPostId(
     @Request() req: any,
-    @Param('blogId') blogId: string,
-    @Param('postId') postId: string,
+    @Param() params: ParamsBlogIdPostIdDto,
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
+    console.log(params.blogId);
+    console.log(params.postId);
     const currentUserDto: CurrentUserDto = req.user;
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUserDto.id,
@@ -142,11 +146,11 @@ export class BloggerBlogsController {
       isBanned: currentUserDto.banInfo.isBanned,
     };
     const updatePostPlusIdDto: UpdatePostPlusIdDto = {
-      id: postId,
+      id: params.postId,
       title: updatePostBBlogDto.title,
       shortDescription: updatePostBBlogDto.shortDescription,
       content: updatePostBBlogDto.content,
-      blogId: blogId,
+      blogId: params.blogId,
     };
     return await this.commandBus.execute(
       new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
@@ -157,12 +161,11 @@ export class BloggerBlogsController {
   @Delete(':blogId/posts/:postId')
   async removePostByPostId(
     @Request() req: any,
-    @Param('blogId') blogId: string,
-    @Param('postId') postId: string,
+    @Param() params: ParamsBlogIdPostIdDto,
   ) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemovePostByPostIdCommand(blogId, postId, currentUser),
+      new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
     );
   }
 }
