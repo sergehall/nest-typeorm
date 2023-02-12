@@ -25,6 +25,7 @@ export class BaseAuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
+    console.log(this.configService.get('auth').BASIC_AUTH);
     const exceptedAuthInput =
       'Basic ' + this.configService.get('auth').BASIC_AUTH;
     if (!request.headers || !request.headers.authorization) {

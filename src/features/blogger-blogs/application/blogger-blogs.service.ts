@@ -23,6 +23,9 @@ export class BloggerBlogsService {
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );
+    console.log(field, 'queryPagination.sortBy');
+    console.log(searchFilters, 'searchFilters');
+    console.log(convertedFilters, 'convertedFilters');
     const pagination = await this.pagination.convert(queryPagination, field);
     const totalCount = await this.bloggerBlogsRepository.countDocuments(
       convertedFilters,
