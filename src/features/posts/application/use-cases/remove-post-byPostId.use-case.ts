@@ -31,6 +31,8 @@ export class RemovePostByPostIdUseCase
       command.blogId,
     );
     if (!blogToDelete) throw new NotFoundException();
+    const post = await this.postsRepository.findPostById(command.postId);
+    if (!post) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
       id: blogToDelete.blogOwnerInfo.userId,
     });
@@ -38,10 +40,7 @@ export class RemovePostByPostIdUseCase
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: command.currentUser.id,
       });
-
-      const removePost = await this.postsRepository.removePost(command.postId);
-      if (!removePost) throw new NotFoundException();
-      return removePost;
+      return await this.postsRepository.removePost(command.postId);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

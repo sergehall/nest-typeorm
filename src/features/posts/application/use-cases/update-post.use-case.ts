@@ -29,6 +29,10 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
         command.updatePostPlusIdDto.blogId,
       );
     if (!blog) throw new NotFoundException();
+    const post = await this.postsRepository.findPostById(
+      command.updatePostPlusIdDto.id,
+    );
+    if (!post) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForBBlogger({
       id: blog.blogOwnerInfo.userId,
     });
