@@ -33,9 +33,8 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
       id: blog.blogOwnerInfo.userId,
     });
     try {
-      // needs to take command.ownerInfoDto.userId,
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: blog.blogOwnerInfo.userId,
+        id: command.ownerInfoDto.userId,
       });
       return await this.postsRepository.updatePost(command.updatePostPlusIdDto);
     } catch (error) {
