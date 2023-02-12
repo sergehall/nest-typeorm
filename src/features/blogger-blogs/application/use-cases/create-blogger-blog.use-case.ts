@@ -18,7 +18,7 @@ export class CreateBloggerBlogUseCase
       ...command.blogsOwnerDto,
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
     };
     const newBlog: BloggerBlogsEntity =
       await this.bloggerBlogsRepository.createBlogs(blogsEntity);
