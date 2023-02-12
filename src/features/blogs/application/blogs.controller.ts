@@ -13,9 +13,6 @@ export class BlogsController {
   async findBlogs(
     @Param() params: IdParams,
   ): Promise<BloggerBlogsEntity | null> {
-    console.log('------------BlogsController--findBlogs------------------');
-    console.log('-----------------', params.id, '--------------');
-    console.log('--------------------------------');
     const blog = await this.blogsService.findBlogs(params.id);
     if (!blog) {
       throw new NotFoundException();
