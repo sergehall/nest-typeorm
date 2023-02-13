@@ -3,6 +3,7 @@ import { SortOrder } from '../../parse-query/types/sort-order.types';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { CommentsEntity } from '../../../comments/entities/comments.entity';
+import { BBlogsBannedUsersEntity } from '../../../comments/entities/bBlogs-banned-users.entity';
 
 export type PaginationTypes = {
   pagesCount: number;
@@ -13,7 +14,8 @@ export type PaginationTypes = {
     | PostsEntity[]
     | CommentsEntity[]
     | BloggerBlogsEntity[]
-    | UsersEntity[];
+    | UsersEntity[]
+    | BBlogsBannedUsersEntity[];
 };
 export type PaginationDBType = {
   startIndex: number;

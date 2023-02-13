@@ -27,7 +27,7 @@ export class UpdateBlogByIdUseCase
     const blogToUpdate: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepository.findBlogById(command.id);
     if (!blogToUpdate) throw new NotFoundException();
-    const ability = this.caslAbilityFactory.createForBBlogger({
+    const ability = this.caslAbilityFactory.createForBBlogs({
       id: blogToUpdate.blogOwnerInfo.userId,
     });
     try {

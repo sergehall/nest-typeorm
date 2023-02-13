@@ -9,7 +9,7 @@ import { CommentsDocument } from '../../comments/infrastructure/schemas/comments
 import { EmailsConfirmCodeDocument } from '../../mails/infrastructure/schemas/email-confirm-code.schema';
 import { DevicesDocument } from '../../security-devices/infrastructure/schemas/devices.schema';
 import { refreshTokenBlackListDocument } from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
-import { BBlogsDocument } from '../../blogger-blogs/infrastructure/schemas/blogger-blogsr.schema';
+import { BBlogsDocument } from '../../blogger-blogs/infrastructure/schemas/blogger-blogs.schema';
 
 @Injectable()
 export class TestingRepository {

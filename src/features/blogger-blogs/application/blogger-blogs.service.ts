@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
@@ -12,7 +12,7 @@ export class BloggerBlogsService {
   constructor(
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
-    private bloggerBlogsRepository: BloggerBlogsRepository,
+    protected bloggerBlogsRepository: BloggerBlogsRepository,
   ) {}
 
   async findBlogs(
@@ -72,5 +72,37 @@ export class BloggerBlogsService {
 
   async findBlogByIdForBlogs(id: string): Promise<BloggerBlogsEntity | null> {
     return this.bloggerBlogsRepository.findBlogByIdForBlogs(id);
+  }
+  async findBannedUsers(
+    blogId: string,
+    queryPagination: PaginationDto,
+    searchFilters: QueryArrType,
+  ): Promise<PaginationTypes> {
+    const blog = await this.bloggerBlogsRepository.findBlogById(blogId);
+    if (!blog) throw new NotFoundException();
+    const field = queryPagination.sortBy;
+    const pageNumber = queryPagination.pageNumber;
+    const pageSize = queryPagination.pageSize;
+    const convertedFilters = await this.convertFiltersForDB.convert(
+      searchFilters,
+    );
+    const totalCount =
+      await this.bloggerBlogsRepository.countBannedUsersDocuments(
+        convertedFilters,
+      );
+    const pagesCount = Math.ceil(totalCount / pageSize);
+    const pagination = await this.pagination.convert(queryPagination, field);
+    const bannedUsers = await this.bloggerBlogsRepository.findBannedUsers(
+      pagination,
+      convertedFilters,
+    );
+
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: totalCount,
+      items: bannedUsers,
+    };
   }
 }

@@ -4,30 +4,34 @@ import { ProvidersEnums } from '../../../infrastructure/database/enums/providers
 import { Model } from 'mongoose';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
-import { BBlogsDocument } from './schemas/blogger-blogsr.schema';
+import { BBlogsDocument } from './schemas/blogger-blogs.schema';
+import { BBlogsBannedUsersEntity } from '../../comments/entities/bBlogs-banned-users.entity';
+import { BBlogsBannedUserDocument } from './schemas/blogger-blogs-banned-users.schema';
 
 @Injectable()
 export class BloggerBlogsRepository {
   constructor(
     @Inject(ProvidersEnums.BBLOG_MODEL)
-    private BlogsModel: Model<BBlogsDocument>,
+    private BBlogsModel: Model<BBlogsDocument>,
+    @Inject(ProvidersEnums.BBLOG_BANNED_USER_MODEL)
+    private BBannedUsersModel: Model<BBlogsBannedUserDocument>,
   ) {}
   async createBlogs(
     blogsEntity: BloggerBlogsEntity,
   ): Promise<BloggerBlogsEntity> {
     try {
-      return await this.BlogsModel.create(blogsEntity);
+      return await this.BBlogsModel.create(blogsEntity);
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
   }
   async countDocuments(searchFilters: QueryArrType): Promise<number> {
-    return await this.BlogsModel.countDocuments({
+    return await this.BBlogsModel.countDocuments({
       $and: searchFilters,
     });
   }
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
-    return await this.BlogsModel.findOne(
+    return await this.BBlogsModel.findOne(
       { id: blogId },
       {
         _id: false,
@@ -38,7 +42,7 @@ export class BloggerBlogsRepository {
   async findBlogByIdForBlogs(
     blogId: string,
   ): Promise<BloggerBlogsEntity | null> {
-    return await this.BlogsModel.findOne(
+    return await this.BBlogsModel.findOne(
       { id: blogId },
       {
         _id: false,
@@ -51,7 +55,7 @@ export class BloggerBlogsRepository {
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity[]> {
-    return await this.BlogsModel.find(
+    return await this.BBlogsModel.find(
       {
         $and: searchFilters,
       },
@@ -70,7 +74,7 @@ export class BloggerBlogsRepository {
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity[]> {
-    return await this.BlogsModel.find(
+    return await this.BBlogsModel.find(
       {
         $or: searchFilters,
       },
@@ -87,7 +91,7 @@ export class BloggerBlogsRepository {
       .lean();
   }
   async updatedBlogById(blogEntity: BloggerBlogsEntity): Promise<boolean> {
-    return await this.BlogsModel.findOneAndUpdate(
+    return await this.BBlogsModel.findOneAndUpdate(
       { id: blogEntity.id },
       {
         $set: {
@@ -106,7 +110,56 @@ export class BloggerBlogsRepository {
     ).lean();
   }
   async removeBlogById(id: string): Promise<boolean> {
-    const result = await this.BlogsModel.deleteOne({ id: id });
+    const result = await this.BBlogsModel.deleteOne({ id: id });
     return result.acknowledged && result.deletedCount === 1;
+  }
+  async banUserForBlog(
+    blogId: string,
+    banUserInfo: BBlogsBannedUsersEntity,
+  ): Promise<boolean> {
+    const updateBan = await this.BBannedUsersModel.findOneAndUpdate(
+      { $and: [{ id: banUserInfo.id, blogId: blogId }] },
+      {
+        $set: {
+          blogId: blogId,
+          id: banUserInfo.id,
+          login: banUserInfo.login,
+          createdAt: banUserInfo.createdAt,
+          'banInfo.isBanned': banUserInfo.banInfo.isBanned,
+          'banInfo.banReason': banUserInfo.banInfo.banReason,
+          'banInfo.banDate': banUserInfo.banInfo.banDate,
+        },
+      },
+      { upsert: true },
+    );
+    return updateBan !== null;
+  }
+  async countBannedUsersDocuments(
+    searchFilters: QueryArrType,
+  ): Promise<number> {
+    return await this.BBannedUsersModel.countDocuments({
+      $and: searchFilters,
+    });
+  }
+  async findBannedUsers(
+    pagination: PaginationDBType,
+    searchFilters: QueryArrType,
+  ): Promise<BBlogsBannedUsersEntity[]> {
+    return await this.BBannedUsersModel.find(
+      {
+        $and: searchFilters,
+      },
+      {
+        blogId: false,
+        createdAt: false,
+        _id: false,
+        __v: false,
+        'banInfo._id': false,
+      },
+    )
+      .limit(pagination.pageSize)
+      .skip(pagination.startIndex)
+      .sort({ [pagination.field]: pagination.direction })
+      .lean();
   }
 }

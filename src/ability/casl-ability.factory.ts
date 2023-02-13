@@ -52,12 +52,12 @@ export class CaslAbilityFactory {
     can(Action.DELETE, 'all', ({ id }) => id === user.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForBBlogger(blogger: BloggerBlogsBlogIdEntity) {
+  createForBBlogs(blogs: BloggerBlogsBlogIdEntity) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
-    can(Action.CREATE, 'all', ({ id }) => id === blogger.id);
-    can(Action.UPDATE, 'all', ({ id }) => id === blogger.id);
-    can(Action.DELETE, 'all', ({ id }) => id === blogger.id);
+    can(Action.CREATE, 'all', ({ id }) => id === blogs.id);
+    can(Action.UPDATE, 'all', ({ id }) => id === blogs.id);
+    can(Action.DELETE, 'all', ({ id }) => id === blogs.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
 }

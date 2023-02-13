@@ -3,7 +3,7 @@ import { IsNotEmpty, Length, Matches } from 'class-validator';
 export class SessionDevicesEntity {
   @IsNotEmpty()
   @Length(0, 100, {
-    message: 'Incorrect id! Must be max 15 ch.',
+    message: 'Incorrect id! Must be max 100 ch.',
   })
   userId: string;
   @IsNotEmpty()

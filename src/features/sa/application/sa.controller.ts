@@ -34,7 +34,7 @@ import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
-import { BanUserCommand } from '../../users/application/use-cases/ban-user.use-case';
+import { BanUserCommand } from './use-cases/ban-user.use-case';
 import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-cases/change-banStatus-comments.use-case';
 import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { RemoveDevicesBannedUserCommand } from '../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';

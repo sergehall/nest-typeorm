@@ -31,7 +31,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         command.createPostDto.blogId,
       );
     if (!blog) throw new NotFoundException();
-    const ability = this.caslAbilityFactory.createForBBlogger({
+    const ability = this.caslAbilityFactory.createForBBlogs({
       id: blog.blogOwnerInfo.userId,
     });
     try {

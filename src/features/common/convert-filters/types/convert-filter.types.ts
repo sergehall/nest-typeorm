@@ -5,4 +5,5 @@ export type QueryArrType = {
   blogId?: string;
   userId?: string;
   banStatus?: string;
+  'banInfo.isBanned'?: boolean;
 }[];

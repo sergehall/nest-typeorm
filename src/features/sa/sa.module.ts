@@ -17,7 +17,7 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
 import { ChangeRoleUseCase } from './application/use-cases/change-role.use-case';
-import { BanUserUseCase } from '../users/application/use-cases/ban-user.use-case';
+import { BanUserUseCase } from './application/use-cases/ban-user.use-case';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,

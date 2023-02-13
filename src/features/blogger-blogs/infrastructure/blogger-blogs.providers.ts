@@ -10,7 +10,15 @@ import {
   LikeStatusPostSchema,
   LikeStatusPostsDocument,
 } from '../../posts/infrastructure/schemas/like-status-posts.schemas';
-import { BBlogsSchema, BBlogsDocument } from './schemas/blogger-blogsr.schema';
+import { BBlogsSchema, BBlogsDocument } from './schemas/blogger-blogs.schema';
+import {
+  UsersDocument,
+  UsersSchema,
+} from '../../users/infrastructure/schemas/user.schema';
+import {
+  BBlogsBannedUserDocument,
+  BBlogsBannedUsersSchema,
+} from './schemas/blogger-blogs-banned-users.schema';
 
 export const bloggerBlogsProviders = [
   {
@@ -40,6 +48,26 @@ export const bloggerBlogsProviders = [
         NamesCollectionsEnums.BBLOGS,
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<UsersDocument>(
+        NamesCollectionsEnums.USERS,
+        UsersSchema,
+        NamesCollectionsEnums.USERS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<BBlogsBannedUserDocument>(
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+        BBlogsBannedUsersSchema,
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },

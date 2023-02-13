@@ -1,10 +1,13 @@
-import { UpdateBanDto } from '../../../sa/dto/update-sa.dto';
-import { BanInfo, User } from '../../infrastructure/schemas/user.schema';
+import { UpdateBanDto } from '../../dto/update-sa.dto';
+import {
+  BanInfo,
+  User,
+} from '../../../users/infrastructure/schemas/user.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class BanUserCommand {
@@ -40,7 +43,7 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
       const ability = this.caslAbilityFactory.createForUser(
         command.currentUser,
       );
-      ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToBan);
+      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
       return this.usersRepository.banUser(userToBan, updateBan);
     } catch (error) {
       if (error instanceof ForbiddenError) {

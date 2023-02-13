@@ -15,11 +15,16 @@ import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
+import { FindCommentsCurrentUserUseCase } from './application/use-cases/find-comments-current-user.use-case';
+import { BlogBanUserUseCase } from './application/use-cases/blog-ban-user.use-case';
+import { UsersRepository } from '../users/infrastructure/users.repository';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,
+  FindCommentsCurrentUserUseCase,
+  BlogBanUserUseCase,
 ];
 
 @Module({
@@ -27,6 +32,7 @@ const bloggersBlogUseCases = [
   controllers: [BloggerBlogsController],
   providers: [
     BloggerBlogsService,
+    UsersRepository,
     BloggerBlogsRepository,
     PostsService,
     Pagination,

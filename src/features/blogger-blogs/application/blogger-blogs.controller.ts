@@ -34,16 +34,19 @@ import { UpdatePostCommand } from '../../posts/application/use-cases/update-post
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { IdParams } from '../../common/params/id.params';
 import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
+import { FindCommentsCurrentUserCommand } from './use-cases/find-comments-current-user.use-case';
+import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
+import { BlogBanUserCommand } from './use-cases/blog-ban-user.use-case';
 
 @SkipThrottle()
-@Controller('blogger/blogs')
+@Controller('blogger')
 export class BloggerBlogsController {
   constructor(
     private readonly bBloggerService: BloggerBlogsService,
     protected commandBus: CommandBus,
   ) {}
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('blogs')
   async findBlogsCurrentUser(
     @Request() req: any,
     @Query() query: any,
@@ -63,14 +66,32 @@ export class BloggerBlogsController {
       userIdFilter,
     ]);
   }
-  @Post()
+
+  @UseGuards(JwtAuthGuard)
+  @Get('blogs/comments')
+  async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
+    const currentUser = req.user;
+    const userIdFilter = { userId: currentUser.id };
+    const paginationData = ParseQuery.getPaginationData(query);
+    const queryPagination: PaginationDto = {
+      pageNumber: paginationData.pageNumber,
+      pageSize: paginationData.pageSize,
+      sortBy: paginationData.sortBy,
+      sortDirection: paginationData.sortDirection,
+    };
+    return await this.commandBus.execute(
+      new FindCommentsCurrentUserCommand(queryPagination, [userIdFilter]),
+    );
+  }
+
+  @Post('blogs')
   @UseGuards(JwtAuthGuard)
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
   ) {
     const currentUser = req.user;
-    const blogsOwnerDto = {
+    const blogDto = {
       name: createBBlogsDto.name,
       description: createBBlogsDto.description,
       websiteUrl: createBBlogsDto.websiteUrl,
@@ -80,11 +101,9 @@ export class BloggerBlogsController {
         isBanned: currentUser.banInfo.isBanned,
       },
     };
-    return await this.commandBus.execute(
-      new CreateBloggerBlogCommand(blogsOwnerDto),
-    );
+    return await this.commandBus.execute(new CreateBloggerBlogCommand(blogDto));
   }
-  @Post(':blogId/posts')
+  @Post('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   async createPostByBlogId(
     @Request() req: any,
@@ -110,7 +129,7 @@ export class BloggerBlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @Put('blogs/:id')
   async updateBlogById(
     @Request() req: any,
     @Param() params: IdParams,
@@ -124,7 +143,7 @@ export class BloggerBlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('blogs/:id')
   async removeBlogById(@Request() req: any, @Param() params: IdParams) {
     const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
@@ -134,7 +153,7 @@ export class BloggerBlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  @Put(':blogId/posts/:postId')
+  @Put('blogs/:blogId/posts/:postId')
   async updatePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
@@ -159,14 +178,52 @@ export class BloggerBlogsController {
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  @Delete(':blogId/posts/:postId')
+  @Delete('blogs/:blogId/posts/:postId')
   async removePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
   ) {
-    const currentUser: CurrentUserDto = req.user;
+    const currentUser = req.user;
     return await this.commandBus.execute(
       new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
     );
+  }
+  @Put('users/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async banUser(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() updateBanUserDto: UpdateBanUserDto,
+  ) {
+    const currentUser = req.user;
+    return await this.commandBus.execute(
+      new BlogBanUserCommand(params.id, updateBanUserDto, currentUser),
+    );
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('users/blog/:id')
+  async findBannedUsers(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Query() query: any,
+  ) {
+    // const currentUser = req.user;
+    const blogId = params.id;
+    const queryData = ParseQuery.getPaginationData(query);
+    const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
+    const searchByBlogId = { blogId: blogId };
+    const banStatus = { banStatus: 'true' };
+    const queryPagination: PaginationDto = {
+      pageNumber: queryData.pageNumber,
+      pageSize: queryData.pageSize,
+      sortBy: queryData.sortBy,
+      sortDirection: queryData.sortDirection,
+    };
+    return await this.bBloggerService.findBannedUsers(blogId, queryPagination, [
+      searchLoginTerm,
+      searchByBlogId,
+      banStatus,
+    ]);
   }
 }

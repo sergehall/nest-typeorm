@@ -6,7 +6,7 @@ import { ConnectionEnums } from '../../../infrastructure/database/enums/connecti
 import {
   BBlogsDocument,
   BBlogsSchema,
-} from '../../blogger-blogs/infrastructure/schemas/blogger-blogsr.schema';
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogs.schema';
 import {
   PostsDocument,
   PostsSchema,
@@ -15,6 +15,10 @@ import {
   LikeStatusPostSchema,
   LikeStatusPostsDocument,
 } from '../../posts/infrastructure/schemas/like-status-posts.schemas';
+import {
+  BBlogsBannedUserDocument,
+  BBlogsBannedUsersSchema,
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogs-banned-users.schema';
 
 export const blogsProviders = [
   {
@@ -54,6 +58,16 @@ export const blogsProviders = [
         NamesCollectionsEnums.LIKE_STATUS_POST,
         LikeStatusPostSchema,
         NamesCollectionsEnums.LIKE_STATUS_POST,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<BBlogsBannedUserDocument>(
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+        BBlogsBannedUsersSchema,
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },
