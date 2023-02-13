@@ -34,7 +34,8 @@ export class UpdateBlogByIdUseCase
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: command.currentUser.id,
       });
-      const blogEntity: BloggerBlogsEntity = {
+
+      const updatedBlog: BloggerBlogsEntity = {
         id: blogToUpdate.id,
         name: command.updateBlogDto.name,
         description: command.updateBlogDto.description,
@@ -46,8 +47,13 @@ export class UpdateBlogByIdUseCase
           userLogin: blogToUpdate.blogOwnerInfo.userLogin,
           isBanned: blogToUpdate.blogOwnerInfo.isBanned,
         },
+        banInfo: {
+          isBanned: blogToUpdate.banInfo.isBanned,
+          banDate: blogToUpdate.banInfo.banDate,
+          banReason: blogToUpdate.banInfo.banReason,
+        },
       };
-      return await this.bloggerBlogsRepository.updatedBlogById(blogEntity);
+      return await this.bloggerBlogsRepository.updatedBlogById(updatedBlog);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

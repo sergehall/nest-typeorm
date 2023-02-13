@@ -36,7 +36,7 @@ import { IdParams } from '../../common/params/id.params';
 import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
 import { FindCommentsCurrentUserCommand } from './use-cases/find-comments-current-user.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
-import { BlogBanUserCommand } from './use-cases/blog-ban-user.use-case';
+import { BanUserForBlogCommand } from './use-cases/ban-user-for-blog.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -191,14 +191,14 @@ export class BloggerBlogsController {
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async banUser(
+  async banUserForBlog(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateBanUserDto: UpdateBanUserDto,
   ) {
     const currentUser = req.user;
     return await this.commandBus.execute(
-      new BlogBanUserCommand(params.id, updateBanUserDto, currentUser),
+      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUser),
     );
   }
   @UseGuards(JwtAuthGuard)

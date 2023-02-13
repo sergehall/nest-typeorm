@@ -47,6 +47,7 @@ export class BloggerBlogsRepository {
       {
         _id: false,
         __v: false,
+        banInfo: false,
         blogOwnerInfo: false,
       },
     );
@@ -62,6 +63,7 @@ export class BloggerBlogsRepository {
       {
         _id: false,
         __v: false,
+        banInfo: false,
         blogOwnerInfo: false,
       },
     )
@@ -81,6 +83,7 @@ export class BloggerBlogsRepository {
       {
         _id: false,
         __v: false,
+        banInfo: false,
         'blogOwnerInfo._id': false,
         'blogOwnerInfo.isBanned': false,
       },
@@ -103,6 +106,11 @@ export class BloggerBlogsRepository {
           blogOwnerInfo: {
             userId: blogEntity.blogOwnerInfo.userId,
             userLogin: blogEntity.blogOwnerInfo.userLogin,
+          },
+          banInfo: {
+            isBanned: blogEntity.banInfo.isBanned,
+            banDate: blogEntity.banInfo.banDate,
+            banReason: blogEntity.banInfo.banReason,
           },
         },
       },

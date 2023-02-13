@@ -3,6 +3,15 @@ import { HydratedDocument } from 'mongoose';
 
 export type BBlogsDocument = HydratedDocument<BBlogs>;
 
+export class BanInfo {
+  @Prop({ required: true })
+  isBanned: boolean;
+  @Prop({ type: String, default: null })
+  banDate: string | null;
+  @Prop({ type: String, default: null })
+  banReason: string | null;
+}
+
 @Schema()
 export class BlogsOwnerInfo {
   @Prop({ required: true })
@@ -28,6 +37,8 @@ export class BBlogs {
   isMembership: boolean;
   @Prop({ required: true })
   blogOwnerInfo: BlogsOwnerInfo;
+  @Prop({ required: true, type: BanInfo })
+  banInfo: BanInfo;
 }
 
 export const BBlogsSchema = SchemaFactory.createForClass(BBlogs);

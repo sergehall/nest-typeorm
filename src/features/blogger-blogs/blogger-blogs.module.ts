@@ -16,7 +16,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
 import { FindCommentsCurrentUserUseCase } from './application/use-cases/find-comments-current-user.use-case';
-import { BlogBanUserUseCase } from './application/use-cases/blog-ban-user.use-case';
+import { BanUserForBlogUseCase } from './application/use-cases/ban-user-for-blog.use-case';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 
 const bloggersBlogUseCases = [
@@ -24,7 +24,7 @@ const bloggersBlogUseCases = [
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,
   FindCommentsCurrentUserUseCase,
-  BlogBanUserUseCase,
+  BanUserForBlogUseCase,
 ];
 
 @Module({

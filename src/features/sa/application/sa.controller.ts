@@ -28,7 +28,6 @@ import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { UpdateBanDto } from '../dto/update-sa.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
@@ -39,6 +38,8 @@ import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-c
 import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { RemoveDevicesBannedUserCommand } from '../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
 import { IdParams } from '../../common/params/id.params';
+import { SaBanUserDto } from '../dto/sa-ban-user..dto';
+import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 
 @SkipThrottle()
 @Controller('sa')
@@ -142,7 +143,7 @@ export class SaController {
   async banUser(
     @Request() req: any,
     @Param() params: IdParams,
-    @Body() updateSaBanDto: UpdateBanDto,
+    @Body() updateSaBanDto: SaBanUserDto,
   ) {
     const currentUser = req.user;
     await this.commandBus.execute(
@@ -157,5 +158,19 @@ export class SaController {
     return await this.commandBus.execute(
       new BanUserCommand(params.id, updateSaBanDto, currentUser),
     );
+  }
+  @Put('blogs/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async banBlogs(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() saBanBlogDto: SaBanBlogDto,
+  ) {
+    const currentUser = req.user;
+    console.log(currentUser, 'currentUser');
+    console.log(params.id, 'params.id');
+    console.log(saBanBlogDto, 'saBanBlogDto');
+    return true;
   }
 }

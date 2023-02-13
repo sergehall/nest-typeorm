@@ -19,7 +19,11 @@ export class CreateBloggerBlogUseCase
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),
       isMembership: false,
-      bannedUsers: [],
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     };
     const newBlog: BloggerBlogsEntity =
       await this.bloggerBlogsRepository.createBlogs(blogsEntity);

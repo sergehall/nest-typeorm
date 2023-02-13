@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, Length } from 'class-validator';
 
-export class UpdateBanDto {
+export class SaBanUserDto {
   @IsNotEmpty()
   @IsBoolean({
     message: 'Incorrect isBanned length! Must be boolean.',

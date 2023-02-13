@@ -1,5 +1,13 @@
 import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
 
+export class BanInfo {
+  @IsBoolean()
+  isBanned: boolean;
+  @IsNotEmpty()
+  banDate: string | null;
+  @IsNotEmpty()
+  banReason: string | null;
+}
 export class BlogOwnerInfo {
   @IsNotEmpty()
   @Length(0, 100, {
@@ -52,4 +60,6 @@ export class BloggerBlogsEntity {
   isMembership: boolean;
   @IsNotEmpty()
   blogOwnerInfo: BlogOwnerInfo;
+  @IsNotEmpty()
+  banInfo: BanInfo;
 }

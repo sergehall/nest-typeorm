@@ -9,21 +9,23 @@ import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repos
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BBlogsBannedUsersEntity } from '../../../comments/entities/bBlogs-banned-users.entity';
 
-export class BlogBanUserCommand {
+export class BanUserForBlogCommand {
   constructor(
     public id: string,
     public updateBanUserDto: UpdateBanUserDto,
     public currentUser: User,
   ) {}
 }
-@CommandHandler(BlogBanUserCommand)
-export class BlogBanUserUseCase implements ICommandHandler<BlogBanUserCommand> {
+@CommandHandler(BanUserForBlogCommand)
+export class BanUserForBlogUseCase
+  implements ICommandHandler<BanUserForBlogCommand>
+{
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepository: UsersRepository,
     protected bloggerBlogsRepository: BloggerBlogsRepository,
   ) {}
-  async execute(command: BlogBanUserCommand) {
+  async execute(command: BanUserForBlogCommand) {
     const userToBan = await this.usersRepository.findUserByUserId(command.id);
     if (!userToBan) throw new NotFoundException();
     const blogForBan = await this.bloggerBlogsRepository.findBlogById(
@@ -45,9 +47,8 @@ export class BlogBanUserUseCase implements ICommandHandler<BlogBanUserCommand> {
       id: command.currentUser.id,
     });
     try {
-      // blogForBan.blogOwnerInfo.userId
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: command.currentUser.id,
+        id: blogForBan.blogOwnerInfo.userId,
       });
       return await this.bloggerBlogsRepository.banUserForBlog(
         blogForBan.id,
