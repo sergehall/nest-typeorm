@@ -11,6 +11,11 @@ import { StatusLike } from '../../../infrastructure/database/enums/like-status.e
 export class LikeStatusCommentEntity {
   @IsNotEmpty()
   @Length(0, 100, {
+    message: 'Incorrect blogId length! Must be min 0, max 100 ch.',
+  })
+  blogId: string;
+  @IsNotEmpty()
+  @Length(0, 100, {
     message: 'Incorrect commentId length! Must be min 0, max 100 ch.',
   })
   commentId: string;

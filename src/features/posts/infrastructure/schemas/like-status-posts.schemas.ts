@@ -7,6 +7,8 @@ export type LikeStatusPostsDocument = HydratedDocument<LikeStatusPost>;
 @Schema()
 export class LikeStatusPost {
   @Prop({ required: true })
+  blogId: string;
+  @Prop({ required: true })
   postId: string;
   @Prop({ required: true })
   userId: string;

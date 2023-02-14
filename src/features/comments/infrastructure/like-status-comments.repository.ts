@@ -23,6 +23,7 @@ export class LikeStatusCommentsRepository {
         },
         {
           $set: {
+            blogId: likeStatusCommEntity.blogId,
             commentId: likeStatusCommEntity.commentId,
             userId: likeStatusCommEntity.userId,
             isBanned: likeStatusCommEntity.isBanned,
@@ -37,13 +38,26 @@ export class LikeStatusCommentsRepository {
     return result !== null;
   }
 
-  async changeBanStatusComments(
+  async changeBanStatusCommentsLike(
     userId: string,
     isBanned: boolean,
   ): Promise<boolean> {
     const updateLikes = await this.likeStatusCommentModel.updateMany(
       {
         userId: userId,
+      },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
+  }
+  async changeBanStatusCommentsLikeByBlogId(
+    userId: string,
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusCommentModel.updateMany(
+      {
+        $and: [{ userId: userId }, { blogId: blogId }],
       },
       { isBanned: isBanned },
     );

@@ -1,6 +1,5 @@
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 import {
-  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -11,10 +10,6 @@ import {
 } from 'class-validator';
 
 class CommentatorInfo {
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect userId! Must be max 15 ch.',
-  })
   userId: string;
   @IsNotEmpty()
   @Length(3, 10, {
@@ -22,8 +17,6 @@ class CommentatorInfo {
   })
   @Matches('^[a-zA-Z0-9_-]*$')
   userLogin: string;
-  @IsBoolean()
-  isBanned: boolean;
 }
 
 export class LikesInfo {
@@ -40,12 +33,7 @@ export class LikesInfo {
   myStatus: StatusLike;
 }
 
-export class CommentsEntity {
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect blogId! Must be max 15 ch.',
-  })
-  blogId: string;
+export class CommentsReturnEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id length! Must be min 0, max 100 ch.',

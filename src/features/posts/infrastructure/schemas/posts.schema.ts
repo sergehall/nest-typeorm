@@ -5,6 +5,15 @@ import { StatusLike } from '../../../../infrastructure/database/enums/like-statu
 export type PostsDocument = HydratedDocument<Post>;
 
 @Schema()
+export class BanInfo {
+  @Prop({ required: true })
+  isBanned: boolean;
+  @Prop({ type: String, default: null })
+  banDate: string | null;
+  @Prop({ type: String, default: null })
+  banReason: string | null;
+}
+@Schema()
 export class PostOwnerInfo {
   @Prop({ required: true })
   userId: string;
@@ -52,10 +61,12 @@ export class Post {
   blogName: string;
   @Prop({ required: true })
   createdAt: string;
-  @Prop({ required: true })
-  postOwnerInfo: PostOwnerInfo;
-  @Prop({ required: true })
+  @Prop({ required: true, type: ExtendedLikesInfo })
   extendedLikesInfo: ExtendedLikesInfo;
+  @Prop({ required: true, type: PostOwnerInfo })
+  postOwnerInfo: PostOwnerInfo;
+  @Prop({ required: true, type: BanInfo })
+  banInfo: BanInfo;
 }
 
 export const PostsSchema = SchemaFactory.createForClass(Post);

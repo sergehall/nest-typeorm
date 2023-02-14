@@ -10,10 +10,10 @@ export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
 
   @Get(':id')
-  async findBlogs(
+  async findBlogsById(
     @Param() params: IdParams,
   ): Promise<BloggerBlogsEntity | null> {
-    const blog = await this.blogsService.findBlogs(params.id);
+    const blog = await this.blogsService.findBlogsById(params.id);
     if (!blog) {
       throw new NotFoundException();
     }

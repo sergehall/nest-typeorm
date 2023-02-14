@@ -6,6 +6,7 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../../common/pagination/pagination';
 import { BloggerBlogsRepository } from '../infrastructure/blogger-blogs.repository';
+import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -75,6 +76,7 @@ export class BloggerBlogsService {
   }
   async findBannedUsers(
     blogId: string,
+    currentUser: CurrentUserDto,
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {

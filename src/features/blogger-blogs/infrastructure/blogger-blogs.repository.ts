@@ -5,8 +5,11 @@ import { Model } from 'mongoose';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { BBlogsDocument } from './schemas/blogger-blogs.schema';
-import { BBlogsBannedUsersEntity } from '../../comments/entities/bBlogs-banned-users.entity';
 import { BBlogsBannedUserDocument } from './schemas/blogger-blogs-banned-users.schema';
+import {
+  BanInfo,
+  BloggerBlogsBannedUsersByBlogIdEntity,
+} from '../entities/blogger-blogs-banned-users.entity';
 
 @Injectable()
 export class BloggerBlogsRepository {
@@ -121,24 +124,35 @@ export class BloggerBlogsRepository {
     const result = await this.BBlogsModel.deleteOne({ id: id });
     return result.acknowledged && result.deletedCount === 1;
   }
-  async banUserForBlog(
-    blogId: string,
-    banUserInfo: BBlogsBannedUsersEntity,
+  async addBannedUserToBanList(
+    banUserInfo: BloggerBlogsBannedUsersByBlogIdEntity,
   ): Promise<boolean> {
     const updateBan = await this.BBannedUsersModel.findOneAndUpdate(
-      { $and: [{ id: banUserInfo.id, blogId: blogId }] },
+      { $and: [{ id: banUserInfo.id, blogId: banUserInfo.blogId }] },
       {
         $set: {
-          blogId: blogId,
+          blogId: banUserInfo.blogId,
           id: banUserInfo.id,
           login: banUserInfo.login,
-          createdAt: banUserInfo.createdAt,
           'banInfo.isBanned': banUserInfo.banInfo.isBanned,
-          'banInfo.banReason': banUserInfo.banInfo.banReason,
           'banInfo.banDate': banUserInfo.banInfo.banDate,
+          'banInfo.banReason': banUserInfo.banInfo.banReason,
         },
       },
       { upsert: true },
+    ).lean();
+    return updateBan !== null;
+  }
+  async banBlog(blogId: string, banInfo: BanInfo): Promise<boolean> {
+    const updateBan = await this.BBlogsModel.updateOne(
+      { id: blogId },
+      {
+        $set: {
+          'banInfo.isBanned': banInfo.isBanned,
+          'banInfo.banDate': banInfo.banDate,
+          'banInfo.banReason': banInfo.banReason,
+        },
+      },
     );
     return updateBan !== null;
   }
@@ -152,14 +166,14 @@ export class BloggerBlogsRepository {
   async findBannedUsers(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BBlogsBannedUsersEntity[]> {
+  ): Promise<BloggerBlogsBannedUsersByBlogIdEntity[]> {
+    console.log(searchFilters);
     return await this.BBannedUsersModel.find(
       {
         $and: searchFilters,
       },
       {
         blogId: false,
-        createdAt: false,
         _id: false,
         __v: false,
         'banInfo._id': false,

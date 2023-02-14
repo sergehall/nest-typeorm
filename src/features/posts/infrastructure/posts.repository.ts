@@ -1,11 +1,12 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { PostsEntity } from '../entities/posts.entity';
 import { Model } from 'mongoose';
-import { PostsDocument } from './schemas/posts.schema';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
 import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
+import { PostsDocument } from './schemas/posts.schema';
+import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -54,9 +55,9 @@ export class PostsRepository {
       },
     );
   }
-  async createPost(postsEntity: PostsEntity): Promise<PostsEntity> {
+  async createPost(newPost: PostsEntity): Promise<PostsEntity> {
     try {
-      return await this.postsModel.create(postsEntity);
+      return await this.postsModel.create(newPost);
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
@@ -108,6 +109,29 @@ export class PostsRepository {
         {
           $set: {
             'postOwnerInfo.isBanned': isBanned,
+          },
+        },
+      )
+      .lean();
+    return changeBanStatus !== null;
+  }
+  async changeBanStatusPostByBlogId(
+    userId: string,
+    updateBanUserDto: UpdateBanUserDto,
+  ): Promise<boolean> {
+    const changeBanStatus = await this.postsModel
+      .findOneAndUpdate(
+        {
+          $and: [
+            { blogId: updateBanUserDto.blogId },
+            { 'postOwnerInfo.userId': userId },
+          ],
+        },
+        {
+          $set: {
+            'banInfo.isBanned': updateBanUserDto.isBanned,
+            'banInfo.banDate': new Date().toISOString(),
+            'banInfo.banReason': updateBanUserDto.banReason,
           },
         },
       )

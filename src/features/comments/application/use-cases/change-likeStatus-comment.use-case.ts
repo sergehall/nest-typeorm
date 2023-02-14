@@ -28,6 +28,7 @@ export class ChangeLikeStatusCommentUseCase
     );
     if (!findComment) throw new NotFoundException();
     const likeStatusCommEntity: LikeStatusCommentEntity = {
+      blogId: findComment.blogId,
       commentId: command.commentId,
       userId: command.currentUser.id,
       isBanned: command.currentUser.banInfo.isBanned,

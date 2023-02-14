@@ -53,8 +53,7 @@ export class CommentsService {
     );
     let desc = 1;
     let asc = -1;
-    const field: 'userLogin' | 'content' | 'createdAt' =
-      queryPagination.sortBy === 'userLogin' ||
+    const field: 'content' | 'createdAt' =
       queryPagination.sortBy === 'content'
         ? queryPagination.sortBy
         : 'createdAt';
@@ -72,7 +71,7 @@ export class CommentsService {
     );
 
     async function byField(
-      field: 'userLogin' | 'content' | 'createdAt',
+      field: 'content' | 'createdAt',
       asc: number,
       desc: number,
     ) {

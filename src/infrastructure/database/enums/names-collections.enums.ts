@@ -2,7 +2,7 @@ export enum NamesCollectionsEnums {
   POSTS = 'Posts',
   BLOGS = 'Blogs',
   BBLOGS = 'BloggerBlogs',
-  BBLOGS_BANNED_USERS = 'BloggerBlogsBannedUsers',
+  BBLOGS_BANNED_USERS = 'BannedUsersForBlog',
   USERS = 'Users',
   COMMENTS = 'Comments',
   LIKE_STATUS_COMMENTS = 'LikeStatusComments',

@@ -26,6 +26,7 @@ export class ChangeLikeStatusPostUseCase
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();
     const likeStatusPostEntity: LikeStatusPostEntity = {
+      blogId: post.blogId,
       postId: command.postId,
       userId: command.currentUser.id,
       login: command.currentUser.login,

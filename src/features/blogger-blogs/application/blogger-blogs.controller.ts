@@ -188,6 +188,7 @@ export class BloggerBlogsController {
       new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
     );
   }
+
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -196,11 +197,12 @@ export class BloggerBlogsController {
     @Param() params: IdParams,
     @Body() updateBanUserDto: UpdateBanUserDto,
   ) {
-    const currentUser = req.user;
+    const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new BanUserForBlogCommand(params.id, updateBanUserDto, currentUser),
     );
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('users/blog/:id')
   async findBannedUsers(
@@ -208,7 +210,7 @@ export class BloggerBlogsController {
     @Param() params: IdParams,
     @Query() query: any,
   ) {
-    // const currentUser = req.user;
+    const currentUser: CurrentUserDto = req.user;
     const blogId = params.id;
     const queryData = ParseQuery.getPaginationData(query);
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
@@ -220,10 +222,11 @@ export class BloggerBlogsController {
       sortBy: queryData.sortBy,
       sortDirection: queryData.sortDirection,
     };
-    return await this.bBloggerService.findBannedUsers(blogId, queryPagination, [
-      searchLoginTerm,
-      searchByBlogId,
-      banStatus,
-    ]);
+    return await this.bBloggerService.findBannedUsers(
+      blogId,
+      currentUser,
+      queryPagination,
+      [searchLoginTerm, searchByBlogId, banStatus],
+    );
   }
 }

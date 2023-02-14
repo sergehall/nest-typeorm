@@ -5,7 +5,7 @@ import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blo
 @Injectable()
 export class BlogsService {
   constructor(protected bloggerBlogsService: BloggerBlogsService) {}
-  async findBlogs(id: string): Promise<BloggerBlogsEntity | null> {
+  async findBlogsById(id: string): Promise<BloggerBlogsEntity | null> {
     return await this.bloggerBlogsService.findBlogByIdForBlogs(id);
   }
 }

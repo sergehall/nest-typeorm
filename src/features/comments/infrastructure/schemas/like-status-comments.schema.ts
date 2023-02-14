@@ -7,6 +7,10 @@ export type LikeStatusCommentDocument = HydratedDocument<LikeStatusComment>;
 @Schema()
 export class LikeStatusComment {
   @Prop({ required: true })
+  blogId: string;
+  @Prop({ required: true })
+  postId: string;
+  @Prop({ required: true })
   commentId: string;
   @Prop({ required: true })
   userId: string;

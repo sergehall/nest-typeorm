@@ -12,6 +12,7 @@ export class CommentsRepository {
     private commentsModel: Model<CommentsDocument>,
   ) {}
   async createComment(
+    blogId: string,
     postId: string,
     commentEntity: CommentsEntity,
   ): Promise<CommentsEntity> {
@@ -21,7 +22,9 @@ export class CommentsRepository {
         {
           $push: { comments: commentEntity },
         },
-        { upsert: true },
+        {
+          upsert: true,
+        },
       );
       return commentEntity;
     } catch (error) {
@@ -81,5 +84,33 @@ export class CommentsRepository {
     return (
       resultDeleted.comments.filter((i) => i.id === commentId).length === 0
     );
+  }
+  async bannedCommentByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<CommentsEntity[] | null> {
+    return await this.commentsModel
+      .findOneAndUpdate(
+        { 'comments.commentatorInfo.userId': userId },
+        { $set: { 'comments.$.commentatorInfo.isBanned': isBanned } },
+      )
+      .lean();
+  }
+  async changeBanStatusCommentsByUserIdAndBlogId(
+    userId: string,
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<CommentsEntity[] | null> {
+    return await this.commentsModel
+      .findOneAndUpdate(
+        {
+          $and: [
+            { 'comments.blogId': blogId },
+            { 'comments.commentatorInfo.userId': userId },
+          ],
+        },
+        { $set: { 'comments.$.commentatorInfo.isBanned': isBanned } },
+      )
+      .lean();
   }
 }

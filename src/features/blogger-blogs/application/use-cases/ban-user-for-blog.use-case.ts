@@ -1,19 +1,22 @@
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
-import { User } from '../../../users/infrastructure/schemas/user.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BBlogsBannedUsersEntity } from '../../../comments/entities/bBlogs-banned-users.entity';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BanInfo } from '../../entities/blogger-blogs-banned-users.entity';
+import { CurrentUserDto } from '../../../auth/dto/currentUser.dto';
+import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-blogId.use-case';
+import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
+import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use-case';
 
 export class BanUserForBlogCommand {
   constructor(
     public id: string,
     public updateBanUserDto: UpdateBanUserDto,
-    public currentUser: User,
+    public currentUser: CurrentUserDto,
   ) {}
 }
 @CommandHandler(BanUserForBlogCommand)
@@ -24,6 +27,7 @@ export class BanUserForBlogUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepository: UsersRepository,
     protected bloggerBlogsRepository: BloggerBlogsRepository,
+    protected commandBus: CommandBus,
   ) {}
   async execute(command: BanUserForBlogCommand) {
     const userToBan = await this.usersRepository.findUserByUserId(command.id);
@@ -32,17 +36,12 @@ export class BanUserForBlogUseCase
       command.updateBanUserDto.blogId,
     );
     if (!blogForBan) throw new NotFoundException();
-    const banUserInfo: BBlogsBannedUsersEntity = {
-      blogId: command.updateBanUserDto.blogId,
-      id: command.id,
-      login: userToBan.login,
-      createdAt: new Date().toISOString(),
-      banInfo: {
-        isBanned: command.updateBanUserDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: command.updateBanUserDto.banReason,
-      },
+    const banInfo: BanInfo = {
+      isBanned: command.updateBanUserDto.isBanned,
+      banDate: new Date().toISOString(),
+      banReason: command.updateBanUserDto.banReason,
     };
+
     const ability = this.caslAbilityFactory.createForBBlogs({
       id: command.currentUser.id,
     });
@@ -50,10 +49,27 @@ export class BanUserForBlogUseCase
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: blogForBan.blogOwnerInfo.userId,
       });
-      return await this.bloggerBlogsRepository.banUserForBlog(
-        blogForBan.id,
-        banUserInfo,
+      await this.commandBus.execute(
+        new ChangeBanStatusPostsByBlogIdCommand(
+          command.id,
+          command.updateBanUserDto,
+        ),
       );
+      await this.commandBus.execute(
+        new ChangeBanStatusCommentsByBlogIdCommand(
+          command.id,
+          command.updateBanUserDto.blogId,
+          command.updateBanUserDto.isBanned,
+        ),
+      );
+      await this.commandBus.execute(
+        new AddBannedUserToBanListCommand(
+          command.id,
+          userToBan.login,
+          command.updateBanUserDto,
+        ),
+      );
+      return await this.bloggerBlogsRepository.banBlog(blogForBan.id, banInfo);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

@@ -26,6 +26,7 @@ export class LikeStatusPostsRepository {
           ],
         },
         {
+          blogId: dtoLikeStatusPost.blogId,
           postId: dtoLikeStatusPost.postId,
           userId: dtoLikeStatusPost.userId,
           isBanned: dtoLikeStatusPost.isBanned,
@@ -134,6 +135,17 @@ export class LikeStatusPostsRepository {
       {
         userId: userId,
       },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
+  }
+  async changeBanStatusPostsLikeStatusByBlogId(
+    userId: string,
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusPostModel.updateMany(
+      { $and: [{ userId: userId }, { blogId: blogId }] },
       { isBanned: isBanned },
     );
     return updateLikes.acknowledged;

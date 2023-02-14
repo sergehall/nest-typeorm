@@ -7,6 +7,7 @@ import { StatusLike } from '../../../../infrastructure/database/enums/like-statu
 import { PostsService } from '../../../posts/application/posts.service';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommentsReturnEntity } from '../../entities/comments-return.entity';
 
 export class CreateCommentCommand {
   constructor(
@@ -23,25 +24,43 @@ export class CreateCommentUseCase
     protected postsService: PostsService,
     protected commentsRepository: CommentsRepository,
   ) {}
-  async execute(command: CreateCommentCommand): Promise<CommentsEntity> {
+  async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
     const post = await this.postsService.checkPostInDB(command.postId);
     if (!post) throw new NotFoundException();
     const newComment: CommentsEntity = {
+      blogId: post.blogId,
       id: uuid4().toString(),
       content: command.createCommentDto.content,
-      userId: command.user.id,
-      userLogin: command.user.login,
       createdAt: new Date().toISOString(),
+      commentatorInfo: {
+        userId: command.user.id,
+        userLogin: command.user.login,
+        isBanned: false,
+      },
       likesInfo: {
         likesCount: 0,
         dislikesCount: 0,
         myStatus: StatusLike.NONE,
       },
     };
-
-    return await this.commentsRepository.createComment(
+    await this.commentsRepository.createComment(
+      post.blogId,
       command.postId,
       newComment,
     );
+    return {
+      id: newComment.id,
+      content: newComment.content,
+      createdAt: newComment.createdAt,
+      commentatorInfo: {
+        userId: newComment.commentatorInfo.userId,
+        userLogin: newComment.commentatorInfo.userLogin,
+      },
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: StatusLike.NONE,
+      },
+    };
   }
 }

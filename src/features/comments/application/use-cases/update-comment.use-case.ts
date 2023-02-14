@@ -33,7 +33,7 @@ export class UpdateCommentUseCase
         id: command.currentUser.id,
       });
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: findComment.userId,
+        id: findComment.commentatorInfo.userId,
       });
       return await this.commentsRepository.updateComment(
         command.commentId,

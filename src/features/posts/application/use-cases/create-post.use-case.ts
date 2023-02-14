@@ -10,6 +10,7 @@ import { OwnerInfoDto } from '../../dto/ownerInfo.dto';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { PostsRepository } from '../../infrastructure/posts.repository';
+import { PostsEntity } from '../../entities/posts.entity';
 
 export class CreatePostCommand {
   constructor(
@@ -36,9 +37,9 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
-        id: command.ownerInfoDto.userId,
+        id: blog.blogOwnerInfo.userId,
       });
-      const newPost = {
+      const newPost: PostsEntity = {
         id: uuid4().toString(),
         title: command.createPostDto.title,
         shortDescription: command.createPostDto.shortDescription,
@@ -46,16 +47,21 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         blogId: command.createPostDto.blogId,
         blogName: blog.name,
         createdAt: new Date().toISOString(),
-        postOwnerInfo: {
-          userId: command.ownerInfoDto.userId,
-          userLogin: command.ownerInfoDto.userLogin,
-          isBanned: false,
-        },
         extendedLikesInfo: {
           likesCount: 0,
           dislikesCount: 0,
           myStatus: StatusLike.NONE,
           newestLikes: [],
+        },
+        postOwnerInfo: {
+          userId: command.ownerInfoDto.userId,
+          userLogin: command.ownerInfoDto.userLogin,
+          isBanned: false,
+        },
+        banInfo: {
+          isBanned: false,
+          banDate: null,
+          banReason: null,
         },
       };
       const result = await this.postsRepository.createPost(newPost);

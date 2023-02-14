@@ -28,7 +28,7 @@ export class RemoveCommentUseCase
         id: command.currentUser.id,
       });
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: findComment.userId,
+        id: findComment.commentatorInfo.userId,
       });
       return this.commentsRepository.removeComment(command.commentId);
     } catch (error) {

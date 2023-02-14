@@ -16,7 +16,7 @@ export class FilteringCommentsNoBannedUserUseCase
     const commentsWithoutBannedUser: CommentsEntity[] = [];
     for (let i = 0; i < command.commentsArr.length; i++) {
       const user = await this.usersRepository.findUserByUserId(
-        command.commentsArr[i].userId,
+        command.commentsArr[i].commentatorInfo.userId,
       );
       if (user && !user.banInfo.isBanned) {
         commentsWithoutBannedUser.push(command.commentsArr[i]);

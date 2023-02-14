@@ -8,7 +8,7 @@ export class BanInfo {
   isBanned: boolean;
   @IsNotEmpty()
   @Length(0, 100, {
-    message: 'Incorrect createdAt length! Must be max 100 ch.',
+    message: 'Incorrect banDate length! Must be max 100 ch.',
   })
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
@@ -20,7 +20,7 @@ export class BanInfo {
   })
   banReason: string;
 }
-export class BBlogsBannedUsersEntity {
+export class BloggerBlogsBannedUsersByBlogIdEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect blogId! Must be max 15 ch.',
@@ -41,13 +41,5 @@ export class BBlogsBannedUsersEntity {
   @Length(20, 300, {
     message: 'Incorrect banReason length! Must be min 20 max 300 ch.',
   })
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect createdAt length! Must be max 100 ch.',
-  })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
-  createdAt: string;
   banInfo: BanInfo;
 }

@@ -68,8 +68,8 @@ export class FillingCommentsDataUseCase
       const filledComment = {
         id: currentComment.id,
         content: currentComment.content,
-        userId: currentComment.userId,
-        userLogin: currentComment.userLogin,
+        userId: currentComment.commentatorInfo.userId,
+        userLogin: currentComment.commentatorInfo.userLogin,
         createdAt: currentComment.createdAt,
         likesInfo: {
           likesCount: likesCount,

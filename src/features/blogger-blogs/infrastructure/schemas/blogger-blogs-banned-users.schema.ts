@@ -21,9 +21,7 @@ export class BannedUsers {
   id: string;
   @Prop({ required: true })
   login: string;
-  @Prop({ required: true })
-  createdAt: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: BanInfo })
   banInfo: BanInfo;
 }
 
