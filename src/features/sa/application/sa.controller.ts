@@ -157,7 +157,6 @@ export class SaController {
     @Body() saBanBlogDto: SaBanBlogDto,
   ) {
     const currentUser = req.user;
-    console.log(currentUser, 'currentUser');
     return await this.commandBus.execute(
       new SaBanBlogCommand(params.id, saBanBlogDto, currentUser),
     );

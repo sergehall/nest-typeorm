@@ -74,6 +74,7 @@ export class BloggerBlogsService {
   async findBlogByIdForBlogs(id: string): Promise<BloggerBlogsEntity | null> {
     return this.bloggerBlogsRepository.findBlogByIdForBlogs(id);
   }
+
   async findBannedUsers(
     blogId: string,
     currentUser: CurrentUserDto,
