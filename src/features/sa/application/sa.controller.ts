@@ -33,13 +33,11 @@ import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
-import { BanUserCommand } from './use-cases/ban-user.use-case';
-import { ChangeBanStatusCommentsCommand } from '../../comments/application/use-cases/change-banStatus-comments.use-case';
-import { ChangeBanStatusPostsCommand } from '../../posts/application/use-cases/change-banStatus-posts.use-case';
-import { RemoveDevicesBannedUserCommand } from '../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
+import { SaBanUserCommand } from './use-cases/sa-ban-user.use-case';
 import { IdParams } from '../../common/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
+import { SaBanBlogCommand } from './use-cases/sa-ban-blog.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -146,17 +144,8 @@ export class SaController {
     @Body() updateSaBanDto: SaBanUserDto,
   ) {
     const currentUser = req.user;
-    await this.commandBus.execute(
-      new RemoveDevicesBannedUserCommand(params.id),
-    );
-    await this.commandBus.execute(
-      new ChangeBanStatusCommentsCommand(params.id, updateSaBanDto.isBanned),
-    );
-    await this.commandBus.execute(
-      new ChangeBanStatusPostsCommand(params.id, updateSaBanDto.isBanned),
-    );
     return await this.commandBus.execute(
-      new BanUserCommand(params.id, updateSaBanDto, currentUser),
+      new SaBanUserCommand(params.id, updateSaBanDto, currentUser),
     );
   }
   @Put('blogs/:id/ban')
@@ -169,8 +158,8 @@ export class SaController {
   ) {
     const currentUser = req.user;
     console.log(currentUser, 'currentUser');
-    console.log(params.id, 'params.id');
-    console.log(saBanBlogDto, 'saBanBlogDto');
-    return true;
+    return await this.commandBus.execute(
+      new SaBanBlogCommand(params.id, saBanBlogDto, currentUser),
+    );
   }
 }

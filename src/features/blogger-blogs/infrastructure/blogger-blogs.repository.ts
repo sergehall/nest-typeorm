@@ -167,7 +167,6 @@ export class BloggerBlogsRepository {
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsBannedUsersByBlogIdEntity[]> {
-    console.log(searchFilters);
     return await this.BBannedUsersModel.find(
       {
         $and: searchFilters,
