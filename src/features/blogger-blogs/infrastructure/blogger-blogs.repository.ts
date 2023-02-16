@@ -19,6 +19,44 @@ export class BloggerBlogsRepository {
     @Inject(ProvidersEnums.BBLOG_BANNED_USER_MODEL)
     private BBannedUsersModel: Model<BBlogsBannedUserDocument>,
   ) {}
+
+  async openFindBlogs(
+    pagination: PaginationDBType,
+    searchFilters: QueryArrType,
+  ): Promise<BloggerBlogsEntity[]> {
+    return await this.BBlogsModel.find(
+      {
+        $and: searchFilters,
+      },
+      {
+        _id: false,
+        __v: false,
+        banInfo: false,
+        'blogOwnerInfo._id': false,
+        'blogOwnerInfo.isBanned': false,
+      },
+    )
+      .limit(pagination.pageSize)
+      .skip(pagination.startIndex)
+      .sort({ [pagination.field]: pagination.direction })
+      .lean();
+  }
+
+  async openFindBlogById(
+    searchFilters: QueryArrType,
+  ): Promise<BloggerBlogsEntity | null> {
+    return await this.BBlogsModel.findOne(
+      {
+        $and: searchFilters,
+      },
+      {
+        _id: false,
+        __v: false,
+        blogOwnerInfo: false,
+        banInfo: false,
+      },
+    );
+  }
   async createBlogs(
     blogsEntity: BloggerBlogsEntity,
   ): Promise<BloggerBlogsEntity> {
@@ -42,19 +80,7 @@ export class BloggerBlogsRepository {
       },
     );
   }
-  async findBlogByIdForBlogs(
-    blogId: string,
-  ): Promise<BloggerBlogsEntity | null> {
-    return await this.BBlogsModel.findOne(
-      { id: blogId },
-      {
-        _id: false,
-        __v: false,
-        banInfo: false,
-        blogOwnerInfo: false,
-      },
-    );
-  }
+
   async findBlogsCurrentUser(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
@@ -75,12 +101,11 @@ export class BloggerBlogsRepository {
       .sort({ [pagination.field]: pagination.direction })
       .lean();
   }
-  async findBlogs(
+
+  async saFindBlogs(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity[]> {
-    searchFilters.push({ 'blogOwnerInfo.isBanned': false });
-    searchFilters.push({ 'banInfo.isBanned': false });
     return await this.BBlogsModel.find(
       {
         $and: searchFilters,
@@ -88,7 +113,7 @@ export class BloggerBlogsRepository {
       {
         _id: false,
         __v: false,
-        banInfo: false,
+        'banInfo.banReason': false,
         'blogOwnerInfo._id': false,
         'blogOwnerInfo.isBanned': false,
       },

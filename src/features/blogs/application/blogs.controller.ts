@@ -19,7 +19,7 @@ export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
 
   @Get()
-  async findBlogs(@Query() query: any): Promise<PaginationTypes> {
+  async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
     const paginationData = ParseQuery.getPaginationData(query);
     const searchFilter = { searchNameTerm: paginationData.searchNameTerm };
     const queryPagination: PaginationDto = {
@@ -28,7 +28,7 @@ export class BlogsController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    const blogs = await this.blogsService.findBlogs(queryPagination, [
+    const blogs = await this.blogsService.openFindBlogs(queryPagination, [
       searchFilter,
     ]);
     if (!blogs) {
@@ -38,10 +38,10 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async findBlogsById(
+  async openFindBlogById(
     @Param() params: IdParams,
   ): Promise<BloggerBlogsEntity | null> {
-    const blog = await this.blogsService.findBlogsById(params.id);
+    const blog = await this.blogsService.openFindBlogById(params.id);
     if (!blog) {
       throw new NotFoundException();
     }

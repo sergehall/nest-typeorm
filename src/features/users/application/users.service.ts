@@ -29,7 +29,6 @@ export class UsersService {
     const field = queryPagination.sortBy;
     const pageNumber = queryPagination.pageNumber;
     const pageSize = queryPagination.pageSize;
-
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );

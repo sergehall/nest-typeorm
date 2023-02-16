@@ -73,20 +73,22 @@ export class SaController {
 
   @Get('blogs')
   @UseGuards(BaseAuthGuard)
-  async findBlogs(
+  async saFindBlogs(
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const paginationData = ParseQuery.getPaginationData(query);
     const searchFilters = { searchNameTerm: paginationData.searchNameTerm };
+    const banStatus = { banStatus: paginationData.banStatus };
     const queryPagination: PaginationDto = {
       pageNumber: paginationData.pageNumber,
       pageSize: paginationData.pageSize,
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    return await this.bloggerBlogsService.findBlogs(queryPagination, [
+    return await this.bloggerBlogsService.saFindBlogs(queryPagination, [
       searchFilters,
+      banStatus,
     ]);
   }
 

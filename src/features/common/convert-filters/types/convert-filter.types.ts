@@ -1,4 +1,5 @@
 export type QueryArrType = {
+  id?: string;
   searchNameTerm?: string;
   searchLoginTerm?: string;
   searchEmailTerm?: string;

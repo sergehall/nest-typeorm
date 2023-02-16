@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SortOrder } from './types/sort-order.types';
+import { BanStatusTypes } from './types/ban-status.types';
 
 @Injectable()
 export class ParseQuery {
@@ -18,13 +19,12 @@ export class ParseQuery {
     let sortBy = 'createdAt';
     const querySortDirection: SortOrder = query?.sortDirection;
     let sortDirection: SortOrder = 'desc';
-    let banStatus: string = query.banStatus?.toString();
-    if (banStatus === 'banned') {
+    const queryBanStatus: string = query.banStatus?.toString();
+    let banStatus: BanStatusTypes = '';
+    if (queryBanStatus === 'banned') {
       banStatus = 'true';
-    } else if (banStatus === 'notBanned') {
+    } else if (queryBanStatus === 'notBanned') {
       banStatus = 'false';
-    } else {
-      banStatus = '';
     }
     if (!searchNameTerm) {
       searchNameTerm = '';

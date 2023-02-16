@@ -16,7 +16,46 @@ export class BloggerBlogsService {
     protected bloggerBlogsRepository: BloggerBlogsRepository,
   ) {}
 
-  async findBlogs(
+  async openFindBlogs(
+    queryPagination: PaginationDto,
+    searchFilters: QueryArrType,
+  ): Promise<PaginationTypes> {
+    const field = queryPagination.sortBy;
+    const convertedFilters = await this.convertFiltersForDB.convert(
+      searchFilters,
+    );
+    const pagination = await this.pagination.convert(queryPagination, field);
+    const totalCount = await this.bloggerBlogsRepository.countDocuments(
+      convertedFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
+    convertedFilters.push({ 'blogOwnerInfo.isBanned': false });
+    convertedFilters.push({ 'banInfo.isBanned': false });
+    const blogs: BloggerBlogsEntity[] =
+      await this.bloggerBlogsRepository.openFindBlogs(
+        pagination,
+        convertedFilters,
+      );
+    const pageNumber = queryPagination.pageNumber;
+    const pageSize = pagination.pageSize;
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: totalCount,
+      items: blogs,
+    };
+  }
+
+  async openFindBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const searchFilters = [];
+    searchFilters.push({ id: blogId });
+    searchFilters.push({ 'blogOwnerInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
+    return this.bloggerBlogsRepository.openFindBlogById(searchFilters);
+  }
+
+  async saFindBlogs(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
@@ -30,7 +69,10 @@ export class BloggerBlogsService {
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const blogs: BloggerBlogsEntity[] =
-      await this.bloggerBlogsRepository.findBlogs(pagination, convertedFilters);
+      await this.bloggerBlogsRepository.saFindBlogs(
+        pagination,
+        convertedFilters,
+      );
     const pageNumber = queryPagination.pageNumber;
     const pageSize = pagination.pageSize;
     return {
@@ -69,10 +111,6 @@ export class BloggerBlogsService {
       totalCount: totalCount,
       items: blogs,
     };
-  }
-
-  async findBlogByIdForBlogs(id: string): Promise<BloggerBlogsEntity | null> {
-    return this.bloggerBlogsRepository.findBlogByIdForBlogs(id);
   }
 
   async findBannedUsers(

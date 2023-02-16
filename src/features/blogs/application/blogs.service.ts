@@ -8,14 +8,14 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 @Injectable()
 export class BlogsService {
   constructor(protected bloggerBlogsService: BloggerBlogsService) {}
-  async findBlogsById(id: string): Promise<BloggerBlogsEntity | null> {
-    return await this.bloggerBlogsService.findBlogByIdForBlogs(id);
+  async openFindBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    return await this.bloggerBlogsService.openFindBlogById(blogId);
   }
-  async findBlogs(
+  async openFindBlogs(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
   ): Promise<PaginationTypes> {
-    return await this.bloggerBlogsService.findBlogs(
+    return await this.bloggerBlogsService.openFindBlogs(
       queryPagination,
       searchFilters,
     );
