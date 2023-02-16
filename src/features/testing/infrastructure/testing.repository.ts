@@ -10,6 +10,7 @@ import { EmailsConfirmCodeDocument } from '../../mails/infrastructure/schemas/em
 import { DevicesDocument } from '../../security-devices/infrastructure/schemas/devices.schema';
 import { refreshTokenBlackListDocument } from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
 import { BBlogsDocument } from '../../blogger-blogs/infrastructure/schemas/blogger-blogs.schema';
+import { BBlogsBannedUserDocument } from '../../blogger-blogs/infrastructure/schemas/blogger-blogs-banned-users.schema';
 
 @Injectable()
 export class TestingRepository {
@@ -32,6 +33,8 @@ export class TestingRepository {
     private MyModelDevicesModel: Model<DevicesDocument>,
     @Inject(ProvidersEnums.BBLOG_MODEL)
     private BBlogsModel: Model<BBlogsDocument>,
+    @Inject(ProvidersEnums.BBLOG_BANNED_USER_MODEL)
+    private BBannedUsersModel: Model<BBlogsBannedUserDocument>,
   ) {}
   async removeAllCollections(): Promise<boolean> {
     // delete all Collections
@@ -44,6 +47,7 @@ export class TestingRepository {
     await this.EmailsConfirmModel.deleteMany({});
     await this.JwtRefreshBlacklistModel.deleteMany({});
     await this.MyModelDevicesModel.deleteMany({});
+    await this.BBannedUsersModel.deleteMany({});
     return true;
   }
 }

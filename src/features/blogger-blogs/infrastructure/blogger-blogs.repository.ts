@@ -224,4 +224,13 @@ export class BloggerBlogsRepository {
     );
     return updateBan !== null;
   }
+  async verifyUserInBlackListForBlog(
+    userId: string,
+    blogId: string,
+  ): Promise<boolean> {
+    const result = await this.BBannedUsersModel.findOne({
+      $and: [{ id: userId }, { blogId: blogId }],
+    });
+    return result !== null;
+  }
 }

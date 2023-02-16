@@ -32,6 +32,12 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         command.createPostDto.blogId,
       );
     if (!blog) throw new NotFoundException();
+    const verifyUserForBlog =
+      await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
+        command.ownerInfoDto.userId,
+        command.createPostDto.blogId,
+      );
+    if (verifyUserForBlog) throw new ForbiddenException();
     const ability = this.caslAbilityFactory.createForBBlogs({
       id: blog.blogOwnerInfo.userId,
     });

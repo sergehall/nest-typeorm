@@ -38,6 +38,10 @@ import {
   BBlogsSchema,
   BBlogsDocument,
 } from '../../blogger-blogs/infrastructure/schemas/blogger-blogs.schema';
+import {
+  BBlogsBannedUserDocument,
+  BBlogsBannedUsersSchema,
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogs-banned-users.schema';
 
 export const testingProviders = [
   {
@@ -127,6 +131,16 @@ export const testingProviders = [
         NamesCollectionsEnums.BBLOGS,
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<BBlogsBannedUserDocument>(
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+        BBlogsBannedUsersSchema,
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },
