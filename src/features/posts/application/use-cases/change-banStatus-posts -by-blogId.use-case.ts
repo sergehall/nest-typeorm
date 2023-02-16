@@ -1,13 +1,10 @@
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../../infrastructure/like-status-posts.repository';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateBanUserDto } from '../../../blogger-blogs/dto/update-ban-user.dto';
+import { BanInfo } from '../../../blogger-blogs/entities/blogger-blogs-banned-users.entity';
 
 export class ChangeBanStatusPostsByBlogIdCommand {
-  constructor(
-    public userId: string,
-    public updateBanUserDto: UpdateBanUserDto,
-  ) {}
+  constructor(public blogId: string, public banInfo: BanInfo) {}
 }
 
 @CommandHandler(ChangeBanStatusPostsByBlogIdCommand)
@@ -22,13 +19,12 @@ export class ChangeBanStatusPostsByBlogIdUseCase
     command: ChangeBanStatusPostsByBlogIdCommand,
   ): Promise<boolean> {
     await this.postsRepository.changeBanStatusPostByBlogId(
-      command.userId,
-      command.updateBanUserDto,
+      command.blogId,
+      command.banInfo,
     );
     await this.likeStatusPostsRepository.changeBanStatusPostsLikeStatusByBlogId(
-      command.userId,
-      command.updateBanUserDto.blogId,
-      command.updateBanUserDto.isBanned,
+      command.blogId,
+      command.banInfo.isBanned,
     );
     return true;
   }

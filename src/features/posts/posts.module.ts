@@ -27,6 +27,7 @@ import { RemovePostByPostIdUseCase } from './application/use-cases/remove-post-b
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
+import { ChangeBanStatusPostsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-blogId.use-case';
 
 const postsUseCases = [
@@ -36,6 +37,7 @@ const postsUseCases = [
   RemovePostByPostIdUseCase,
   RemovePostByIdOldUseCase,
   ChangeLikeStatusPostUseCase,
+  ChangeBanStatusPostsByUserIdBlogIdUseCase,
   ChangeBanStatusPostsByBlogIdUseCase,
 ];
 

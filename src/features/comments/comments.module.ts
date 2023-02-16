@@ -25,7 +25,7 @@ import { CreateCommentUseCase } from './application/use-cases/create-comment.use
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use-case';
 import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
-import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
+import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -34,7 +34,7 @@ const commentsUseCases = [
   ChangeBanStatusCommentsUseCase,
   ChangeLikeStatusCommentUseCase,
   FillingCommentsDataUseCase,
-  ChangeBanStatusCommentsByBlogIdUseCase,
+  ChangeBanStatusCommentsByUserIdBlogIdUseCase,
 ];
 
 @Module({

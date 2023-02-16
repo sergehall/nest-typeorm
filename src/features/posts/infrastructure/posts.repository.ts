@@ -5,7 +5,7 @@ import { QueryArrType } from '../../common/convert-filters/types/convert-filter.
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
 import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
-import { PostsDocument } from './schemas/posts.schema';
+import { BanInfo, PostsDocument } from './schemas/posts.schema';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 
 @Injectable()
@@ -32,6 +32,19 @@ export class PostsRepository {
       .skip(pagination.startIndex)
       .sort({ [pagination.field]: pagination.direction })
       .lean();
+  }
+  async openFindPostById(
+    searchFilters: QueryArrType,
+  ): Promise<PostsEntity | null> {
+    return await this.postsModel.findOne(
+      { $and: searchFilters },
+      {
+        _id: false,
+        __v: false,
+        'extendedLikesInfo._id': false,
+        'extendedLikesInfo.newestLikes._id': false,
+      },
+    );
   }
   async findPostById(postId: string): Promise<PostsEntity | null> {
     return await this.postsModel.findOne(
@@ -115,7 +128,7 @@ export class PostsRepository {
       .lean();
     return changeBanStatus !== null;
   }
-  async changeBanStatusPostByBlogId(
+  async changeBanStatusPostByUserIdBlogId(
     userId: string,
     updateBanUserDto: UpdateBanUserDto,
   ): Promise<boolean> {
@@ -132,6 +145,24 @@ export class PostsRepository {
             'banInfo.isBanned': updateBanUserDto.isBanned,
             'banInfo.banDate': new Date().toISOString(),
             'banInfo.banReason': updateBanUserDto.banReason,
+          },
+        },
+      )
+      .lean();
+    return changeBanStatus !== null;
+  }
+  async changeBanStatusPostByBlogId(
+    blogId: string,
+    banInfo: BanInfo,
+  ): Promise<boolean> {
+    const changeBanStatus = await this.postsModel
+      .updateMany(
+        { blogId: blogId },
+        {
+          $set: {
+            'banInfo.isBanned': banInfo.isBanned,
+            'banInfo.banDate': banInfo.banDate,
+            'banInfo.banReason': banInfo.banReason,
           },
         },
       )

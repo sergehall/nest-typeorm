@@ -45,11 +45,15 @@ export class PostsService {
     };
   }
 
-  async findPostById(
+  async openFindPostById(
     postId: string,
     currentUser: UsersEntity | null,
   ): Promise<PostsWithoutOwnersInfoEntity | null> {
-    const post = await this.postsRepository.findPostById(postId);
+    const searchFilters = [];
+    searchFilters.push({ id: postId });
+    searchFilters.push({ 'postOwnerInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
+    const post = await this.postsRepository.openFindPostById(searchFilters);
     if (!post) throw new NotFoundException();
     const filledPost =
       await this.likeStatusPostsRepository.preparationPostsForReturn(

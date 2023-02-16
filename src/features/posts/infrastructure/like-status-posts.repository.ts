@@ -139,13 +139,23 @@ export class LikeStatusPostsRepository {
     );
     return updateLikes.acknowledged;
   }
-  async changeBanStatusPostsLikeStatusByBlogId(
+  async changeBanStatusPostsLikeStatusByUserIdBlogId(
     userId: string,
     blogId: string,
     isBanned: boolean,
   ): Promise<boolean> {
     const updateLikes = await this.likeStatusPostModel.updateMany(
       { $and: [{ userId: userId }, { blogId: blogId }] },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
+  }
+  async changeBanStatusPostsLikeStatusByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusPostModel.updateMany(
+      { blogId: blogId },
       { isBanned: isBanned },
     );
     return updateLikes.acknowledged;

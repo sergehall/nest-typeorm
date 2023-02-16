@@ -8,9 +8,9 @@ import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repos
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanInfo } from '../../entities/blogger-blogs-banned-users.entity';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-blogId.use-case';
-import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
+import { ChangeBanStatusCommentsByUserIdBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use-case';
+import { ChangeBanStatusPostsByUserIdBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -50,13 +50,13 @@ export class BanUserForBlogUseCase
         id: blogForBan.blogOwnerInfo.userId,
       });
       await this.commandBus.execute(
-        new ChangeBanStatusPostsByBlogIdCommand(
+        new ChangeBanStatusPostsByUserIdBlogIdCommand(
           command.id,
           command.updateBanUserDto,
         ),
       );
       await this.commandBus.execute(
-        new ChangeBanStatusCommentsByBlogIdCommand(
+        new ChangeBanStatusCommentsByUserIdBlogIdCommand(
           command.id,
           command.updateBanUserDto.blogId,
           command.updateBanUserDto.isBanned,

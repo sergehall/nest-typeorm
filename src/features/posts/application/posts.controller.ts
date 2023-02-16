@@ -76,12 +76,12 @@ export class PostsController {
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async findPostById(
+  async openFindPostById(
     @Request() req: any,
     @Param() params: PostIdParams,
   ): Promise<PostsWithoutOwnersInfoEntity> {
     const currentUser: UsersEntity | null = req.user;
-    const post = await this.postsService.findPostById(
+    const post = await this.postsService.openFindPostById(
       params.postId,
       currentUser,
     );

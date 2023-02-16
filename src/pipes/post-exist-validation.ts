@@ -12,8 +12,12 @@ export class PostExistsRule implements ValidatorConstraintInterface {
   constructor(private postsRepository: PostsRepository) {}
 
   async validate(value: string) {
+    const searchFilters = [];
+    searchFilters.push({ id: value });
+    searchFilters.push({ 'postOwnerInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
     try {
-      if (await this.postsRepository.findPostById(value)) {
+      if (await this.postsRepository.openFindPostById(searchFilters)) {
         return true;
       }
     } catch (e) {
