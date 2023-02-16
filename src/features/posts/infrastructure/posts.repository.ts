@@ -99,12 +99,12 @@ export class PostsRepository {
     const result = await this.postsModel.deleteOne({ id: id });
     return result.acknowledged && result.deletedCount === 1;
   }
-  async changeBanStatusPostRepo(
+  async changeBanStatusUserPosts(
     userId: string,
     isBanned: boolean,
   ): Promise<boolean> {
     const changeBanStatus = await this.postsModel
-      .findOneAndUpdate(
+      .updateMany(
         { 'postOwnerInfo.id': userId },
         {
           $set: {

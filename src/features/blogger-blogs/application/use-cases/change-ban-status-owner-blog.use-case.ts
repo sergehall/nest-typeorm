@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BloggerBlogsService } from '../blogger-blogs.service';
 
-export class ChangeBanStatusOwnerBlogsCommand {
+export class ChangeBanStatusUserBlogsCommand {
   constructor(public userId: string, public isBanned: boolean) {}
 }
-@CommandHandler(ChangeBanStatusOwnerBlogsCommand)
+@CommandHandler(ChangeBanStatusUserBlogsCommand)
 export class ChangeBanStatusOwnerBlogUseCase
-  implements ICommandHandler<ChangeBanStatusOwnerBlogsCommand>
+  implements ICommandHandler<ChangeBanStatusUserBlogsCommand>
 {
   constructor(protected bloggerBlogsService: BloggerBlogsService) {}
-  async execute(command: ChangeBanStatusOwnerBlogsCommand) {
+  async execute(command: ChangeBanStatusUserBlogsCommand) {
     await this.bloggerBlogsService.changeBanStatusOwnerBlog(
       command.userId,
       command.isBanned,

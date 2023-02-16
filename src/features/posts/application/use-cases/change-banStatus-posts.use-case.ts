@@ -2,20 +2,20 @@ import { PostsRepository } from '../../infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../../infrastructure/like-status-posts.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class ChangeBanStatusPostsCommand {
+export class ChangeBanStatusUserPostsCommand {
   constructor(public userId: string, public isBanned: boolean) {}
 }
 
-@CommandHandler(ChangeBanStatusPostsCommand)
+@CommandHandler(ChangeBanStatusUserPostsCommand)
 export class ChangeBanStatusPostsUseCase
-  implements ICommandHandler<ChangeBanStatusPostsCommand>
+  implements ICommandHandler<ChangeBanStatusUserPostsCommand>
 {
   constructor(
     protected postsRepository: PostsRepository,
     protected likeStatusPostsRepository: LikeStatusPostsRepository,
   ) {}
-  async execute(command: ChangeBanStatusPostsCommand): Promise<boolean> {
-    await this.postsRepository.changeBanStatusPostRepo(
+  async execute(command: ChangeBanStatusUserPostsCommand): Promise<boolean> {
+    await this.postsRepository.changeBanStatusUserPosts(
       command.userId,
       command.isBanned,
     );

@@ -7,10 +7,10 @@ import { UsersRepository } from '../../../users/infrastructure/users.repository'
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
 import { RemoveDevicesBannedUserCommand } from '../../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
-import { ChangeBanStatusCommentsCommand } from '../../../comments/application/use-cases/change-banStatus-comments.use-case';
-import { ChangeBanStatusPostsCommand } from '../../../posts/application/use-cases/change-banStatus-posts.use-case';
+import { ChangeBanStatusUserCommentsCommand } from '../../../comments/application/use-cases/change-banStatus-comments.use-case';
+import { ChangeBanStatusUserPostsCommand } from '../../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ChangeBanStatusOwnerBlogsCommand } from '../../../blogger-blogs/application/use-cases/change-ban-status-owner-blog.use-case';
+import { ChangeBanStatusUserBlogsCommand } from '../../../blogger-blogs/application/use-cases/change-ban-status-owner-blog.use-case';
 
 export class SaBanUserCommand {
   constructor(
@@ -49,19 +49,19 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
         new RemoveDevicesBannedUserCommand(userToBan.id),
       );
       await this.commandBus.execute(
-        new ChangeBanStatusCommentsCommand(
+        new ChangeBanStatusUserCommentsCommand(
           userToBan.id,
           command.saBanUserDto.isBanned,
         ),
       );
       await this.commandBus.execute(
-        new ChangeBanStatusPostsCommand(
+        new ChangeBanStatusUserPostsCommand(
           userToBan.id,
           command.saBanUserDto.isBanned,
         ),
       );
       await this.commandBus.execute(
-        new ChangeBanStatusOwnerBlogsCommand(
+        new ChangeBanStatusUserBlogsCommand(
           userToBan.id,
           command.saBanUserDto.isBanned,
         ),

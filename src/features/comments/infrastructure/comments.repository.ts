@@ -85,12 +85,12 @@ export class CommentsRepository {
       resultDeleted.comments.filter((i) => i.id === commentId).length === 0
     );
   }
-  async bannedCommentByUserId(
+  async changeBanStatusCommentsByUserId(
     userId: string,
     isBanned: boolean,
   ): Promise<CommentsEntity[] | null> {
     return await this.commentsModel
-      .findOneAndUpdate(
+      .updateMany(
         { 'comments.commentatorInfo.userId': userId },
         { $set: { 'comments.$.commentatorInfo.isBanned': isBanned } },
       )
