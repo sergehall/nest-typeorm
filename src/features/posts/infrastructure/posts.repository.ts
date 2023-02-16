@@ -128,12 +128,12 @@ export class PostsRepository {
       .lean();
     return changeBanStatus !== null;
   }
-  async changeBanStatusPostByUserIdBlogId(
+  async changeBanStatusPostsByUserIdBlogId(
     userId: string,
     updateBanUserDto: UpdateBanUserDto,
   ): Promise<boolean> {
     const changeBanStatus = await this.postsModel
-      .findOneAndUpdate(
+      .updateMany(
         {
           $and: [
             { blogId: updateBanUserDto.blogId },

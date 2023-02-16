@@ -26,7 +26,7 @@ export class ChangeBanStatusCommentsByUserIdBlogIdUseCase
       command.blogId,
       command.isBanned,
     );
-    await this.likeStatusCommentsRepository.changeBanStatusCommentsLikeByBlogId(
+    await this.likeStatusCommentsRepository.changeBanStatusCommentsLikeByUserIdBlogId(
       command.userId,
       command.blogId,
       command.isBanned,

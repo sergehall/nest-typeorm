@@ -7,10 +7,12 @@ import { QueryArrType } from '../../common/convert-filters/types/convert-filter.
 import { UsersEntity } from '../../users/entities/users.entity';
 import { LikeStatusPostsRepository } from '../infrastructure/like-status-posts.repository';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
+import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 
 @Injectable()
 export class PostsService {
   constructor(
+    protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected postsRepository: PostsRepository,
     protected likeStatusPostsRepository: LikeStatusPostsRepository,
@@ -22,12 +24,19 @@ export class PostsService {
     currentUser: UsersEntity | null,
   ) {
     const field = queryPagination.sortBy;
+    const convertedFilters = await this.convertFiltersForDB.convert(
+      searchFilters,
+    );
+    convertedFilters.push({ 'postOwnerInfo.isBanned': false });
+    convertedFilters.push({ 'banInfo.isBanned': false });
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.postsRepository.countDocuments(searchFilters);
+    const totalCount = await this.postsRepository.countDocuments(
+      convertedFilters,
+    );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const posts: PostsEntity[] = await this.postsRepository.findPosts(
       pagination,
-      searchFilters,
+      convertedFilters,
     );
     const filledPost =
       await this.likeStatusPostsRepository.preparationPostsForReturn(

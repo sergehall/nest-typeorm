@@ -21,7 +21,7 @@ export class ChangeBanStatusPostsByUserIdBlogIdUseCase
   async execute(
     command: ChangeBanStatusPostsByUserIdBlogIdCommand,
   ): Promise<boolean> {
-    await this.postsRepository.changeBanStatusPostByUserIdBlogId(
+    await this.postsRepository.changeBanStatusPostsByUserIdBlogId(
       command.userId,
       command.updateBanUserDto,
     );

@@ -50,7 +50,7 @@ export class LikeStatusCommentsRepository {
     );
     return updateLikes.acknowledged;
   }
-  async changeBanStatusCommentsLikeByBlogId(
+  async changeBanStatusCommentsLikeByUserIdBlogId(
     userId: string,
     blogId: string,
     isBanned: boolean,
@@ -59,6 +59,16 @@ export class LikeStatusCommentsRepository {
       {
         $and: [{ userId: userId }, { blogId: blogId }],
       },
+      { isBanned: isBanned },
+    );
+    return updateLikes.acknowledged;
+  }
+  async changeBanStatusCommentsLikeByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateLikes = await this.likeStatusCommentModel.updateMany(
+      { blogId: blogId },
       { isBanned: isBanned },
     );
     return updateLikes.acknowledged;

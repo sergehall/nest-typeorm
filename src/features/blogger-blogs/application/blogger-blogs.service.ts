@@ -24,13 +24,13 @@ export class BloggerBlogsService {
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );
+    convertedFilters.push({ 'blogOwnerInfo.isBanned': false });
+    convertedFilters.push({ 'banInfo.isBanned': false });
     const pagination = await this.pagination.convert(queryPagination, field);
     const totalCount = await this.bloggerBlogsRepository.countDocuments(
       convertedFilters,
     );
     const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    convertedFilters.push({ 'blogOwnerInfo.isBanned': false });
-    convertedFilters.push({ 'banInfo.isBanned': false });
     const blogs: BloggerBlogsEntity[] =
       await this.bloggerBlogsRepository.openFindBlogs(
         pagination,
