@@ -19,6 +19,7 @@ import { FindCommentsCurrentUserUseCase } from './application/use-cases/find-com
 import { BanUserForBlogUseCase } from './application/use-cases/ban-user-for-blog.use-case';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/add-banned-user-to-ban-list.use-case';
+import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/change-ban-status-owner-blog.use-case';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -27,6 +28,7 @@ const bloggersBlogUseCases = [
   FindCommentsCurrentUserUseCase,
   BanUserForBlogUseCase,
   AddBannedUserToBanListUseCase,
+  ChangeBanStatusOwnerBlogUseCase,
 ];
 
 @Module({

@@ -108,4 +108,13 @@ export class BloggerBlogsService {
       items: bannedUsers,
     };
   }
+  async changeBanStatusOwnerBlog(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    return await this.bloggerBlogsRepository.changeBanStatusOwnerBlog(
+      userId,
+      isBanned,
+    );
+  }
 }

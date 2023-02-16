@@ -79,9 +79,11 @@ export class BloggerBlogsRepository {
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity[]> {
+    searchFilters.push({ 'blogOwnerInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
     return await this.BBlogsModel.find(
       {
-        $or: searchFilters,
+        $and: searchFilters,
       },
       {
         _id: false,
@@ -182,5 +184,19 @@ export class BloggerBlogsRepository {
       .skip(pagination.startIndex)
       .sort({ [pagination.field]: pagination.direction })
       .lean();
+  }
+  async changeBanStatusOwnerBlog(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    const updateBan = await this.BBlogsModel.updateMany(
+      { 'blogOwnerInfo.userId': userId },
+      {
+        $set: {
+          'blogOwnerInfo.isBanned': isBanned,
+        },
+      },
+    );
+    return updateBan !== null;
   }
 }

@@ -10,6 +10,7 @@ import { RemoveDevicesBannedUserCommand } from '../../../security-devices/applic
 import { ChangeBanStatusCommentsCommand } from '../../../comments/application/use-cases/change-banStatus-comments.use-case';
 import { ChangeBanStatusPostsCommand } from '../../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { ChangeBanStatusOwnerBlogsCommand } from '../../../blogger-blogs/application/use-cases/change-ban-status-owner-blog.use-case';
 
 export class SaBanUserCommand {
   constructor(
@@ -45,17 +46,23 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
       await this.commandBus.execute(
-        new RemoveDevicesBannedUserCommand(command.id),
+        new RemoveDevicesBannedUserCommand(userToBan.id),
       );
       await this.commandBus.execute(
         new ChangeBanStatusCommentsCommand(
-          command.id,
+          userToBan.id,
           command.saBanUserDto.isBanned,
         ),
       );
       await this.commandBus.execute(
         new ChangeBanStatusPostsCommand(
-          command.id,
+          userToBan.id,
+          command.saBanUserDto.isBanned,
+        ),
+      );
+      await this.commandBus.execute(
+        new ChangeBanStatusOwnerBlogsCommand(
+          userToBan.id,
           command.saBanUserDto.isBanned,
         ),
       );
