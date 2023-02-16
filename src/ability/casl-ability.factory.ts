@@ -5,59 +5,58 @@ import {
   MatchConditions,
   PureAbility,
 } from '@casl/ability';
-import { Role } from './roles/role.enum';
+import { RolesEnums } from './enums/roles.enums';
 import { Action } from './roles/action.enum';
-import { UserIdEntity } from '../features/comments/entities/userId.entity';
-import { PostsIdEntity } from '../features/posts/entities/postsId.entity';
-import { UsersEntity } from '../features/users/entities/users.entity';
-import { BloggerBlogsBlogIdEntity } from '../features/blogger-blogs/entities/blogger-blogs-blogId.entity';
+import { IdDto } from './dto/id.dto';
+import { CurrentUserDto } from '../features/users/dto/currentUser.dto';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;
 const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
 
 @Injectable()
 export class CaslAbilityFactory {
-  createForUser(user: UsersEntity) {
+  createForUser(currentUser: CurrentUserDto) {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility);
-    if (user.roles === Role.SA) {
+    if (currentUser.roles === RolesEnums.SA) {
       can(Action.MANAGE, 'all');
       cannot(
         Action.CREATE,
         'User',
-        ({ orgId }) => orgId !== user.orgId,
+        ({ orgId }) => orgId !== currentUser.orgId,
       ).because('Because different organizations');
     } else {
       can(Action.READ, 'all');
       can(Action.CREATE, 'all');
-      can(Action.UPDATE, 'all', ({ id }) => id === user.id);
-      can(Action.DELETE, 'all', ({ id }) => id === user.id);
-      cannot(Action.UPDATE, 'all', ({ orgId }) => orgId !== user.orgId);
-      cannot(Action.CREATE, 'all', ({ orgId }) => orgId !== user.orgId);
+      can(Action.UPDATE, 'all', ({ id }) => id === currentUser.id);
+      can(Action.DELETE, 'all', ({ id }) => id === currentUser.id);
+      cannot(Action.CREATE, 'all', ({ isBanned }) => isBanned === true);
+      cannot(Action.UPDATE, 'all', ({ orgId }) => orgId !== currentUser.orgId);
+      cannot(Action.CREATE, 'all', ({ orgId }) => orgId !== currentUser.orgId);
     }
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForPost(post: PostsIdEntity) {
+  createForPost(postId: IdDto) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
     can(Action.CREATE, 'all');
-    can(Action.UPDATE, 'all', ({ id }) => id === post.id);
-    can(Action.DELETE, 'all', ({ id }) => id === post.id);
+    can(Action.UPDATE, 'all', ({ id }) => id === postId.id);
+    can(Action.DELETE, 'all', ({ id }) => id === postId.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForComments(user: UserIdEntity) {
+  createForComments(commentId: IdDto) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
     can(Action.CREATE, 'all');
-    can(Action.UPDATE, 'all', ({ id }) => id === user.id);
-    can(Action.DELETE, 'all', ({ id }) => id === user.id);
+    can(Action.UPDATE, 'all', ({ id }) => id === commentId.id);
+    can(Action.DELETE, 'all', ({ id }) => id === commentId.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForBBlogs(blogs: BloggerBlogsBlogIdEntity) {
+  createForBBlogs(blogId: IdDto) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
-    can(Action.CREATE, 'all', ({ id }) => id === blogs.id);
-    can(Action.UPDATE, 'all', ({ id }) => id === blogs.id);
-    can(Action.DELETE, 'all', ({ id }) => id === blogs.id);
+    can(Action.CREATE, 'all', ({ id }) => id === blogId.id);
+    can(Action.UPDATE, 'all', ({ id }) => id === blogId.id);
+    can(Action.DELETE, 'all', ({ id }) => id === blogId.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
 }

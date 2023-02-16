@@ -33,7 +33,7 @@ import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInf
 import { OwnerInfoDto } from '../dto/ownerInfo.dto';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CreatePostCommand } from './use-cases/create-post.use-case';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
@@ -98,7 +98,7 @@ export class PostsController {
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUserDto.id,
       userLogin: currentUserDto.login,
-      isBanned: currentUserDto.banInfo.isBanned,
+      isBanned: currentUserDto.isBanned,
     };
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, ownerInfoDto),

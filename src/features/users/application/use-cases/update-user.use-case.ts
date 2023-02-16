@@ -1,17 +1,17 @@
 import { UpdateUserDto } from '../../dto/update-user.dto';
-import { UsersEntity } from '../../entities/users.entity';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenException } from '@nestjs/common';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../dto/currentUser.dto';
 
 export class UpdateUserCommand {
   constructor(
     public id: string,
     public updateUserDto: UpdateUserDto,
-    public currentUser: UsersEntity,
+    public currentUser: CurrentUserDto,
   ) {}
 }
 @CommandHandler(UpdateUserCommand)

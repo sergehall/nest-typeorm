@@ -1,5 +1,5 @@
 import { UpdateBBlogsDto } from '../../dto/update-blogger-blogs.dto';
-import { CurrentUserDto } from '../../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';

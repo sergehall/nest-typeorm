@@ -1,11 +1,11 @@
-import { Role } from '../../../../ability/roles/role.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import * as uuid4 from 'uuid4';
 import * as bcrypt from 'bcrypt';
 import { RegistrationData } from '../../entities/users.entity';
-import { OrgIdEnums } from '../../../../infrastructure/database/enums/org-id.enums';
+import { OrgIdEnums } from '../../enums/org-id.enums';
+import { RolesEnums } from '../../../../ability/enums/roles.enums';
 
 export type UsersDocument = HydratedDocument<User>;
 
@@ -53,7 +53,7 @@ export class User {
   @Prop({ required: true })
   orgId: OrgIdEnums;
   @Prop({ required: true })
-  roles: Role;
+  roles: RolesEnums;
   @Prop({ required: true, type: BanInfo })
   banInfo: BanInfo;
   @Prop({ required: true })
@@ -63,7 +63,7 @@ export class User {
   async setOrgId(organization: OrgIdEnums) {
     this.orgId = organization;
   }
-  async setRoles(role: Role) {
+  async setRoles(role: RolesEnums) {
     this.roles = role;
   }
   async setPasswordHash(password: string) {
@@ -91,7 +91,7 @@ export class User {
     makeInstance.passwordHash = passwordHash;
     makeInstance.createdAt = createdAt;
     makeInstance.orgId = OrgIdEnums.IT_INCUBATOR;
-    makeInstance.roles = Role.User;
+    makeInstance.roles = RolesEnums.USER;
     makeInstance.banInfo = {
       isBanned: false,
       banDate: null,

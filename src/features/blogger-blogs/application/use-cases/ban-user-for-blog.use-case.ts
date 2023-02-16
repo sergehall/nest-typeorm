@@ -7,7 +7,7 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanInfo } from '../../entities/blogger-blogs-banned-users.entity';
-import { CurrentUserDto } from '../../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-blogId.use-case';
 import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use-case';

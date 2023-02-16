@@ -1,13 +1,13 @@
-import { User } from '../../infrastructure/schemas/user.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../dto/currentUser.dto';
 
 export class RemoveUserByIdCommand {
-  constructor(public id: string, public currentUser: User) {}
+  constructor(public id: string, public currentUser: CurrentUserDto) {}
 }
 
 @CommandHandler(RemoveUserByIdCommand)

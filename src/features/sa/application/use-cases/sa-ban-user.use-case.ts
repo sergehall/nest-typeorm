@@ -1,7 +1,4 @@
-import {
-  BanInfo,
-  User,
-} from '../../../users/infrastructure/schemas/user.schema';
+import { BanInfo } from '../../../users/infrastructure/schemas/user.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
@@ -12,12 +9,13 @@ import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
 import { RemoveDevicesBannedUserCommand } from '../../../security-devices/application/use-cases/remove-devices-bannedUser.use-case';
 import { ChangeBanStatusCommentsCommand } from '../../../comments/application/use-cases/change-banStatus-comments.use-case';
 import { ChangeBanStatusPostsCommand } from '../../../posts/application/use-cases/change-banStatus-posts.use-case';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class SaBanUserCommand {
   constructor(
     public id: string,
     public saBanUserDto: SaBanUserDto,
-    public currentUser: User,
+    public currentUser: CurrentUserDto,
   ) {}
 }
 
@@ -43,10 +41,8 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
         banReason: command.saBanUserDto.banReason,
       };
     }
+    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
     try {
-      const ability = this.caslAbilityFactory.createForUser(
-        command.currentUser,
-      );
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
       await this.commandBus.execute(
         new RemoveDevicesBannedUserCommand(command.id),

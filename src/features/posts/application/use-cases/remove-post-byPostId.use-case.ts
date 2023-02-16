@@ -1,4 +1,4 @@
-import { CurrentUserDto } from '../../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';

@@ -6,7 +6,7 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../../common/pagination/pagination';
 import { BloggerBlogsRepository } from '../infrastructure/blogger-blogs.repository';
-import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class BloggerBlogsService {

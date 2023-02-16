@@ -13,10 +13,10 @@ import {
   moAnyAuthHeaders,
 } from '../../../exception-filter/errors-messages';
 import { User } from '../../users/infrastructure/schemas/user.schema';
-import { OrgIdEnums } from '../../../infrastructure/database/enums/org-id.enums';
-import { Role } from '../../../ability/roles/role.enum';
+import { OrgIdEnums } from '../../users/enums/org-id.enums';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../../config/configuration';
+import { RolesEnums } from '../../../ability/enums/roles.enums';
 
 @Injectable()
 export class BaseAuthGuard implements CanActivate {
@@ -43,7 +43,7 @@ export class BaseAuthGuard implements CanActivate {
       saUser.login = 'admin';
       saUser.email = 'saUser@email.com';
       saUser.orgId = OrgIdEnums.IT_INCUBATOR;
-      saUser.roles = Role.SA;
+      saUser.roles = RolesEnums.SA;
       const banInfo = { isBanned: false };
       request.user = { ...saUser, banInfo };
       return true;

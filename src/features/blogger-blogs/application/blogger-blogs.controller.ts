@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BloggerBlogsService } from './blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import { CreatePostBloggerBlogsDto } from '../dto/create-post-blogger-blogs.dto';
-import { CurrentUserDto } from '../../auth/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
@@ -91,17 +91,9 @@ export class BloggerBlogsController {
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
   ) {
     const currentUser = req.user;
-    const blogDto = {
-      name: createBBlogsDto.name,
-      description: createBBlogsDto.description,
-      websiteUrl: createBBlogsDto.websiteUrl,
-      blogOwnerInfo: {
-        userId: currentUser.id,
-        userLogin: currentUser.login,
-        isBanned: currentUser.banInfo.isBanned,
-      },
-    };
-    return await this.commandBus.execute(new CreateBloggerBlogCommand(blogDto));
+    return await this.commandBus.execute(
+      new CreateBloggerBlogCommand(createBBlogsDto, currentUser),
+    );
   }
   @Post('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
@@ -114,7 +106,7 @@ export class BloggerBlogsController {
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUser.id,
       userLogin: currentUser.login,
-      isBanned: currentUser.banInfo.isBanned,
+      isBanned: currentUser.isBanned,
     };
     const createPostDto = {
       title: createPostBBlogsDto.title,
@@ -163,7 +155,7 @@ export class BloggerBlogsController {
     const ownerInfoDto: OwnerInfoDto = {
       userId: currentUserDto.id,
       userLogin: currentUserDto.login,
-      isBanned: currentUserDto.banInfo.isBanned,
+      isBanned: currentUserDto.isBanned,
     };
     const updatePostPlusIdDto: UpdatePostPlusIdDto = {
       id: params.postId,

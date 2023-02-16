@@ -1,5 +1,6 @@
-import { Role } from '../../../ability/roles/role.enum';
 import { Prop } from '@nestjs/mongoose';
+import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { OrgIdEnums } from '../enums/org-id.enums';
 
 export class BanInfo {
   @Prop({ required: true })
@@ -39,9 +40,9 @@ export class UsersEntity {
   @Prop({ required: true })
   createdAt: string;
   @Prop({ required: true })
-  orgId: string;
+  orgId: OrgIdEnums;
   @Prop({ required: true })
-  roles: Role;
+  roles: RolesEnums;
   @Prop({ required: true, type: BanInfo })
   banInfo: BanInfo;
   @Prop({ required: true, type: EmailConfirmation })

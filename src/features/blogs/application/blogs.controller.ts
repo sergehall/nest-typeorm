@@ -22,14 +22,13 @@ export class BlogsController {
   async findBlogs(@Query() query: any): Promise<PaginationTypes> {
     const paginationData = ParseQuery.getPaginationData(query);
     const searchFilter = { searchNameTerm: paginationData.searchNameTerm };
-    const banStatus = { banStatus: 'false' };
+    const banStatus = { banStatus: 'true' };
     const queryPagination: PaginationDto = {
       pageNumber: paginationData.pageNumber,
       pageSize: paginationData.pageSize,
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    console.log(searchFilter, queryPagination);
     const blogs = await this.blogsService.findBlogs(queryPagination, [
       searchFilter,
       banStatus,

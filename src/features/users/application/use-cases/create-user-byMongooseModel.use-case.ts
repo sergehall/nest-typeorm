@@ -3,10 +3,10 @@ import { RegDataDto } from '../../dto/reg-data.dto';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { UsersEntity } from '../../entities/users.entity';
 import * as uuid4 from 'uuid4';
-import { OrgIdEnums } from '../../../../infrastructure/database/enums/org-id.enums';
-import { Role } from '../../../../ability/roles/role.enum';
+import { OrgIdEnums } from '../../enums/org-id.enums';
 import * as bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { RolesEnums } from '../../../../ability/enums/roles.enums';
 
 export class CreateUserByMongooseModelCommand {
   constructor(
@@ -46,7 +46,7 @@ export class CreateUserByMongooseModelUseCase
       passwordHash: passwordHash,
       createdAt: currentTime,
       orgId: OrgIdEnums.IT_INCUBATOR,
-      roles: Role.User,
+      roles: RolesEnums.USER,
       banInfo: {
         isBanned: false,
         banDate: null,

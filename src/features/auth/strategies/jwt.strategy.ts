@@ -23,7 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         id: user.id,
         login: user.login,
         email: user.email,
-        banInfo: { isBanned: user.banInfo.isBanned },
+        orgId: user.orgId,
+        roles: user.roles,
+        isBanned: user.banInfo.isBanned,
         payloadExp: new Date(payload.exp * 1000).toISOString(),
       };
     }

@@ -22,7 +22,6 @@ import { UsersService } from '../../users/application/users.service';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { User } from '../../users/infrastructure/schemas/user.schema';
-import { Role } from '../../../ability/roles/role.enum';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
@@ -38,6 +37,7 @@ import { IdParams } from '../../common/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { SaBanBlogCommand } from './use-cases/sa-ban-blog.use-case';
+import { RolesEnums } from '../../../ability/enums/roles.enums';
 
 @SkipThrottle()
 @Controller('sa')
@@ -108,7 +108,7 @@ export class SaController {
     const newUser = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
-    newUser.roles = Role.SA;
+    newUser.roles = RolesEnums.SA;
     const saUser: UsersEntity | null = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
