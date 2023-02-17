@@ -1,12 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikeStatusCommentsRepository } from '../../infrastructure/like-status-comments.repository';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
+import { BanInfo } from '../../../blogger-blogs/entities/blogger-blogs-banned-users.entity';
 
 export class ChangeBanStatusCommentsByUserIdBlogIdCommand {
   constructor(
     public userId: string,
     public blogId: string,
-    public isBanned: boolean,
+    public banInfo: BanInfo,
   ) {}
 }
 
@@ -24,12 +25,12 @@ export class ChangeBanStatusCommentsByUserIdBlogIdUseCase
     await this.commentsRepository.changeBanStatusCommentsByUserIdAndBlogId(
       command.userId,
       command.blogId,
-      command.isBanned,
+      command.banInfo,
     );
     await this.likeStatusCommentsRepository.changeBanStatusCommentsLikeByUserIdBlogId(
       command.userId,
       command.blogId,
-      command.isBanned,
+      command.banInfo.isBanned,
     );
     return true;
   }

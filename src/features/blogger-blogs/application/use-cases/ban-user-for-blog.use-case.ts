@@ -59,7 +59,7 @@ export class BanUserForBlogUseCase
         new ChangeBanStatusCommentsByUserIdBlogIdCommand(
           command.id,
           command.updateBanUserDto.blogId,
-          command.updateBanUserDto.isBanned,
+          banInfo,
         ),
       );
       await this.commandBus.execute(

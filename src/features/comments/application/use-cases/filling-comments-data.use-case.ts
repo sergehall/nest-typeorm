@@ -1,4 +1,3 @@
-import { Comment } from '../../infrastructure/schemas/comments.schema';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { Inject } from '@nestjs/common';
 import { ProvidersEnums } from '../../../../infrastructure/database/enums/providers.enums';
@@ -6,10 +5,11 @@ import { Model } from 'mongoose';
 import { LikeStatusCommentDocument } from '../../infrastructure/schemas/like-status-comments.schema';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CommentsEntity } from '../../entities/comments.entity';
 
 export class FillingCommentsDataCommand {
   constructor(
-    public commentsArray: Comment[],
+    public commentsArray: CommentsEntity[],
     public currentUser: CurrentUserDto | null,
   ) {}
 }
@@ -25,7 +25,7 @@ export class FillingCommentsDataUseCase
     const filledComments = [];
     for (const i in command.commentsArray) {
       const commentId = command.commentsArray[i].id;
-      const currentComment: Comment = command.commentsArray[i];
+      const currentComment: CommentsEntity = command.commentsArray[i];
 
       let ownLikeStatus = StatusLike.NONE;
       if (command.currentUser) {

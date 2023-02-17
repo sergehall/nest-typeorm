@@ -62,6 +62,11 @@ export class CreateCommentUseCase
         dislikesCount: 0,
         myStatus: StatusLike.NONE,
       },
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     };
     const createComment = await this.commentsRepository.createComment(
       post.blogId,

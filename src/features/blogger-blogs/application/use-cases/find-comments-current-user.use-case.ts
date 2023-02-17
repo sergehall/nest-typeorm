@@ -1,10 +1,10 @@
 import { PaginationDto } from '../../../common/pagination/dto/pagination.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { FilteringCommentsNoBannedUserCommand } from '../../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
-import { CommentsEntity } from '../../../comments/entities/comments.entity';
-import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
 import { CommentsRepository } from '../../../comments/infrastructure/comments.repository';
+import { ConvertFiltersForDB } from '../../../common/convert-filters/convertFiltersForDB';
+import { QueryArrType } from '../../../common/convert-filters/types/convert-filter.types';
+import { Pagination } from '../../../common/pagination/pagination';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -17,12 +17,26 @@ export class FindCommentsCurrentUserCommand {
 export class FindCommentsCurrentUserUseCase
   implements ICommandHandler<FindCommentsCurrentUserCommand>
 {
-  constructor(protected commentsRepository: CommentsRepository) {}
+  constructor(
+    protected commentsRepository: CommentsRepository,
+    protected convertFiltersForDB: ConvertFiltersForDB,
+    protected pagination: Pagination,
+  ) {}
   async execute(command: FindCommentsCurrentUserCommand) {
-    const comments = await this.commentsRepository.findCommentsByBlogOwnerId(
-      command.currentUser.id,
+    const field = command.queryPagination.sortBy;
+    const searchFilters: QueryArrType = [];
+    searchFilters.push({ 'postInfo.blogOwnerId': command.currentUser.id });
+    searchFilters.push({ 'commentatorInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
+    const pagination = await this.pagination.convert(
+      command.queryPagination,
+      field,
     );
-    if (!comments || comments.length === 0) {
+    const comments = await this.commentsRepository.findCommentsByBlogOwnerId(
+      pagination,
+      searchFilters,
+    );
+    if (!comments) {
       return {
         pagesCount: 1,
         page: 1,
@@ -31,57 +45,19 @@ export class FindCommentsCurrentUserUseCase
         items: [],
       };
     }
-    console.log(comments);
-    // const commentsNotBannedUser = await this.commandBus.execute(
-    //   new FilteringCommentsNoBannedUserCommand(comments),
-    // );
-    // let desc = 1;
-    // let asc = -1;
-    // const field: 'content' | 'createdAt' =
-    //   queryPagination.sortBy === 'content'
-    //     ? queryPagination.sortBy
-    //     : 'createdAt';
-    // if (
-    //   queryPagination.sortDirection === 'asc' ||
-    //   queryPagination.sortDirection === 'ascending' ||
-    //   queryPagination.sortDirection === 1
-    // ) {
-    //   desc = -1;
-    //   asc = 1;
-    // }
-    // const totalCount = commentsNotBannedUser.length;
-    // const allComments = commentsNotBannedUser.sort(
-    //   await byField(field, asc, desc),
-    // );
-    //
-    // async function byField(
-    //   field: 'content' | 'createdAt',
-    //   asc: number,
-    //   desc: number,
-    // ) {
-    //   return (a: CommentsEntity, b: CommentsEntity) =>
-    //     a[field] > b[field] ? asc : desc;
-    // }
-    //
-    // const startIndex =
-    //   (queryPagination.pageNumber - 1) * queryPagination.pageSize;
-    // const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    //
-    // const commentsSlice = allComments.slice(
-    //   startIndex,
-    //   startIndex + queryPagination.pageSize,
-    // );
-    // const filledComments = await this.commandBus.execute(
-    //   new FillingCommentsDataCommand(commentsSlice, currentUser),
-    // );
-    //
-    // return {
-    //   pagesCount: pagesCount,
-    //   page: queryPagination.pageNumber,
-    //   pageSize: queryPagination.pageSize,
-    //   totalCount: totalCount,
-    //   items: filledComments,
-    // };
-    return true;
+    const totalCount = await this.commentsRepository.countDocuments(
+      searchFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / command.queryPagination.pageSize);
+
+    const pageNumber = command.queryPagination.pageNumber;
+    const pageSize = pagination.pageSize;
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: totalCount,
+      items: comments,
+    };
   }
 }
