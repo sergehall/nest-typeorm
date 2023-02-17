@@ -67,11 +67,10 @@ export class BloggerBlogsController {
     ]);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('blogs/comments')
+  @UseGuards(JwtAuthGuard)
   async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
     const currentUser = req.user;
-    const userIdFilter = { userId: currentUser.id };
     const paginationData = ParseQuery.getPaginationData(query);
     const queryPagination: PaginationDto = {
       pageNumber: paginationData.pageNumber,
@@ -80,7 +79,7 @@ export class BloggerBlogsController {
       sortDirection: paginationData.sortDirection,
     };
     return await this.commandBus.execute(
-      new FindCommentsCurrentUserCommand(queryPagination, [userIdFilter]),
+      new FindCommentsCurrentUserCommand(queryPagination, currentUser),
     );
   }
 

@@ -1,6 +1,10 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
 import { CommentsEntity } from '../../entities/comments.entity';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { PostsService } from '../../../posts/application/posts.service';
@@ -29,6 +33,8 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
     const post = await this.postsService.checkPostInDB(command.postId);
     if (!post) throw new NotFoundException();
+    const blog = await this.bloggerBlogsRepository.findBlogById(post.blogId);
+    if (!blog) throw new NotFoundException();
     const verifyUserForBlog =
       await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
         command.currentUser.id,
@@ -36,10 +42,16 @@ export class CreateCommentUseCase
       );
     if (verifyUserForBlog) throw new ForbiddenException();
     const newComment: CommentsEntity = {
-      blogId: post.blogId,
       id: uuid4().toString(),
       content: command.createCommentDto.content,
       createdAt: new Date().toISOString(),
+      postInfo: {
+        id: post.id,
+        title: post.title,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        blogOwnerId: blog.blogOwnerInfo.userId,
+      },
       commentatorInfo: {
         userId: command.currentUser.id,
         userLogin: command.currentUser.login,
@@ -51,11 +63,12 @@ export class CreateCommentUseCase
         myStatus: StatusLike.NONE,
       },
     };
-    await this.commentsRepository.createComment(
+    const createComment = await this.commentsRepository.createComment(
       post.blogId,
       command.postId,
       newComment,
     );
+    if (!createComment) throw new InternalServerErrorException();
     return {
       id: newComment.id,
       content: newComment.content,

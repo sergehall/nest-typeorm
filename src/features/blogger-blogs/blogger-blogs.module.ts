@@ -20,6 +20,7 @@ import { BanUserForBlogUseCase } from './application/use-cases/ban-user-for-blog
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/add-banned-user-to-ban-list.use-case';
 import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/change-ban-status-owner-blog.use-case';
+import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -44,6 +45,7 @@ const bloggersBlogUseCases = [
     CaslAbilityFactory,
     LikeStatusPostsRepository,
     ConvertFiltersForDB,
+    CommentsRepository,
     BlogExistsRule,
     ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,

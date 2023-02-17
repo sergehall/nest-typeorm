@@ -54,6 +54,14 @@ export class CommentsRepository {
       ? comments.comments
       : null;
   }
+  async findCommentsByBlogOwnerId(blogOwnerId: string) {
+    return await this.commentsModel
+      .find(
+        { 'comments.postInfo.blogOwnerId': blogOwnerId },
+        { _id: false, 'comments._id': false },
+      )
+      .lean();
+  }
   async updateComment(
     commentId: string,
     updateCommentDto: UpdateCommentDto,

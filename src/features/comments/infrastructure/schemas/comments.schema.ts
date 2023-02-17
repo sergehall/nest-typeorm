@@ -5,6 +5,19 @@ import { CommentsEntity } from '../../entities/comments.entity';
 
 export type CommentsDocument = HydratedDocument<Comments>;
 
+class PostInfo {
+  @Prop({ required: true })
+  id: string;
+  @Prop({ required: true })
+  title: string;
+  @Prop({ required: true })
+  blogId: string;
+  @Prop({ required: true })
+  blogName: string;
+  @Prop({ required: true })
+  blogOwnerId: string;
+}
+
 class CommentatorInfo {
   @Prop({ required: true })
   userId: string;
@@ -25,14 +38,14 @@ export class LikesInfo {
 }
 @Schema()
 export class Comment {
-  @Prop({ required: true })
-  blogId: string;
   @Prop({ required: true, unique: true })
   id: string;
   @Prop({ required: true })
   content: string;
   @Prop({ required: true })
   createdAt: string;
+  @Prop({ required: true, type: PostInfo })
+  postInfo: PostInfo;
   @Prop({ required: true, type: CommentatorInfo })
   commentatorInfo: CommentatorInfo;
   @Prop({ required: true, type: LikesInfo })

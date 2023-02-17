@@ -19,6 +19,10 @@ import {
   BBlogsBannedUserDocument,
   BBlogsBannedUsersSchema,
 } from './schemas/blogger-blogs-banned-users.schema';
+import {
+  CommentsDocument,
+  CommentsSchema,
+} from '../../comments/infrastructure/schemas/comments.schema';
 
 export const bloggerBlogsProviders = [
   {
@@ -68,6 +72,16 @@ export const bloggerBlogsProviders = [
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.COMMENT_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<CommentsDocument>(
+        NamesCollectionsEnums.COMMENTS,
+        CommentsSchema,
+        NamesCollectionsEnums.COMMENTS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },
