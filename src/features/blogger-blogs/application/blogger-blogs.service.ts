@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
@@ -121,6 +125,8 @@ export class BloggerBlogsService {
   ): Promise<PaginationTypes> {
     const blog = await this.bloggerBlogsRepository.findBlogById(blogId);
     if (!blog) throw new NotFoundException();
+    if (blog.blogOwnerInfo.userId !== currentUser.id)
+      throw new ForbiddenException();
     const field = queryPagination.sortBy;
     const pageNumber = queryPagination.pageNumber;
     const pageSize = queryPagination.pageSize;
