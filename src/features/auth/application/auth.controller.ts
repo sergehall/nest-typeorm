@@ -42,7 +42,6 @@ import { CheckingUserExistenceCommand } from '../../users/application/use-cases/
 import jwt_decode from 'jwt-decode';
 
 @SkipThrottle()
-//
 @Controller('auth')
 export class AuthController {
   constructor(private commandBus: CommandBus) {}
