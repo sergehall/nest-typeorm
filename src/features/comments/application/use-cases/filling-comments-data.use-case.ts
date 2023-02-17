@@ -1,16 +1,16 @@
 import { Comment } from '../../infrastructure/schemas/comments.schema';
-import { UsersEntity } from '../../../users/entities/users.entity';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { Inject } from '@nestjs/common';
 import { ProvidersEnums } from '../../../../infrastructure/database/enums/providers.enums';
 import { Model } from 'mongoose';
 import { LikeStatusCommentDocument } from '../../infrastructure/schemas/like-status-comments.schema';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class FillingCommentsDataCommand {
   constructor(
     public commentsArray: Comment[],
-    public currentUser: UsersEntity | null,
+    public currentUser: CurrentUserDto | null,
   ) {}
 }
 @CommandHandler(FillingCommentsDataCommand)

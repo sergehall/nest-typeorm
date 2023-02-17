@@ -1,19 +1,20 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
-import { UsersEntity } from '../../../users/entities/users.entity';
 import { CommentsEntity } from '../../entities/comments.entity';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { PostsService } from '../../../posts/application/posts.service';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsReturnEntity } from '../../entities/comments-return.entity';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 
 export class CreateCommentCommand {
   constructor(
     public postId: string,
     public createCommentDto: CreateCommentDto,
-    public user: UsersEntity,
+    public currentUser: CurrentUserDto,
   ) {}
 }
 @CommandHandler(CreateCommentCommand)
@@ -23,18 +24,25 @@ export class CreateCommentUseCase
   constructor(
     protected postsService: PostsService,
     protected commentsRepository: CommentsRepository,
+    protected bloggerBlogsRepository: BloggerBlogsRepository,
   ) {}
   async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
     const post = await this.postsService.checkPostInDB(command.postId);
     if (!post) throw new NotFoundException();
+    const verifyUserForBlog =
+      await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
+        command.currentUser.id,
+        post.blogId,
+      );
+    if (verifyUserForBlog) throw new ForbiddenException();
     const newComment: CommentsEntity = {
       blogId: post.blogId,
       id: uuid4().toString(),
       content: command.createCommentDto.content,
       createdAt: new Date().toISOString(),
       commentatorInfo: {
-        userId: command.user.id,
-        userLogin: command.user.login,
+        userId: command.currentUser.id,
+        userLogin: command.currentUser.login,
         isBanned: false,
       },
       likesInfo: {

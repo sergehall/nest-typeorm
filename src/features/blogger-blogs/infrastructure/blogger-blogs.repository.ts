@@ -229,7 +229,7 @@ export class BloggerBlogsRepository {
     blogId: string,
   ): Promise<boolean> {
     const result = await this.BBannedUsersModel.findOne({
-      $and: [{ id: userId }, { blogId: blogId }],
+      $and: [{ id: userId }, { blogId: blogId }, { 'banInfo.isBanned': true }],
     });
     return result !== null;
   }

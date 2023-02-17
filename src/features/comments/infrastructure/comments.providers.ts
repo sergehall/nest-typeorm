@@ -27,6 +27,14 @@ import {
   refreshTokenBlackListDocument,
   RefreshTokenBlacklistSchema,
 } from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
+import {
+  BBlogsBannedUserDocument,
+  BBlogsBannedUsersSchema,
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogs-banned-users.schema';
+import {
+  BBlogsDocument,
+  BBlogsSchema,
+} from '../../blogger-blogs/infrastructure/schemas/blogger-blogs.schema';
 
 export const commentsProviders = [
   {
@@ -96,6 +104,26 @@ export const commentsProviders = [
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BBLOG_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<BBlogsDocument>(
+        NamesCollectionsEnums.BBLOGS,
+        BBlogsSchema,
+        NamesCollectionsEnums.BBLOGS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<BBlogsBannedUserDocument>(
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+        BBlogsBannedUsersSchema,
+        NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },

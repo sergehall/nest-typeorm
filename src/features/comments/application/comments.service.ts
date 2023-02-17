@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Pagination } from '../../common/pagination/pagination';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import { PostsService } from '../../posts/application/posts.service';
 import { CommentsEntity } from '../entities/comments.entity';
 import { FilteringCommentsNoBannedUserCommand } from '../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class CommentsService {
@@ -18,7 +18,7 @@ export class CommentsService {
     protected commandBus: CommandBus,
   ) {}
 
-  async findCommentById(commentId: string, currentUser: UsersEntity | null) {
+  async findCommentById(commentId: string, currentUser: CurrentUserDto | null) {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
     const commentNotBannedUser = await this.commandBus.execute(
@@ -34,7 +34,7 @@ export class CommentsService {
   async findCommentsByPostId(
     queryPagination: PaginationDto,
     postId: string,
-    currentUser: UsersEntity | null,
+    currentUser: CurrentUserDto | null,
   ) {
     const post = await this.postsService.checkPostInDB(postId);
     if (!post) throw new NotFoundException();

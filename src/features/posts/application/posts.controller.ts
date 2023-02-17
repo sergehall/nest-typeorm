@@ -111,7 +111,7 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    const currentUser: UsersEntity = req.user;
+    const currentUser: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUser),
     );
@@ -125,7 +125,7 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Query() query: any,
   ) {
-    const currentUser: UsersEntity | null = req.user;
+    const currentUser: CurrentUserDto | null = req.user;
     const paginationData = ParseQuery.getPaginationData(query);
     const queryPagination: PaginationDto = {
       pageNumber: paginationData.pageNumber,
@@ -133,8 +133,6 @@ export class PostsController {
       sortBy: paginationData.sortBy,
       sortDirection: paginationData.sortDirection,
     };
-    const post = await this.postsService.checkPostInDB(params.postId);
-    if (!post) throw new NotFoundException();
     return await this.commentsService.findCommentsByPostId(
       queryPagination,
       params.postId,

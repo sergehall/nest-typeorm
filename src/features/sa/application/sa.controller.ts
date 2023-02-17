@@ -8,7 +8,6 @@ import {
   UseGuards,
   Request,
   Ip,
-  NotFoundException,
   Query,
   HttpCode,
   HttpStatus,
@@ -30,7 +29,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
 import { ChangeRoleCommand } from './use-cases/change-role.use-case';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
 import { SaBanUserCommand } from './use-cases/sa-ban-user.use-case';
 import { IdParams } from '../../common/params/id.params';
@@ -96,7 +94,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
-  async createUser(
+  async saCreateUser(
     @Request() req: any,
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
@@ -111,10 +109,9 @@ export class SaController {
       new CreateUserCommand(createUserDto, registrationData),
     );
     newUser.roles = RolesEnums.SA;
-    const saUser: UsersEntity | null = await this.commandBus.execute(
+    const saUser = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
-    if (!saUser) throw new NotFoundException();
     return {
       id: saUser.id,
       login: saUser.login,
