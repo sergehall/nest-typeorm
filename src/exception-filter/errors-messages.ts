@@ -22,7 +22,7 @@ export const moAnyAuthHeaders = {
 };
 export const userAlreadyExists = {
   message: 'Login or password invalid',
-  field: 'headers.authorization',
+  field: 'email',
 };
 export const loginOrEmailInvalid = {
   message: 'Unsuitable loginOrEmail min 3 max 20',
