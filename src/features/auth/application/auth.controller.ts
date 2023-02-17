@@ -83,7 +83,7 @@ export class AuthController {
     if (userExist) {
       throw new HttpException(
         {
-          message: [userAlreadyExists],
+          message: [{ ...userAlreadyExists, field: userExist }],
         },
         HttpStatus.BAD_REQUEST,
       );

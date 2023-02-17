@@ -23,10 +23,18 @@ export class UsersRepository {
     });
   }
   async userAlreadyExist(login: string, email: string): Promise<string | null> {
-    const findLogin = await this.UsersModel.findOne({ login: { $eq: login } });
-    const findEmail = await this.UsersModel.findOne({ email: { $eq: email } });
-    if (findLogin || findEmail) {
-      return findLogin ? 'login' : 'email';
+    // const findLogin = await this.UsersModel.findOne({ login: { $eq: login } });
+    // const findEmail = await this.UsersModel.findOne({ email: { $eq: email } });
+    const checkEmailLogin = await this.UsersModel.findOne({
+      $or: [{ email: { $eq: email } }, { login: { $eq: login } }],
+    });
+    if (checkEmailLogin) {
+      if (checkEmailLogin.login === login) {
+        return 'login';
+      }
+      if (checkEmailLogin.email === email) {
+        return 'email';
+      }
     }
     return null;
   }
