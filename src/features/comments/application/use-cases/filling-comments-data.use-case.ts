@@ -78,6 +78,12 @@ export class FillingCommentsDataUseCase
           dislikesCount: dislikesCount,
           myStatus: ownLikeStatus,
         },
+        postInfo: {
+          id: currentComment.postInfo.id,
+          title: currentComment.postInfo.title,
+          blogId: currentComment.postInfo.blogId,
+          blogName: currentComment.postInfo.blogName,
+        },
       };
       filledComments.push(filledComment);
     }

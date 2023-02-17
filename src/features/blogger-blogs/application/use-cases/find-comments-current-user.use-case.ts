@@ -1,10 +1,11 @@
 import { PaginationDto } from '../../../common/pagination/dto/pagination.dto';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRepository } from '../../../comments/infrastructure/comments.repository';
 import { ConvertFiltersForDB } from '../../../common/convert-filters/convertFiltersForDB';
 import { QueryArrType } from '../../../common/convert-filters/types/convert-filter.types';
 import { Pagination } from '../../../common/pagination/pagination';
+import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -21,6 +22,7 @@ export class FindCommentsCurrentUserUseCase
     protected commentsRepository: CommentsRepository,
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
+    protected commandBus: CommandBus,
   ) {}
   async execute(command: FindCommentsCurrentUserCommand) {
     const field = command.queryPagination.sortBy;
@@ -45,6 +47,9 @@ export class FindCommentsCurrentUserUseCase
         items: [],
       };
     }
+    const filledComments = await this.commandBus.execute(
+      new FillingCommentsDataCommand(comments, command.currentUser),
+    );
     const totalCount = await this.commentsRepository.countDocuments(
       searchFilters,
     );
@@ -57,7 +62,7 @@ export class FindCommentsCurrentUserUseCase
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: comments,
+      items: filledComments,
     };
   }
 }
