@@ -41,6 +41,7 @@ import { UpdateRefreshJwtCommand } from './use-cases/update-refresh-jwt.use-case
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import jwt_decode from 'jwt-decode';
 
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(private commandBus: CommandBus) {}
