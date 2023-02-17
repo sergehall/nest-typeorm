@@ -29,7 +29,7 @@ export class UpdateCommentUseCase
     );
     if (!findComment) throw new NotFoundException();
     try {
-      const ability = this.caslAbilityFactory.createForComments({
+      const ability = this.caslAbilityFactory.createForUserId({
         id: command.currentUser.id,
       });
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {

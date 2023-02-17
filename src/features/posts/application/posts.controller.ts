@@ -169,9 +169,10 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
-  async removePost(@Param() params: IdParams) {
+  async removePost(@Request() req: any, @Param() params: IdParams) {
+    const currentUser = req.user;
     return await this.commandBus.execute(
-      new RemovePostByIdOldCommand(params.id),
+      new RemovePostByIdOldCommand(params.id, currentUser),
     );
   }
   @HttpCode(HttpStatus.NO_CONTENT)

@@ -23,7 +23,7 @@ export class RemoveBlogByIdUseCase
       command.id,
     );
     if (!blogToDelete) throw new NotFoundException();
-    const ability = this.caslAbilityFactory.createForBBlogs({
+    const ability = this.caslAbilityFactory.createForUserId({
       id: blogToDelete.blogOwnerInfo.userId,
     });
     try {

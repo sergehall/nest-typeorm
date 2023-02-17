@@ -35,28 +35,12 @@ export class CaslAbilityFactory {
     }
     return build({ conditionsMatcher: lambdaMatcher });
   }
-  createForPost(postId: IdDto) {
+  createForUserId(userId: IdDto) {
     const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
     can(Action.READ, 'all');
-    can(Action.CREATE, 'all');
-    can(Action.UPDATE, 'all', ({ id }) => id === postId.id);
-    can(Action.DELETE, 'all', ({ id }) => id === postId.id);
-    return build({ conditionsMatcher: lambdaMatcher });
-  }
-  createForComments(commentId: IdDto) {
-    const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
-    can(Action.READ, 'all');
-    can(Action.CREATE, 'all');
-    can(Action.UPDATE, 'all', ({ id }) => id === commentId.id);
-    can(Action.DELETE, 'all', ({ id }) => id === commentId.id);
-    return build({ conditionsMatcher: lambdaMatcher });
-  }
-  createForBBlogs(blogId: IdDto) {
-    const { can, build } = new AbilityBuilder<AppAbility>(PureAbility);
-    can(Action.READ, 'all');
-    can(Action.CREATE, 'all', ({ id }) => id === blogId.id);
-    can(Action.UPDATE, 'all', ({ id }) => id === blogId.id);
-    can(Action.DELETE, 'all', ({ id }) => id === blogId.id);
+    can(Action.CREATE, 'all', ({ id }) => id === userId.id);
+    can(Action.UPDATE, 'all', ({ id }) => id === userId.id);
+    can(Action.DELETE, 'all', ({ id }) => id === userId.id);
     return build({ conditionsMatcher: lambdaMatcher });
   }
 }

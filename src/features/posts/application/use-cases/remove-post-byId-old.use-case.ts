@@ -4,9 +4,10 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class RemovePostByIdOldCommand {
-  constructor(public id: string) {}
+  constructor(public id: string, public currentUser: CurrentUserDto) {}
 }
 
 @CommandHandler(RemovePostByIdOldCommand)
@@ -20,11 +21,15 @@ export class RemovePostByIdOldUseCase
   async execute(
     command: RemovePostByIdOldCommand,
   ): Promise<boolean | undefined> {
-    const postToDelete = await this.postsRepository.findPostById(command.id);
+    const postToDelete = await this.postsRepository.findPostById(
+      command.currentUser.id,
+    );
     if (!postToDelete) {
       throw new NotFoundException();
     }
-    const ability = this.caslAbilityFactory.createForPost({ id: command.id });
+    const ability = this.caslAbilityFactory.createForUserId({
+      id: command.currentUser.id,
+    });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: postToDelete.id,

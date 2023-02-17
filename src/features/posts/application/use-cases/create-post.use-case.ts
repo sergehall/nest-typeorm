@@ -38,7 +38,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         command.createPostDto.blogId,
       );
     if (verifyUserForBlog) throw new ForbiddenException();
-    const ability = this.caslAbilityFactory.createForBBlogs({
+    const ability = this.caslAbilityFactory.createForUserId({
       id: blog.blogOwnerInfo.userId,
     });
     try {

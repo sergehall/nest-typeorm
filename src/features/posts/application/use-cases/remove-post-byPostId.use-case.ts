@@ -33,7 +33,7 @@ export class RemovePostByPostIdUseCase
     if (!blogToDelete) throw new NotFoundException();
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();
-    const ability = this.caslAbilityFactory.createForBBlogs({
+    const ability = this.caslAbilityFactory.createForUserId({
       id: blogToDelete.blogOwnerInfo.userId,
     });
     try {

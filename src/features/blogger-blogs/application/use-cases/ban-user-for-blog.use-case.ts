@@ -42,7 +42,7 @@ export class BanUserForBlogUseCase
       banReason: command.updateBanUserDto.banReason,
     };
 
-    const ability = this.caslAbilityFactory.createForBBlogs({
+    const ability = this.caslAbilityFactory.createForUserId({
       id: command.currentUser.id,
     });
     try {
