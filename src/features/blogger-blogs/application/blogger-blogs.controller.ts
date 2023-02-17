@@ -70,7 +70,7 @@ export class BloggerBlogsController {
   @Get('blogs/comments')
   @UseGuards(JwtAuthGuard)
   async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
-    const currentUser = req.user;
+    const currentUser: CurrentUserDto = req.user;
     const paginationData = ParseQuery.getPaginationData(query);
     const queryPagination: PaginationDto = {
       pageNumber: paginationData.pageNumber,
