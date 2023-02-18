@@ -45,6 +45,10 @@ export class BloggerBlogsRepository {
   async openFindBlogById(
     searchFilters: QueryArrType,
   ): Promise<BloggerBlogsEntity | null> {
+    console.log(searchFilters, 'QueryArrType', 'openFindBlogById');
+    const blogId = searchFilters[0]?.id;
+    const blog = await this.BBlogsModel.findOne({ id: blogId });
+    console.log(blog, 'blog');
     return await this.BBlogsModel.findOne(
       {
         $and: searchFilters,
