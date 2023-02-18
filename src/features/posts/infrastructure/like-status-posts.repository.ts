@@ -100,6 +100,7 @@ export class LikeStatusPostsRepository {
             _id: false,
             __v: false,
             postId: false,
+            blogId: false,
             likeStatus: false,
             isBanned: false,
           },

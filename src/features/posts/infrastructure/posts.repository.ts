@@ -41,23 +41,14 @@ export class PostsRepository {
       {
         _id: false,
         __v: false,
+        blogId: false,
         'extendedLikesInfo._id': false,
         'extendedLikesInfo.newestLikes._id': false,
-        'extendedLikesInfo.newestLikes.blogId': false,
       },
     );
   }
   async findPostById(postId: string): Promise<PostsEntity | null> {
-    return await this.postsModel.findOne(
-      { id: postId },
-      {
-        _id: false,
-        __v: false,
-        'extendedLikesInfo._id': false,
-        'extendedLikesInfo.newestLikes._id': false,
-        'extendedLikesInfo.newestLikes.blogId': false,
-      },
-    );
+    return await this.postsModel.findOne({ id: postId });
   }
   async checkPostInDB(postId: string): Promise<PostsEntity | null> {
     return await this.postsModel.findOne(
@@ -103,7 +94,6 @@ export class PostsRepository {
             __v: false,
             'extendedLikesInfo._id': false,
             'extendedLikesInfo.newestLikes._id': false,
-            'extendedLikesInfo.newestLikes.blogId': false,
             postOwnerInfo: false,
           },
         },

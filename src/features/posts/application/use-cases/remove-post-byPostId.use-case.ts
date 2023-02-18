@@ -34,11 +34,11 @@ export class RemovePostByPostIdUseCase
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToDelete.blogOwnerInfo.userId,
+      id: command.currentUser.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: command.currentUser.id,
+        id: blogToDelete.blogOwnerInfo.userId,
       });
       return await this.postsRepository.removePost(command.postId);
     } catch (error) {
