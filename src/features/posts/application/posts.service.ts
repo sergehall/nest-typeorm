@@ -8,6 +8,7 @@ import { LikeStatusPostsRepository } from '../infrastructure/like-status-posts.r
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 
 @Injectable()
 export class PostsService {
@@ -22,7 +23,7 @@ export class PostsService {
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
     currentUserDto: CurrentUserDto | null,
-  ) {
+  ): Promise<PaginationTypes> {
     const field = queryPagination.sortBy;
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
@@ -71,6 +72,7 @@ export class PostsService {
       );
     return filledPost[0];
   }
+
   async checkPostInDB(postId: string): Promise<PostsEntity | null> {
     return await this.postsRepository.checkPostInDB(postId);
   }
