@@ -80,16 +80,18 @@ export class ParseQuery {
       sortDirection = 1;
     }
     return {
-      pageNumber: pageNumber,
-      pageSize: pageSize,
+      queryPagination: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        sortBy: sortBy,
+        sortDirection: sortDirection,
+      },
       searchNameTerm: searchNameTerm,
       title: title,
       userName: userName,
       searchTitle: searchTitle,
       code: code,
       confirmationCode: confirmationCode,
-      sortBy: sortBy,
-      sortDirection: sortDirection,
       searchLoginTerm: searchLoginTerm,
       searchEmailTerm: searchEmailTerm,
       banStatus: banStatus,

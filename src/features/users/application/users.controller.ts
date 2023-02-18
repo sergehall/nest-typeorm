@@ -49,12 +49,7 @@ export class UsersController {
     const queryData = ParseQuery.getPaginationData(query);
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
     const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
-    const queryPagination: PaginationDto = {
-      pageNumber: queryData.pageNumber,
-      pageSize: queryData.pageSize,
-      sortBy: queryData.sortBy,
-      sortDirection: queryData.sortDirection,
-    };
+    const queryPagination: PaginationDto = queryData.queryPagination;
     return this.usersService.findUsers(queryPagination, [
       searchLoginTerm,
       searchEmailTerm,

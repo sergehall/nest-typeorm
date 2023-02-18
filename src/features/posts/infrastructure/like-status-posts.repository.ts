@@ -4,9 +4,9 @@ import { LikeStatusPostEntity } from '../entities/like-status-post.entity';
 import { LikeStatusPostsDocument } from './schemas/like-status-posts.schemas';
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
 import { PostsEntity } from '../entities/posts.entity';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class LikeStatusPostsRepository {
@@ -42,7 +42,7 @@ export class LikeStatusPostsRepository {
   }
   async preparationPostsForReturn(
     postArray: PostsEntity[],
-    currentUser: UsersEntity | null,
+    currentUserDto: CurrentUserDto | null,
   ): Promise<PostsWithoutOwnersInfoEntity[]> {
     const filledPosts: PostsWithoutOwnersInfoEntity[] = [];
     for (const i in postArray) {
@@ -74,11 +74,11 @@ export class LikeStatusPostsRepository {
         .lean();
       // getting the status of the post owner
       let ownLikeStatus = StatusLike.NONE;
-      if (currentUser) {
+      if (currentUserDto) {
         const findOwnPost = await this.likeStatusPostModel.findOne({
           $and: [
             { postId: postId },
-            { userId: currentUser.id },
+            { userId: currentUserDto.id },
             { isBanned: false },
           ],
         });

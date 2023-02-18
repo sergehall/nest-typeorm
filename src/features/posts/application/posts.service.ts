@@ -4,10 +4,10 @@ import { Pagination } from '../../common/pagination/pagination';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { PostsEntity } from '../entities/posts.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { LikeStatusPostsRepository } from '../infrastructure/like-status-posts.repository';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class PostsService {
@@ -21,7 +21,7 @@ export class PostsService {
   async findPosts(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
-    currentUser: UsersEntity | null,
+    currentUserDto: CurrentUserDto | null,
   ) {
     const field = queryPagination.sortBy;
     const convertedFilters = await this.convertFiltersForDB.convert(
@@ -41,7 +41,7 @@ export class PostsService {
     const filledPost =
       await this.likeStatusPostsRepository.preparationPostsForReturn(
         posts,
-        currentUser,
+        currentUserDto,
       );
     const pageNumber = queryPagination.pageNumber;
     const pageSize = pagination.pageSize;
@@ -56,7 +56,7 @@ export class PostsService {
 
   async openFindPostById(
     postId: string,
-    currentUser: UsersEntity | null,
+    currentUserDto: CurrentUserDto | null,
   ): Promise<PostsWithoutOwnersInfoEntity | null> {
     const searchFilters = [];
     searchFilters.push({ id: postId });
@@ -67,7 +67,7 @@ export class PostsService {
     const filledPost =
       await this.likeStatusPostsRepository.preparationPostsForReturn(
         [post],
-        currentUser,
+        currentUserDto,
       );
     return filledPost[0];
   }

@@ -4,9 +4,9 @@ import { Model } from 'mongoose';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
-import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
 import { BanInfo, PostsDocument } from './schemas/posts.schema';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
+import { UpdateDataPostBloggerBlogsDto } from '../../blogger-blogs/dto/update-data-post-blogger-blogs.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -81,18 +81,17 @@ export class PostsRepository {
     });
   }
   async updatePost(
-    updatePostPlusIdDto: UpdatePostPlusIdDto,
+    postId: string,
+    updatePostBloggerBlogsDto: UpdateDataPostBloggerBlogsDto,
   ): Promise<PostsEntity> {
     return await this.postsModel
       .findOneAndUpdate(
-        { id: updatePostPlusIdDto.id },
+        { id: postId },
         {
           $set: {
-            id: updatePostPlusIdDto.id,
-            title: updatePostPlusIdDto.title,
-            shortDescription: updatePostPlusIdDto.shortDescription,
-            content: updatePostPlusIdDto.content,
-            blogId: updatePostPlusIdDto.blogId,
+            title: updatePostBloggerBlogsDto.title,
+            shortDescription: updatePostBloggerBlogsDto.shortDescription,
+            content: updatePostBloggerBlogsDto.content,
           },
         },
         {

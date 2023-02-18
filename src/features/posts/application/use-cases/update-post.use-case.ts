@@ -5,13 +5,15 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdatePostPlusIdDto } from '../../dto/update-post-plusId.dto';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { BlogIdPostIdParams } from '../../../common/params/blogId-postId.params';
+import { UpdateDataPostDto } from '../../dto/update-data-post.dto';
 
 export class UpdatePostCommand {
   constructor(
-    public updatePostPlusIdDto: UpdatePostPlusIdDto,
+    public updateDataPostDto: UpdateDataPostDto,
+    public params: BlogIdPostIdParams,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
@@ -25,13 +27,9 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
   ) {}
   async execute(command: UpdatePostCommand) {
     const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepository.findBlogById(
-        command.updatePostPlusIdDto.blogId,
-      );
+      await this.bloggerBlogsRepository.findBlogById(command.params.blogId);
     if (!blog) throw new NotFoundException();
-    const post = await this.postsRepository.findPostById(
-      command.updatePostPlusIdDto.id,
-    );
+    const post = await this.postsRepository.findPostById(command.params.postId);
     if (!post) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForUserId({
       id: blog.blogOwnerInfo.userId,
@@ -40,7 +38,10 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: command.currentUserDto.id,
       });
-      return await this.postsRepository.updatePost(command.updatePostPlusIdDto);
+      return await this.postsRepository.updatePost(
+        command.params.postId,
+        command.updateDataPostDto,
+      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

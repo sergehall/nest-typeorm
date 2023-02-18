@@ -18,7 +18,10 @@ export class CommentsService {
     protected commandBus: CommandBus,
   ) {}
 
-  async findCommentById(commentId: string, currentUser: CurrentUserDto | null) {
+  async findCommentById(
+    commentId: string,
+    currentUserDto: CurrentUserDto | null,
+  ) {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
     const commentNotBannedUser = await this.commandBus.execute(
@@ -26,7 +29,7 @@ export class CommentsService {
     );
     if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(commentNotBannedUser, currentUser),
+      new FillingCommentsDataCommand(commentNotBannedUser, currentUserDto),
     );
     return filledComments[0];
   }
@@ -34,7 +37,7 @@ export class CommentsService {
   async findCommentsByPostId(
     queryPagination: PaginationDto,
     postId: string,
-    currentUser: CurrentUserDto | null,
+    currentUserDto: CurrentUserDto | null,
   ) {
     const post = await this.postsService.checkPostInDB(postId);
     if (!post) throw new NotFoundException();
@@ -87,7 +90,7 @@ export class CommentsService {
       startIndex + queryPagination.pageSize,
     );
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(commentsSlice, currentUser),
+      new FillingCommentsDataCommand(commentsSlice, currentUserDto),
     );
 
     return {

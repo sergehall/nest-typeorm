@@ -20,14 +20,9 @@ export class BlogsController {
 
   @Get()
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
-    const paginationData = ParseQuery.getPaginationData(query);
-    const searchFilter = { searchNameTerm: paginationData.searchNameTerm };
-    const queryPagination: PaginationDto = {
-      pageNumber: paginationData.pageNumber,
-      pageSize: paginationData.pageSize,
-      sortBy: paginationData.sortBy,
-      sortDirection: paginationData.sortDirection,
-    };
+    const queryData = ParseQuery.getPaginationData(query);
+    const searchFilter = { searchNameTerm: queryData.searchNameTerm };
+    const queryPagination: PaginationDto = queryData.queryPagination;
     const blogs = await this.blogsService.openFindBlogs(queryPagination, [
       searchFilter,
     ]);

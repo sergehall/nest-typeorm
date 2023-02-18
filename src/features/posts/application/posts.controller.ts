@@ -18,7 +18,6 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { CommentsService } from '../../comments/application/comments.service';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -35,12 +34,12 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CreatePostCommand } from './use-cases/create-post.use-case';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { UpdatePostPlusIdDto } from '../dto/update-post-plusId.dto';
 import { UpdatePostCommand } from './use-cases/update-post.use-case';
 import { RemovePostByIdOldCommand } from './use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostCommand } from './use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../common/params/postId.params';
 import { IdParams } from '../../common/params/id.params';
+import { UpdateDataPostDto } from '../dto/update-data-post.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -55,19 +54,14 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPosts(@Request() req: any, @Query() query: any) {
-    const currentUser = req.user;
-    const paginationData = ParseQuery.getPaginationData(query);
+    const currentUserDto = req.user;
+    const queryData = ParseQuery.getPaginationData(query);
     const searchFilters = {};
-    const queryPagination: PaginationDto = {
-      pageNumber: paginationData.pageNumber,
-      pageSize: paginationData.pageSize,
-      sortBy: paginationData.sortBy,
-      sortDirection: paginationData.sortDirection,
-    };
+    const queryPagination: PaginationDto = queryData.queryPagination;
     return this.postsService.findPosts(
       queryPagination,
       [searchFilters],
-      currentUser,
+      currentUserDto,
     );
   }
 
@@ -79,10 +73,10 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
   ): Promise<PostsWithoutOwnersInfoEntity> {
-    const currentUser: UsersEntity | null = req.user;
+    const currentUserDto: CurrentUserDto | null = req.user;
     const post = await this.postsService.openFindPostById(
       params.postId,
-      currentUser,
+      currentUserDto,
     );
     if (!post) throw new NotFoundException();
     return post;
@@ -105,9 +99,9 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    const currentUser: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new CreateCommentCommand(params.postId, createCommentDto, currentUser),
+      new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
     );
   }
   @Get(':postId/comments')
@@ -119,18 +113,13 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Query() query: any,
   ) {
-    const currentUser: CurrentUserDto | null = req.user;
-    const paginationData = ParseQuery.getPaginationData(query);
-    const queryPagination: PaginationDto = {
-      pageNumber: paginationData.pageNumber,
-      pageSize: paginationData.pageSize,
-      sortBy: paginationData.sortBy,
-      sortDirection: paginationData.sortDirection,
-    };
+    const currentUserDto: CurrentUserDto | null = req.user;
+    const queryData = ParseQuery.getPaginationData(query);
+    const queryPagination: PaginationDto = queryData.queryPagination;
     return await this.commentsService.findCommentsByPostId(
       queryPagination,
       params.postId,
-      currentUser,
+      currentUserDto,
     );
   }
 
@@ -143,12 +132,17 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const currentUserDto = req.user;
-    const updatePostPlusIdDto: UpdatePostPlusIdDto = {
-      ...updatePostDto,
-      id: params.id,
+    const updateDataPostDto: UpdateDataPostDto = {
+      title: updatePostDto.title,
+      shortDescription: updatePostDto.shortDescription,
+      content: updatePostDto.content,
+    };
+    const blogIdPostId = {
+      blogId: updatePostDto.blogId,
+      postId: params.id,
     };
     const updatePost = await this.commandBus.execute(
-      new UpdatePostCommand(updatePostPlusIdDto, currentUserDto),
+      new UpdatePostCommand(updateDataPostDto, blogIdPostId, currentUserDto),
     );
     if (!updatePost) throw new NotFoundException();
     return updatePost;
@@ -170,13 +164,13 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
-    const currentUser = req.user;
+    const currentUserDto = req.user;
 
     return await this.commandBus.execute(
       new ChangeLikeStatusPostCommand(
         params.postId,
         likeStatusDto,
-        currentUser,
+        currentUserDto,
       ),
     );
   }

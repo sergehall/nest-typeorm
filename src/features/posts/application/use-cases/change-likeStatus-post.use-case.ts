@@ -1,16 +1,16 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
-import { UsersEntity } from '../../../users/entities/users.entity';
 import { NotFoundException } from '@nestjs/common';
 import { LikeStatusPostEntity } from '../../entities/like-status-post.entity';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../../infrastructure/like-status-posts.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class ChangeLikeStatusPostCommand {
   constructor(
     public postId: string,
     public likeStatusDto: LikeStatusDto,
-    public currentUser: UsersEntity,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -28,9 +28,9 @@ export class ChangeLikeStatusPostUseCase
     const likeStatusPostEntity: LikeStatusPostEntity = {
       blogId: post.blogId,
       postId: command.postId,
-      userId: command.currentUser.id,
-      login: command.currentUser.login,
-      isBanned: command.currentUser.banInfo.isBanned,
+      userId: command.currentUserDto.id,
+      login: command.currentUserDto.login,
+      isBanned: command.currentUserDto.isBanned,
       likeStatus: command.likeStatusDto.likeStatus,
       addedAt: new Date().toISOString(),
     };

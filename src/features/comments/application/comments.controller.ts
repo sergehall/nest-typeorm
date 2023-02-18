@@ -73,11 +73,12 @@ export class CommentsController {
     @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
+    const currentUserDto = req.user;
     return await this.commandBus.execute(
       new ChangeLikeStatusCommentCommand(
         params.commentId,
         likeStatusDto,
-        req.user,
+        currentUserDto,
       ),
     );
   }

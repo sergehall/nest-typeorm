@@ -1,17 +1,17 @@
 import { UpdateCommentDto } from '../../dto/update-comment.dto';
-import { User } from '../../../users/infrastructure/schemas/user.schema';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class UpdateCommentCommand {
   constructor(
     public commentId: string,
     public updateCommentDto: UpdateCommentDto,
-    public currentUser: User,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -30,7 +30,7 @@ export class UpdateCommentUseCase
     if (!findComment) throw new NotFoundException();
     try {
       const ability = this.caslAbilityFactory.createForUserId({
-        id: command.currentUser.id,
+        id: command.currentUserDto.id,
       });
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: findComment.commentatorInfo.userId,

@@ -56,12 +56,7 @@ export class SaController {
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
     const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
     const banStatus = { banStatus: queryData.banStatus };
-    const queryPagination: PaginationDto = {
-      pageNumber: queryData.pageNumber,
-      pageSize: queryData.pageSize,
-      sortBy: queryData.sortBy,
-      sortDirection: queryData.sortDirection,
-    };
+    const queryPagination: PaginationDto = queryData.queryPagination;
     return this.usersService.findUsers(queryPagination, [
       searchLoginTerm,
       searchEmailTerm,
@@ -75,15 +70,10 @@ export class SaController {
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
-    const paginationData = ParseQuery.getPaginationData(query);
-    const searchFilters = { searchNameTerm: paginationData.searchNameTerm };
-    const banStatus = { banStatus: paginationData.banStatus };
-    const queryPagination: PaginationDto = {
-      pageNumber: paginationData.pageNumber,
-      pageSize: paginationData.pageSize,
-      sortBy: paginationData.sortBy,
-      sortDirection: paginationData.sortDirection,
-    };
+    const queryData = ParseQuery.getPaginationData(query);
+    const searchFilters = { searchNameTerm: queryData.searchNameTerm };
+    const banStatus = { banStatus: queryData.banStatus };
+    const queryPagination: PaginationDto = queryData.queryPagination;
     return await this.bloggerBlogsService.saFindBlogs(queryPagination, [
       searchFilters,
       banStatus,
@@ -129,9 +119,9 @@ export class SaController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   async removeUserById(@Request() req: any, @Param() params: IdParams) {
-    const currentUser = req.user;
+    const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemoveUserByIdCommand(params.id, currentUser),
+      new RemoveUserByIdCommand(params.id, currentUserDto),
     );
   }
   @Put('users/:id/ban')
@@ -142,9 +132,9 @@ export class SaController {
     @Param() params: IdParams,
     @Body() updateSaBanDto: SaBanUserDto,
   ) {
-    const currentUser = req.user;
+    const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUserCommand(params.id, updateSaBanDto, currentUser),
+      new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
   @Put('blogs/:id/ban')
@@ -155,9 +145,9 @@ export class SaController {
     @Param() params: IdParams,
     @Body() saBanBlogDto: SaBanBlogDto,
   ) {
-    const currentUser = req.user;
+    const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanBlogCommand(params.id, saBanBlogDto, currentUser),
+      new SaBanBlogCommand(params.id, saBanBlogDto, currentUserDto),
     );
   }
 }
