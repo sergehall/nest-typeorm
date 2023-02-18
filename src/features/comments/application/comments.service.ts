@@ -3,7 +3,6 @@ import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Pagination } from '../../common/pagination/pagination';
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import { PostsService } from '../../posts/application/posts.service';
-import { FilteringCommentsNoBannedUserCommand } from '../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -23,12 +22,8 @@ export class CommentsService {
   ) {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
-    const commentNotBannedUser = await this.commandBus.execute(
-      new FilteringCommentsNoBannedUserCommand([comment]),
-    );
-    if (commentNotBannedUser.length === 0) throw new NotFoundException();
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(commentNotBannedUser, currentUserDto),
+      new FillingCommentsDataCommand([comment], currentUserDto),
     );
     return filledComments[0];
   }

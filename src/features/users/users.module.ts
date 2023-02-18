@@ -17,7 +17,6 @@ import { CreateUserByMongooseModelUseCase } from './application/use-cases/create
 import { CreateUserByInstanceUseCase } from './application/use-cases/create-user-byInstance.use-case';
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
-import { FilteringCommentsNoBannedUserUseCase } from './application/use-cases/filtering-comments-noBannedUser.use-case';
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 
 const usersUseCases = [
@@ -25,7 +24,6 @@ const usersUseCases = [
   CreateUserByInstanceUseCase,
   UpdateUserUseCase,
   RemoveUserByIdUseCase,
-  FilteringCommentsNoBannedUserUseCase,
   CheckingUserExistenceUseCase,
 ];
 

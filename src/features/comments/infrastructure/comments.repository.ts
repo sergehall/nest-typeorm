@@ -26,12 +26,14 @@ export class CommentsRepository {
     }
   }
   async findCommentById(commentId: string): Promise<CommentsEntity | null> {
-    return await this.commentsModel.findOne(
-      { id: commentId },
-      {
-        _id: false,
-      },
-    );
+    return await this.commentsModel
+      .findOne(
+        { id: commentId },
+        {
+          _id: false,
+        },
+      )
+      .lean();
   }
   async findCommentsByPostId(
     pagination: PaginationDBType,
@@ -50,7 +52,6 @@ export class CommentsRepository {
           postInfo: false,
           'commentatorInfo._id': false,
           'commentatorInfo.isBanned': false,
-          'postInfo.blogOwnerId': false,
         },
       )
       .limit(pagination.pageSize)
@@ -75,7 +76,6 @@ export class CommentsRepository {
           postInfo: false,
           'commentatorInfo._id': false,
           'commentatorInfo.isBanned': false,
-          'postInfo.blogOwnerId': false,
         },
       )
       .limit(pagination.pageSize)

@@ -10,7 +10,7 @@ import { CommentsEntity } from '../../entities/comments.entity';
 export class FillingCommentsDataCommand {
   constructor(
     public commentsArray: CommentsEntity[],
-    public currentUser: CurrentUserDto | null,
+    public currentUserDto: CurrentUserDto | null,
   ) {}
 }
 @CommandHandler(FillingCommentsDataCommand)
@@ -26,13 +26,12 @@ export class FillingCommentsDataUseCase
     for (const i in command.commentsArray) {
       const commentId = command.commentsArray[i].id;
       const currentComment: CommentsEntity = command.commentsArray[i];
-
       let ownLikeStatus = StatusLike.NONE;
-      if (command.currentUser) {
+      if (command.currentUserDto) {
         const currentComment = await this.likeStatusCommentModel.findOne(
           {
             $and: [
-              { userId: command.currentUser.id },
+              { userId: command.currentUserDto.id },
               { commentId: commentId },
               { isBanned: false },
             ],
@@ -46,7 +45,6 @@ export class FillingCommentsDataUseCase
           ownLikeStatus = currentComment.likeStatus;
         }
       }
-
       // getting likes count
       const likesCount = await this.likeStatusCommentModel.countDocuments({
         $and: [
@@ -77,12 +75,6 @@ export class FillingCommentsDataUseCase
           likesCount: likesCount,
           dislikesCount: dislikesCount,
           myStatus: ownLikeStatus,
-        },
-        postInfo: {
-          id: currentComment.postInfo.id,
-          title: currentComment.postInfo.title,
-          blogId: currentComment.postInfo.blogId,
-          blogName: currentComment.postInfo.blogName,
         },
       };
       filledComments.push(filledComment);
