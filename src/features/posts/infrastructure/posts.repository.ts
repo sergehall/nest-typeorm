@@ -119,7 +119,7 @@ export class PostsRepository {
   ): Promise<boolean> {
     const changeBanStatus = await this.postsModel
       .updateMany(
-        { 'postOwnerInfo.id': userId },
+        { 'postOwnerInfo.userId': userId },
         {
           $set: {
             'postOwnerInfo.isBanned': isBanned,
