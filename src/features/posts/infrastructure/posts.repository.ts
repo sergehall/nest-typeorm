@@ -43,6 +43,7 @@ export class PostsRepository {
         __v: false,
         'extendedLikesInfo._id': false,
         'extendedLikesInfo.newestLikes._id': false,
+        'extendedLikesInfo.newestLikes.blogId': false,
       },
     );
   }
@@ -54,6 +55,7 @@ export class PostsRepository {
         __v: false,
         'extendedLikesInfo._id': false,
         'extendedLikesInfo.newestLikes._id': false,
+        'extendedLikesInfo.newestLikes.blogId': false,
       },
     );
   }
@@ -101,6 +103,7 @@ export class PostsRepository {
             __v: false,
             'extendedLikesInfo._id': false,
             'extendedLikesInfo.newestLikes._id': false,
+            'extendedLikesInfo.newestLikes.blogId': false,
             postOwnerInfo: false,
           },
         },
