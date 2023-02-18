@@ -32,7 +32,7 @@ export class SaBanBlogUseCase implements ICommandHandler<SaBanBlogCommand> {
     const banInfo: BanInfo = {
       isBanned: command.saBanBlogDto.isBanned,
       banDate: new Date().toISOString(),
-      banReason: "Because, I'm super admin",
+      banReason: "Because, I'm super admin :)",
     };
     const ability = this.caslAbilityFactory.createForUser(command.currentUser);
 
