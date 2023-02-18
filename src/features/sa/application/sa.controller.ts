@@ -102,7 +102,6 @@ export class SaController {
     const saUser = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
-    console.log(newUser, 'saCreateUser');
     return {
       id: saUser.id,
       login: saUser.login,

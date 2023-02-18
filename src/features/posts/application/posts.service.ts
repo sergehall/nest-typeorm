@@ -65,6 +65,9 @@ export class PostsService {
     searchFilters.push({ 'postOwnerInfo.isBanned': false });
     searchFilters.push({ 'banInfo.isBanned': false });
     const post = await this.postsRepository.openFindPostById(searchFilters);
+    console.log(currentUserDto, 'currentUserDto');
+    console.log(searchFilters, 'searchFilters');
+    console.log(post, 'post');
     if (!post) throw new NotFoundException();
     const filledPost =
       await this.likeStatusPostsRepository.preparationPostsForReturn(
