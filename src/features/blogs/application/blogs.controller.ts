@@ -61,19 +61,15 @@ export class BlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Query() query: any,
-  ) {
+  ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
     const queryPagination: PaginationDto = queryData.queryPagination;
     const searchFilters = { blogId: params.blogId };
-    const posts = await this.postsService.findPosts(
+    return await this.postsService.findPosts(
       queryPagination,
       [searchFilters],
       currentUserDto,
     );
-    if (!posts) {
-      throw new NotFoundException();
-    }
-    return posts;
   }
 }

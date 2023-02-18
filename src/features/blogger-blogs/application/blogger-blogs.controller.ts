@@ -101,6 +101,7 @@ export class BloggerBlogsController {
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
   ) {
     const currentUserDto = req.user;
+    console.log(currentUserDto, 'createBlog');
     return await this.commandBus.execute(
       new CreateBloggerBlogCommand(createBBlogsDto, currentUserDto),
     );
@@ -138,6 +139,7 @@ export class BloggerBlogsController {
     @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+    console.log(currentUserDto, 'createPostByBlogId');
     const createPostDto: CreatePostDto = {
       title: createPostBBlogsDto.title,
       shortDescription: createPostBBlogsDto.shortDescription,

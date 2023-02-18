@@ -40,6 +40,7 @@ import { SineRefreshJwtCommand } from './use-cases/sine-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from './use-cases/update-refresh-jwt.use-case';
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import jwt_decode from 'jwt-decode';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -53,9 +54,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessToken> {
+    const currentUserDto: CurrentUserDto = req.user;
     const userAgent = req.get('user-agent') || 'None';
     const signedToken = await this.commandBus.execute(
-      new SineRefreshJwtCommand(req.user),
+      new SineRefreshJwtCommand(currentUserDto),
     );
     const newPayload: PayloadDto = jwt_decode(signedToken.refreshToken);
     if (newPayload) {
@@ -63,6 +65,7 @@ export class AuthController {
         new CreateDeviceCommand(newPayload, ip, userAgent),
       );
     }
+    console.log(currentUserDto, 'login');
     res.cookie('refreshToken', signedToken.refreshToken, {
       httpOnly: true,
       secure: true,

@@ -1,12 +1,12 @@
-import { UsersEntity } from '../../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class SineRefreshJwtCommand {
-  constructor(public user: UsersEntity) {}
+  constructor(public currentUserDto: CurrentUserDto) {}
 }
 
 @CommandHandler(SineRefreshJwtCommand)
@@ -17,8 +17,8 @@ export class SineRefreshJwtUseCase
   async execute(command: SineRefreshJwtCommand) {
     const deviceId = uuid4().toString();
     const payload = {
-      userId: command.user.id,
-      email: command.user.email,
+      userId: command.currentUserDto.id,
+      email: command.currentUserDto.email,
       deviceId: deviceId,
     };
     const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();

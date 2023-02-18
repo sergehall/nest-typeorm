@@ -102,6 +102,7 @@ export class SaController {
     const saUser = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
+    console.log(newUser, 'saCreateUser');
     return {
       id: saUser.id,
       login: saUser.login,
@@ -133,6 +134,7 @@ export class SaController {
     @Body() updateSaBanDto: SaBanUserDto,
   ) {
     const currentUserDto = req.user;
+    console.log(params, updateSaBanDto, currentUserDto, 'banUser');
     return await this.commandBus.execute(
       new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
