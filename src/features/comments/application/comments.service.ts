@@ -21,7 +21,8 @@ export class CommentsService {
     currentUserDto: CurrentUserDto | null,
   ) {
     const comment = await this.commentsRepository.findCommentById(commentId);
-    if (!comment) throw new NotFoundException();
+    if (!comment || comment.commentatorInfo.isBanned)
+      throw new NotFoundException();
     const filledComments = await this.commandBus.execute(
       new FillingCommentsDataCommand([comment], currentUserDto),
     );
