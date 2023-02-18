@@ -52,6 +52,7 @@ export class BlogsController {
     }
     return blog;
   }
+
   @Get(':blogId/posts')
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPostsByBlogId(
