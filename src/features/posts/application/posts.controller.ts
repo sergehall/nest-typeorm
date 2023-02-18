@@ -95,13 +95,8 @@ export class PostsController {
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const currentUserDto: CurrentUserDto = req.user;
-    const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUserDto.id,
-      userLogin: currentUserDto.login,
-      isBanned: currentUserDto.isBanned,
-    };
     return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, ownerInfoDto),
+      new CreatePostCommand(createPostDto, currentUserDto),
     );
   }
   @Post(':postId/comments')
