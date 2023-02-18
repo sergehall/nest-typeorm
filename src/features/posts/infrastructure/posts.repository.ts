@@ -36,16 +36,6 @@ export class PostsRepository {
   async openFindPostById(
     searchFilters: QueryArrType,
   ): Promise<PostsEntity | null> {
-    const post = await this.postsModel.findOne(
-      { id: searchFilters[0].id },
-      {
-        _id: false,
-        __v: false,
-        'extendedLikesInfo._id': false,
-        'extendedLikesInfo.newestLikes._id': false,
-      },
-    );
-    console.log(post, 'openFindPostById only id');
     return await this.postsModel.findOne(
       { $and: searchFilters },
       {
