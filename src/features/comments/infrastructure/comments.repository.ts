@@ -33,15 +33,34 @@ export class CommentsRepository {
       },
     );
   }
-  async findCommentsByPostId(postId: string): Promise<CommentsEntity[] | null> {
+  async findCommentsByPostId(
+    pagination: PaginationDBType,
+    searchFilters: QueryArrType,
+  ): Promise<CommentsEntity[] | null> {
     return await this.commentsModel
-      .find({ 'postInfo.id': postId }, { _id: false })
+      .find(
+        {
+          $and: searchFilters,
+        },
+        {
+          _id: false,
+          __v: false,
+          likesInfo: false,
+          banInfo: false,
+          'commentatorInfo._id': false,
+          'commentatorInfo.isBanned': false,
+          'postInfo.blogOwnerId': false,
+        },
+      )
+      .limit(pagination.pageSize)
+      .skip(pagination.startIndex)
+      .sort({ [pagination.field]: pagination.direction })
       .lean();
   }
   async findCommentsByBlogOwnerId(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ) {
+  ): Promise<CommentsEntity[] | null> {
     return await this.commentsModel
       .find(
         {

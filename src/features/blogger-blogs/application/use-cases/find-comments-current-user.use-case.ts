@@ -10,7 +10,7 @@ import { FillingCommentsDataCommand } from '../../../comments/application/use-ca
 export class FindCommentsCurrentUserCommand {
   constructor(
     public queryPagination: PaginationDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -27,7 +27,7 @@ export class FindCommentsCurrentUserUseCase
   async execute(command: FindCommentsCurrentUserCommand) {
     const field = command.queryPagination.sortBy;
     const searchFilters: QueryArrType = [];
-    searchFilters.push({ 'postInfo.blogOwnerId': command.currentUser.id });
+    searchFilters.push({ 'postInfo.blogOwnerId': command.currentUserDto.id });
     searchFilters.push({ 'commentatorInfo.isBanned': false });
     searchFilters.push({ 'banInfo.isBanned': false });
     const pagination = await this.pagination.convert(
@@ -48,19 +48,17 @@ export class FindCommentsCurrentUserUseCase
       };
     }
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(comments, command.currentUser),
+      new FillingCommentsDataCommand(comments, command.currentUserDto),
     );
     const totalCount = await this.commentsRepository.countDocuments(
       searchFilters,
     );
     const pagesCount = Math.ceil(totalCount / command.queryPagination.pageSize);
 
-    const pageNumber = command.queryPagination.pageNumber;
-    const pageSize = pagination.pageSize;
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: command.queryPagination.pageNumber,
+      pageSize: command.queryPagination.pageSize,
       totalCount: totalCount,
       items: filledComments,
     };

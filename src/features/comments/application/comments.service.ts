@@ -3,7 +3,6 @@ import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Pagination } from '../../common/pagination/pagination';
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import { PostsService } from '../../posts/application/posts.service';
-import { CommentsEntity } from '../entities/comments.entity';
 import { FilteringCommentsNoBannedUserCommand } from '../../users/application/use-cases/filtering-comments-noBannedUser.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
@@ -40,9 +39,19 @@ export class CommentsService {
     currentUserDto: CurrentUserDto | null,
   ) {
     const post = await this.postsService.checkPostInDB(postId);
-    if (!post) throw new NotFoundException();
-    const comments = await this.commentsRepository.findCommentsByPostId(postId);
-    if (!comments || comments.length === 0) {
+    if (!post || post.banInfo.isBanned || post.postOwnerInfo.isBanned)
+      throw new NotFoundException();
+    const searchFilters = [];
+    searchFilters.push({ 'postInfo.id': postId });
+    searchFilters.push({ 'commentatorInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
+    const field = queryPagination.sortBy;
+    const pagination = await this.pagination.convert(queryPagination, field);
+    const comments = await this.commentsRepository.findCommentsByPostId(
+      pagination,
+      searchFilters,
+    );
+    if (!comments) {
       return {
         pagesCount: 1,
         page: 1,
@@ -51,47 +60,13 @@ export class CommentsService {
         items: [],
       };
     }
-    const commentsNotBannedUser = await this.commandBus.execute(
-      new FilteringCommentsNoBannedUserCommand(comments),
-    );
-    let desc = 1;
-    let asc = -1;
-    const field: 'content' | 'createdAt' =
-      queryPagination.sortBy === 'content'
-        ? queryPagination.sortBy
-        : 'createdAt';
-    if (
-      queryPagination.sortDirection === 'asc' ||
-      queryPagination.sortDirection === 'ascending' ||
-      queryPagination.sortDirection === 1
-    ) {
-      desc = -1;
-      asc = 1;
-    }
-    const totalCount = commentsNotBannedUser.length;
-    const allComments = commentsNotBannedUser.sort(
-      await byField(field, asc, desc),
-    );
-
-    async function byField(
-      field: 'content' | 'createdAt',
-      asc: number,
-      desc: number,
-    ) {
-      return (a: CommentsEntity, b: CommentsEntity) =>
-        a[field] > b[field] ? asc : desc;
-    }
-    const startIndex =
-      (queryPagination.pageNumber - 1) * queryPagination.pageSize;
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-
-    const commentsSlice = allComments.slice(
-      startIndex,
-      startIndex + queryPagination.pageSize,
-    );
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(commentsSlice, currentUserDto),
+      new FillingCommentsDataCommand(comments, currentUserDto),
     );
+    const totalCount = await this.commentsRepository.countDocuments(
+      searchFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
 
     return {
       pagesCount: pagesCount,
