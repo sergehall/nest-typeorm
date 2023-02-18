@@ -24,6 +24,7 @@ export class PostsRepository {
         {
           _id: false,
           __v: false,
+          blogId: false,
           'extendedLikesInfo._id': false,
           'extendedLikesInfo.newestLikes._id': false,
         },
@@ -92,6 +93,7 @@ export class PostsRepository {
           projection: {
             _id: false,
             __v: false,
+            blogId: false,
             'extendedLikesInfo._id': false,
             'extendedLikesInfo.newestLikes._id': false,
             postOwnerInfo: false,
