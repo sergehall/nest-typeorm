@@ -28,7 +28,6 @@ import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -69,17 +68,9 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async openFindPostById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<PostsWithoutOwnersInfoEntity> {
+  async openFindPostById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const post = await this.postsService.openFindPostById(
-      params.id,
-      currentUserDto,
-    );
-    if (!post) throw new NotFoundException();
-    return post;
+    return await this.postsService.openFindPostById(params.id, currentUserDto);
   }
 
   @Post()
