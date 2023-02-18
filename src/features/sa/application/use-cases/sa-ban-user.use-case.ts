@@ -16,7 +16,7 @@ export class SaBanUserCommand {
   constructor(
     public id: string,
     public saBanUserDto: SaBanUserDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -42,9 +42,13 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
         banReason: command.saBanUserDto.banReason,
       };
     }
-    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
+    const ability = this.caslAbilityFactory.createForUser(
+      command.currentUserDto,
+    );
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
+      console.log(command.id, 'command.id');
+      console.log(userToBan.id, 'userToBan.id');
       await this.commandBus.execute(
         new RemoveDevicesBannedUserCommand(userToBan.id),
       );
