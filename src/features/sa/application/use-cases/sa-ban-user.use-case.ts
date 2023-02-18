@@ -30,13 +30,13 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
   async execute(command: SaBanUserCommand): Promise<boolean | undefined> {
     const userToBan = await this.usersRepository.findUserByUserId(command.id);
     if (!userToBan) throw new NotFoundException();
-    let updateBan: BanInfo = {
+    let banInfo: BanInfo = {
       isBanned: command.saBanUserDto.isBanned,
       banDate: null,
       banReason: null,
     };
     if (command.saBanUserDto.isBanned) {
-      updateBan = {
+      banInfo = {
         isBanned: command.saBanUserDto.isBanned,
         banDate: new Date().toISOString(),
         banReason: command.saBanUserDto.banReason,
@@ -47,8 +47,6 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
     );
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
-      console.log(command.id, 'command.id');
-      console.log(userToBan.id, 'userToBan.id');
       await this.commandBus.execute(
         new RemoveDevicesBannedUserCommand(userToBan.id),
       );
@@ -70,7 +68,7 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
           command.saBanUserDto.isBanned,
         ),
       );
-      return this.usersRepository.banUser(userToBan, updateBan);
+      return this.usersRepository.banUser(userToBan, banInfo);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
