@@ -4,6 +4,7 @@ import {
   Param,
   NotFoundException,
   Query,
+  UseGuards,
   Request,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
@@ -13,6 +14,7 @@ import { IdParams } from '../../common/params/id.params';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { User } from '../../users/infrastructure/schemas/user.schema';
@@ -52,8 +54,8 @@ export class BlogsController {
     }
     return blog;
   }
-
   @Get(':blogId/posts')
+  @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPostsByBlogId(
     @Request() req: any,

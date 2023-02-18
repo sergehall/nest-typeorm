@@ -19,6 +19,14 @@ import {
   BBlogsBannedUserDocument,
   BBlogsBannedUsersSchema,
 } from '../../blogger-blogs/infrastructure/schemas/blogger-blogs-banned-users.schema';
+import {
+  refreshTokenBlackListDocument,
+  RefreshTokenBlacklistSchema,
+} from '../../auth/infrastructure/schemas/refreshToken-blacklist.schema';
+import {
+  UsersDocument,
+  UsersSchema,
+} from '../../users/infrastructure/schemas/user.schema';
 
 export const blogsProviders = [
   {
@@ -68,6 +76,26 @@ export const blogsProviders = [
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<refreshTokenBlackListDocument>(
+        NamesCollectionsEnums.REFRESH_TOKEN_BL,
+        RefreshTokenBlacklistSchema,
+        NamesCollectionsEnums.REFRESH_TOKEN_BL,
+      ),
+    inject: [ConnectionEnums.ASYNC_CONNECTION],
+  },
+  {
+    provide: ProvidersEnums.USER_MODEL,
+    useFactory: (mongoose: Mongoose) =>
+      mongoose.model<UsersDocument>(
+        NamesCollectionsEnums.USERS,
+        UsersSchema,
+        NamesCollectionsEnums.USERS,
       ),
     inject: [ConnectionEnums.ASYNC_CONNECTION],
   },
