@@ -28,7 +28,6 @@ import { UpdateBlogByIdCommand } from './use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdCommand } from './use-cases/remove-blog-byId.use-case';
 import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
-import { OwnerInfoDto } from '../../posts/dto/ownerInfo.dto';
 import { UpdatePostPlusIdDto } from '../../posts/dto/update-post-plusId.dto';
 import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { BlogIdParams } from '../../common/params/blogId.params';
@@ -174,11 +173,6 @@ export class BloggerBlogsController {
     @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
-    const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUserDto.id,
-      userLogin: currentUserDto.login,
-      isBanned: currentUserDto.isBanned,
-    };
     const updatePostPlusIdDto: UpdatePostPlusIdDto = {
       id: params.postId,
       title: updatePostBBlogDto.title,
@@ -187,7 +181,7 @@ export class BloggerBlogsController {
       blogId: params.blogId,
     };
     return await this.commandBus.execute(
-      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
+      new UpdatePostCommand(updatePostPlusIdDto, currentUserDto),
     );
   }
 

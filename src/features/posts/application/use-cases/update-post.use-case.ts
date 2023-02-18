@@ -5,14 +5,14 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { OwnerInfoDto } from '../../dto/ownerInfo.dto';
 import { UpdatePostPlusIdDto } from '../../dto/update-post-plusId.dto';
 import { PostsRepository } from '../../infrastructure/posts.repository';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class UpdatePostCommand {
   constructor(
     public updatePostPlusIdDto: UpdatePostPlusIdDto,
-    public ownerInfoDto: OwnerInfoDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -38,7 +38,7 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: command.ownerInfoDto.userId,
+        id: command.currentUserDto.id,
       });
       return await this.postsRepository.updatePost(command.updatePostPlusIdDto);
     } catch (error) {

@@ -30,7 +30,6 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
-import { OwnerInfoDto } from '../dto/ownerInfo.dto';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -144,17 +143,12 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const currentUserDto = req.user;
-    const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUserDto.id,
-      userLogin: currentUserDto.login,
-      isBanned: currentUserDto.banInfo.isBanned,
-    };
     const updatePostPlusIdDto: UpdatePostPlusIdDto = {
       ...updatePostDto,
       id: params.id,
     };
     const updatePost = await this.commandBus.execute(
-      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
+      new UpdatePostCommand(updatePostPlusIdDto, currentUserDto),
     );
     if (!updatePost) throw new NotFoundException();
     return updatePost;
