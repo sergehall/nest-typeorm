@@ -76,8 +76,12 @@ export class BloggerBlogsRepository {
     });
   }
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const searchFilters = [];
+    searchFilters.push({ id: blogId });
+    searchFilters.push({ 'blogOwnerInfo.isBanned': false });
+    searchFilters.push({ 'banInfo.isBanned': false });
     return await this.BBlogsModel.findOne(
-      { id: blogId },
+      { $and: searchFilters },
       {
         _id: false,
         __v: false,
