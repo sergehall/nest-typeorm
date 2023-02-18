@@ -65,17 +65,17 @@ export class PostsController {
     );
   }
 
-  @Get(':postId')
-  @UseGuards(AbilitiesGuard)
+  @Get(':id')
   @UseGuards(NoneStatusGuard)
+  @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPostById(
     @Request() req: any,
-    @Param() params: PostIdParams,
+    @Param() params: IdParams,
   ): Promise<PostsWithoutOwnersInfoEntity> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const post = await this.postsService.openFindPostById(
-      params.postId,
+      params.id,
       currentUserDto,
     );
     if (!post) throw new NotFoundException();
@@ -165,7 +165,6 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUserDto = req.user;
-
     return await this.commandBus.execute(
       new ChangeLikeStatusPostCommand(
         params.postId,

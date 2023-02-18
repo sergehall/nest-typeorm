@@ -65,7 +65,6 @@ export class AuthController {
         new CreateDeviceCommand(newPayload, ip, userAgent),
       );
     }
-    console.log(currentUserDto, 'login');
     res.cookie('refreshToken', signedToken.refreshToken, {
       httpOnly: true,
       secure: true,

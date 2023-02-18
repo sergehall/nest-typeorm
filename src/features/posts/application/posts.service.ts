@@ -57,11 +57,11 @@ export class PostsService {
   }
 
   async openFindPostById(
-    postId: string,
+    id: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsWithoutOwnersInfoEntity | null> {
     const searchFilters = [];
-    searchFilters.push({ id: postId });
+    searchFilters.push({ id: id });
     searchFilters.push({ 'postOwnerInfo.isBanned': false });
     searchFilters.push({ 'banInfo.isBanned': false });
     const post = await this.postsRepository.openFindPostById(searchFilters);
