@@ -30,6 +30,7 @@ export class PostsService {
     );
     convertedFilters.push({ 'postOwnerInfo.isBanned': false });
     convertedFilters.push({ 'banInfo.isBanned': false });
+
     const pagination = await this.pagination.convert(queryPagination, field);
     const totalCount = await this.postsRepository.countDocuments(
       convertedFilters,

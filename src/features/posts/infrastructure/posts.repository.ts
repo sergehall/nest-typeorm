@@ -69,7 +69,7 @@ export class PostsRepository {
   }
   async countDocuments(searchFilters: QueryArrType): Promise<number> {
     return await this.postsModel.countDocuments({
-      $or: searchFilters,
+      $and: searchFilters,
     });
   }
   async updatePost(
