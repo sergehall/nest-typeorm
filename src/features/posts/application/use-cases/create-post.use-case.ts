@@ -6,16 +6,16 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { OwnerInfoDto } from '../../dto/ownerInfo.dto';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { PostsEntity } from '../../entities/posts.entity';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 export class CreatePostCommand {
   constructor(
     public createPostDto: CreatePostDto,
-    public ownerInfoDto: OwnerInfoDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -34,12 +34,12 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     if (!blog) throw new NotFoundException();
     const verifyUserForBlog =
       await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
-        command.ownerInfoDto.userId,
+        command.currentUserDto.id,
         command.createPostDto.blogId,
       );
     if (verifyUserForBlog) throw new ForbiddenException();
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blog.blogOwnerInfo.userId,
+      id: command.currentUserDto.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
@@ -60,8 +60,8 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
           newestLikes: [],
         },
         postOwnerInfo: {
-          userId: command.ownerInfoDto.userId,
-          userLogin: command.ownerInfoDto.userLogin,
+          userId: command.currentUserDto.id,
+          userLogin: command.currentUserDto.login,
           isBanned: false,
         },
         banInfo: {

@@ -83,117 +83,6 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs')
-  @UseGuards(JwtAuthGuard)
-  async createBlog(
-    @Request() req: any,
-    @Body() createBBlogsDto: CreateBloggerBlogsDto,
-  ) {
-    const currentUser = req.user;
-    return await this.commandBus.execute(
-      new CreateBloggerBlogCommand(createBBlogsDto, currentUser),
-    );
-  }
-  @Post('blogs/:blogId/posts')
-  @UseGuards(JwtAuthGuard)
-  async createPostByBlogId(
-    @Request() req: any,
-    @Param() params: BlogIdParams,
-    @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
-  ) {
-    const currentUser: CurrentUserDto = req.user;
-    const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUser.id,
-      userLogin: currentUser.login,
-      isBanned: currentUser.isBanned,
-    };
-    const createPostDto = {
-      title: createPostBBlogsDto.title,
-      shortDescription: createPostBBlogsDto.shortDescription,
-      content: createPostBBlogsDto.content,
-      blogId: params.blogId,
-    };
-    return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, ownerInfoDto),
-    );
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  @Put('blogs/:id')
-  async updateBlogById(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() updateBlogDto: CreateBloggerBlogsDto,
-  ) {
-    const currentUser: CurrentUserDto = req.user;
-    return await this.commandBus.execute(
-      new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUser),
-    );
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  @Delete('blogs/:id')
-  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
-    const currentUser: CurrentUserDto = req.user;
-    return await this.commandBus.execute(
-      new RemoveBlogByIdCommand(params.id, currentUser),
-    );
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  @Put('blogs/:blogId/posts/:postId')
-  async updatePostByPostId(
-    @Request() req: any,
-    @Param() params: BlogIdPostIdParams,
-    @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
-  ) {
-    const currentUserDto: CurrentUserDto = req.user;
-    const ownerInfoDto: OwnerInfoDto = {
-      userId: currentUserDto.id,
-      userLogin: currentUserDto.login,
-      isBanned: currentUserDto.isBanned,
-    };
-    const updatePostPlusIdDto: UpdatePostPlusIdDto = {
-      id: params.postId,
-      title: updatePostBBlogDto.title,
-      shortDescription: updatePostBBlogDto.shortDescription,
-      content: updatePostBBlogDto.content,
-      blogId: params.blogId,
-    };
-    return await this.commandBus.execute(
-      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
-    );
-  }
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  @Delete('blogs/:blogId/posts/:postId')
-  async removePostByPostId(
-    @Request() req: any,
-    @Param() params: BlogIdPostIdParams,
-  ) {
-    const currentUser = req.user;
-    return await this.commandBus.execute(
-      new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
-    );
-  }
-
-  @Put('users/:id/ban')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  async banUserForBlog(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() updateBanUserDto: UpdateBanUserDto,
-  ) {
-    const currentUser: CurrentUserDto = req.user;
-    return await this.commandBus.execute(
-      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUser),
-    );
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get('users/blog/:id')
   async findBannedUsers(
@@ -218,6 +107,114 @@ export class BloggerBlogsController {
       currentUser,
       queryPagination,
       [searchLoginTerm, searchByBlogId, banStatus],
+    );
+  }
+
+  @Post('blogs')
+  @UseGuards(JwtAuthGuard)
+  async createBlog(
+    @Request() req: any,
+    @Body() createBBlogsDto: CreateBloggerBlogsDto,
+  ) {
+    const currentUser = req.user;
+    return await this.commandBus.execute(
+      new CreateBloggerBlogCommand(createBBlogsDto, currentUser),
+    );
+  }
+
+  @Put('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updateBlogById(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() updateBlogDto: CreateBloggerBlogsDto,
+  ) {
+    const currentUser: CurrentUserDto = req.user;
+    return await this.commandBus.execute(
+      new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUser),
+    );
+  }
+
+  @Delete('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
+    const currentUser: CurrentUserDto = req.user;
+    return await this.commandBus.execute(
+      new RemoveBlogByIdCommand(params.id, currentUser),
+    );
+  }
+
+  @Post('blogs/:blogId/posts')
+  @UseGuards(JwtAuthGuard)
+  async createPostByBlogId(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+    @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
+  ) {
+    const currentUser: CurrentUserDto = req.user;
+    const createPostDto = {
+      title: createPostBBlogsDto.title,
+      shortDescription: createPostBBlogsDto.shortDescription,
+      content: createPostBBlogsDto.content,
+      blogId: params.blogId,
+    };
+    return await this.commandBus.execute(
+      new CreatePostCommand(createPostDto, currentUser),
+    );
+  }
+
+  @Put('blogs/:blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updatePostByPostId(
+    @Request() req: any,
+    @Param() params: BlogIdPostIdParams,
+    @Body() updatePostBBlogDto: UpdatePostBloggerBlogsDto,
+  ) {
+    const currentUserDto: CurrentUserDto = req.user;
+    const ownerInfoDto: OwnerInfoDto = {
+      userId: currentUserDto.id,
+      userLogin: currentUserDto.login,
+      isBanned: currentUserDto.isBanned,
+    };
+    const updatePostPlusIdDto: UpdatePostPlusIdDto = {
+      id: params.postId,
+      title: updatePostBBlogDto.title,
+      shortDescription: updatePostBBlogDto.shortDescription,
+      content: updatePostBBlogDto.content,
+      blogId: params.blogId,
+    };
+    return await this.commandBus.execute(
+      new UpdatePostCommand(updatePostPlusIdDto, ownerInfoDto),
+    );
+  }
+
+  @Delete('blogs/:blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async removePostByPostId(
+    @Request() req: any,
+    @Param() params: BlogIdPostIdParams,
+  ) {
+    const currentUser = req.user;
+    return await this.commandBus.execute(
+      new RemovePostByPostIdCommand(params.blogId, params.postId, currentUser),
+    );
+  }
+
+  @Put('users/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async banUserForBlog(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() updateBanUserDto: UpdateBanUserDto,
+  ) {
+    const currentUser: CurrentUserDto = req.user;
+    return await this.commandBus.execute(
+      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUser),
     );
   }
 }
