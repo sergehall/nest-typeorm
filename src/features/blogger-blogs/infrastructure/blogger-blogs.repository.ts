@@ -134,24 +134,7 @@ export class BloggerBlogsRepository {
   async updatedBlogById(blogEntity: BloggerBlogsEntity): Promise<boolean> {
     return await this.BBlogsModel.findOneAndUpdate(
       { id: blogEntity.id },
-      {
-        $set: {
-          id: blogEntity.id,
-          name: blogEntity.name,
-          description: blogEntity.description,
-          websiteUrl: blogEntity.websiteUrl,
-          createdAt: blogEntity.createdAt,
-          blogOwnerInfo: {
-            userId: blogEntity.blogOwnerInfo.userId,
-            userLogin: blogEntity.blogOwnerInfo.userLogin,
-          },
-          banInfo: {
-            isBanned: blogEntity.banInfo.isBanned,
-            banDate: blogEntity.banInfo.banDate,
-            banReason: blogEntity.banInfo.banReason,
-          },
-        },
-      },
+      { $set: blogEntity },
       { returnDocument: 'after', projection: { _id: false, __v: false } },
     ).lean();
   }
