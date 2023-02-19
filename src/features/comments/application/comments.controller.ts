@@ -26,6 +26,7 @@ import { UpdateCommentCommand } from './use-cases/update-comment.use-case';
 import { RemoveCommentCommand } from './use-cases/remove-comment.use-case';
 import { IdParams } from '../../common/params/id.params';
 import { CommentIdParams } from '../../common/params/commentId.params';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @SkipThrottle()
 @Controller('comments')
@@ -40,7 +41,8 @@ export class CommentsController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async findComment(@Request() req: any, @Param() params: IdParams) {
-    return this.commentsService.findCommentById(params.id, req.user);
+    const currentUserDto: CurrentUserDto = req.user;
+    return this.commentsService.findCommentById(params.id, currentUserDto);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -51,8 +53,13 @@ export class CommentsController {
     @Param() params: CommentIdParams,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new UpdateCommentCommand(params.commentId, updateCommentDto, req.user),
+      new UpdateCommentCommand(
+        params.commentId,
+        updateCommentDto,
+        currentUserDto,
+      ),
     );
   }
 
@@ -60,8 +67,9 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':commentId')
   async removeComment(@Request() req: any, @Param() params: CommentIdParams) {
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemoveCommentCommand(params.commentId, req.user),
+      new RemoveCommentCommand(params.commentId, currentUserDto),
     );
   }
 
@@ -73,7 +81,7 @@ export class CommentsController {
     @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new ChangeLikeStatusCommentCommand(
         params.commentId,
