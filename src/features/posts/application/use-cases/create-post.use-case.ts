@@ -33,7 +33,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       );
     if (!blog) throw new NotFoundException();
     const verifyUserForBlog =
-      await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
+      await this.bloggerBlogsRepository.isBannedUserForBlog(
         command.currentUserDto.id,
         command.createPostDto.blogId,
       );

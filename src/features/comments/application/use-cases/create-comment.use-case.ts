@@ -33,16 +33,12 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
     const post = await this.postsService.checkPostInDB(command.postId);
     if (!post) throw new NotFoundException();
-    // const blog = await this.bloggerBlogsRepository.findBlogById(post.blogId);
-    // if (!blog) throw new NotFoundException();
-    const verifyUserForBlog =
-      await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
+    const isBannedUserForBlog =
+      await this.bloggerBlogsRepository.isBannedUserForBlog(
         command.currentUser.id,
         post.blogId,
       );
-    if (verifyUserForBlog) throw new ForbiddenException();
-    // console.log(post.postOwnerInfo.userId, 'post.postOwnerInfo.userId');
-    // console.log(blog.blogOwnerInfo.userId, 'blog.blogOwnerInfo.userId');
+    if (isBannedUserForBlog) throw new ForbiddenException();
     const newComment: CommentsEntity = {
       id: uuid4().toString(),
       content: command.createCommentDto.content,

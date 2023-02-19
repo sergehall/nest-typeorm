@@ -207,10 +207,7 @@ export class BloggerBlogsRepository {
     );
     return updateBan !== null;
   }
-  async verifyUserInBlackListForBlog(
-    userId: string,
-    blogId: string,
-  ): Promise<boolean> {
+  async isBannedUserForBlog(userId: string, blogId: string): Promise<boolean> {
     const result = await this.BBannedUsersModel.findOne({
       $and: [{ id: userId }, { blogId: blogId }, { 'banInfo.isBanned': true }],
     });
