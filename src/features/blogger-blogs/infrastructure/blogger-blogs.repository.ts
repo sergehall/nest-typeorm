@@ -153,7 +153,7 @@ export class BloggerBlogsRepository {
     ).lean();
     return updateBan !== null;
   }
-  async banBlog(blogId: string, banInfo: BanInfo): Promise<boolean> {
+  async banBlogById(blogId: string, banInfo: BanInfo): Promise<boolean> {
     const updateBan = await this.BBlogsModel.updateOne(
       { id: blogId },
       {

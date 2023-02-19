@@ -45,7 +45,10 @@ export class SaBanBlogUseCase implements ICommandHandler<SaBanBlogCommand> {
         new ChangeBanStatusPostsByBlogIdCommand(command.id, banInfo),
       );
 
-      return await this.bloggerBlogsRepository.banBlog(blogForBan.id, banInfo);
+      return await this.bloggerBlogsRepository.banBlogById(
+        blogForBan.id,
+        banInfo,
+      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

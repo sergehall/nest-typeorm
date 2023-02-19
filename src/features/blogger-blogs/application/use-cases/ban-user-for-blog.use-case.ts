@@ -69,7 +69,10 @@ export class BanUserForBlogUseCase
           command.updateBanUserDto,
         ),
       );
-      return await this.bloggerBlogsRepository.banBlog(blogForBan.id, banInfo);
+      return await this.bloggerBlogsRepository.banBlogById(
+        blogForBan.id,
+        banInfo,
+      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
