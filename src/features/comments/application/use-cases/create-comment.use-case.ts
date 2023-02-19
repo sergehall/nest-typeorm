@@ -33,14 +33,16 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
     const post = await this.postsService.checkPostInDB(command.postId);
     if (!post) throw new NotFoundException();
-    const blog = await this.bloggerBlogsRepository.findBlogById(post.blogId);
-    if (!blog) throw new NotFoundException();
+    // const blog = await this.bloggerBlogsRepository.findBlogById(post.blogId);
+    // if (!blog) throw new NotFoundException();
     const verifyUserForBlog =
       await this.bloggerBlogsRepository.verifyUserInBlackListForBlog(
         command.currentUser.id,
         post.blogId,
       );
     if (verifyUserForBlog) throw new ForbiddenException();
+    // console.log(post.postOwnerInfo.userId, 'post.postOwnerInfo.userId');
+    // console.log(blog.blogOwnerInfo.userId, 'blog.blogOwnerInfo.userId');
     const newComment: CommentsEntity = {
       id: uuid4().toString(),
       content: command.createCommentDto.content,
@@ -50,7 +52,7 @@ export class CreateCommentUseCase
         title: post.title,
         blogId: post.blogId,
         blogName: post.blogName,
-        blogOwnerId: blog.blogOwnerInfo.userId,
+        blogOwnerId: post.postOwnerInfo.userId,
       },
       commentatorInfo: {
         userId: command.currentUser.id,
