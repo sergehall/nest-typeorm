@@ -28,7 +28,6 @@ export class AbilitiesGuard implements CanActivate {
     if (!currentUser) {
       currentUser = { roles: RolesEnums.USER };
     }
-    // console.log(currentUser, rules, 'AbilitiesGuard rules');
     const ability = this.caslAbilityFactory.createForUser(currentUser);
     try {
       rules.forEach((rule) =>

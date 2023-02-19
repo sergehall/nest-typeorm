@@ -36,6 +36,7 @@ import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { SaBanBlogCommand } from './use-cases/sa-ban-blog.use-case';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { RolesGuard } from '../../../ability/roles/guard';
 
 @SkipThrottle()
 @Controller('sa')
@@ -66,6 +67,9 @@ export class SaController {
 
   @Get('blogs')
   @UseGuards(BaseAuthGuard)
+  @UseGuards(AbilitiesGuard)
+  @UseGuards(RolesGuard)
+  @CheckAbilities({ action: Action.READ, subject: User })
   async saFindBlogs(
     @Request() req: any,
     @Query() query: any,

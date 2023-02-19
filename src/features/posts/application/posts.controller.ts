@@ -49,8 +49,8 @@ export class PostsController {
     protected commandBus: CommandBus,
   ) {}
   @Get()
-  @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
+  @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPosts(@Request() req: any, @Query() query: any) {
     const currentUserDto = req.user;
