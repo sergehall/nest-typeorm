@@ -20,7 +20,7 @@ export class BanInfo {
   })
   banReason: string;
 }
-export class BloggerBlogsBannedUsersByBlogIdEntity {
+export class UsersBannedByBlogIdEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect blogId! Must be max 15 ch.',

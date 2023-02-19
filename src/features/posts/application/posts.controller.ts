@@ -70,7 +70,11 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPostById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto | null = req.user;
-    return await this.postsService.openFindPostById(params.id, currentUserDto);
+    const searchFilters = { id: params.id };
+    return await this.postsService.openFindPostById(
+      [searchFilters],
+      currentUserDto,
+    );
   }
 
   @Post()

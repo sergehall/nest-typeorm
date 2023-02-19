@@ -8,7 +8,7 @@ import { BBlogsDocument } from './schemas/blogger-blogs.schema';
 import { BBlogsBannedUserDocument } from './schemas/blogger-blogs-banned-users.schema';
 import {
   BanInfo,
-  BloggerBlogsBannedUsersByBlogIdEntity,
+  UsersBannedByBlogIdEntity,
 } from '../entities/blogger-blogs-banned-users.entity';
 
 @Injectable()
@@ -135,7 +135,7 @@ export class BloggerBlogsRepository {
     return result.acknowledged && result.deletedCount === 1;
   }
   async addBannedUserToBanList(
-    banUserInfo: BloggerBlogsBannedUsersByBlogIdEntity,
+    banUserInfo: UsersBannedByBlogIdEntity,
   ): Promise<boolean> {
     const updateBan = await this.BBannedUsersModel.findOneAndUpdate(
       { $and: [{ id: banUserInfo.id, blogId: banUserInfo.blogId }] },
@@ -176,7 +176,7 @@ export class BloggerBlogsRepository {
   async findBannedUsers(
     pagination: PaginationDBType,
     searchFilters: QueryArrType,
-  ): Promise<BloggerBlogsBannedUsersByBlogIdEntity[]> {
+  ): Promise<UsersBannedByBlogIdEntity[]> {
     return await this.BBannedUsersModel.find(
       {
         $and: searchFilters,

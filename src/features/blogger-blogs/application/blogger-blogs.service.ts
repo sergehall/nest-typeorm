@@ -31,21 +31,19 @@ export class BloggerBlogsService {
     convertedFilters.push({ 'blogOwnerInfo.isBanned': false });
     convertedFilters.push({ 'banInfo.isBanned': false });
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.bloggerBlogsRepository.countDocuments(
-      convertedFilters,
-    );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const blogs: BloggerBlogsEntity[] =
       await this.bloggerBlogsRepository.openFindBlogs(
         pagination,
         convertedFilters,
       );
-    const pageNumber = queryPagination.pageNumber;
-    const pageSize = pagination.pageSize;
+    const totalCount = await this.bloggerBlogsRepository.countDocuments(
+      convertedFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: queryPagination.pageNumber,
+      pageSize: pagination.pageSize,
       totalCount: totalCount,
       items: blogs,
     };
@@ -68,21 +66,19 @@ export class BloggerBlogsService {
       searchFilters,
     );
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.bloggerBlogsRepository.countDocuments(
-      convertedFilters,
-    );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const blogs: BloggerBlogsEntity[] =
       await this.bloggerBlogsRepository.saFindBlogs(
         pagination,
         convertedFilters,
       );
-    const pageNumber = queryPagination.pageNumber;
-    const pageSize = pagination.pageSize;
+    const totalCount = await this.bloggerBlogsRepository.countDocuments(
+      convertedFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: queryPagination.pageNumber,
+      pageSize: pagination.pageSize,
       totalCount: totalCount,
       items: blogs,
     };
@@ -97,21 +93,19 @@ export class BloggerBlogsService {
       searchFilters,
     );
     const pagination = await this.pagination.convert(queryPagination, field);
-    const totalCount = await this.bloggerBlogsRepository.countDocuments(
-      convertedFilters,
-    );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     const blogs: BloggerBlogsEntity[] =
       await this.bloggerBlogsRepository.findBlogsCurrentUser(
         pagination,
         convertedFilters,
       );
-    const pageNumber = queryPagination.pageNumber;
-    const pageSize = pagination.pageSize;
+    const totalCount = await this.bloggerBlogsRepository.countDocuments(
+      convertedFilters,
+    );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: queryPagination.pageNumber,
+      pageSize: pagination.pageSize,
       totalCount: totalCount,
       items: blogs,
     };
@@ -119,35 +113,33 @@ export class BloggerBlogsService {
 
   async findBannedUsers(
     blogId: string,
-    currentUser: CurrentUserDto,
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
+    currentUser: CurrentUserDto,
   ): Promise<PaginationTypes> {
     const blog = await this.bloggerBlogsRepository.findBlogById(blogId);
     if (!blog) throw new NotFoundException();
     if (blog.blogOwnerInfo.userId !== currentUser.id)
       throw new ForbiddenException();
     const field = queryPagination.sortBy;
-    const pageNumber = queryPagination.pageNumber;
-    const pageSize = queryPagination.pageSize;
     const convertedFilters = await this.convertFiltersForDB.convert(
       searchFilters,
     );
-    const totalCount =
-      await this.bloggerBlogsRepository.countBannedUsersDocuments(
-        convertedFilters,
-      );
-    const pagesCount = Math.ceil(totalCount / pageSize);
     const pagination = await this.pagination.convert(queryPagination, field);
     const bannedUsers = await this.bloggerBlogsRepository.findBannedUsers(
       pagination,
       convertedFilters,
     );
+    const totalCount =
+      await this.bloggerBlogsRepository.countBannedUsersDocuments(
+        convertedFilters,
+      );
+    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: queryPagination.pageNumber,
+      pageSize: queryPagination.pageSize,
       totalCount: totalCount,
       items: bannedUsers,
     };

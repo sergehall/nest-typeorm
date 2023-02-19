@@ -29,7 +29,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
     const ability = this.caslAbilityFactory.createForUser(command.currentUser);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);
-      //Update call DB
+      // Call DB  to update user
       return `This action update a #${command.id} user`;
     } catch (error) {
       if (error instanceof ForbiddenError) {

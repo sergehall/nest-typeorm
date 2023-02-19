@@ -5,8 +5,8 @@ import { LikeStatusPostsDocument } from './schemas/like-status-posts.schemas';
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
 import { PostsEntity } from '../entities/posts.entity';
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
-import { PostsWithoutOwnersInfoEntity } from '../entities/posts-without-ownerInfo.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { PostsReturnEntity } from '../entities/posts-without-ownerInfo.entity';
 
 @Injectable()
 export class LikeStatusPostsRepository {
@@ -43,8 +43,8 @@ export class LikeStatusPostsRepository {
   async preparationPostsForReturn(
     postArray: PostsEntity[],
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsWithoutOwnersInfoEntity[]> {
-    const filledPosts: PostsWithoutOwnersInfoEntity[] = [];
+  ): Promise<PostsReturnEntity[]> {
+    const filledPosts: PostsReturnEntity[] = [];
     for (const i in postArray) {
       const postId = postArray[i].id;
       const currentPost: PostsEntity = postArray[i];

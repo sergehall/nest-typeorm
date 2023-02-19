@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
 import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
-import { BloggerBlogsBannedUsersByBlogIdEntity } from '../../entities/blogger-blogs-banned-users.entity';
+import { UsersBannedByBlogIdEntity } from '../../entities/blogger-blogs-banned-users.entity';
 
 export class AddBannedUserToBanListCommand {
   constructor(
@@ -16,7 +16,7 @@ export class AddBannedUserToBanListUseCase
 {
   constructor(protected bloggerBlogsRepository: BloggerBlogsRepository) {}
   async execute(command: AddBannedUserToBanListCommand) {
-    const bannedUser: BloggerBlogsBannedUsersByBlogIdEntity = {
+    const bannedUser: UsersBannedByBlogIdEntity = {
       blogId: command.updateBanUserDto.blogId,
       id: command.userId,
       login: command.userLogin,

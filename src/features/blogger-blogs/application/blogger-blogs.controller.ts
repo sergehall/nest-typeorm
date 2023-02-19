@@ -80,17 +80,16 @@ export class BloggerBlogsController {
     @Query() query: any,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
-    const blogId = params.id;
     const queryData = ParseQuery.getPaginationData(query);
     const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
-    const searchByBlogId = { blogId: blogId };
+    const searchByBlogId = { blogId: params.id };
     const banStatus = { banStatus: 'true' };
     const queryPagination: PaginationDto = queryData.queryPagination;
     return await this.bBloggerService.findBannedUsers(
-      blogId,
-      currentUserDto,
+      params.id,
       queryPagination,
       [searchLoginTerm, searchByBlogId, banStatus],
+      currentUserDto,
     );
   }
 
