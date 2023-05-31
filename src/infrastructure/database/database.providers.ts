@@ -14,8 +14,10 @@ export const databaseProviders = [
         nameDatabase = getConfiguration().db.nameDatabase.PROD_NEST_DATABASE;
       }
       if (uri && nameDatabase) {
-        const connection = await createConnection(uri + '/' + nameDatabase);
-        console.log('Mongoose connected.');
+        const connection = await createConnection(uri, {
+          dbName: nameDatabase,
+        });
+        console.log('Mongoose connected');
         return connection;
       }
       throw new BadGatewayException();
