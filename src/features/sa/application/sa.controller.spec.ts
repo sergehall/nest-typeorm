@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SaController } from './sa.controller';
 import { SaService } from './sa.service';
+import { SaController } from './sa.controller';
 
 describe('SaController', () => {
   let controller: SaController;
@@ -14,7 +14,7 @@ describe('SaController', () => {
     controller = module.get<SaController>(SaController);
   });
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
     expect(controller).toBeDefined();
   });
 });
