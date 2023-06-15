@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - staging # specify the name of the branch in which we want to push and launch our deployment
-env:
-  SERVER: production
-
 jobs:
   tests:
     name: Tests # the name of a specific job in pipeline
