@@ -30,4 +30,6 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
           heroku_app_name: "nest-api"
           heroku_email: "sergioartg@gmail.com"
+        env:
+            SERVER: production
 
