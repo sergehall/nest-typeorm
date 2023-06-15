@@ -17,7 +17,7 @@ jobs:
         run: yarn # installing dependencies
 
       - name: Test
-        run: yarn test:e2e # run the script with tests
+        run: yarn test # run the script with tests
 
   deploy:
     name: Deploy
