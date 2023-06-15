@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - staging # specify the name of the branch in which we want to push and launch our deployment
+env:
+  SERVER: production
 
 jobs:
   tests:
@@ -17,7 +19,7 @@ jobs:
         run: yarn # installing dependencies
 
       - name: Test
-        run: yarn test # run the script with tests I've chosen test:e2e
+        run: yarn test # run the script with tests
 
   deploy:
     name: Deploy
@@ -30,6 +32,4 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
           heroku_app_name: "nest-api"
           heroku_email: "sergioartg@gmail.com"
-        env:
-            SERVER: production
 
