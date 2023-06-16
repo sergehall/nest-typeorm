@@ -37,28 +37,28 @@ jobs:
           THROTTLE_LIMIT: ${{ secrets.THROTTLE_LIMIT }}
           THROTTLE_TTL: ${{ secrets.THROTTLE_TTL }}
 
-#  Sync-main-branch:
-#    name: Sync-main-branch
-#    runs-on: ubuntu-latest
-#    needs: Tests
-#    steps:
-#      - uses: actions/checkout@master
-#      - name: Merge staging -> main
-#        uses: devmasx/merge-branch@master
-#        with:
-#          type: now
-#          from_branch: staging
-#          target_branch: main
-#          github_token: ${{ github.GH_ACTIONS_TOKEN }}
-
-  deploy:
-    name: Deploy
-    needs: tests # we specify the dependent job t/e in this case, the deployment will not start if the tests failed with an error
+  Sync-main-branch:
+    name: Sync-main-branch
     runs-on: ubuntu-latest
+    needs: Tests
     steps:
-      - uses: actions/checkout@v3
-      - uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
+      - uses: actions/checkout@master
+      - name: Merge staging -> main
+        uses: devmasx/merge-branch@master
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
-          heroku_app_name: "nest-api"
-          heroku_email: "sergioartg@gmail.com"
+          type: now
+          from_branch: staging
+          target_branch: main
+          github_token: ${{ github.token }}
+
+#  deploy:
+#    name: Deploy
+#    needs: tests # we specify the dependent job t/e in this case, the deployment will not start if the tests failed with an error
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
+#        with:
+#          heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
+#          heroku_app_name: "nest-api"
+#          heroku_email: "sergioartg@gmail.com"
