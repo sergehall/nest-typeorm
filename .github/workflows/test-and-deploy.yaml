@@ -18,7 +18,7 @@ jobs:
         run: yarn # installing dependencies
 
       - name: Test
-        run: yarn test # run the script with tests
+        run: yarn test:e2e # run the script with tests
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           ACCESS_SECRET_KEY: ${{ secrets.ACCESS_SECRET_KEY }}
