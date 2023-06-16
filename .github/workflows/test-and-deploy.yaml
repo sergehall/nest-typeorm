@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Tests # the name of a specific job in pipeline
+    name: Tests # the name of a specific job in pipeline !!!
     runs-on: ubuntu-latest
     steps:
       - name: Checkout  # cloning the repository
