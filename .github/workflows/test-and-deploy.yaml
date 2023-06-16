@@ -19,6 +19,9 @@ jobs:
 
       - name: Test
         run: yarn test # run the script with tests
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+
 
   deploy:
     name: Deploy
