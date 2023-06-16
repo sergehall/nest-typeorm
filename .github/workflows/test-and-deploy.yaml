@@ -50,15 +50,3 @@ jobs:
           from_branch: staging
           target_branch: main
           github_token: ${{ github.token }}
-
-#  deploy:
-#    name: Deploy
-#    needs: tests # we specify the dependent job t/e in this case, the deployment will not start if the tests failed with an error
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
-#        with:
-#          heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
-#          heroku_app_name: "nest-api"
-#          heroku_email: "sergioartg@gmail.com"
