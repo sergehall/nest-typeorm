@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Tests # the name of a specific job in pipeline
+    name: Tests # the name of a specific job in pipeline !!!
     runs-on: ubuntu-latest
     steps:
       - name: Checkout  # cloning the repository
@@ -19,16 +19,46 @@ jobs:
 
       - name: Test
         run: yarn test # run the script with tests
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          ACCESS_SECRET_KEY: ${{ secrets.ACCESS_SECRET_KEY }}
+          ATLAS_URI: ${{ secrets.ATLAS_URI }}
+          BASIC_AUTH: ${{ secrets.BASIC_AUTH }}
+          DEV_DATABASE: ${{ secrets.DEV_DATABASE }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          EXP_ACC_TIME: ${{ secrets.EXP_ACC_TIME }}
+          EXP_REF_TIME: ${{ secrets.EXP_REF_TIME }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          NODEMAILER_APP_PASSWORD: ${{ secrets.NODEMAILER_APP_PASSWORD }}
+          NODEMAILER_EMAIL: ${{ secrets.NODEMAILER_EMAIL }}
+          PROD_NEST_DATABASE: ${{ secrets.PROD_NEST_DATABASE }}
+          REFRESH_SECRET_KEY: ${{ secrets.REFRESH_SECRET_KEY }}
+          TEST_DATABASE: ${{ secrets.TEST_DATABASE }}
+          THROTTLE_LIMIT: ${{ secrets.THROTTLE_LIMIT }}
+          THROTTLE_TTL: ${{ secrets.THROTTLE_TTL }}
 
-  deploy:
-    name: Deploy
-    needs: tests # we specify the dependent job t/e in this case, the deployment will not start if the tests failed with an error
+  Sync-main-branch:
+    name: Sync-main-branch
     runs-on: ubuntu-latest
+    needs: Tests
     steps:
-      - uses: actions/checkout@v3
-      - uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
+      - uses: actions/checkout@master
+      - name: Merge staging -> main
+        uses: devmasx/merge-branch@master
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
-          heroku_app_name: "nest-api"
-          heroku_email: "sergioartg@gmail.com"
+          type: now
+          from_branch: staging
+          target_branch: main
+          github_token: ${{ github.token }}
 
+#  deploy:
+#    name: Deploy
+#    needs: tests # we specify the dependent job t/e in this case, the deployment will not start if the tests failed with an error
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
+#        with:
+#          heroku_api_key: ${{secrets.HEROKU_API_KEY}} # you can get it on heroku
+#          heroku_app_name: "nest-api"
+#          heroku_email: "sergioartg@gmail.com"
