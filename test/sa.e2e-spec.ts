@@ -7,13 +7,6 @@ import { isUUID } from 'class-validator';
 import { AppModule } from '../src/app.module';
 import { createApp } from '../src/createApp';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
-import {
-  SaBanUserCommand,
-  SaBanUserUseCase,
-} from '../src/features/sa/application/use-cases/sa-ban-user.use-case';
-import { SaBanBlogUseCase } from '../src/features/sa/application/use-cases/sa-ban-blog.use-case';
-import { SaBanUserDto } from '../src/features/sa/dto/sa-ban-user..dto';
-import { CurrentUserDto } from '../src/features/users/dto/currentUser.dto';
 
 const generateRandomString = (size: number): string => {
   return crypto.randomBytes(size).toString('base64').slice(0, size);
@@ -23,8 +16,6 @@ describe('SaController (e2e)', () => {
   let mongoMemoryServer: MongoMemoryServer;
   let app: INestApplication;
   let server: any;
-
-  let banUserUseCase: SaBanUserUseCase;
 
   const sa = {
     login: 'admin',
@@ -43,16 +34,6 @@ describe('SaController (e2e)', () => {
     app = createApp(app);
     await app.init();
     server = app.getHttpServer();
-    banUserUseCase = app.get(SaBanBlogUseCase);
-  });
-
-  it('should ', async () => {
-    const dto = new SaBanUserDto();
-    dto.banReason = 'any';
-    dto.isBanned = true;
-    const cUDto = new CurrentUserDto();
-    cUDto.id = '123';
-    await banUserUseCase.execute(new SaBanUserCommand('123', dto, cUDto));
   });
 
   afterAll(async () => {
