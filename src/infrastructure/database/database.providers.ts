@@ -17,7 +17,7 @@ export const databaseProviders = [
         const connection = await createConnection(uri, {
           dbName: nameDatabase,
         });
-        console.log('Mongoose connected');
+        console.log('Mongoose connected.');
         return connection;
       }
       throw new BadGatewayException();
