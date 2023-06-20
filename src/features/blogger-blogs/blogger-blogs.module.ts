@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { bloggerBlogsProviders } from './infrastructure/blogger-blogs.providers';
-import { BloggerBlogsController } from './application/blogger-blogs.controller';
+import { BloggerBlogsController } from './api/blogger-blogs.controller';
 import { BloggerBlogsService } from './application/blogger-blogs.service';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { PostsService } from '../posts/application/posts.service';

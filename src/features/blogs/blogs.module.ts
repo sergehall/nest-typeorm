@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BlogsService } from './application/blogs.service';
-import { BlogsController } from './application/blogs.controller';
+import { BlogsController } from './api/blogs.controller';
 import { BlogsRepository } from './infrastructure/blogs.repository';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { blogsProviders } from './infrastructure/blogs.providers';

@@ -10,13 +10,13 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { SecurityDevicesService } from './security-devices.service';
+import { SecurityDevicesService } from '../application/security-devices.service';
 import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import { RemoveDevicesExceptCurrentCommand } from './use-cases/remove-devices-exceptCurrent.use-case';
+import { RemoveDevicesExceptCurrentCommand } from '../application/use-cases/remove-devices-exceptCurrent.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { RemoveDevicesByDeviceIdCommand } from './use-cases/remove-devices-byDeviceId.use-case';
+import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-byDeviceId.use-case';
 import jwt_decode from 'jwt-decode';
 import { DeviceIdParams } from '../../common/params/deviceId.params';
 

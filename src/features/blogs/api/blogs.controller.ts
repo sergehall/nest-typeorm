@@ -7,7 +7,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { BlogsService } from './blogs.service';
+import { BlogsService } from '../application/blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { IdParams } from '../../common/params/id.params';

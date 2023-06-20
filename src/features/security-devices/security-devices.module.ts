@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SecurityDevicesService } from './application/security-devices.service';
-import { SecurityDevicesController } from './application/security-devices.controller';
+import { SecurityDevicesController } from './api/security-devices.controller';
 import { SecurityDevicesRepository } from './infrastructure/security-devices.repository';
 import { devicesProviders } from './infrastructure/devices.providers';
 import { DatabaseModule } from '../../infrastructure/database/database.module';

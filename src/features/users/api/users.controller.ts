@@ -14,7 +14,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UsersService } from '../application/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
@@ -28,9 +28,9 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../dto/reg-data.dto';
-import { CreateUserCommand } from './use-cases/create-user-byInstance.use-case';
-import { UpdateUserCommand } from './use-cases/update-user.use-case';
-import { RemoveUserByIdCommand } from './use-cases/remove-user-byId.use-case';
+import { CreateUserCommand } from '../application/use-cases/create-user-byInstance.use-case';
+import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
+import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../common/params/id.params';
 
 @SkipThrottle()
