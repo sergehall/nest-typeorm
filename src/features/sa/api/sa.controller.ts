@@ -13,7 +13,7 @@ import {
   HttpStatus,
   Put,
 } from '@nestjs/common';
-import { SaService } from './sa.service';
+import { SaService } from '../application/sa.service';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
@@ -28,13 +28,13 @@ import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blo
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
-import { ChangeRoleCommand } from './use-cases/change-role.use-case';
+import { ChangeRoleCommand } from '../application/use-cases/change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
-import { SaBanUserCommand } from './use-cases/sa-ban-user.use-case';
+import { SaBanUserCommand } from '../application/use-cases/sa-ban-user.use-case';
 import { IdParams } from '../../common/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
-import { SaBanBlogCommand } from './use-cases/sa-ban-blog.use-case';
+import { SaBanBlogCommand } from '../application/use-cases/sa-ban-blog.use-case';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 
 @SkipThrottle()

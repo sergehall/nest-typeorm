@@ -10,7 +10,7 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
-import { CommentsService } from './comments.service';
+import { CommentsService } from '../application/comments.service';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { LikeStatusDto } from '../dto/like-status.dto';
 import { User } from '../../users/infrastructure/schemas/user.schema';
@@ -20,10 +20,10 @@ import { Action } from '../../../ability/roles/action.enum';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ChangeLikeStatusCommentCommand } from './use-cases/change-likeStatus-comment.use-case';
+import { ChangeLikeStatusCommentCommand } from '../application/use-cases/change-likeStatus-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { UpdateCommentCommand } from './use-cases/update-comment.use-case';
-import { RemoveCommentCommand } from './use-cases/remove-comment.use-case';
+import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
+import { RemoveCommentCommand } from '../application/use-cases/remove-comment.use-case';
 import { IdParams } from '../../common/params/id.params';
 import { CommentIdParams } from '../../common/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';

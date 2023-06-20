@@ -13,7 +13,7 @@ import {
   Request,
   NotFoundException,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
+import { PostsService } from '../application/posts.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { CommentsService } from '../../comments/application/comments.service';
 import { ParseQuery } from '../../common/parse-query/parse-query';
@@ -31,11 +31,11 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { CreatePostCommand } from './use-cases/create-post.use-case';
+import { CreatePostCommand } from '../application/use-cases/create-post.use-case';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { UpdatePostCommand } from './use-cases/update-post.use-case';
-import { RemovePostByIdOldCommand } from './use-cases/remove-post-byId-old.use-case';
-import { ChangeLikeStatusPostCommand } from './use-cases/change-likeStatus-post.use-case';
+import { UpdatePostCommand } from '../application/use-cases/update-post.use-case';
+import { RemovePostByIdOldCommand } from '../application/use-cases/remove-post-byId-old.use-case';
+import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../common/params/postId.params';
 import { IdParams } from '../../common/params/id.params';
 import { UpdateDataPostDto } from '../dto/update-data-post.dto';

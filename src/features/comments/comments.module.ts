@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CommentsService } from './application/comments.service';
-import { CommentsController } from './application/comments.controller';
+import { CommentsController } from './api/comments.controller';
 import { Pagination } from '../common/pagination/pagination';
 import { commentsProviders } from './infrastructure/comments.providers';
 import { DatabaseModule } from '../../infrastructure/database/database.module';

@@ -1,5 +1,5 @@
 import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
-import { TestingService } from './testing.service';
+import { TestingService } from '../testing.service';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()

@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { BloggerBlogsService } from './blogger-blogs.service';
+import { BloggerBlogsService } from '../application/blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import { CreatePostBloggerBlogsDto } from '../dto/create-post-blogger-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -23,18 +23,18 @@ import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { UpdateDataPostBloggerBlogsDto } from '../dto/update-data-post-blogger-blogs.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateBloggerBlogCommand } from './use-cases/create-blogger-blog.use-case';
-import { UpdateBlogByIdCommand } from './use-cases/update-blog-byId.use-case';
-import { RemoveBlogByIdCommand } from './use-cases/remove-blog-byId.use-case';
+import { CreateBloggerBlogCommand } from '../application/use-cases/create-blogger-blog.use-case';
+import { UpdateBlogByIdCommand } from '../application/use-cases/update-blog-byId.use-case';
+import { RemoveBlogByIdCommand } from '../application/use-cases/remove-blog-byId.use-case';
 import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { IdParams } from '../../common/params/id.params';
 import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
-import { FindCommentsCurrentUserCommand } from './use-cases/find-comments-current-user.use-case';
+import { FindCommentsCurrentUserCommand } from '../application/use-cases/find-comments-current-user.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
-import { BanUserForBlogCommand } from './use-cases/ban-user-for-blog.use-case';
+import { BanUserForBlogCommand } from '../application/use-cases/ban-user-for-blog.use-case';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 
 @SkipThrottle()

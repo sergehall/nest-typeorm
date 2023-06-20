@@ -10,7 +10,7 @@ import { CaslModule } from '../../ability/casl.module';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
-import { SaController } from './application/sa.controller';
+import { SaController } from './api/sa.controller';
 import { SaService } from './application/sa.service';
 import { LikeStatusCommentsRepository } from '../comments/infrastructure/like-status-comments.repository';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './application/users.service';
-import { UsersController } from './application/users.controller';
+import { UsersController } from './api/users.controller';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../common/pagination/pagination';
 import { AuthService } from '../auth/application/auth.service';
