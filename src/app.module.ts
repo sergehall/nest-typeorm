@@ -27,10 +27,22 @@ import { SaController } from './features/sa/api/sa.controller';
 import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { getConfiguration } from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     configModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: getConfiguration().db.pg.local.PG_URI_LOCAL,
+      port: getConfiguration().db.pg.port.PG_PORT_LOCAL,
+      username: getConfiguration().auth.PG_USER_NAME,
+      password: getConfiguration().auth.PG_USER_PASSWORD,
+      database: getConfiguration().db.nameDatabase.PG_NEST_DATABASE,
+      entities: [],
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
     ThrottlerModule.forRoot({
       ttl: getConfiguration().throttle.THROTTLE_TTL,
       limit: getConfiguration().throttle.THROTTLE_LIMIT,

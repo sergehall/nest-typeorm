@@ -14,7 +14,7 @@ export const configModule = ConfigModule.forRoot({
       EnvNamesEnums.PRODUCTION,
       EnvNamesEnums.TEST,
     ),
-    MONGO_URI: Joi.string().uri().min(10).max(23).required(),
+    MONGO_URI_LOCAL: Joi.string().uri().min(10).max(23).required(),
     ATLAS_URI: Joi.string().uri().min(10).max(63).required(),
     TEST_DATABASE: Joi.string()
       .pattern(new RegExp('^[-a-zA-Z0-9]{7}$'))
@@ -52,6 +52,17 @@ export const configModule = ConfigModule.forRoot({
     THROTTLE_TTL: Joi.number().required(),
     THROTTLE_LIMIT: Joi.number().required(),
     PORT: Joi.number().default(5000),
+    PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
+    PG_USER_NAME: Joi.string()
+      .min(2)
+      .max(20)
+      .pattern(new RegExp('^[a-zA-Z0-9]'))
+      .required(),
+    PG_USER_PASSWORD: Joi.string().min(2).max(30).required(),
+    PG_PORT_LOCAL: Joi.number().default(5432),
+    PG_NEST_DATABASE: Joi.string()
+      .pattern(new RegExp('^[-a-zA-Z0-9]{10}$'))
+      .required(),
   }),
   load: [getConfiguration],
 });
