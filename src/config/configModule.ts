@@ -53,15 +53,23 @@ export const configModule = ConfigModule.forRoot({
     THROTTLE_LIMIT: Joi.number().required(),
     PORT: Joi.number().default(5000),
     PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
-    PG_USER_NAME: Joi.string()
+    PG_HOST_HEROKU: Joi.string().min(41).max(41).required(),
+    DATABASE_URL: Joi.string().min(10).max(170).required(),
+    PG_HEROKU_USER_NAME: Joi.string()
+      .min(2)
+      .max(50)
+      .pattern(new RegExp('^[a-zA-Z0-9]'))
+      .required(),
+    PG_HEROKU_USER_PASSWORD: Joi.string().min(2).max(70).required(),
+    PG_LOCAL_USER_NAME: Joi.string()
       .min(2)
       .max(20)
       .pattern(new RegExp('^[a-zA-Z0-9]'))
       .required(),
-    PG_USER_PASSWORD: Joi.string().min(2).max(30).required(),
-    PG_PORT_LOCAL: Joi.number().default(5432),
-    PG_NEST_DATABASE: Joi.string()
-      .pattern(new RegExp('^[-a-zA-Z0-9]{10}$'))
+    PG_LOCAL_USER_PASSWORD: Joi.string().min(2).max(20).required(),
+    PG_PORT: Joi.number().default(5432),
+    PG_NEST_HEROKU_DATABASE: Joi.string()
+      .pattern(new RegExp('^[-a-zA-Z0-9]{14}$'))
       .required(),
   }),
   load: [getConfiguration],

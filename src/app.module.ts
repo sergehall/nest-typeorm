@@ -27,22 +27,31 @@ import { SaController } from './features/sa/api/sa.controller';
 import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { getConfiguration } from './config/configuration';
+import { DatabaseModule } from './infrastructure/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EnvNamesEnums } from './config/throttle/enums/env-names.enums';
 
 @Module({
   imports: [
-    configModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: getConfiguration().db.pg.local.PG_URI_LOCAL,
-      port: getConfiguration().db.pg.port.PG_PORT_LOCAL,
-      username: getConfiguration().auth.PG_USER_NAME,
-      password: getConfiguration().auth.PG_USER_PASSWORD,
-      database: getConfiguration().db.nameDatabase.PG_NEST_DATABASE,
-      entities: [],
-      autoLoadEntities: false,
-      synchronize: false,
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => ({
+        type: 'postgres' as const,
+        host: getConfiguration().db.pg.host.heroku.PG_HOST_HEROKU,
+        port: getConfiguration().db.pg.port.PG_PORT,
+        username: getConfiguration().auth.PG_HEROKU_USER_NAME,
+        password: getConfiguration().auth.PG_HEROKU_USER_PASSWORD,
+        database: getConfiguration().db.nameDatabase.PG_NEST_HEROKU_DATABASE,
+        ssl:
+          getConfiguration().ENV === EnvNamesEnums.DEVELOPMENT
+            ? false
+            : { rejectUnauthorized: false },
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
+        logging: false,
+      }),
     }),
+    configModule,
+    DatabaseModule,
     ThrottlerModule.forRoot({
       ttl: getConfiguration().throttle.THROTTLE_TTL,
       limit: getConfiguration().throttle.THROTTLE_LIMIT,
