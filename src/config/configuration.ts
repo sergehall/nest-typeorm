@@ -6,9 +6,20 @@ export const getConfiguration = () => {
     ENV: process.env.NODE_ENV || EnvNamesEnums.DEVELOPMENT,
     PORT: Number(process.env.PORT) || 5000,
     db: {
+      pg: {
+        type: {
+          POSGRES: process.env.POSGRES || 'postgres',
+        },
+        local: {
+          PG_URI_LOCAL: process.env.PG_URI_LOCAL || 'localhost',
+        },
+        port: {
+          PG_PORT_LOCAL: Number(process.env.PG_PORT_LOCAL) || 5432,
+        },
+      },
       mongo: {
         local: {
-          MONGO_URI: process.env.MONGO_URI || 'localhost://0.0.0.0',
+          MONGO_URI_LOCAL: process.env.MONGO_URI_LOCAL || 'localhost://0.0.0.0',
         },
         atlas: {
           ATLAS_URI: process.env.ATLAS_URI || 'localhost://0.0.0.0',
@@ -19,6 +30,7 @@ export const getConfiguration = () => {
         TEST_DATABASE: process.env.TEST_DATABASE || 'Test-DB',
         DEV_DATABASE: process.env.DEV_DATABASE || 'Test-DB',
         PROD_NEST_DATABASE: process.env.PROD_NEST_DATABASE || 'Test-DB',
+        PG_NEST_DATABASE: process.env.PG_NEST_DATABASE || 'nest-pg',
       },
     },
     mail: {
@@ -35,6 +47,8 @@ export const getConfiguration = () => {
     },
     auth: {
       BASIC_AUTH: process.env.BASIC_AUTH || 'BASIC_SECRET',
+      PG_USER_NAME: process.env.PG_USER_NAME || 'sa',
+      PG_USER_PASSWORD: process.env.PG_USER_PASSWORD || 'sa',
     },
     throttle: {
       THROTTLE_TTL:
