@@ -7,14 +7,19 @@ export const getConfiguration = () => {
     PORT: Number(process.env.PORT) || 5000,
     db: {
       pg: {
-        type: {
-          POSGRES: process.env.POSGRES || 'postgres',
+        url: {
+          DATABASE_URL: process.env.DATABASE_URL || 'localhost',
         },
-        local: {
-          PG_URI_LOCAL: process.env.PG_URI_LOCAL || 'localhost',
+        host: {
+          local: {
+            PG_URI_LOCAL: process.env.PG_URI_LOCAL || 'localhost',
+          },
+          heroku: {
+            PG_HOST_HEROKU: process.env.PG_HOST_HEROKU || 'localhost',
+          },
         },
         port: {
-          PG_PORT_LOCAL: Number(process.env.PG_PORT_LOCAL) || 5432,
+          PG_PORT: Number(process.env.PG_PORT) || 5432,
         },
       },
       mongo: {
@@ -30,7 +35,9 @@ export const getConfiguration = () => {
         TEST_DATABASE: process.env.TEST_DATABASE || 'Test-DB',
         DEV_DATABASE: process.env.DEV_DATABASE || 'Test-DB',
         PROD_NEST_DATABASE: process.env.PROD_NEST_DATABASE || 'Test-DB',
-        PG_NEST_DATABASE: process.env.PG_NEST_DATABASE || 'nest-pg',
+        PG_NEST_LOCAL_DATABASE: process.env.PG_NEST_LOCAL_DATABASE || 'nest-pg',
+        PG_NEST_HEROKU_DATABASE:
+          process.env.PG_NEST_HEROKU_DATABASE || 'nest-pg',
       },
     },
     mail: {
@@ -47,8 +54,10 @@ export const getConfiguration = () => {
     },
     auth: {
       BASIC_AUTH: process.env.BASIC_AUTH || 'BASIC_SECRET',
-      PG_USER_NAME: process.env.PG_USER_NAME || 'sa',
-      PG_USER_PASSWORD: process.env.PG_USER_PASSWORD || 'sa',
+      PG_LOCAL_USER_NAME: process.env.PG_LOCAL_USER_NAME || 'postgres',
+      PG_LOCAL_USER_PASSWORD: process.env.PG_LOCAL_USER_PASSWORD || 'sa',
+      PG_HEROKU_USER_NAME: process.env.PG_HEROKU_USER_NAME || 'postgres',
+      PG_HEROKU_USER_PASSWORD: process.env.PG_HEROKU_USER_PASSWORD || 'sa',
     },
     throttle: {
       THROTTLE_TTL:
@@ -83,4 +92,14 @@ export type ConfigType = ConfigurationConfigType & {
   BASIC_AUTH: string;
   THROTTLE_TTL: number;
   THROTTLE_LIMIT: number;
+  PG_URI_LOCAL: string;
+  PG_HOST_HEROKU: string;
+  DATABASE_URL: string;
+  PG_NEST_HEROKU_DATABASE: string;
+  PG_HEROKU_USER_NAME: string;
+  PG_HEROKU_USER_PASSWORD: string;
+  PG_LOCAL_USER_NAME: string;
+  PG_LOCAL_USER_PASSWORD: string;
+  PG_PORT: number;
+  PG_NEST_LOCAL_DATABASE: string;
 };
