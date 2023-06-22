@@ -29,26 +29,12 @@ import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.modul
 import { getConfiguration } from './config/configuration';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EnvNamesEnums } from './config/throttle/enums/env-names.enums';
+import { ormConfig } from './config/db/orm.config';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: async () => ({
-        type: 'postgres' as const,
-        host: getConfiguration().db.pg.host.heroku.PG_HOST_HEROKU,
-        port: getConfiguration().db.pg.port.PG_PORT,
-        username: getConfiguration().auth.PG_HEROKU_USER_NAME,
-        password: getConfiguration().auth.PG_HEROKU_USER_PASSWORD,
-        database: getConfiguration().db.nameDatabase.PG_NEST_HEROKU_DATABASE,
-        ssl:
-          getConfiguration().ENV === EnvNamesEnums.DEVELOPMENT
-            ? false
-            : { rejectUnauthorized: false },
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
-        logging: false,
-      }),
+      useFactory: async () => ormConfig,
     }),
     configModule,
     DatabaseModule,
