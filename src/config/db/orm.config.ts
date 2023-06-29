@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getConfiguration } from '../configuration';
-import { UserEntityPg } from '../../auth-pg/entities/user.entity';
+import { UserEntityPg } from '../../posgreSql/auth-pg/entities/user.entity';
 
 export const ormConfig: {
   localHost: TypeOrmModuleOptions;

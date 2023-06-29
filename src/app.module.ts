@@ -29,7 +29,7 @@ import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.modul
 import { getConfiguration } from './config/configuration';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthPgModule } from './auth-pg/auth-pg.module';
+import { AuthPgModule } from './posgreSql/auth-pg/auth-pg.module';
 import { ormConfig } from './config/db/orm.config';
 
 @Module({

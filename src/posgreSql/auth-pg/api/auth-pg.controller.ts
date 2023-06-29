@@ -8,12 +8,12 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { LoginDto } from '../../features/auth/dto/login.dto';
-import { CheckingUserExistenceCommand } from '../../features/users/application/use-cases/checking-user-existence.use-case';
-import { userAlreadyExists } from '../../exception-filter/errors-messages';
-import { RegDataDto } from '../../features/users/dto/reg-data.dto';
-import { RegistrationUserCommand } from '../../features/auth/application/use-cases/registration-user.use-case';
+import { CheckingUserExistenceCommand } from '../../../features/users/application/use-cases/checking-user-existence.use-case';
+import { userAlreadyExists } from '../../../exception-filter/errors-messages';
+import { RegDataDto } from '../../../features/users/dto/reg-data.dto';
+import { RegistrationUserCommand } from '../../../features/auth/application/use-cases/registration-user.use-case';
 import { CommandBus } from '@nestjs/cqrs';
+import { RegistrationDto } from '../dto/registration.dto';
 
 @Controller('auth-pg')
 export class AuthPgController {
@@ -23,11 +23,14 @@ export class AuthPgController {
   @Post('registration')
   async registration(
     @Request() req: any,
-    @Body() loginDto: LoginDto,
+    @Body() registrationDto: RegistrationDto,
     @Ip() ip: string,
   ) {
     const userExist = await this.commandBus.execute(
-      new CheckingUserExistenceCommand(loginDto.login, loginDto.email),
+      new CheckingUserExistenceCommand(
+        registrationDto.login,
+        registrationDto.email,
+      ),
     );
     if (userExist) {
       throw new HttpException(
@@ -42,7 +45,7 @@ export class AuthPgController {
       userAgent: req.get('user-agent') || 'None',
     };
     const newUser = await this.commandBus.execute(
-      new RegistrationUserCommand(loginDto, registrationData),
+      new RegistrationUserCommand(registrationDto, registrationData),
     );
 
     return {
