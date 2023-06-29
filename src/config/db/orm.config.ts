@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getConfiguration } from '../configuration';
-import { AuthPgEntity } from '../../auth-pg/auth-pg.entity';
+import { UserEntityPg } from '../../auth-pg/entities/user.entity';
 
 export const ormConfig: {
   localHost: TypeOrmModuleOptions;
@@ -14,7 +14,7 @@ export const ormConfig: {
     password: getConfiguration().auth.PG_LOCAL_USER_PASSWORD,
     database: 'Local-Nest-pg-DB',
     ssl: { rejectUnauthorized: false },
-    entities: [AuthPgEntity],
+    entities: [UserEntityPg],
     synchronize: true,
     logging: false,
   },
