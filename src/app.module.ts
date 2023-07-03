@@ -29,7 +29,6 @@ import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.modul
 import { getConfiguration } from './config/configuration';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthPgModule } from './posgreSql/auth-pg/auth-pg.module';
 import { ormConfig } from './config/db/orm.config';
 
 @Module({
@@ -37,7 +36,6 @@ import { ormConfig } from './config/db/orm.config';
     TypeOrmModule.forRootAsync({
       useFactory: async () => ormConfig.herokuPosgreSql,
     }),
-    AuthPgModule,
     configModule,
     DatabaseModule,
     ThrottlerModule.forRoot({
@@ -57,7 +55,6 @@ import { ormConfig } from './config/db/orm.config';
     BlogsModule,
     SaModule,
     BloggerBlogsModule,
-    AuthPgModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],
