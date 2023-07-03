@@ -29,6 +29,7 @@ import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-by
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 import { ChangeBanStatusPostsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-blogId.use-case';
+import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -59,6 +60,7 @@ const postsUseCases = [
     BloggerBlogsService,
     Pagination,
     PostsRepository,
+    UsersSqlRepository,
     BloggerBlogsRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,

@@ -18,6 +18,7 @@ import { CreateUserByInstanceUseCase } from './application/use-cases/create-user
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
+import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
 
 const usersUseCases = [
   CreateUserByMongooseModelUseCase,
@@ -35,6 +36,7 @@ const usersUseCases = [
     Pagination,
     JwtConfig,
     BlacklistJwtRepository,
+    UsersSqlRepository,
     AuthService,
     UsersRepository,
     JwtService,

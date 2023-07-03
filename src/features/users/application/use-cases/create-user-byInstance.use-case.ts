@@ -4,6 +4,7 @@ import { UsersDocument } from '../../infrastructure/schemas/user.schema';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
+import { UsersService } from '../users.service';
 
 export class CreateUserCommand {
   constructor(
@@ -15,8 +16,15 @@ export class CreateUserCommand {
 export class CreateUserByInstanceUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    protected usersService: UsersService,
+  ) {}
   async execute(command: CreateUserCommand): Promise<UsersDocument> {
+    const createUser = await this.usersService.createUsers(
+      command.createUserDto,
+      command.registrationData,
+    );
     const newInstance = await this.usersRepository.makeInstanceUser(
       command.createUserDto,
       command.registrationData,

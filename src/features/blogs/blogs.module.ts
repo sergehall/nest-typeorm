@@ -17,6 +17,7 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
 import { UsersService } from '../users/application/users.service';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],
@@ -32,6 +33,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     ConvertFiltersForDB,
     BlogsRepository,
     Pagination,
+    UsersSqlRepository,
     PostsService,
     PostsRepository,
     LikeStatusPostsRepository,
