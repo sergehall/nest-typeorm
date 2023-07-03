@@ -8,12 +8,13 @@ import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { RegDataDto } from '../dto/reg-data.dto';
-import { UsersSqlRepository } from '../../auth/infrastructure/rawSql-repository/usersSql.repository';
+import { UsersRawSqlRepository } from '../../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
 import * as uuid4 from 'uuid4';
 import * as bcrypt from 'bcrypt';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { CreateUserRawSqlDto } from '../../auth/dto/createUserRawSql.dto';
+import { CreateUserRawSqlEntity } from '../entities/createUserRawSql.entity';
+import { CreateUserRawSqlWithIdEntity } from '../entities/createUserRawSqlWithId.entity';
 
 @Injectable()
 export class UsersService {
@@ -21,13 +22,13 @@ export class UsersService {
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected usersRepository: UsersRepository,
-    protected usersSqlRepository: UsersSqlRepository,
+    protected usersSqlRepository: UsersRawSqlRepository,
   ) {}
   async createUsers(
     createUserDto: CreateUserDto,
     regDataDto: RegDataDto,
-  ): Promise<CreateUserRawSqlDto | null> {
-    const createUserRawSql: CreateUserRawSqlDto = {
+  ): Promise<CreateUserRawSqlWithIdEntity> {
+    const createUserRawSql: CreateUserRawSqlEntity = {
       login: createUserDto.login,
       email: createUserDto.email,
       passwordHash: await bcrypt.hash(
@@ -37,19 +38,26 @@ export class UsersService {
       createdAt: new Date().toISOString(),
       orgId: OrgIdEnums.IT_INCUBATOR,
       roles: RolesEnums.USER,
-      isBanned: false,
-      banDate: null,
-      banReason: null,
-      confirmationCode: uuid4().toString(),
-      expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
-      isConfirmed: false,
-      isConfirmedDate: null,
-      ip: regDataDto.ip,
-      userAgent: regDataDto.userAgent,
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+      emailConfirmation: {
+        confirmationCode: uuid4().toString(),
+        expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
+        isConfirmed: false,
+        isConfirmedDate: null,
+      },
+      registrationData: {
+        ip: regDataDto.ip,
+        userAgent: regDataDto.userAgent,
+      },
     };
 
     return await this.usersSqlRepository.createUser(createUserRawSql);
   }
+
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UsersEntity | null> {

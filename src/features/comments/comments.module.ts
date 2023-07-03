@@ -27,7 +27,7 @@ import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use
 import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
 import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
-import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
+import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -58,7 +58,7 @@ const commentsUseCases = [
     UsersService,
     UsersRepository,
     MailsRepository,
-    UsersSqlRepository,
+    UsersRawSqlRepository,
     BloggerBlogsRepository,
     ...commentsUseCases,
     ...commentsProviders,

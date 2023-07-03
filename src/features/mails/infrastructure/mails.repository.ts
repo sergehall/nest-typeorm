@@ -6,9 +6,12 @@ import {
   EmailsConfirmCode,
   EmailsConfirmCodeDocument,
 } from './schemas/email-confirm-code.schema';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 export class MailsRepository {
   constructor(
+    @InjectDataSource() private readonly db: DataSource,
     @Inject(ProvidersEnums.CONFIRM_CODE_MODEL)
     private EmailsConfirmCodeModel: Model<EmailsConfirmCodeDocument>,
   ) {}
@@ -16,7 +19,22 @@ export class MailsRepository {
     newConfirmationCode: EmailConfimCodeEntity,
   ): Promise<EmailConfimCodeEntity> {
     try {
-      return await this.EmailsConfirmCodeModel.create(newConfirmationCode);
+      return await this.db.query(
+        `
+        INSERT INTO public."EmailsConfirmationCode"
+        ( "id", 
+          "email", 
+          "confirmationCode", 
+          "createdAt")
+          VALUES ($1, $2, $3, $4)
+         `,
+        [
+          newConfirmationCode.id,
+          newConfirmationCode.email,
+          newConfirmationCode.confirmationCode,
+          newConfirmationCode.createdAt,
+        ],
+      );
     } catch (error) {
       throw new ForbiddenException(error.message);
     }

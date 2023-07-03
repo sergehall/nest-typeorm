@@ -19,7 +19,7 @@ import { CreateDeviceUseCase } from './application/use-cases/create-device.use-c
 import { RemoveDevicesAfterLogoutUseCase } from './application/use-cases/remove-devices-after-logout.use-case';
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-exceptCurrent.use-case';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-byDeviceId.use-case';
-import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
+import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -35,7 +35,7 @@ const securityDevicesCases = [
   providers: [
     ConvertFiltersForDB,
     JwtService,
-    UsersSqlRepository,
+    UsersRawSqlRepository,
     JwtConfig,
     Pagination,
     CaslAbilityFactory,
