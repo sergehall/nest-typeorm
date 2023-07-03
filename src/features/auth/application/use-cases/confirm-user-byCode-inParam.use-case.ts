@@ -1,5 +1,6 @@
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UsersRawSqlRepository } from '../../infrastructure/raw-sql-repository/users-raw-sql.repository';
 
 export class ConfirmUserByCodeInParamCommand {
   constructor(public code: string) {}
@@ -9,20 +10,25 @@ export class ConfirmUserByCodeInParamCommand {
 export class ConfirmUserByCodeInParamUseCase
   implements ICommandHandler<ConfirmUserByCodeInParamCommand>
 {
-  constructor(protected usersRepository: UsersRepository) {}
+  constructor(
+    protected usersRepository: UsersRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
+  ) {}
   async execute(command: ConfirmUserByCodeInParamCommand): Promise<boolean> {
-    const user = await this.usersRepository.findUserByConfirmationCode(
-      command.code,
-    );
-    if (user) {
-      if (!user.emailConfirmation.isConfirmed) {
-        if (user.emailConfirmation.expirationDate > new Date().toISOString()) {
-          user.emailConfirmation.isConfirmed = true;
-          user.emailConfirmation.isConfirmedDate = new Date().toISOString();
-          await this.usersRepository.updateUser(user);
-          return true;
-        }
-      }
+    const userToUpdateConfirmCode =
+      await this.usersRawSqlRepository.findUserByConfirmationCode(command.code);
+    if (
+      userToUpdateConfirmCode &&
+      !userToUpdateConfirmCode.isConfirmed &&
+      userToUpdateConfirmCode.expirationDate > new Date().toISOString()
+    ) {
+      const isConfirmed = true;
+      const isConfirmedDate = new Date().toISOString();
+      return await this.usersRawSqlRepository.confirmUserByConfirmCode(
+        command.code,
+        isConfirmed,
+        isConfirmedDate,
+      );
     }
     return false;
   }
