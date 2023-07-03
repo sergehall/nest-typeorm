@@ -1,6 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getConfiguration } from '../configuration';
-import { UserEntityPg } from '../../posgreSql/auth-pg/entities/user.entity';
 
 export const ormConfig: {
   localHost: TypeOrmModuleOptions;
@@ -14,7 +13,7 @@ export const ormConfig: {
     password: getConfiguration().auth.PG_LOCAL_USER_PASSWORD,
     database: 'Local-Nest-pg-DB',
     ssl: { rejectUnauthorized: false },
-    entities: [UserEntityPg],
+    entities: [],
     synchronize: true,
     logging: false,
   },
