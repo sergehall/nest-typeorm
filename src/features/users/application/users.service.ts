@@ -6,6 +6,14 @@ import { UsersRepository } from '../infrastructure/users.repository';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { RegDataDto } from '../dto/reg-data.dto';
+import { UsersSqlRepository } from '../../auth/infrastructure/rawSql-repository/usersSql.repository';
+import * as uuid4 from 'uuid4';
+import * as bcrypt from 'bcrypt';
+import { OrgIdEnums } from '../enums/org-id.enums';
+import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { CreateUserRawSqlDto } from '../../auth/dto/createUserRawSql.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,8 +21,35 @@ export class UsersService {
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected usersRepository: UsersRepository,
+    protected usersSqlRepository: UsersSqlRepository,
   ) {}
+  async createUsers(
+    createUserDto: CreateUserDto,
+    regDataDto: RegDataDto,
+  ): Promise<CreateUserRawSqlDto | null> {
+    const createUserRawSql: CreateUserRawSqlDto = {
+      login: createUserDto.login,
+      email: createUserDto.email,
+      passwordHash: await bcrypt.hash(
+        createUserDto.password,
+        await bcrypt.genSalt(Number(process.env.SALT_FACTOR)),
+      ),
+      createdAt: new Date().toISOString(),
+      orgId: OrgIdEnums.IT_INCUBATOR,
+      roles: RolesEnums.USER,
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+      confirmationCode: uuid4().toString(),
+      expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
+      isConfirmed: false,
+      isConfirmedDate: null,
+      ip: regDataDto.ip,
+      userAgent: regDataDto.userAgent,
+    };
 
+    return await this.usersSqlRepository.createUser(createUserRawSql);
+  }
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UsersEntity | null> {

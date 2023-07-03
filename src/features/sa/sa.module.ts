@@ -19,6 +19,7 @@ import { CreateUserByInstanceUseCase } from '../users/application/use-cases/crea
 import { ChangeRoleUseCase } from './application/use-cases/change-role.use-case';
 import { SaBanUserUseCase } from './application/use-cases/sa-ban-user.use-case';
 import { SaBanBlogUseCase } from './application/use-cases/sa-ban-blog.use-case';
+import { UsersSqlRepository } from '../auth/infrastructure/rawSql-repository/usersSql.repository';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -40,6 +41,7 @@ const saUseCases = [
     UsersRepository,
     MailsRepository,
     PostsRepository,
+    UsersSqlRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
     ...saUseCases,
