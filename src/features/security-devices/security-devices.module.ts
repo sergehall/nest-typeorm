@@ -20,6 +20,7 @@ import { RemoveDevicesAfterLogoutUseCase } from './application/use-cases/remove-
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-exceptCurrent.use-case';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-byDeviceId.use-case';
 import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from './infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -44,6 +45,7 @@ const securityDevicesCases = [
     UsersService,
     BlacklistJwtRepository,
     SecurityDevicesRepository,
+    SecurityDevicesRawSqlRepository,
     SecurityDevicesService,
     ...securityDevicesCases,
     ...devicesProviders,

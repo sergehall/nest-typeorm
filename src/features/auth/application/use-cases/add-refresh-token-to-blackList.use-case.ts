@@ -1,6 +1,6 @@
 import { JwtBlacklistDto } from '../../dto/jwt-blacklist.dto';
-import { BlacklistJwtRepository } from '../../infrastructure/blacklist-jwt.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BlacklistJwtRawSqlRepository } from '../../infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 export class AddRefreshTokenToBlackListCommand {
   constructor(public currentToken: JwtBlacklistDto) {}
@@ -9,8 +9,10 @@ export class AddRefreshTokenToBlackListCommand {
 export class AddRefreshTokenToBlackListUseCase
   implements ICommandHandler<AddRefreshTokenToBlackListCommand>
 {
-  constructor(private blacklistJwtRepository: BlacklistJwtRepository) {}
+  constructor(
+    private blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
+  ) {}
   async execute(command: AddRefreshTokenToBlackListCommand): Promise<boolean> {
-    return await this.blacklistJwtRepository.addJWT(command.currentToken);
+    return await this.blacklistJwtRawSqlRepository.addJWT(command.currentToken);
   }
 }
