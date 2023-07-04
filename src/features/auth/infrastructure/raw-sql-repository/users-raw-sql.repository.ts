@@ -91,4 +91,23 @@ export class UsersRawSqlRepository {
       throw new ForbiddenException(error.message);
     }
   }
+
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<TablesUsersEntity | null> {
+    const user = await this.db.query(
+      `
+        SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+        WHERE "email" = $1 or "login" = $1
+      `,
+      [loginOrEmail],
+    );
+
+    if (user[0]) {
+      return user[0];
+    } else {
+      return null;
+    }
+  }
 }

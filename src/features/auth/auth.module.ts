@@ -28,6 +28,7 @@ import { UpdateRefreshJwtUseCase } from './application/use-cases/update-refresh-
 import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.use-case';
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
 import { UsersRawSqlRepository } from './infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from './infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -55,6 +56,7 @@ const authUseCases = [
     UsersRepository,
     AuthService,
     SecurityDevicesService,
+    BlacklistJwtRawSqlRepository,
     LocalStrategy,
     JwtStrategy,
     MailsRepository,
