@@ -17,7 +17,7 @@ import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.rep
 import { UsersService } from '../users/application/users.service';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],

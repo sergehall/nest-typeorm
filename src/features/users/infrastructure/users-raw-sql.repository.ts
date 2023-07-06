@@ -1,17 +1,17 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CreateUserRawSqlEntity } from '../../../users/entities/createUserRawSql.entity';
-import { CreateUserRawSqlWithIdEntity } from '../../../users/entities/createUserRawSqlWithId.entity';
-import { TablesUsersEntity } from '../../../users/entities/tablesUsers.entity';
+import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
+import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
+import { TablesUsersEntity } from '../entities/tablesUsers.entity';
 
 @Injectable()
 export class UsersRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async createUser(
-    createUserRawSql: CreateUserRawSqlEntity,
-  ): Promise<CreateUserRawSqlWithIdEntity> {
+    createUserRawSql: UsersRawSqlEntity,
+  ): Promise<UserRawSqlWithIdEntity> {
     try {
       const insertNewUser = await this.db.query(
         `
@@ -92,6 +92,27 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async updateUserConfirmationCode(
+    user: UserRawSqlWithIdEntity,
+  ): Promise<boolean> {
+    try {
+      const updateUser = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "confirmationCode" = $2, "expirationDate" = $3
+      WHERE "confirmationCode" = $1`,
+        [
+          user.id,
+          user.emailConfirmation.confirmationCode,
+          user.emailConfirmation.expirationDate,
+        ],
+      );
+      return !!updateUser[0];
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
+
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<TablesUsersEntity | null> {
@@ -103,7 +124,6 @@ export class UsersRawSqlRepository {
       `,
       [loginOrEmail],
     );
-
     if (user[0]) {
       return user[0];
     } else {

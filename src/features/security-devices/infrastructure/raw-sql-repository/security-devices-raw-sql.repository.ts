@@ -12,9 +12,17 @@ export class SecurityDevicesRawSqlRepository {
     try {
       const createOrUpdateDevice = await this.db.query(
         `
-      INSERT INTO public."SecurityDevices"("userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId")
-      VALUES($1, $2, $3, $4, $5, $6,)
-      ON CONFLICT("userId" = $1 and "deviceId" = $6 ) DO UPDATE SET "userId" = $1, "ip" = $2, "title" = $3, "lastActiveDate" = $4, "expirationDate" = $5, "deviceId" = $6
+      INSERT INTO public."SecurityDevices"
+      ("userId",
+       "ip", 
+       "title", 
+       "lastActiveDate", 
+       "expirationDate", 
+       "deviceId")
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT ( "userId", "deviceId" ) 
+      DO UPDATE SET "userId" = $1, "ip" = $2, "title" = $3, "lastActiveDate" = $4, "expirationDate" = $5, "deviceId" = $6
+      returning "userId"
       `,
         [
           filter.userId,

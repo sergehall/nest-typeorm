@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { TablesUsersEntity } from '../../../users/entities/tablesUsers.entity';
 
 export class ValidatePasswordCommand {

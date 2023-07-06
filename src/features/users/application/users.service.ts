@@ -8,13 +8,13 @@ import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { RegDataDto } from '../dto/reg-data.dto';
-import { UsersRawSqlRepository } from '../../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
 import * as uuid4 from 'uuid4';
 import * as bcrypt from 'bcrypt';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { CreateUserRawSqlEntity } from '../entities/createUserRawSql.entity';
-import { CreateUserRawSqlWithIdEntity } from '../entities/createUserRawSqlWithId.entity';
+import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
+import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
 
 @Injectable()
 export class UsersService {
@@ -27,8 +27,8 @@ export class UsersService {
   async createUsers(
     createUserDto: CreateUserDto,
     regDataDto: RegDataDto,
-  ): Promise<CreateUserRawSqlWithIdEntity> {
-    const createUserRawSql: CreateUserRawSqlEntity = {
+  ): Promise<UserRawSqlWithIdEntity> {
+    const createUserRawSql: UsersRawSqlEntity = {
       login: createUserDto.login,
       email: createUserDto.email,
       passwordHash: await bcrypt.hash(

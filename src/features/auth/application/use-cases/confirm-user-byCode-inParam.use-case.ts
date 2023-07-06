@@ -1,6 +1,6 @@
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 
 export class ConfirmUserByCodeInParamCommand {
   constructor(public code: string) {}

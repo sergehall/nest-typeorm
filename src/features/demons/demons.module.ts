@@ -15,7 +15,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { AddSentEmailTimeUseCase } from '../mails/application/use-cases/add-sent-email-time.use-case';
 import { RemoveEmailByIdUseCase } from '../mails/application/use-cases/remove-email-byId.use-case';
 import { MailsAdapter } from '../mails/adapters/mails.adapter';
-import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 
 const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
 

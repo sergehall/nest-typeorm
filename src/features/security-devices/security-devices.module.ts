@@ -19,7 +19,7 @@ import { CreateDeviceUseCase } from './application/use-cases/create-device.use-c
 import { RemoveDevicesAfterLogoutUseCase } from './application/use-cases/remove-devices-after-logout.use-case';
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-exceptCurrent.use-case';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-byDeviceId.use-case';
-import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from './infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
 
 const securityDevicesCases = [

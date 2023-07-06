@@ -65,10 +65,11 @@ export class AuthController {
         new CreateDeviceCommand(newPayload, ip, userAgent),
       );
     }
-    res.cookie('refreshToken', signedToken.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie('refreshToken', signedToken.refreshToken);
+    // res.cookie('refreshToken', signedToken.refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    // });
     return await this.commandBus.execute(new SignAccessJwtUseCommand(req.user));
   }
 
@@ -139,10 +140,11 @@ export class AuthController {
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),
     );
-    res.cookie('refreshToken', newRefreshToken.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie('refreshToken', newRefreshToken.refreshToken);
+    // res.cookie('refreshToken', newRefreshToken.refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    // });
     return await this.commandBus.execute(
       new UpdateAccessJwtCommand(currentPayload),
     );
