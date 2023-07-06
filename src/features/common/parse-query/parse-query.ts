@@ -1,6 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { SortOrder } from './types/sort-order.types';
 import { BanStatusTypes } from './types/ban-status.types';
+type QueryPaginationType = {
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: SortOrder;
+};
+export type ParseQueryType = {
+  queryPagination: QueryPaginationType;
+  searchNameTerm: string;
+  title: string;
+  userName: string;
+  searchTitle: string;
+  code: string;
+  confirmationCode: string;
+  searchLoginTerm: string;
+  searchEmailTerm: string;
+  banStatus: BanStatusTypes;
+};
 
 @Injectable()
 export class ParseQuery {

@@ -53,15 +53,16 @@ export class SaController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async saFindUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
-    const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
-    const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
-    const banStatus = { banStatus: queryData.banStatus };
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    return this.usersService.findUsers(queryPagination, [
-      searchLoginTerm,
-      searchEmailTerm,
-      banStatus,
-    ]);
+    // const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
+    // const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
+    // const banStatus = { banStatus: queryData.banStatus };
+    // const queryPagination: PaginationDto = queryData.queryPagination;
+    // return this.usersService.findUsers(queryPagination, [
+    //   searchLoginTerm,
+    //   searchEmailTerm,
+    //   banStatus,
+    // ]);
+    return this.usersService.findUsersRawSql(queryData);
   }
 
   @Get('blogs')

@@ -4,6 +4,8 @@ import { DataSource } from 'typeorm';
 import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
 import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
+import { PaginationDBType } from '../../common/pagination/types/pagination.types';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -34,7 +36,7 @@ export class UsersRawSqlRepository {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
           returning id`,
         [
-          createUserRawSql.login.toLowerCase(),
+          createUserRawSql.login,
           createUserRawSql.email,
           createUserRawSql.passwordHash,
           createUserRawSql.createdAt,
@@ -67,6 +69,21 @@ export class UsersRawSqlRepository {
       FROM public."Users"
       WHERE "confirmationCode" = $1`,
         [confirmationCode],
+      );
+      return user[0] ? user[0] : null;
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
+
+  async findUserByUserId(userId: string): Promise<TablesUsersEntity | null> {
+    try {
+      const user = await this.db.query(
+        `
+      SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      FROM public."Users"
+      WHERE "id" = $1`,
+        [userId],
       );
       return user[0] ? user[0] : null;
     } catch (error) {
@@ -129,5 +146,78 @@ export class UsersRawSqlRepository {
     } else {
       return null;
     }
+  }
+  async findUsers(
+    pagination: PaginationDBType,
+    queryData: ParseQueryType,
+  ): Promise<TablesUsersEntity[]> {
+    const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+    return await this.db.query(
+      `
+        SELECT "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        FROM public."Users"
+        WHERE "email" like $1 OR "login" like $2
+        AND  "isBanned" in (${preparedQuery.banCondition})
+        ORDER BY $3
+        LIMIT $4 OFFSET $5
+      `,
+      [
+        preparedQuery.searchEmailTerm,
+        preparedQuery.searchLoginTerm,
+        preparedQuery.orderByWithDirection,
+        pagination.pageSize,
+        pagination.startIndex,
+      ],
+    );
+  }
+  async totalCount(
+    pagination: PaginationDBType,
+    queryData: ParseQueryType,
+  ): Promise<number> {
+    const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+    const totalCount = await this.db.query(
+      `
+        SELECT count(*)
+        FROM public."Users"
+        WHERE "email" like $1 OR "login" like $2
+        AND  "isBanned" in (${preparedQuery.banCondition})
+      `,
+      [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
+    );
+    return Number(totalCount[0].count);
+  }
+
+  async _prepQueryRawSql(
+    pagination: PaginationDBType,
+    queryData: ParseQueryType,
+  ) {
+    const direction = [-1, 'ascending', 'asc'].includes(pagination.direction)
+      ? 'asc'
+      : 'desc';
+
+    const orderByWithDirection = `"${pagination.field}" ${direction}`;
+    const banCondition =
+      queryData.banStatus === ''
+        ? [true, false]
+        : queryData.banStatus === 'true'
+        ? [true]
+        : [false];
+    const searchEmailTerm =
+      queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
+        ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
+        : '';
+    let searchLoginTerm =
+      queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
+        ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
+        : '';
+    if (searchEmailTerm.length + searchLoginTerm.length === 0) {
+      searchLoginTerm = '%%';
+    }
+    return {
+      orderByWithDirection: orderByWithDirection,
+      banCondition: banCondition,
+      searchEmailTerm: searchEmailTerm,
+      searchLoginTerm: searchLoginTerm,
+    };
   }
 }

@@ -27,14 +27,14 @@ export class NoneStatusGuard implements CanActivate {
     );
     if (!checkInBL && payload) {
       const user = await this.usersService.findUserByUserId(payload.userId);
-      if (user && !user.banInfo?.isBanned) {
+      if (user && !user.isBanned) {
         request.user = {
           id: user.id,
           login: user.login,
           email: user.email,
           orgId: user.orgId,
           roles: user.roles,
-          isBanned: user.banInfo.isBanned,
+          isBanned: user.isBanned,
           payloadExp: new Date(payload.exp * 1000).toISOString(),
         };
       }

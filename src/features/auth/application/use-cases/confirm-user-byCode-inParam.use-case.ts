@@ -23,7 +23,7 @@ export class ConfirmUserByCodeInParamUseCase
       userToUpdateConfirmCode.expirationDate > new Date().toISOString()
     ) {
       const isConfirmed = true;
-      const isConfirmedDate = new Date().toISOString();
+      const isConfirmedDate: string = new Date().toISOString();
       return await this.usersRawSqlRepository.confirmUserByConfirmCode(
         command.code,
         isConfirmed,

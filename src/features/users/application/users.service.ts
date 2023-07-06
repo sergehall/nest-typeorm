@@ -4,7 +4,6 @@ import { ConvertFiltersForDB } from '../../common/convert-filters/convertFilters
 import { Pagination } from '../../common/pagination/pagination';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
-import { UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { RegDataDto } from '../dto/reg-data.dto';
@@ -15,6 +14,8 @@ import { OrgIdEnums } from '../enums/org-id.enums';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
 import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
+import { TablesUsersEntity } from '../entities/tablesUsers.entity';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
 
 @Injectable()
 export class UsersService {
@@ -22,15 +23,15 @@ export class UsersService {
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected usersRepository: UsersRepository,
-    protected usersSqlRepository: UsersRawSqlRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
   async createUsers(
     createUserDto: CreateUserDto,
     regDataDto: RegDataDto,
   ): Promise<UserRawSqlWithIdEntity> {
     const createUserRawSql: UsersRawSqlEntity = {
-      login: createUserDto.login,
-      email: createUserDto.email,
+      login: createUserDto.login.toLowerCase(),
+      email: createUserDto.email.toLowerCase(),
       passwordHash: await bcrypt.hash(
         createUserDto.password,
         await bcrypt.genSalt(Number(process.env.SALT_FACTOR)),
@@ -55,13 +56,49 @@ export class UsersService {
       },
     };
 
-    return await this.usersSqlRepository.createUser(createUserRawSql);
+    return await this.usersRawSqlRepository.createUser(createUserRawSql);
   }
 
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UsersEntity | null> {
-    return await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+  async findUsersRawSql(queryData: ParseQueryType): Promise<PaginationTypes> {
+    const field = queryData.queryPagination.sortBy;
+    const pagination = await this.pagination.convert(
+      {
+        pageNumber: queryData.queryPagination.pageNumber,
+        pageSize: queryData.queryPagination.pageSize,
+        sortBy: queryData.queryPagination.sortBy,
+        sortDirection: queryData.queryPagination.sortDirection,
+      },
+      field,
+    );
+    const users = await this.usersRawSqlRepository.findUsers(
+      pagination,
+      queryData,
+    );
+    const transformedArrUsers = users.map((i) => ({
+      id: i.id,
+      login: i.login,
+      email: i.email,
+      createdAt: i.createdAt,
+      banInfo: {
+        isBanned: i.isBanned,
+        banDate: i.banDate,
+        banReason: i.banReason,
+      },
+    }));
+    const totalCount = await this.usersRawSqlRepository.totalCount(
+      pagination,
+      queryData,
+    );
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCount,
+      items: transformedArrUsers,
+    };
   }
 
   async findUsers(
@@ -73,7 +110,7 @@ export class UsersService {
       searchFilters,
     );
     const pagination = await this.pagination.convert(queryPagination, field);
-    const posts = await this.usersRepository.findUsers(
+    const users = await this.usersRepository.findUsers(
       pagination,
       convertedFilters,
     );
@@ -86,11 +123,11 @@ export class UsersService {
       page: queryPagination.pageNumber,
       pageSize: queryPagination.pageSize,
       totalCount: totalCount,
-      items: posts,
+      items: users,
     };
   }
 
-  async findUserByUserId(userId: string): Promise<UsersEntity | null> {
-    return await this.usersRepository.findUserByUserId(userId);
+  async findUserByUserId(userId: string): Promise<TablesUsersEntity | null> {
+    return await this.usersRawSqlRepository.findUserByUserId(userId);
   }
 }
