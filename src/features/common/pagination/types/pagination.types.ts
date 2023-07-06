@@ -5,6 +5,8 @@ import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blog
 import { CommentsEntity } from '../../../comments/entities/comments.entity';
 import { UsersBannedByBlogIdEntity } from '../../../blogger-blogs/entities/blogger-blogs-banned-users.entity';
 import { PostsReturnEntity } from '../../../posts/entities/posts-without-ownerInfo.entity';
+import { TablesUsersEntity } from '../../../users/entities/tablesUsers.entity';
+import { UsersReturnEntity } from '../../../users/entities/usersReturn.entity';
 
 export type PaginationTypes = {
   pagesCount: number;
@@ -17,7 +19,9 @@ export type PaginationTypes = {
     | BloggerBlogsEntity[]
     | UsersEntity[]
     | UsersBannedByBlogIdEntity[]
-    | PostsReturnEntity[];
+    | PostsReturnEntity[]
+    | TablesUsersEntity[]
+    | UsersReturnEntity[];
 };
 export type PaginationDBType = {
   startIndex: number;
