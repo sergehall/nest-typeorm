@@ -4,6 +4,7 @@ import { userNotExists } from '../../../../exception-filter/errors-messages';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -16,6 +17,7 @@ export class UpdateSentConfirmationCodeUseCase
   constructor(
     protected usersRepository: UsersRepository,
     protected mailsRepository: MailsRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
     const user = await this.usersRepository.findUserByLoginOrEmail(
@@ -27,7 +29,7 @@ export class UpdateSentConfirmationCodeUseCase
         user.emailConfirmation.confirmationCode = uuid4().toString();
         user.emailConfirmation.expirationDate = expirationDate;
         // update user
-        await this.usersRepository.updateUserConfirmationCode(user);
+        await this.usersRawSqlRepository.updateUserConfirmationCode(user);
 
         const newEmailConfirmationCode = {
           id: uuid4().toString(),

@@ -29,7 +29,7 @@ import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-by
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 import { ChangeBanStatusPostsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-blogId.use-case';
-import { UsersRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,

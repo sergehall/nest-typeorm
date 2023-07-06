@@ -27,7 +27,7 @@ import { SineRefreshJwtUseCase } from './application/use-cases/sine-refresh-jwt.
 import { UpdateRefreshJwtUseCase } from './application/use-cases/update-refresh-jwt.use-case';
 import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.use-case';
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
-import { UsersRawSqlRepository } from './infrastructure/raw-sql-repository/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from './infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 const authUseCases = [

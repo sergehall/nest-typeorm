@@ -29,7 +29,7 @@ export class RegistrationData {
   @MaxLength(100)
   userAgent: string;
 }
-export class CreateUserRawSqlEntity {
+export class UsersRawSqlEntity {
   @IsNotEmpty()
   @Length(3, 10, {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',

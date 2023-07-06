@@ -5,7 +5,7 @@ import * as uuid4 from 'uuid4';
 import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
-import { CreateUserRawSqlWithIdEntity } from '../../../users/entities/createUserRawSqlWithId.entity';
+import { UserRawSqlWithIdEntity } from '../../../users/entities/userRawSqlWithId.entity';
 
 export class RegistrationUserCommand {
   constructor(
@@ -23,7 +23,7 @@ export class RegistrationUserUseCase
   ) {}
   async execute(
     command: RegistrationUserCommand,
-  ): Promise<CreateUserRawSqlWithIdEntity> {
+  ): Promise<UserRawSqlWithIdEntity> {
     const newUser = await this.commandBus.execute(
       new CreateUserCommand(command.createUserDto, command.registrationData),
     );
