@@ -1,6 +1,6 @@
-import { SecurityDevicesRepository } from '../../infrastructure/security-devices.repository';
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SecurityDevicesRawSqlRepository } from '../../infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
 
 export class RemoveDevicesAfterLogoutCommand {
   constructor(public payload: PayloadDto) {}
@@ -10,10 +10,12 @@ export class RemoveDevicesAfterLogoutCommand {
 export class RemoveDevicesAfterLogoutUseCase
   implements ICommandHandler<RemoveDevicesAfterLogoutCommand>
 {
-  constructor(private securityDevicesRepository: SecurityDevicesRepository) {}
+  constructor(
+    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+  ) {}
 
   async execute(command: RemoveDevicesAfterLogoutCommand): Promise<boolean> {
-    return this.securityDevicesRepository.removeDeviceByDeviceIdAfterLogout(
+    return this.securityDevicesRawSqlRepository.removeDeviceByDeviceIdAfterLogout(
       command.payload,
     );
   }
