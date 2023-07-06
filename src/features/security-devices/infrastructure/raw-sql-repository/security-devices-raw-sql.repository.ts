@@ -2,6 +2,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { FiltersDevicesEntity } from '../../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../../entities/security-device.entity';
+import { PayloadDto } from '../../../auth/dto/payload.dto';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -34,6 +35,24 @@ export class SecurityDevicesRawSqlRepository {
         ],
       );
       return createOrUpdateDevice[0] != null;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+  async removeDeviceByDeviceIdAfterLogout(
+    payload: PayloadDto,
+  ): Promise<boolean> {
+    try {
+      const removeCurrentDevice = await this.db.query(
+        `
+      DELETE FROM public."SecurityDevices"
+      WHERE "userId" = $1 and "deviceId" = $2
+      returning "userId"
+      `,
+        [payload.userId, payload.deviceId],
+      );
+      return removeCurrentDevice[0] != null;
     } catch (e) {
       console.log(e);
       return false;
