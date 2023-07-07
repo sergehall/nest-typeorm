@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
@@ -56,7 +56,7 @@ export class UsersRawSqlRepository {
       );
       return { id: insertNewUser[0].id, ...createUserRawSql };
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -75,7 +75,7 @@ export class UsersRawSqlRepository {
       );
       return updateUserRole[0][0];
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async findUserByConfirmationCode(
@@ -91,7 +91,7 @@ export class UsersRawSqlRepository {
       );
       return user[0] ? user[0] : null;
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -106,7 +106,7 @@ export class UsersRawSqlRepository {
       );
       return user[0] ? user[0] : null;
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async confirmUserByConfirmCode(
@@ -124,7 +124,7 @@ export class UsersRawSqlRepository {
       );
       return !!user[0];
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -145,34 +145,39 @@ export class UsersRawSqlRepository {
       );
       return !!updateUser[0];
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<TablesUsersEntity | null> {
-    const user = await this.db.query(
-      `
+    try {
+      const user = await this.db.query(
+        `
         SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
         WHERE "email" = $1 or "login" = $1
       `,
-      [loginOrEmail],
-    );
-    if (user[0]) {
-      return user[0];
-    } else {
-      return null;
+        [loginOrEmail],
+      );
+      if (user[0]) {
+        return user[0];
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
   async findUsers(
     pagination: PaginationDBType,
     queryData: ParseQueryType,
   ): Promise<TablesUsersEntity[]> {
-    const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
-    return await this.db.query(
-      `
+    try {
+      const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+      return await this.db.query(
+        `
         SELECT "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
@@ -180,63 +185,74 @@ export class UsersRawSqlRepository {
         ORDER BY $3
         LIMIT $4 OFFSET $5
       `,
-      [
-        preparedQuery.searchEmailTerm,
-        preparedQuery.searchLoginTerm,
-        preparedQuery.orderByWithDirection,
-        pagination.pageSize,
-        pagination.startIndex,
-      ],
-    );
+        [
+          preparedQuery.searchEmailTerm,
+          preparedQuery.searchLoginTerm,
+          preparedQuery.orderByWithDirection,
+          pagination.pageSize,
+          pagination.startIndex,
+        ],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
   async totalCount(
     pagination: PaginationDBType,
     queryData: ParseQueryType,
   ): Promise<number> {
-    const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
-    const totalCount = await this.db.query(
-      `
+    try {
+      const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+      const totalCount = await this.db.query(
+        `
         SELECT count(*)
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
         AND  "isBanned" in (${preparedQuery.banCondition})
       `,
-      [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
-    );
-    return Number(totalCount[0].count);
+        [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
+      );
+      return Number(totalCount[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async _prepQueryRawSql(
     pagination: PaginationDBType,
     queryData: ParseQueryType,
   ) {
-    const direction = [-1, 'ascending', 'asc'].includes(pagination.direction)
-      ? 'asc'
-      : 'desc';
+    try {
+      const direction = [-1, 'ascending', 'asc'].includes(pagination.direction)
+        ? 'asc'
+        : 'desc';
 
-    const orderByWithDirection = `"${pagination.field}" ${direction}`;
-    const banCondition =
-      queryData.banStatus === ''
-        ? [true, false]
-        : queryData.banStatus === 'true'
-        ? [true]
-        : [false];
-    const searchEmailTerm =
-      queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
-        ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
-        : '';
-    let searchLoginTerm =
-      queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
-        ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
-        : '';
-    if (searchEmailTerm.length + searchLoginTerm.length === 0) {
-      searchLoginTerm = '%%';
+      const orderByWithDirection = `"${pagination.field}" ${direction}`;
+      const banCondition =
+        queryData.banStatus === ''
+          ? [true, false]
+          : queryData.banStatus === 'true'
+          ? [true]
+          : [false];
+      const searchEmailTerm =
+        queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
+          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
+          : '';
+      let searchLoginTerm =
+        queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
+          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
+          : '';
+      if (searchEmailTerm.length + searchLoginTerm.length === 0) {
+        searchLoginTerm = '%%';
+      }
+      return {
+        orderByWithDirection: orderByWithDirection,
+        banCondition: banCondition,
+        searchEmailTerm: searchEmailTerm,
+        searchLoginTerm: searchLoginTerm,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
-    return {
-      orderByWithDirection: orderByWithDirection,
-      banCondition: banCondition,
-      searchEmailTerm: searchEmailTerm,
-      searchLoginTerm: searchLoginTerm,
-    };
   }
 }
