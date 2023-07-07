@@ -1,18 +1,22 @@
-import { UsersEntity } from '../../../users/entities/users.entity';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
+import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
+import { TablesUsersEntity } from '../../../users/entities/tablesUsers.entity';
+import { UserRawSqlWithIdEntity } from '../../../users/entities/userRawSqlWithId.entity';
 
 export class ChangeRoleCommand {
-  constructor(public newUser: UsersEntity) {}
+  constructor(public newUser: UserRawSqlWithIdEntity) {}
 }
 
 @CommandHandler(ChangeRoleCommand)
 export class ChangeRoleUseCase implements ICommandHandler<ChangeRoleCommand> {
-  constructor(protected usersRepository: UsersRepository) {}
-  async execute(command: ChangeRoleCommand): Promise<UsersEntity> {
-    const updateRole: UsersEntity | null =
-      await this.usersRepository.changeRole(command.newUser);
+  constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
+  async execute(command: ChangeRoleCommand): Promise<TablesUsersEntity> {
+    const updateRole: TablesUsersEntity =
+      await this.usersRawSqlRepository.changeRole(
+        command.newUser.id,
+        command.newUser.roles,
+      );
     if (!updateRole) throw new InternalServerErrorException();
     return updateRole;
   }

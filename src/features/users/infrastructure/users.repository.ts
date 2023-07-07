@@ -138,12 +138,9 @@ export class UsersRepository {
       { $push: { 'emailConfirmation.sentEmail': currentTime } },
     );
   }
-  async banUser(
-    userToBan: UsersEntity,
-    updateBanDto: BanInfo,
-  ): Promise<boolean> {
+  async banUser(userId: string, updateBanDto: BanInfo): Promise<boolean> {
     const updateBan = await this.UsersModel.updateOne(
-      { id: userToBan.id },
+      { id: userId },
       {
         $set: {
           'banInfo.isBanned': updateBanDto.isBanned,

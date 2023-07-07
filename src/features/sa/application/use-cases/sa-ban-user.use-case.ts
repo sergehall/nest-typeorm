@@ -1,4 +1,3 @@
-import { BanInfo } from '../../../users/infrastructure/schemas/user.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
@@ -11,6 +10,7 @@ import { ChangeBanStatusUserCommentsCommand } from '../../../comments/applicatio
 import { ChangeBanStatusUserPostsCommand } from '../../../posts/application/use-cases/change-banStatus-posts.use-case';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ChangeBanStatusUserBlogsCommand } from '../../../blogger-blogs/application/use-cases/change-ban-status-owner-blog.use-case';
+import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 
 export class SaBanUserCommand {
   constructor(
@@ -25,23 +25,20 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepository: UsersRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: SaBanUserCommand): Promise<boolean | undefined> {
-    const userToBan = await this.usersRepository.findUserByUserId(command.id);
+    const userToBan = await this.usersRawSqlRepository.findUserByUserId(
+      command.id,
+    );
     if (!userToBan) throw new NotFoundException();
-    let banInfo: BanInfo = {
+
+    const banInfo = {
       isBanned: command.saBanUserDto.isBanned,
-      banDate: null,
-      banReason: null,
+      banDate: command.saBanUserDto.isBanned ? new Date().toISOString() : null,
+      banReason: command.saBanUserDto.banReason || null,
     };
-    if (command.saBanUserDto.isBanned) {
-      banInfo = {
-        isBanned: command.saBanUserDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: command.saBanUserDto.banReason,
-      };
-    }
     const ability = this.caslAbilityFactory.createForUser(
       command.currentUserDto,
     );
@@ -68,7 +65,7 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
           command.saBanUserDto.isBanned,
         ),
       );
-      return this.usersRepository.banUser(userToBan, banInfo);
+      return await this.usersRepository.banUser(userToBan.id, banInfo);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

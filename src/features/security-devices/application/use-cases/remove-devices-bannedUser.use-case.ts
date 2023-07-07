@@ -1,5 +1,5 @@
-import { SecurityDevicesRepository } from '../../infrastructure/security-devices.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SecurityDevicesRawSqlRepository } from '../../infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
 
 export class RemoveDevicesBannedUserCommand {
   constructor(public userId: string) {}
@@ -9,9 +9,11 @@ export class RemoveDevicesBannedUserCommand {
 export class RemoveDevicesBannedUserUseCase
   implements ICommandHandler<RemoveDevicesBannedUserCommand>
 {
-  constructor(private securityDevicesRepository: SecurityDevicesRepository) {}
+  constructor(
+    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+  ) {}
   async execute(command: RemoveDevicesBannedUserCommand) {
-    return await this.securityDevicesRepository.removeDevicesBannedUser(
+    return await this.securityDevicesRawSqlRepository.removeDevicesBannedUser(
       command.userId,
     );
   }

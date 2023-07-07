@@ -6,6 +6,7 @@ import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { RolesEnums } from '../../../ability/enums/roles.enums';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -59,6 +60,24 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async changeRole(
+    userId: string,
+    roles: RolesEnums,
+  ): Promise<TablesUsersEntity> {
+    try {
+      const updateUserRole = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "roles" = $2
+      WHERE "id" = $1
+      returning *`,
+        [userId, roles],
+      );
+      return updateUserRole[0][0];
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
   async findUserByConfirmationCode(
     confirmationCode: string,
   ): Promise<TablesUsersEntity | null> {

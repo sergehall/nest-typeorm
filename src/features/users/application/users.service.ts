@@ -55,7 +55,6 @@ export class UsersService {
         userAgent: regDataDto.userAgent,
       },
     };
-
     return await this.usersRawSqlRepository.createUser(createUserRawSql);
   }
 
