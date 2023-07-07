@@ -1,16 +1,19 @@
 import { CreatePostDto } from '../../dto/create-post.dto';
-import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
-import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
-import { PostsRepository } from '../../infrastructure/posts.repository';
-import { PostsEntity } from '../../entities/posts.entity';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { BloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/blogger-blogs-raw-sql.entity';
+import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
+import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 
 export class CreatePostCommand {
   constructor(
@@ -22,18 +25,18 @@ export class CreatePostCommand {
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRepository: PostsRepository,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: CreatePostCommand) {
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepository.findBlogById(
+    const blog: BloggerBlogsRawSqlEntity | null =
+      await this.bloggerBlogsRawSqlRepository.findBlogById(
         command.createPostDto.blogId,
       );
     if (!blog) throw new NotFoundException();
     const verifyUserForBlog =
-      await this.bloggerBlogsRepository.isBannedUserForBlog(
+      await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
         command.currentUserDto.id,
         command.createPostDto.blogId,
       );
@@ -43,9 +46,9 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
-        id: blog.blogOwnerInfo.userId,
+        id: blog.blogOwnerId,
       });
-      const newPost: PostsEntity = {
+      const newPost: PostsRawSqlEntity = {
         id: uuid4().toString(),
         title: command.createPostDto.title,
         shortDescription: command.createPostDto.shortDescription,
@@ -53,24 +56,15 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         blogId: command.createPostDto.blogId,
         blogName: blog.name,
         createdAt: new Date().toISOString(),
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: StatusLike.NONE,
-          newestLikes: [],
-        },
-        postOwnerInfo: {
-          userId: command.currentUserDto.id,
-          userLogin: command.currentUserDto.login,
-          isBanned: false,
-        },
-        banInfo: {
-          isBanned: false,
-          banDate: null,
-          banReason: null,
-        },
+        postOwnerId: command.currentUserDto.id,
+        postOwnerLogin: command.currentUserDto.login,
+        postOwnerIsBanned: false,
+        banInfoBanStatus: false,
+        banInfoBanDate: null,
+        banInfoBanReason: null,
       };
-      const result = await this.postsRepository.createPost(newPost);
+      const result: PostsRawSqlEntity =
+        await this.postsRawSqlRepository.createPost(newPost);
       return {
         id: result.id,
         title: result.title,
@@ -80,16 +74,17 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         blogName: result.blogName,
         createdAt: result.createdAt,
         extendedLikesInfo: {
-          likesCount: result.extendedLikesInfo.likesCount,
-          dislikesCount: result.extendedLikesInfo.dislikesCount,
-          myStatus: result.extendedLikesInfo.myStatus,
-          newestLikes: result.extendedLikesInfo.newestLikes,
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
         },
       };
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
       }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

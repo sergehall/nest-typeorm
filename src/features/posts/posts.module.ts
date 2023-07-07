@@ -30,6 +30,8 @@ import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-like
 import { ChangeBanStatusPostsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-blogId.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -64,6 +66,8 @@ const postsUseCases = [
     BloggerBlogsRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
+    BloggerBlogsRawSqlRepository,
+    PostsRawSqlRepository,
     ...postsUseCases,
     ...postsProviders,
   ],
