@@ -36,6 +36,8 @@ import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { SaBanBlogCommand } from '../application/use-cases/sa-ban-blog.use-case';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { TablesUsersEntity } from '../../users/entities/tablesUsers.entity';
+import { UserRawSqlWithIdEntity } from '../../users/entities/userRawSqlWithId.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -53,15 +55,6 @@ export class SaController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async saFindUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
-    // const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
-    // const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
-    // const banStatus = { banStatus: queryData.banStatus };
-    // const queryPagination: PaginationDto = queryData.queryPagination;
-    // return this.usersService.findUsers(queryPagination, [
-    //   searchLoginTerm,
-    //   searchEmailTerm,
-    //   banStatus,
-    // ]);
     return this.usersService.findUsersRawSql(queryData);
   }
 
@@ -98,11 +91,11 @@ export class SaController {
       userAgent: userAgent,
     };
 
-    const newUser = await this.commandBus.execute(
+    const newUser: UserRawSqlWithIdEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
     newUser.roles = RolesEnums.SA;
-    const saUser = await this.commandBus.execute(
+    const saUser: TablesUsersEntity = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
     return {
@@ -111,9 +104,9 @@ export class SaController {
       email: saUser.email,
       createdAt: saUser.createdAt,
       banInfo: {
-        isBanned: saUser.banInfo.isBanned,
-        banDate: saUser.banInfo.banDate,
-        banReason: saUser.banInfo.banReason,
+        isBanned: saUser.isBanned,
+        banDate: saUser.banDate,
+        banReason: saUser.banReason,
       },
     };
   }

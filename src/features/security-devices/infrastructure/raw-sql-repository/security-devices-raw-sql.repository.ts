@@ -58,4 +58,21 @@ export class SecurityDevicesRawSqlRepository {
       return false;
     }
   }
+
+  async removeDevicesBannedUser(userId: string) {
+    try {
+      const removeCurrentDevice = await this.db.query(
+        `
+      DELETE FROM public."SecurityDevices"
+      WHERE "userId" = $1
+      returning "userId"
+      `,
+        [userId],
+      );
+      return removeCurrentDevice[0] != null;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
 }
