@@ -28,6 +28,9 @@ import { FillingCommentsDataUseCase } from './application/use-cases/filling-comm
 import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
+import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { CommentsRawSqlRepository } from './infrastructure/comments-raw-sql.repository';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -60,6 +63,9 @@ const commentsUseCases = [
     MailsRepository,
     UsersRawSqlRepository,
     BloggerBlogsRepository,
+    PostsRawSqlRepository,
+    BloggerBlogsRawSqlRepository,
+    CommentsRawSqlRepository,
     ...commentsUseCases,
     ...commentsProviders,
   ],
