@@ -13,18 +13,10 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blog = await this.db.query(
         `
-      SELECT "id", 
-        "createdAt", 
-        "isMembership", 
-        "blogOwnerId", 
-        "blogOwnerLogin", 
-        "blogOwnerBanStatus", 
-        "banInfoBanStatus", 
-        "banInfoBanDate", 
-        "banInfoBanReason", 
-        "name", 
-        "description", 
-        "websiteUrl"
+      SELECT "id", "createdAt", "isMembership", 
+      "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+      "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+      "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
       WHERE "id" = $1`,
         [blogId],
@@ -41,18 +33,10 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blog: BloggerBlogsRawSqlEntity[] = await this.db.query(
         `
-      SELECT "id", 
-        "createdAt", 
-        "isMembership", 
-        "blogOwnerId", 
-        "blogOwnerLogin", 
-        "blogOwnerBanStatus", 
-        "banInfoBanStatus", 
-        "banInfoBanDate", 
-        "banInfoBanReason", 
-        "name", 
-        "description", 
-        "websiteUrl"
+      SELECT "id", "createdAt", "isMembership", 
+        "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+        "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+        "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
       WHERE "id" = $1 AND "blogOwnerId" = $2 AND "banInfoBanStatus" = true`,
         [blogId, blogOwnerId],
@@ -70,18 +54,10 @@ export class BloggerBlogsRawSqlRepository {
       const createNewBlog = await this.db.query(
         `
         INSERT INTO public."BloggerBlogs"(
-        "id", 
-        "createdAt", 
-        "isMembership", 
-        "blogOwnerId", 
-        "blogOwnerLogin", 
-        "blogOwnerBanStatus", 
-        "banInfoBanStatus", 
-        "banInfoBanDate", 
-        "banInfoBanReason", 
-        "name", 
-        "description", 
-        "websiteUrl")
+        "id", "createdAt", "isMembership", 
+        "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+        "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+        "name",  "description", "websiteUrl")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           returning "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
         [

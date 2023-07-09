@@ -12,21 +12,13 @@ export class PostsRawSqlRepository {
       const insertNewPost = await this.db.query(
         `
         INSERT INTO public."Posts"
-        ( "id", 
-          "title", 
-          "shortDescription", 
-          "content", 
-          "blogId", 
-          "blogName", 
-          "createdAt", 
-          "postOwnerId", 
-          "postOwnerLogin", 
-          "postOwnerIsBanned", 
-          "banInfoBanStatus", 
-          "banInfoBanDate", 
-          "banInfoBanReason")
+        ( "id", "title", "shortDescription", "content", "blogId", "blogName", 
+          "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
+          "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-          returning "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
+          returning 
+          "id", "title", "shortDescription", "content", "blogId", "blogName", 
+          "createdAt"
           `,
         [
           postsRawSqlEntity.id,
