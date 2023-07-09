@@ -5,6 +5,23 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
+
+  async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
+    try {
+      const post = await this.db.query(
+        `
+      SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
+      FROM public."Posts"
+      WHERE "id" = $1`,
+        [postId],
+      );
+      return post[0] ? post[0] : null;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async createPost(
     postsRawSqlEntity: PostsRawSqlEntity,
   ): Promise<PostsRawSqlEntity> {
@@ -38,6 +55,7 @@ export class PostsRawSqlRepository {
       );
       return insertNewPost[0];
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

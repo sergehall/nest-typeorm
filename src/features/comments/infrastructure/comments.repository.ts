@@ -13,11 +13,7 @@ export class CommentsRepository {
     @Inject(ProvidersEnums.COMMENT_MODEL)
     private commentsModel: Model<CommentsDocument>,
   ) {}
-  async createComment(
-    blogId: string,
-    postId: string,
-    commentEntity: CommentsEntity,
-  ): Promise<CommentsEntity> {
+  async createComment(commentEntity: CommentsEntity): Promise<CommentsEntity> {
     try {
       return await this.commentsModel.create(commentEntity);
     } catch (error) {
