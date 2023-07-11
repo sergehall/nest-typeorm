@@ -197,7 +197,7 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async totalCount(
+  async totalCountUsers(
     pagination: PaginationDBType,
     queryData: ParseQueryType,
   ): Promise<number> {

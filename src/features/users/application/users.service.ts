@@ -84,7 +84,7 @@ export class UsersService {
         banReason: i.banReason,
       },
     }));
-    const totalCount = await this.usersRawSqlRepository.totalCount(
+    const totalCount = await this.usersRawSqlRepository.totalCountUsers(
       pagination,
       queryData,
     );

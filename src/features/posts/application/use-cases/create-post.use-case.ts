@@ -11,9 +11,9 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { BloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/blogger-blogs-raw-sql.entity';
 import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
+import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
 export class CreatePostCommand {
   constructor(
@@ -30,7 +30,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: CreatePostCommand) {
-    const blog: BloggerBlogsRawSqlEntity | null =
+    const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(
         command.createPostDto.blogId,
       );

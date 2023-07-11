@@ -18,6 +18,7 @@ import { UsersService } from '../users/application/users.service';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],
@@ -37,6 +38,7 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
     PostsService,
     PostsRepository,
     LikeStatusPostsRepository,
+    BloggerBlogsRawSqlRepository,
     ...blogsProviders,
   ],
 })

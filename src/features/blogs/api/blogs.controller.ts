@@ -33,15 +33,7 @@ export class BlogsController {
   @Get()
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
-    const searchFilter = { searchNameTerm: queryData.searchNameTerm };
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    const blogs = await this.blogsService.openFindBlogs(queryPagination, [
-      searchFilter,
-    ]);
-    if (!blogs) {
-      throw new NotFoundException();
-    }
-    return blogs;
+    return await this.blogsService.openFindBlogs(queryData);
   }
 
   @Get(':id')
