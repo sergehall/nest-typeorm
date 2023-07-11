@@ -11,7 +11,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { BloggerBlogsRawSqlEntity } from '../../entities/blogger-blogs-raw-sql.entity';
+import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -29,7 +29,7 @@ export class CreateBloggerBlogUseCase
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: CreateBloggerBlogCommand) {
-    const blogsEntity: BloggerBlogsRawSqlEntity = {
+    const blogsEntity: TableBloggerBlogsRawSqlEntity = {
       ...command.createBloggerBlogsDto,
       id: uuid4().toString(),
       createdAt: new Date().toISOString(),

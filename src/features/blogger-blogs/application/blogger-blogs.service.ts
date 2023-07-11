@@ -11,6 +11,10 @@ import { ConvertFiltersForDB } from '../../common/convert-filters/convertFilters
 import { Pagination } from '../../common/pagination/pagination';
 import { BloggerBlogsRepository } from '../infrastructure/blogger-blogs.repository';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
+import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -18,34 +22,46 @@ export class BloggerBlogsService {
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected bloggerBlogsRepository: BloggerBlogsRepository,
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
-  async openFindBlogs(
-    queryPagination: PaginationDto,
-    searchFilters: QueryArrType,
-  ): Promise<PaginationTypes> {
-    const field = queryPagination.sortBy;
-    const convertedFilters = await this.convertFiltersForDB.convert(
-      searchFilters,
+  async openFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {
+    const field = queryData.queryPagination.sortBy;
+    const pagination = await this.pagination.convert(
+      {
+        pageNumber: queryData.queryPagination.pageNumber,
+        pageSize: queryData.queryPagination.pageSize,
+        sortBy: queryData.queryPagination.sortBy,
+        sortDirection: queryData.queryPagination.sortDirection,
+      },
+      field,
     );
-    convertedFilters.push({ 'blogOwnerInfo.isBanned': false });
-    convertedFilters.push({ 'banInfo.isBanned': false });
-    const pagination = await this.pagination.convert(queryPagination, field);
-    const blogs: BloggerBlogsEntity[] =
-      await this.bloggerBlogsRepository.openFindBlogs(
+    const blogs: TableBloggerBlogsRawSqlEntity[] =
+      await this.bloggerBlogsRawSqlRepository.openFindBlogs(
         pagination,
-        convertedFilters,
+        queryData,
       );
-    const totalCount = await this.bloggerBlogsRepository.countDocuments(
-      convertedFilters,
+    const transformedBlogs: ReturnBloggerBlogsEntity[] = blogs.map((i) => ({
+      id: i.id,
+      name: i.name,
+      description: i.description,
+      websiteUrl: i.websiteUrl,
+      createdAt: i.createdAt,
+      isMembership: i.isMembership,
+    }));
+    const totalCount = await this.bloggerBlogsRawSqlRepository.totalCountBlogs(
+      pagination,
+      queryData,
     );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
+    );
     return {
       pagesCount: pagesCount,
-      page: queryPagination.pageNumber,
+      page: queryData.queryPagination.pageNumber,
       pageSize: pagination.pageSize,
       totalCount: totalCount,
-      items: blogs,
+      items: transformedBlogs,
     };
   }
 
