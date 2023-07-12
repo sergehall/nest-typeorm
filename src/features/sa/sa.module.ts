@@ -21,6 +21,7 @@ import { SaBanUserUseCase } from './application/use-cases/sa-ban-user.use-case';
 import { SaBanBlogUseCase } from './application/use-cases/sa-ban-blog.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -46,6 +47,7 @@ const saUseCases = [
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
     BloggerBlogsRawSqlRepository,
+    LikeStatusPostsRawSqlRepository,
     ...saUseCases,
     ...saProviders,
   ],

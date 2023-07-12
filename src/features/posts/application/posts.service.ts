@@ -9,6 +9,9 @@ import { PostsReturnEntity } from '../entities/posts-without-ownerInfo.entity';
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
+import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 
 @Injectable()
 export class PostsService {
@@ -16,8 +19,42 @@ export class PostsService {
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected postsRepository: PostsRepository,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRepository: LikeStatusPostsRepository,
   ) {}
+
+  async findPosts2(
+    queryData: ParseQueryType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PaginationTypes> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
+    const posts: PostsRawSqlEntity[] =
+      await this.postsRawSqlRepository.openFindPosts(
+        queryData,
+        postOwnerIsBanned,
+        banInfoBanStatus,
+      );
+    const filledPosts =
+      await this.likeStatusPostsRepository.preparationPostsForReturn2(
+        posts,
+        currentUserDto,
+      );
+    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts(
+      postOwnerIsBanned,
+      banInfoBanStatus,
+    );
+    const pagesCount = Math.ceil(
+      totalCountPosts / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCountPosts,
+      items: filledPosts,
+    };
+  }
 
   async findPosts(
     queryPagination: PaginationDto,

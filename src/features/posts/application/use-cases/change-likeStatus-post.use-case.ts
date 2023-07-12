@@ -1,10 +1,11 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
 import { NotFoundException } from '@nestjs/common';
 import { LikeStatusPostEntity } from '../../entities/like-status-post.entity';
-import { PostsRepository } from '../../infrastructure/posts.repository';
-import { LikeStatusPostsRepository } from '../../infrastructure/like-status-posts.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
+import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
+import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 
 export class ChangeLikeStatusPostCommand {
   constructor(
@@ -19,11 +20,12 @@ export class ChangeLikeStatusPostUseCase
   implements ICommandHandler<ChangeLikeStatusPostCommand>
 {
   constructor(
-    protected postsRepository: PostsRepository,
-    protected likeStatusPostsRepository: LikeStatusPostsRepository,
+    protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: ChangeLikeStatusPostCommand) {
-    const post = await this.postsRepository.findPostById(command.postId);
+    const post: PostsRawSqlEntity | null =
+      await this.postsRawSqlRepository.findPostByPostId(command.postId);
     if (!post) throw new NotFoundException();
     const likeStatusPostEntity: LikeStatusPostEntity = {
       blogId: post.blogId,
@@ -34,7 +36,7 @@ export class ChangeLikeStatusPostUseCase
       likeStatus: command.likeStatusDto.likeStatus,
       addedAt: new Date().toISOString(),
     };
-    return await this.likeStatusPostsRepository.updateLikeStatusPost(
+    return await this.likeStatusPostsRawSqlRepository.updateLikeStatusPosts(
       likeStatusPostEntity,
     );
   }

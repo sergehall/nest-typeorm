@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 
-class NewestLikes {
+export class NewestLikes {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect userId length! Must be min 1, max 100 ch.',
