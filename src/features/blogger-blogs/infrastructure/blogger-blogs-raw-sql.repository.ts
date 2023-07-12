@@ -4,7 +4,6 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 
@@ -31,47 +30,42 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
   async openFindBlogs(
-    pagination: PaginationDBType,
     queryData: ParseQueryType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
-      // const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
+      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+        queryData.queryPagination.sortDirection,
+      )
+        ? 'ASC'
+        : 'DESC';
       const searchNameTerm =
         queryData.searchNameTerm.length !== 0
           ? `%${queryData.searchNameTerm}%`
-          : '%';
-      const orderByWithDirection = `"${pagination.field}" ${pagination.direction}`;
+          : '%%';
       return await this.db.query(
         `
-        SELECT "id", "createdAt", "isMembership",
-        "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus",  
-        "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
-        "name", "description", "websiteUrl"
+        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
         WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2
-        AND "name" LIKE $3
-        ORDER BY $4
-        LIMIT $5 OFFSET $6
-      `,
+        AND "name" ILIKE $3
+        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        LIMIT $4 OFFSET $5
+        `,
         [
           blogOwnerBanStatus,
           banInfoBanStatus,
           searchNameTerm,
-          orderByWithDirection,
-          pagination.pageSize,
-          pagination.startIndex,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber,
         ],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async totalCountBlogs(
-    pagination: PaginationDBType,
-    queryData: ParseQueryType,
-  ): Promise<number> {
+  async totalCountBlogs(queryData: ParseQueryType): Promise<number> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -145,43 +139,6 @@ export class BloggerBlogsRawSqlRepository {
       return createNewBlog[0];
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-  async _prepQueryRawSql(
-    pagination: PaginationDBType,
-    queryData: ParseQueryType,
-  ) {
-    try {
-      const direction = [-1, 'ascending', 'asc'].includes(pagination.direction)
-        ? 'asc'
-        : 'desc';
-
-      const orderByWithDirection = `"${pagination.field}" ${direction}`;
-      const banCondition =
-        queryData.banStatus === ''
-          ? [true, false]
-          : queryData.banStatus === 'true'
-          ? [true]
-          : [false];
-      const searchEmailTerm =
-        queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
-          : '';
-      let searchLoginTerm =
-        queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
-          : '';
-      if (searchEmailTerm.length + searchLoginTerm.length === 0) {
-        searchLoginTerm = '%%';
-      }
-      return {
-        orderByWithDirection: orderByWithDirection,
-        banCondition: banCondition,
-        searchEmailTerm: searchEmailTerm,
-        searchLoginTerm: searchLoginTerm,
-      };
-    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }

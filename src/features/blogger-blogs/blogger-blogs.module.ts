@@ -22,6 +22,7 @@ import { AddBannedUserToBanListUseCase } from './application/use-cases/add-banne
 import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/change-ban-status-owner-blog.use-case';
 import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
+import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -49,6 +50,7 @@ const bloggersBlogUseCases = [
     CommentsRepository,
     BlogExistsRule,
     BloggerBlogsRawSqlRepository,
+    CommentsRawSqlRepository,
     ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,
   ],

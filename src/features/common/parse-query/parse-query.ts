@@ -88,9 +88,18 @@ export class ParseQuery {
       sortBy = querySortBy;
     }
     if (
-      [-1, 1, 'descending', 'desc', 'ascending', 'asc'].includes(
-        querySortDirection,
-      )
+      [
+        -1,
+        1,
+        'DESCENDING',
+        'descending',
+        'DESC',
+        'desc',
+        'ASCENDING',
+        'ascending',
+        'ASC',
+        'asc',
+      ].includes(querySortDirection)
     ) {
       sortDirection = querySortDirection;
     }

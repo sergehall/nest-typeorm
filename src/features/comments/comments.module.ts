@@ -24,13 +24,17 @@ import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-l
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use-case';
-import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
+import {
+  FillingCommentsDataUseCase,
+  FillingCommentsDataUseCase2,
+} from './application/use-cases/filling-comments-data.use-case';
 import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from './infrastructure/comments-raw-sql.repository';
+import { LikeStatusCommentsRawSqlRepository } from './infrastructure/like-status-comments-raw-sql.repository';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -39,6 +43,7 @@ const commentsUseCases = [
   ChangeBanStatusCommentsUseCase,
   ChangeLikeStatusCommentUseCase,
   FillingCommentsDataUseCase,
+  FillingCommentsDataUseCase2,
   ChangeBanStatusCommentsByUserIdBlogIdUseCase,
 ];
 
@@ -66,6 +71,7 @@ const commentsUseCases = [
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
+    LikeStatusCommentsRawSqlRepository,
     ...commentsUseCases,
     ...commentsProviders,
   ],

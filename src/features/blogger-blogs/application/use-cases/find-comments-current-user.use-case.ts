@@ -1,11 +1,11 @@
 import { PaginationDto } from '../../../common/pagination/dto/pagination.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { CommentsRepository } from '../../../comments/infrastructure/comments.repository';
 import { ConvertFiltersForDB } from '../../../common/convert-filters/convertFiltersForDB';
-import { QueryArrType } from '../../../common/convert-filters/types/convert-filter.types';
 import { Pagination } from '../../../common/pagination/pagination';
-import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
+import { FillingCommentsDataCommand2 } from '../../../comments/application/use-cases/filling-comments-data.use-case';
+import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
+import { TablesCommentsRawSqlEntity } from '../../../comments/entities/tables-comments-raw-sql.entity';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -19,26 +19,28 @@ export class FindCommentsCurrentUserUseCase
   implements ICommandHandler<FindCommentsCurrentUserCommand>
 {
   constructor(
-    protected commentsRepository: CommentsRepository,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: FindCommentsCurrentUserCommand) {
-    const field = command.queryPagination.sortBy;
-    const searchFilters: QueryArrType = [];
-    searchFilters.push({ 'postInfo.blogOwnerId': command.currentUserDto.id });
-    searchFilters.push({ 'commentatorInfo.isBanned': false });
-    searchFilters.push({ 'banInfo.isBanned': false });
     const pagination = await this.pagination.convert(
       command.queryPagination,
-      field,
+      command.queryPagination.sortBy,
     );
-    const comments = await this.commentsRepository.findCommentsByBlogOwnerId(
-      pagination,
-      searchFilters,
-    );
-    if (!comments) {
+    const postInfoBlogOwnerId = command.currentUserDto.id;
+    const commentatorInfoIsBanned = false;
+    const banInfoIsBanned = false;
+
+    const comments: TablesCommentsRawSqlEntity[] =
+      await this.commentsRawSqlRepository.findCommentsByBlogOwnerId(
+        pagination,
+        postInfoBlogOwnerId,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+      );
+    if (comments.length === 0) {
       return {
         pagesCount: 1,
         page: 1,
@@ -48,18 +50,22 @@ export class FindCommentsCurrentUserUseCase
       };
     }
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand(comments, command.currentUserDto),
+      new FillingCommentsDataCommand2(comments, command.currentUserDto),
     );
-    const totalCount = await this.commentsRepository.countDocuments(
-      searchFilters,
+    const totalCountComments = await this.commentsRawSqlRepository.totalCount(
+      postInfoBlogOwnerId,
+      commentatorInfoIsBanned,
+      banInfoIsBanned,
     );
-    const pagesCount = Math.ceil(totalCount / command.queryPagination.pageSize);
+    const pagesCount = Math.ceil(
+      totalCountComments / command.queryPagination.pageSize,
+    );
 
     return {
       pagesCount: pagesCount,
       page: command.queryPagination.pageNumber,
       pageSize: command.queryPagination.pageSize,
-      totalCount: totalCount,
+      totalCount: totalCountComments,
       items: filledComments,
     };
   }
