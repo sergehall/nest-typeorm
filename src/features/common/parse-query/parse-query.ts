@@ -69,7 +69,7 @@ export class ParseQuery {
       userName = '';
     }
     if (isNaN(pageNumber)) {
-      pageNumber = 1;
+      pageNumber = 0;
     }
     if (isNaN(pageSize)) {
       pageSize = 10;

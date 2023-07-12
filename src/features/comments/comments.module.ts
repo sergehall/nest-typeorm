@@ -35,6 +35,7 @@ import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.rep
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from './infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from './infrastructure/like-status-comments-raw-sql.repository';
+import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -72,6 +73,7 @@ const commentsUseCases = [
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
+    LikeStatusPostsRawSqlRepository,
     ...commentsUseCases,
     ...commentsProviders,
   ],
