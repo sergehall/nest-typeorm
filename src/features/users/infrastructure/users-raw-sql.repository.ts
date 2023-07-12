@@ -170,27 +170,23 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async findUsers(
-    pagination: PaginationDBType,
-    queryData: ParseQueryType,
-  ): Promise<TablesUsersEntity[]> {
+  async findUsers(queryData: ParseQueryType): Promise<TablesUsersEntity[]> {
     try {
-      const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+      const preparedQuery = await this._prepQueryRawSql(queryData);
       return await this.db.query(
         `
         SELECT "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
         AND  "isBanned" in (${preparedQuery.banCondition})
-        ORDER BY $3
-        LIMIT $4 OFFSET $5
+        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+        LIMIT $3 OFFSET $4
       `,
         [
           preparedQuery.searchEmailTerm,
           preparedQuery.searchLoginTerm,
-          preparedQuery.orderByWithDirection,
-          pagination.pageSize,
-          pagination.startIndex,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber,
         ],
       );
     } catch (error) {
@@ -202,7 +198,7 @@ export class UsersRawSqlRepository {
     queryData: ParseQueryType,
   ): Promise<number> {
     try {
-      const preparedQuery = await this._prepQueryRawSql(pagination, queryData);
+      const preparedQuery = await this._prepQueryRawSql(queryData);
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -218,16 +214,15 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async _prepQueryRawSql(
-    pagination: PaginationDBType,
-    queryData: ParseQueryType,
-  ) {
+  async _prepQueryRawSql(queryData: ParseQueryType) {
     try {
-      const direction = [-1, 'ascending', 'asc'].includes(pagination.direction)
-        ? 'asc'
-        : 'desc';
+      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+        queryData.queryPagination.sortDirection,
+      )
+        ? 'ASC'
+        : 'DESC';
 
-      const orderByWithDirection = `"${pagination.field}" ${direction}`;
+      const orderByWithDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       const banCondition =
         queryData.banStatus === ''
           ? [true, false]
@@ -246,6 +241,7 @@ export class UsersRawSqlRepository {
         searchLoginTerm = '%%';
       }
       return {
+        direction: direction,
         orderByWithDirection: orderByWithDirection,
         banCondition: banCondition,
         searchEmailTerm: searchEmailTerm,

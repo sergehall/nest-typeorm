@@ -69,10 +69,7 @@ export class UsersService {
       },
       field,
     );
-    const users = await this.usersRawSqlRepository.findUsers(
-      pagination,
-      queryData,
-    );
+    const users = await this.usersRawSqlRepository.findUsers(queryData);
     const transformedArrUsers = users.map((i) => ({
       id: i.id,
       login: i.login,

@@ -1,10 +1,10 @@
 import { LikeStatusDto } from '../../dto/like-status.dto';
 import { NotFoundException } from '@nestjs/common';
 import { LikeStatusCommentEntity } from '../../entities/like-status-comment.entity';
-import { LikeStatusCommentsRepository } from '../../infrastructure/like-status-comments.repository';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
+import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(
@@ -19,23 +19,23 @@ export class ChangeLikeStatusCommentUseCase
   implements ICommandHandler<ChangeLikeStatusCommentCommand>
 {
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
+    protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
   ) {}
   async execute(command: ChangeLikeStatusCommentCommand): Promise<boolean> {
-    const findComment = await this.commentsRepository.findCommentById(
+    const findComment = await this.commentsRawSqlRepository.findCommentById(
       command.commentId,
     );
-    if (!findComment) throw new NotFoundException();
+    if (findComment.length === 0) throw new NotFoundException();
     const likeStatusCommEntity: LikeStatusCommentEntity = {
-      blogId: findComment.postInfo.blogId,
+      blogId: findComment[0].postInfoBlogId,
       commentId: command.commentId,
       userId: command.currentUserDto.id,
       isBanned: command.currentUserDto.isBanned,
       likeStatus: command.likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),
     };
-    return await this.likeStatusCommentsRepository.updateLikeStatusComment(
+    return await this.likeStatusCommentsRawSqlRepository.updateLikeStatusComment(
       likeStatusCommEntity,
     );
   }
