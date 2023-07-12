@@ -159,7 +159,7 @@ export class UsersRawSqlRepository {
         FROM public."Users"
         WHERE "email" = $1 or "login" = $1
       `,
-        [loginOrEmail],
+        [loginOrEmail.toLocaleLowerCase()],
       );
       if (user[0]) {
         return user[0];
