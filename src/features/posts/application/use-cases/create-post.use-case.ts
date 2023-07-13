@@ -31,7 +31,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   ) {}
   async execute(command: CreatePostCommand) {
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(
+      await this.bloggerBlogsRawSqlRepository.openFindBlogById(
         command.createPostDto.blogId,
       );
     if (!blog) throw new NotFoundException();

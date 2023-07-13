@@ -10,10 +10,12 @@ import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-r
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async findBlogById(
+  async openFindBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     try {
+      const blogOwnerBanStatus = false;
+      const banInfoBanStatus = false;
       const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
@@ -21,8 +23,9 @@ export class BloggerBlogsRawSqlRepository {
       "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1`,
-        [blogId],
+      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      `,
+        [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
       return blog[0] ? blog[0] : null;
     } catch (error) {

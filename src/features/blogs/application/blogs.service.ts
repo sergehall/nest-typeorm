@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 @Injectable()
 export class BlogsService {
   constructor(protected bloggerBlogsService: BloggerBlogsService) {}
-  async openFindBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+  async openFindBlogById(blogId: string): Promise<ReturnBloggerBlogsEntity> {
     return await this.bloggerBlogsService.openFindBlogById(blogId);
   }
   async openFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {

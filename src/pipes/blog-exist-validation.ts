@@ -15,7 +15,7 @@ export class BlogExistsRule implements ValidatorConstraintInterface {
 
   async validate(value: string) {
     try {
-      if (await this.bloggerBlogsRawSqlRepository.findBlogById(value)) {
+      if (await this.bloggerBlogsRawSqlRepository.openFindBlogById(value)) {
         return true;
       }
     } catch (e) {
