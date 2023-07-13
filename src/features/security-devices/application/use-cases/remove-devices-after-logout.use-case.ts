@@ -1,6 +1,6 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SecurityDevicesRawSqlRepository } from '../../infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 
 export class RemoveDevicesAfterLogoutCommand {
   constructor(public payload: PayloadDto) {}

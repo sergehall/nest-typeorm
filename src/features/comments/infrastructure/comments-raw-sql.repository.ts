@@ -1,8 +1,12 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
 
 export class CommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -82,11 +86,28 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+  async updateComment(
+    commentId: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<boolean> {
+    try {
+      const updateUser = await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET  "content" = $2
+      WHERE "id" = $1`,
+        [commentId, updateCommentDto.content],
+      );
+      return !!updateUser[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
   async findCommentById(
     commentId: string,
-  ): Promise<TablesCommentsRawSqlEntity[]> {
+  ): Promise<TablesCommentsRawSqlEntity | null> {
     try {
-      return await this.db.query(
+      const comment = await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
@@ -94,9 +115,10 @@ export class CommentsRawSqlRepository {
           `,
         [commentId],
       );
+      return comment[0] ? comment[0] : null;
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      throw new NotFoundException(error.message);
     }
   }
   async totalCount(

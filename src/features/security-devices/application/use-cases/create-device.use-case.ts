@@ -1,7 +1,7 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { SessionDevicesEntity } from '../../entities/security-device.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SecurityDevicesRawSqlRepository } from '../../infrastructure/raw-sql-repository/security-devices-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 
 export class CreateDeviceCommand {
   constructor(
