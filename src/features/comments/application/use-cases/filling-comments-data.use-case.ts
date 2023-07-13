@@ -8,6 +8,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsEntity } from '../../entities/comments.entity';
 import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
+import { FilledCommentEntity } from '../../entities/filledComment.entity';
 
 export class FillingCommentsDataCommand {
   constructor(
@@ -97,7 +98,9 @@ export class FillingCommentsDataUseCase2
   constructor(
     protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
   ) {}
-  async execute(command: FillingCommentsDataCommand2) {
+  async execute(
+    command: FillingCommentsDataCommand2,
+  ): Promise<FilledCommentEntity[]> {
     try {
       const filledComments = [];
       for (const i in command.commentsArray2) {
@@ -135,7 +138,7 @@ export class FillingCommentsDataUseCase2
             dislike,
           );
 
-        const filledComment = {
+        const filledComment: FilledCommentEntity = {
           id: currentComment.id,
           content: currentComment.content,
           createdAt: currentComment.createdAt,
