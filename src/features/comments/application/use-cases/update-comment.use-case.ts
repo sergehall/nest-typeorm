@@ -1,11 +1,15 @@
 import { UpdateCommentDto } from '../../dto/update-comment.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 
 export class UpdateCommentCommand {
   constructor(
@@ -20,11 +24,11 @@ export class UpdateCommentUseCase
   implements ICommandHandler<UpdateCommentCommand>
 {
   constructor(
-    protected commentsRepository: CommentsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
   async execute(command: UpdateCommentCommand) {
-    const findComment = await this.commentsRepository.findCommentById(
+    const findComment = await this.commentsRawSqlRepository.findCommentById(
       command.commentId,
     );
     if (!findComment) throw new NotFoundException();
@@ -33,9 +37,9 @@ export class UpdateCommentUseCase
         id: command.currentUserDto.id,
       });
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: findComment.commentatorInfo.userId,
+        id: findComment.commentatorInfoUserId,
       });
-      return await this.commentsRepository.updateComment(
+      return await this.commentsRawSqlRepository.updateComment(
         command.commentId,
         command.updateCommentDto,
       );
@@ -43,6 +47,10 @@ export class UpdateCommentUseCase
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
       }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

@@ -1,8 +1,8 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { FiltersDevicesEntity } from '../../entities/filters-devices.entity';
-import { SessionDevicesEntity } from '../../entities/security-device.entity';
-import { PayloadDto } from '../../../auth/dto/payload.dto';
+import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
+import { SessionDevicesEntity } from '../entities/security-device.entity';
+import { PayloadDto } from '../../auth/dto/payload.dto';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}

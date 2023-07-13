@@ -30,10 +30,10 @@ export class CommentsService {
     const comment = await this.commentsRawSqlRepository.findCommentById(
       commentId,
     );
-    if (!comment[0] || comment[0].commentatorInfoIsBanned)
+    if (!comment || comment.commentatorInfoIsBanned)
       throw new NotFoundException();
     const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
-      new FillingCommentsDataCommand2([comment[0]], currentUserDto),
+      new FillingCommentsDataCommand2([comment], currentUserDto),
     );
     return {
       id: filledComments[0].id,
