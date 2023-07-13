@@ -4,14 +4,21 @@ import { Pagination } from '../../common/pagination/pagination';
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import { PostsService } from '../../posts/application/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
-import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
+import {
+  FillingCommentsDataCommand,
+  FillingCommentsDataCommand2,
+} from './use-cases/filling-comments-data.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CommentsRawSqlRepository } from '../infrastructure/comments-raw-sql.repository';
+import { FilledCommentEntity } from '../entities/filledComment.entity';
+import { CommentsReturnEntity } from '../entities/comments-return.entity';
 
 @Injectable()
 export class CommentsService {
   constructor(
     protected pagination: Pagination,
     protected commentsRepository: CommentsRepository,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected postsService: PostsService,
     protected commandBus: CommandBus,
   ) {}
@@ -19,14 +26,29 @@ export class CommentsService {
   async findCommentById(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
-  ) {
-    const comment = await this.commentsRepository.findCommentById(commentId);
-    if (!comment || comment.commentatorInfo.isBanned)
-      throw new NotFoundException();
-    const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand([comment], currentUserDto),
+  ): Promise<CommentsReturnEntity> {
+    const comment = await this.commentsRawSqlRepository.findCommentById(
+      commentId,
     );
-    return filledComments[0];
+    if (!comment[0] || comment[0].commentatorInfoIsBanned)
+      throw new NotFoundException();
+    const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
+      new FillingCommentsDataCommand2([comment[0]], currentUserDto),
+    );
+    return {
+      id: filledComments[0].id,
+      content: filledComments[0].content,
+      createdAt: filledComments[0].createdAt,
+      commentatorInfo: {
+        userId: filledComments[0].commentatorInfo.userId,
+        userLogin: filledComments[0].commentatorInfo.userLogin,
+      },
+      likesInfo: {
+        likesCount: filledComments[0].likesInfo.likesCount,
+        dislikesCount: filledComments[0].likesInfo.dislikesCount,
+        myStatus: filledComments[0].likesInfo.myStatus,
+      },
+    };
   }
 
   async findCommentsByPostId(
