@@ -14,6 +14,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -43,12 +44,21 @@ export class BloggerBlogsService {
     };
   }
 
-  async openFindBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
-    const searchFilters = [];
-    searchFilters.push({ id: blogId });
-    searchFilters.push({ 'blogOwnerInfo.isBanned': false });
-    searchFilters.push({ 'banInfo.isBanned': false });
-    return this.bloggerBlogsRepository.openFindBlogById(searchFilters);
+  async openFindBlogById(blogId: string): Promise<ReturnBloggerBlogsEntity> {
+    const blog = await this.bloggerBlogsRawSqlRepository.openFindBlogById(
+      blogId,
+    );
+    if (!blog) {
+      throw new NotFoundException();
+    }
+    return {
+      id: blog.id,
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt,
+      isMembership: blog.isMembership,
+    };
   }
 
   async saFindBlogs(
