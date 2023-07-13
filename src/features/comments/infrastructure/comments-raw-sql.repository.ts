@@ -121,6 +121,22 @@ export class CommentsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+  async removeComment(commentId: string): Promise<boolean> {
+    try {
+      const comment = await this.db.query(
+        `
+        DELETE FROM public."Comments"
+        WHERE "id" = $1
+        RETURNING "id"
+          `,
+        [commentId],
+      );
+      return comment[1] === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
   async totalCount(
     postInfoBlogOwnerId: string,
     commentatorInfoIsBanned: boolean,
