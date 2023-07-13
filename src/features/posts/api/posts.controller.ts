@@ -55,7 +55,7 @@ export class PostsController {
   async openFindPosts(@Request() req: any, @Query() query: any) {
     const currentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    return this.postsService.findPosts2(queryData, currentUserDto);
+    return this.postsService.findPosts(queryData, currentUserDto);
   }
 
   @Get(':id')

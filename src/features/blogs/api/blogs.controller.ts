@@ -12,7 +12,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { IdParams } from '../../common/params/id.params';
 import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -56,12 +55,6 @@ export class BlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    const searchFilters = { blogId: params.blogId };
-    return await this.postsService.findPosts(
-      queryPagination,
-      [searchFilters],
-      currentUserDto,
-    );
+    return await this.postsService.findPosts(queryData, currentUserDto);
   }
 }

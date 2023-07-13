@@ -58,7 +58,7 @@ export class BloggerBlogsRawSqlRepository {
           banInfoBanStatus,
           searchNameTerm,
           queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber,
+          queryData.queryPagination.pageNumber - 1,
         ],
       );
     } catch (error) {
