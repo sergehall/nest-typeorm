@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Pagination } from '../../common/pagination/pagination';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { PostsEntity } from '../entities/posts.entity';
@@ -23,7 +22,7 @@ export class PostsService {
     protected likeStatusPostsRepository: LikeStatusPostsRepository,
   ) {}
 
-  async findPosts2(
+  async findPosts(
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
@@ -56,40 +55,40 @@ export class PostsService {
     };
   }
 
-  async findPosts(
-    queryPagination: PaginationDto,
-    searchFilters: QueryArrType,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PaginationTypes> {
-    const field = queryPagination.sortBy;
-    const convertedFilters = await this.convertFiltersForDB.convert(
-      searchFilters,
-    );
-    convertedFilters.push({ 'postOwnerInfo.isBanned': false });
-    convertedFilters.push({ 'banInfo.isBanned': false });
-
-    const pagination = await this.pagination.convert(queryPagination, field);
-    const posts: PostsEntity[] = await this.postsRepository.findPosts(
-      pagination,
-      convertedFilters,
-    );
-    const filledPosts =
-      await this.likeStatusPostsRepository.preparationPostsForReturn(
-        posts,
-        currentUserDto,
-      );
-    const totalCount = await this.postsRepository.countDocuments(
-      convertedFilters,
-    );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-    return {
-      pagesCount: pagesCount,
-      page: queryPagination.pageNumber,
-      pageSize: queryPagination.pageSize,
-      totalCount: totalCount,
-      items: filledPosts,
-    };
-  }
+  // async findPosts2(
+  //   queryPagination: PaginationDto,
+  //   searchFilters: QueryArrType,
+  //   currentUserDto: CurrentUserDto | null,
+  // ): Promise<PaginationTypes> {
+  //   const field = queryPagination.sortBy;
+  //   const convertedFilters = await this.convertFiltersForDB.convert(
+  //     searchFilters,
+  //   );
+  //   convertedFilters.push({ 'postOwnerInfo.isBanned': false });
+  //   convertedFilters.push({ 'banInfo.isBanned': false });
+  //
+  //   const pagination = await this.pagination.convert(queryPagination, field);
+  //   const posts: PostsEntity[] = await this.postsRepository.findPosts(
+  //     pagination,
+  //     convertedFilters,
+  //   );
+  //   const filledPosts =
+  //     await this.likeStatusPostsRepository.preparationPostsForReturn(
+  //       posts,
+  //       currentUserDto,
+  //     );
+  //   const totalCount = await this.postsRepository.countDocuments(
+  //     convertedFilters,
+  //   );
+  //   const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
+  //   return {
+  //     pagesCount: pagesCount,
+  //     page: queryPagination.pageNumber,
+  //     pageSize: queryPagination.pageSize,
+  //     totalCount: totalCount,
+  //     items: filledPosts,
+  //   };
+  // }
 
   async openFindPostById(
     searchFilters: QueryArrType,
