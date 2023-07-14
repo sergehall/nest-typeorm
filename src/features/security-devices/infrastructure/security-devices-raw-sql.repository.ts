@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
+import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -73,6 +75,25 @@ export class SecurityDevicesRawSqlRepository {
     } catch (e) {
       console.log(e);
       return false;
+    }
+  }
+  async findDevices(
+    payload: PayloadDto,
+  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+    try {
+      const expirationDate = new Date().toISOString();
+      return await this.db.query(
+        `
+        SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
+        FROM public."SecurityDevices"
+        WHERE "userId" = $1 AND "expirationDate"  >= $2
+        ORDER BY "lastActiveDate" DESC
+        LIMIT 100 OFFSET 0
+        `,
+        [payload.userId, expirationDate],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

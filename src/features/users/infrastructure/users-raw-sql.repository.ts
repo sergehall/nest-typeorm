@@ -60,24 +60,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async changeRole(
-    userId: string,
-    roles: RolesEnums,
-  ): Promise<TablesUsersEntity> {
-    try {
-      const updateUserRole = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET  "roles" = $2
-      WHERE "id" = $1
-      returning *`,
-        [userId, roles],
-      );
-      return updateUserRole[0][0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
   async findUserByConfirmationCode(
     confirmationCode: string,
   ): Promise<TablesUsersEntity | null> {
@@ -209,6 +191,25 @@ export class UsersRawSqlRepository {
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
       );
       return Number(totalCount[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeRole(
+    userId: string,
+    roles: RolesEnums,
+  ): Promise<TablesUsersEntity> {
+    try {
+      const updateUserRole = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "roles" = $2
+      WHERE "id" = $1
+      returning *`,
+        [userId, roles],
+      );
+      return updateUserRole[0][0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

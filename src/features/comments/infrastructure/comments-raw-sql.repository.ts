@@ -129,6 +129,7 @@ export class CommentsRawSqlRepository {
     queryData: ParseQueryType,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
+      const offset = queryData.queryPagination.pageNumber - 1;
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
       const orderByDirection = `"${queryData.queryPagination.sortBy}" ${queryData.queryPagination.sortDirection}`;
@@ -145,7 +146,7 @@ export class CommentsRawSqlRepository {
           commentatorInfoIsBanned,
           banInfoIsBanned,
           queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber,
+          offset,
         ],
       );
     } catch (error) {

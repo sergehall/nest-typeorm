@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { PayloadDto } from '../../auth/dto/payload.dto';
+import { SecurityDevicesRawSqlRepository } from '../infrastructure/security-devices-raw-sql.repository';
 
 @Injectable()
 export class SecurityDevicesService {
-  constructor(private securityDevicesRepository: SecurityDevicesRepository) {}
+  constructor(
+    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+  ) {}
 
   async findDevices(currentPayload: PayloadDto) {
-    return await this.securityDevicesRepository.findDevices(currentPayload);
+    return await this.securityDevicesRawSqlRepository.findDevices(
+      currentPayload,
+    );
   }
 }

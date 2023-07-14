@@ -29,6 +29,7 @@ import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from './infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -49,17 +50,18 @@ const authUseCases = [
   imports: [DatabaseModule, UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
-    BlacklistJwtRepository,
-    SecurityDevicesRepository,
-    JwtConfig,
-    UsersRawSqlRepository,
-    UsersRepository,
-    AuthService,
-    SecurityDevicesService,
-    BlacklistJwtRawSqlRepository,
     LocalStrategy,
     JwtStrategy,
     MailsRepository,
+    JwtConfig,
+    AuthService,
+    UsersRepository,
+    BlacklistJwtRepository,
+    SecurityDevicesRepository,
+    UsersRawSqlRepository,
+    SecurityDevicesService,
+    BlacklistJwtRawSqlRepository,
+    SecurityDevicesRawSqlRepository,
     ...authUseCases,
     ...authProviders,
   ],
