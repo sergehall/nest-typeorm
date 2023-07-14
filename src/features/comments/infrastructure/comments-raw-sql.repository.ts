@@ -103,17 +103,19 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async findCommentById(
+  async findCommentByCommentId(
     commentId: string,
   ): Promise<TablesCommentsRawSqlEntity | null> {
     try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
       const comment = await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
-        WHERE "id" = $1
+        WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
           `,
-        [commentId],
+        [commentId, commentatorInfoIsBanned, banInfoIsBanned],
       );
       return comment[0] ? comment[0] : null;
     } catch (error) {
@@ -121,6 +123,27 @@ export class CommentsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+
+  async findCommentsByPostId(
+    postId: string,
+  ): Promise<TablesCommentsRawSqlEntity[]> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      return await this.db.query(
+        `
+        SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        FROM public."Comments"
+            WHERE "postInfoId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+          `,
+        [postId, commentatorInfoIsBanned, banInfoIsBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async removeComment(commentId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(

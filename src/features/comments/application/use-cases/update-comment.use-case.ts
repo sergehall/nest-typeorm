@@ -28,9 +28,10 @@ export class UpdateCommentUseCase
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
   async execute(command: UpdateCommentCommand) {
-    const findComment = await this.commentsRawSqlRepository.findCommentById(
-      command.commentId,
-    );
+    const findComment =
+      await this.commentsRawSqlRepository.findCommentByCommentId(
+        command.commentId,
+      );
     if (!findComment) throw new NotFoundException();
     try {
       const ability = this.caslAbilityFactory.createForUserId({
