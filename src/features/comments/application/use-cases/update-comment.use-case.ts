@@ -36,7 +36,7 @@ export class UpdateCommentUseCase
       const ability = this.caslAbilityFactory.createForUserId({
         id: command.currentUserDto.id,
       });
-      ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
+      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: findComment.commentatorInfoUserId,
       });
       return await this.commentsRawSqlRepository.updateComment(

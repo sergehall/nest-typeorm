@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Pagination } from '../../common/pagination/pagination';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { PostsEntity } from '../entities/posts.entity';
-import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
-import { LikeStatusPostsRepository } from '../infrastructure/like-status-posts.repository';
-import { PostsReturnEntity } from '../entities/posts-without-ownerInfo.entity';
+import {
+  NewestLikes,
+  PostsReturnEntity,
+} from '../entities/posts-without-ownerInfo.entity';
 import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
+import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
+import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 
 @Injectable()
 export class PostsService {
@@ -19,7 +26,7 @@ export class PostsService {
     protected pagination: Pagination,
     protected postsRepository: PostsRepository,
     protected postsRawSqlRepository: PostsRawSqlRepository,
-    protected likeStatusPostsRepository: LikeStatusPostsRepository,
+    protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
   ) {}
 
   async findPosts(
@@ -34,11 +41,10 @@ export class PostsService {
         postOwnerIsBanned,
         banInfoBanStatus,
       );
-    const filledPosts =
-      await this.likeStatusPostsRepository.preparationPostsForReturn2(
-        posts,
-        currentUserDto,
-      );
+    const filledPosts = await this.preparationPostsForReturn(
+      posts,
+      currentUserDto,
+    );
     const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts(
       postOwnerIsBanned,
       banInfoBanStatus,
@@ -55,58 +61,96 @@ export class PostsService {
     };
   }
 
-  // async findPosts2(
-  //   queryPagination: PaginationDto,
-  //   searchFilters: QueryArrType,
-  //   currentUserDto: CurrentUserDto | null,
-  // ): Promise<PaginationTypes> {
-  //   const field = queryPagination.sortBy;
-  //   const convertedFilters = await this.convertFiltersForDB.convert(
-  //     searchFilters,
-  //   );
-  //   convertedFilters.push({ 'postOwnerInfo.isBanned': false });
-  //   convertedFilters.push({ 'banInfo.isBanned': false });
-  //
-  //   const pagination = await this.pagination.convert(queryPagination, field);
-  //   const posts: PostsEntity[] = await this.postsRepository.findPosts(
-  //     pagination,
-  //     convertedFilters,
-  //   );
-  //   const filledPosts =
-  //     await this.likeStatusPostsRepository.preparationPostsForReturn(
-  //       posts,
-  //       currentUserDto,
-  //     );
-  //   const totalCount = await this.postsRepository.countDocuments(
-  //     convertedFilters,
-  //   );
-  //   const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-  //   return {
-  //     pagesCount: pagesCount,
-  //     page: queryPagination.pageNumber,
-  //     pageSize: queryPagination.pageSize,
-  //     totalCount: totalCount,
-  //     items: filledPosts,
-  //   };
-  // }
-
-  async openFindPostById(
-    searchFilters: QueryArrType,
+  async openFindPostByPostId(
+    id: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsReturnEntity | null> {
-    searchFilters.push({ 'postOwnerInfo.isBanned': false });
-    searchFilters.push({ 'banInfo.isBanned': false });
-    const post = await this.postsRepository.openFindPostById(searchFilters);
+    const post = await this.postsRawSqlRepository.openFindPostByPostId(id);
     if (!post) throw new NotFoundException();
-    const filledPost =
-      await this.likeStatusPostsRepository.preparationPostsForReturn(
-        [post],
-        currentUserDto,
-      );
+    const filledPost = await this.preparationPostsForReturn(
+      [post],
+      currentUserDto,
+    );
     return filledPost[0];
   }
 
   async checkPostInDB(postId: string): Promise<PostsEntity | null> {
     return await this.postsRepository.checkPostInDB(postId);
+  }
+  async preparationPostsForReturn(
+    postArray: PostsRawSqlEntity[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PostsReturnEntity[]> {
+    try {
+      const filledPosts: PostsReturnEntity[] = [];
+      for (const i in postArray) {
+        const postId = postArray[i].id;
+        const isBanned = false;
+        const currentPost: PostsRawSqlEntity = postArray[i];
+        if (postArray[i].postOwnerIsBanned) {
+          continue;
+        }
+        // getting likes count
+        const like = 'Like';
+        const likesCount =
+          await this.likeStatusPostsRawSqlRepository.countLikesDislikes(
+            postId,
+            isBanned,
+            like,
+          );
+
+        // getting dislikes count
+        const dislike = 'Dislike';
+        const dislikesCount =
+          await this.likeStatusPostsRawSqlRepository.countLikesDislikes(
+            postId,
+            isBanned,
+            dislike,
+          );
+        // getting the status of the post owner
+        let ownLikeStatus = StatusLike.NONE;
+        if (currentUserDto) {
+          const findOwnPost =
+            await this.likeStatusPostsRawSqlRepository.findOne(
+              postId,
+              currentUserDto.id,
+              isBanned,
+            );
+          if (findOwnPost[0]) {
+            ownLikeStatus = findOwnPost[0].likeStatus;
+          }
+        }
+        // getting 3 last likes
+        const limitLikes = 3;
+        const likeStatus = StatusLike.LIKE;
+        const newestLikes: NewestLikes[] =
+          await this.likeStatusPostsRawSqlRepository.findNewestLikes(
+            postId,
+            likeStatus,
+            isBanned,
+            limitLikes,
+          );
+        const currentPostWithLastThreeLikes = {
+          id: currentPost.id,
+          title: currentPost.title,
+          shortDescription: currentPost.shortDescription,
+          content: currentPost.content,
+          blogId: currentPost.blogId,
+          blogName: currentPost.blogName,
+          createdAt: currentPost.createdAt,
+          extendedLikesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: ownLikeStatus,
+            newestLikes: newestLikes,
+          },
+        };
+
+        filledPosts.push(currentPostWithLastThreeLikes);
+      }
+      return filledPosts;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

@@ -31,7 +31,7 @@ export class CreateCommentUseCase
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
   async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
-    const post = await this.postsRawSqlRepository.findPostByPostId(
+    const post = await this.postsRawSqlRepository.openFindPostByPostId(
       command.postId,
     );
     if (!post) throw new NotFoundException();
