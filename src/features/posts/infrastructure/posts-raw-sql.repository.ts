@@ -58,14 +58,18 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
+  async openFindPostByPostId(
+    postId: string,
+  ): Promise<PostsRawSqlEntity | null> {
     try {
+      const postOwnerIsBanned = false;
+      const banInfoBanStatus = false;
       const post = await this.db.query(
         `
       SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
       FROM public."Posts"
-      WHERE "id" = $1`,
-        [postId],
+      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3`,
+        [postId, postOwnerIsBanned, banInfoBanStatus],
       );
       return post[0] ? post[0] : null;
     } catch (error) {
@@ -73,7 +77,6 @@ export class PostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-
   async createPost(
     postsRawSqlEntity: PostsRawSqlEntity,
   ): Promise<PostsRawSqlEntity> {
