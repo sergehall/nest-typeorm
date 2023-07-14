@@ -1,6 +1,6 @@
-import { SecurityDevicesRepository } from '../../infrastructure/security-devices.repository';
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 
 export class RemoveDevicesExceptCurrentCommand {
   constructor(public currentPayload: PayloadDto) {}
@@ -10,10 +10,12 @@ export class RemoveDevicesExceptCurrentCommand {
 export class RemoveDevicesExceptCurrentUseCase
   implements ICommandHandler<RemoveDevicesExceptCurrentCommand>
 {
-  constructor(private securityDevicesRepository: SecurityDevicesRepository) {}
+  constructor(
+    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+  ) {}
 
   async execute(command: RemoveDevicesExceptCurrentCommand) {
-    return await this.securityDevicesRepository.removeDevicesExceptCurrent(
+    return await this.securityDevicesRawSqlRepository.removeDevicesExceptCurrent(
       command.currentPayload,
     );
   }

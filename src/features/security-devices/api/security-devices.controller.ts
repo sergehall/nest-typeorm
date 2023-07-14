@@ -6,9 +6,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
-  HttpException,
   Param,
-  NotFoundException,
 } from '@nestjs/common';
 import { SecurityDevicesService } from '../application/security-devices.service';
 import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
@@ -19,6 +17,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-byDeviceId.use-case';
 import jwt_decode from 'jwt-decode';
 import { DeviceIdParams } from '../../common/params/deviceId.params';
+import { SessionDevicesEntity } from '../entities/security-device.entity';
 
 @SkipThrottle()
 @Controller('security')
@@ -29,7 +28,7 @@ export class SecurityDevicesController {
   ) {}
   @UseGuards(CookiesJwtVerificationGuard)
   @Get('devices')
-  async findDevices(@Request() req: any) {
+  async findDevices(@Request() req: any): Promise<SessionDevicesEntity[]> {
     const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
     return this.securityDevicesService.findDevices(currentPayload);
   }
@@ -50,18 +49,8 @@ export class SecurityDevicesController {
     @Param() params: DeviceIdParams,
   ) {
     const currentPayload: PayloadDto = jwt_decode(req.cookies.refreshToken);
-    const result = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new RemoveDevicesByDeviceIdCommand(params.deviceId, currentPayload),
     );
-    if (result === '404') throw new NotFoundException();
-    if (result === '403') {
-      throw new HttpException(
-        {
-          message: ['It is forbidden to delete a device that is not your own.'],
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-    return true;
   }
 }
