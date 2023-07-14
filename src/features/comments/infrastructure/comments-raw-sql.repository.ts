@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
-import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
 
 export class CommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -52,33 +52,33 @@ export class CommentsRawSqlRepository {
     }
   }
   async findCommentsByBlogOwnerId(
-    pagination: PaginationDBType,
+    queryData: ParseQueryType,
     postInfoBlogOwnerId: string,
     commentatorInfoIsBanned: boolean,
     banInfoIsBanned: boolean,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        pagination.direction,
+        queryData.queryPagination.sortDirection,
       )
         ? 'ASC'
         : 'DESC';
-
+      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 
         AND "banInfoIsBanned" = $3
-        ORDER BY "${pagination.field}" ${direction}
+        ORDER BY ${orderByDirection}
         LIMIT $4 OFFSET $5
           `,
         [
           postInfoBlogOwnerId,
           commentatorInfoIsBanned,
           banInfoIsBanned,
-          pagination.pageSize,
-          pagination.startIndex,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber,
         ],
       );
     } catch (error) {
@@ -126,17 +126,27 @@ export class CommentsRawSqlRepository {
 
   async findCommentsByPostId(
     postId: string,
+    queryData: ParseQueryType,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
+      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${queryData.queryPagination.sortDirection}`;
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
-            WHERE "postInfoId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        WHERE "postInfoId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        ORDER BY ${orderByDirection}
+        LIMIT $4 OFFSET $5
           `,
-        [postId, commentatorInfoIsBanned, banInfoIsBanned],
+        [
+          postId,
+          commentatorInfoIsBanned,
+          banInfoIsBanned,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber,
+        ],
       );
     } catch (error) {
       console.log(error.message);

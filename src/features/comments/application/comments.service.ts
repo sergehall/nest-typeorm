@@ -56,7 +56,10 @@ export class CommentsService {
     const post = await this.postsRawSqlRepository.openFindPostByPostId(postId);
     if (!post) throw new NotFoundException();
     const comments: TablesCommentsRawSqlEntity[] =
-      await this.commentsRawSqlRepository.findCommentsByPostId(postId);
+      await this.commentsRawSqlRepository.findCommentsByPostId(
+        postId,
+        queryData,
+      );
     if (comments.length === 0) {
       return {
         pagesCount: queryData.queryPagination.pageNumber,
@@ -82,6 +85,7 @@ export class CommentsService {
     );
     const commentsWithoutPostInfo: CommentsReturnEntity[] = filledComments.map(
       (currentComment: FilledCommentEntity) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { postInfo, ...commentWithoutPostInfo } = currentComment;
 
         return commentWithoutPostInfo;

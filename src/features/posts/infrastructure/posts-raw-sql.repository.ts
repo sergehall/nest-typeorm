@@ -17,6 +17,7 @@ export class PostsRawSqlRepository {
       )
         ? 'ASC'
         : 'DESC';
+      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
@@ -24,7 +25,7 @@ export class PostsRawSqlRepository {
           "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
         WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
-        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        ORDER BY ${orderByDirection}
         LIMIT $3 OFFSET $4
         `,
         [

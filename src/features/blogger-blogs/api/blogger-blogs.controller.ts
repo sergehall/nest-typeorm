@@ -66,9 +66,8 @@ export class BloggerBlogsController {
   async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    const queryPagination: PaginationDto = queryData.queryPagination;
     return await this.commandBus.execute(
-      new FindCommentsCurrentUserCommand(queryPagination, currentUserDto),
+      new FindCommentsCurrentUserCommand(queryData, currentUserDto),
     );
   }
 
