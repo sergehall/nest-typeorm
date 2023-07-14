@@ -1,25 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Pagination } from '../../common/pagination/pagination';
-import { CommentsRepository } from '../infrastructure/comments.repository';
-import { PostsService } from '../../posts/application/posts.service';
 import { CommandBus } from '@nestjs/cqrs';
-import {
-  FillingCommentsDataCommand,
-  FillingCommentsDataCommand2,
-} from './use-cases/filling-comments-data.use-case';
+import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../infrastructure/comments-raw-sql.repository';
 import { FilledCommentEntity } from '../entities/filledComment.entity';
 import { CommentsReturnEntity } from '../entities/comments-return.entity';
+import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { PostsRawSqlRepository } from '../../posts/infrastructure/posts-raw-sql.repository';
+import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 
 @Injectable()
 export class CommentsService {
   constructor(
     protected pagination: Pagination,
-    protected commentsRepository: CommentsRepository,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
-    protected postsService: PostsService,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
 
@@ -27,13 +24,13 @@ export class CommentsService {
     commentId: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsReturnEntity> {
-    const comment = await this.commentsRawSqlRepository.findCommentById(
+    const comment = await this.commentsRawSqlRepository.findCommentByCommentId(
       commentId,
     );
     if (!comment || comment.commentatorInfoIsBanned)
       throw new NotFoundException();
     const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
-      new FillingCommentsDataCommand2([comment], currentUserDto),
+      new FillingCommentsDataCommand([comment], currentUserDto),
     );
     return {
       id: filledComments[0].id,
@@ -52,46 +49,50 @@ export class CommentsService {
   }
 
   async findCommentsByPostId(
-    queryPagination: PaginationDto,
     postId: string,
+    queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
-  ) {
-    const post = await this.postsService.checkPostInDB(postId);
-    if (!post || post.banInfo.isBanned || post.postOwnerInfo.isBanned)
-      throw new NotFoundException();
-    const searchFilters = [];
-    searchFilters.push({ 'postInfo.id': postId });
-    searchFilters.push({ 'commentatorInfo.isBanned': false });
-    searchFilters.push({ 'banInfo.isBanned': false });
-    const field = queryPagination.sortBy;
-    const pagination = await this.pagination.convert(queryPagination, field);
-    const comments = await this.commentsRepository.findCommentsByPostId(
-      pagination,
-      searchFilters,
-    );
-    if (!comments) {
+  ): Promise<PaginationTypes> {
+    const post = await this.postsRawSqlRepository.openFindPostByPostId(postId);
+    if (!post) throw new NotFoundException();
+    const comments: TablesCommentsRawSqlEntity[] =
+      await this.commentsRawSqlRepository.findCommentsByPostId(postId);
+    if (comments.length === 0) {
       return {
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 0,
+        pagesCount: queryData.queryPagination.pageNumber,
+        page: queryData.queryPagination.pageNumber,
+        pageSize: queryData.queryPagination.pageSize,
+        totalCount: queryData.queryPagination.pageNumber - 1,
         items: [],
       };
     }
-    const filledComments = await this.commandBus.execute(
+    const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
       new FillingCommentsDataCommand(comments, currentUserDto),
     );
-    const totalCount = await this.commentsRepository.countDocuments(
-      searchFilters,
+    const postInfoBlogOwnerId = post.postOwnerId;
+    const commentatorInfoIsBanned = false;
+    const banInfoIsBanned = false;
+    const totalCount = await this.commentsRawSqlRepository.totalCount(
+      postInfoBlogOwnerId,
+      commentatorInfoIsBanned,
+      banInfoIsBanned,
     );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
+    );
+    const commentsWithoutPostInfo: CommentsReturnEntity[] = filledComments.map(
+      (currentComment: FilledCommentEntity) => {
+        const { postInfo, ...commentWithoutPostInfo } = currentComment;
 
+        return commentWithoutPostInfo;
+      },
+    );
     return {
       pagesCount: pagesCount,
-      page: queryPagination.pageNumber,
-      pageSize: queryPagination.pageSize,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
       totalCount: totalCount,
-      items: filledComments,
+      items: commentsWithoutPostInfo,
     };
   }
 }

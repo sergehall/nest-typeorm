@@ -17,7 +17,6 @@ import { PostsService } from '../application/posts.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { CommentsService } from '../../comments/application/comments.service';
 import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -39,6 +38,7 @@ import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-lik
 import { PostIdParams } from '../../common/params/postId.params';
 import { IdParams } from '../../common/params/id.params';
 import { UpdateDataPostDto } from '../dto/update-data-post.dto';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 
 @SkipThrottle()
 @Controller('posts')
@@ -52,7 +52,10 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
-  async openFindPosts(@Request() req: any, @Query() query: any) {
+  async openFindPosts(
+    @Request() req: any,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
     const currentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
     return this.postsService.findPosts(queryData, currentUserDto);
@@ -100,13 +103,12 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Query() query: any,
-  ) {
+  ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    const queryPagination: PaginationDto = queryData.queryPagination;
     return await this.commentsService.findCommentsByPostId(
-      queryPagination,
       params.postId,
+      queryData,
       currentUserDto,
     );
   }

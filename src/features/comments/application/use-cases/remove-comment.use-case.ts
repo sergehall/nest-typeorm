@@ -26,9 +26,10 @@ export class RemoveCommentUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
   ) {}
   async execute(command: RemoveCommentCommand) {
-    const findComment = await this.commentsRawSqlRepository.findCommentById(
-      command.commentId,
-    );
+    const findComment =
+      await this.commentsRawSqlRepository.findCommentByCommentId(
+        command.commentId,
+      );
     if (!findComment) throw new NotFoundException();
     try {
       const ability = this.caslAbilityFactory.createForUserId({

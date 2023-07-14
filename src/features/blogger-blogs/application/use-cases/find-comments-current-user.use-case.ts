@@ -3,9 +3,9 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ConvertFiltersForDB } from '../../../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../../../common/pagination/pagination';
-import { FillingCommentsDataCommand2 } from '../../../comments/application/use-cases/filling-comments-data.use-case';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { TablesCommentsRawSqlEntity } from '../../../comments/entities/tables-comments-raw-sql.entity';
+import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -50,7 +50,7 @@ export class FindCommentsCurrentUserUseCase
       };
     }
     const filledComments = await this.commandBus.execute(
-      new FillingCommentsDataCommand2(comments, command.currentUserDto),
+      new FillingCommentsDataCommand(comments, command.currentUserDto),
     );
     const totalCountComments = await this.commentsRawSqlRepository.totalCount(
       postInfoBlogOwnerId,

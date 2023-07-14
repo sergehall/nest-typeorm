@@ -23,9 +23,10 @@ export class ChangeLikeStatusCommentUseCase
     protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
   ) {}
   async execute(command: ChangeLikeStatusCommentCommand): Promise<boolean> {
-    const findComment = await this.commentsRawSqlRepository.findCommentById(
-      command.commentId,
-    );
+    const findComment =
+      await this.commentsRawSqlRepository.findCommentByCommentId(
+        command.commentId,
+      );
     if (!findComment) throw new NotFoundException();
     const likeStatusCommEntity: LikeStatusCommentEntity = {
       blogId: findComment.postInfoBlogId,
