@@ -40,3 +40,8 @@ export const userNotExists = {
   message: 'User does not exist',
   field: 'email',
 };
+export const forbiddenDeleteDevice = {
+  message:
+    'it is forbidden to delete the device if it does not belong to the current user.',
+  params: 'deviceId',
+};

@@ -3,7 +3,6 @@ import { DataSource } from 'typeorm';
 import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
-import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class SecurityDevicesRawSqlRepository {
@@ -37,8 +36,8 @@ export class SecurityDevicesRawSqlRepository {
         ],
       );
       return createOrUpdateDevice[0] != null;
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error.message);
       return false;
     }
   }
@@ -49,7 +48,7 @@ export class SecurityDevicesRawSqlRepository {
       const removeCurrentDevice = await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1 and "deviceId" = $2
+      WHERE "userId" = $1 AND "deviceId" = $2
       returning "userId"
       `,
         [payload.userId, payload.deviceId],
@@ -58,6 +57,49 @@ export class SecurityDevicesRawSqlRepository {
     } catch (e) {
       console.log(e);
       return false;
+    }
+  }
+  async removeDeviceByDeviceId(
+    deviceId: string,
+    currentPayload: PayloadDto,
+  ): Promise<string> {
+    try {
+      const findDevice = await this.findDeviceByDeviceId(deviceId);
+      if (findDevice.length == 0) {
+        return '404';
+      } else if (findDevice[0].userId !== currentPayload.userId) {
+        return '403';
+      }
+      const removeDeviceByDeviceId = await this.db.query(
+        `
+      DELETE FROM public."SecurityDevices"
+      WHERE "deviceId" = $1
+      returning "deviceId"
+      `,
+        [deviceId],
+      );
+      console.log(removeDeviceByDeviceId, 'removeDeviceByDeviceId');
+      return removeDeviceByDeviceId[1] === 1 ? '204' : '500';
+    } catch (e) {
+      console.log(e);
+      return '500';
+    }
+  }
+  async findDeviceByDeviceId(
+    deviceId: string,
+  ): Promise<SessionDevicesEntity[]> {
+    try {
+      const expirationDate = new Date().toISOString();
+      return await this.db.query(
+        `
+        SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
+        FROM public."SecurityDevices"
+        WHERE "deviceId" = $1 AND "expirationDate" >= $2
+        `,
+        [deviceId, expirationDate],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -77,20 +119,34 @@ export class SecurityDevicesRawSqlRepository {
       return false;
     }
   }
-  async findDevices(
-    payload: PayloadDto,
-  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+  async removeDevicesExceptCurrent(currentPayload: PayloadDto) {
     try {
-      const expirationDate = new Date().toISOString();
       return await this.db.query(
         `
-        SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
+      DELETE FROM public."SecurityDevices"
+      WHERE "userId" = $1 AND "deviceId" <> $2
+      `,
+        [currentPayload.userId, currentPayload.deviceId],
+      );
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+  async findDevices(payload: PayloadDto): Promise<SessionDevicesEntity[]> {
+    try {
+      const expirationDate = new Date().toISOString();
+      const limit = 100;
+      const offset = 0;
+      return await this.db.query(
+        `
+        SELECT "ip", "title", "lastActiveDate", "deviceId"
         FROM public."SecurityDevices"
-        WHERE "userId" = $1 AND "expirationDate"  >= $2
+        WHERE "userId" = $1 AND "expirationDate" >= $2
         ORDER BY "lastActiveDate" DESC
-        LIMIT 100 OFFSET 0
+        LIMIT $3 OFFSET $4
         `,
-        [payload.userId, expirationDate],
+        [payload.userId, expirationDate, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
