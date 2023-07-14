@@ -16,7 +16,7 @@ export class RemoveDevicesByDeviceIdUseCase
     protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
 
-  async execute(command: RemoveDevicesByDeviceIdCommand) {
+  async execute(command: RemoveDevicesByDeviceIdCommand): Promise<boolean> {
     const result =
       await this.securityDevicesRawSqlRepository.removeDeviceByDeviceId(
         command.deviceId,
@@ -26,6 +26,6 @@ export class RemoveDevicesByDeviceIdUseCase
     if (result === '403') {
       throw new HttpException(forbiddenDeleteDevice, HttpStatus.FORBIDDEN);
     }
-    return result;
+    return result === '204';
   }
 }

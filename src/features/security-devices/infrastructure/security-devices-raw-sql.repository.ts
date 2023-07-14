@@ -4,6 +4,7 @@ import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
+import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -78,7 +79,6 @@ export class SecurityDevicesRawSqlRepository {
       `,
         [deviceId],
       );
-      console.log(removeDeviceByDeviceId, 'removeDeviceByDeviceId');
       return removeDeviceByDeviceId[1] === 1 ? '204' : '500';
     } catch (e) {
       console.log(e);
@@ -133,7 +133,9 @@ export class SecurityDevicesRawSqlRepository {
       return false;
     }
   }
-  async findDevices(payload: PayloadDto): Promise<SessionDevicesEntity[]> {
+  async findDevices(
+    payload: PayloadDto,
+  ): Promise<ReturnSecurityDeviceEntity[]> {
     try {
       const expirationDate = new Date().toISOString();
       const limit = 100;

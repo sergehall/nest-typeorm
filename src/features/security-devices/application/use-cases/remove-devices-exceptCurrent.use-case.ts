@@ -14,7 +14,7 @@ export class RemoveDevicesExceptCurrentUseCase
     protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
 
-  async execute(command: RemoveDevicesExceptCurrentCommand) {
+  async execute(command: RemoveDevicesExceptCurrentCommand): Promise<boolean> {
     return await this.securityDevicesRawSqlRepository.removeDevicesExceptCurrent(
       command.currentPayload,
     );
