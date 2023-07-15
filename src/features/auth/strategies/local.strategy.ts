@@ -1,7 +1,6 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UsersEntity } from '../../users/entities/users.entity';
 import {
   loginOrEmailInvalid,
   passwordInvalid,
@@ -9,6 +8,7 @@ import {
 } from '../../../exception-filter/errors-messages';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
+import { UsersRawSqlEntity } from '../../users/entities/usersRawSql.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -21,7 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(
     loginOrEmail: string,
     password: string,
-  ): Promise<UsersEntity | null> {
+  ): Promise<UsersRawSqlEntity | null> {
     const messages = [];
     if (
       loginOrEmail.toString().length < 3 ||
