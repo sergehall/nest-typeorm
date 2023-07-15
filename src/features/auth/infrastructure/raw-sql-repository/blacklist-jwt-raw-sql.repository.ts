@@ -23,7 +23,6 @@ export class BlacklistJwtRawSqlRepository {
   async clearingInvalidJWTFromBlackList(): Promise<boolean> {
     try {
       const currentTime = new Date().toISOString();
-      console.log('clearingInvalidJWTFromBlackList');
       const removeCurrentDevice = await this.db.query(
         `
       DELETE FROM public."BlacklistJwt"
@@ -48,7 +47,7 @@ export class BlacklistJwtRawSqlRepository {
       `,
         [jwt],
       );
-      return findJwt[0] !== null;
+      return findJwt.length !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
