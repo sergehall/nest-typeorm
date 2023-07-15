@@ -2,7 +2,7 @@ import * as uuid4 from 'uuid4';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { userNotExists } from '../../../../exception-filter/errors-messages';
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 
@@ -16,7 +16,7 @@ export class UpdateSentConfirmationCodeUseCase
 {
   constructor(
     protected usersRepository: UsersRepository,
-    protected mailsRepository: MailsRepository,
+    protected mailsRepository: MailsRawSqlRepository,
     protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {

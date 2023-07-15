@@ -15,7 +15,7 @@ import { UsersRepository } from '../users/infrastructure/users.repository';
 import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
@@ -56,7 +56,7 @@ const postsUseCases = [
     JwtService,
     PostsService,
     CommentsService,
-    MailsRepository,
+    MailsRawSqlRepository,
     CommentsRepository,
     ConvertFiltersForDB,
     UsersService,

@@ -10,7 +10,7 @@ import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersFor
 import { Pagination } from '../common/pagination/pagination';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { UsersRepository } from '../users/infrastructure/users.repository';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -41,7 +41,7 @@ const securityDevicesCases = [
     Pagination,
     CaslAbilityFactory,
     UsersRepository,
-    MailsRepository,
+    MailsRawSqlRepository,
     UsersService,
     BlacklistJwtRepository,
     SecurityDevicesRepository,

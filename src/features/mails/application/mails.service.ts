@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { MailsRepository } from '../infrastructure/mails.repository';
-import { EmailsConfirmCode } from '../infrastructure/schemas/email-confirm-code.schema';
+import { MailsRawSqlRepository } from '../infrastructure/mails-raw-sql.repository';
+import { EmailsConfirmCodeEntity } from '../../demons/entities/emailsConfirmCode.entity';
 
 @Injectable()
 export class MailsService {
-  constructor(private mailsRepository: MailsRepository) {}
-  async findEmailByOldestDate(): Promise<EmailsConfirmCode | null> {
-    return await this.mailsRepository.findEmailByOldestDate();
+  constructor(private mailsRawSqlRepository: MailsRawSqlRepository) {}
+  async findEmailByOldestDate(): Promise<EmailsConfirmCodeEntity[]> {
+    return await this.mailsRawSqlRepository.findEmailByOldestDate();
   }
 }

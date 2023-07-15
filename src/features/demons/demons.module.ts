@@ -4,7 +4,7 @@ import { DemonsController } from './api/demons.controller';
 import { demonsProviders } from './infrastructure/demons.providers';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { MailsModule } from '../mails/mails.module';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../common/pagination/pagination';
@@ -16,6 +16,7 @@ import { AddSentEmailTimeUseCase } from '../mails/application/use-cases/add-sent
 import { RemoveEmailByIdUseCase } from '../mails/application/use-cases/remove-email-byId.use-case';
 import { MailsAdapter } from '../mails/adapters/mails.adapter';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
+import { SentEmailEmailsConfirmationCodeTimeRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 
 const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
 
@@ -25,13 +26,14 @@ const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
   providers: [
     MailsAdapter,
     DemonsService,
-    MailsRepository,
+    MailsRawSqlRepository,
     UsersService,
     Pagination,
     ConvertFiltersForDB,
     UsersRepository,
     UsersRawSqlRepository,
     BlacklistJwtRepository,
+    SentEmailEmailsConfirmationCodeTimeRepository,
     ...demonsUseCases,
     ...demonsProviders,
   ],

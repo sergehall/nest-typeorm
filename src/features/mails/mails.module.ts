@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MailsService } from './application/mails.service';
 import { mailsProviders } from './infrastructure/mails.provaiders';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
-import { MailsRepository } from './infrastructure/mails.repository';
+import { MailsRawSqlRepository } from './infrastructure/mails-raw-sql.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -42,7 +42,7 @@ const mailsAdapterUseCases = [SendCodeByRegistrationUseCase];
   ],
   providers: [
     MailsService,
-    MailsRepository,
+    MailsRawSqlRepository,
     MailsAdapter,
     ...mailsAdapterUseCases,
     ...mailsProviders,

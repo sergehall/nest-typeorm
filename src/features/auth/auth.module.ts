@@ -13,7 +13,7 @@ import { SecurityDevicesService } from '../security-devices/application/security
 import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
 import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
@@ -52,7 +52,7 @@ const authUseCases = [
   providers: [
     LocalStrategy,
     JwtStrategy,
-    MailsRepository,
+    MailsRawSqlRepository,
     JwtConfig,
     AuthService,
     UsersRepository,
