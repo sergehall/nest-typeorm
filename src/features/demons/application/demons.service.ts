@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { MailsService } from '../../mails/application/mails.service';
-import { BlacklistJwtRepository } from '../../auth/infrastructure/blacklist-jwt.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-sent-email-time.use-case';
 import { RemoveEmailByIdCommand } from '../../mails/application/use-cases/remove-email-byId.use-case';
 import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/send-code-by-registration.use-case';
 import { EmailsConfirmCodeEntity } from '../entities/emailsConfirmCode.entity';
+import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 @Injectable()
 export class DemonsService {
   constructor(
     private mailService: MailsService,
-    private blacklistJwtRepository: BlacklistJwtRepository,
+    private blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
     private commandBus: CommandBus,
   ) {}
   @Cron('* * * * * *')
@@ -33,6 +33,6 @@ export class DemonsService {
   }
   @Cron('0 */5 * * * *')
   async clearingInvalidJWTFromBlackList() {
-    await this.blacklistJwtRepository.clearingInvalidJWTFromBlackList();
+    await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
   }
 }

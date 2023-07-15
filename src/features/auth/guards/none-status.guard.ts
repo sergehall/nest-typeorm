@@ -1,17 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-
-import { AuthService } from '../application/auth.service';
-import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
 import { UsersService } from '../../users/application/users.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt.use-case';
+import { BlacklistJwtRawSqlRepository } from '../infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
-    private blacklistJwtRepository: BlacklistJwtRepository,
-    private usersService: UsersService,
+    protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
+    protected usersService: UsersService,
     protected commandBus: CommandBus,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -21,7 +18,9 @@ export class NoneStatusGuard implements CanActivate {
       return true;
     }
     const accessToken = request.headers.authorization.split(' ')[1];
-    const checkInBL = await this.blacklistJwtRepository.findJWT(accessToken);
+    const checkInBL = await this.blacklistJwtRawSqlRepository.findJWT(
+      accessToken,
+    );
     const payload = await this.commandBus.execute(
       new ValidAccessJwtCommand(accessToken),
     );

@@ -5,15 +5,15 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { BlacklistJwtRepository } from '../infrastructure/blacklist-jwt.repository';
 import { jwtCookiesIncorrect } from '../../../exception-filter/errors-messages';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidRefreshJwtCommand } from '../application/use-cases/valid-refresh-jwt.use-case';
+import { BlacklistJwtRawSqlRepository } from '../infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 @Injectable()
 export class CookiesJwtVerificationGuard implements CanActivate {
   constructor(
-    private blacklistJwtRepository: BlacklistJwtRepository,
+    protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -23,7 +23,9 @@ export class CookiesJwtVerificationGuard implements CanActivate {
       const verifyJwt = await this.commandBus.execute(
         new ValidRefreshJwtCommand(refreshToken),
       );
-      const checkInBL = await this.blacklistJwtRepository.findJWT(refreshToken);
+      const checkInBL = await this.blacklistJwtRawSqlRepository.findJWT(
+        refreshToken,
+      );
       if (verifyJwt && !checkInBL) {
         return true;
       }

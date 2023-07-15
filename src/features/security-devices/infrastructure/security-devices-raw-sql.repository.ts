@@ -103,22 +103,6 @@ export class SecurityDevicesRawSqlRepository {
     }
   }
 
-  async removeDevicesBannedUser(userId: string) {
-    try {
-      const removeCurrentDevice = await this.db.query(
-        `
-      DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1
-      returning "userId"
-      `,
-        [userId],
-      );
-      return removeCurrentDevice[0] != null;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
-  }
   async removeDevicesExceptCurrent(currentPayload: PayloadDto) {
     try {
       return await this.db.query(
@@ -137,7 +121,7 @@ export class SecurityDevicesRawSqlRepository {
     payload: PayloadDto,
   ): Promise<ReturnSecurityDeviceEntity[]> {
     try {
-      const expirationDate = new Date().toISOString();
+      const nowTime = new Date().toISOString();
       const limit = 100;
       const offset = 0;
       return await this.db.query(
@@ -148,10 +132,27 @@ export class SecurityDevicesRawSqlRepository {
         ORDER BY "lastActiveDate" DESC
         LIMIT $3 OFFSET $4
         `,
-        [payload.userId, expirationDate, limit, offset],
+        [payload.userId, nowTime, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeDevicesBannedUser(userId: string) {
+    try {
+      const removeCurrentDevice = await this.db.query(
+        `
+      DELETE FROM public."SecurityDevices"
+      WHERE "userId" = $1
+      returning "userId"
+      `,
+        [userId],
+      );
+      return removeCurrentDevice[0] != null;
+    } catch (e) {
+      console.log(e);
+      return false;
     }
   }
 }
