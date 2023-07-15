@@ -34,6 +34,7 @@ import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/bl
 import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from './infrastructure/like-status-posts-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -72,6 +73,7 @@ const postsUseCases = [
     LikeStatusPostsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
+    BlacklistJwtRawSqlRepository,
     ...postsUseCases,
     ...postsProviders,
   ],

@@ -21,6 +21,7 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],
@@ -43,6 +44,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
+    BlacklistJwtRawSqlRepository,
     ...blogsProviders,
   ],
 })

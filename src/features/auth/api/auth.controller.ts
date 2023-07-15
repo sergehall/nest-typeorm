@@ -125,12 +125,12 @@ export class AuthController {
   ): Promise<AccessToken> {
     const refreshToken = req.cookies.refreshToken;
     const currentPayload: PayloadDto = jwt_decode(refreshToken);
-    const jwtToBlackList = {
+    const refreshTokenToBlackList = {
       refreshToken: refreshToken,
       expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
     };
     await this.commandBus.execute(
-      new AddRefreshTokenToBlackListCommand(jwtToBlackList),
+      new AddRefreshTokenToBlackListCommand(refreshTokenToBlackList),
     );
     const newRefreshToken = await this.commandBus.execute(
       new UpdateRefreshJwtCommand(currentPayload),
