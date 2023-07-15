@@ -2,7 +2,7 @@ import { CreateUserDto } from '../../../users/dto/create-user.dto';
 import { RegDataDto } from '../../../users/dto/reg-data.dto';
 import { EmailConfimCodeEntity } from '../../../mails/entities/email-confim-code.entity';
 import * as uuid4 from 'uuid4';
-import { MailsRepository } from '../../../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
 import { UserRawSqlWithIdEntity } from '../../../users/entities/userRawSqlWithId.entity';
@@ -18,7 +18,7 @@ export class RegistrationUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
   constructor(
-    protected mailsRepository: MailsRepository,
+    protected mailsRawSqlRepository: MailsRawSqlRepository,
     private commandBus: CommandBus,
   ) {}
   async execute(
@@ -33,7 +33,9 @@ export class RegistrationUserUseCase
       confirmationCode: newUser.emailConfirmation.confirmationCode,
       createdAt: new Date().toISOString(),
     };
-    await this.mailsRepository.createEmailConfirmCode(newConfirmationCode);
+    await this.mailsRawSqlRepository.createEmailConfirmCode(
+      newConfirmationCode,
+    );
     return newUser;
   }
 }

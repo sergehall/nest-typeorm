@@ -6,6 +6,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-sent-email-time.use-case';
 import { RemoveEmailByIdCommand } from '../../mails/application/use-cases/remove-email-byId.use-case';
 import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/send-code-by-registration.use-case';
+import { EmailsConfirmCodeEntity } from '../entities/emailsConfirmCode.entity';
 
 @Injectable()
 export class DemonsService {
@@ -16,16 +17,17 @@ export class DemonsService {
   ) {}
   @Cron('* * * * * *')
   async sendAndDeleteConfirmationCode() {
-    const emailAndCode = await this.mailService.findEmailByOldestDate();
-    if (emailAndCode) {
+    const emailAndCode: EmailsConfirmCodeEntity[] =
+      await this.mailService.findEmailByOldestDate();
+    if (emailAndCode[0]) {
       await this.commandBus.execute(
-        new RemoveEmailByIdCommand(emailAndCode.id),
+        new RemoveEmailByIdCommand(emailAndCode[0].id),
       );
       await this.commandBus.execute(
-        new SendCodeByRegistrationCommand(emailAndCode),
+        new SendCodeByRegistrationCommand(emailAndCode[0]),
       );
       await this.commandBus.execute(
-        new AddSentEmailTimeCommand(emailAndCode.email),
+        new AddSentEmailTimeCommand(emailAndCode[0].id, emailAndCode[0].email),
       );
     }
   }

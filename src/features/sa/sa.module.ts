@@ -3,7 +3,7 @@ import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
 import { Pagination } from '../common/pagination/pagination';
 import { UsersRepository } from '../users/infrastructure/users.repository';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { saProviders } from './infrastructure/sa.providers';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { CaslModule } from '../../ability/casl.module';
@@ -41,7 +41,7 @@ const saUseCases = [
     BloggerBlogsRepository,
     Pagination,
     UsersRepository,
-    MailsRepository,
+    MailsRawSqlRepository,
     PostsRepository,
     UsersRawSqlRepository,
     LikeStatusPostsRepository,

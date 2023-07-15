@@ -15,7 +15,7 @@ import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
 import { UsersRepository } from '../users/infrastructure/users.repository';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-banStatus-comments.use-case';
@@ -62,7 +62,7 @@ const commentsUseCases = [
     AuthService,
     UsersService,
     UsersRepository,
-    MailsRepository,
+    MailsRawSqlRepository,
     UsersRawSqlRepository,
     BloggerBlogsRepository,
     PostsRawSqlRepository,

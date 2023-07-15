@@ -9,7 +9,7 @@ import { CaslModule } from '../../ability/casl.module';
 import { UsersRepository } from './infrastructure/users.repository';
 import { usersProviders } from './infrastructure/users.providers';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
-import { MailsRepository } from '../mails/infrastructure/mails.repository';
+import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -41,7 +41,7 @@ const usersUseCases = [
     UsersRepository,
     JwtService,
     ConvertFiltersForDB,
-    MailsRepository,
+    MailsRawSqlRepository,
     ...usersUseCases,
     ...usersProviders,
   ],
