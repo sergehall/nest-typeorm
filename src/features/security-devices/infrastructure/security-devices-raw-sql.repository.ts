@@ -89,14 +89,13 @@ export class SecurityDevicesRawSqlRepository {
     deviceId: string,
   ): Promise<SessionDevicesEntity[]> {
     try {
-      const expirationDate = new Date().toISOString();
       return await this.db.query(
         `
         SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
         FROM public."SecurityDevices"
-        WHERE "deviceId" = $1 AND "expirationDate" >= $2
+        WHERE "deviceId" = $1
         `,
-        [deviceId, expirationDate],
+        [deviceId],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
