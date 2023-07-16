@@ -1,6 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { JwtBlacklistDto } from '../../dto/jwt-blacklist.dto';
+import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class BlacklistJwtRawSqlRepository {

@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/application/users.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt.use-case';
-import { BlacklistJwtRawSqlRepository } from '../infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../infrastructure/blacklist-jwt-raw-sql.repository';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
