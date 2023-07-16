@@ -18,7 +18,6 @@ import { UsersService } from '../application/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { Action } from '../../../ability/roles/action.enum';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
@@ -47,13 +46,7 @@ export class UsersController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
-    const searchLoginTerm = { searchLoginTerm: queryData.searchLoginTerm };
-    const searchEmailTerm = { searchEmailTerm: queryData.searchEmailTerm };
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    return this.usersService.findUsers(queryPagination, [
-      searchLoginTerm,
-      searchEmailTerm,
-    ]);
+    return this.usersService.findUsersRawSql(queryData);
   }
 
   @Get(':id')

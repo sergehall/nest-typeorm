@@ -17,7 +17,7 @@ import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.rep
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
-import { ConfirmUserByCodeInParamUseCase } from './application/use-cases/confirm-user-byCode-inParam.use-case';
+import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-byCode-inParam.use-case';
 import { UpdateSentConfirmationCodeUseCase } from '../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { AddRefreshTokenToBlackListUseCase } from './application/use-cases/add-refresh-token-to-blackList.use-case';
 import { ValidatePasswordUseCase } from './application/use-cases/validate-password.use-case';
@@ -34,7 +34,7 @@ import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastruct
 const authUseCases = [
   CreateUserByInstanceUseCase,
   RegistrationUserUseCase,
-  ConfirmUserByCodeInParamUseCase,
+  ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,
   AddRefreshTokenToBlackListUseCase,
   ValidatePasswordUseCase,

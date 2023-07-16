@@ -31,7 +31,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../../users/dto/reg-data.dto';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { ConfirmUserByCodeInParamCommand } from '../application/use-cases/confirm-user-byCode-inParam.use-case';
+import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-byCode-inParam.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
 import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
 import { AddRefreshTokenToBlackListCommand } from '../application/use-cases/add-refresh-token-to-blackList.use-case';
@@ -176,7 +176,7 @@ export class AuthController {
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
     const result = await this.commandBus.execute(
-      new ConfirmUserByCodeInParamCommand(codeDto.code),
+      new ConfirmUserByCodeCommand(codeDto.code),
     );
     if (!result) {
       throw new HttpException(
@@ -186,12 +186,12 @@ export class AuthController {
     }
     return true;
   }
-  @HttpCode(HttpStatus.NO_CONTENT)
+
   @Get('confirm-registration')
-  async confirmRegistration(@Query() query: any): Promise<boolean> {
+  async confirmRegistrationByCodeFromQuery(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
     const result = await this.commandBus.execute(
-      new ConfirmUserByCodeInParamCommand(queryData.code),
+      new ConfirmUserByCodeCommand(queryData.code),
     );
     if (!result) {
       throw new HttpException(
@@ -199,7 +199,7 @@ export class AuthController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return true;
+    return 'Congratulations account is confirmed. Send a message not here. To email that has been confirmed.';
   }
 
   @SkipThrottle()
