@@ -1,5 +1,5 @@
-import { UsersRawSqlEntity } from './usersRawSql.entity';
+import { TablesUsersEntity } from './tablesUsers.entity';
 
-export class UserRawSqlWithIdEntity extends UsersRawSqlEntity {
+export class TablesUsersEntityWithId extends TablesUsersEntity {
   id: string;
 }

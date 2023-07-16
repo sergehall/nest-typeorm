@@ -36,8 +36,7 @@ import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { SaBanBlogCommand } from '../application/use-cases/sa-ban-blog.use-case';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { TablesUsersEntity } from '../../users/entities/tablesUsers.entity';
-import { UserRawSqlWithIdEntity } from '../../users/entities/userRawSqlWithId.entity';
+import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -91,11 +90,11 @@ export class SaController {
       userAgent: userAgent,
     };
 
-    const newUser: UserRawSqlWithIdEntity = await this.commandBus.execute(
+    const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
     newUser.roles = RolesEnums.SA;
-    const saUser: TablesUsersEntity = await this.commandBus.execute(
+    const saUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
     return {
