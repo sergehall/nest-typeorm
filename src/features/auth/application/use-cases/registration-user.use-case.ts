@@ -24,13 +24,13 @@ export class RegistrationUserUseCase
   async execute(
     command: RegistrationUserCommand,
   ): Promise<TablesUsersEntityWithId> {
-    const newUser = await this.commandBus.execute(
+    const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new CreateUserCommand(command.createUserDto, command.registrationData),
     );
     const newConfirmationCode: EmailConfimCodeEntity = {
       id: uuid4().toString(),
       email: newUser.email,
-      confirmationCode: newUser.emailConfirmation.confirmationCode,
+      confirmationCode: newUser.confirmationCode,
       createdAt: new Date().toISOString(),
     };
     await this.mailsRawSqlRepository.createEmailConfirmCode(

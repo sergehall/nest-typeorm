@@ -187,7 +187,7 @@ export class AuthController {
     return true;
   }
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('confirm-registration')
+  @Get('confirm-registration')
   async confirmRegistration(@Query() query: any): Promise<boolean> {
     const queryData = ParseQuery.getPaginationData(query);
     const result = await this.commandBus.execute(
