@@ -10,7 +10,6 @@ export class MailsRawSqlRepository {
     newConfirmationCode: EmailConfimCodeEntity,
   ): Promise<EmailConfimCodeEntity> {
     try {
-      console.log(newConfirmationCode);
       return await this.db.query(
         `
         INSERT INTO public."EmailsConfirmationCode"
