@@ -16,7 +16,7 @@ export class SendCodeByRegistrationUseCase
     private configService: ConfigService,
   ) {}
   async execute(command: SendCodeByRegistrationCommand): Promise<void> {
-    const domainName = DomainNamesEnums.NEST_API_URL;
+    const domainName = DomainNamesEnums.NEST_RAQ_SQL_URL;
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + command.emailAndCode.confirmationCode;
     const fullURL = domainName + path + parameter;
