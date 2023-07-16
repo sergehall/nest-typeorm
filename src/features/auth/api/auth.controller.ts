@@ -10,6 +10,7 @@ import {
   Ip,
   HttpStatus,
   Res,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -41,6 +42,7 @@ import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import jwt_decode from 'jwt-decode';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { ParseQuery } from '../../common/parse-query/parse-query';
 
 @SkipThrottle()
 @Controller('auth')
@@ -85,9 +87,7 @@ export class AuthController {
     );
     if (userExist) {
       throw new HttpException(
-        {
-          message: [{ ...userAlreadyExists, field: userExist }],
-        },
+        { message: [userAlreadyExists] },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -177,6 +177,21 @@ export class AuthController {
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
     const result = await this.commandBus.execute(
       new ConfirmUserByCodeInParamCommand(codeDto.code),
+    );
+    if (!result) {
+      throw new HttpException(
+        { message: [codeIncorrect] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return true;
+  }
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('confirm-registration')
+  async confirmRegistration(@Query() query: any): Promise<boolean> {
+    const queryData = ParseQuery.getPaginationData(query);
+    const result = await this.commandBus.execute(
+      new ConfirmUserByCodeInParamCommand(queryData.code),
     );
     if (!result) {
       throw new HttpException(

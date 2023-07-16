@@ -31,7 +31,7 @@ export class ParseQuery {
     let title: string = query.sitle?.toString();
     let userName: string = query.searchName?.toString();
     let searchTitle: string = query.searchTitle?.toString();
-    let code: string = query.sode?.toString();
+    let code: string = query.code?.toString();
     let confirmationCode: string = query.sonfirmationCode?.toString();
     const querySortBy: string = query.sortBy?.toString();
     let sortBy = 'createdAt';

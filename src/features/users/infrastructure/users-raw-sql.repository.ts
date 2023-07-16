@@ -110,20 +110,14 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async updateUserConfirmationCode(
-    user: UserRawSqlWithIdEntity,
-  ): Promise<boolean> {
+  async updateUserConfirmationCode(user: TablesUsersEntity): Promise<boolean> {
     try {
       const updateUser = await this.db.query(
         `
       UPDATE public."Users"
       SET  "confirmationCode" = $2, "expirationDate" = $3
-      WHERE "confirmationCode" = $1`,
-        [
-          user.id,
-          user.emailConfirmation.confirmationCode,
-          user.emailConfirmation.expirationDate,
-        ],
+      WHERE "id" = $1`,
+        [user.id, user.confirmationCode, user.expirationDate],
       );
       return !!updateUser[0];
     } catch (error) {
@@ -206,6 +200,22 @@ export class UsersRawSqlRepository {
       );
       return Number(totalCount[0].count);
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async clearingUserWithExpirationDate() {
+    try {
+      const currentTime = new Date().toISOString();
+      return await this.db.query(
+        `
+      DELETE FROM public."Users"
+      WHERE "expirationDate" <= $1
+      `,
+        [currentTime],
+      );
+    } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }

@@ -73,7 +73,7 @@ export class SecurityDevicesRawSqlRepository {
         `
       DELETE FROM public."SecurityDevices"
       WHERE "userId" = $1 AND "deviceId" = $2
-      returning "userId"
+      RETURNING "userId"
       `,
         [payload.userId, payload.deviceId],
       );
@@ -98,7 +98,7 @@ export class SecurityDevicesRawSqlRepository {
         `
       DELETE FROM public."SecurityDevices"
       WHERE "deviceId" = $1
-      returning "deviceId"
+      RETURNING "deviceId"
       `,
         [deviceId],
       );
@@ -164,7 +164,7 @@ export class SecurityDevicesRawSqlRepository {
         `
       DELETE FROM public."SecurityDevices"
       WHERE "userId" = $1 AND "expirationDate" >= $2
-      returning "userId"
+      RETURNING "userId"
       `,
         [userId, currentTime],
       );
