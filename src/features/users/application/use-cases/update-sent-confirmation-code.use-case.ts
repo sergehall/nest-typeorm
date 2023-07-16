@@ -4,7 +4,7 @@ import { userNotExists } from '../../../../exception-filter/errors-messages';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
-import { TablesUsersEntity } from '../../entities/tablesUsers.entity';
+import { TablesUsersEntityWithId } from '../../entities/userRawSqlWithId.entity';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -19,7 +19,7 @@ export class UpdateSentConfirmationCodeUseCase
     protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
-    const user: TablesUsersEntity | null =
+    const user: TablesUsersEntityWithId | null =
       await this.usersRawSqlRepository.findUserByLoginOrEmail(command.email);
     // The expression Date.now() + 65 * 60 * 1000 calculates the value of the current timestamp in milliseconds plus 65 minutes converted to milliseconds.
     const expirationDate = new Date(Date.now() + 65 * 60 * 1000).toISOString();
@@ -29,7 +29,6 @@ export class UpdateSentConfirmationCodeUseCase
         user.expirationDate = expirationDate;
         // update user
         await this.usersRawSqlRepository.updateUserConfirmationCode(user);
-
         const newEmailConfirmationCode = {
           id: uuid4().toString(),
           email: user.email,

@@ -49,8 +49,6 @@ export class DemonsService {
   // every 1 min
   @Cron('0 */1 * * * *')
   async clearingUserWithExpirationDate() {
-    console.log('clearingUserWithExpirationDate');
-    return;
-    // await this.usersRawSqlRepository.clearingUserWithExpirationDate();
+    await this.usersRawSqlRepository.clearingUserWithExpirationDate();
   }
 }

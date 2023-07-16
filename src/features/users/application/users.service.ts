@@ -12,10 +12,9 @@ import * as uuid4 from 'uuid4';
 import * as bcrypt from 'bcrypt';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
-import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
 
 @Injectable()
 export class UsersService {
@@ -28,34 +27,29 @@ export class UsersService {
   async createUsers(
     createUserDto: CreateUserDto,
     regDataDto: RegDataDto,
-  ): Promise<UserRawSqlWithIdEntity> {
-    const createUserRawSql: UsersRawSqlEntity = {
+  ): Promise<TablesUsersEntityWithId> {
+    const passwordHash = await bcrypt.hash(
+      createUserDto.password,
+      await bcrypt.genSalt(Number(process.env.SALT_FACTOR)),
+    );
+    const newUser: TablesUsersEntity = {
       login: createUserDto.login.toLowerCase(),
       email: createUserDto.email.toLowerCase(),
-      passwordHash: await bcrypt.hash(
-        createUserDto.password,
-        await bcrypt.genSalt(Number(process.env.SALT_FACTOR)),
-      ),
+      passwordHash: passwordHash,
       createdAt: new Date().toISOString(),
       orgId: OrgIdEnums.IT_INCUBATOR,
       roles: RolesEnums.USER,
-      banInfo: {
-        isBanned: false,
-        banDate: null,
-        banReason: null,
-      },
-      emailConfirmation: {
-        confirmationCode: uuid4().toString(),
-        expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
-        isConfirmed: false,
-        isConfirmedDate: null,
-      },
-      registrationData: {
-        ip: regDataDto.ip,
-        userAgent: regDataDto.userAgent,
-      },
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+      confirmationCode: uuid4().toString(),
+      expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
+      isConfirmed: false,
+      isConfirmedDate: null,
+      ip: regDataDto.ip,
+      userAgent: regDataDto.userAgent,
     };
-    return await this.usersRawSqlRepository.createUser(createUserRawSql);
+    return await this.usersRawSqlRepository.createUser(newUser);
   }
 
   async findUsersRawSql(queryData: ParseQueryType): Promise<PaginationTypes> {
@@ -123,7 +117,9 @@ export class UsersService {
     };
   }
 
-  async findUserByUserId(userId: string): Promise<TablesUsersEntity | null> {
+  async findUserByUserId(
+    userId: string,
+  ): Promise<TablesUsersEntityWithId | null> {
     return await this.usersRawSqlRepository.findUserByUserId(userId);
   }
 }

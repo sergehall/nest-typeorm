@@ -10,9 +10,6 @@ import { RolesEnums } from '../../../ability/enums/roles.enums';
 
 export class TablesUsersEntity {
   @IsNotEmpty()
-  @MaxLength(100)
-  id: string;
-  @IsNotEmpty()
   @Length(3, 10, {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })

@@ -1,20 +1,19 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UsersRawSqlEntity } from '../entities/usersRawSql.entity';
-import { UserRawSqlWithIdEntity } from '../entities/userRawSqlWithId.entity';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
 
 @Injectable()
 export class UsersRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async createUser(
-    createUserRawSql: UsersRawSqlEntity,
-  ): Promise<UserRawSqlWithIdEntity> {
+    tablesUsersEntity: TablesUsersEntity,
+  ): Promise<TablesUsersEntityWithId> {
     try {
       const insertNewUser = await this.db.query(
         `
@@ -35,26 +34,26 @@ export class UsersRawSqlRepository {
           "ip",
           "userAgent")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-          returning id`,
+          RETURNING id`,
         [
-          createUserRawSql.login,
-          createUserRawSql.email,
-          createUserRawSql.passwordHash,
-          createUserRawSql.createdAt,
-          createUserRawSql.orgId,
-          createUserRawSql.roles,
-          createUserRawSql.banInfo.isBanned,
-          createUserRawSql.banInfo.banDate,
-          createUserRawSql.banInfo.banReason,
-          createUserRawSql.emailConfirmation.confirmationCode,
-          createUserRawSql.emailConfirmation.expirationDate,
-          createUserRawSql.emailConfirmation.isConfirmed,
-          createUserRawSql.emailConfirmation.isConfirmedDate,
-          createUserRawSql.registrationData.ip,
-          createUserRawSql.registrationData.userAgent,
+          tablesUsersEntity.login,
+          tablesUsersEntity.email,
+          tablesUsersEntity.passwordHash,
+          tablesUsersEntity.createdAt,
+          tablesUsersEntity.orgId,
+          tablesUsersEntity.roles,
+          tablesUsersEntity.isBanned,
+          tablesUsersEntity.banDate,
+          tablesUsersEntity.banReason,
+          tablesUsersEntity.confirmationCode,
+          tablesUsersEntity.expirationDate,
+          tablesUsersEntity.isConfirmed,
+          tablesUsersEntity.isConfirmedDate,
+          tablesUsersEntity.ip,
+          tablesUsersEntity.userAgent,
         ],
       );
-      return { id: insertNewUser[0].id, ...createUserRawSql };
+      return { id: insertNewUser[0].id, ...tablesUsersEntity };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -62,7 +61,7 @@ export class UsersRawSqlRepository {
 
   async findUserByConfirmationCode(
     confirmationCode: string,
-  ): Promise<TablesUsersEntity | null> {
+  ): Promise<TablesUsersEntityWithId | null> {
     try {
       const user = await this.db.query(
         `
@@ -77,7 +76,9 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async findUserByUserId(userId: string): Promise<TablesUsersEntity | null> {
+  async findUserByUserId(
+    userId: string,
+  ): Promise<TablesUsersEntityWithId | null> {
     try {
       const user = await this.db.query(
         `
@@ -110,7 +111,9 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async updateUserConfirmationCode(user: TablesUsersEntity): Promise<boolean> {
+  async updateUserConfirmationCode(
+    user: TablesUsersEntityWithId,
+  ): Promise<boolean> {
     try {
       const updateUser = await this.db.query(
         `
@@ -127,7 +130,7 @@ export class UsersRawSqlRepository {
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<TablesUsersEntity | null> {
+  ): Promise<TablesUsersEntityWithId | null> {
     try {
       const user = await this.db.query(
         `
@@ -160,7 +163,9 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async findUsers(queryData: ParseQueryType): Promise<TablesUsersEntity[]> {
+  async findUsers(
+    queryData: ParseQueryType,
+  ): Promise<TablesUsersEntityWithId[]> {
     try {
       const preparedQuery = await this._prepQueryRawSql(queryData);
       return await this.db.query(
@@ -206,13 +211,14 @@ export class UsersRawSqlRepository {
 
   async clearingUserWithExpirationDate() {
     try {
+      const isConfirmed = true;
       const currentTime = new Date().toISOString();
       return await this.db.query(
         `
       DELETE FROM public."Users"
-      WHERE "expirationDate" <= $1
+      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
       `,
-        [currentTime],
+        [isConfirmed, currentTime],
       );
     } catch (error) {
       console.log(error);
@@ -230,7 +236,7 @@ export class UsersRawSqlRepository {
       UPDATE public."Users"
       SET  "roles" = $2
       WHERE "id" = $1
-      returning *`,
+      RETURNING *`,
         [userId, roles],
       );
       return updateUserRole[0][0];
