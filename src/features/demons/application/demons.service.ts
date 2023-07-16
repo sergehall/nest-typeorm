@@ -8,6 +8,7 @@ import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/sen
 import { EmailsConfirmCodeEntity } from '../entities/emailsConfirmCode.entity';
 import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
+import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
 
 @Injectable()
 export class DemonsService {
@@ -15,6 +16,7 @@ export class DemonsService {
     protected mailService: MailsService,
     protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
     protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   // every sec
@@ -43,5 +45,12 @@ export class DemonsService {
   @Cron('0 */1 * * * *')
   async clearingDevicesWithExpiredDate() {
     await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
+  }
+  // every 1 min
+  @Cron('0 */1 * * * *')
+  async clearingUserWithExpirationDate() {
+    console.log('clearingUserWithExpirationDate');
+    return;
+    // await this.usersRawSqlRepository.clearingUserWithExpirationDate();
   }
 }
