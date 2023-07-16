@@ -23,7 +23,7 @@ import { AddRefreshTokenToBlackListUseCase } from './application/use-cases/add-r
 import { ValidatePasswordUseCase } from './application/use-cases/validate-password.use-case';
 import { SignAccessJwtUseCase } from './application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtUseCase } from './application/use-cases/update-access-jwt.use-case';
-import { SineRefreshJwtUseCase } from './application/use-cases/sine-refresh-jwt.use-case';
+import { SignRefreshJwtUseCase } from './application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtUseCase } from './application/use-cases/update-refresh-jwt.use-case';
 import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.use-case';
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
@@ -40,7 +40,7 @@ const authUseCases = [
   ValidatePasswordUseCase,
   SignAccessJwtUseCase,
   UpdateAccessJwtUseCase,
-  SineRefreshJwtUseCase,
+  SignRefreshJwtUseCase,
   UpdateRefreshJwtUseCase,
   ValidAccessJwtUseCase,
   ValidRefreshJwtUseCase,

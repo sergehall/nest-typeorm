@@ -3,8 +3,8 @@ import { AccessToken } from '../../dto/accessToken.dto';
 import * as uuid4 from 'uuid4';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { getConfiguration } from '../../../../config/configuration';
 
 export class SignAccessJwtUseCommand {
   constructor(public user: UsersEntity) {}
@@ -14,7 +14,7 @@ export class SignAccessJwtUseCommand {
 export class SignAccessJwtUseCase
   implements ICommandHandler<SignAccessJwtUseCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(private jwtService: JwtService) {}
   async execute(command: SignAccessJwtUseCommand): Promise<AccessToken> {
     const deviceId = uuid4().toString();
     const payload = {
@@ -22,8 +22,8 @@ export class SignAccessJwtUseCase
       email: command.user.email,
       deviceId: deviceId,
     };
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    const ACCESS_SECRET_KEY = getConfiguration().jwt.ACCESS_SECRET_KEY;
+    const EXP_ACC_TIME = getConfiguration().jwt.EXP_ACC_TIME;
     if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
       throw new InternalServerErrorException();
     return {

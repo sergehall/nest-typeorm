@@ -36,7 +36,7 @@ import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/applicat
 import { AddRefreshTokenToBlackListCommand } from '../application/use-cases/add-refresh-token-to-blackList.use-case';
 import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
-import { SineRefreshJwtCommand } from '../application/use-cases/sine-refresh-jwt.use-case';
+import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import jwt_decode from 'jwt-decode';
