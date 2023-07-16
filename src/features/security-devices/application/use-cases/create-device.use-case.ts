@@ -19,10 +19,6 @@ export class CreateDeviceUseCase
     private securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
   async execute(command: CreateDeviceCommand): Promise<boolean> {
-    const filter = {
-      userId: command.newPayload.userId,
-      deviceId: command.newPayload.deviceId,
-    };
     const newDevices: SessionDevicesEntity = {
       userId: command.newPayload.userId,
       ip: command.clientIp,
@@ -32,7 +28,6 @@ export class CreateDeviceUseCase
       deviceId: command.newPayload.deviceId,
     };
     return await this.securityDevicesRawSqlRepository.createOrUpdateDevice(
-      filter,
       newDevices,
     );
   }

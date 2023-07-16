@@ -1,6 +1,6 @@
 import { JwtBlacklistDto } from '../../dto/jwt-blacklist.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlacklistJwtRawSqlRepository } from '../../infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../../infrastructure/blacklist-jwt-raw-sql.repository';
 
 export class AddRefreshTokenToBlackListCommand {
   constructor(public refreshTokenToBlackList: JwtBlacklistDto) {}

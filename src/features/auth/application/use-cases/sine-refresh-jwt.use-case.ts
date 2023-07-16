@@ -15,11 +15,10 @@ export class SineRefreshJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SineRefreshJwtCommand) {
-    const deviceId = uuid4().toString();
     const payload = {
       userId: command.currentUserDto.id,
       email: command.currentUserDto.email,
-      deviceId: deviceId,
+      deviceId: uuid4().toString(),
     };
     const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
     const EXP_REF_TIME = this.jwtConfig.getExpRefTime();

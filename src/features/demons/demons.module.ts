@@ -17,7 +17,8 @@ import { RemoveEmailByIdUseCase } from '../mails/application/use-cases/remove-em
 import { MailsAdapter } from '../mails/adapters/mails.adapter';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SentEmailEmailsConfirmationCodeTimeRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
-import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 
 const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
 
@@ -35,6 +36,7 @@ const demonsUseCases = [AddSentEmailTimeUseCase, RemoveEmailByIdUseCase];
     UsersRawSqlRepository,
     BlacklistJwtRepository,
     SentEmailEmailsConfirmationCodeTimeRepository,
+    SecurityDevicesRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     ...demonsUseCases,
     ...demonsProviders,

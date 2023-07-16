@@ -6,15 +6,18 @@ import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-s
 import { RemoveEmailByIdCommand } from '../../mails/application/use-cases/remove-email-byId.use-case';
 import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/send-code-by-registration.use-case';
 import { EmailsConfirmCodeEntity } from '../entities/emailsConfirmCode.entity';
-import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/raw-sql-repository/blacklist-jwt-raw-sql.repository';
+import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
 
 @Injectable()
 export class DemonsService {
   constructor(
-    private mailService: MailsService,
-    private blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
-    private commandBus: CommandBus,
+    protected mailService: MailsService,
+    protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
+    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+    protected commandBus: CommandBus,
   ) {}
+  // every sec
   @Cron('* * * * * *')
   async sendAndDeleteConfirmationCode() {
     const emailAndCode: EmailsConfirmCodeEntity[] =
@@ -31,8 +34,14 @@ export class DemonsService {
       );
     }
   }
+  // every 5 min
   @Cron('0 */5 * * * *')
   async clearingInvalidJWTFromBlackList() {
     await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
+  }
+  // every 1 min
+  @Cron('0 */1 * * * *')
+  async clearingDevicesWithExpiredDate() {
+    await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
   }
 }

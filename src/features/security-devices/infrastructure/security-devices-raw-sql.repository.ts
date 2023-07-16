@@ -1,6 +1,5 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -8,8 +7,8 @@ import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.e
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
+
   async createOrUpdateDevice(
-    filter: FiltersDevicesEntity,
     newDevices: SessionDevicesEntity,
   ): Promise<boolean> {
     try {
@@ -17,31 +16,55 @@ export class SecurityDevicesRawSqlRepository {
         `
       INSERT INTO public."SecurityDevices"
       ("userId",
+       "deviceId",
        "ip", 
        "title", 
        "lastActiveDate", 
-       "expirationDate", 
-       "deviceId")
+       "expirationDate"
+       )
       VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT ( "userId", "deviceId" ) 
-      DO UPDATE SET "userId" = $1, "ip" = $2, "title" = $3, "lastActiveDate" = $4, "expirationDate" = $5, "deviceId" = $6
-      returning "userId"
+      ON CONFLICT ( "userId", "title" ) 
+      DO UPDATE SET "userId" = $1, "deviceId" = $2, "ip" = $3, "title" = $4, "lastActiveDate" = $5, "expirationDate" = $6
+      RETURNING "userId"
       `,
         [
-          filter.userId,
+          newDevices.userId,
+          newDevices.deviceId,
           newDevices.ip,
           newDevices.title,
           newDevices.lastActiveDate,
           newDevices.expirationDate,
-          filter.deviceId,
         ],
       );
       return createOrUpdateDevice[0] != null;
     } catch (error) {
-      console.log(error.message);
-      return false;
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
+
+  async findDevices(
+    payload: PayloadDto,
+  ): Promise<ReturnSecurityDeviceEntity[]> {
+    try {
+      const currentTime = new Date().toISOString();
+      const limit = 100;
+      const offset = 0;
+      return await this.db.query(
+        `
+        SELECT "ip", "title", "lastActiveDate", "deviceId"
+        FROM public."SecurityDevices"
+        WHERE "userId" = $1 AND "expirationDate" >= $2
+        ORDER BY "lastActiveDate" DESC
+        LIMIT $3 OFFSET $4
+        `,
+        [payload.userId, currentTime, limit, offset],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async removeDeviceByDeviceIdAfterLogout(
     payload: PayloadDto,
   ): Promise<boolean> {
@@ -55,9 +78,9 @@ export class SecurityDevicesRawSqlRepository {
         [payload.userId, payload.deviceId],
       );
       return removeCurrentDevice[0] != null;
-    } catch (e) {
-      console.log(e);
-      return false;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async removeDeviceByDeviceId(
@@ -80,24 +103,26 @@ export class SecurityDevicesRawSqlRepository {
         [deviceId],
       );
       return removeDeviceByDeviceId[1] === 1 ? '204' : '500';
-    } catch (e) {
-      console.log(e);
-      return '500';
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async findDeviceByDeviceId(
     deviceId: string,
   ): Promise<SessionDevicesEntity[]> {
     try {
+      const currentTime = new Date().toISOString();
       return await this.db.query(
         `
         SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
         FROM public."SecurityDevices"
-        WHERE "deviceId" = $1
+        WHERE "deviceId" = $1 AND "expirationDate" >= $2
         `,
-        [deviceId],
+        [deviceId, currentTime],
       );
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -111,47 +136,42 @@ export class SecurityDevicesRawSqlRepository {
       `,
         [currentPayload.userId, currentPayload.deviceId],
       );
-    } catch (e) {
-      console.log(e);
-      return false;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
-  async findDevices(
-    payload: PayloadDto,
-  ): Promise<ReturnSecurityDeviceEntity[]> {
+  async clearingDevicesWithExpiredDate() {
     try {
-      const nowTime = new Date().toISOString();
-      const limit = 100;
-      const offset = 0;
+      const currentTime = new Date().toISOString();
       return await this.db.query(
         `
-        SELECT "ip", "title", "lastActiveDate", "deviceId"
-        FROM public."SecurityDevices"
-        WHERE "userId" = $1 AND "expirationDate" >= $2
-        ORDER BY "lastActiveDate" DESC
-        LIMIT $3 OFFSET $4
-        `,
-        [payload.userId, nowTime, limit, offset],
+      DELETE FROM public."SecurityDevices"
+      WHERE "expirationDate" <= $1
+      `,
+        [currentTime],
       );
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }
 
   async removeDevicesBannedUser(userId: string) {
     try {
+      const currentTime = new Date().toISOString();
       const removeCurrentDevice = await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1
+      WHERE "userId" = $1 AND "expirationDate" >= $2
       returning "userId"
       `,
-        [userId],
+        [userId, currentTime],
       );
       return removeCurrentDevice[0] != null;
-    } catch (e) {
-      console.log(e);
-      return false;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

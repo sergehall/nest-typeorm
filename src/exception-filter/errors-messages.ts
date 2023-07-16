@@ -42,6 +42,6 @@ export const userNotExists = {
 };
 export const forbiddenDeleteDevice = {
   message:
-    'it is forbidden to delete the device if it does not belong to the current user.',
+    'Forbidden to delete the device. Device not belongs to the current user.',
   params: 'deviceId',
 };
