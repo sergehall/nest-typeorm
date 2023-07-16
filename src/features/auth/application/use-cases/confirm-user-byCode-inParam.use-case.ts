@@ -1,16 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 
-export class ConfirmUserByCodeInParamCommand {
+export class ConfirmUserByCodeCommand {
   constructor(public code: string) {}
 }
 
-@CommandHandler(ConfirmUserByCodeInParamCommand)
-export class ConfirmUserByCodeInParamUseCase
-  implements ICommandHandler<ConfirmUserByCodeInParamCommand>
+@CommandHandler(ConfirmUserByCodeCommand)
+export class ConfirmUserByCodeUseCase
+  implements ICommandHandler<ConfirmUserByCodeCommand>
 {
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
-  async execute(command: ConfirmUserByCodeInParamCommand): Promise<boolean> {
+  async execute(command: ConfirmUserByCodeCommand): Promise<boolean> {
     const userToUpdateConfirmCode =
       await this.usersRawSqlRepository.findUserByConfirmationCode(command.code);
     if (

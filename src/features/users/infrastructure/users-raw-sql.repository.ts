@@ -168,6 +168,8 @@ export class UsersRawSqlRepository {
   ): Promise<TablesUsersEntityWithId[]> {
     try {
       const preparedQuery = await this._prepQueryRawSql(queryData);
+      const limit = queryData.queryPagination.pageSize;
+      const offset = queryData.queryPagination.pageNumber - 1;
       return await this.db.query(
         `
         SELECT "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
@@ -180,8 +182,8 @@ export class UsersRawSqlRepository {
         [
           preparedQuery.searchEmailTerm,
           preparedQuery.searchLoginTerm,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber,
+          limit,
+          offset,
         ],
       );
     } catch (error) {
