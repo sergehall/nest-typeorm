@@ -27,12 +27,17 @@ export class UpdateSentConfirmationCodeUseCase
       if (user.expirationDate > new Date().toISOString()) {
         user.confirmationCode = uuid4().toString();
         user.expirationDate = expirationDate;
-        // update user
-        await this.usersRawSqlRepository.updateUserConfirmationCode(user);
+        // update user with confirmationCode and expirationDate
+        await this.usersRawSqlRepository.updateUserConfirmationCode(
+          user.id,
+          user.confirmationCode,
+          user.expirationDate,
+        );
         const newEmailConfirmationCode = {
-          id: uuid4().toString(),
+          codeId: uuid4().toString(),
           email: user.email,
           confirmationCode: user.confirmationCode,
+          expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
           createdAt: new Date().toISOString(),
         };
         // add Email to emailsToSentRepository

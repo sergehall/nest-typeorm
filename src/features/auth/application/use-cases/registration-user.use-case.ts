@@ -1,11 +1,11 @@
 import { CreateUserDto } from '../../../users/dto/create-user.dto';
 import { RegDataDto } from '../../../users/dto/reg-data.dto';
-import { EmailConfimCodeEntity } from '../../../mails/entities/email-confim-code.entity';
 import * as uuid4 from 'uuid4';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
+import { EmailsConfirmCodeEntity } from '../../../demons/entities/emailsConfirmCode.entity';
 
 export class RegistrationUserCommand {
   constructor(
@@ -27,10 +27,11 @@ export class RegistrationUserUseCase
     const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new CreateUserCommand(command.createUserDto, command.registrationData),
     );
-    const newConfirmationCode: EmailConfimCodeEntity = {
-      id: uuid4().toString(),
+    const newConfirmationCode: EmailsConfirmCodeEntity = {
+      codeId: uuid4().toString(),
       email: newUser.email,
       confirmationCode: newUser.confirmationCode,
+      expirationDate: newUser.expirationDate,
       createdAt: new Date().toISOString(),
     };
     await this.mailsRawSqlRepository.createEmailConfirmCode(

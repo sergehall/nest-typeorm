@@ -43,11 +43,12 @@ import { CheckingUserExistenceCommand } from '../../users/application/use-cases/
 import jwt_decode from 'jwt-decode';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
+import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
 
 @SkipThrottle()
 @Controller('auth')
 export class AuthController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(protected commandBus: CommandBus) {}
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -172,6 +173,7 @@ export class AuthController {
     return true;
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
@@ -187,6 +189,21 @@ export class AuthController {
     return true;
   }
 
+  @SkipThrottle()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('password-recovery')
+  async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
+    const result = await this.commandBus.execute(
+      new PasswordRecoveryCommand(emailDto.email),
+    );
+    if (!result) {
+      throw new HttpException(
+        { message: [codeIncorrect] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return true;
+  }
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);

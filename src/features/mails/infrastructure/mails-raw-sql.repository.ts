@@ -1,5 +1,4 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { EmailConfimCodeEntity } from '../entities/email-confim-code.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { EmailsConfirmCodeEntity } from '../../demons/entities/emailsConfirmCode.entity';
@@ -7,22 +6,24 @@ import { EmailsConfirmCodeEntity } from '../../demons/entities/emailsConfirmCode
 export class MailsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
   async createEmailConfirmCode(
-    newConfirmationCode: EmailConfimCodeEntity,
-  ): Promise<EmailConfimCodeEntity> {
+    newConfirmationCode: EmailsConfirmCodeEntity,
+  ): Promise<EmailsConfirmCodeEntity> {
     try {
       return await this.db.query(
         `
         INSERT INTO public."EmailsConfirmationCode"
-        ( "id", 
+        ( "codeId", 
           "email", 
           "confirmationCode", 
+          "expirationDate",
           "createdAt")
-          VALUES ($1, $2, $3, $4)
+          VALUES ($1, $2, $3, $4, $5)
          `,
         [
-          newConfirmationCode.id,
+          newConfirmationCode.codeId,
           newConfirmationCode.email,
           newConfirmationCode.confirmationCode,
+          newConfirmationCode.expirationDate,
           newConfirmationCode.createdAt,
         ],
       );
@@ -37,7 +38,7 @@ export class MailsRawSqlRepository {
       const offset = 0;
       return await this.db.query(
         `
-        SELECT "id", "email", "confirmationCode", "createdAt"
+        SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt"
         FROM public."EmailsConfirmationCode"
         ORDER BY ${orderByDirection}
         LIMIT $1 OFFSET $2
@@ -48,15 +49,15 @@ export class MailsRawSqlRepository {
       throw new ForbiddenException(error.message);
     }
   }
-  async removeEmailById(id: string): Promise<boolean> {
+  async removeEmailByCodeId(codeId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(
         `
         DELETE FROM public."EmailsConfirmationCode"
-        WHERE "id" = $1
-        RETURNING "id"
+        WHERE "codeId" = $1
+        RETURNING "codeId"
           `,
-        [id],
+        [codeId],
       );
       return comment[1] === 1;
     } catch (error) {

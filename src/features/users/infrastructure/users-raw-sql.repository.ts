@@ -92,6 +92,24 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async findUserByEmail(
+    email: string,
+  ): Promise<TablesUsersEntityWithId | null> {
+    try {
+      const user = await this.db.query(
+        `
+      SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      FROM public."Users"
+      WHERE "email" = $1`,
+        [email],
+      );
+      return user[0] ? user[0] : null;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async confirmUserByConfirmCode(
     confirmationCode: string,
     isConfirmed: boolean,
@@ -112,17 +130,20 @@ export class UsersRawSqlRepository {
   }
 
   async updateUserConfirmationCode(
-    user: TablesUsersEntityWithId,
-  ): Promise<boolean> {
+    userId: string,
+    confirmationCode: string,
+    expirationDate: string,
+  ): Promise<TablesUsersEntityWithId> {
     try {
       const updateUser = await this.db.query(
         `
       UPDATE public."Users"
       SET  "confirmationCode" = $2, "expirationDate" = $3
-      WHERE "id" = $1`,
-        [user.id, user.confirmationCode, user.expirationDate],
+      WHERE "id" = $1
+      RETURNING *`,
+        [userId, confirmationCode, expirationDate],
       );
-      return !!updateUser[0];
+      return updateUser[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
