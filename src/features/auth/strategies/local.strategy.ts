@@ -2,6 +2,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
+  errorMessageType,
   loginOrEmailInvalid,
   passwordInvalid,
   validatePasswordFailed,
@@ -22,16 +23,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<UsersRawSqlEntity | null> {
-    const messages = [];
-    if (
-      loginOrEmail.toString().length < 3 ||
-      loginOrEmail.toString().length > 20
-    ) {
-      messages.push(loginOrEmailInvalid);
-    }
-    if (password.toString().length < 6 || password.toString().length > 20) {
-      messages.push(passwordInvalid);
-    }
+    const messages: errorMessageType[] = [];
+
+    this.validateLength(
+      loginOrEmail.toString(),
+      3,
+      20,
+      loginOrEmailInvalid,
+      messages,
+    );
+    this.validateLength(password.toString(), 6, 20, passwordInvalid, messages);
+
     if (messages.length !== 0) {
       throw new HttpException(
         {
@@ -52,5 +54,16 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       );
     }
     return user;
+  }
+  private validateLength(
+    value: string,
+    min: number,
+    max: number,
+    errorMessage: errorMessageType,
+    messages: errorMessageType[],
+  ): void {
+    if (value.length < min || value.length > max) {
+      messages.push(errorMessage);
+    }
   }
 }

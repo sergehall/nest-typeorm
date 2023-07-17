@@ -15,16 +15,14 @@ export class ValidatePasswordUseCase
   async execute(
     command: ValidatePasswordCommand,
   ): Promise<TablesUsersEntity | null> {
+    const { loginOrEmail, password } = command;
     const user = await this.usersRawSqlRepository.findUserByLoginOrEmail(
-      command.loginOrEmail,
+      loginOrEmail,
     );
-    if (
+    const isValidPassword =
       user &&
       !user.isBanned &&
-      (await bcrypt.compare(command.password, user.passwordHash))
-    ) {
-      return user;
-    }
-    return null;
+      (await bcrypt.compare(password, user.passwordHash));
+    return isValidPassword ? user : null;
   }
 }
