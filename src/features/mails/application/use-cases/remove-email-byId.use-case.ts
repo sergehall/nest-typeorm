@@ -10,6 +10,6 @@ export class RemoveEmailByIdUseCase
 {
   constructor(protected mailsRepository: MailsRawSqlRepository) {}
   async execute(command: RemoveEmailByIdCommand): Promise<boolean> {
-    return await this.mailsRepository.removeEmailById(command.id);
+    return await this.mailsRepository.removeEmailByCodeId(command.id);
   }
 }

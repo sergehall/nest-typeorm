@@ -1,11 +1,11 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { EmailConfimCodeEntity } from '../../entities/email-confim-code.entity';
 import { DomainNamesEnums } from '../../enums/domain-names.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { EmailsConfirmCodeEntity } from '../../../demons/entities/emailsConfirmCode.entity';
 
 export class SendCodeByRegistrationCommand {
-  constructor(public emailAndCode: EmailConfimCodeEntity) {}
+  constructor(public emailAndCode: EmailsConfirmCodeEntity) {}
 }
 @CommandHandler(SendCodeByRegistrationCommand)
 export class SendCodeByRegistrationUseCase
@@ -31,7 +31,7 @@ export class SendCodeByRegistrationUseCase
       <h1 style="color: dimgrey">Click on the link below to confirm your email address.</h1>
        <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm email.</a></div>`,
         context: {
-          name: command.emailAndCode.createdAt,
+          name: command.emailAndCode.codeId,
           fullURL,
         },
       })

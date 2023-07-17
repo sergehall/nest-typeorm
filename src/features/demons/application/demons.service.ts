@@ -26,13 +26,16 @@ export class DemonsService {
       await this.mailService.findEmailByOldestDate();
     if (emailAndCode[0]) {
       await this.commandBus.execute(
-        new RemoveEmailByIdCommand(emailAndCode[0].id),
+        new RemoveEmailByIdCommand(emailAndCode[0].codeId),
       );
       await this.commandBus.execute(
         new SendCodeByRegistrationCommand(emailAndCode[0]),
       );
       await this.commandBus.execute(
-        new AddSentEmailTimeCommand(emailAndCode[0].id, emailAndCode[0].email),
+        new AddSentEmailTimeCommand(
+          emailAndCode[0].codeId,
+          emailAndCode[0].email,
+        ),
       );
     }
   }
