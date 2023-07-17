@@ -40,6 +40,11 @@ export const userNotExists = {
   message: 'User does not exist',
   field: 'email',
 };
+export const emailNotExistsOrIsConfirmed = {
+  message:
+    'The email does not exist or user already in the database and is confirmed = true',
+  field: 'email',
+};
 export const forbiddenDeleteDevice = {
   message:
     'Forbidden to delete the device. Device not belongs to the current user.',
