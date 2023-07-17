@@ -25,11 +25,11 @@ export const userAlreadyExists = {
   field: 'loginOrEmail',
 };
 export const loginOrEmailInvalid = {
-  message: 'Unsuitable loginOrEmail min 3 max 20',
+  message: 'Unsuitable loginOrEmail length must be min 3 max 20',
   field: 'loginOrEmail',
 };
 export const passwordInvalid = {
-  message: 'Unsuitable password min 6 max 20',
+  message: 'Unsuitable password length must be min 6 max 20',
   field: 'password',
 };
 export const validatePasswordFailed = {
@@ -44,4 +44,9 @@ export const forbiddenDeleteDevice = {
   message:
     'Forbidden to delete the device. Device not belongs to the current user.',
   params: 'deviceId',
+};
+
+export type errorMessageType = {
+  message: string;
+  field: string;
 };
