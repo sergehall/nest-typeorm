@@ -192,17 +192,10 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
-  async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
-    const result = await this.commandBus.execute(
+  async passwordRecovery(@Body() emailDto: EmailDto) {
+    return await this.commandBus.execute(
       new PasswordRecoveryCommand(emailDto.email),
     );
-    if (!result) {
-      throw new HttpException(
-        { message: [codeIncorrect] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return true;
   }
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {
