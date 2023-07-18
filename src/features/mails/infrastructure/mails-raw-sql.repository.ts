@@ -19,6 +19,7 @@ export class MailsRawSqlRepository {
           "expirationDate",
           "createdAt")
           VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
          `,
         [
           newConfirmationCode.codeId,
@@ -33,27 +34,23 @@ export class MailsRawSqlRepository {
     }
   }
   async createEmailRecoveryCode(
-    newConfirmationCode: EmailsRecoveryCodesEntity,
-  ): Promise<EmailsConfirmCodeEntity> {
+    newRecoveryCode: EmailsRecoveryCodesEntity,
+  ): Promise<EmailsRecoveryCodesEntity[]> {
     try {
-      return await this.db.query(
-        `
-        INSERT INTO public."EmailsRecoveryCodes"
-        ( "codeId", 
-          "email", 
-          "recoveryCode", 
-          "expirationDate",
-          "createdAt")
-          VALUES ($1, $2, $3, $4, $5)
-         `,
-        [
-          newConfirmationCode.codeId,
-          newConfirmationCode.email,
-          newConfirmationCode.recoveryCode,
-          newConfirmationCode.expirationDate,
-          newConfirmationCode.createdAt,
-        ],
-      );
+      const query = `
+        INSERT INTO public."EmailsRecoveryCodes" 
+        ("codeId", "email", "recoveryCode", "expirationDate", "createdAt")
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+        `;
+      const values = [
+        newRecoveryCode.codeId,
+        newRecoveryCode.email,
+        newRecoveryCode.recoveryCode,
+        newRecoveryCode.expirationDate,
+        newRecoveryCode.createdAt,
+      ];
+      return await this.db.query(query, values);
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
