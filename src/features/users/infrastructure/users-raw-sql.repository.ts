@@ -104,6 +104,7 @@ export class UsersRawSqlRepository {
       WHERE "email" = $1`,
         [email],
       );
+      console.log(user, 'user1');
       return user[0] ? user[0] : null;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -130,18 +131,18 @@ export class UsersRawSqlRepository {
   }
 
   async updateUserConfirmationCode(
-    userId: string,
+    email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<TablesUsersEntityWithId> {
+  ): Promise<TablesUsersEntityWithId[]> {
     try {
       const updateUser = await this.db.query(
         `
       UPDATE public."Users"
       SET  "confirmationCode" = $2, "expirationDate" = $3
-      WHERE "id" = $1
+      WHERE "email" = $1
       RETURNING *`,
-        [userId, confirmationCode, expirationDate],
+        [email, confirmationCode, expirationDate],
       );
       return updateUser[0];
     } catch (error) {

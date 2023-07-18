@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SentEmailEmailsConfirmationCodeTimeRepository } from '../../infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 
 export class AddSentEmailTimeCommand {
   constructor(public codeId: string, public email: string) {}
@@ -10,11 +10,11 @@ export class AddSentEmailTimeUseCase
   implements ICommandHandler<AddSentEmailTimeCommand>
 {
   constructor(
-    protected sentEmailEmailsConfirmationCodeTimeRepository: SentEmailEmailsConfirmationCodeTimeRepository,
+    protected sentEmailsTimeConfirmAndRecoverCodesRepository: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
   async execute(command: AddSentEmailTimeCommand) {
     const currentTime = new Date().toISOString();
-    return await this.sentEmailEmailsConfirmationCodeTimeRepository.addConfirmationCode(
+    return await this.sentEmailsTimeConfirmAndRecoverCodesRepository.addConfirmationCode(
       command.codeId,
       command.email,
       currentTime,

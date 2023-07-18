@@ -2,7 +2,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 
-export class SentEmailEmailsConfirmationCodeTimeRepository {
+export class SentEmailsTimeConfirmAndRecoverCodesRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
   async addConfirmationCode(
     codeId: string,
@@ -12,7 +12,8 @@ export class SentEmailEmailsConfirmationCodeTimeRepository {
     try {
       return await this.db.query(
         `
-        INSERT INTO public."SentEmailEmailsConfirmationCodeTime" ("codeId", "userId", "email", "sentConfirmCodeTime")
+        INSERT INTO public."SentEmailsTimeConfirmAndRecoverCodes" 
+        ("codeId", "userId", "email", "sentConfirmCodeTime")
         SELECT $1::uuid, u."id"::uuid, $2, $3
         FROM public."Users" u
         WHERE u."email" = $4

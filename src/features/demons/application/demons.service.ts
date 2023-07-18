@@ -27,19 +27,17 @@ export class DemonsService {
   async sendAndDeleteConfirmationCode() {
     const emailAndCode: EmailsConfirmCodeEntity[] =
       await this.mailService.findEmailConfCodeByOldestDate();
-    if (emailAndCode[0]) {
+
+    if (emailAndCode.length > 0) {
+      const { codeId, email } = emailAndCode[0];
+
       await this.commandBus.execute(
-        new RemoveEmailConfirmCodeByIdCommand(emailAndCode[0].codeId),
+        new RemoveEmailConfirmCodeByIdCommand(codeId),
       );
       await this.commandBus.execute(
         new SendRegistrationCodesCommand(emailAndCode[0]),
       );
-      await this.commandBus.execute(
-        new AddSentEmailTimeCommand(
-          emailAndCode[0].codeId,
-          emailAndCode[0].email,
-        ),
-      );
+      await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
     }
   }
   // every sec
@@ -47,19 +45,16 @@ export class DemonsService {
   async sendAndDeleteRecoveryCode() {
     const emailAndCode: EmailsRecoveryCodesEntity[] =
       await this.mailService.findEmailRecCodeByOldestDate();
-    if (emailAndCode[0]) {
+    if (emailAndCode.length > 0) {
+      const { email, codeId } = emailAndCode[0];
+
       await this.commandBus.execute(
-        new RemoveEmailRecoverCodeByIdCommand(emailAndCode[0].codeId),
+        new RemoveEmailRecoverCodeByIdCommand(codeId),
       );
       await this.commandBus.execute(
         new SendRecoveryCodesCommand(emailAndCode[0]),
       );
-      await this.commandBus.execute(
-        new AddSentEmailTimeCommand(
-          emailAndCode[0].codeId,
-          emailAndCode[0].email,
-        ),
-      );
+      await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
     }
   }
   // every 5 min
