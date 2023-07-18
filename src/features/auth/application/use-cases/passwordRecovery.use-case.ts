@@ -3,7 +3,7 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import * as uuid4 from 'uuid4';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
-import { EmailsConfirmCodeEntity } from '../../../demons/entities/emailsConfirmCode.entity';
+import { EmailsRecoveryCodesEntity } from '../../../demons/entities/emailsRecoveryCodes.entity';
 
 export class PasswordRecoveryCommand {
   constructor(public email: string) {}
@@ -21,15 +21,15 @@ export class PasswordRecoveryUseCase
     const { email } = command;
     const user: TablesUsersEntityWithId | null =
       await this.usersRawSqlRepository.findUserByEmail(email);
-    const newConfirmationCode: EmailsConfirmCodeEntity = {
+    const newConfirmationCode: EmailsRecoveryCodesEntity = {
       codeId: uuid4().toString(),
       email: email,
-      confirmationCode: uuid4().toString(),
+      recoveryCode: uuid4().toString(),
       expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString(),
     };
     if (!user) {
-      await this.mailsRawSqlRepository.createEmailConfirmCode(
+      await this.mailsRawSqlRepository.createEmailRecoveryCode(
         newConfirmationCode,
       );
       return true;
@@ -37,10 +37,10 @@ export class PasswordRecoveryUseCase
 
     await this.usersRawSqlRepository.updateUserConfirmationCode(
       user.id,
-      newConfirmationCode.confirmationCode,
+      newConfirmationCode.recoveryCode,
       newConfirmationCode.expirationDate,
     );
-    await this.mailsRawSqlRepository.createEmailConfirmCode(
+    await this.mailsRawSqlRepository.createEmailRecoveryCode(
       newConfirmationCode,
     );
     return true;
