@@ -3,12 +3,15 @@ import { Cron } from '@nestjs/schedule';
 import { MailsService } from '../../mails/application/mails.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-sent-email-time.use-case';
-import { RemoveEmailByIdCommand } from '../../mails/application/use-cases/remove-email-byId.use-case';
-import { SendCodeByRegistrationCommand } from '../../mails/adapters/use-case/send-code-by-registration.use-case';
 import { EmailsConfirmCodeEntity } from '../entities/emailsConfirmCode.entity';
 import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
+import { EmailsRecoveryCodesEntity } from '../entities/emailsRecoveryCodes.entity';
+import { RemoveEmailConfirmCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-confCode-byId.use-case';
+import { RemoveEmailRecoverCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-recCode-byId.use-case';
+import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registrationCodes.use-case';
+import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recoveryCodes';
 
 @Injectable()
 export class DemonsService {
@@ -23,13 +26,33 @@ export class DemonsService {
   @Cron('* * * * * *')
   async sendAndDeleteConfirmationCode() {
     const emailAndCode: EmailsConfirmCodeEntity[] =
-      await this.mailService.findEmailByOldestDate();
+      await this.mailService.findEmailConfCodeByOldestDate();
     if (emailAndCode[0]) {
       await this.commandBus.execute(
-        new RemoveEmailByIdCommand(emailAndCode[0].codeId),
+        new RemoveEmailConfirmCodeByIdCommand(emailAndCode[0].codeId),
       );
       await this.commandBus.execute(
-        new SendCodeByRegistrationCommand(emailAndCode[0]),
+        new SendRegistrationCodesCommand(emailAndCode[0]),
+      );
+      await this.commandBus.execute(
+        new AddSentEmailTimeCommand(
+          emailAndCode[0].codeId,
+          emailAndCode[0].email,
+        ),
+      );
+    }
+  }
+  // every sec
+  @Cron('* * * * * *')
+  async sendAndDeleteRecoveryCode() {
+    const emailAndCode: EmailsRecoveryCodesEntity[] =
+      await this.mailService.findEmailRecCodeByOldestDate();
+    if (emailAndCode[0]) {
+      await this.commandBus.execute(
+        new RemoveEmailRecoverCodeByIdCommand(emailAndCode[0].codeId),
+      );
+      await this.commandBus.execute(
+        new SendRecoveryCodesCommand(emailAndCode[0]),
       );
       await this.commandBus.execute(
         new AddSentEmailTimeCommand(
