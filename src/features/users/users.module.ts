@@ -19,6 +19,7 @@ import { UpdateUserUseCase } from './application/use-cases/update-user.use-case'
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
+import { RecoveryCodeExistsRule } from '../../pipes/recoveryCodeExistsRule-validation';
 
 const usersUseCases = [
   CreateUserByMongooseModelUseCase,
@@ -27,6 +28,7 @@ const usersUseCases = [
   RemoveUserByIdUseCase,
   CheckingUserExistenceUseCase,
 ];
+const usersRules = [RecoveryCodeExistsRule];
 
 @Module({
   imports: [DatabaseModule, CaslModule, CqrsModule],
@@ -42,6 +44,7 @@ const usersUseCases = [
     JwtService,
     ConvertFiltersForDB,
     MailsRawSqlRepository,
+    ...usersRules,
     ...usersUseCases,
     ...usersProviders,
   ],

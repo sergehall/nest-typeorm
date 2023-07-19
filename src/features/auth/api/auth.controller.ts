@@ -44,6 +44,8 @@ import jwt_decode from 'jwt-decode';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
+import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
+import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -192,10 +194,27 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
-  async passwordRecovery(@Body() emailDto: EmailDto) {
+  async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
     return await this.commandBus.execute(
       new PasswordRecoveryCommand(emailDto.email),
     );
+  }
+  @SkipThrottle()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('new-password')
+  async newPassword(
+    @Body() newPasswordRecoveryDto: NewPasswordRecoveryDto,
+  ): Promise<boolean> {
+    const result = await this.commandBus.execute(
+      new newPasswordRecoveryCommand(newPasswordRecoveryDto),
+    );
+    if (!result) {
+      throw new HttpException(
+        { message: [codeIncorrect] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return result;
   }
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {

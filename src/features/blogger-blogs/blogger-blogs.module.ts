@@ -35,6 +35,7 @@ const bloggersBlogUseCases = [
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
 ];
+const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
   imports: [DatabaseModule, CqrsModule],
@@ -50,11 +51,11 @@ const bloggersBlogUseCases = [
     LikeStatusPostsRepository,
     ConvertFiltersForDB,
     CommentsRepository,
-    BlogExistsRule,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
+    ...bloggersBlogRules,
     ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,
   ],
