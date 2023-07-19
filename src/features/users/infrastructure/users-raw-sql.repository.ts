@@ -136,8 +136,9 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async updateUserPasswordHash(
-    userId: string,
+
+  async updateUserPasswordHashByRecoveryCode(
+    recoveryCode: string,
     newPasswordHash: string,
   ): Promise<TablesUsersEntityWithId[]> {
     try {
@@ -145,9 +146,9 @@ export class UsersRawSqlRepository {
         `
       UPDATE public."Users"
       SET  "passwordHash" = $2
-      WHERE "id" = $1
+      WHERE "confirmationCode" = $1
       RETURNING *`,
-        [userId, newPasswordHash],
+        [recoveryCode, newPasswordHash],
       );
       return updateUserPassword[0];
     } catch (error) {

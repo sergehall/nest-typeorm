@@ -7,10 +7,10 @@ export class NewPasswordRecoveryDto {
     message: 'Incorrect newPassword length! Must be min 6, max 20 ch.',
   })
   newPassword: string;
-  @Validate(RecoveryCodeExistsRule)
   @IsNotEmpty()
   @MaxLength(100, {
     message: 'Incorrect recoveryCode length! Must be max 100 ch.',
   })
+  @Validate(RecoveryCodeExistsRule)
   recoveryCode: string;
 }

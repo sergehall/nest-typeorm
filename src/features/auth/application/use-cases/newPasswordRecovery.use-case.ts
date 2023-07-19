@@ -15,19 +15,13 @@ export class newPasswordRecoveryUseCase
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
   async execute(command: newPasswordRecoveryCommand): Promise<boolean> {
     const { newPassword, recoveryCode } = command.newPasswordRecoveryDto;
-    const user = await this.usersRawSqlRepository.findUserByConfirmationCode(
-      recoveryCode,
-    );
-    if (!user) {
-      return false;
-    }
     const saltFactor = Number(getConfiguration().bcrypt.SALT_FACTOR);
     const passwordHash = await bcrypt.hash(newPassword, saltFactor);
-    await this.usersRawSqlRepository.updateUserPasswordHash(
-      user.id,
-      passwordHash,
-    );
-
-    return true;
+    const isPasswordUpdated =
+      await this.usersRawSqlRepository.updateUserPasswordHashByRecoveryCode(
+        recoveryCode,
+        passwordHash,
+      );
+    return isPasswordUpdated.length !== 0;
   }
 }
