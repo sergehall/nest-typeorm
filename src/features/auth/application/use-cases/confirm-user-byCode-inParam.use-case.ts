@@ -20,6 +20,9 @@ export class ConfirmUserByCodeUseCase
     ) {
       const isConfirmed = true;
       const isConfirmedDate: string = new Date().toISOString();
+
+      // 'Congratulations account is confirmed. Send a message not here. To email that has been confirmed.';
+
       return await this.usersRawSqlRepository.confirmUserByConfirmCode(
         command.code,
         isConfirmed,

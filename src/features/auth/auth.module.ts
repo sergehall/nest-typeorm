@@ -31,6 +31,7 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecovery.use-case';
+import { newPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -46,6 +47,7 @@ const authUseCases = [
   ValidAccessJwtUseCase,
   ValidRefreshJwtUseCase,
   PasswordRecoveryUseCase,
+  newPasswordRecoveryUseCase,
 ];
 
 @Module({

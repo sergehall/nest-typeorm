@@ -63,14 +63,19 @@ export class UsersRawSqlRepository {
     confirmationCode: string,
   ): Promise<TablesUsersEntityWithId | null> {
     try {
-      const user = await this.db.query(
-        `
-      SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-      FROM public."Users"
-      WHERE "confirmationCode" = $1`,
-        [confirmationCode],
-      );
-      return user[0] ? user[0] : null;
+      const currentTime = new Date().toISOString();
+      const query = `
+        SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned",
+        "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+        WHERE "confirmationCode" = $1
+        AND (
+          ("isConfirmed" = false AND "expirationDate" > $2)
+          OR "isConfirmed" = true
+        )
+        `;
+      const user = await this.db.query(query, [confirmationCode, currentTime]);
+      return user[0] || null;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -87,24 +92,6 @@ export class UsersRawSqlRepository {
       WHERE "id" = $1`,
         [userId],
       );
-      return user[0] ? user[0] : null;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findUserByEmail(
-    email: string,
-  ): Promise<TablesUsersEntityWithId | null> {
-    try {
-      const user = await this.db.query(
-        `
-      SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-      FROM public."Users"
-      WHERE "email" = $1`,
-        [email],
-      );
-      console.log(user, 'user1');
       return user[0] ? user[0] : null;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -145,6 +132,24 @@ export class UsersRawSqlRepository {
         [email, confirmationCode, expirationDate],
       );
       return updateUser[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async updateUserPasswordHash(
+    userId: string,
+    newPasswordHash: string,
+  ): Promise<TablesUsersEntityWithId[]> {
+    try {
+      const updateUserPassword = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "passwordHash" = $2
+      WHERE "id" = $1
+      RETURNING *`,
+        [userId, newPasswordHash],
+      );
+      return updateUserPassword[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

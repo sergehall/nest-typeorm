@@ -66,6 +66,9 @@ export const getConfiguration = () => {
         Number(process.env.THROTTLE_LIMIT) ||
         NumberThrottlerEnums.THROTTLE_LIMIT,
     },
+    bcrypt: {
+      SALT_FACTOR: Number(process.env.SALT_FACTOR),
+    },
   };
 };
 
@@ -102,4 +105,5 @@ export type ConfigType = ConfigurationConfigType & {
   PG_LOCAL_USER_PASSWORD: string;
   PG_PORT: number;
   PG_NEST_LOCAL_DATABASE: string;
+  SALT_FACTOR: number;
 };
