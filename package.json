@@ -1,7 +1,7 @@
 {
-  "name": "nest-api",
+  "name": "nest-raw-sql",
   "version": "0.0.1",
-  "description": "",
+  "description": "API by NestJS by Raw SQL. My first steps work with NodeJS, Express, NestJS, Swagger, MongoDB, PostgreSQL, Microservices, RabbitMQ, WebSocket, DevOps basics (docker + kubernetes + jenkins), SOLID, Hexagonal architecture, SAGA,front-end basics.",
   "author": "Serge Hall",
   "private": true,
   "license": "UNLICENSED",
