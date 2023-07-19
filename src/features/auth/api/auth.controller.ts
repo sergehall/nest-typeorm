@@ -205,17 +205,11 @@ export class AuthController {
   async newPassword(
     @Body() newPasswordRecoveryDto: NewPasswordRecoveryDto,
   ): Promise<boolean> {
-    const result = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new newPasswordRecoveryCommand(newPasswordRecoveryDto),
     );
-    if (!result) {
-      throw new HttpException(
-        { message: [codeIncorrect] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return result;
   }
+
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
