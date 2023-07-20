@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { forbiddenDeleteDevice } from '../../../../exception-filter/errors-messages';
+import { SessionDevicesEntity } from '../../entities/security-device.entity';
 
 export class RemoveDevicesByDeviceIdCommand {
   constructor(public deviceId: string, public currentPayload: PayloadDto) {}
@@ -17,15 +18,23 @@ export class RemoveDevicesByDeviceIdUseCase
   ) {}
 
   async execute(command: RemoveDevicesByDeviceIdCommand): Promise<boolean> {
-    const result =
-      await this.securityDevicesRawSqlRepository.removeDeviceByDeviceId(
-        command.deviceId,
-        command.currentPayload,
-      );
-    if (result === '404') throw new NotFoundException();
-    if (result === '403') {
+    const { deviceId, currentPayload } = command;
+    const device: SessionDevicesEntity[] =
+      await this.securityDevicesRawSqlRepository.findDeviceByDeviceId(deviceId);
+
+    if (device.length === 0) {
+      throw new NotFoundException('Device not found');
+    }
+
+    if (device[0].userId !== currentPayload.userId) {
       throw new HttpException(forbiddenDeleteDevice, HttpStatus.FORBIDDEN);
     }
-    return result === '204';
+
+    const deleteResult =
+      await this.securityDevicesRawSqlRepository.removeDeviceByDeviceId(
+        deviceId,
+      );
+
+    return deleteResult.length != 0;
   }
 }

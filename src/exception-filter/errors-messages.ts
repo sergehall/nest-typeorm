@@ -46,8 +46,7 @@ export const emailNotExistsOrIsConfirmed = {
   field: 'email',
 };
 export const forbiddenDeleteDevice = {
-  message:
-    'Forbidden to delete the device. Device not belongs to the current user.',
+  message: 'You are not authorized to remove this device.',
   params: 'deviceId',
 };
 

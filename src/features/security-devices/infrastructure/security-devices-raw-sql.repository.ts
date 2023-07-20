@@ -85,24 +85,16 @@ export class SecurityDevicesRawSqlRepository {
   }
   async removeDeviceByDeviceId(
     deviceId: string,
-    currentPayload: PayloadDto,
-  ): Promise<string> {
+  ): Promise<SessionDevicesEntity[]> {
     try {
-      const findDevice = await this.findDeviceByDeviceId(deviceId);
-      if (findDevice.length == 0) {
-        return '404';
-      } else if (findDevice[0].userId !== currentPayload.userId) {
-        return '403';
-      }
-      const removeDeviceByDeviceId = await this.db.query(
+      return await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
       WHERE "deviceId" = $1
-      RETURNING "deviceId"
+      RETURNING *
       `,
         [deviceId],
       );
-      return removeDeviceByDeviceId[1] === 1 ? '204' : '500';
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);

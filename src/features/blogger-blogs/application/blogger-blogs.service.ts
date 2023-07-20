@@ -60,6 +60,15 @@ export class BloggerBlogsService {
       isMembership: blog.isMembership,
     };
   }
+  async findBlogById(blogId: string): Promise<TableBloggerBlogsRawSqlEntity> {
+    console.log('findBlogById');
+    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+    console.log(blog, 'blog');
+    if (!blog) {
+      throw new NotFoundException();
+    }
+    return blog;
+  }
 
   async saFindBlogs(
     queryPagination: PaginationDto,
@@ -154,5 +163,8 @@ export class BloggerBlogsService {
       userId,
       isBanned,
     );
+  }
+  async removeBlogById(blogId: string): Promise<boolean> {
+    return await this.bloggerBlogsRawSqlRepository.removeBlogById(blogId);
   }
 }

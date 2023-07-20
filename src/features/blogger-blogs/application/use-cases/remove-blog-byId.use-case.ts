@@ -2,9 +2,9 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BloggerBlogsService } from '../blogger-blogs.service';
 
 export class RemoveBlogByIdCommand {
   constructor(public id: string, public currentUser: CurrentUserDto) {}
@@ -15,22 +15,24 @@ export class RemoveBlogByIdUseCase
   implements ICommandHandler<RemoveBlogByIdCommand>
 {
   constructor(
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
+    protected bloggerBlogsService: BloggerBlogsService,
     protected caslAbilityFactory: CaslAbilityFactory,
   ) {}
   async execute(command: RemoveBlogByIdCommand) {
-    const blogToDelete = await this.bloggerBlogsRepository.findBlogById(
+    console.log(command.currentUser, command.id, 'command.currentUser');
+    const blogToDelete = await this.bloggerBlogsService.findBlogById(
       command.id,
     );
+    console.log(blogToDelete, 'blogToDelete');
     if (!blogToDelete) throw new NotFoundException();
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToDelete.blogOwnerInfo.userId,
+      id: blogToDelete.blogOwnerId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: command.currentUser.id,
       });
-      return await this.bloggerBlogsRepository.removeBlogById(command.id);
+      return await this.bloggerBlogsService.removeBlogById(command.id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
