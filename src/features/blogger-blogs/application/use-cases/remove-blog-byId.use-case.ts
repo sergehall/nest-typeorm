@@ -1,5 +1,5 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -22,15 +22,9 @@ export class RemoveBlogByIdUseCase
     const blogToDelete = await this.bloggerBlogsService.findBlogById(
       command.id,
     );
-
-    if (!blogToDelete) {
-      throw new NotFoundException('Blog not found');
-    }
-
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToDelete.blogOwnerId,
+      id: blogToDelete[0].blogOwnerId,
     });
-
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: command.currentUser.id,
