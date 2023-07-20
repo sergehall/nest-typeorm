@@ -5,6 +5,7 @@ import {
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../features/blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { TableBloggerBlogsRawSqlEntity } from '../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
 @ValidatorConstraint({ name: 'BlogExists', async: true })
 @Injectable()
@@ -13,15 +14,14 @@ export class BlogExistsRule implements ValidatorConstraintInterface {
     private bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
-  async validate(value: string) {
+  async validate(value: string): Promise<boolean> {
     try {
-      if (await this.bloggerBlogsRawSqlRepository.openFindBlogById(value)) {
-        return true;
-      }
-    } catch (e) {
+      const blog: TableBloggerBlogsRawSqlEntity | null =
+        await this.bloggerBlogsRawSqlRepository.openFindBlogById(value);
+      return !!blog; // Convert the blog to a boolean value (true if not null, false if null)
+    } catch (error) {
       return false;
     }
-    return false;
   }
 
   defaultMessage(args: ValidationArguments) {
