@@ -25,29 +25,39 @@ export class CreatePostCommand {
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRawSqlRepository: PostsRawSqlRepository,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: CreatePostCommand) {
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.openFindBlogById(
+      await this.bloggerBlogsRawSqlRepository.findBlogById(
         command.createPostDto.blogId,
       );
-    if (!blog) throw new NotFoundException();
-    const verifyUserForBlog =
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    // Check if the user is banned from posting in this blog
+    const isUserBanned =
       await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
         command.currentUserDto.id,
         command.createPostDto.blogId,
       );
-    if (verifyUserForBlog) throw new ForbiddenException();
+    if (isUserBanned)
+      // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
+      throw new ForbiddenException('You are banned from posting in this blog');
+
+    // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({
       id: command.currentUserDto.id,
     });
     try {
+      // Check the user's ability to create a post in this blog
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
         id: blog.blogOwnerId,
       });
+      // User has the permission, proceed with creating the post
       const newPost: PostsRawSqlEntity = {
         id: uuid4().toString(),
         title: command.createPostDto.title,
@@ -63,16 +73,17 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         banInfoBanDate: null,
         banInfoBanReason: null,
       };
-      const result: PostsRawSqlEntity =
+      // Create and return the new post
+      const createdNewPost: PostsRawSqlEntity =
         await this.postsRawSqlRepository.createPost(newPost);
       return {
-        id: result.id,
-        title: result.title,
-        shortDescription: result.shortDescription,
-        content: result.content,
-        blogId: result.blogId,
-        blogName: result.blogName,
-        createdAt: result.createdAt,
+        id: createdNewPost.id,
+        title: createdNewPost.title,
+        shortDescription: createdNewPost.shortDescription,
+        content: createdNewPost.content,
+        blogId: createdNewPost.blogId,
+        blogName: createdNewPost.blogName,
+        createdAt: createdNewPost.createdAt,
         extendedLikesInfo: {
           likesCount: 0,
           dislikesCount: 0,
@@ -82,9 +93,13 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       };
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
+        throw new ForbiddenException(
+          'You do not have permission to create a blog post',
+        );
       }
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(
+        'Failed to create a new blog post',
+      );
     }
   }
 }
