@@ -15,28 +15,37 @@ export class RemoveBlogByIdUseCase
   implements ICommandHandler<RemoveBlogByIdCommand>
 {
   constructor(
-    protected bloggerBlogsService: BloggerBlogsService,
-    protected caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsService: BloggerBlogsService,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
-  async execute(command: RemoveBlogByIdCommand) {
-    console.log(command.currentUser, command.id, 'command.currentUser');
+  async execute(command: RemoveBlogByIdCommand): Promise<void> {
     const blogToDelete = await this.bloggerBlogsService.findBlogById(
       command.id,
     );
-    console.log(blogToDelete, 'blogToDelete');
-    if (!blogToDelete) throw new NotFoundException();
+
+    if (!blogToDelete) {
+      throw new NotFoundException('Blog not found');
+    }
+
     const ability = this.caslAbilityFactory.createForUserId({
       id: blogToDelete.blogOwnerId,
     });
+
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: command.currentUser.id,
       });
-      return await this.bloggerBlogsService.removeBlogById(command.id);
+
+      await this.bloggerBlogsService.removeBlogById(command.id);
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
+      this.handleForbiddenError(error);
     }
+  }
+
+  private handleForbiddenError(error: any): void {
+    if (error instanceof ForbiddenError) {
+      throw new ForbiddenException('You are not allowed to delete this blog');
+    }
+    throw error; // Rethrow the error if it's not a ForbiddenError
   }
 }

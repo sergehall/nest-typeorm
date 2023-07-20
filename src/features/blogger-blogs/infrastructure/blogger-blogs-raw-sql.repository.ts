@@ -38,9 +38,9 @@ export class BloggerBlogsRawSqlRepository {
   async findBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+    const blogOwnerBanStatus = false;
+    const banInfoBanStatus = false;
     try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
       const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
@@ -48,7 +48,7 @@ export class BloggerBlogsRawSqlRepository {
       "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1::uuid AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
       `,
         [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
