@@ -195,7 +195,7 @@ export class UsersRawSqlRepository {
     queryData: ParseQueryType,
   ): Promise<TablesUsersEntityWithId[]> {
     try {
-      const preparedQuery = await this._prepQueryRawSql(queryData);
+      const preparedQuery = await this.prepQueryRawSql(queryData);
       const limit = queryData.queryPagination.pageSize;
       const offset = queryData.queryPagination.pageNumber - 1;
       return await this.db.query(
@@ -223,7 +223,7 @@ export class UsersRawSqlRepository {
     queryData: ParseQueryType,
   ): Promise<number> {
     try {
-      const preparedQuery = await this._prepQueryRawSql(queryData);
+      const preparedQuery = await this.prepQueryRawSql(queryData);
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -275,7 +275,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async _prepQueryRawSql(queryData: ParseQueryType) {
+  private async prepQueryRawSql(queryData: ParseQueryType) {
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
         queryData.queryPagination.sortDirection,

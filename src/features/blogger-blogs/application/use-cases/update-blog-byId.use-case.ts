@@ -1,12 +1,12 @@
 import { UpdateBBlogsDto } from '../../dto/update-blogger-blogs.dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
+import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 
 export class UpdateBlogByIdCommand {
   constructor(
@@ -20,44 +20,40 @@ export class UpdateBlogByIdUseCase
   implements ICommandHandler<UpdateBlogByIdCommand>
 {
   constructor(
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
-    protected caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
+
   async execute(command: UpdateBlogByIdCommand) {
-    const blogToUpdate: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepository.findBlogById(command.id);
-    if (!blogToUpdate) throw new NotFoundException();
+    const blogToUpdate =
+      await this.bloggerBlogsRawSqlRepository.openFindBlogById(command.id);
+    if (!blogToUpdate) {
+      throw new NotFoundException();
+    }
+
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToUpdate.blogOwnerInfo.userId,
+      id: blogToUpdate.blogOwnerId,
     });
+    this.checkUpdatePermission(ability, command.currentUser);
+
+    const updatedBlog: TableBloggerBlogsRawSqlEntity = {
+      ...blogToUpdate,
+      ...command.updateBlogDto,
+    };
+
+    return await this.bloggerBlogsRawSqlRepository.updatedBlogById(updatedBlog);
+  }
+
+  private checkUpdatePermission(
+    ability: any,
+    currentUser: CurrentUserDto,
+  ): void {
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: command.currentUser.id,
+        id: currentUser.id,
       });
-
-      const updatedBlog: BloggerBlogsEntity = {
-        id: blogToUpdate.id,
-        name: command.updateBlogDto.name,
-        description: command.updateBlogDto.description,
-        websiteUrl: command.updateBlogDto.websiteUrl,
-        createdAt: blogToUpdate.createdAt,
-        isMembership: blogToUpdate.isMembership,
-        blogOwnerInfo: {
-          userId: blogToUpdate.blogOwnerInfo.userId,
-          userLogin: blogToUpdate.blogOwnerInfo.userLogin,
-          isBanned: blogToUpdate.blogOwnerInfo.isBanned,
-        },
-        banInfo: {
-          isBanned: blogToUpdate.banInfo.isBanned,
-          banDate: blogToUpdate.banInfo.banDate,
-          banReason: blogToUpdate.banInfo.banReason,
-        },
-      };
-      return await this.bloggerBlogsRepository.updatedBlogById(updatedBlog);
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
+      throw new ForbiddenException(error.message);
     }
   }
 }

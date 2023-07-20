@@ -161,6 +161,23 @@ export class BloggerBlogsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+  async updatedBlogById(
+    newBlog: TableBloggerBlogsRawSqlEntity,
+  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+    try {
+      const updatedBlogById = await this.db.query(
+        `
+      UPDATE public."BloggerBlogs"
+      SET  "name" = $2, "description" = $3, "websiteUrl" = $4
+      WHERE "id" = $1
+      RETURNING *`,
+        [newBlog.id, newBlog.name, newBlog.description, newBlog.websiteUrl],
+      );
+      return updatedBlogById[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async createBlogs(
     bloggerBlogsRawSqlEntity: TableBloggerBlogsRawSqlEntity,
