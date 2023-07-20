@@ -19,7 +19,7 @@ import { UpdateUserUseCase } from './application/use-cases/update-user.use-case'
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
-import { RecoveryCodeExistsRule } from '../../pipes/recoveryCodeExistsRule-validation';
+import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.validation';
 
 const usersUseCases = [
   CreateUserByMongooseModelUseCase,
