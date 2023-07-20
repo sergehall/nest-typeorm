@@ -163,7 +163,7 @@ export class BloggerBlogsRawSqlRepository {
   }
   async updatedBlogById(
     newBlog: TableBloggerBlogsRawSqlEntity,
-  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+  ): Promise<boolean> {
     try {
       const updatedBlogById = await this.db.query(
         `
@@ -173,7 +173,7 @@ export class BloggerBlogsRawSqlRepository {
       RETURNING *`,
         [newBlog.id, newBlog.name, newBlog.description, newBlog.websiteUrl],
       );
-      return updatedBlogById[0];
+      return updatedBlogById.length !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

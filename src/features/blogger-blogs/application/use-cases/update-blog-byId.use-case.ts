@@ -24,7 +24,7 @@ export class UpdateBlogByIdUseCase
     private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
-  async execute(command: UpdateBlogByIdCommand) {
+  async execute(command: UpdateBlogByIdCommand): Promise<boolean> {
     const blogToUpdate =
       await this.bloggerBlogsRawSqlRepository.openFindBlogById(command.id);
     if (!blogToUpdate) {
@@ -40,7 +40,6 @@ export class UpdateBlogByIdUseCase
       ...blogToUpdate,
       ...command.updateBlogDto,
     };
-
     return await this.bloggerBlogsRawSqlRepository.updatedBlogById(updatedBlog);
   }
 
