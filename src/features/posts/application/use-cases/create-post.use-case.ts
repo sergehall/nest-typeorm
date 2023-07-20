@@ -97,9 +97,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
           'You do not have permission to create a blog post',
         );
       }
-      throw new InternalServerErrorException(
-        'Failed to create a new blog post',
-      );
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
