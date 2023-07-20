@@ -60,9 +60,7 @@ export class BloggerBlogsService {
       isMembership: blog.isMembership,
     };
   }
-  async findBlogById(
-    blogId: string,
-  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+  async findBlogById(blogId: string): Promise<TableBloggerBlogsRawSqlEntity[]> {
     return await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
   }
 

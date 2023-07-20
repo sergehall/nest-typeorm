@@ -35,13 +35,12 @@ export class BloggerBlogsRawSqlRepository {
       throw new ForbiddenException(error.message);
     }
   }
-  async findBlogById(
-    blogId: string,
-  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+  async findBlogById(blogId: string): Promise<TableBloggerBlogsRawSqlEntity[]> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     try {
-      const blog = await this.db.query(
+      console.log(blogId);
+      return await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
       "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
@@ -52,10 +51,8 @@ export class BloggerBlogsRawSqlRepository {
       `,
         [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
-      return blog[0] || null;
     } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      throw new NotFoundException('Blog not found');
     }
   }
   async findBlogsCurrentUser(
