@@ -50,15 +50,12 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    const searchFilter = { searchNameTerm: queryData.searchNameTerm };
-    const userIdFilter = { userId: currentUserDto.id };
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    return await this.bBloggerService.findBlogsCurrentUser(queryPagination, [
-      searchFilter,
-      userIdFilter,
-    ]);
+    return await this.bBloggerService.findBlogsCurrentUser(
+      currentUserDto,
+      queryData,
+    );
   }
 
   @Get('blogs/comments')

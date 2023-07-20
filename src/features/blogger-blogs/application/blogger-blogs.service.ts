@@ -89,27 +89,25 @@ export class BloggerBlogsService {
   }
 
   async findBlogsCurrentUser(
-    queryPagination: PaginationDto,
-    searchFilters: QueryArrType,
+    currentUserDto: CurrentUserDto,
+    queryData: ParseQueryType,
   ): Promise<PaginationTypes> {
-    const field = queryPagination.sortBy;
-    const convertedFilters = await this.convertFiltersForDB.convert(
-      searchFilters,
-    );
-    const pagination = await this.pagination.convert(queryPagination, field);
-    const blogs: BloggerBlogsEntity[] =
-      await this.bloggerBlogsRepository.findBlogsCurrentUser(
-        pagination,
-        convertedFilters,
+    const blogs: TableBloggerBlogsRawSqlEntity[] =
+      await this.bloggerBlogsRawSqlRepository.findBlogsCurrentUser(
+        currentUserDto,
+        queryData,
       );
-    const totalCount = await this.bloggerBlogsRepository.countDocuments(
-      convertedFilters,
+    const totalCount =
+      await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
+        currentUserDto.id,
+      );
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
     );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
     return {
       pagesCount: pagesCount,
-      page: queryPagination.pageNumber,
-      pageSize: pagination.pageSize,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
       totalCount: totalCount,
       items: blogs,
     };
