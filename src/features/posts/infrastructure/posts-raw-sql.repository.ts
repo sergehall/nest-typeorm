@@ -69,7 +69,8 @@ export class PostsRawSqlRepository {
         `
       SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
       FROM public."Posts"
-      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3`,
+      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3
+      `,
         [postId, postOwnerIsBanned, banInfoBanStatus],
       );
       return post[0] ? post[0] : null;
