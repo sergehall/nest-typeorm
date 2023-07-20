@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import {
   ForbiddenException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
@@ -30,7 +31,31 @@ export class BloggerBlogsRawSqlRepository {
       );
       return blog[0] ? blog[0] : null;
     } catch (error) {
+      console.log(error.message);
       throw new ForbiddenException(error.message);
+    }
+  }
+  async findBlogById(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+    try {
+      const blogOwnerBanStatus = false;
+      const banInfoBanStatus = false;
+      const blog = await this.db.query(
+        `
+      SELECT "id", "createdAt", "isMembership", 
+      "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+      "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+      "name", "description", "websiteUrl"
+      FROM public."BloggerBlogs"
+      WHERE "id" = $1::uuid AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      `,
+        [blogId, blogOwnerBanStatus, banInfoBanStatus],
+      );
+      return blog[0] || null;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async findBlogsCurrentUser(
@@ -211,6 +236,22 @@ export class BloggerBlogsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+  async removeBlogById(blogId: string): Promise<boolean> {
+    try {
+      const comment = await this.db.query(
+        `
+        DELETE FROM public."BloggerBlogs"
+        WHERE "id" = $1
+        RETURNING "id"
+          `,
+        [blogId],
+      );
+      return comment[1] === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 }
