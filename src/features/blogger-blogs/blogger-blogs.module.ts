@@ -9,7 +9,6 @@ import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
-import { BlogExistsRule } from '../../pipes/blog-exist-validation';
 import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repository';
 import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger-blog.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -25,6 +24,7 @@ import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
+import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,

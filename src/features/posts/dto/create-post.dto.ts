@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, Validate } from 'class-validator';
-import { BlogExistsRule } from '../../../pipes/blog-exist-validation';
+import { BlogExistsRule } from '../../../pipes/blog-exist-rule.validation';
 
 export class CreatePostDto {
   @IsNotEmpty()
