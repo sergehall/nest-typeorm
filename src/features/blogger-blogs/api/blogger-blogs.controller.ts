@@ -108,7 +108,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateBlogDto: CreateBloggerBlogsDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUserDto),
