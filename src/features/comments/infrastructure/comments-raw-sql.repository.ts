@@ -76,7 +76,7 @@ export class CommentsRawSqlRepository {
           commentatorInfoIsBanned,
           banInfoIsBanned,
           queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber,
+          queryData.queryPagination.pageNumber - 1,
         ],
       );
     } catch (error) {
