@@ -8,7 +8,6 @@ import { Action } from '../../../../ability/roles/action.enum';
 import {
   ForbiddenException,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
@@ -25,47 +24,60 @@ export class CreateBloggerBlogUseCase
   implements ICommandHandler<CreateBloggerBlogCommand>
 {
   constructor(
-    protected caslAbilityFactory: CaslAbilityFactory,
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: CreateBloggerBlogCommand) {
-    const blogsEntity: TableBloggerBlogsRawSqlEntity = {
-      ...command.createBloggerBlogsDto,
-      id: uuid4().toString(),
+    const blogsEntity = this.createBlogsEntity(
+      command.createBloggerBlogsDto,
+      command.currentUser,
+    );
+
+    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
+    this.checkPermission(ability, command.currentUser);
+
+    const newBlog = await this.bloggerBlogsRawSqlRepository.createBlogs(
+      blogsEntity,
+    );
+
+    return this.getBlogResponse(newBlog);
+  }
+
+  private createBlogsEntity(
+    dto: CreateBloggerBlogsDto,
+    currentUser: CurrentUserDto,
+  ): TableBloggerBlogsRawSqlEntity {
+    const { id, login, isBanned } = currentUser;
+
+    return {
+      ...dto,
+      id: uuid4(),
       createdAt: new Date().toISOString(),
       isMembership: false,
-      blogOwnerId: command.currentUser.id,
-      blogOwnerLogin: command.currentUser.login,
-      blogOwnerBanStatus: command.currentUser.isBanned,
+      blogOwnerId: id,
+      blogOwnerLogin: login,
+      blogOwnerBanStatus: isBanned,
       banInfoBanStatus: false,
       banInfoBanDate: null,
       banInfoBanReason: null,
     };
-    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
+  }
+
+  private checkPermission(ability: any, currentUser: CurrentUserDto): void {
     try {
-      ForbiddenError.from(ability).throwUnlessCan(
-        Action.CREATE,
-        command.currentUser,
-      );
-      const newBlog = await this.bloggerBlogsRawSqlRepository.createBlogs(
-        blogsEntity,
-      );
-      return {
-        id: newBlog.id,
-        name: newBlog.name,
-        description: newBlog.description,
-        websiteUrl: newBlog.websiteUrl,
-        createdAt: newBlog.createdAt,
-        isMembership: newBlog.isMembership,
-      };
+      ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, currentUser);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
       }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private getBlogResponse(
+    blog: TableBloggerBlogsRawSqlEntity,
+  ): Partial<TableBloggerBlogsRawSqlEntity> {
+    const { id, name, description, websiteUrl, createdAt, isMembership } = blog;
+    return { id, name, description, websiteUrl, createdAt, isMembership };
   }
 }

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -30,6 +31,38 @@ export class BloggerBlogsRawSqlRepository {
       return blog[0] ? blog[0] : null;
     } catch (error) {
       throw new ForbiddenException(error.message);
+    }
+  }
+  async findBlogsCurrentUser(
+    currentUserDto: CurrentUserDto,
+    queryData: ParseQueryType,
+  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+    try {
+      const blogOwnerBanStatus = false;
+      const banInfoBanStatus = false;
+      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+        queryData.queryPagination.sortDirection,
+      )
+        ? 'ASC'
+        : 'DESC';
+      return await this.db.query(
+        `
+        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+        FROM public."BloggerBlogs"
+        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2 AND "blogOwnerId" = $3
+        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        LIMIT $4 OFFSET $5
+        `,
+        [
+          blogOwnerBanStatus,
+          banInfoBanStatus,
+          currentUserDto.id,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber - 1,
+        ],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
   async openFindBlogs(
@@ -84,6 +117,24 @@ export class BloggerBlogsRawSqlRepository {
         AND "name" LIKE $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountBlogsByUserId(blogOwnerId: string): Promise<number> {
+    try {
+      const blogOwnerBanStatus = false;
+      const banInfoBanStatus = false;
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."BloggerBlogs"
+        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2 AND "blogOwnerId" = $3
+      `,
+        [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId],
       );
       return Number(countBlogs[0].count);
     } catch (error) {

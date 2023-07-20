@@ -12,6 +12,7 @@ import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
+import { getConfiguration } from '../../../config/configuration';
 
 @Injectable()
 export class UsersService {
@@ -24,13 +25,14 @@ export class UsersService {
     createUserDto: CreateUserDto,
     regDataDto: RegDataDto,
   ): Promise<TablesUsersEntityWithId> {
-    const passwordHash = await bcrypt.hash(
-      createUserDto.password,
-      await bcrypt.genSalt(Number(process.env.SALT_FACTOR)),
-    );
+    const { login, email, password } = createUserDto;
+    // Hash the user's password
+    const passwordHash = await this.hashPassword(password);
+
+    // Prepare the user object with the necessary properties
     const newUser: TablesUsersEntity = {
-      login: createUserDto.login.toLowerCase(),
-      email: createUserDto.email.toLowerCase(),
+      login: login.toLowerCase(),
+      email: email.toLowerCase(),
       passwordHash: passwordHash,
       createdAt: new Date().toISOString(),
       orgId: OrgIdEnums.IT_INCUBATOR,
@@ -45,6 +47,7 @@ export class UsersService {
       ip: regDataDto.ip,
       userAgent: regDataDto.userAgent,
     };
+    // Call the repository method to create the user and return the result
     return await this.usersRawSqlRepository.createUser(newUser);
   }
 
@@ -91,5 +94,11 @@ export class UsersService {
     userId: string,
   ): Promise<TablesUsersEntityWithId | null> {
     return await this.usersRawSqlRepository.findUserByUserId(userId);
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    const saltFactor = Number(getConfiguration().bcrypt.SALT_FACTOR);
+    const salt = await bcrypt.genSalt(saltFactor);
+    return bcrypt.hash(password, salt);
   }
 }
