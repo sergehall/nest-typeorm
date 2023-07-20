@@ -18,6 +18,7 @@ import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repositor
 import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { BlogIdParams } from '../../common/params/blogId.params';
 
 @Injectable()
 export class PostsService {
@@ -60,12 +61,47 @@ export class PostsService {
       items: filledPosts,
     };
   }
+  async findPostsByBlogId(
+    params: BlogIdParams,
+    queryData: ParseQueryType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PaginationTypes> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
+    const posts: PostsRawSqlEntity[] =
+      await this.postsRawSqlRepository.findPostsByBlogId(
+        params,
+        queryData,
+        postOwnerIsBanned,
+        banInfoBanStatus,
+      );
+    const filledPosts = await this.preparationPostsForReturn(
+      posts,
+      currentUserDto,
+    );
+    const totalCountPosts =
+      await this.postsRawSqlRepository.totalCountPostsByBlogId(
+        params,
+        postOwnerIsBanned,
+        banInfoBanStatus,
+      );
+    const pagesCount = Math.ceil(
+      totalCountPosts / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCountPosts,
+      items: filledPosts,
+    };
+  }
 
   async openFindPostByPostId(
     id: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsReturnEntity | null> {
-    const post = await this.postsRawSqlRepository.openFindPostByPostId(id);
+    const post = await this.postsRawSqlRepository.findPostByPostId(id);
     if (!post) throw new NotFoundException();
     const filledPost = await this.preparationPostsForReturn(
       [post],

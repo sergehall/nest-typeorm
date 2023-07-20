@@ -17,7 +17,7 @@ export class BloggerBlogsRawSqlRepository {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     try {
-      const result = await this.db.query(
+      const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
       "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
@@ -29,7 +29,7 @@ export class BloggerBlogsRawSqlRepository {
         [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
       // Return the first blog if found, if not found actuate catch (error)
-      return result[0];
+      return blog[0];
     } catch (error) {
       console.log(error.message);
       // If an error occurs, return null instead of throwing an exception

@@ -53,7 +53,7 @@ export class CommentsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const post = await this.postsRawSqlRepository.openFindPostByPostId(postId);
+    const post = await this.postsRawSqlRepository.findPostByPostId(postId);
     if (!post) throw new NotFoundException();
     const comments: TablesCommentsRawSqlEntity[] =
       await this.commentsRawSqlRepository.findCommentsByPostId(

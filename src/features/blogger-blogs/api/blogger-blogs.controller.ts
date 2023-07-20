@@ -36,12 +36,17 @@ import { FindCommentsCurrentUserCommand } from '../application/use-cases/find-co
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
 import { BanUserForBlogCommand } from '../application/use-cases/ban-user-for-blog.use-case';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
+import { CheckAbilities } from '../../../ability/abilities.decorator';
+import { Action } from '../../../ability/roles/action.enum';
+import { User } from '../../users/infrastructure/schemas/user.schema';
+import { PostsService } from '../../posts/application/posts.service';
 
 @SkipThrottle()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(
     private readonly bBloggerService: BloggerBlogsService,
+    private readonly postsService: PostsService,
     protected commandBus: CommandBus,
   ) {}
   @UseGuards(JwtAuthGuard)
@@ -141,6 +146,22 @@ export class BloggerBlogsController {
     };
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, currentUserDto),
+    );
+  }
+  @Get('blogs/:blogId/posts')
+  @UseGuards(JwtAuthGuard)
+  @CheckAbilities({ action: Action.READ, subject: User })
+  async findPostsByBlogId(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
+    const currentUserDto: CurrentUserDto | null = req.user;
+    const queryData = ParseQuery.getPaginationData(query);
+    return await this.postsService.findPostsByBlogId(
+      params,
+      queryData,
+      currentUserDto,
     );
   }
 
