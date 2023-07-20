@@ -17,7 +17,7 @@ export class BlogExistsRule implements ValidatorConstraintInterface {
   async validate(value: string): Promise<boolean> {
     try {
       const blog: TableBloggerBlogsRawSqlEntity | null =
-        await this.bloggerBlogsRawSqlRepository.openFindBlogById(value);
+        await this.bloggerBlogsRawSqlRepository.findBlogById(value);
       return !!blog; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
       return false;

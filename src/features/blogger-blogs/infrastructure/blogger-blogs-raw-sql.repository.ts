@@ -1,7 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
-  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,47 +11,29 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async openFindBlogById(
+  async findBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
-    try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
-      const blog = await this.db.query(
-        `
-      SELECT "id", "createdAt", "isMembership", 
-      "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
-      "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
-      "name", "description", "websiteUrl"
-      FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
-      `,
-        [blogId, blogOwnerBanStatus, banInfoBanStatus],
-      );
-      return blog[0] ? blog[0] : null;
-    } catch (error) {
-      console.log(error.message);
-      throw new ForbiddenException(error.message);
-    }
-  }
-  async findBlogById(blogId: string): Promise<TableBloggerBlogsRawSqlEntity[]> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     try {
-      console.log(blogId);
-      return await this.db.query(
+      const result = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
       "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
       "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      WHERE "id"::uuid = $1::uuid AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
       `,
         [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
+      // Return the first blog if found, if not found actuate catch (error)
+      return result[0];
     } catch (error) {
-      throw new NotFoundException('Blog not found');
+      console.log(error.message);
+      // If an error occurs, return null instead of throwing an exception
+      return null;
     }
   }
   async findBlogsCurrentUser(

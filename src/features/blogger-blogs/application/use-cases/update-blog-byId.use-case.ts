@@ -25,10 +25,11 @@ export class UpdateBlogByIdUseCase
   ) {}
 
   async execute(command: UpdateBlogByIdCommand): Promise<boolean> {
-    const blogToUpdate =
-      await this.bloggerBlogsRawSqlRepository.openFindBlogById(command.id);
+    const blogToUpdate = await this.bloggerBlogsRawSqlRepository.findBlogById(
+      command.id,
+    );
     if (!blogToUpdate) {
-      throw new NotFoundException();
+      throw new NotFoundException('Blog not found');
     }
 
     const ability = this.caslAbilityFactory.createForUserId({
