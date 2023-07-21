@@ -4,6 +4,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
+import { UpdateDataPostDto } from '../dto/update-data-post.dto';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -38,6 +39,28 @@ export class PostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
+    try {
+      const postOwnerIsBanned = false;
+      const banInfoBanStatus = false;
+      const post = await this.db.query(
+        `
+      SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
+      FROM public."Posts"
+      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3
+      `,
+        [postId, postOwnerIsBanned, banInfoBanStatus],
+      );
+      // Return the first blog if found, if not found actuate catch (error)
+      return post[0];
+    } catch (error) {
+      console.log(error.message);
+      // If an error occurs, return null instead of throwing an exception
+      return null;
+    }
+  }
+
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueryType,
@@ -77,61 +100,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async totalCountPosts(): Promise<number> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Posts"
-        WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
-      `,
-        [postOwnerIsBanned, banInfoBanStatus],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-  async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Posts"
-        WHERE "blogId" = $3 AND "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
-      `,
-        [postOwnerIsBanned, banInfoBanStatus, params.blogId],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
-    try {
-      const postOwnerIsBanned = false;
-      const banInfoBanStatus = false;
-      const post = await this.db.query(
-        `
-      SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
-      FROM public."Posts"
-      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3
-      `,
-        [postId, postOwnerIsBanned, banInfoBanStatus],
-      );
-      // Return the first blog if found, if not found actuate catch (error)
-      return post[0];
-    } catch (error) {
-      console.log(error.message);
-      // If an error occurs, return null instead of throwing an exception
-      return null;
-    }
-  }
   async createPost(
     postsRawSqlEntity: PostsRawSqlEntity,
   ): Promise<PostsRawSqlEntity> {
@@ -166,6 +134,65 @@ export class PostsRawSqlRepository {
       return insertNewPost[0];
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updatePost(
+    postId: string,
+    updateDataPostDto: UpdateDataPostDto,
+  ): Promise<boolean> {
+    try {
+      const updatePost = await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET  "title" = $2, "shortDescription" = $3, "content" = $4
+      WHERE "id" = $1`,
+        [
+          postId,
+          updateDataPostDto.title,
+          updateDataPostDto.shortDescription,
+          updateDataPostDto.content,
+        ],
+      );
+      return !!updatePost[0];
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountPosts(): Promise<number> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
+    try {
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."Posts"
+        WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+      `,
+        [postOwnerIsBanned, banInfoBanStatus],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
+    try {
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."Posts"
+        WHERE "blogId" = $3 AND "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+      `,
+        [postOwnerIsBanned, banInfoBanStatus, params.blogId],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }

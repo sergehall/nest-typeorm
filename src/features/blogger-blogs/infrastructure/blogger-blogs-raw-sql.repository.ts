@@ -24,7 +24,7 @@ export class BloggerBlogsRawSqlRepository {
       "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id"::uuid = $1::uuid AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
       `,
         [blogId, blogOwnerBanStatus, banInfoBanStatus],
       );
