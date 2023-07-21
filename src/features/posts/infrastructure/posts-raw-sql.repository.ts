@@ -1,10 +1,13 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
-import { UpdateDataPostDto } from '../dto/update-data-post.dto';
+import { UpdatePostDto } from '../dto/update-post.dto';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -138,9 +141,9 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async updatePost(
+  async updatePostByPostId(
     postId: string,
-    updateDataPostDto: UpdateDataPostDto,
+    updatePostDto: UpdatePostDto,
   ): Promise<boolean> {
     try {
       const updatePost = await this.db.query(
@@ -150,12 +153,12 @@ export class PostsRawSqlRepository {
       WHERE "id" = $1`,
         [
           postId,
-          updateDataPostDto.title,
-          updateDataPostDto.shortDescription,
-          updateDataPostDto.content,
+          updatePostDto.title,
+          updatePostDto.shortDescription,
+          updatePostDto.content,
         ],
       );
-      return !!updatePost[0];
+      return updatePost[1] === 1;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -194,6 +197,23 @@ export class PostsRawSqlRepository {
       return Number(countBlogs[0].count);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removePostByPostId(postId: string): Promise<boolean> {
+    try {
+      const isDeleted = await this.db.query(
+        `
+        DELETE FROM public."Posts"
+        WHERE "id" = $1
+        RETURNING "id"
+          `,
+        [postId],
+      );
+      return isDeleted[1] === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 }

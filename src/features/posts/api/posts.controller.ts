@@ -11,10 +11,8 @@ import {
   UseGuards,
   HttpStatus,
   Request,
-  NotFoundException,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { CreatePostDto } from '../dto/create-post.dto';
 import { CommentsService } from '../../comments/application/comments.service';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
@@ -31,14 +29,15 @@ import { CreateCommentCommand } from '../../comments/application/use-cases/creat
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CreatePostCommand } from '../application/use-cases/create-post.use-case';
-import { UpdatePostDto } from '../dto/update-post.dto';
-import { UpdatePostCommand } from '../application/use-cases/update-post.use-case';
 import { RemovePostByIdOldCommand } from '../application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../common/params/postId.params';
 import { IdParams } from '../../common/params/id.params';
-import { UpdateDataPostDto } from '../dto/update-data-post.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
+import { UpdatePostWithBlogIdDto } from '../dto/update-post-withBlogId.dto';
+import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
+import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
 
 @SkipThrottle()
 @Controller('posts')
@@ -77,10 +76,15 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
-  async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
+  async createPost(
+    @Request() req: any,
+    @Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto,
+  ) {
     const currentUserDto: CurrentUserDto = req.user;
+    const params = { blogId: createPostWithBlogIdDto.blogId };
+    const { blogId, ...createPostDto } = createPostWithBlogIdDto;
     return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, currentUserDto),
+      new CreatePostCommand(params, createPostDto, currentUserDto),
     );
   }
   @Post(':postId/comments')
@@ -119,24 +123,23 @@ export class PostsController {
   async updatePost(
     @Request() req: any,
     @Param() params: IdParams,
-    @Body() updatePostDto: UpdatePostDto,
+    @Body() updatePostWithBlogIdDto: UpdatePostWithBlogIdDto,
   ) {
     const currentUserDto = req.user;
-    const updateDataPostDto: UpdateDataPostDto = {
-      title: updatePostDto.title,
-      shortDescription: updatePostDto.shortDescription,
-      content: updatePostDto.content,
-    };
-    const blogIdPostId = {
-      blogId: updatePostDto.blogId,
+    const paramsForCommand: BlogIdPostIdParams = {
       postId: params.id,
+      blogId: updatePostWithBlogIdDto.blogId,
     };
-    const updatePost = await this.commandBus.execute(
-      new UpdatePostCommand(updateDataPostDto, blogIdPostId, currentUserDto),
+    const { blogId, ...updatePostDto } = updatePostWithBlogIdDto;
+    return await this.commandBus.execute(
+      new UpdatePostByPostIdCommand(
+        paramsForCommand,
+        updatePostDto,
+        currentUserDto,
+      ),
     );
-    if (!updatePost) throw new NotFoundException();
-    return updatePost;
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
@@ -146,6 +149,7 @@ export class PostsController {
       new RemovePostByIdOldCommand(params.id, currentUser),
     );
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Put(':postId/like-status')

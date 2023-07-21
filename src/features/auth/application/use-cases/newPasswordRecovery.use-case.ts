@@ -9,7 +9,7 @@ export class newPasswordRecoveryCommand {
 }
 
 @CommandHandler(newPasswordRecoveryCommand)
-export class newPasswordRecoveryUseCase
+export class NewPasswordRecoveryUseCase
   implements ICommandHandler<newPasswordRecoveryCommand>
 {
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}

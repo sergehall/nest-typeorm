@@ -12,11 +12,11 @@ import {
   loginOrPassInvalid,
   moAnyAuthHeaders,
 } from '../../../exception-filter/errors-messages';
-import { User } from '../../users/infrastructure/schemas/user.schema';
 import { OrgIdEnums } from '../../users/enums/org-id.enums';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../../config/configuration';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class BaseAuthGuard implements CanActivate {
@@ -38,14 +38,15 @@ export class BaseAuthGuard implements CanActivate {
           HttpStatus.UNAUTHORIZED,
         );
       }
-      const saUser = new User();
-      saUser.id = 'sa.d';
-      saUser.login = 'sa.login';
-      saUser.email = 'sa@email.com';
+      const saUser: CurrentUserDto = new CurrentUserDto();
+      saUser.id = 'id.SA';
+      saUser.login = 'login.SA';
+      saUser.email = 'SA@email.com';
       saUser.orgId = OrgIdEnums.IT_INCUBATOR;
       saUser.roles = RolesEnums.SA;
-      const banInfo = { isBanned: false };
-      request.user = { ...saUser, banInfo };
+      saUser.isBanned = false;
+      saUser.payloadExp = 'infinity.SA';
+      request.user = { ...saUser };
       return true;
     }
   }
