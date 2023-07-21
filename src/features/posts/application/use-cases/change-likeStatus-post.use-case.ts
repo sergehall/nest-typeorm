@@ -26,7 +26,7 @@ export class ChangeLikeStatusPostUseCase
   async execute(command: ChangeLikeStatusPostCommand) {
     const post: PostsRawSqlEntity | null =
       await this.postsRawSqlRepository.findPostByPostId(command.postId);
-    if (!post) throw new NotFoundException();
+    if (!post) throw new NotFoundException('Not found post.');
     const likeStatusPostEntity: LikeStatusPostEntity = {
       blogId: post.blogId,
       postId: command.postId,

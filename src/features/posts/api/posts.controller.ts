@@ -58,7 +58,7 @@ export class PostsController {
   ): Promise<PaginationTypes> {
     const currentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    return this.postsService.findPosts(queryData, currentUserDto);
+    return this.postsService.openFindPosts(queryData, currentUserDto);
   }
 
   @Get(':id')
