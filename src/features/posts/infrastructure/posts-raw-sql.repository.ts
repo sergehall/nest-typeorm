@@ -7,11 +7,9 @@ import { BlogIdParams } from '../../common/params/blogId.params';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async openFindPosts(
-    queryData: ParseQueryType,
-    postOwnerIsBanned: boolean,
-    banInfoBanStatus: boolean,
-  ): Promise<PostsRawSqlEntity[]> {
+  async openFindPosts(queryData: ParseQueryType): Promise<PostsRawSqlEntity[]> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
         queryData.queryPagination.sortDirection,
@@ -43,9 +41,9 @@ export class PostsRawSqlRepository {
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueryType,
-    postOwnerIsBanned: boolean,
-    banInfoBanStatus: boolean,
   ): Promise<PostsRawSqlEntity[] | null> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
         queryData.queryPagination.sortDirection,
@@ -79,10 +77,9 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async totalCountPosts(
-    postOwnerIsBanned: boolean,
-    banInfoBanStatus: boolean,
-  ): Promise<number> {
+  async totalCountPosts(): Promise<number> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
     try {
       const countBlogs = await this.db.query(
         `
@@ -97,11 +94,9 @@ export class PostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async totalCountPostsByBlogId(
-    params: BlogIdParams,
-    postOwnerIsBanned: boolean,
-    banInfoBanStatus: boolean,
-  ): Promise<number> {
+  async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
     try {
       const countBlogs = await this.db.query(
         `

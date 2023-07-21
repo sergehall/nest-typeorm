@@ -130,6 +130,23 @@ export class BloggerBlogsController {
     );
   }
 
+  @Get('blogs/:blogId/posts')
+  @UseGuards(JwtAuthGuard)
+  @CheckAbilities({ action: Action.READ, subject: User })
+  async findPostsByBlogId(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const queryData = ParseQuery.getPaginationData(query);
+    return await this.postsService.findPostsByBlogId(
+      params,
+      queryData,
+      currentUserDto,
+    );
+  }
+
   @Post('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   async createPostByBlogId(
@@ -146,22 +163,6 @@ export class BloggerBlogsController {
     };
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, currentUserDto),
-    );
-  }
-  @Get('blogs/:blogId/posts')
-  @UseGuards(JwtAuthGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
-  async findPostsByBlogId(
-    @Request() req: any,
-    @Param() params: BlogIdParams,
-    @Query() query: any,
-  ): Promise<PaginationTypes> {
-    const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData = ParseQuery.getPaginationData(query);
-    return await this.postsService.findPostsByBlogId(
-      params,
-      queryData,
-      currentUserDto,
     );
   }
 
