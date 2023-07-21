@@ -29,12 +29,14 @@ export class BlogsController {
   ) {}
 
   @Get()
+  @CheckAbilities({ action: Action.READ, subject: User })
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
     return await this.blogsService.openFindBlogs(queryData);
   }
 
   @Get(':id')
+  @CheckAbilities({ action: Action.READ, subject: User })
   async openFindBlogById(
     @Param() params: IdParams,
   ): Promise<ReturnBloggerBlogsEntity> {
@@ -50,6 +52,10 @@ export class BlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    return await this.postsService.findPosts(queryData, currentUserDto);
+    return await this.postsService.openFindPostsByBlogId(
+      params,
+      queryData,
+      currentUserDto,
+    );
   }
 }

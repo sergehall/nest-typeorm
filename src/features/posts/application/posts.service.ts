@@ -1,11 +1,11 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Pagination } from '../../common/pagination/pagination';
-import { PostsRepository } from '../infrastructure/posts.repository';
-import { PostsEntity } from '../entities/posts.entity';
 import {
   NewestLikes,
   PostsReturnEntity,
@@ -19,18 +19,50 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
 import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
 import { BlogIdParams } from '../../common/params/blogId.params';
+import { userNotHavePermission } from '../../../exception-filter/errors-messages';
 
 @Injectable()
 export class PostsService {
   constructor(
     protected convertFiltersForDB: ConvertFiltersForDB,
     protected pagination: Pagination,
-    protected postsRepository: PostsRepository,
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
   ) {}
+  async openFindPosts(
+    queryData: ParseQueryType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PaginationTypes> {
+    const postOwnerIsBanned = false;
+    const banInfoBanStatus = false;
+    const posts: PostsRawSqlEntity[] =
+      await this.postsRawSqlRepository.openFindPosts(
+        queryData,
+        postOwnerIsBanned,
+        banInfoBanStatus,
+      );
+    const filledPosts = await this.preparationPostsForReturn(
+      posts,
+      currentUserDto,
+    );
+    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts(
+      postOwnerIsBanned,
+      banInfoBanStatus,
+    );
+    const pagesCount = Math.ceil(
+      totalCountPosts / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCountPosts,
+      items: filledPosts,
+    };
+  }
 
-  async findPosts(
+  async openFindPostsByBlogId(
+    params: BlogIdParams,
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
@@ -68,13 +100,19 @@ export class PostsService {
   ): Promise<PaginationTypes> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
-    const posts: PostsRawSqlEntity[] =
+    const posts: PostsRawSqlEntity[] | null =
       await this.postsRawSqlRepository.findPostsByBlogId(
         params,
         queryData,
         postOwnerIsBanned,
         banInfoBanStatus,
       );
+    if (!posts) {
+      throw new NotFoundException('BlogId not found');
+    }
+    if (posts[0].postOwnerId !== currentUserDto?.id) {
+      throw new HttpException(userNotHavePermission, HttpStatus.FORBIDDEN);
+    }
     const filledPosts = await this.preparationPostsForReturn(
       posts,
       currentUserDto,
@@ -110,9 +148,6 @@ export class PostsService {
     return filledPost[0];
   }
 
-  async checkPostInDB(postId: string): Promise<PostsEntity | null> {
-    return await this.postsRepository.checkPostInDB(postId);
-  }
   async preparationPostsForReturn(
     postArray: PostsRawSqlEntity[],
     currentUserDto: CurrentUserDto | null,

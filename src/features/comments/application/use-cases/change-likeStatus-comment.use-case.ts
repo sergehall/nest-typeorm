@@ -27,7 +27,7 @@ export class ChangeLikeStatusCommentUseCase
       await this.commentsRawSqlRepository.findCommentByCommentId(
         command.commentId,
       );
-    if (!findComment) throw new NotFoundException();
+    if (!findComment) throw new NotFoundException('Not found comment.');
     const likeStatusCommEntity: LikeStatusCommentEntity = {
       blogId: findComment.postInfoBlogId,
       commentId: command.commentId,

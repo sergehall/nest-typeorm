@@ -36,9 +36,9 @@ export const validatePasswordFailed = {
   message: 'Login or password invalid',
   field: 'loginOrEmail or password in auth headers',
 };
-export const userNotExists = {
-  message: 'User does not exist',
-  field: 'email',
+export const userNotHavePermission = {
+  message: 'You do not have permission, the blog does not belong to you.',
+  params: 'blogId',
 };
 export const emailNotExistsOrIsConfirmed = {
   message:

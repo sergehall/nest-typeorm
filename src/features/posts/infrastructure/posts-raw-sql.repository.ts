@@ -45,7 +45,7 @@ export class PostsRawSqlRepository {
     queryData: ParseQueryType,
     postOwnerIsBanned: boolean,
     banInfoBanStatus: boolean,
-  ): Promise<PostsRawSqlEntity[]> {
+  ): Promise<PostsRawSqlEntity[] | null> {
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
         queryData.queryPagination.sortDirection,
@@ -53,6 +53,7 @@ export class PostsRawSqlRepository {
         ? 'ASC'
         : 'DESC';
       const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
+      // Return posts if found, if not found actuate catch (error)
       return await this.db.query(
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
@@ -72,7 +73,9 @@ export class PostsRawSqlRepository {
         ],
       );
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      console.log(error.message);
+      // If an error occurs, return null instead of throwing an exception
+      return null;
     }
   }
 

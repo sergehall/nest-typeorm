@@ -18,10 +18,8 @@ export class CommentsRawSqlRepository {
         `
         INSERT INTO public."Comments"(
         "id", "content", "createdAt", 
-        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", 
-        "postInfoBlogOwnerId", 
-        "commentatorInfoUserId", "commentatorInfoUserLogin", 
-        "commentatorInfoIsBanned", 
+        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING "id", "content", "createdAt" "commentatorInfoUserId", "commentatorInfoUserLogin"
@@ -64,7 +62,10 @@ export class CommentsRawSqlRepository {
       const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
-        SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        SELECT "id", "content", "createdAt", 
+        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+         "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 
         AND "banInfoIsBanned" = $3
@@ -109,16 +110,19 @@ export class CommentsRawSqlRepository {
       const banInfoIsBanned = false;
       const comment = await this.db.query(
         `
-        SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        SELECT "id", "content", "createdAt", 
+        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
           `,
         [commentId, commentatorInfoIsBanned, banInfoIsBanned],
       );
-      return comment[0] ? comment[0] : null;
+      return comment[0];
     } catch (error) {
       console.log(error.message);
-      throw new NotFoundException(error.message);
+      return null;
     }
   }
 
@@ -133,7 +137,10 @@ export class CommentsRawSqlRepository {
       const orderByDirection = `"${queryData.queryPagination.sortBy}" ${queryData.queryPagination.sortDirection}`;
       return await this.db.query(
         `
-        SELECT "id", "content", "createdAt", "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "likesInfoLikesCount", "likesInfoDislikesCount", "likesInfoMyStatus", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        SELECT "id", "content", "createdAt",
+         "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "postInfoId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
         ORDER BY ${orderByDirection}
