@@ -176,6 +176,7 @@ export class CommentsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+
   async totalCount(
     postInfoBlogOwnerId: string,
     commentatorInfoIsBanned: boolean,

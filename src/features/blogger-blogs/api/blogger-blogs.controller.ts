@@ -16,30 +16,29 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BloggerBlogsService } from '../application/blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
-import { CreatePostBloggerBlogsDto } from '../dto/create-post-blogger-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
-import { UpdateDataPostBloggerBlogsDto } from '../dto/update-data-post-blogger-blogs.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateBloggerBlogCommand } from '../application/use-cases/create-blogger-blog.use-case';
 import { UpdateBlogByIdCommand } from '../application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdCommand } from '../application/use-cases/remove-blog-byId.use-case';
 import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
-import { UpdatePostCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { IdParams } from '../../common/params/id.params';
 import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
 import { FindCommentsCurrentUserCommand } from '../application/use-cases/find-comments-current-user.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
 import { BanUserForBlogCommand } from '../application/use-cases/ban-user-for-blog.use-case';
-import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { User } from '../../users/infrastructure/schemas/user.schema';
 import { PostsService } from '../../posts/application/posts.service';
+import { UpdatePostDto } from '../../posts/dto/update-post.dto';
+import { CreatePostDto } from '../../posts/dto/create-post.dto';
+import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -152,17 +151,11 @@ export class BloggerBlogsController {
   async createPostByBlogId(
     @Request() req: any,
     @Param() params: BlogIdParams,
-    @Body() createPostBBlogsDto: CreatePostBloggerBlogsDto,
+    @Body() createPostDto: CreatePostDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
-    const createPostDto: CreatePostDto = {
-      title: createPostBBlogsDto.title,
-      shortDescription: createPostBBlogsDto.shortDescription,
-      content: createPostBBlogsDto.content,
-      blogId: params.blogId,
-    };
     return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, currentUserDto),
+      new CreatePostCommand(params, createPostDto, currentUserDto),
     );
   }
 
@@ -172,11 +165,11 @@ export class BloggerBlogsController {
   async updatePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
-    @Body() updatePostBBlogDto: UpdateDataPostBloggerBlogsDto,
-  ) {
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new UpdatePostCommand(updatePostBBlogDto, params, currentUserDto),
+      new UpdatePostByPostIdCommand(params, updatePostDto, currentUserDto),
     );
   }
 
@@ -186,14 +179,10 @@ export class BloggerBlogsController {
   async removePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemovePostByPostIdCommand(
-        params.blogId,
-        params.postId,
-        currentUserDto,
-      ),
+      new RemovePostByPostIdCommand(params, currentUserDto),
     );
   }
 

@@ -22,7 +22,6 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banStatus-posts.use-case';
-import { UpdatePostUseCase } from './application/use-cases/update-post.use-case';
 import { RemovePostByPostIdUseCase } from './application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-byId-old.use-case';
@@ -35,13 +34,14 @@ import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository
 import { LikeStatusPostsRawSqlRepository } from './infrastructure/like-status-posts-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.use-case';
 
 const postsUseCases = [
   CreatePostUseCase,
-  ChangeBanStatusPostsUseCase,
-  UpdatePostUseCase,
+  UpdatePostByPostIdUseCase,
   RemovePostByPostIdUseCase,
   RemovePostByIdOldUseCase,
+  ChangeBanStatusPostsUseCase,
   ChangeLikeStatusPostUseCase,
   ChangeBanStatusPostsByUserIdBlogIdUseCase,
   ChangeBanStatusPostsByBlogIdUseCase,

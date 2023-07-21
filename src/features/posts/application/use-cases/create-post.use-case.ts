@@ -1,4 +1,3 @@
-import { CreatePostDto } from '../../dto/create-post.dto';
 import {
   ForbiddenException,
   InternalServerErrorException,
@@ -14,9 +13,12 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { BlogIdParams } from '../../../common/params/blogId.params';
+import { CreatePostDto } from '../../dto/create-post.dto';
 
 export class CreatePostCommand {
   constructor(
+    public params: BlogIdParams,
     public createPostDto: CreatePostDto,
     public currentUserDto: CurrentUserDto,
   ) {}
@@ -32,7 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   async execute(command: CreatePostCommand) {
     const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(
-        command.createPostDto.blogId,
+        command.params.blogId,
       );
     if (!blog) {
       throw new NotFoundException('Blog not found');
@@ -42,7 +44,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     const isUserBanned =
       await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
         command.currentUserDto.id,
-        command.createPostDto.blogId,
+        command.params.blogId,
       );
     if (isUserBanned)
       // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
@@ -63,7 +65,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         title: command.createPostDto.title,
         shortDescription: command.createPostDto.shortDescription,
         content: command.createPostDto.content,
-        blogId: command.createPostDto.blogId,
+        blogId: command.params.blogId,
         blogName: blog.name,
         createdAt: new Date().toISOString(),
         postOwnerId: command.currentUserDto.id,
@@ -94,7 +96,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(
-          'You do not have permission to create a blog post',
+          'You do not have permission to create a post for this blog.',
         );
       }
       throw new InternalServerErrorException(error.message);

@@ -6,7 +6,7 @@ import { PaginationDBType } from '../../common/pagination/types/pagination.types
 import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
 import { BanInfo, PostsDocument } from './schemas/posts.schema';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
-import { UpdateDataPostBloggerBlogsDto } from '../../blogger-blogs/dto/update-data-post-blogger-blogs.dto';
+import { UpdatePostDto } from '../dto/update-post.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -74,16 +74,16 @@ export class PostsRepository {
   }
   async updatePost(
     postId: string,
-    updatePostBloggerBlogsDto: UpdateDataPostBloggerBlogsDto,
+    updatePostDto: UpdatePostDto,
   ): Promise<PostsEntity> {
     return await this.postsModel
       .findOneAndUpdate(
         { id: postId },
         {
           $set: {
-            title: updatePostBloggerBlogsDto.title,
-            shortDescription: updatePostBloggerBlogsDto.shortDescription,
-            content: updatePostBloggerBlogsDto.content,
+            title: updatePostDto.title,
+            shortDescription: updatePostDto.shortDescription,
+            content: updatePostDto.content,
           },
         },
         {
