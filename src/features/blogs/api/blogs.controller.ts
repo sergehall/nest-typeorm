@@ -16,17 +16,13 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { User } from '../../users/infrastructure/schemas/user.schema';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { PostsService } from '../../posts/application/posts.service';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
-  constructor(
-    protected blogsService: BlogsService,
-    protected postsService: PostsService,
-  ) {}
+  constructor(protected blogsService: BlogsService) {}
 
   @Get()
   @CheckAbilities({ action: Action.READ, subject: User })
@@ -52,7 +48,7 @@ export class BlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
-    return await this.postsService.openFindPostsByBlogId(
+    return await this.blogsService.openFindPostsByBlogId(
       params,
       queryData,
       currentUserDto,

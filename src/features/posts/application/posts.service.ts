@@ -33,22 +33,13 @@ export class PostsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
     const posts: PostsRawSqlEntity[] =
-      await this.postsRawSqlRepository.openFindPosts(
-        queryData,
-        postOwnerIsBanned,
-        banInfoBanStatus,
-      );
+      await this.postsRawSqlRepository.openFindPosts(queryData);
     const filledPosts = await this.preparationPostsForReturn(
       posts,
       currentUserDto,
     );
-    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts(
-      postOwnerIsBanned,
-      banInfoBanStatus,
-    );
+    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts();
     const pagesCount = Math.ceil(
       totalCountPosts / queryData.queryPagination.pageSize,
     );
@@ -66,22 +57,23 @@ export class PostsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
-    const posts: PostsRawSqlEntity[] =
-      await this.postsRawSqlRepository.openFindPosts(
-        queryData,
-        postOwnerIsBanned,
-        banInfoBanStatus,
-      );
+    const posts: PostsRawSqlEntity[] | null =
+      await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
+    if (!posts || posts.length === 0) {
+      return {
+        pagesCount: queryData.queryPagination.pageNumber,
+        page: queryData.queryPagination.pageNumber,
+        pageSize: queryData.queryPagination.pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
     const filledPosts = await this.preparationPostsForReturn(
       posts,
       currentUserDto,
     );
-    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts(
-      postOwnerIsBanned,
-      banInfoBanStatus,
-    );
+    const totalCountPosts =
+      await this.postsRawSqlRepository.totalCountPostsByBlogId(params);
     const pagesCount = Math.ceil(
       totalCountPosts / queryData.queryPagination.pageSize,
     );
@@ -96,18 +88,11 @@ export class PostsService {
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueryType,
-    currentUserDto: CurrentUserDto | null,
+    currentUserDto: CurrentUserDto,
   ): Promise<PaginationTypes> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
     const posts: PostsRawSqlEntity[] | null =
-      await this.postsRawSqlRepository.findPostsByBlogId(
-        params,
-        queryData,
-        postOwnerIsBanned,
-        banInfoBanStatus,
-      );
-    if (!posts) {
+      await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
+    if (!posts || posts.length === 0) {
       throw new NotFoundException('BlogId not found');
     }
     if (posts[0].postOwnerId !== currentUserDto?.id) {
@@ -118,11 +103,7 @@ export class PostsService {
       currentUserDto,
     );
     const totalCountPosts =
-      await this.postsRawSqlRepository.totalCountPostsByBlogId(
-        params,
-        postOwnerIsBanned,
-        banInfoBanStatus,
-      );
+      await this.postsRawSqlRepository.totalCountPostsByBlogId(params);
     const pagesCount = Math.ceil(
       totalCountPosts / queryData.queryPagination.pageSize,
     );
