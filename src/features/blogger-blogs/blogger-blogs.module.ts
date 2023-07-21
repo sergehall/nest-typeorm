@@ -24,7 +24,6 @@ import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
-import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -35,7 +34,6 @@ const bloggersBlogUseCases = [
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
 ];
-const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
   imports: [DatabaseModule, CqrsModule],
@@ -55,7 +53,6 @@ const bloggersBlogRules = [BlogExistsRule];
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
-    ...bloggersBlogRules,
     ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,
   ],

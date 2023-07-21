@@ -1,14 +1,19 @@
-import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { BloggerBlogsRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs.repository';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRepository } from '../../infrastructure/posts.repository';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BlogIdPostIdParams } from '../../../common/params/blogId-postId.params';
 import { UpdateDataPostDto } from '../../dto/update-data-post.dto';
+import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
+import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 
 export class UpdatePostCommand {
   constructor(
@@ -21,34 +26,53 @@ export class UpdatePostCommand {
 @CommandHandler(UpdatePostCommand)
 export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
   constructor(
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRepository: PostsRepository,
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
+
   async execute(command: UpdatePostCommand) {
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepository.findBlogById(command.params.blogId);
-    if (!blog) throw new NotFoundException();
-    const post = await this.postsRepository.findPostById(command.params.postId);
-    if (!post) throw new NotFoundException();
+    const blog: TableBloggerBlogsRawSqlEntity | null =
+      await this.bloggerBlogsRawSqlRepository.findBlogById(
+        command.params.blogId,
+      );
+
+    if (!blog) {
+      throw new NotFoundException('Not found blog.');
+    }
+
+    const post: PostsRawSqlEntity | null =
+      await this.postsRawSqlRepository.findPostByPostId(command.params.postId);
+
+    if (!post) {
+      throw new NotFoundException('Not found post');
+    }
+
+    this.checkUserAuthorization(blog, command.currentUserDto);
+
+    return await this.postsRawSqlRepository.updatePost(
+      command.params.postId,
+      command.updateDataPostDto,
+    );
+  }
+
+  private checkUserAuthorization(
+    blog: TableBloggerBlogsRawSqlEntity,
+    currentUserDto: CurrentUserDto,
+  ) {
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blog.blogOwnerInfo.userId,
+      id: blog.blogOwnerId,
     });
+
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: command.currentUserDto.id,
+        id: currentUserDto.id,
       });
-      return await this.postsRepository.updatePost(
-        command.params.postId,
-        command.updateDataPostDto,
-      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
       }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
