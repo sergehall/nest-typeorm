@@ -3,7 +3,7 @@ import { IsBoolean, IsNotEmpty, Length } from 'class-validator';
 export class UpdateBanUserDto {
   @IsNotEmpty()
   @IsBoolean({
-    message: 'Incorrect isBanned length! Must be boolean.',
+    message: 'isBanned must be boolean.',
   })
   isBanned: boolean;
   @IsNotEmpty()

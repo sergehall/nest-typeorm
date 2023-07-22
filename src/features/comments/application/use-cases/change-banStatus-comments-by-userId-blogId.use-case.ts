@@ -1,14 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LikeStatusCommentsRepository } from '../../infrastructure/like-status-comments.repository';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
-import { BanInfo } from '../../../blogger-blogs/entities/blogger-blogs-banned-users.entity';
+import { BannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
+import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 
 export class ChangeBanStatusCommentsByUserIdBlogIdCommand {
-  constructor(
-    public userId: string,
-    public blogId: string,
-    public banInfo: BanInfo,
-  ) {}
+  constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
 }
 
 @CommandHandler(ChangeBanStatusCommentsByUserIdBlogIdCommand)
@@ -16,21 +12,17 @@ export class ChangeBanStatusCommentsByUserIdBlogIdUseCase
   implements ICommandHandler<ChangeBanStatusCommentsByUserIdBlogIdCommand>
 {
   constructor(
-    protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
-    protected commentsRepository: CommentsRepository,
+    protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
   async execute(
     command: ChangeBanStatusCommentsByUserIdBlogIdCommand,
   ): Promise<boolean> {
-    await this.commentsRepository.changeBanStatusCommentsByUserIdAndBlogId(
-      command.userId,
-      command.blogId,
-      command.banInfo,
+    await this.commentsRawSqlRepository.changeBanStatusCommentsByUserIdBlogId(
+      command.bannedUserForBlogEntity,
     );
-    await this.likeStatusCommentsRepository.changeBanStatusCommentsLikeByUserIdBlogId(
-      command.userId,
-      command.blogId,
-      command.banInfo.isBanned,
+    await this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByUserIdBlogId(
+      command.bannedUserForBlogEntity,
     );
     return true;
   }

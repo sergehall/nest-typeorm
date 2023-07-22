@@ -2,6 +2,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikeStatusCommentEntity } from '../entities/like-status-comment.entity';
 import { InternalServerErrorException } from '@nestjs/common';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class LikeStatusCommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -67,6 +68,28 @@ export class LikeStatusCommentsRawSqlRepository {
       );
       return Number(countBlogs[0].count);
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusLikesCommentsByUserIdBlogId(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."LikeStatusComments"
+        SET "isBanned" = $3
+        WHERE "userId" = $1 AND "blogId" = $2
+        `,
+        [
+          bannedUserForBlogEntity.userId,
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.isBanned,
+        ],
+      );
+    } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

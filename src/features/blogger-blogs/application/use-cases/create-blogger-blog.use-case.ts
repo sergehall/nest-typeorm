@@ -57,7 +57,7 @@ export class CreateBloggerBlogUseCase
       blogOwnerId: id,
       blogOwnerLogin: login,
       blogOwnerBanStatus: isBanned,
-      banInfoBanStatus: false,
+      banInfoIsBanned: false,
       banInfoBanDate: null,
       banInfoBanReason: null,
     };

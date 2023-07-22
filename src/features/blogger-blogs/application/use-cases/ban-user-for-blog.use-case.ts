@@ -1,20 +1,25 @@
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BanInfo } from '../../entities/blogger-blogs-banned-users.entity';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ChangeBanStatusCommentsByUserIdBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use-case';
 import { ChangeBanStatusPostsByUserIdBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
+import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
+import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
+import * as uuid4 from 'uuid4';
 
 export class BanUserForBlogCommand {
   constructor(
-    public id: string,
+    public userId: string,
     public updateBanUserDto: UpdateBanUserDto,
     public currentUser: CurrentUserDto,
   ) {}
@@ -25,18 +30,24 @@ export class BanUserForBlogUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRepository: UsersRepository,
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: BanUserForBlogCommand) {
-    const userToBan = await this.usersRepository.findUserByUserId(command.id);
-    if (!userToBan) throw new NotFoundException();
-    const blogForBan = await this.bloggerBlogsRepository.findBlogById(
+    const userToBan = await this.usersRawSqlRepository.findUserByUserId(
+      command.userId,
+    );
+    if (!userToBan) throw new NotFoundException('Not found user.');
+    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogById(
       command.updateBanUserDto.blogId,
     );
-    if (!blogForBan) throw new NotFoundException();
-    const banInfo: BanInfo = {
+    if (!blogForBan) throw new NotFoundException('Not found blog.');
+    const bannedUserForBlogEntity: BannedUsersForBlogsEntity = {
+      id: uuid4(),
+      userId: userToBan.id,
+      blogId: blogForBan.id,
+      login: userToBan.login,
       isBanned: command.updateBanUserDto.isBanned,
       banDate: new Date().toISOString(),
       banReason: command.updateBanUserDto.banReason,
@@ -47,39 +58,26 @@ export class BanUserForBlogUseCase
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: blogForBan.blogOwnerInfo.userId,
+        id: blogForBan.blogOwnerId,
       });
       await this.commandBus.execute(
-        new ChangeBanStatusPostsByUserIdBlogIdCommand(
-          command.id,
-          command.updateBanUserDto,
-        ),
+        new ChangeBanStatusPostsByUserIdBlogIdCommand(bannedUserForBlogEntity),
       );
       await this.commandBus.execute(
         new ChangeBanStatusCommentsByUserIdBlogIdCommand(
-          command.id,
-          command.updateBanUserDto.blogId,
-          banInfo,
+          bannedUserForBlogEntity,
         ),
       );
-      await this.commandBus.execute(
-        new AddBannedUserToBanListCommand(
-          command.id,
-          userToBan.login,
-          command.updateBanUserDto,
-        ),
-      );
-      return await this.bloggerBlogsRepository.banBlogById(
-        blogForBan.id,
-        banInfo,
+      return await this.commandBus.execute(
+        new AddBannedUserToBanListCommand(bannedUserForBlogEntity),
       );
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
+        throw new ForbiddenException(
+          'You are not allowed to banned user for this blog. ' + error.message,
+        );
       }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

@@ -41,7 +41,9 @@ export class RemoveBlogByIdUseCase
 
   private handleForbiddenError(error: any): void {
     if (error instanceof ForbiddenError) {
-      throw new ForbiddenException('You are not allowed to delete this blog');
+      throw new ForbiddenException(
+        'You are not allowed to delete this blog. ' + error.message,
+      );
     }
     throw error; // Rethrow the error if it's not a ForbiddenError
   }

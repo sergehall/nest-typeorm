@@ -52,7 +52,7 @@ export class TableBloggerBlogsRawSqlEntity {
   @IsBoolean({
     message: 'Incorrect isBanned length! Must be boolean.',
   })
-  banInfoBanStatus: boolean;
+  banInfoIsBanned: boolean;
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect createdAt length! Must be max 100 ch.',

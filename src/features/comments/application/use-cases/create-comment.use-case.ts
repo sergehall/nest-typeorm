@@ -34,13 +34,16 @@ export class CreateCommentUseCase
     const post = await this.postsRawSqlRepository.findPostByPostId(
       command.postId,
     );
-    if (!post) throw new NotFoundException();
+    if (!post) throw new NotFoundException('Not found post.');
     const isBannedUserForBlog =
       await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
         command.currentUser.id,
         post.blogId,
       );
-    if (isBannedUserForBlog) throw new ForbiddenException();
+    if (isBannedUserForBlog)
+      throw new ForbiddenException(
+        'You are not allowed to create comment for this blog.',
+      );
     const newComment: TablesCommentsRawSqlEntity = {
       id: uuid4().toString(),
       content: command.createCommentDto.content,

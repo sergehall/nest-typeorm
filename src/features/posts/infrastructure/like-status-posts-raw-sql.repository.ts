@@ -4,6 +4,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { LikeStatusPostEntity } from '../entities/like-status-post.entity';
 import { LikeStatusCommentEntity } from '../../comments/entities/like-status-comment.entity';
 import { NewestLikes } from '../entities/posts-without-ownerInfo.entity';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class LikeStatusPostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -19,7 +20,7 @@ export class LikeStatusPostsRawSqlRepository {
       ON CONFLICT ( "postId", "userId" ) 
       DO UPDATE SET "postId" = $1, "userId" = $2, "blogId" = $3,
        "isBanned" = $4, "login" = $5, "likeStatus" = $6, "addedAt" = $7
-      returning "userId"
+      RETURNING "userId"
       `,
         [
           likeStatusCommEntity.postId,
@@ -37,6 +38,29 @@ export class LikeStatusPostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async changeBanStatusLikesPostsByUserIdBlogId(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."LikeStatusPosts"
+        SET "isBanned" = $3
+        WHERE "userId" = $1 AND "blogId" = $2
+        `,
+        [
+          bannedUserForBlogEntity.userId,
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.isBanned,
+        ],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async countLikesDislikes(
     postId: string,
     isBanned: boolean,
