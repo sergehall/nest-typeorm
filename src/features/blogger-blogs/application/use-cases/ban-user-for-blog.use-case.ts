@@ -37,8 +37,9 @@ export class BanUserForBlogUseCase
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute(command: BanUserForBlogCommand) {
+  async execute(command: BanUserForBlogCommand): Promise<boolean> {
     const userToBan = await this.getUserToBan(command.userId);
+
     const blogForBan = await this.getBlogForBan(
       command.updateBanUserDto.blogId,
     );
@@ -103,7 +104,7 @@ export class BanUserForBlogUseCase
 
   private async executeChangeBanStatusCommands(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
-  ) {
+  ): Promise<boolean> {
     try {
       await Promise.all([
         this.commandBus.execute(
@@ -120,6 +121,7 @@ export class BanUserForBlogUseCase
           new AddBannedUserToBanListCommand(bannedUserForBlogEntity),
         ),
       ]);
+      return true;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

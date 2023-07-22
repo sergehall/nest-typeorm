@@ -47,11 +47,7 @@ export class BannedUsersForBlogsRawSqlRepository {
         queryData.searchLoginTerm,
       );
       const sortBy = this.mapSortByField(queryData.queryPagination.sortBy);
-      console.log(
-        queryData.queryPagination.sortBy,
-        '-------sortBy------',
-        sortBy,
-      );
+      const limit = queryData.queryPagination.pageSize;
       const offset = queryData.queryPagination.pageNumber - 1;
 
       return await this.db.query(
@@ -63,14 +59,25 @@ export class BannedUsersForBlogsRawSqlRepository {
         ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
         `,
-        [
-          isBanned,
-          blogId,
-          searchLoginTerm,
-          queryData.queryPagination.pageSize,
-          offset,
-        ],
+        [isBanned, blogId, searchLoginTerm, limit, offset],
       );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async countBannedUsersForBlog(blogId: string): Promise<number> {
+    try {
+      const isBanned = true;
+      const countBannedUsers = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."BannedUsersForBlogs"
+        WHERE "isBanned" = $1  AND "blogId" = $2
+      `,
+        [isBanned, blogId],
+      );
+      return Number(countBannedUsers[0].count);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -90,22 +97,5 @@ export class BannedUsersForBlogsRawSqlRepository {
 
   private mapSortByField(sortBy: string): string {
     return sortBy === 'createdAt' ? 'banDate' : sortBy;
-  }
-
-  async countBannedUsersForBlog(blogId: string): Promise<number> {
-    try {
-      const isBanned = true;
-      const countBannedUsers = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."BannedUsersForBlogs"
-        WHERE "isBanned" = $1  AND "blogId" = $2
-      `,
-        [isBanned, blogId],
-      );
-      return Number(countBannedUsers[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
   }
 }
