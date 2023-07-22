@@ -1,31 +1,20 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
-import { BloggerBlogsRepository } from '../../infrastructure/blogger-blogs.repository';
-import { UsersBannedByBlogIdEntity } from '../../entities/blogger-blogs-banned-users.entity';
+import { BannedUsersForBlogsRawSqlRepository } from '../../infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
 
 export class AddBannedUserToBanListCommand {
-  constructor(
-    public userId: string,
-    public userLogin: string,
-    public updateBanUserDto: UpdateBanUserDto,
-  ) {}
+  constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
 }
 @CommandHandler(AddBannedUserToBanListCommand)
 export class AddBannedUserToBanListUseCase
   implements ICommandHandler<AddBannedUserToBanListCommand>
 {
-  constructor(protected bloggerBlogsRepository: BloggerBlogsRepository) {}
-  async execute(command: AddBannedUserToBanListCommand) {
-    const bannedUser: UsersBannedByBlogIdEntity = {
-      blogId: command.updateBanUserDto.blogId,
-      id: command.userId,
-      login: command.userLogin,
-      banInfo: {
-        isBanned: command.updateBanUserDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: command.updateBanUserDto.banReason,
-      },
-    };
-    return await this.bloggerBlogsRepository.addBannedUserToBanList(bannedUser);
+  constructor(
+    protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+  ) {}
+  async execute(command: AddBannedUserToBanListCommand): Promise<boolean> {
+    return await this.bannedUsersForBlogsRawSqlRepository.addBannedUserToBanList(
+      command.bannedUserForBlogEntity,
+    );
   }
 }

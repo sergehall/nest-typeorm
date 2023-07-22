@@ -7,6 +7,7 @@ import {
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class CommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -193,6 +194,28 @@ export class CommentsRawSqlRepository {
       );
       return Number(countBlogs[0].count);
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async changeBanStatusCommentsByUserIdBlogId(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET "banInfoIsBanned" = $3, "banInfoBanDate" = $4, "banInfoBanReason" = $5 
+      WHERE "commentatorInfoUserId" = $1 AND "postInfoBlogId" = $2`,
+        [
+          bannedUserForBlogEntity.userId,
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.isBanned,
+          bannedUserForBlogEntity.banDate,
+          bannedUserForBlogEntity.banReason,
+        ],
+      );
+    } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

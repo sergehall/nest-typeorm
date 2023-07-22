@@ -53,7 +53,9 @@ export class UpdateBlogByIdUseCase
         id: currentUser.id,
       });
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw new ForbiddenException(
+        'You are not allowed to update this blog. ' + error.message,
+      );
     }
   }
 }

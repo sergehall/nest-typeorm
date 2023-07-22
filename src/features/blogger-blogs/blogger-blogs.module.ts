@@ -25,6 +25,8 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
+import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
+import { BannedUsersForBlogsRawSqlRepository } from './infrastructure/banned-users-for-blogs-raw-sql.repository';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -51,10 +53,12 @@ const bloggersBlogRules = [BlogExistsRule];
     LikeStatusPostsRepository,
     ConvertFiltersForDB,
     CommentsRepository,
+    UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
+    BannedUsersForBlogsRawSqlRepository,
     ...bloggersBlogRules,
     ...bloggersBlogUseCases,
     ...bloggerBlogsProviders,

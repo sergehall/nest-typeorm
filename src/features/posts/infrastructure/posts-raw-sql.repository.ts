@@ -8,6 +8,7 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -25,7 +26,7 @@ export class PostsRawSqlRepository {
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
           "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
         WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
         ORDER BY ${orderByDirection}
@@ -46,14 +47,17 @@ export class PostsRawSqlRepository {
   async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
     try {
       const postOwnerIsBanned = false;
-      const banInfoBanStatus = false;
+      const banInfoIsBanned = false;
       const post = await this.db.query(
         `
-      SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
+      SELECT "id", "title", "shortDescription", "content", 
+      "blogId", "blogName", "createdAt", 
+      "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
       FROM public."Posts"
-      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoBanStatus" = $3
+      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
-        [postId, postOwnerIsBanned, banInfoBanStatus],
+        [postId, postOwnerIsBanned, banInfoIsBanned],
       );
       // Return the first blog if found, if not found actuate catch (error)
       return post[0];
@@ -82,7 +86,7 @@ export class PostsRawSqlRepository {
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
           "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason"
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
         WHERE "blogId" = $5 AND "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
         ORDER BY ${orderByDirection}
@@ -112,7 +116,7 @@ export class PostsRawSqlRepository {
         INSERT INTO public."Posts"
         ( "id", "title", "shortDescription", "content", "blogId", "blogName", 
           "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason")
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
           returning 
           "id", "title", "shortDescription", "content", "blogId", "blogName", 
@@ -129,12 +133,35 @@ export class PostsRawSqlRepository {
           postsRawSqlEntity.postOwnerId,
           postsRawSqlEntity.postOwnerLogin,
           postsRawSqlEntity.postOwnerIsBanned,
-          postsRawSqlEntity.banInfoBanStatus,
+          postsRawSqlEntity.banInfoIsBanned,
           postsRawSqlEntity.banInfoBanDate,
           postsRawSqlEntity.banInfoBanReason,
         ],
       );
       return insertNewPost[0];
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostsByUserIdBlogId(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "banInfoIsBanned" = $3, "banInfoBanDate" = $4, "banInfoBanReason" = $5
+      WHERE "postOwnerId" = $1 AND "blogId" = $2`,
+        [
+          bannedUserForBlogEntity.userId,
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.isBanned,
+          bannedUserForBlogEntity.banDate,
+          bannedUserForBlogEntity.banReason,
+        ],
+      );
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -173,7 +200,7 @@ export class PostsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Posts"
-        WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+        WHERE "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
       `,
         [postOwnerIsBanned, banInfoBanStatus],
       );
@@ -190,7 +217,7 @@ export class PostsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Posts"
-        WHERE "blogId" = $3 AND "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+        WHERE "blogId" = $3 AND "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
       `,
         [postOwnerIsBanned, banInfoBanStatus, params.blogId],
       );

@@ -15,18 +15,18 @@ export class BloggerBlogsRawSqlRepository {
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     const blogOwnerBanStatus = false;
-    const banInfoBanStatus = false;
+    const banInfoIsBanned = false;
     try {
       const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
       "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
-      "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoBanStatus" = $3
+      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoIsBanned" = $3
       `,
-        [blogId, blogOwnerBanStatus, banInfoBanStatus],
+        [blogId, blogOwnerBanStatus, banInfoIsBanned],
       );
       // Return the first blog if found, if not found actuate catch (error)
       return blog[0];
@@ -52,7 +52,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2 AND "blogOwnerId" = $3
+        WHERE "blogOwnerBanStatus" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
         ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
         LIMIT $4 OFFSET $5
         `,
@@ -135,7 +135,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2 AND "blogOwnerId" = $3
+        WHERE "blogOwnerBanStatus" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId],
       );
@@ -148,16 +148,18 @@ export class BloggerBlogsRawSqlRepository {
     blogOwnerId: string,
     blogId: string,
   ): Promise<boolean> {
+    const banInfoIsBanned = true;
     try {
       const blog: TableBloggerBlogsRawSqlEntity[] = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
         "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
-        "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerId" = $2 AND "banInfoBanStatus" = true`,
-        [blogId, blogOwnerId],
+      WHERE "id" = $1 AND "blogOwnerId" = $2 AND "banInfoIsBanned" = $3
+      `,
+        [blogId, blogOwnerId, banInfoIsBanned],
       );
       return blog.length !== 0;
     } catch (error) {
@@ -191,7 +193,7 @@ export class BloggerBlogsRawSqlRepository {
         INSERT INTO public."BloggerBlogs"(
         "id", "createdAt", "isMembership", 
         "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
-        "banInfoBanStatus", "banInfoBanDate", "banInfoBanReason", 
+        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name",  "description", "websiteUrl")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           returning "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
@@ -202,7 +204,7 @@ export class BloggerBlogsRawSqlRepository {
           bloggerBlogsRawSqlEntity.blogOwnerId,
           bloggerBlogsRawSqlEntity.blogOwnerLogin,
           bloggerBlogsRawSqlEntity.blogOwnerBanStatus,
-          bloggerBlogsRawSqlEntity.banInfoBanStatus,
+          bloggerBlogsRawSqlEntity.banInfoIsBanned,
           bloggerBlogsRawSqlEntity.banInfoBanDate,
           bloggerBlogsRawSqlEntity.banInfoBanReason,
           bloggerBlogsRawSqlEntity.name,

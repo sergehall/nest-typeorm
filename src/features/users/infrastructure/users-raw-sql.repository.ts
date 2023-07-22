@@ -92,9 +92,10 @@ export class UsersRawSqlRepository {
       WHERE "id" = $1`,
         [userId],
       );
-      return user[0] ? user[0] : null;
+      return user[0];
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      console.log(error.message);
+      return null;
     }
   }
 

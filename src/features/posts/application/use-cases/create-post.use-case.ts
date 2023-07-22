@@ -71,7 +71,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         postOwnerId: command.currentUserDto.id,
         postOwnerLogin: command.currentUserDto.login,
         postOwnerIsBanned: false,
-        banInfoBanStatus: false,
+        banInfoIsBanned: false,
         banInfoBanDate: null,
         banInfoBanReason: null,
       };
