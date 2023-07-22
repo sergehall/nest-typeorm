@@ -36,35 +36,46 @@ export class FindAllBannedUsersForBlogUseCase
   ): Promise<PaginationTypes> {
     const { blogId, queryData, currentUser } = command;
 
+    // Check if the blog exists
     const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(
       command.blogId,
     );
     if (!blog) throw new NotFoundException('Not found blog.');
 
+    // Check user's permission to ban the user
     await this.checkUserPermission(currentUser.id, blog.blogOwnerId);
 
+    // Find all banned users for the blog
     const bannedUsers: BannedUsersForBlogsEntity[] =
       await this.bannedUsersForBlogsRawSqlRepository.findBannedUsers(
         blogId,
         queryData,
       );
+
+    // Transform the banned user data into return format
     const transformedBannedUsers: ReturnBannedUsersForBlogEntity[] =
-      bannedUsers.map((i: BannedUsersForBlogsEntity) => ({
-        id: i.id,
-        login: i.login,
+      bannedUsers.map((user: BannedUsersForBlogsEntity) => ({
+        id: user.id,
+        login: user.login,
         banInfo: {
-          isBanned: i.isBanned,
-          banDate: i.banDate,
-          banReason: i.banReason,
+          isBanned: user.isBanned,
+          banDate: user.banDate,
+          banReason: user.banReason,
         },
       }));
+
+    // Get the total count of banned users for pagination purposes
     const totalCount =
       await this.bannedUsersForBlogsRawSqlRepository.countBannedUsersForBlog(
         blogId,
       );
+
+    // Calculate the number of pages for pagination
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
     );
+
+    // Return the paginated and transformed banned users data
     return {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,
@@ -75,6 +86,7 @@ export class FindAllBannedUsersForBlogUseCase
   }
 
   private async checkUserPermission(userId: string, blogOwnerId: string) {
+    // Check if the user has permission to ban user for blog
     const ability = this.caslAbilityFactory.createForUserId({ id: userId });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
