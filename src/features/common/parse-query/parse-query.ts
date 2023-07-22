@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { SortOrder } from './types/sort-order.types';
 import { BanStatusTypes } from './types/ban-status.types';
+
+// Type for pagination data in the query
 type QueryPaginationType = {
   pageNumber: number;
   pageSize: number;
   sortBy: string;
   sortDirection: SortOrder;
 };
+
+// Type for the parsed query parameters
 export type ParseQueryType = {
   queryPagination: QueryPaginationType;
   searchNameTerm: string;
@@ -20,92 +24,62 @@ export type ParseQueryType = {
   banStatus: BanStatusTypes;
 };
 
+// An array of allowed sorting fields
+const allowedSortingFields = [
+  'login',
+  'email',
+  'name',
+  'websiteUrl',
+  'description',
+  'shortDescription',
+  'title',
+  'blogName',
+  'content',
+];
+
+const allowedSortDirection = [
+  -1,
+  1,
+  'DESCENDING',
+  'descending',
+  'DESC',
+  'desc',
+  'ASCENDING',
+  'ascending',
+  'ASC',
+  'asc',
+];
+
 @Injectable()
 export class ParseQuery {
   static getPaginationData(query: any) {
-    let pageNumber: number = parseInt(<string>query.pageNumber);
-    let pageSize: number = parseInt(<string>query.pageSize);
-    let searchNameTerm: string = query.searchNameTerm?.toString();
-    let searchLoginTerm: string = query.searchLoginTerm?.toString();
-    let searchEmailTerm: string = query.searchEmailTerm?.toString();
-    let title: string = query.sitle?.toString();
-    let userName: string = query.searchName?.toString();
-    let searchTitle: string = query.searchTitle?.toString();
-    let code: string = query.code?.toString();
-    let confirmationCode: string = query.sonfirmationCode?.toString();
-    const querySortBy: string = query.sortBy?.toString();
-    let sortBy = 'createdAt';
+    const pageNumber = parseInt(query.pageNumber, 10) || 1;
+    const pageSize = parseInt(query.pageSize, 10) || 10;
+    const searchNameTerm = query.searchNameTerm?.toString() || '';
+    const searchLoginTerm = query.searchLoginTerm?.toString() || '';
+    const searchEmailTerm = query.searchEmailTerm?.toString() || '';
+    const title = query.title?.toString() || '';
+    const userName = query.userName?.toString() || '';
+    const searchTitle = query.searchTitle?.toString() || '';
+    const code = query.code?.toString() || '';
+    const confirmationCode = query.confirmationCode?.toString() || '';
     const querySortDirection: SortOrder = query?.sortDirection;
-    let sortDirection: SortOrder = 'desc';
-    const queryBanStatus: string = query.banStatus?.toString();
-    let banStatus: BanStatusTypes = '';
-    if (queryBanStatus === 'banned') {
-      banStatus = 'true';
-    } else if (queryBanStatus === 'notBanned') {
-      banStatus = 'false';
-    }
-    if (!searchNameTerm) {
-      searchNameTerm = '';
-    }
-    if (!searchLoginTerm) {
-      searchLoginTerm = '';
-    }
-    if (!searchEmailTerm) {
-      searchEmailTerm = '';
-    }
-    if (!confirmationCode) {
-      confirmationCode = '';
-    }
-    if (!code) {
-      code = '';
-    }
-    if (!searchTitle) {
-      searchTitle = '';
-    }
-    if (!title) {
-      title = '';
-    }
-    if (!userName) {
-      userName = '';
-    }
-    if (isNaN(pageNumber)) {
-      pageNumber = 1;
-    }
-    if (isNaN(pageSize)) {
-      pageSize = 10;
-    }
-    if (
-      querySortBy === 'login' ||
-      querySortBy === 'email' ||
-      querySortBy === 'name' ||
-      querySortBy === 'websiteUrl' ||
-      querySortBy === 'description' ||
-      querySortBy === 'shortDescription' ||
-      querySortBy === 'title' ||
-      querySortBy === 'blogName' ||
-      querySortBy === 'content'
-    ) {
-      sortBy = querySortBy;
-    }
-    if (
-      [
-        -1,
-        1,
-        'DESCENDING',
-        'descending',
-        'DESC',
-        'desc',
-        'ASCENDING',
-        'ascending',
-        'ASC',
-        'asc',
-      ].includes(querySortDirection)
-    ) {
-      sortDirection = querySortDirection;
-    }
-    if (Number(querySortDirection) === 1) {
-      sortDirection = 1;
-    }
+    const sortDirection: SortOrder = allowedSortDirection.includes(
+      querySortDirection,
+    )
+      ? querySortDirection
+      : 'desc';
+    const queryBanStatus = query.banStatus?.toString();
+    const banStatus: BanStatusTypes =
+      queryBanStatus === 'banned'
+        ? 'true'
+        : queryBanStatus === 'notBanned'
+        ? 'false'
+        : '';
+    const sortBy = allowedSortingFields.includes(query.sortBy)
+      ? query.sortBy
+      : 'createdAt';
+
     return {
       queryPagination: {
         pageNumber: pageNumber,

@@ -39,6 +39,7 @@ import { PostsService } from '../../posts/application/posts.service';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
+import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-all-banned-users-for-blog.use.case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -85,11 +86,18 @@ export class BloggerBlogsController {
     const searchByBlogId = { blogId: params.id };
     const banStatus = { banStatus: 'true' };
     const queryPagination: PaginationDto = queryData.queryPagination;
-    return await this.bBloggerService.findBannedUsers(
-      params.id,
-      queryPagination,
-      [searchLoginTerm, searchByBlogId, banStatus],
-      currentUserDto,
+    // return await this.bBloggerService.findBannedUsers(
+    //   params.id,
+    //   queryPagination,
+    //   [searchLoginTerm, searchByBlogId, banStatus],
+    //   currentUserDto,
+    // );
+    return await this.commandBus.execute(
+      new FindAllBannedUsersForBlogCommand(
+        params.id,
+        queryData,
+        currentUserDto,
+      ),
     );
   }
 

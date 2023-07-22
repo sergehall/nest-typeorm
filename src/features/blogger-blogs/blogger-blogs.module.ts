@@ -27,6 +27,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from './infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-all-banned-users-for-blog.use.case';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -36,6 +37,7 @@ const bloggersBlogUseCases = [
   BanUserForBlogUseCase,
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
+  FindAllBannedUsersForBlogUseCase,
 ];
 const bloggersBlogRules = [BlogExistsRule];
 

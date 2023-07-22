@@ -16,6 +16,7 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
 import * as uuid4 from 'uuid4';
+import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -24,59 +25,103 @@ export class BanUserForBlogCommand {
     public currentUser: CurrentUserDto,
   ) {}
 }
+
 @CommandHandler(BanUserForBlogCommand)
 export class BanUserForBlogUseCase
   implements ICommandHandler<BanUserForBlogCommand>
 {
   constructor(
-    protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    protected commandBus: CommandBus,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly commandBus: CommandBus,
   ) {}
+
   async execute(command: BanUserForBlogCommand) {
-    const userToBan = await this.usersRawSqlRepository.findUserByUserId(
-      command.userId,
-    );
-    if (!userToBan) throw new NotFoundException('Not found user.');
-    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogById(
+    const userToBan = await this.getUserToBan(command.userId);
+    const blogForBan = await this.getBlogForBan(
       command.updateBanUserDto.blogId,
     );
-    if (!blogForBan) throw new NotFoundException('Not found blog.');
-    const bannedUserForBlogEntity: BannedUsersForBlogsEntity = {
-      id: uuid4(),
-      userId: userToBan.id,
-      blogId: blogForBan.id,
-      login: userToBan.login,
-      isBanned: command.updateBanUserDto.isBanned,
-      banDate: new Date().toISOString(),
-      banReason: command.updateBanUserDto.banReason,
-    };
 
-    const ability = this.caslAbilityFactory.createForUserId({
-      id: command.currentUser.id,
-    });
+    await this.checkUserPermission(
+      command.currentUser.id,
+      blogForBan.blogOwnerId,
+    );
+
+    const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
+      this.createBannedUserEntity(userToBan, command.updateBanUserDto);
+
+    return await this.executeChangeBanStatusCommands(bannedUserForBlogEntity);
+  }
+
+  private async getUserToBan(userId: string): Promise<TablesUsersEntityWithId> {
+    const userToBan: TablesUsersEntityWithId | null =
+      await this.usersRawSqlRepository.findUserByUserId(userId);
+    if (!userToBan) {
+      throw new NotFoundException('Not found user.');
+    }
+    return userToBan;
+  }
+
+  private async getBlogForBan(blogId: string) {
+    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogById(
+      blogId,
+    );
+    if (!blogForBan) {
+      throw new NotFoundException('Not found blog.');
+    }
+    return blogForBan;
+  }
+
+  private createBannedUserEntity(
+    userToBan: TablesUsersEntityWithId,
+    updateBanUserDto: UpdateBanUserDto,
+  ): BannedUsersForBlogsEntity {
+    return {
+      id: uuid4().toString(),
+      userId: userToBan.id,
+      blogId: updateBanUserDto.blogId,
+      login: userToBan.login,
+      isBanned: updateBanUserDto.isBanned,
+      banDate: new Date().toISOString(),
+      banReason: updateBanUserDto.banReason,
+    };
+  }
+
+  private async checkUserPermission(userId: string, blogOwnerId: string) {
+    const ability = this.caslAbilityFactory.createForUserId({ id: userId });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: blogForBan.blogOwnerId,
+        id: blogOwnerId,
       });
-      await this.commandBus.execute(
-        new ChangeBanStatusPostsByUserIdBlogIdCommand(bannedUserForBlogEntity),
-      );
-      await this.commandBus.execute(
-        new ChangeBanStatusCommentsByUserIdBlogIdCommand(
-          bannedUserForBlogEntity,
-        ),
-      );
-      return await this.commandBus.execute(
-        new AddBannedUserToBanListCommand(bannedUserForBlogEntity),
-      );
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'You are not allowed to banned user for this blog. ' + error.message,
-        );
-      }
+      throw new ForbiddenException(
+        'You are not allowed to ban a user for this blog. ' + error.message,
+      );
+    }
+  }
+
+  private async executeChangeBanStatusCommands(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ) {
+    try {
+      await Promise.all([
+        this.commandBus.execute(
+          new ChangeBanStatusPostsByUserIdBlogIdCommand(
+            bannedUserForBlogEntity,
+          ),
+        ),
+        this.commandBus.execute(
+          new ChangeBanStatusCommentsByUserIdBlogIdCommand(
+            bannedUserForBlogEntity,
+          ),
+        ),
+        this.commandBus.execute(
+          new AddBannedUserToBanListCommand(bannedUserForBlogEntity),
+        ),
+      ]);
+    } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

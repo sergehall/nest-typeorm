@@ -28,11 +28,11 @@ export class BloggerBlogsRawSqlRepository {
       `,
         [blogId, blogOwnerBanStatus, banInfoIsBanned],
       );
-      // Return the first blog if found, if not found actuate catch (error)
-      return blog[0];
+      // Return the first blog if found, if not found return null
+      return blog[0] || null;
     } catch (error) {
       console.log(error.message);
-      // If an error occurs, return null instead of throwing an exception
+      // if not blogId not UUID will be error, and return null
       return null;
     }
   }
@@ -144,6 +144,7 @@ export class BloggerBlogsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async isBannedUserForBlog(
     blogOwnerId: string,
     blogId: string,
