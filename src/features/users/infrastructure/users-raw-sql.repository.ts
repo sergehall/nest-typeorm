@@ -192,6 +192,7 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async findUsers(
     queryData: ParseQueryType,
   ): Promise<TablesUsersEntityWithId[]> {
