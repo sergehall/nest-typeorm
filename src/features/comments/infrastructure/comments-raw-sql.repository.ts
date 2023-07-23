@@ -19,7 +19,7 @@ export class CommentsRawSqlRepository {
         `
         INSERT INTO public."Comments"(
         "id", "content", "createdAt", 
-        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
         "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -29,7 +29,7 @@ export class CommentsRawSqlRepository {
           tablesCommentsRawSqlEntity.id,
           tablesCommentsRawSqlEntity.content,
           tablesCommentsRawSqlEntity.createdAt,
-          tablesCommentsRawSqlEntity.postInfoId,
+          tablesCommentsRawSqlEntity.postInfoPostId,
           tablesCommentsRawSqlEntity.postInfoTitle,
           tablesCommentsRawSqlEntity.postInfoBlogId,
           tablesCommentsRawSqlEntity.postInfoBlogName,
@@ -64,7 +64,7 @@ export class CommentsRawSqlRepository {
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", 
-        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
@@ -132,7 +132,7 @@ export class CommentsRawSqlRepository {
       const comment = await this.db.query(
         `
         SELECT "id", "content", "createdAt", 
-        "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
         "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
@@ -159,7 +159,7 @@ export class CommentsRawSqlRepository {
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt",
-         "postInfoId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+         "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
           "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
@@ -233,6 +233,24 @@ export class CommentsRawSqlRepository {
           bannedUserForBlogEntity.banDate,
           bannedUserForBlogEntity.banReason,
         ],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async changeBanStatusCommentsByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET "banInfoIsBanned" = $2
+      WHERE "postInfoBlogId" = $1
+      `,
+        [blogId, isBanned],
       );
     } catch (error) {
       console.log(error.message);

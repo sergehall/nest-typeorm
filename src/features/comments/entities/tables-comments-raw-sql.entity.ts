@@ -30,7 +30,7 @@ export class TablesCommentsRawSqlEntity {
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 15 ch.',
   })
-  postInfoId: string;
+  postInfoPostId: string;
   @IsNotEmpty()
   @Length(0, 30, {
     message: 'Incorrect title length! Must be max 100 ch.',

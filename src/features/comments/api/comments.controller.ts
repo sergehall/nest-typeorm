@@ -40,7 +40,7 @@ export class CommentsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: User })
-  async findComment(@Request() req: any, @Param() params: IdParams) {
+  async findCommentById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
     return this.commentsService.findCommentById(params.id, currentUserDto);
   }

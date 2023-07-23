@@ -34,6 +34,7 @@ import { CommentsRawSqlRepository } from './infrastructure/comments-raw-sql.repo
 import { LikeStatusCommentsRawSqlRepository } from './infrastructure/like-status-comments-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -43,6 +44,7 @@ const commentsUseCases = [
   ChangeLikeStatusCommentUseCase,
   FillingCommentsDataUseCase,
   ChangeBanStatusCommentsByUserIdBlogIdUseCase,
+  ChangeBanStatusCommentsByBlogIdUseCase,
 ];
 
 @Module({

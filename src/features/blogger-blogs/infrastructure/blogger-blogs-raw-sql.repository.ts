@@ -20,11 +20,11 @@ export class BloggerBlogsRawSqlRepository {
       const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
-      "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+      "blogOwnerId", "dependencyIsBanned",
       "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
       "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerBanStatus" = $2 AND "banInfoIsBanned" = $3
+      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
         [blogId, blogOwnerBanStatus, banInfoIsBanned],
       );
@@ -52,7 +52,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
         ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
         LIMIT $4 OFFSET $5
         `,
@@ -87,7 +87,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         AND "name" ILIKE $3
         ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
         LIMIT $4 OFFSET $5
@@ -116,7 +116,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoBanStatus" = $2
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         AND "name" LIKE $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
@@ -135,7 +135,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "blogOwnerBanStatus" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId],
       );
@@ -154,7 +154,7 @@ export class BloggerBlogsRawSqlRepository {
       const blog: TableBloggerBlogsRawSqlEntity[] = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
-        "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+        "blogOwnerId", "dependencyIsBanned",
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name", "description", "websiteUrl"
       FROM public."BloggerBlogs"
@@ -193,18 +193,17 @@ export class BloggerBlogsRawSqlRepository {
         `
         INSERT INTO public."BloggerBlogs"(
         "id", "createdAt", "isMembership", 
-        "blogOwnerId", "blogOwnerLogin", "blogOwnerBanStatus", 
+        "blogOwnerId", "dependencyIsBanned", 
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name",  "description", "websiteUrl")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
           returning "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
         [
           bloggerBlogsRawSqlEntity.id,
           bloggerBlogsRawSqlEntity.createdAt,
           bloggerBlogsRawSqlEntity.isMembership,
           bloggerBlogsRawSqlEntity.blogOwnerId,
-          bloggerBlogsRawSqlEntity.blogOwnerLogin,
-          bloggerBlogsRawSqlEntity.blogOwnerBanStatus,
+          bloggerBlogsRawSqlEntity.dependencyIsBanned,
           bloggerBlogsRawSqlEntity.banInfoIsBanned,
           bloggerBlogsRawSqlEntity.banInfoBanDate,
           bloggerBlogsRawSqlEntity.banInfoBanReason,
@@ -245,7 +244,7 @@ export class BloggerBlogsRawSqlRepository {
       const updateBlogs = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
-      SET "blogOwnerBanStatus" = $2
+      SET "banInfoIsBanned" = $2
       WHERE "blogOwnerId" = $1`,
         [userId, isBanned],
       );

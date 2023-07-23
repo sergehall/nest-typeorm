@@ -47,7 +47,7 @@ export class CreateBloggerBlogUseCase
     dto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
   ): TableBloggerBlogsRawSqlEntity {
-    const { id, login, isBanned } = currentUser;
+    const { id, isBanned } = currentUser;
 
     return {
       ...dto,
@@ -55,8 +55,7 @@ export class CreateBloggerBlogUseCase
       createdAt: new Date().toISOString(),
       isMembership: false,
       blogOwnerId: id,
-      blogOwnerLogin: login,
-      blogOwnerBanStatus: isBanned,
+      dependencyIsBanned: isBanned,
       banInfoIsBanned: false,
       banInfoBanDate: null,
       banInfoBanReason: null,

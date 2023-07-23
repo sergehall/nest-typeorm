@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class ChangeBanStatusCommentsByUserIdBlogIdCommand {
   constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
@@ -18,12 +19,21 @@ export class ChangeBanStatusCommentsByUserIdBlogIdUseCase
   async execute(
     command: ChangeBanStatusCommentsByUserIdBlogIdCommand,
   ): Promise<boolean> {
-    await this.commentsRawSqlRepository.changeBanStatusCommentsByUserIdBlogId(
-      command.bannedUserForBlogEntity,
-    );
-    await this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByUserIdBlogId(
-      command.bannedUserForBlogEntity,
-    );
-    return true;
+    const { bannedUserForBlogEntity } = command;
+    try {
+      await Promise.all([
+        this.commentsRawSqlRepository.changeBanStatusCommentsByUserIdBlogId(
+          bannedUserForBlogEntity,
+        ),
+        this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByUserIdBlogId(
+          bannedUserForBlogEntity,
+        ),
+      ]);
+      return true;
+    } catch (error) {
+      // If an error occurs during the execution of repository methods, log the error and rethrow it as an InternalServerErrorException
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
