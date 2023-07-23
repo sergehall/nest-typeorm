@@ -69,8 +69,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         blogName: blog.name,
         createdAt: new Date().toISOString(),
         postOwnerId: command.currentUserDto.id,
-        postOwnerLogin: command.currentUserDto.login,
-        postOwnerIsBanned: false,
+        dependencyIsBanned: false,
         banInfoIsBanned: false,
         banInfoBanDate: null,
         banInfoBanReason: null,
@@ -78,6 +77,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       // Create and return the new post
       const createdNewPost: PostsRawSqlEntity =
         await this.postsRawSqlRepository.createPost(newPost);
+
       return {
         id: createdNewPost.id,
         title: createdNewPost.title,

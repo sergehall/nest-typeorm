@@ -35,6 +35,7 @@ export class CreateCommentUseCase
       command.postId,
     );
     if (!post) throw new NotFoundException('Not found post.');
+
     const isBannedUserForBlog =
       await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
         command.currentUser.id,
@@ -48,7 +49,7 @@ export class CreateCommentUseCase
       id: uuid4().toString(),
       content: command.createCommentDto.content,
       createdAt: new Date().toISOString(),
-      postInfoId: post.id,
+      postInfoPostId: post.id,
       postInfoTitle: post.title,
       postInfoBlogId: post.blogId,
       postInfoBlogName: post.blogName,

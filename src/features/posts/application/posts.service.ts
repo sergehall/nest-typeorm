@@ -139,7 +139,7 @@ export class PostsService {
         const postId = postArray[i].id;
         const isBanned = false;
         const currentPost: PostsRawSqlEntity = postArray[i];
-        if (postArray[i].postOwnerIsBanned) {
+        if (postArray[i].dependencyIsBanned) {
           continue;
         }
         // getting likes count

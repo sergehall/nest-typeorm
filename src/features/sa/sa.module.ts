@@ -18,16 +18,16 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
 import { ChangeRoleUseCase } from './application/use-cases/change-role.use-case';
 import { SaBanUserUseCase } from './application/use-cases/sa-ban-user.use-case';
-import { SaBanBlogUseCase } from './application/use-cases/sa-ban-blog.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
+import { SaBanBlogByBlogIUseCase } from './application/use-cases/sa-ban-blog-byBlogId.use-case';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
   ChangeRoleUseCase,
   SaBanUserUseCase,
-  SaBanBlogUseCase,
+  SaBanBlogByBlogIUseCase,
 ];
 
 @Module({

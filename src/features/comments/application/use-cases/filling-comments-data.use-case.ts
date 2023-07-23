@@ -73,7 +73,7 @@ export class FillingCommentsDataUseCase
             myStatus: ownLikeStatus,
           },
           postInfo: {
-            id: currentComment.postInfoId,
+            id: currentComment.postInfoPostId,
             title: currentComment.postInfoTitle,
             blogId: currentComment.postInfoBlogId,
             blogName: currentComment.postInfoBlogName,

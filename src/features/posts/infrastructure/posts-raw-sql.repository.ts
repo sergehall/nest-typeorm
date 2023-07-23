@@ -12,6 +12,7 @@ import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-u
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
+
   async openFindPosts(queryData: ParseQueryType): Promise<PostsRawSqlEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
@@ -28,7 +29,7 @@ export class PostsRawSqlRepository {
           "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
-        WHERE "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+        WHERE "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
         ORDER BY ${orderByDirection}
         LIMIT $3 OFFSET $4
         `,
@@ -46,18 +47,18 @@ export class PostsRawSqlRepository {
 
   async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
     try {
-      const postOwnerIsBanned = false;
+      const dependencyIsBanned = false;
       const banInfoIsBanned = false;
       const post = await this.db.query(
         `
       SELECT "id", "title", "shortDescription", "content", 
       "blogId", "blogName", "createdAt", 
-      "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
+      "postOwnerId", "dependencyIsBanned", 
       "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
       FROM public."Posts"
-      WHERE "id" = $1 AND "postOwnerIsBanned" = $2 AND "banInfoIsBanned" = $3
+      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
-        [postId, postOwnerIsBanned, banInfoIsBanned],
+        [postId, dependencyIsBanned, banInfoIsBanned],
       );
       // Return the first blog if found, if not found actuate catch (error)
       return post[0];
@@ -114,10 +115,11 @@ export class PostsRawSqlRepository {
       const insertNewPost = await this.db.query(
         `
         INSERT INTO public."Posts"
-        ( "id", "title", "shortDescription", "content", "blogId", "blogName", 
-          "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            (
+             "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
+             "postOwnerId", "dependencyIsBanned",
+             "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           returning 
           "id", "title", "shortDescription", "content", "blogId", "blogName", 
           "createdAt"
@@ -131,8 +133,7 @@ export class PostsRawSqlRepository {
           postsRawSqlEntity.blogName,
           postsRawSqlEntity.createdAt,
           postsRawSqlEntity.postOwnerId,
-          postsRawSqlEntity.postOwnerLogin,
-          postsRawSqlEntity.postOwnerIsBanned,
+          postsRawSqlEntity.dependencyIsBanned,
           postsRawSqlEntity.banInfoIsBanned,
           postsRawSqlEntity.banInfoBanDate,
           postsRawSqlEntity.banInfoBanReason,
@@ -161,6 +162,24 @@ export class PostsRawSqlRepository {
           bannedUserForBlogEntity.banDate,
           bannedUserForBlogEntity.banReason,
         ],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostsByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "blogId" = $1`,
+        [blogId, isBanned],
       );
     } catch (error) {
       console.log(error.message);
@@ -200,7 +219,7 @@ export class PostsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Posts"
-        WHERE "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
       `,
         [postOwnerIsBanned, banInfoBanStatus],
       );
@@ -217,7 +236,7 @@ export class PostsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Posts"
-        WHERE "blogId" = $3 AND "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
+        WHERE "blogId" = $3 AND "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
       `,
         [postOwnerIsBanned, banInfoBanStatus, params.blogId],
       );
@@ -252,7 +271,7 @@ export class PostsRawSqlRepository {
       const updatePosts = await this.db.query(
         `
       UPDATE public."Posts"
-      SET "postOwnerIsBanned" = $2
+      SET "dependencyIsBanned" = $2
       WHERE "postOwnerId" = $1`,
         [userId, isBanned],
       );

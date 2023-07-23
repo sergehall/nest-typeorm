@@ -1,28 +1,36 @@
-import { BanInfo } from '../../../blogger-blogs/entities/blogger-blogs-banned-users.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LikeStatusCommentsRepository } from '../../infrastructure/like-status-comments.repository';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
+import { InternalServerErrorException } from '@nestjs/common';
+import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
+import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 
 export class ChangeBanStatusCommentsByBlogIdCommand {
-  constructor(public blogId: string, public banInfo: BanInfo) {}
+  constructor(public blogId: string, public isBanned: boolean) {}
 }
 @CommandHandler(ChangeBanStatusCommentsByBlogIdCommand)
 export class ChangeBanStatusCommentsByBlogIdUseCase
   implements ICommandHandler<ChangeBanStatusCommentsByBlogIdCommand>
 {
   constructor(
-    protected likeStatusCommentsRepository: LikeStatusCommentsRepository,
-    protected commentsRepository: CommentsRepository,
+    protected commentsRawSqlRepository: CommentsRawSqlRepository,
+    protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
   ) {}
   async execute(command: ChangeBanStatusCommentsByBlogIdCommand) {
-    await this.commentsRepository.changeBanStatusCommentsByBlogId(
-      command.blogId,
-      command.banInfo.isBanned,
-    );
-    await this.likeStatusCommentsRepository.changeBanStatusCommentsLikeByBlogId(
-      command.blogId,
-      command.banInfo.isBanned,
-    );
-    return;
+    const { blogId, isBanned } = command;
+    try {
+      await Promise.all([
+        this.commentsRawSqlRepository.changeBanStatusCommentsByBlogId(
+          blogId,
+          isBanned,
+        ),
+        this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByBlogId(
+          blogId,
+          isBanned,
+        ),
+      ]);
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

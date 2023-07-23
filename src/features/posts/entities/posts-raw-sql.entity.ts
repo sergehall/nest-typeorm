@@ -51,14 +51,8 @@ export class PostsRawSqlEntity {
     message: 'Incorrect id! Must be max 15 ch.',
   })
   postOwnerId: string;
-  @IsNotEmpty()
-  @Length(3, 10, {
-    message: 'Incorrect login length! Must be min 3, max 10 ch.',
-  })
-  @Matches('^[a-zA-Z0-9_-]*$')
-  postOwnerLogin: string;
   @IsBoolean()
-  postOwnerIsBanned: boolean;
+  dependencyIsBanned: boolean;
   @IsNotEmpty()
   @IsBoolean({
     message: 'Incorrect isBanned length! Must be boolean.',

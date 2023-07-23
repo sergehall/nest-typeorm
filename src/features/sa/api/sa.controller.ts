@@ -34,9 +34,9 @@ import { SaBanUserCommand } from '../application/use-cases/sa-ban-user.use-case'
 import { IdParams } from '../../common/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
-import { SaBanBlogCommand } from '../application/use-cases/sa-ban-blog.use-case';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
+import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-byBlogId.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -142,7 +142,7 @@ export class SaController {
   ) {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanBlogCommand(params.id, saBanBlogDto, currentUserDto),
+      new SaBanBlogByBlogIdCommand(params.id, saBanBlogDto, currentUserDto),
     );
   }
 }

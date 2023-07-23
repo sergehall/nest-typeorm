@@ -9,6 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+
 class PostInfo {
   @IsNotEmpty()
   @Length(1, 100, {
