@@ -6,6 +6,7 @@ import { PaginationDBType } from '../../common/pagination/types/pagination.types
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
+import { BanInfoDto } from '../dto/banInfo.dto';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -34,7 +35,7 @@ export class UsersRawSqlRepository {
           "ip",
           "userAgent")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-          RETURNING id`,
+          RETURNING "userId" AS "id"`,
         [
           tablesUsersEntity.login,
           tablesUsersEntity.email,
@@ -65,8 +66,10 @@ export class UsersRawSqlRepository {
     try {
       const currentTime = new Date().toISOString();
       const query = `
-        SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned",
-        "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        SELECT 
+        "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
         WHERE "confirmationCode" = $1
         AND (
@@ -87,9 +90,11 @@ export class UsersRawSqlRepository {
     try {
       const user = await this.db.query(
         `
-      SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
       FROM public."Users"
-      WHERE "id" = $1`,
+      WHERE "userId" = $1`,
         [userId],
       );
       return user[0];
@@ -163,7 +168,9 @@ export class UsersRawSqlRepository {
     try {
       const user = await this.db.query(
         `
-        SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        SELECT "userId" as "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
+        "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed",
+         "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
         WHERE "email" = $1 or "login" = $1
       `,
@@ -181,7 +188,9 @@ export class UsersRawSqlRepository {
     try {
       const user = await this.db.query(
         `
-        SELECT "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        SELECT "userId", "login", "email", "passwordHash", "createdAt", "orgId",
+         "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
+         "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
         WHERE "login" = $1 OR "email" = $2
       `,
@@ -202,7 +211,7 @@ export class UsersRawSqlRepository {
       const offset = queryData.queryPagination.pageNumber - 1;
       return await this.db.query(
         `
-        SELECT "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
         AND  "isBanned" in (${preparedQuery.banCondition})
@@ -267,7 +276,7 @@ export class UsersRawSqlRepository {
         `
       UPDATE public."Users"
       SET  "roles" = $2
-      WHERE "id" = $1
+      WHERE "userId" = $1
       RETURNING *`,
         [userId, roles],
       );
@@ -310,6 +319,22 @@ export class UsersRawSqlRepository {
         searchEmailTerm: searchEmailTerm,
         searchLoginTerm: searchLoginTerm,
       };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+    try {
+      const { isBanned, banReason, banDate } = banInfo;
+      const updatePosts = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
+      WHERE "userId" = $1`,
+        [userId, isBanned, banDate, banReason],
+      );
+      return !!updatePosts[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

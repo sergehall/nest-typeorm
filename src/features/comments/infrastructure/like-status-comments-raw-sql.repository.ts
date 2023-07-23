@@ -93,4 +93,23 @@ export class LikeStatusCommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async changeBanStatusCommentsLikesByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."LikeStatusComments"
+        SET "isBanned" = $2
+        WHERE "userId" = $1
+        `,
+        [userId, isBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

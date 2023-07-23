@@ -151,16 +151,15 @@ export class SecurityDevicesRawSqlRepository {
 
   async removeDevicesBannedUser(userId: string) {
     try {
-      const currentTime = new Date().toISOString();
-      const removeCurrentDevice = await this.db.query(
+      const removeCurrentDevices = await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1 AND "expirationDate" >= $2
+      WHERE "userId" = $1
       RETURNING "userId"
       `,
-        [userId, currentTime],
+        [userId],
       );
-      return removeCurrentDevice[0] != null;
+      return removeCurrentDevices[0] != null;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);

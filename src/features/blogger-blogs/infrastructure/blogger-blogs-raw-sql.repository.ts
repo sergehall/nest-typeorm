@@ -219,6 +219,7 @@ export class BloggerBlogsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async removeBlogById(blogId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(
@@ -233,6 +234,24 @@ export class BloggerBlogsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new NotFoundException(error.message);
+    }
+  }
+
+  async changeBanStatusBlogsOwnerByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updateBlogs = await this.db.query(
+        `
+      UPDATE public."BloggerBlogs"
+      SET "blogOwnerBanStatus" = $2
+      WHERE "blogOwnerId" = $1`,
+        [userId, isBanned],
+      );
+      return !!updateBlogs[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
