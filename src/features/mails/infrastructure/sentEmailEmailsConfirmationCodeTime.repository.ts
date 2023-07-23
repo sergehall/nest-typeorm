@@ -14,7 +14,7 @@ export class SentEmailsTimeConfirmAndRecoverCodesRepository {
         `
         INSERT INTO public."SentEmailsTimeConfirmAndRecoverCodes" 
         ("codeId", "userId", "email", "sentConfirmCodeTime")
-        SELECT $1::uuid, u."id"::uuid, $2, $3
+        SELECT $1::uuid, u."userId"::uuid, $2, $3
         FROM public."Users" u
         WHERE u."email" = $4
         RETURNING "codeId";

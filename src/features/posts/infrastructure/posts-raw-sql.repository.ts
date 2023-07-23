@@ -243,4 +243,22 @@ export class PostsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+
+  async changeBanStatusPostOwnerByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updatePosts = await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "postOwnerIsBanned" = $2
+      WHERE "postOwnerId" = $1`,
+        [userId, isBanned],
+      );
+      return !!updatePosts[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

@@ -86,6 +86,7 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async updateComment(
     commentId: string,
     updateCommentDto: UpdateCommentDto,
@@ -103,6 +104,25 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async changeBanStatusCommentatorsByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updateComments = await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET "commentatorInfoIsBanned" = $2
+      WHERE "commentatorInfoUserId" = $1`,
+        [userId, isBanned],
+      );
+      return !!updateComments[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async findCommentByCommentId(
     commentId: string,
   ): Promise<TablesCommentsRawSqlEntity | null> {

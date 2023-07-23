@@ -9,7 +9,7 @@ import {
 } from '../../../exception-filter/errors-messages';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
-import { UsersRawSqlEntity } from '../../users/entities/usersRawSql.entity';
+import { TablesUsersEntity } from '../../users/entities/tablesUsers.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -22,7 +22,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(
     loginOrEmail: string,
     password: string,
-  ): Promise<UsersRawSqlEntity | null> {
+  ): Promise<TablesUsersEntity | null> {
     const messages: errorMessageType[] = [];
 
     this.validateLength(

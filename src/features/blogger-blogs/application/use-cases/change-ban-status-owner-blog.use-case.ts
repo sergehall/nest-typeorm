@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsService } from '../blogger-blogs.service';
+import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 
 export class ChangeBanStatusUserBlogsCommand {
   constructor(public userId: string, public isBanned: boolean) {}
@@ -8,9 +8,11 @@ export class ChangeBanStatusUserBlogsCommand {
 export class ChangeBanStatusOwnerBlogUseCase
   implements ICommandHandler<ChangeBanStatusUserBlogsCommand>
 {
-  constructor(protected bloggerBlogsService: BloggerBlogsService) {}
+  constructor(
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+  ) {}
   async execute(command: ChangeBanStatusUserBlogsCommand) {
-    await this.bloggerBlogsService.changeBanStatusOwnerBlog(
+    await this.bloggerBlogsRawSqlRepository.changeBanStatusBlogsOwnerByUserId(
       command.userId,
       command.isBanned,
     );
