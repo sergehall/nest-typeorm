@@ -11,6 +11,82 @@ import { BanInfoDto } from '../dto/banInfo.dto';
 export class UsersRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
+  async saFindUsers(
+    queryData: ParseQueryType,
+  ): Promise<TablesUsersEntityWithId[]> {
+    try {
+      const preparedQuery = await this.prepQueryRawSql(queryData);
+      const limit = queryData.queryPagination.pageSize;
+      const offset = queryData.queryPagination.pageNumber - 1;
+      return await this.db.query(
+        `
+        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        FROM public."Users"
+        WHERE "email" like $1 OR "login" like $2
+        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+        LIMIT $3 OFFSET $4
+      `,
+        [
+          preparedQuery.searchEmailTerm,
+          preparedQuery.searchLoginTerm,
+          limit,
+          offset,
+        ],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findUsers(
+    queryData: ParseQueryType,
+  ): Promise<TablesUsersEntityWithId[]> {
+    try {
+      const preparedQuery = await this.prepQueryRawSql(queryData);
+      const limit = queryData.queryPagination.pageSize;
+      const offset = queryData.queryPagination.pageNumber - 1;
+      const isBanned = false;
+      return await this.db.query(
+        `
+      SELECT "userId" as "id", "login", "email", "createdAt"
+      FROM public."Users"
+      WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" = $3
+      ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+      LIMIT $4 OFFSET $5
+    `,
+        [
+          preparedQuery.searchEmailTerm,
+          preparedQuery.searchLoginTerm,
+          isBanned,
+          limit,
+          offset,
+        ],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<TablesUsersEntityWithId | null> {
+    try {
+      const user = await this.db.query(
+        `
+        SELECT "userId" as "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
+        "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed",
+         "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+        WHERE "email" = $1 or "login" = $1
+      `,
+        [loginOrEmail.toLocaleLowerCase()],
+      );
+      return user[0] ? user[0] : null;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async createUser(
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersEntityWithId> {
@@ -161,25 +237,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<TablesUsersEntityWithId | null> {
-    try {
-      const user = await this.db.query(
-        `
-        SELECT "userId" as "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
-        "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed",
-         "isConfirmedDate", "ip", "userAgent"
-        FROM public."Users"
-        WHERE "email" = $1 or "login" = $1
-      `,
-        [loginOrEmail.toLocaleLowerCase()],
-      );
-      return user[0] ? user[0] : null;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
   async userAlreadyExist(
     login: string,
     email: string,
@@ -201,62 +258,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async saFindUsers(
-    queryData: ParseQueryType,
-  ): Promise<TablesUsersEntityWithId[]> {
-    try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const limit = queryData.queryPagination.pageSize;
-      const offset = queryData.queryPagination.pageNumber - 1;
-      return await this.db.query(
-        `
-        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
-        FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2
-        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
-        LIMIT $3 OFFSET $4
-      `,
-        [
-          preparedQuery.searchEmailTerm,
-          preparedQuery.searchLoginTerm,
-          limit,
-          offset,
-        ],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findUsers(
-    queryData: ParseQueryType,
-  ): Promise<TablesUsersEntityWithId[]> {
-    try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const limit = queryData.queryPagination.pageSize;
-      const offset = queryData.queryPagination.pageNumber - 1;
-      return await this.db.query(
-        `
-        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
-        FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2
-        AND  "isBanned" in (${preparedQuery.banCondition})
-        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
-        LIMIT $3 OFFSET $4
-      `,
-        [
-          preparedQuery.searchEmailTerm,
-          preparedQuery.searchLoginTerm,
-          limit,
-          offset,
-        ],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountUsers(queryData: ParseQueryType): Promise<number> {
+  async totalCountUsersForSa(queryData: ParseQueryType): Promise<number> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const totalCount = await this.db.query(
@@ -267,6 +269,28 @@ export class UsersRawSqlRepository {
         AND  "isBanned" in (${preparedQuery.banCondition})
       `,
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
+      );
+      return Number(totalCount[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountUsers(queryData: ParseQueryType): Promise<number> {
+    try {
+      const preparedQuery = await this.prepQueryRawSql(queryData);
+      const isBanned = false;
+      const totalCount = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."Users"
+        WHERE "email" like $1 OR "login" like $2 AND  "isBanned" = $3
+        `,
+        [
+          preparedQuery.searchEmailTerm,
+          preparedQuery.searchLoginTerm,
+          isBanned,
+        ],
       );
       return Number(totalCount[0].count);
     } catch (error) {
@@ -310,6 +334,22 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+    try {
+      const { isBanned, banReason, banDate } = banInfo;
+      const updatePosts = await this.db.query(
+        `
+      UPDATE public."Users"
+      SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
+      WHERE "userId" = $1`,
+        [userId, isBanned, banDate, banReason],
+      );
+      return !!updatePosts[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async prepQueryRawSql(queryData: ParseQueryType) {
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
@@ -343,22 +383,6 @@ export class UsersRawSqlRepository {
         searchEmailTerm: searchEmailTerm,
         searchLoginTerm: searchLoginTerm,
       };
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
-    try {
-      const { isBanned, banReason, banDate } = banInfo;
-      const updatePosts = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
-      WHERE "userId" = $1`,
-        [userId, isBanned, banDate, banReason],
-      );
-      return !!updatePosts[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

@@ -46,7 +46,7 @@ export class UsersController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
-    return this.usersService.findUsersRawSql(queryData);
+    return this.usersService.findUsers(queryData);
   }
 
   @Get(':id')
