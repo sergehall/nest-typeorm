@@ -25,8 +25,8 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
       command.id,
     );
     if (!userToUpdate || userToUpdate.id !== command.currentUser.id)
-      throw new ForbiddenException();
-    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
+      throw new ForbiddenException('You are not allowed to update this user.');
+    const ability = this.caslAbilityFactory.createSaUser(command.currentUser);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);
       // Call DB  to update user

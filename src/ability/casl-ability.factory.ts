@@ -15,7 +15,7 @@ const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
 
 @Injectable()
 export class CaslAbilityFactory {
-  createForUser(currentUser: CurrentUserDto) {
+  createSaUser(currentUser: CurrentUserDto) {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility);
     if (currentUser.roles === RolesEnums.SA) {
       can(Action.MANAGE, 'all');

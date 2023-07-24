@@ -102,7 +102,7 @@ export class LikeStatusCommentsRawSqlRepository {
       return await this.db.query(
         `
         UPDATE public."LikeStatusComments"
-        SET "isBanned" = $3
+        SET "isBanned" = $2
         WHERE "blogId" = $1
         `,
         [blogId, isBanned],

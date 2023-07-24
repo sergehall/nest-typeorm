@@ -22,6 +22,7 @@ export class ChangeBanStatusPostsByBlogIdUseCase
     command: ChangeBanStatusPostsByBlogIdCommand,
   ): Promise<boolean> {
     const { blogId, isBanned } = command;
+
     try {
       // Execute the changeBanStatusPostsByUserIdBlogId and changeBanStatusLikesPostsByUserIdBlogId methods in parallel
       await Promise.all([
@@ -34,6 +35,7 @@ export class ChangeBanStatusPostsByBlogIdUseCase
           isBanned,
         ),
       ]);
+
       // Return true to indicate that the ban status change was successful
       return true;
     } catch (error) {

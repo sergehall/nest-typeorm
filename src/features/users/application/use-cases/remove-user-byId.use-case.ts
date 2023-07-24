@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -22,20 +26,18 @@ export class RemoveUserByIdUseCase
     const userToDelete = await this.usersRepository.findUserByUserId(
       command.id,
     );
-    if (!userToDelete) throw new NotFoundException();
+    if (!userToDelete) throw new NotFoundException('Not found user.');
     try {
-      const ability = this.caslAbilityFactory.createForUser(
-        command.currentUser,
-      );
+      const ability = this.caslAbilityFactory.createSaUser(command.currentUser);
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToDelete);
       return this.usersRepository.removeUserById(command.id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
+        throw new ForbiddenException(
+          'You are not allowed to delete this user. ' + error.message,
+        );
       }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException();
-      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

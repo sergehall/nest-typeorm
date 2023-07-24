@@ -18,7 +18,7 @@ export class SaBanBlogByBlogIdCommand {
   constructor(
     public blogId: string,
     public saBanBlogDto: SaBanBlogDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -32,12 +32,12 @@ export class SaBanBlogByBlogIUseCase
     private readonly commandBus: CommandBus,
   ) {}
   async execute(command: SaBanBlogByBlogIdCommand) {
-    const { blogId, saBanBlogDto, currentUser } = command;
+    const { blogId, saBanBlogDto, currentUserDto } = command;
 
     const blogForBan = await this.getBlogForBan(blogId);
     if (!blogForBan) throw new NotFoundException('Not found blog.');
 
-    await this.checkUserPermission(currentUser.id, blogForBan.blogOwnerId);
+    this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
     await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
     return true;
@@ -66,8 +66,11 @@ export class SaBanBlogByBlogIUseCase
     }
   }
 
-  private async checkUserPermission(userId: string, blogOwnerId: string) {
-    const ability = this.caslAbilityFactory.createForUserId({ id: userId });
+  private checkUserPermission(
+    currentUserDto: CurrentUserDto,
+    blogOwnerId: string,
+  ) {
+    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: blogOwnerId,
@@ -80,7 +83,7 @@ export class SaBanBlogByBlogIUseCase
   }
 
   private async getBlogForBan(blogId: string) {
-    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogById(
+    const blogForBan = await this.bloggerBlogsRawSqlRepository.existenceBlog(
       blogId,
     );
     if (!blogForBan) {

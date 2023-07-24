@@ -28,7 +28,7 @@ export class AbilitiesGuard implements CanActivate {
     if (!currentUser) {
       currentUser = { roles: RolesEnums.USER };
     }
-    const ability = this.caslAbilityFactory.createForUser(currentUser);
+    const ability = this.caslAbilityFactory.createSaUser(currentUser);
     try {
       rules.forEach((rule) =>
         ForbiddenError.from(ability).throwUnlessCan(rule.action, rule.subject),
