@@ -5,6 +5,7 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
+import { ReturnUsersBanInfoEntity } from '../../sa/entities/return-users-banInfo.entity';
 
 @Injectable()
 export class UsersService {
@@ -14,31 +15,32 @@ export class UsersService {
     protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
 
-  async findUsersRawSql(queryData: ParseQueryType): Promise<PaginationTypes> {
-    const field = queryData.queryPagination.sortBy;
-    const pagination = await this.pagination.convert(
-      {
-        pageNumber: queryData.queryPagination.pageNumber,
-        pageSize: queryData.queryPagination.pageSize,
-        sortBy: queryData.queryPagination.sortBy,
-        sortDirection: queryData.queryPagination.sortDirection,
-      },
-      field,
-    );
-    const users = await this.usersRawSqlRepository.findUsers(queryData);
-    const transformedArrUsers = users.map((user: TablesUsersEntityWithId) => ({
-      id: user.id,
-      login: user.login,
-      email: user.email,
-      createdAt: user.createdAt,
-      banInfo: {
-        isBanned: user.isBanned,
-        banDate: user.banDate,
-        banReason: user.banReason,
-      },
-    }));
+  async saFindUsers(queryData: ParseQueryType): Promise<PaginationTypes> {
+    const arrUsers = await this.usersRawSqlRepository.saFindUsers(queryData);
+
+    const transformedArrUsers = await this.transformedArrUsers(arrUsers);
+
     const totalCount = await this.usersRawSqlRepository.totalCountUsers(
-      pagination,
+      queryData,
+    );
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCount,
+      items: transformedArrUsers,
+    };
+  }
+
+  async findUsersRawSql(queryData: ParseQueryType): Promise<PaginationTypes> {
+    const users = await this.usersRawSqlRepository.findUsers(queryData);
+
+    const transformedArrUsers = await this.transformedArrUsers(users);
+
+    const totalCount = await this.usersRawSqlRepository.totalCountUsers(
       queryData,
     );
     const pagesCount = Math.ceil(
@@ -57,5 +59,21 @@ export class UsersService {
     userId: string,
   ): Promise<TablesUsersEntityWithId | null> {
     return await this.usersRawSqlRepository.findUserByUserId(userId);
+  }
+
+  private async transformedArrUsers(
+    usersArr: TablesUsersEntityWithId[],
+  ): Promise<ReturnUsersBanInfoEntity[]> {
+    return usersArr.map((user: TablesUsersEntityWithId) => ({
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
+      },
+    }));
   }
 }

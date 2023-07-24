@@ -15,8 +15,8 @@ export class TablesUsersEntity {
   })
   login: string;
   @IsNotEmpty()
-  @Length(6, 30, {
-    message: 'Incorrect email length! Must be min 6, max 30 ch.',
+  @Length(6, 20, {
+    message: 'Incorrect email length! Must be min 6, max 20 ch.',
   })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;

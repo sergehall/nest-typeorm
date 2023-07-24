@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
-import { PaginationDBType } from '../../common/pagination/types/pagination.types';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
@@ -202,6 +201,33 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async saFindUsers(
+    queryData: ParseQueryType,
+  ): Promise<TablesUsersEntityWithId[]> {
+    try {
+      const preparedQuery = await this.prepQueryRawSql(queryData);
+      const limit = queryData.queryPagination.pageSize;
+      const offset = queryData.queryPagination.pageNumber - 1;
+      return await this.db.query(
+        `
+        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        FROM public."Users"
+        WHERE "email" like $1 OR "login" like $2
+        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+        LIMIT $3 OFFSET $4
+      `,
+        [
+          preparedQuery.searchEmailTerm,
+          preparedQuery.searchLoginTerm,
+          limit,
+          offset,
+        ],
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async findUsers(
     queryData: ParseQueryType,
   ): Promise<TablesUsersEntityWithId[]> {
@@ -229,10 +255,8 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async totalCountUsers(
-    pagination: PaginationDBType,
-    queryData: ParseQueryType,
-  ): Promise<number> {
+
+  async totalCountUsers(queryData: ParseQueryType): Promise<number> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const totalCount = await this.db.query(
