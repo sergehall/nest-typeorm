@@ -35,14 +35,12 @@ export class SaBanBlogByBlogIUseCase
     const { blogId, saBanBlogDto, currentUser } = command;
 
     const blogForBan = await this.getBlogForBan(blogId);
-    if (!blogForBan) throw new NotFoundException();
+    if (!blogForBan) throw new NotFoundException('Not found blog.');
 
     await this.checkUserPermission(currentUser.id, blogForBan.blogOwnerId);
 
-    return await this.executeChangeBanStatusCommands(
-      blogId,
-      saBanBlogDto.isBanned,
-    );
+    await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
+    return true;
   }
 
   private async executeChangeBanStatusCommands(
