@@ -18,9 +18,9 @@ export class UsersService {
   async saFindUsers(queryData: ParseQueryType): Promise<PaginationTypes> {
     const arrUsers = await this.usersRawSqlRepository.saFindUsers(queryData);
 
-    const transformedArrUsers = await this.transformedArrUsers(arrUsers);
+    const transformedArrUsers = await this.transformedArrUsersForSa(arrUsers);
 
-    const totalCount = await this.usersRawSqlRepository.totalCountUsers(
+    const totalCount = await this.usersRawSqlRepository.totalCountUsersForSa(
       queryData,
     );
     const pagesCount = Math.ceil(
@@ -35,10 +35,8 @@ export class UsersService {
     };
   }
 
-  async findUsersRawSql(queryData: ParseQueryType): Promise<PaginationTypes> {
+  async findUsers(queryData: ParseQueryType): Promise<PaginationTypes> {
     const users = await this.usersRawSqlRepository.findUsers(queryData);
-
-    const transformedArrUsers = await this.transformedArrUsers(users);
 
     const totalCount = await this.usersRawSqlRepository.totalCountUsers(
       queryData,
@@ -51,7 +49,7 @@ export class UsersService {
       page: queryData.queryPagination.pageNumber,
       pageSize: queryData.queryPagination.pageSize,
       totalCount: totalCount,
-      items: transformedArrUsers,
+      items: users,
     };
   }
 
@@ -61,7 +59,7 @@ export class UsersService {
     return await this.usersRawSqlRepository.findUserByUserId(userId);
   }
 
-  private async transformedArrUsers(
+  private async transformedArrUsersForSa(
     usersArr: TablesUsersEntityWithId[],
   ): Promise<ReturnUsersBanInfoEntity[]> {
     return usersArr.map((user: TablesUsersEntityWithId) => ({
