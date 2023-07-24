@@ -36,6 +36,26 @@ export class BannedUsersForBlogsRawSqlRepository {
     }
   }
 
+  async existenceBannedUser(userId: string, blogId: string): Promise<boolean> {
+    try {
+      const isBanned = true;
+      const blog = await this.db.query(
+        `
+      SELECT "id"
+      FROM public."BannedUsersForBlogs"
+      WHERE "userId" = $1 AND "blogId" = $2 AND "isBanned" <> $3
+      `,
+        [userId, blogId, isBanned],
+      );
+      // Return the first blog if found, if not found return false
+      return blog[0] !== 0;
+    } catch (error) {
+      console.log(error.message);
+      // if not blogId not UUID will be error, and return false
+      return false;
+    }
+  }
+
   async findBannedUsers(
     blogId: string,
     queryData: ParseQueryType,
