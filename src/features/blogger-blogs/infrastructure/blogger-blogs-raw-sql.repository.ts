@@ -93,6 +93,7 @@ export class BloggerBlogsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async openFindBlogs(
     queryData: ParseQueryType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
@@ -129,6 +130,7 @@ export class BloggerBlogsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async totalCountBlogs(queryData: ParseQueryType): Promise<number> {
     try {
       const blogOwnerBanStatus = false;
@@ -147,6 +149,44 @@ export class BloggerBlogsRawSqlRepository {
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
       );
       return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saOpenFindBlogs(
+    queryData: ParseQueryType,
+  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+    try {
+      const blogOwnerBanStatus = false;
+      const banInfoBanStatus = false;
+      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+        queryData.queryPagination.sortDirection,
+      )
+        ? 'ASC'
+        : 'DESC';
+      const searchNameTerm =
+        queryData.searchNameTerm.length !== 0
+          ? `%${queryData.searchNameTerm}%`
+          : '%%';
+      return await this.db.query(
+        `
+        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership", 
+        "blogOwnerId" AS "userId", "userLogin"
+        FROM public."BloggerBlogs"
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
+        AND "name" ILIKE $3
+        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        LIMIT $4 OFFSET $5
+        `,
+        [
+          blogOwnerBanStatus,
+          banInfoBanStatus,
+          searchNameTerm,
+          queryData.queryPagination.pageSize,
+          queryData.queryPagination.pageNumber - 1,
+        ],
+      );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -218,16 +258,17 @@ export class BloggerBlogsRawSqlRepository {
         `
         INSERT INTO public."BloggerBlogs"(
         "id", "createdAt", "isMembership", 
-        "blogOwnerId", "dependencyIsBanned", 
+        "blogOwnerId", "blogOwnerLogin", "dependencyIsBanned", 
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name",  "description", "websiteUrl")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           returning "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
         [
           bloggerBlogsRawSqlEntity.id,
           bloggerBlogsRawSqlEntity.createdAt,
           bloggerBlogsRawSqlEntity.isMembership,
           bloggerBlogsRawSqlEntity.blogOwnerId,
+          bloggerBlogsRawSqlEntity.blogOwnerLogin,
           bloggerBlogsRawSqlEntity.dependencyIsBanned,
           bloggerBlogsRawSqlEntity.banInfoIsBanned,
           bloggerBlogsRawSqlEntity.banInfoBanDate,
@@ -273,6 +314,25 @@ export class BloggerBlogsRawSqlRepository {
       WHERE "id" = $1
       `,
         [userId, isBanned],
+      );
+      return updateBanStatusBlog[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusBlogsByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updateBanStatusBlog = await this.db.query(
+        `
+      UPDATE public."BloggerBlogs"
+      SET "banInfoIsBanned" = $2
+      WHERE "id" = $1
+      `,
+        [blogId, isBanned],
       );
       return updateBanStatusBlog[0];
     } catch (error) {

@@ -22,7 +22,6 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { User } from '../../users/infrastructure/schemas/user.schema';
 import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -66,13 +65,7 @@ export class SaController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
-    const searchFilters = { searchNameTerm: queryData.searchNameTerm };
-    const banStatus = { banStatus: queryData.banStatus };
-    const queryPagination: PaginationDto = queryData.queryPagination;
-    return await this.bloggerBlogsService.saFindBlogs(queryPagination, [
-      searchFilters,
-      banStatus,
-    ]);
+    return await this.bloggerBlogsService.saOpenFindBlogs(queryData);
   }
 
   @Post('users')
@@ -135,7 +128,7 @@ export class SaController {
   @Put('blogs/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async banBlogs(
+  async banSaBlogsByBlogId(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() saBanBlogDto: SaBanBlogDto,

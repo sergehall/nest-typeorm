@@ -12,7 +12,7 @@ export class ChangeBanStatusBlogsByBlogIdUseCase
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: ChangeBanStatusBlogsByBlogIdCommand) {
-    await this.bloggerBlogsRawSqlRepository.changeBanStatusBlogsOwnerByUserId(
+    await this.bloggerBlogsRawSqlRepository.changeBanStatusBlogsByBlogId(
       command.blogId,
       command.isBanned,
     );

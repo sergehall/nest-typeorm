@@ -64,6 +64,25 @@ export class BloggerBlogsService {
     return await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
   }
 
+  async saOpenFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {
+    const blogs: TableBloggerBlogsRawSqlEntity[] =
+      await this.bloggerBlogsRawSqlRepository.saOpenFindBlogs(queryData);
+
+    const totalCount = await this.bloggerBlogsRawSqlRepository.totalCountBlogs(
+      queryData,
+    );
+    const pagesCount = Math.ceil(
+      totalCount / queryData.queryPagination.pageSize,
+    );
+    return {
+      pagesCount: pagesCount,
+      page: queryData.queryPagination.pageNumber,
+      pageSize: queryData.queryPagination.pageSize,
+      totalCount: totalCount,
+      items: blogs,
+    };
+  }
+
   async saFindBlogs(
     queryPagination: PaginationDto,
     searchFilters: QueryArrType,
