@@ -20,7 +20,6 @@ import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/application/users.service';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
-import { User } from '../../users/infrastructure/schemas/user.schema';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
@@ -36,6 +35,7 @@ import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
 import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-byBlogId.use-case';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @SkipThrottle()
 @Controller('sa')
@@ -50,16 +50,16 @@ export class SaController {
   @Get('users')
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
-    return this.usersService.findUsersRawSql(queryData);
+    return this.usersService.saFindUsers(queryData);
   }
 
   @Get('blogs')
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindBlogs(
     @Request() req: any,
     @Query() query: any,
@@ -71,7 +71,7 @@ export class SaController {
   @Post('users')
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.CREATE, subject: User })
+  @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
     @Request() req: any,
     @Body() createUserDto: CreateUserDto,
