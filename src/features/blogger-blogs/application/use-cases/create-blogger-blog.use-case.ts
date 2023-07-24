@@ -33,8 +33,7 @@ export class CreateBloggerBlogUseCase
       command.currentUser,
     );
 
-    const ability = this.caslAbilityFactory.createForUser(command.currentUser);
-    this.checkPermission(ability, command.currentUser);
+    this.checkPermission(command.currentUser);
 
     const newBlog = await this.bloggerBlogsRawSqlRepository.createBlogs(
       blogsEntity,
@@ -62,9 +61,13 @@ export class CreateBloggerBlogUseCase
     };
   }
 
-  private checkPermission(ability: any, currentUser: CurrentUserDto): void {
+  private checkPermission(currentUserDto: CurrentUserDto): void {
+    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
-      ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, currentUser);
+      ForbiddenError.from(ability).throwUnlessCan(
+        Action.CREATE,
+        currentUserDto,
+      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

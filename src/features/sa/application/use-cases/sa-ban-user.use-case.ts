@@ -90,7 +90,7 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
     currentUserDto: CurrentUserDto,
     userToBan: TablesUsersEntityWithId,
   ) {
-    const ability = this.caslAbilityFactory.createForUser(currentUserDto);
+    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: userToBan.id,

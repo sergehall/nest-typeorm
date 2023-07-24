@@ -138,6 +138,24 @@ export class BloggerBlogsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('users/blog/:id')
+  async findBannedUsers(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const queryData = ParseQuery.getPaginationData(query);
+    return await this.commandBus.execute(
+      new FindAllBannedUsersForBlogCommand(
+        params.id,
+        queryData,
+        currentUserDto,
+      ),
+    );
+  }
+
   @Put('blogs/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -162,24 +180,6 @@ export class BloggerBlogsController {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
       new RemovePostByPostIdCommand(params, currentUserDto),
-    );
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('users/blog/:id')
-  async findBannedUsers(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Query() query: any,
-  ): Promise<PaginationTypes> {
-    const currentUserDto: CurrentUserDto = req.user;
-    const queryData = ParseQuery.getPaginationData(query);
-    return await this.commandBus.execute(
-      new FindAllBannedUsersForBlogCommand(
-        params.id,
-        queryData,
-        currentUserDto,
-      ),
     );
   }
 

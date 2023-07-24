@@ -14,7 +14,7 @@ export class BloggerBlogsRawSqlRepository {
   async findBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
-    const blogOwnerBanStatus = false;
+    const dependencyIsBanned = false;
     const banInfoIsBanned = false;
     try {
       const blog = await this.db.query(
@@ -26,7 +26,7 @@ export class BloggerBlogsRawSqlRepository {
       FROM public."BloggerBlogs"
       WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
-        [blogId, blogOwnerBanStatus, banInfoIsBanned],
+        [blogId, dependencyIsBanned, banInfoIsBanned],
       );
       // Return the first blog if found, if not found return null
       return blog[0] || null;
@@ -36,6 +36,31 @@ export class BloggerBlogsRawSqlRepository {
       return null;
     }
   }
+
+  async existenceBlog(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+    try {
+      const blog = await this.db.query(
+        `
+      SELECT "id", "createdAt", "isMembership", 
+      "blogOwnerId", "dependencyIsBanned",
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
+      "name", "description", "websiteUrl"
+      FROM public."BloggerBlogs"
+      WHERE "id" = $1
+      `,
+        [blogId],
+      );
+      // Return the first blog if found, if not found return null
+      return blog[0] || null;
+    } catch (error) {
+      console.log(error.message);
+      // if not blogId not UUID will be error, and return null
+      return null;
+    }
+  }
+
   async findBlogsCurrentUser(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueryType,
@@ -241,14 +266,15 @@ export class BloggerBlogsRawSqlRepository {
     isBanned: boolean,
   ): Promise<boolean> {
     try {
-      const updateBlogs = await this.db.query(
+      const updateBanStatusBlog = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
       SET "banInfoIsBanned" = $2
-      WHERE "blogOwnerId" = $1`,
+      WHERE "id" = $1
+      `,
         [userId, isBanned],
       );
-      return !!updateBlogs[0];
+      return updateBanStatusBlog[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

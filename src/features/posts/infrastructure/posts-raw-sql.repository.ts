@@ -25,11 +25,11 @@ export class PostsRawSqlRepository {
       const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
-        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
-          "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
+         "postOwnerId", "dependencyIsBanned",
+         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
-        WHERE "postOwnerIsBanned" = $1 AND "banInfoIsBanned" = $2
+        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         ORDER BY ${orderByDirection}
         LIMIT $3 OFFSET $4
         `,
@@ -85,11 +85,11 @@ export class PostsRawSqlRepository {
       // Return posts if found, if not found actuate catch (error)
       return await this.db.query(
         `
-        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", 
-          "createdAt", "postOwnerId", "postOwnerLogin", "postOwnerIsBanned", 
-          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
+         "postOwnerId", "dependencyIsBanned",
+         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
-        WHERE "blogId" = $5 AND "postOwnerIsBanned" = $1 AND "banInfoBanStatus" = $2
+        WHERE "blogId" = $5 AND "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         ORDER BY ${orderByDirection}
         LIMIT $3 OFFSET $4
         `,
@@ -178,7 +178,8 @@ export class PostsRawSqlRepository {
         `
       UPDATE public."Posts"
       SET "dependencyIsBanned" = $2
-      WHERE "blogId" = $1`,
+      WHERE "blogId" = $1
+      `,
         [blogId, isBanned],
       );
     } catch (error) {

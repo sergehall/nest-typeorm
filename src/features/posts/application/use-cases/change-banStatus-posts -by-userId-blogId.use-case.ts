@@ -26,9 +26,10 @@ export class ChangeBanStatusPostsByUserIdBlogIdUseCase
     try {
       // Execute the changeBanStatusPostsByUserIdBlogId and changeBanStatusLikesPostsByUserIdBlogId methods in parallel
       await Promise.all([
-        this.postsRawSqlRepository.changeBanStatusPostsByUserIdBlogId(
-          bannedUserForBlogEntity,
-        ),
+        // no needs
+        // this.postsRawSqlRepository.changeBanStatusPostsByUserIdBlogId(
+        //   bannedUserForBlogEntity,
+        // ),
         this.likeStatusPostsRawSqlRepository.changeBanStatusLikesPostsByUserIdBlogId(
           bannedUserForBlogEntity,
         ),
