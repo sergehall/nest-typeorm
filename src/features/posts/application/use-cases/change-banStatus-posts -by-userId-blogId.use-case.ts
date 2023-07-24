@@ -24,16 +24,9 @@ export class ChangeBanStatusPostsByUserIdBlogIdUseCase
   ): Promise<boolean> {
     const { bannedUserForBlogEntity } = command;
     try {
-      // Execute the changeBanStatusPostsByUserIdBlogId and changeBanStatusLikesPostsByUserIdBlogId methods in parallel
-      await Promise.all([
-        // no needs
-        // this.postsRawSqlRepository.changeBanStatusPostsByUserIdBlogId(
-        //   bannedUserForBlogEntity,
-        // ),
-        this.likeStatusPostsRawSqlRepository.changeBanStatusLikesPostsByUserIdBlogId(
-          bannedUserForBlogEntity,
-        ),
-      ]);
+      await this.likeStatusPostsRawSqlRepository.changeBanStatusLikesPostsByUserIdBlogId(
+        bannedUserForBlogEntity,
+      );
       // Return true to indicate that the ban status change was successful
       return true;
     } catch (error) {

@@ -16,6 +16,7 @@ export class ChangeBanStatusCommentsByBlogIdUseCase
   ) {}
   async execute(command: ChangeBanStatusCommentsByBlogIdCommand) {
     const { blogId, isBanned } = command;
+
     try {
       await Promise.all([
         this.commentsRawSqlRepository.changeBanStatusCommentsByBlogId(

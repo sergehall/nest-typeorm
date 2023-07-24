@@ -28,12 +28,12 @@ export class CreateBloggerBlogUseCase
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: CreateBloggerBlogCommand) {
+    this.checkPermission(command.currentUser);
+
     const blogsEntity = this.createBlogsEntity(
       command.createBloggerBlogsDto,
       command.currentUser,
     );
-
-    this.checkPermission(command.currentUser);
 
     const newBlog = await this.bloggerBlogsRawSqlRepository.createBlogs(
       blogsEntity,
@@ -46,7 +46,7 @@ export class CreateBloggerBlogUseCase
     dto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
   ): TableBloggerBlogsRawSqlEntity {
-    const { id, isBanned } = currentUser;
+    const { id, login, isBanned } = currentUser;
 
     return {
       ...dto,
@@ -54,6 +54,7 @@ export class CreateBloggerBlogUseCase
       createdAt: new Date().toISOString(),
       isMembership: false,
       blogOwnerId: id,
+      blogOwnerLogin: login,
       dependencyIsBanned: isBanned,
       banInfoIsBanned: false,
       banInfoBanDate: null,

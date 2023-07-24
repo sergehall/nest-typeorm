@@ -8,7 +8,6 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -140,29 +139,6 @@ export class PostsRawSqlRepository {
         ],
       );
       return insertNewPost[0];
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusPostsByUserIdBlogId(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
-  ): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET "banInfoIsBanned" = $3, "banInfoBanDate" = $4, "banInfoBanReason" = $5
-      WHERE "postOwnerId" = $1 AND "blogId" = $2`,
-        [
-          bannedUserForBlogEntity.userId,
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.isBanned,
-          bannedUserForBlogEntity.banDate,
-          bannedUserForBlogEntity.banReason,
-        ],
-      );
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

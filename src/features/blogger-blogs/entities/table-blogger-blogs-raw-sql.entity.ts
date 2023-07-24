@@ -41,6 +41,12 @@ export class TableBloggerBlogsRawSqlEntity {
   })
   blogOwnerId: string;
   @IsBoolean()
+  @IsNotEmpty()
+  @Length(3, 10, {
+    message: 'Incorrect blogOwnerLogin length! Must be min 3, max 10 ch.',
+  })
+  @Matches('^[a-zA-Z0-9_-]*$')
+  blogOwnerLogin: string;
   dependencyIsBanned: boolean;
   @IsNotEmpty()
   @IsBoolean({
