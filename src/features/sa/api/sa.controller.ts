@@ -65,7 +65,7 @@ export class SaController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
-    return await this.bloggerBlogsService.saOpenFindBlogs(queryData);
+    return await this.bloggerBlogsService.saFindBlogs(queryData);
   }
 
   @Post('users')

@@ -13,22 +13,25 @@ export class ConfirmUserByCodeUseCase
   async execute(command: ConfirmUserByCodeCommand): Promise<boolean> {
     const userToUpdateConfirmCode =
       await this.usersRawSqlRepository.findUserByConfirmationCode(command.code);
+
+    const currentDate = new Date().toISOString();
+
     if (
-      userToUpdateConfirmCode &&
-      !userToUpdateConfirmCode.isConfirmed &&
-      userToUpdateConfirmCode.expirationDate > new Date().toISOString()
+      !userToUpdateConfirmCode ||
+      (!userToUpdateConfirmCode.isConfirmed &&
+        userToUpdateConfirmCode.expirationDate <= currentDate)
     ) {
-      const isConfirmed = true;
-      const isConfirmedDate: string = new Date().toISOString();
-
-      // 'Congratulations account is confirmed. Send a message not here. To email that has been confirmed.';
-
-      return await this.usersRawSqlRepository.confirmUserByConfirmCode(
-        command.code,
-        isConfirmed,
-        isConfirmedDate,
-      );
+      return false;
     }
-    return false;
+
+    if (userToUpdateConfirmCode.isConfirmed) {
+      return true;
+    }
+
+    return await this.usersRawSqlRepository.confirmUserByConfirmCode(
+      command.code,
+      true,
+      currentDate,
+    ); // Returning true if the user was successfully updated, otherwise false.
   }
 }

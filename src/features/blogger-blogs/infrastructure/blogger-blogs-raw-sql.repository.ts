@@ -154,12 +154,10 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saOpenFindBlogs(
+  async saFindBlogs(
     queryData: ParseQueryType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
         queryData.queryPagination.sortDirection,
       )
@@ -172,16 +170,13 @@ export class BloggerBlogsRawSqlRepository {
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership", 
-        "blogOwnerId" AS "userId", "userLogin"
+        "blogOwnerId", "blogOwnerLogin", "banInfoIsBanned", "banInfoBanDate"
         FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        AND "name" ILIKE $3
+        WHERE "name" ILIKE $1
         ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
-        LIMIT $4 OFFSET $5
+        LIMIT $2 OFFSET $3
         `,
         [
-          blogOwnerBanStatus,
-          banInfoBanStatus,
           searchNameTerm,
           queryData.queryPagination.pageSize,
           queryData.queryPagination.pageNumber - 1,
@@ -326,13 +321,14 @@ export class BloggerBlogsRawSqlRepository {
     isBanned: boolean,
   ): Promise<boolean> {
     try {
+      const isBannedDate = new Date().toISOString();
       const updateBanStatusBlog = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
-      SET "banInfoIsBanned" = $2
+      SET "banInfoIsBanned" = $2, "banInfoBanDate" = $3
       WHERE "id" = $1
       `,
-        [blogId, isBanned],
+        [blogId, isBanned, isBannedDate],
       );
       return updateBanStatusBlog[0];
     } catch (error) {
