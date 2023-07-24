@@ -126,7 +126,7 @@ export class SaController {
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateSaBanDto: SaBanUserDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
       new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
@@ -139,7 +139,7 @@ export class SaController {
     @Request() req: any,
     @Param() params: IdParams,
     @Body() saBanBlogDto: SaBanBlogDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
       new SaBanBlogByBlogIdCommand(params.id, saBanBlogDto, currentUserDto),

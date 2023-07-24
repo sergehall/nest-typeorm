@@ -15,6 +15,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ChangeBanStatusUserBlogsCommand } from '../../../blogger-blogs/application/use-cases/change-ban-status-owner-blog.use-case';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
+import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
 
 export class SaBanUserCommand {
   constructor(
@@ -33,6 +34,8 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
   ) {}
 
   async execute(command: SaBanUserCommand): Promise<boolean> {
+    const { isBanned, banReason } = command.saBanUserDto;
+    const { currentUserDto } = command;
     const userToBan = await this.usersRawSqlRepository.findUserByUserId(
       command.id,
     );
@@ -41,43 +44,37 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
       throw new NotFoundException('Not found user.');
     }
 
+    await this.checkUserPermission(currentUserDto, userToBan);
+
     const banInfo: BanInfoDto = {
-      isBanned: command.saBanUserDto.isBanned,
-      banDate: command.saBanUserDto.isBanned ? new Date().toISOString() : null,
-      banReason: command.saBanUserDto.banReason || null,
+      isBanned: isBanned,
+      banDate: isBanned ? new Date().toISOString() : null,
+      banReason: banReason || null,
     };
 
-    const ability = this.caslAbilityFactory.createForUser(
-      command.currentUserDto,
-    );
+    await this.executeChangeBanStatusCommands(userToBan.id, banInfo);
 
+    return true;
+  }
+
+  private async executeChangeBanStatusCommands(
+    userId: string,
+    banInfo: BanInfoDto,
+  ): Promise<boolean> {
     try {
-      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToBan);
-
       // Use Promise.all to execute the commands concurrently
       await Promise.all([
         this.commandBus.execute(
-          new RemoveDevicesBannedUserCommand(userToBan.id),
+          new ChangeBanStatusUserBlogsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(
-          new ChangeBanStatusUserCommentsCommand(
-            userToBan.id,
-            command.saBanUserDto.isBanned,
-          ),
+          new ChangeBanStatusUserPostsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(
-          new ChangeBanStatusUserPostsCommand(
-            userToBan.id,
-            command.saBanUserDto.isBanned,
-          ),
+          new ChangeBanStatusUserCommentsCommand(userId, banInfo.isBanned),
         ),
-        this.commandBus.execute(
-          new ChangeBanStatusUserBlogsCommand(
-            userToBan.id,
-            command.saBanUserDto.isBanned,
-          ),
-        ),
-        this.usersRawSqlRepository.banUser(userToBan.id, banInfo),
+        this.commandBus.execute(new RemoveDevicesBannedUserCommand(userId)),
+        this.usersRawSqlRepository.banUser(userId, banInfo),
       ]);
       return true;
     } catch (error) {
@@ -86,6 +83,22 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
       }
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async checkUserPermission(
+    currentUserDto: CurrentUserDto,
+    userToBan: TablesUsersEntityWithId,
+  ) {
+    const ability = this.caslAbilityFactory.createForUser(currentUserDto);
+    try {
+      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
+        id: userToBan.id,
+      });
+    } catch (error) {
+      throw new ForbiddenException(
+        'You are not allowed to ban a user. ' + error.message,
+      );
     }
   }
 }
