@@ -26,15 +26,15 @@ export class UsersService {
       field,
     );
     const users = await this.usersRawSqlRepository.findUsers(queryData);
-    const transformedArrUsers = users.map((i) => ({
-      id: i.id,
-      login: i.login,
-      email: i.email,
-      createdAt: i.createdAt,
+    const transformedArrUsers = users.map((user: TablesUsersEntityWithId) => ({
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
       banInfo: {
-        isBanned: i.isBanned,
-        banDate: i.banDate,
-        banReason: i.banReason,
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
       },
     }));
     const totalCount = await this.usersRawSqlRepository.totalCountUsers(
