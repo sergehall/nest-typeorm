@@ -33,7 +33,6 @@ export class DemonDeleteDataUsersWithExpiredDateUseCase
       const oldestUser: TablesUsersEntityWithId[] =
         await this.usersRawSqlRepository.getOldestUserWithExpirationDate();
       if (oldestUser.length === 0) return true;
-      console.log(oldestUser);
       const { id } = oldestUser[0];
       await Promise.all([
         this.sentEmailsTimeConfCodeRepository.removeSentEmailsTimeByUserId(id),
