@@ -10,7 +10,7 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenError } from '@casl/ability';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { ChangeBanStatusBlogsByBlogIdCommand } from './change-banStatus-blogs-byBlogId.use-case';
+import { ChangeBanStatusBlogsByBlogIdCommand } from './sa-change-banStatus-blogs-byBlogId.use-case';
 import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts-byBlogId.use-case';
 import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
 

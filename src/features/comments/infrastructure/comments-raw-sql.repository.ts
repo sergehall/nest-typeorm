@@ -181,7 +181,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async removeComment(commentId: string): Promise<boolean> {
+  async removeCommentByCommentId(commentId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(
         `
@@ -255,6 +255,35 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async deleteLikePostUserByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."LikeStatusPosts"
+        WHERE "userId" = $1
+        `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async removeCommentsByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."Comments"
+        WHERE "commentatorInfoUserId" = $1
+          `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 }

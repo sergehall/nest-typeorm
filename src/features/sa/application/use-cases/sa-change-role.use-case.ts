@@ -9,7 +9,7 @@ export class ChangeRoleCommand {
 }
 
 @CommandHandler(ChangeRoleCommand)
-export class ChangeRoleUseCase implements ICommandHandler<ChangeRoleCommand> {
+export class SaChangeRoleUseCase implements ICommandHandler<ChangeRoleCommand> {
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
   async execute(command: ChangeRoleCommand): Promise<TablesUsersEntity> {
     const updateRole: TablesUsersEntity =

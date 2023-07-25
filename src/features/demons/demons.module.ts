@@ -20,11 +20,19 @@ import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastruct
 import { RemoveEmailConfirmCodeByIdUseCase } from '../mails/application/use-cases/remove-emai-confCode-byId.use-case';
 import { RemoveEmailRecoverCodeByIdUseCase } from '../mails/application/use-cases/remove-emai-recCode-byId.use-case';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
+import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
+import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
+import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
+import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { DemonDeleteDataUsersWithExpiredDateUseCase } from './application/use-case/demon-delete-data-users-with-expired-date.use-case';
+import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
   RemoveEmailConfirmCodeByIdUseCase,
   RemoveEmailRecoverCodeByIdUseCase,
+  DemonDeleteDataUsersWithExpiredDateUseCase,
 ];
 
 @Module({
@@ -40,9 +48,15 @@ const demonsUseCases = [
     UsersRepository,
     UsersRawSqlRepository,
     BlacklistJwtRepository,
-    SentEmailsTimeConfirmAndRecoverCodesRepository,
-    SecurityDevicesRawSqlRepository,
+    CommentsRawSqlRepository,
+    PostsRawSqlRepository,
+    BloggerBlogsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
+    LikeStatusPostsRawSqlRepository,
+    SecurityDevicesRawSqlRepository,
+    LikeStatusCommentsRawSqlRepository,
+    BannedUsersForBlogsRawSqlRepository,
+    SentEmailsTimeConfirmAndRecoverCodesRepository,
     ...demonsUseCases,
     ...demonsProviders,
   ],

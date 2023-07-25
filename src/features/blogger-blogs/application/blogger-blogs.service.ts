@@ -85,9 +85,8 @@ export class BloggerBlogsService {
         },
       }),
     );
-    const totalCount = await this.bloggerBlogsRawSqlRepository.totalCountBlogs(
-      queryData,
-    );
+    const totalCount =
+      await this.bloggerBlogsRawSqlRepository.saTotalCountBlogs(queryData);
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
     );

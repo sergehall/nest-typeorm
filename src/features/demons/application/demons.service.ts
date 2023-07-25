@@ -12,6 +12,7 @@ import { RemoveEmailConfirmCodeByIdCommand } from '../../mails/application/use-c
 import { RemoveEmailRecoverCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-recCode-byId.use-case';
 import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registrationCodes.use-case';
 import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recoveryCodes';
+import { DemonDeleteDataUsersWithExpiredDateCommand } from './use-case/demon-delete-data-users-with-expired-date.use-case';
 
 @Injectable()
 export class DemonsService {
@@ -70,6 +71,8 @@ export class DemonsService {
   // every 1 hour
   @Cron('0 * * * *')
   async clearingUserWithExpirationDate() {
-    await this.usersRawSqlRepository.clearingUserWithExpirationDate();
+    await this.commandBus.execute(
+      new DemonDeleteDataUsersWithExpiredDateCommand(),
+    );
   }
 }

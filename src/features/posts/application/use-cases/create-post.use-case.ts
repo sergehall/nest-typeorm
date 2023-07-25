@@ -13,12 +13,11 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { BlogIdParams } from '../../../common/params/blogId.params';
 import { CreatePostDto } from '../../dto/create-post.dto';
 
 export class CreatePostCommand {
   constructor(
-    public params: BlogIdParams,
+    public blogId: string,
     public createPostDto: CreatePostDto,
     public currentUserDto: CurrentUserDto,
   ) {}
@@ -27,15 +26,15 @@ export class CreatePostCommand {
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRawSqlRepository: PostsRawSqlRepository,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: CreatePostCommand) {
+    const { blogId, currentUserDto, createPostDto } = command;
+
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(
-        command.params.blogId,
-      );
+      await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
@@ -43,8 +42,8 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     // Check if the user is banned from posting in this blog
     const isUserBanned =
       await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
-        command.currentUserDto.id,
-        command.params.blogId,
+        currentUserDto.id,
+        blogId,
       );
     if (isUserBanned)
       // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
@@ -52,7 +51,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({
-      id: command.currentUserDto.id,
+      id: currentUserDto.id,
     });
     try {
       // Check the user's ability to create a post in this blog
@@ -62,13 +61,13 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       // User has the permission, proceed with creating the post
       const newPost: PostsRawSqlEntity = {
         id: uuid4().toString(),
-        title: command.createPostDto.title,
-        shortDescription: command.createPostDto.shortDescription,
-        content: command.createPostDto.content,
-        blogId: command.params.blogId,
+        title: createPostDto.title,
+        shortDescription: createPostDto.shortDescription,
+        content: createPostDto.content,
+        blogId: blogId,
         blogName: blog.name,
         createdAt: new Date().toISOString(),
-        postOwnerId: command.currentUserDto.id,
+        postOwnerId: currentUserDto.id,
         dependencyIsBanned: false,
         banInfoIsBanned: false,
         banInfoBanDate: null,

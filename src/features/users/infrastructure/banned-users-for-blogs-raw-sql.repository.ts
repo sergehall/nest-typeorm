@@ -1,7 +1,10 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { InternalServerErrorException } from '@nestjs/common';
-import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 
 export class BannedUsersForBlogsRawSqlRepository {
@@ -100,6 +103,21 @@ export class BannedUsersForBlogsRawSqlRepository {
       return Number(countBannedUsers[0].count);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeBannedUserByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."BannedUsersForBlogs"
+        WHERE "userId" = $1
+          `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 

@@ -35,7 +35,7 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts-byBlogId.use-case';
-import { BannedUsersForBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,

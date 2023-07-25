@@ -6,7 +6,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 
 export class ChangeLikeStatusPostCommand {
   constructor(

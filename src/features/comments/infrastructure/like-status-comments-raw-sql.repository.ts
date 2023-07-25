@@ -131,4 +131,19 @@ export class LikeStatusCommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async removeLikesUserCommentByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."LikeStatusComments"
+        WHERE "userId" = $1
+        `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }
