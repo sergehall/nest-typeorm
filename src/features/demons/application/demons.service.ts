@@ -41,6 +41,7 @@ export class DemonsService {
       await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
     }
   }
+
   // every sec
   @Cron('* * * * * *')
   async sendAndDeleteRecoveryCode() {
@@ -58,18 +59,21 @@ export class DemonsService {
       await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
     }
   }
-  // every 5 min
-  @Cron('0 */5 * * * *')
+
+  // every 30 min
+  @Cron('*/30 * * * *')
   async clearingInvalidJWTFromBlackList() {
     await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
   }
-  // every 1 min
-  @Cron('0 */1 * * * *')
+
+  // every 1 hour
+  @Cron('0 * * * *')
   async clearingDevicesWithExpiredDate() {
     await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
   }
-  // every 1 hour
-  @Cron('0 * * * *')
+
+  // every 1 min
+  @Cron('0 */1 * * * *')
   async clearingUserWithExpirationDate() {
     await this.commandBus.execute(
       new DemonDeleteDataUsersWithExpiredDateCommand(),
