@@ -37,30 +37,6 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async existenceBlog(
-    blogId: string,
-  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
-    try {
-      const blog = await this.db.query(
-        `
-      SELECT "id", "createdAt", "isMembership", 
-      "blogOwnerId", "dependencyIsBanned",
-      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
-      "name", "description", "websiteUrl"
-      FROM public."BloggerBlogs"
-      WHERE "id" = $1
-      `,
-        [blogId],
-      );
-      // Return the first blog if found, if not found return null
-      return blog[0] || null;
-    } catch (error) {
-      console.log(error.message);
-      // if not blogId not UUID will be error, and return null
-      return null;
-    }
-  }
-
   async findBlogsCurrentUser(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueryType,
@@ -147,6 +123,26 @@ export class BloggerBlogsRawSqlRepository {
         AND "name" LIKE $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saTotalCountBlogs(queryData: ParseQueryType): Promise<number> {
+    try {
+      const searchNameTerm =
+        queryData.searchNameTerm.length !== 0
+          ? `%${queryData.searchNameTerm}%`
+          : '%';
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."BloggerBlogs"
+        WHERE "name" LIKE $1
+      `,
+        [searchNameTerm],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
@@ -297,20 +293,19 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async changeBanStatusBlogsOwnerByUserId(
+  async changeBanStatusBlogsDependencyIsBannedByUserId(
     userId: string,
     isBanned: boolean,
   ): Promise<boolean> {
     try {
-      const updateBanStatusBlog = await this.db.query(
+      return await this.db.query(
         `
       UPDATE public."BloggerBlogs"
-      SET "banInfoIsBanned" = $2
-      WHERE "id" = $1
+      SET "dependencyIsBanned" = $2
+      WHERE "blogOwnerId" = $1
       `,
         [userId, isBanned],
       );
-      return updateBanStatusBlog[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -333,6 +328,45 @@ export class BloggerBlogsRawSqlRepository {
       return updateBanStatusBlog[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeBlogsByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."BloggerBlogs"
+        WHERE "blogOwnerId" = $1
+          `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
+  async existenceBlog(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+    try {
+      const blog = await this.db.query(
+        `
+      SELECT "id", "createdAt", "isMembership", 
+      "blogOwnerId", "dependencyIsBanned",
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
+      "name", "description", "websiteUrl"
+      FROM public."BloggerBlogs"
+      WHERE "id" = $1
+      `,
+        [blogId],
+      );
+      // Return the first blog if found, if not found return null
+      return blog[0] || null;
+    } catch (error) {
+      console.log(error.message);
+      // if not blogId not UUID will be error, and return null
+      return null;
     }
   }
 }

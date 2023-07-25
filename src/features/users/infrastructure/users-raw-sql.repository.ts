@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { TablesUsersEntity } from '../entities/tablesUsers.entity';
@@ -298,23 +302,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async clearingUserWithExpirationDate() {
-    try {
-      const isConfirmed = true;
-      const currentTime = new Date().toISOString();
-      return await this.db.query(
-        `
-      DELETE FROM public."Users"
-      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
-      `,
-        [isConfirmed, currentTime],
-      );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async changeRole(
     userId: string,
     roles: RolesEnums,
@@ -347,6 +334,44 @@ export class UsersRawSqlRepository {
       return !!updatePosts[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getOldestUserWithExpirationDate() {
+    try {
+      const isConfirmed = true;
+      const currentTime = new Date().toISOString();
+      const orderByDirection = `"createdAt" DESC`;
+      const limit = 1;
+      const offset = 0;
+      return await this.db.query(
+        `
+      SELECT "userId" AS "id"
+      FROM public."Users"
+      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
+      ORDER BY ${orderByDirection}
+      LIMIT $3 OFFSET $4
+      `,
+        [isConfirmed, currentTime, limit, offset],
+      );
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeUserByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."Users"
+        WHERE "userId" = $1
+          `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 

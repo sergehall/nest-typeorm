@@ -134,7 +134,7 @@ export class BloggerBlogsController {
   ) {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new CreatePostCommand(params, createPostDto, currentUserDto),
+      new CreatePostCommand(params.blogId, createPostDto, currentUserDto),
     );
   }
 

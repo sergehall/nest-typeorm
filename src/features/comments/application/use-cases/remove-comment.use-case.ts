@@ -38,7 +38,9 @@ export class RemoveCommentUseCase
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: findComment.commentatorInfoUserId,
       });
-      return this.commentsRawSqlRepository.removeComment(command.commentId);
+      return this.commentsRawSqlRepository.removeCommentByCommentId(
+        command.commentId,
+      );
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

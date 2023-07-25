@@ -26,7 +26,7 @@ import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blo
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
-import { ChangeRoleCommand } from '../application/use-cases/change-role.use-case';
+import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
 import { SaBanUserCommand } from '../application/use-cases/sa-ban-user.use-case';
 import { IdParams } from '../../common/params/id.params';
@@ -36,6 +36,7 @@ import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
 import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-byBlogId.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { IdUserIdParams } from '../../common/params/idUserId.params';
 
 @SkipThrottle()
 @Controller('sa')
@@ -112,6 +113,7 @@ export class SaController {
       new RemoveUserByIdCommand(params.id, currentUserDto),
     );
   }
+
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
@@ -125,6 +127,21 @@ export class SaController {
       new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
+
+  @Put('blogs/:id/bind-with-user/:userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async banBlogWithUser(
+    @Request() req: any,
+    @Param() params: IdUserIdParams,
+    @Body() updateSaBanDto: SaBanUserDto,
+  ): Promise<boolean> {
+    const currentUserDto = req.user;
+    return await this.commandBus.execute(
+      new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
+    );
+  }
+
   @Put('blogs/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)

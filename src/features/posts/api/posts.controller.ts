@@ -81,12 +81,12 @@ export class PostsController {
     @Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
-    const params = { blogId: createPostWithBlogIdDto.blogId };
     const { blogId, ...createPostDto } = createPostWithBlogIdDto;
     return await this.commandBus.execute(
-      new CreatePostCommand(params, createPostDto, currentUserDto),
+      new CreatePostCommand(blogId, createPostDto, currentUserDto),
     );
   }
+
   @Post(':postId/comments')
   @UseGuards(JwtAuthGuard)
   async createComment(
@@ -126,17 +126,13 @@ export class PostsController {
     @Body() updatePostWithBlogIdDto: UpdatePostWithBlogIdDto,
   ) {
     const currentUserDto = req.user;
-    const paramsForCommand: BlogIdPostIdParams = {
-      postId: params.id,
-      blogId: updatePostWithBlogIdDto.blogId,
-    };
     const { blogId, ...updatePostDto } = updatePostWithBlogIdDto;
+    const idBlogId: BlogIdPostIdParams = {
+      postId: params.id,
+      blogId: blogId,
+    };
     return await this.commandBus.execute(
-      new UpdatePostByPostIdCommand(
-        paramsForCommand,
-        updatePostDto,
-        currentUserDto,
-      ),
+      new UpdatePostByPostIdCommand(idBlogId, updatePostDto, currentUserDto),
     );
   }
 

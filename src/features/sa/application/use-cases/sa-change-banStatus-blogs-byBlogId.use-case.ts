@@ -5,7 +5,7 @@ export class ChangeBanStatusBlogsByBlogIdCommand {
   constructor(public blogId: string, public isBanned: boolean) {}
 }
 @CommandHandler(ChangeBanStatusBlogsByBlogIdCommand)
-export class ChangeBanStatusBlogsByBlogIdUseCase
+export class SaChangeBanStatusBlogsByBlogIdUseCase
   implements ICommandHandler<ChangeBanStatusBlogsByBlogIdCommand>
 {
   constructor(
