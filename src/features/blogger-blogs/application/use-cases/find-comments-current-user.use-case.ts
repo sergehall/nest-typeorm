@@ -25,34 +25,31 @@ export class FindCommentsCurrentUserUseCase
     protected commandBus: CommandBus,
   ) {}
   async execute(command: FindCommentsCurrentUserCommand) {
-    const postInfoBlogOwnerId = command.currentUserDto.id;
-    const commentatorInfoIsBanned = false;
-    const banInfoIsBanned = false;
+    const { queryData, currentUserDto } = command;
+    const { id } = currentUserDto;
 
     const comments: TablesCommentsRawSqlEntity[] =
-      await this.commentsRawSqlRepository.findCommentsByBlogOwnerId(
-        command.queryData,
-        postInfoBlogOwnerId,
-        commentatorInfoIsBanned,
-        banInfoIsBanned,
+      await this.commentsRawSqlRepository.findCommentsByCommentatorId(
+        queryData,
+        id,
       );
     if (comments.length === 0) {
       return {
-        pagesCount: 1,
+        pagesCount: 0,
         page: 1,
         pageSize: 10,
         totalCount: 0,
         items: [],
       };
     }
+
     const filledComments = await this.commandBus.execute(
       new FillingCommentsDataCommand(comments, command.currentUserDto),
     );
-    const totalCountComments = await this.commentsRawSqlRepository.totalCount(
-      postInfoBlogOwnerId,
-      commentatorInfoIsBanned,
-      banInfoIsBanned,
-    );
+
+    const totalCountComments =
+      await this.commentsRawSqlRepository.totalCountByCommentatorId(id);
+
     const pagesCount = Math.ceil(
       totalCountComments / command.queryData.queryPagination.pageSize,
     );

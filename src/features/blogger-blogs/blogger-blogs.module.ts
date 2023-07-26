@@ -29,6 +29,7 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-all-banned-users-for-blog.use.case';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banStatus-blogs-byBlogId.use-case';
+import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -40,6 +41,7 @@ const bloggersBlogUseCases = [
   ChangeBanStatusOwnerBlogUseCase,
   FindAllBannedUsersForBlogUseCase,
   SaChangeBanStatusBlogsByBlogIdUseCase,
+  ChangeBanStatusLikesPostForBannedUserUseCase,
 ];
 const bloggersBlogRules = [BlogExistsRule];
 

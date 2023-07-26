@@ -11,12 +11,12 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ChangeBanStatusCommentsByUserIdBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use-case';
-import { ChangeBanStatusPostsByUserIdBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
 import * as uuid4 from 'uuid4';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
+import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -38,7 +38,7 @@ export class BanUserForBlogUseCase
   ) {}
 
   async execute(command: BanUserForBlogCommand): Promise<boolean> {
-    const userToBan = await this.getUserToBan(command.userId);
+    const userForBan = await this.getUserToBan(command.userId);
 
     const blogForBan = await this.getBlogForBan(
       command.updateBanUserDto.blogId,
@@ -50,7 +50,7 @@ export class BanUserForBlogUseCase
     );
 
     const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
-      this.createBannedUserEntity(userToBan, command.updateBanUserDto);
+      this.createBannedUserEntity(userForBan, command.updateBanUserDto);
 
     return await this.executeChangeBanStatusCommands(bannedUserForBlogEntity);
   }
@@ -108,7 +108,7 @@ export class BanUserForBlogUseCase
     try {
       await Promise.all([
         this.commandBus.execute(
-          new ChangeBanStatusPostsByUserIdBlogIdCommand(
+          new ChangeBanStatusLikesPostsForBannedUserCommand(
             bannedUserForBlogEntity,
           ),
         ),

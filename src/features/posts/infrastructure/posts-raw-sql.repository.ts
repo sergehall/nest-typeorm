@@ -8,6 +8,7 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -145,25 +146,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async changeBanStatusPostsByBlogId(
-    blogId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET "dependencyIsBanned" = $2
-      WHERE "blogId" = $1
-      `,
-        [blogId, isBanned],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async updatePostByPostId(
     postId: string,
     updatePostDto: UpdatePostDto,
@@ -240,7 +222,7 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async changeBanStatusPostOwnerByUserId(
+  async changeBanStatusPostByUserId(
     userId: string,
     isBanned: boolean,
   ): Promise<boolean> {
@@ -254,6 +236,43 @@ export class PostsRawSqlRepository {
       );
       return !!updatePosts[0];
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostByUserIdAndBlogId(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ): Promise<boolean> {
+    const { userId, blogId, isBanned } = bannedUserForBlogEntity;
+    try {
+      const updatePosts = await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "postOwnerId" = $1`,
+        [userId, blogId, isBanned],
+      );
+      return !!updatePosts[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostsByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "blogId" = $1
+      `,
+        [blogId, isBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

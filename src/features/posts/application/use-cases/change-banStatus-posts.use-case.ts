@@ -20,7 +20,7 @@ export class ChangeBanStatusPostsUseCase
       // Use Promise.all to execute the repository methods concurrently
       const { userId, isBanned } = command;
       await Promise.all([
-        this.postsRawSqlRepository.changeBanStatusPostOwnerByUserId(
+        this.postsRawSqlRepository.changeBanStatusPostByUserId(
           userId,
           isBanned,
         ),
