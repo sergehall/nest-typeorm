@@ -272,6 +272,7 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async removeCommentsByUserId(userId: string): Promise<boolean> {
     try {
       return await this.db.query(
@@ -284,6 +285,25 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new NotFoundException(error.message);
+    }
+  }
+
+  async changeIntoCommentsBlogOwner(
+    blogId: string,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."Comments"
+        SET "postInfoBlogOwnerId" = $2
+        WHERE "postInfoBlogId" = $1
+        `,
+        [blogId, userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

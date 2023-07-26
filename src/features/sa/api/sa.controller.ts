@@ -27,7 +27,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
-import { SaBanUserCommand } from '../application/use-cases/sa-ban-user.use-case';
 import { IdParams } from '../../common/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
@@ -37,6 +36,8 @@ import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-b
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../common/params/idUserId.params';
 import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-byUserId.use-case';
+import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
+import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -114,21 +115,48 @@ export class SaController {
     );
   }
 
+  @Put('blogs/:id/bind-with-user/:userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async bindBlogWithUser(
+    @Request() req: any,
+    @Param() params: IdUserIdParams,
+  ): Promise<boolean> {
+    const currentUserDto = req.user;
+    return await this.commandBus.execute(
+      new SaBindBlogWithUserCommand(params, currentUserDto),
+    );
+  }
+
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async banUser(
+  async saBanUserById(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateSaBanDto: SaBanUserDto,
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
+      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 
-  @Put('blogs/:id/bind-with-user/:userId')
+  @Put('blogs/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saBanBlogsByBlogId(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() saBanBlogDto: SaBanBlogDto,
+  ): Promise<boolean> {
+    const currentUserDto = req.user;
+    return await this.commandBus.execute(
+      new SaBanBlogByBlogIdCommand(params.id, saBanBlogDto, currentUserDto),
+    );
+  }
+
+  @Put('blogs/:id/ban-with-user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   async banBlogWithUser(
@@ -138,21 +166,7 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUserCommand(params.id, updateSaBanDto, currentUserDto),
-    );
-  }
-
-  @Put('blogs/:id/ban')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async banSaBlogsByBlogId(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() saBanBlogDto: SaBanBlogDto,
-  ): Promise<boolean> {
-    const currentUserDto = req.user;
-    return await this.commandBus.execute(
-      new SaBanBlogByBlogIdCommand(params.id, saBanBlogDto, currentUserDto),
+      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 }
