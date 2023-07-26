@@ -17,7 +17,7 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
 
-export class SaBanUserCommand {
+export class SaBanUserByUserIdCommand {
   constructor(
     public id: string,
     public saBanUserDto: SaBanUserDto,
@@ -25,21 +25,22 @@ export class SaBanUserCommand {
   ) {}
 }
 
-@CommandHandler(SaBanUserCommand)
-export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
+@CommandHandler(SaBanUserByUserIdCommand)
+export class SaBanUserByUserIdUseCase
+  implements ICommandHandler<SaBanUserByUserIdCommand>
+{
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRawSqlRepository: UsersRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: SaBanUserCommand): Promise<boolean> {
+  async execute(command: SaBanUserByUserIdCommand): Promise<boolean> {
     const { isBanned, banReason } = command.saBanUserDto;
     const { currentUserDto } = command;
-    const userToBan = await this.usersRawSqlRepository.findUserByUserId(
-      command.id,
-    );
+    const { id } = command;
 
+    const userToBan = await this.usersRawSqlRepository.saFindUserByUserId(id);
     if (!userToBan) {
       throw new NotFoundException('Not found user.');
     }
@@ -48,8 +49,8 @@ export class SaBanUserUseCase implements ICommandHandler<SaBanUserCommand> {
 
     const banInfo: BanInfoDto = {
       isBanned: isBanned,
-      banDate: isBanned ? new Date().toISOString() : null,
-      banReason: banReason || null,
+      banDate: new Date().toISOString(),
+      banReason: banReason,
     };
 
     await this.executeChangeBanStatusCommands(userToBan.id, banInfo);

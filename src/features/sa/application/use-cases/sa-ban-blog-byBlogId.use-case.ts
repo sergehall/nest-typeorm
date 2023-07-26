@@ -83,7 +83,7 @@ export class SaBanBlogByBlogIUseCase
   }
 
   private async getBlogForBan(blogId: string) {
-    const blogForBan = await this.bloggerBlogsRawSqlRepository.existenceBlog(
+    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogByBlogId(
       blogId,
     );
     if (!blogForBan) {

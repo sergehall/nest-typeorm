@@ -272,4 +272,23 @@ export class PostsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+
+  async changeIntoPostsBlogOwner(
+    blogId: string,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."Posts"
+        SET "postOwnerId" = $2
+        WHERE "blogId" = $1
+        `,
+        [blogId, userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

@@ -7,6 +7,7 @@ import {
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -346,7 +347,33 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async existenceBlog(
+  async findBlogByBlogId(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
+    try {
+      const dependencyIsBanned = false;
+      const banInfoIsBanned = false;
+      const blog = await this.db.query(
+        `
+      SELECT "id", "createdAt", "isMembership", 
+      "blogOwnerId", "dependencyIsBanned",
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
+      "name", "description", "websiteUrl"
+      FROM public."BloggerBlogs"
+      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+      `,
+        [blogId, dependencyIsBanned, banInfoIsBanned],
+      );
+      // Return the first blog if found, if not found return null
+      return blog[0] || null;
+    } catch (error) {
+      console.log(error.message);
+      // if not blogId not UUID will be error, and return null
+      return null;
+    }
+  }
+
+  async saFindBlogByBlogId(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     try {
@@ -367,6 +394,25 @@ export class BloggerBlogsRawSqlRepository {
       console.log(error.message);
       // if not blogId not UUID will be error, and return null
       return null;
+    }
+  }
+
+  async changeIntoBlogBlogOwner(
+    blogId: string,
+    userForBind: TablesUsersEntityWithId,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."BloggerBlogs"
+        SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
+        WHERE "id" = $1
+        `,
+        [blogId, userForBind.id, userForBind.login],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

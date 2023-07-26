@@ -17,7 +17,7 @@ import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
 import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
-import { SaBanUserUseCase } from './application/use-cases/sa-ban-user.use-case';
+import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
@@ -34,7 +34,7 @@ import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrast
 const saUseCases = [
   CreateUserByInstanceUseCase,
   SaChangeRoleUseCase,
-  SaBanUserUseCase,
+  SaBanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserUseCase,
   SaRemoveUserByUserIdUseCase,
