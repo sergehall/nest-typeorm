@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
@@ -10,6 +10,7 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { SecurityDevicesRawSqlRepository } from '../../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { SaDeleteUserByUserIdCommand } from '../../../sa/application/use-cases/sa-delete-user-byUserId.use-case';
 
 export class DemonDeleteDataUsersWithExpiredDateCommand {}
 
@@ -27,6 +28,7 @@ export class DemonDeleteDataUsersWithExpiredDateUseCase
     private readonly bloggerBlogsRepository: BloggerBlogsRawSqlRepository,
     private readonly bannedUsersForBlogsRepository: BannedUsersForBlogsRawSqlRepository,
     private readonly sentEmailsTimeConfCodeRepository: SentEmailsTimeConfirmAndRecoverCodesRepository,
+    private readonly commandBus: CommandBus,
   ) {}
   async execute() {
     try {
@@ -34,18 +36,7 @@ export class DemonDeleteDataUsersWithExpiredDateUseCase
         await this.usersRawSqlRepository.getOldestUserWithExpirationDate();
       if (oldestUser.length === 0) return true;
       const { id } = oldestUser[0];
-      await Promise.all([
-        this.sentEmailsTimeConfCodeRepository.removeSentEmailsTimeByUserId(id),
-        this.likeStatusCommentsRepository.removeLikesUserCommentByUserId(id),
-        this.likeStatusPostRepository.removeLikesPostUserByUserId(id),
-        this.commentsRepository.removeCommentsByUserId(id),
-        this.postsRepository.removePostsByUserId(id),
-        this.bloggerBlogsRepository.removeBlogsByUserId(id),
-        this.securityDevicesRepository.removeDevicesByUseId(id),
-        this.bannedUsersForBlogsRepository.removeBannedUserByUserId(id),
-        this.usersRawSqlRepository.removeUserByUserId(id),
-      ]);
-      return true;
+      return await this.commandBus.execute(new SaDeleteUserByUserIdCommand(id));
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
