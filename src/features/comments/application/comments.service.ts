@@ -54,12 +54,14 @@ export class CommentsService {
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
     const post = await this.postsRawSqlRepository.findPostByPostId(postId);
-    if (!post) throw new NotFoundException();
+    if (!post) throw new NotFoundException('Not found post.');
+
     const comments: TablesCommentsRawSqlEntity[] =
       await this.commentsRawSqlRepository.findCommentsByPostId(
         postId,
         queryData,
       );
+
     if (comments.length === 0) {
       return {
         pagesCount: queryData.queryPagination.pageNumber,
@@ -69,19 +71,16 @@ export class CommentsService {
         items: [],
       };
     }
+
     const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
       new FillingCommentsDataCommand(comments, currentUserDto),
     );
-    const postInfoBlogOwnerId = post.postOwnerId;
-    const commentatorInfoIsBanned = false;
-    const banInfoIsBanned = false;
-    const totalCount = await this.commentsRawSqlRepository.totalCount(
-      postInfoBlogOwnerId,
-      commentatorInfoIsBanned,
-      banInfoIsBanned,
-    );
+
+    const totalCountComments =
+      await this.commentsRawSqlRepository.totalCountCommentsByPostId(postId);
+
     const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
+      totalCountComments / queryData.queryPagination.pageSize,
     );
     const commentsWithoutPostInfo: CommentsReturnEntity[] = filledComments.map(
       (currentComment: FilledCommentEntity) => {
@@ -95,7 +94,7 @@ export class CommentsService {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,
       pageSize: queryData.queryPagination.pageSize,
-      totalCount: totalCount,
+      totalCount: totalCountComments,
       items: commentsWithoutPostInfo,
     };
   }

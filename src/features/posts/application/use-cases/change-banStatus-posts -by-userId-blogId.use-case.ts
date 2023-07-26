@@ -1,26 +1,24 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { BannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 
 // Command class representing the action to change the ban status for a user's posts on a particular blog
-export class ChangeBanStatusPostsByUserIdBlogIdCommand {
+export class ChangeBanStatusLikesPostsForBannedUserCommand {
   constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
 }
 
 // Command handler class that implements the ICommandHandler for ChangeBanStatusPostsByUserIdBlogIdCommand
-@CommandHandler(ChangeBanStatusPostsByUserIdBlogIdCommand)
-export class ChangeBanStatusPostsByUserIdBlogIdUseCase
-  implements ICommandHandler<ChangeBanStatusPostsByUserIdBlogIdCommand>
+@CommandHandler(ChangeBanStatusLikesPostsForBannedUserCommand)
+export class ChangeBanStatusLikesPostForBannedUserUseCase
+  implements ICommandHandler<ChangeBanStatusLikesPostsForBannedUserCommand>
 {
   constructor(
-    protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
   ) {}
   // Execute the command to change the ban status of a user's posts and likes on a specific blog
   async execute(
-    command: ChangeBanStatusPostsByUserIdBlogIdCommand,
+    command: ChangeBanStatusLikesPostsForBannedUserCommand,
   ): Promise<boolean> {
     const { bannedUserForBlogEntity } = command;
     try {

@@ -26,7 +26,6 @@ import { RemovePostByPostIdUseCase } from './application/use-cases/remove-post-b
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
-import { ChangeBanStatusPostsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
@@ -36,6 +35,7 @@ import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-j
 import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.use-case';
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts-byBlogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -44,8 +44,8 @@ const postsUseCases = [
   RemovePostByIdOldUseCase,
   ChangeBanStatusPostsUseCase,
   ChangeLikeStatusPostUseCase,
-  ChangeBanStatusPostsByUserIdBlogIdUseCase,
   ChangeBanStatusPostsByBlogIdUseCase,
+  ChangeBanStatusLikesPostForBannedUserUseCase,
 ];
 
 @Module({
