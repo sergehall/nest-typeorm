@@ -1,15 +1,17 @@
 import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class RemoveEmailConfirmCodeByIdCommand {
+export class DemonRemoveEmailConfirmCodeByIdCommand {
   constructor(public codeId: string) {}
 }
-@CommandHandler(RemoveEmailConfirmCodeByIdCommand)
-export class RemoveEmailConfirmCodeByIdUseCase
-  implements ICommandHandler<RemoveEmailConfirmCodeByIdCommand>
+@CommandHandler(DemonRemoveEmailConfirmCodeByIdCommand)
+export class DemonRemoveEmailConfirmCodeByIdUseCase
+  implements ICommandHandler<DemonRemoveEmailConfirmCodeByIdCommand>
 {
   constructor(protected mailsRepository: MailsRawSqlRepository) {}
-  async execute(command: RemoveEmailConfirmCodeByIdCommand): Promise<boolean> {
+  async execute(
+    command: DemonRemoveEmailConfirmCodeByIdCommand,
+  ): Promise<boolean> {
     return await this.mailsRepository.removeEmailConfirmCodesByCodeId(
       command.codeId,
     );

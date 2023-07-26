@@ -23,7 +23,13 @@ import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/bl
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { SaBanBlogByBlogIUseCase } from './application/use-cases/sa-ban-blog-byBlogId.use-case';
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
-import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-byUserId.use-case';
+import { SaRemoveUserByUserIdUseCase } from './application/use-cases/sa-remove-user-byUserId.use-case';
+import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
+import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
+import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
+import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
+import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -31,7 +37,7 @@ const saUseCases = [
   SaBanUserUseCase,
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserUseCase,
-  SaDeleteUserByUserIdUseCase,
+  SaRemoveUserByUserIdUseCase,
 ];
 
 @Module({
@@ -39,19 +45,25 @@ const saUseCases = [
   controllers: [SaController],
   providers: [
     SaService,
+    Pagination,
     UsersService,
     BloggerBlogsService,
     ConvertFiltersForDB,
     BloggerBlogsRepository,
-    Pagination,
     UsersRepository,
     MailsRawSqlRepository,
     PostsRepository,
+    PostsRawSqlRepository,
     UsersRawSqlRepository,
+    CommentsRawSqlRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
+    SecurityDevicesRawSqlRepository,
+    LikeStatusCommentsRawSqlRepository,
+    BannedUsersForBlogsRawSqlRepository,
+    SentEmailsTimeConfirmAndRecoverCodesRepository,
     ...saUseCases,
     ...saProviders,
   ],

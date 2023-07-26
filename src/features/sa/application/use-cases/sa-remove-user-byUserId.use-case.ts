@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../../../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../../comments/infrastructure/like-status-comments-raw-sql.repository';
@@ -8,15 +8,25 @@ import { SecurityDevicesRawSqlRepository } from '../../../security-devices/infra
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { ForbiddenError } from '@casl/ability';
+import { Action } from '../../../../ability/roles/action.enum';
+import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 
-export class SaDeleteUserByUserIdCommand {
-  constructor(public userId: string) {}
+export class SaRemoveUserByUserIdCommand {
+  constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
 }
-export class SaDeleteUserByUserIdUseCase
-  implements ICommandHandler<SaDeleteUserByUserIdCommand>
+@CommandHandler(SaRemoveUserByUserIdCommand)
+export class SaRemoveUserByUserIdUseCase
+  implements ICommandHandler<SaRemoveUserByUserIdCommand>
 {
   constructor(
+    private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
     private readonly likeStatusPostRepository: LikeStatusPostsRawSqlRepository,
     private readonly likeStatusCommentsRepo: LikeStatusCommentsRawSqlRepository,
@@ -27,8 +37,24 @@ export class SaDeleteUserByUserIdUseCase
     private readonly bannedUsersForBlogsRepository: BannedUsersForBlogsRawSqlRepository,
     private readonly sentEmailsTimeConfCodeRepo: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
-  async execute(command: SaDeleteUserByUserIdCommand): Promise<any> {
-    const { userId } = command;
+  async execute(command: SaRemoveUserByUserIdCommand): Promise<boolean> {
+    const { userId, currentUserDto } = command;
+
+    const userToRemove = await this.usersRawSqlRepository.saFindUserByUserId(
+      userId,
+    );
+    if (!userToRemove) throw new NotFoundException('Not found user.');
+
+    this.checkUserPermission(currentUserDto, userToRemove.id);
+
+    await this.executeRemoveUserStatusCommands(userId);
+
+    return true;
+  }
+
+  private async executeRemoveUserStatusCommands(
+    userId: string,
+  ): Promise<boolean> {
     try {
       await Promise.all([
         this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(userId),
@@ -45,6 +71,22 @@ export class SaDeleteUserByUserIdUseCase
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private checkUserPermission(
+    currentUserDto: CurrentUserDto,
+    blogOwnerId: string,
+  ) {
+    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
+    try {
+      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
+        id: blogOwnerId,
+      });
+    } catch (error) {
+      throw new ForbiddenException(
+        'You are not allowed to remove user. ' + error.message,
+      );
     }
   }
 }

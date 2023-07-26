@@ -42,6 +42,48 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async findUserByUserId(
+    userId: string,
+  ): Promise<TablesUsersEntityWithId | null> {
+    const isBanned = false;
+    try {
+      const user = await this.db.query(
+        `
+        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+        WHERE "userId" = $1 AND "isBanned" = $2
+      `,
+        [userId, isBanned],
+      );
+      return user[0];
+    } catch (error) {
+      console.log(error.message);
+      return null;
+    }
+  }
+
+  async saFindUserByUserId(
+    userId: string,
+  ): Promise<TablesUsersEntityWithId | null> {
+    try {
+      const user = await this.db.query(
+        `
+      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      FROM public."Users"
+      WHERE "userId" = $1`,
+        [userId],
+      );
+      return user[0];
+    } catch (error) {
+      console.log(error.message);
+      return null;
+    }
+  }
+
   async findUsers(
     queryData: ParseQueryType,
   ): Promise<TablesUsersEntityWithId[]> {
@@ -160,26 +202,6 @@ export class UsersRawSqlRepository {
       return user[0] || null;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findUserByUserId(
-    userId: string,
-  ): Promise<TablesUsersEntityWithId | null> {
-    try {
-      const user = await this.db.query(
-        `
-      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-      FROM public."Users"
-      WHERE "userId" = $1`,
-        [userId],
-      );
-      return user[0];
-    } catch (error) {
-      console.log(error.message);
-      return null;
     }
   }
 

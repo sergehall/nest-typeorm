@@ -25,7 +25,6 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
-import { RemoveUserByIdCommand } from '../../users/application/use-cases/remove-user-byId.use-case';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
 import { SaBanUserCommand } from '../application/use-cases/sa-ban-user.use-case';
@@ -37,6 +36,7 @@ import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.e
 import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-byBlogId.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../common/params/idUserId.params';
+import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-byUserId.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -110,7 +110,7 @@ export class SaController {
   async removeUserById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemoveUserByIdCommand(params.id, currentUserDto),
+      new SaRemoveUserByUserIdCommand(params.id, currentUserDto),
     );
   }
 

@@ -8,11 +8,11 @@ import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklis
 import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
 import { EmailsRecoveryCodesEntity } from '../entities/emailsRecoveryCodes.entity';
-import { RemoveEmailConfirmCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-confCode-byId.use-case';
-import { RemoveEmailRecoverCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-recCode-byId.use-case';
 import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registrationCodes.use-case';
 import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recoveryCodes';
-import { DemonDeleteDataUsersWithExpiredDateCommand } from './use-case/demon-delete-data-users-with-expired-date.use-case';
+import { DemonRemoveEmailConfirmCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-confCode-byId.use-case';
+import { DemonRemoveEmailRecoverCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-recCode-byId.use-case';
+import { DemonRemoveDataUsersWithExpiredDateCommand } from './use-case/demon-delete-data-users-with-expired-date.use-case';
 
 @Injectable()
 export class DemonsService {
@@ -33,7 +33,7 @@ export class DemonsService {
       const { codeId, email } = emailAndCode[0];
 
       await this.commandBus.execute(
-        new RemoveEmailConfirmCodeByIdCommand(codeId),
+        new DemonRemoveEmailConfirmCodeByIdCommand(codeId),
       );
       await this.commandBus.execute(
         new SendRegistrationCodesCommand(emailAndCode[0]),
@@ -51,7 +51,7 @@ export class DemonsService {
       const { email, codeId } = emailAndCode[0];
 
       await this.commandBus.execute(
-        new RemoveEmailRecoverCodeByIdCommand(codeId),
+        new DemonRemoveEmailRecoverCodeByIdCommand(codeId),
       );
       await this.commandBus.execute(
         new SendRecoveryCodesCommand(emailAndCode[0]),
@@ -76,7 +76,7 @@ export class DemonsService {
   @Cron('0 */1 * * * *')
   async clearingUserWithExpirationDate() {
     await this.commandBus.execute(
-      new DemonDeleteDataUsersWithExpiredDateCommand(),
+      new DemonRemoveDataUsersWithExpiredDateCommand(),
     );
   }
 }
