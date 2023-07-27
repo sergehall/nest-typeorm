@@ -121,6 +121,21 @@ export class BannedUsersForBlogsRawSqlRepository {
     }
   }
 
+  async removeBannedUserByBlogId(blogId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."BannedUsersForBlogs"
+        WHERE "blogId" = $1
+          `,
+        [blogId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
   private getSortingDirection(queryData: ParseQueryType): 'ASC' | 'DESC' {
     return [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
       queryData.queryPagination.sortDirection,

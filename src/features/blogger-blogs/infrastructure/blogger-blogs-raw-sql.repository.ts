@@ -347,6 +347,21 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
+  async removeBlogsByBlogId(blogId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."BloggerBlogs"
+        WHERE "id" = $1
+          `,
+        [blogId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async findBlogByBlogId(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {

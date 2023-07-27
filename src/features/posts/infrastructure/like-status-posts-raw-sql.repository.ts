@@ -159,7 +159,7 @@ export class LikeStatusPostsRawSqlRepository {
     }
   }
 
-  async removeLikesPostUserByUserId(userId: string): Promise<boolean> {
+  async removeLikesPostsByUserId(userId: string): Promise<boolean> {
     try {
       return await this.db.query(
         `
@@ -167,6 +167,21 @@ export class LikeStatusPostsRawSqlRepository {
         WHERE "userId" = $1
         `,
         [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeLikesPostsByBlogId(blogId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."LikeStatusPosts"
+        WHERE "blogId" = $1
+        `,
+        [blogId],
       );
     } catch (error) {
       console.log(error.message);
