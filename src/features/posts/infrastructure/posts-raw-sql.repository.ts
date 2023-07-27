@@ -8,7 +8,6 @@ import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -205,23 +204,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async removePostByPostId(postId: string): Promise<boolean> {
-    try {
-      const isDeleted = await this.db.query(
-        `
-        DELETE FROM public."Posts"
-        WHERE "id" = $1
-        RETURNING "id"
-          `,
-        [postId],
-      );
-      return isDeleted[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   async changeBanStatusPostByUserId(
     userId: string,
     isBanned: boolean,
@@ -233,24 +215,6 @@ export class PostsRawSqlRepository {
       SET "dependencyIsBanned" = $2
       WHERE "postOwnerId" = $1`,
         [userId, isBanned],
-      );
-      return !!updatePosts[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusPostByUserIdAndBlogId(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
-  ): Promise<boolean> {
-    const { userId, blogId, isBanned } = bannedUserForBlogEntity;
-    try {
-      const updatePosts = await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET "dependencyIsBanned" = $2
-      WHERE "postOwnerId" = $1`,
-        [userId, blogId, isBanned],
       );
       return !!updatePosts[0];
     } catch (error) {
@@ -270,6 +234,25 @@ export class PostsRawSqlRepository {
       WHERE "blogId" = $1
       `,
         [blogId, isBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeIntoPostsBlogOwner(
+    blogId: string,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        UPDATE public."Posts"
+        SET "postOwnerId" = $2
+        WHERE "blogId" = $1
+        `,
+        [blogId, userId],
       );
     } catch (error) {
       console.log(error.message);
@@ -307,22 +290,20 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async changeIntoPostsBlogOwner(
-    blogId: string,
-    userId: string,
-  ): Promise<boolean> {
+  async removePostByPostId(postId: string): Promise<boolean> {
     try {
-      return await this.db.query(
+      const isDeleted = await this.db.query(
         `
-        UPDATE public."Posts"
-        SET "postOwnerId" = $2
-        WHERE "blogId" = $1
-        `,
-        [blogId, userId],
+        DELETE FROM public."Posts"
+        WHERE "id" = $1
+        RETURNING "id"
+          `,
+        [postId],
       );
+      return isDeleted[1] === 1;
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 }

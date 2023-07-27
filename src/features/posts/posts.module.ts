@@ -36,6 +36,7 @@ import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.u
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banStatus-posts-byBlogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
+import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -76,6 +77,7 @@ const postsUseCases = [
     PostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
+    LikeStatusCommentsRawSqlRepository,
     ...postsUseCases,
     ...postsProviders,
   ],
