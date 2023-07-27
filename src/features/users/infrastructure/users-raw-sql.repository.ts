@@ -353,7 +353,7 @@ export class UsersRawSqlRepository {
       WHERE "userId" = $1`,
         [userId, isBanned, banDate, banReason],
       );
-      return !!updatePosts[0];
+      return updatePosts[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

@@ -11,11 +11,10 @@ export class ChangeBanStatusOwnerBlogUseCase
   constructor(
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
-  async execute(command: ChangeBanStatusUserBlogsCommand) {
-    await this.bloggerBlogsRawSqlRepository.changeBanStatusBlogsDependencyIsBannedByUserId(
+  async execute(command: ChangeBanStatusUserBlogsCommand): Promise<boolean> {
+    return await this.bloggerBlogsRawSqlRepository.changeBanStatusBlogsDependencyIsBannedByUserId(
       command.userId,
       command.isBanned,
     );
-    return;
   }
 }

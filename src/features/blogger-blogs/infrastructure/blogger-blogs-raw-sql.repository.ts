@@ -299,7 +299,7 @@ export class BloggerBlogsRawSqlRepository {
     isBanned: boolean,
   ): Promise<boolean> {
     try {
-      return await this.db.query(
+      const result = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
       SET "dependencyIsBanned" = $2
@@ -307,6 +307,7 @@ export class BloggerBlogsRawSqlRepository {
       `,
         [userId, isBanned],
       );
+      return result[1] !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
