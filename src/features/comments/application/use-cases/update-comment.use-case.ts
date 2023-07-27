@@ -10,6 +10,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
+import { IdDto } from '../../../../ability/dto/id.dto';
 
 export class UpdateCommentCommand {
   constructor(
@@ -28,30 +29,39 @@ export class UpdateCommentUseCase
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
   async execute(command: UpdateCommentCommand) {
+    const { commentId, updateCommentDto, currentUserDto } = command;
+
     const findComment =
-      await this.commentsRawSqlRepository.findCommentByCommentId(
-        command.commentId,
-      );
-    if (!findComment) throw new NotFoundException();
+      await this.commentsRawSqlRepository.findCommentByCommentId(commentId);
+    if (!findComment) throw new NotFoundException('Not found comment.');
+
+    this.checkUserPermission(currentUserDto, findComment.commentatorInfoUserId);
+
     try {
-      const ability = this.caslAbilityFactory.createForUserId({
-        id: command.currentUserDto.id,
-      });
-      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: findComment.commentatorInfoUserId,
-      });
       return await this.commentsRawSqlRepository.updateComment(
-        command.commentId,
-        command.updateCommentDto,
+        commentId,
+        updateCommentDto,
       );
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      }
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private checkUserPermission(
+    currentUserDto: CurrentUserDto,
+    commentatorId: string,
+  ) {
+    const userIdDto: IdDto = { id: currentUserDto.id };
+    const ability = this.caslAbilityFactory.createForUserId(userIdDto);
+    try {
+      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
+        id: commentatorId,
+      });
+    } catch (error) {
+      throw new ForbiddenException(
+        'You are not allowed to update this comment. ' + error.message,
+      );
     }
   }
 }
