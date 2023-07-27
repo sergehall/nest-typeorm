@@ -12,6 +12,7 @@ export class FillingCommentsDataCommand {
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
+
 @CommandHandler(FillingCommentsDataCommand)
 export class FillingCommentsDataUseCase
   implements ICommandHandler<FillingCommentsDataCommand>
@@ -19,72 +20,81 @@ export class FillingCommentsDataUseCase
   constructor(
     protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
   ) {}
+
   async execute(
     command: FillingCommentsDataCommand,
   ): Promise<FilledCommentEntity[]> {
     try {
-      const filledComments = [];
-      for (const i in command.commentsArray) {
-        const commentId = command.commentsArray[i].id;
+      const { commentsArray, currentUserDto } = command;
+
+      const filledComments: FilledCommentEntity[] = [];
+
+      for (const comment of commentsArray) {
+        const commentId = comment.id;
         const isBanned = false;
-        const currentComment: TablesCommentsRawSqlEntity =
-          command.commentsArray[i];
         let ownLikeStatus = StatusLike.NONE;
-        if (command.currentUserDto) {
+
+        if (currentUserDto) {
           const currentComment =
             await this.likeStatusCommentsRawSqlRepository.findOne(
               commentId,
-              command.currentUserDto.id,
+              currentUserDto.id,
               isBanned,
             );
-          if (currentComment[0]) {
-            ownLikeStatus = currentComment[0].likeStatus;
-          }
+          ownLikeStatus = currentComment[0]?.likeStatus || StatusLike.NONE;
         }
-        // getting likes count
-        const like = 'Like';
-        const likesCount =
-          await this.likeStatusCommentsRawSqlRepository.countLikesDislikes(
-            commentId,
-            isBanned,
-            like,
-          );
 
-        // getting dislikes count
-        const dislike = 'Dislike';
-        const dislikesCount =
-          await this.likeStatusCommentsRawSqlRepository.countLikesDislikes(
-            commentId,
-            isBanned,
-            dislike,
-          );
+        const likesCount = await this.getLikesDislikesCount(
+          commentId,
+          isBanned,
+          'Like',
+        );
+        const dislikesCount = await this.getLikesDislikesCount(
+          commentId,
+          isBanned,
+          'Dislike',
+        );
 
         const filledComment: FilledCommentEntity = {
-          id: currentComment.id,
-          content: currentComment.content,
-          createdAt: currentComment.createdAt,
+          id: comment.id,
+          content: comment.content,
+          createdAt: comment.createdAt,
           commentatorInfo: {
-            userId: currentComment.commentatorInfoUserId,
-            userLogin: currentComment.commentatorInfoUserLogin,
+            userId: comment.commentatorInfoUserId,
+            userLogin: comment.commentatorInfoUserLogin,
           },
           likesInfo: {
-            likesCount: likesCount,
-            dislikesCount: dislikesCount,
+            likesCount,
+            dislikesCount,
             myStatus: ownLikeStatus,
           },
           postInfo: {
-            id: currentComment.postInfoPostId,
-            title: currentComment.postInfoTitle,
-            blogId: currentComment.postInfoBlogId,
-            blogName: currentComment.postInfoBlogName,
+            id: comment.postInfoPostId,
+            title: comment.postInfoTitle,
+            blogId: comment.postInfoBlogId,
+            blogName: comment.postInfoBlogName,
           },
         };
+
         filledComments.push(filledComment);
       }
+
       return filledComments;
     } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      console.error(error.message);
+      throw new InternalServerErrorException('Error filling comments data.');
     }
+  }
+
+  private async getLikesDislikesCount(
+    commentId: string,
+    isBanned: boolean,
+    likeStatus: 'Like' | 'Dislike',
+  ): Promise<number> {
+    return this.likeStatusCommentsRawSqlRepository.countLikesDislikes(
+      commentId,
+      isBanned,
+      likeStatus,
+    );
   }
 }
