@@ -29,7 +29,7 @@ export class FindCommentsCurrentUserUseCase
     const { id } = currentUserDto;
 
     const comments: TablesCommentsRawSqlEntity[] =
-      await this.commentsRawSqlRepository.findCommentsByCommentatorId(
+      await this.commentsRawSqlRepository.findCommentsByBlogOwnerId(
         queryData,
         id,
       );
@@ -48,7 +48,7 @@ export class FindCommentsCurrentUserUseCase
     );
 
     const totalCountComments =
-      await this.commentsRawSqlRepository.totalCountByCommentatorId(id);
+      await this.commentsRawSqlRepository.totalCountCommentsByBlogOwnerId(id);
 
     const pagesCount = Math.ceil(
       totalCountComments / command.queryData.queryPagination.pageSize,

@@ -28,14 +28,14 @@ export class SaRemoveUserByUserIdUseCase
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
-    private readonly likeStatusPostRepository: LikeStatusPostsRawSqlRepository,
     private readonly likeStatusCommentsRepo: LikeStatusCommentsRawSqlRepository,
+    private readonly likeStatusPostsRepository: LikeStatusPostsRawSqlRepository,
     private readonly commentsRepository: CommentsRawSqlRepository,
     private readonly postsRepository: PostsRawSqlRepository,
     private readonly securityDevicesRepository: SecurityDevicesRawSqlRepository,
     private readonly bloggerBlogsRepository: BloggerBlogsRawSqlRepository,
     private readonly bannedUsersForBlogsRepository: BannedUsersForBlogsRawSqlRepository,
-    private readonly sentEmailsTimeConfCodeRepo: SentEmailsTimeConfirmAndRecoverCodesRepository,
+    private readonly sentEmailsTimeRepo: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
   async execute(command: SaRemoveUserByUserIdCommand): Promise<boolean> {
     const { userId, currentUserDto } = command;
@@ -56,17 +56,15 @@ export class SaRemoveUserByUserIdUseCase
     userId: string,
   ): Promise<boolean> {
     try {
-      await Promise.all([
-        this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(userId),
-        this.likeStatusCommentsRepo.removeLikesUserCommentByUserId(userId),
-        this.likeStatusPostRepository.removeLikesPostUserByUserId(userId),
-        this.commentsRepository.removeCommentsByUserId(userId),
-        this.postsRepository.removePostsByUserId(userId),
-        this.bloggerBlogsRepository.removeBlogsByUserId(userId),
-        this.securityDevicesRepository.removeDevicesByUseId(userId),
-        this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
-        this.usersRawSqlRepository.removeUserByUserId(userId),
-      ]);
+      await this.sentEmailsTimeRepo.removeSentEmailsTimeByUserId(userId);
+      await this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId);
+      await this.securityDevicesRepository.removeDevicesByUseId(userId);
+      await this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId);
+      await this.likeStatusPostsRepository.removeLikesPostsByUserId(userId);
+      await this.commentsRepository.removeCommentsByUserId(userId);
+      await this.postsRepository.removePostsByUserId(userId);
+      await this.bloggerBlogsRepository.removeBlogsByUserId(userId);
+      await this.usersRawSqlRepository.removeUserByUserId(userId);
       return true;
     } catch (error) {
       console.log(error.message);
@@ -74,14 +72,11 @@ export class SaRemoveUserByUserIdUseCase
     }
   }
 
-  private checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    blogOwnerId: string,
-  ) {
+  private checkUserPermission(currentUserDto: CurrentUserDto, userId: string) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: blogOwnerId,
+        id: userId,
       });
     } catch (error) {
       throw new ForbiddenException(

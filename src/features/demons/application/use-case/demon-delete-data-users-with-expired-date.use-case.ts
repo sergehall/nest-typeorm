@@ -38,8 +38,8 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
 
       await Promise.all([
         this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(id),
-        this.likeStatusCommentsRepo.removeLikesUserCommentByUserId(id),
-        this.likeStatusPostRepository.removeLikesPostUserByUserId(id),
+        this.likeStatusCommentsRepo.removeLikesCommentsByUserId(id),
+        this.likeStatusPostRepository.removeLikesPostsByUserId(id),
         this.commentsRepository.removeCommentsByUserId(id),
         this.postsRepository.removePostsByUserId(id),
         this.bloggerBlogsRepository.removeBlogsByUserId(id),

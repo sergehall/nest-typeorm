@@ -292,6 +292,21 @@ export class PostsRawSqlRepository {
     }
   }
 
+  async removePostsByBlogId(blogId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."Posts"
+        WHERE "blogId" = $1
+          `,
+        [blogId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async changeIntoPostsBlogOwner(
     blogId: string,
     userId: string,

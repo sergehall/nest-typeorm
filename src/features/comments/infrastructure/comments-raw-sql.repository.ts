@@ -49,7 +49,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentsByCommentatorId(
+  async findCommentsByBlogOwnerId(
     queryData: ParseQueryType,
     postInfoBlogOwnerId: string,
   ): Promise<TablesCommentsRawSqlEntity[]> {
@@ -71,7 +71,7 @@ export class CommentsRawSqlRepository {
          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
-        WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
         ORDER BY ${orderByDirection}
         LIMIT $4 OFFSET $5
           `,
@@ -215,7 +215,9 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async totalCountByCommentatorId(commentatorId: string): Promise<number> {
+  async totalCountCommentsByBlogOwnerId(
+    postInfoBlogOwnerId: string,
+  ): Promise<number> {
     const commentatorInfoIsBanned = false;
     const banInfoIsBanned = false;
     try {
@@ -223,9 +225,9 @@ export class CommentsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Comments"
-        WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
-        [commentatorId, commentatorInfoIsBanned, banInfoIsBanned],
+        [postInfoBlogOwnerId, commentatorInfoIsBanned, banInfoIsBanned],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
@@ -297,6 +299,21 @@ export class CommentsRawSqlRepository {
         WHERE "commentatorInfoUserId" = $1
           `,
         [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
+    }
+  }
+
+  async removeCommentsByBlogId(blogId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."Comments"
+        WHERE "postInfoBlogId" = $1
+          `,
+        [blogId],
       );
     } catch (error) {
       console.log(error.message);
