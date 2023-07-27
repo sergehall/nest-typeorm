@@ -1,6 +1,7 @@
 import {
-  BadRequestException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { ChangeBanStatusUserBlogsCommand } from '../../../blogger-blogs/applicat
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
+import { cannotBlockYourself } from '../../../../exception-filter/errors-messages';
 
 export class SaBanUserByUserIdCommand {
   constructor(
@@ -42,7 +44,10 @@ export class SaBanUserByUserIdUseCase
     const { id } = command;
 
     if (id === currentUserDto.id) {
-      throw new BadRequestException('You cannot block yourself.');
+      throw new HttpException(
+        { message: cannotBlockYourself },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const userToBan = await this.usersRawSqlRepository.saFindUserByUserId(id);

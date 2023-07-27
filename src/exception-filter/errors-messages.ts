@@ -45,6 +45,14 @@ export const emailNotExistsOrIsConfirmed = {
     'The email does not exist or user already in the database and is confirmed = true',
   field: 'email',
 };
+export const cannotBlockOwnBlog = {
+  message: 'You cannot block your own blog.',
+  field: 'id',
+};
+export const cannotBlockYourself = {
+  message: 'You cannot block yourself.',
+  field: 'id',
+};
 export const forbiddenDeleteDevice = {
   message: 'You are not authorized to remove this device.',
   params: 'deviceId',
