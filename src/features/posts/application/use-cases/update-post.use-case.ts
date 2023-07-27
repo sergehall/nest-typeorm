@@ -34,36 +34,35 @@ export class UpdatePostByPostIdUseCase
   ) {}
 
   async execute(command: UpdatePostByPostIdCommand): Promise<boolean> {
+    const { params, updatePostDto, currentUserDto } = command;
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(
-        command.params.blogId,
-      );
+      await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
 
     if (!blog) {
       throw new NotFoundException('Not found blog.');
     }
 
     const post: PostsRawSqlEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(command.params.postId);
+      await this.postsRawSqlRepository.findPostByPostId(params.postId);
 
     if (!post) {
-      throw new NotFoundException('Not found post');
+      throw new NotFoundException('Not found post.');
     }
 
-    this.checkUserAuthorization(blog, command.currentUserDto);
+    this.checkUserPermission(blog.blogOwnerId, currentUserDto);
 
     return await this.postsRawSqlRepository.updatePostByPostId(
-      command.params.postId,
-      command.updatePostDto,
+      params.postId,
+      updatePostDto,
     );
   }
 
-  private checkUserAuthorization(
-    blog: TableBloggerBlogsRawSqlEntity,
+  private checkUserPermission(
+    blogOwnerId: string,
     currentUserDto: CurrentUserDto,
   ) {
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blog.blogOwnerId,
+      id: blogOwnerId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
