@@ -34,8 +34,7 @@ export class SaBanBlogByBlogIUseCase
   async execute(command: SaBanBlogByBlogIdCommand) {
     const { blogId, saBanBlogDto, currentUserDto } = command;
 
-    const blogForBan = await this.getBlogForBan(blogId);
-    if (!blogForBan) throw new NotFoundException('Not found blog.');
+    const blogForBan = await this.saGetBlogForBan(blogId);
 
     this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
@@ -82,13 +81,10 @@ export class SaBanBlogByBlogIUseCase
     }
   }
 
-  private async getBlogForBan(blogId: string) {
-    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogByBlogId(
-      blogId,
-    );
-    if (!blogForBan) {
-      throw new NotFoundException('Not found blog.');
-    }
+  private async saGetBlogForBan(blogId: string) {
+    const blogForBan =
+      await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
+    if (!blogForBan) throw new NotFoundException('Not found blog.');
     return blogForBan;
   }
 }
