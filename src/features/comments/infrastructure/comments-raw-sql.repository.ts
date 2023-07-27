@@ -49,9 +49,9 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentsByBlogOwnerId(
+  async findCommentsByCommentatorId(
     queryData: ParseQueryType,
-    postInfoBlogOwnerId: string,
+    commentatorInfoUserId: string,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     const commentatorInfoIsBanned = false;
     const banInfoIsBanned = false;
@@ -71,12 +71,12 @@ export class CommentsRawSqlRepository {
          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
-        WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
         ORDER BY ${orderByDirection}
         LIMIT $4 OFFSET $5
           `,
         [
-          postInfoBlogOwnerId,
+          commentatorInfoUserId,
           commentatorInfoIsBanned,
           banInfoIsBanned,
           limit,
@@ -208,6 +208,26 @@ export class CommentsRawSqlRepository {
         WHERE "postInfoPostId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
         [postId, commentatorInfoIsBanned, banInfoIsBanned],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountCommentsByCommentatorId(
+    commentatorInfoUserId: string,
+  ): Promise<number> {
+    const commentatorInfoIsBanned = false;
+    const banInfoIsBanned = false;
+    try {
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."Comments"
+        WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+      `,
+        [commentatorInfoUserId, commentatorInfoIsBanned, banInfoIsBanned],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
