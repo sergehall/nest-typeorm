@@ -1,7 +1,8 @@
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
 import {
-  BadRequestException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs
 import * as uuid4 from 'uuid4';
 import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
 import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
+import { cannotBlockYourself } from '../../../../exception-filter/errors-messages';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -43,7 +45,10 @@ export class BanUserForBlogUseCase
     const { userToBanId, updateBanUserDto, currentUserDto } = command;
 
     if (userToBanId === currentUserDto.id) {
-      throw new BadRequestException('You cannot block yourself.');
+      throw new HttpException(
+        { message: cannotBlockYourself },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     // Step 1: Fetch the user to be banned from the repository.

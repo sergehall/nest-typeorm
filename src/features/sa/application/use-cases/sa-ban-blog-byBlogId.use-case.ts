@@ -2,8 +2,9 @@ import { SaBanBlogDto } from '../../dto/sa-ban-blog.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import {
-  BadRequestException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { ChangeBanStatusBlogsByBlogIdCommand } from './sa-change-banStatus-blogs-byBlogId.use-case';
 import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banStatus-posts-byBlogId.use-case';
 import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
+import { cannotBlockOwnBlog } from '../../../../exception-filter/errors-messages';
 
 export class SaBanBlogByBlogIdCommand {
   constructor(
@@ -38,7 +40,10 @@ export class SaBanBlogByBlogIUseCase
     const blogForBan = await this.saGetBlogForBan(blogId);
 
     if (blogForBan.blogOwnerId === currentUserDto.id) {
-      throw new BadRequestException('You cannot block your own blog.');
+      throw new HttpException(
+        { message: cannotBlockOwnBlog },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
