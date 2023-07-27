@@ -98,16 +98,6 @@ export class BloggerBlogsController {
     );
   }
 
-  @Delete('blogs/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
-  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
-    const currentUserDto: CurrentUserDto = req.user;
-    return await this.commandBus.execute(
-      new RemoveBlogByIdCommand(params.id, currentUserDto),
-    );
-  }
-
   @Get('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
@@ -170,6 +160,20 @@ export class BloggerBlogsController {
     );
   }
 
+  @Put('users/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async banUserForBlog(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() updateBanUserDto: UpdateBanUserDto,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+    return await this.commandBus.execute(
+      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUserDto),
+    );
+  }
+
   @Delete('blogs/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -183,17 +187,13 @@ export class BloggerBlogsController {
     );
   }
 
-  @Put('users/:id/ban')
+  @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async banUserForBlog(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() updateBanUserDto: UpdateBanUserDto,
-  ): Promise<boolean> {
+  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUserDto),
+      new RemoveBlogByIdCommand(params.id, currentUserDto),
     );
   }
 }

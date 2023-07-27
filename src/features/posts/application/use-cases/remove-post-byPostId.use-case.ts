@@ -13,6 +13,9 @@ import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/t
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
+import { LikeStatusCommentsRawSqlRepository } from '../../../comments/infrastructure/like-status-comments-raw-sql.repository';
+import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
+import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 
 export class RemovePostByPostIdCommand {
   constructor(
@@ -26,32 +29,37 @@ export class RemovePostByPostIdUseCase
   implements ICommandHandler<RemovePostByPostIdCommand>
 {
   constructor(
-    protected caslAbilityFactory: CaslAbilityFactory,
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    protected postsRawSqlRepository: PostsRawSqlRepository,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly likeStatusCommentsRepo: LikeStatusCommentsRawSqlRepository,
+    private readonly likeStatusPostRepository: LikeStatusPostsRawSqlRepository,
+    private readonly commentsRepository: CommentsRawSqlRepository,
+    private readonly postsRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: RemovePostByPostIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
 
-    const blogToDelete: TableBloggerBlogsRawSqlEntity | null =
+    const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
-    if (!blogToDelete) throw new NotFoundException('Not found blog.');
+    if (!blog) throw new NotFoundException('Not found blog.');
 
-    const post: PostsRawSqlEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(params.postId);
-    if (!post) throw new NotFoundException('Not found post.');
+    const postToRemove: PostsRawSqlEntity | null =
+      await this.postsRepository.findPostByPostId(params.postId);
+    if (!postToRemove) throw new NotFoundException('Not found post.');
 
-    this.checkUserPermission(blogToDelete.blogOwnerId, currentUserDto);
+    this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
 
-    return await this.postsRawSqlRepository.removePostByPostId(params.postId);
+    await this.executeRemovePostByPostIdCommands(postToRemove.id);
+
+    return true;
   }
 
   private checkUserPermission(
-    blogOwnerId: string,
+    postOwnerId: string,
     currentUserDto: CurrentUserDto,
   ) {
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogOwnerId,
+      id: postOwnerId,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
@@ -63,6 +71,19 @@ export class RemovePostByPostIdUseCase
           'You do not have permission to delete a post. ' + error.message,
         );
       }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async executeRemovePostByPostIdCommands(
+    postId: string,
+  ): Promise<boolean> {
+    try {
+      await this.likeStatusPostRepository.removeLikesPostByPosId(postId);
+      await this.commentsRepository.removeCommentsByPostId(postId);
+      return await this.postsRepository.removePostByPostId(postId);
+    } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

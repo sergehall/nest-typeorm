@@ -188,4 +188,19 @@ export class LikeStatusPostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async removeLikesPostByPosId(postId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."LikeStatusPosts"
+        WHERE "postId" = $1
+        `,
+        [postId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }
