@@ -1,5 +1,6 @@
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
 import {
+  BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
@@ -40,6 +41,10 @@ export class BanUserForBlogUseCase
   // This method is executed when the BanUserForBlogCommand is dispatched to this handler.
   async execute(command: BanUserForBlogCommand): Promise<boolean> {
     const { userToBanId, updateBanUserDto, currentUserDto } = command;
+
+    if (userToBanId === currentUserDto.id) {
+      throw new BadRequestException('You cannot block yourself.');
+    }
 
     // Step 1: Fetch the user to be banned from the repository.
     const userForBan = await this.getUserToBan(userToBanId);

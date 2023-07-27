@@ -2,6 +2,7 @@ import { SaBanBlogDto } from '../../dto/sa-ban-blog.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import {
+  BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
@@ -35,6 +36,10 @@ export class SaBanBlogByBlogIUseCase
     const { blogId, saBanBlogDto, currentUserDto } = command;
 
     const blogForBan = await this.saGetBlogForBan(blogId);
+
+    if (blogForBan.blogOwnerId === currentUserDto.id) {
+      throw new BadRequestException('You cannot block your own blog.');
+    }
 
     this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
