@@ -17,7 +17,7 @@ import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.reposi
 export class RemovePostByPostIdCommand {
   constructor(
     public params: BlogIdPostIdParams,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -31,35 +31,28 @@ export class RemovePostByPostIdUseCase
     protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: RemovePostByPostIdCommand): Promise<boolean> {
-    const blogToDelete: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(
-        command.params.blogId,
-      );
+    const { params, currentUserDto } = command;
 
-    if (!blogToDelete) {
-      throw new NotFoundException('Not found blog.');
-    }
+    const blogToDelete: TableBloggerBlogsRawSqlEntity | null =
+      await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
+    if (!blogToDelete) throw new NotFoundException('Not found blog.');
 
     const post: PostsRawSqlEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(command.params.postId);
+      await this.postsRawSqlRepository.findPostByPostId(params.postId);
+    if (!post) throw new NotFoundException('Not found post.');
 
-    if (!post) {
-      throw new NotFoundException('Not found post');
-    }
+    this.checkUserPermission(blogToDelete.blogOwnerId, currentUserDto);
 
-    this.checkUserAuthorization(blogToDelete, command.currentUser);
-    return await this.postsRawSqlRepository.removePostByPostId(
-      command.params.postId,
-    );
+    return await this.postsRawSqlRepository.removePostByPostId(params.postId);
   }
-  private checkUserAuthorization(
-    blogToDelete: TableBloggerBlogsRawSqlEntity,
+
+  private checkUserPermission(
+    blogOwnerId: string,
     currentUserDto: CurrentUserDto,
   ) {
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToDelete.blogOwnerId,
+      id: blogOwnerId,
     });
-
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: currentUserDto.id,
