@@ -20,9 +20,9 @@ import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/ap
 
 export class BanUserForBlogCommand {
   constructor(
-    public userId: string,
+    public userToBanId: string,
     public updateBanUserDto: UpdateBanUserDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -37,43 +37,45 @@ export class BanUserForBlogUseCase
     private readonly commandBus: CommandBus,
   ) {}
 
+  // This method is executed when the BanUserForBlogCommand is dispatched to this handler.
   async execute(command: BanUserForBlogCommand): Promise<boolean> {
-    const userForBan = await this.getUserToBan(command.userId);
+    const { userToBanId, updateBanUserDto, currentUserDto } = command;
 
-    const blogForBan = await this.getBlogForBan(
-      command.updateBanUserDto.blogId,
-    );
+    // Step 1: Fetch the user to be banned from the repository.
+    const userForBan = await this.getUserToBan(userToBanId);
 
-    await this.checkUserPermission(
-      command.currentUser.id,
-      blogForBan.blogOwnerId,
-    );
+    // Step 2: Fetch the blog associated with the ban from the repository.
+    const blogForBan = await this.getBlogForBan(updateBanUserDto.blogId);
 
+    // Step 3: Check if the current user has permission to perform the ban action.
+    await this.checkUserPermission(blogForBan.blogOwnerId, currentUserDto);
+
+    // Step 4: Create a BannedUsersForBlogsEntity object that represents the ban entity.
     const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
-      this.createBannedUserEntity(userForBan, command.updateBanUserDto);
+      this.createBannedUserEntity(userForBan, updateBanUserDto);
 
+    // Step 5: Execute several commands asynchronously to change the ban status for the user in different scenarios.
     return await this.executeChangeBanStatusCommands(bannedUserForBlogEntity);
   }
 
+  // Fetches the user to be banned from the repository based on the provided user ID.
   private async getUserToBan(userId: string): Promise<TablesUsersEntityWithId> {
     const userToBan: TablesUsersEntityWithId | null =
       await this.usersRawSqlRepository.findUserByUserId(userId);
-    if (!userToBan) {
-      throw new NotFoundException('Not found user.');
-    }
+    if (!userToBan) throw new NotFoundException('Not found user.');
     return userToBan;
   }
 
+  // Fetches the blog associated with the ban from the repository based on the provided blog ID.
   private async getBlogForBan(blogId: string) {
     const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogByBlogId(
       blogId,
     );
-    if (!blogForBan) {
-      throw new NotFoundException('Not found blog.');
-    }
+    if (!blogForBan) throw new NotFoundException('Not found blog.');
     return blogForBan;
   }
 
+  // Creates a new instance of BannedUsersForBlogsEntity using the user and DTO information.
   private createBannedUserEntity(
     userToBan: TablesUsersEntityWithId,
     updateBanUserDto: UpdateBanUserDto,
@@ -89,11 +91,16 @@ export class BanUserForBlogUseCase
     };
   }
 
-  private async checkUserPermission(userId: string, blogOwnerId: string) {
+  // Checks if the current user has permission to ban the user associated with the provided user ID.
+  private async checkUserPermission(
+    userId: string,
+    currentUserDto: CurrentUserDto,
+  ) {
     const ability = this.caslAbilityFactory.createForUserId({ id: userId });
     try {
+      // Throws a ForbiddenError if the current user doesn't have the permission to perform the action.
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: blogOwnerId,
+        id: currentUserDto.id,
       });
     } catch (error) {
       throw new ForbiddenException(
@@ -102,6 +109,7 @@ export class BanUserForBlogUseCase
     }
   }
 
+  // Executes a series of commands asynchronously to change the ban status for the user in different contexts (likes, comments, ban list).
   private async executeChangeBanStatusCommands(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
