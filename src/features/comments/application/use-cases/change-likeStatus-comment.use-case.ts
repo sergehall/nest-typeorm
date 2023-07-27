@@ -1,5 +1,9 @@
 import { LikeStatusDto } from '../../dto/like-status.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { LikeStatusCommentEntity } from '../../entities/like-status-comment.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
@@ -48,8 +52,14 @@ export class ChangeLikeStatusCommentUseCase
       likeStatus: command.likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),
     };
-    return await this.likeStatusCommentsRawSqlRepository.updateLikeStatusComment(
-      likeStatusCommEntity,
-    );
+
+    try {
+      return await this.likeStatusCommentsRawSqlRepository.updateLikeStatusComment(
+        likeStatusCommEntity,
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
