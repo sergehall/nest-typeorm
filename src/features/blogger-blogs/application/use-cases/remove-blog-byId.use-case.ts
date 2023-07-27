@@ -47,23 +47,6 @@ export class RemoveBlogByIdUseCase
     return true;
   }
 
-  private async executeRemoveBlogByBlogIdCommands(
-    blogId: string,
-  ): Promise<boolean> {
-    try {
-      await this.likeStatusCommentsRepo.removeLikesCommentsByBlogId(blogId);
-      await this.likeStatusPostRepository.removeLikesPostsByBlogId(blogId);
-      await this.commentsRepository.removeCommentsByBlogId(blogId);
-      await this.postsRepository.removePostsByBlogId(blogId);
-      await this.bannedUsersForBlogsRepository.removeBannedUserByBlogId(blogId);
-      await this.bloggerBlogsRepository.removeBlogsByBlogId(blogId);
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   private checkUserPermission(
     currentUserDto: CurrentUserDto,
     blogOwnerId: string,
@@ -78,6 +61,23 @@ export class RemoveBlogByIdUseCase
       throw new ForbiddenException(
         'You are not allowed to remove this blog. ' + error.message,
       );
+    }
+  }
+
+  private async executeRemoveBlogByBlogIdCommands(
+    blogId: string,
+  ): Promise<boolean> {
+    try {
+      await this.likeStatusCommentsRepo.removeLikesCommentsByBlogId(blogId);
+      await this.likeStatusPostRepository.removeLikesPostsByBlogId(blogId);
+      await this.commentsRepository.removeCommentsByBlogId(blogId);
+      await this.postsRepository.removePostsByBlogId(blogId);
+      await this.bannedUsersForBlogsRepository.removeBannedUserByBlogId(blogId);
+      await this.bloggerBlogsRepository.removeBlogsByBlogId(blogId);
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
