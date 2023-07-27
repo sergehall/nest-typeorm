@@ -7,6 +7,13 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+interface ErrorResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  path: string;
+}
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
@@ -15,16 +22,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
     const responseBody: any = exception.getResponse();
+
+    const errorResponse: ErrorResponse = {
+      statusCode: status,
+      message: responseBody.message,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+    };
+
     if (status === HttpStatus.TOO_MANY_REQUESTS) {
-      response.status(status).json({
-        statusCode: status,
-        message: responseBody,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      });
-      return;
-    }
-    if (
+      errorResponse.message = responseBody;
+    } else if (
       status === HttpStatus.BAD_REQUEST ||
       status === HttpStatus.UNAUTHORIZED
     ) {
@@ -33,15 +41,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       });
       return;
     }
-    if (status === HttpStatus.NOT_FOUND) {
-      response.status(status).json();
-      return;
-    }
-    response.status(status).json({
-      statusCode: status,
-      message: responseBody.message,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-    });
+
+    response.status(status).json(errorResponse);
   }
 }
