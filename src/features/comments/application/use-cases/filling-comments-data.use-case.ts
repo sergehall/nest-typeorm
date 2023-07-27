@@ -29,11 +29,13 @@ export class FillingCommentsDataUseCase
 
       const filledComments: FilledCommentEntity[] = [];
 
+      // Loop through each comment in the commentsArray provided in the command.
       for (const comment of commentsArray) {
         const commentId = comment.id;
         const isBanned = false;
         let ownLikeStatus = StatusLike.NONE;
 
+        // If a currentUserDto is provided in the command, fetch the like status for the current user
         if (currentUserDto) {
           const currentComment =
             await this.likeStatusCommentsRawSqlRepository.findOne(
@@ -44,17 +46,21 @@ export class FillingCommentsDataUseCase
           ownLikeStatus = currentComment[0]?.likeStatus || StatusLike.NONE;
         }
 
+        // Get the count of likes for the current comment.
         const likesCount = await this.getLikesDislikesCount(
           commentId,
           isBanned,
           'Like',
         );
+
+        // Get the count of dislikes for the current comment.
         const dislikesCount = await this.getLikesDislikesCount(
           commentId,
           isBanned,
           'Dislike',
         );
 
+        // Create a FilledCommentEntity object with all the relevant information for the current comment.
         const filledComment: FilledCommentEntity = {
           id: comment.id,
           content: comment.content,
@@ -79,6 +85,7 @@ export class FillingCommentsDataUseCase
         filledComments.push(filledComment);
       }
 
+      // Return the list of filled comments.
       return filledComments;
     } catch (error) {
       console.error(error.message);
