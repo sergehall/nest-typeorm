@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
@@ -39,6 +40,10 @@ export class SaBanUserByUserIdUseCase
     const { isBanned, banReason } = command.saBanUserDto;
     const { currentUserDto } = command;
     const { id } = command;
+
+    if (id === currentUserDto.id) {
+      throw new BadRequestException('You cannot block yourself.');
+    }
 
     const userToBan = await this.usersRawSqlRepository.saFindUserByUserId(id);
     if (!userToBan) {
