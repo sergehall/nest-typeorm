@@ -89,9 +89,6 @@ export class SaBanUserByUserIdUseCase
       ]);
       return true;
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(error.message);
-      }
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
