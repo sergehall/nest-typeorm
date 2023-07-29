@@ -54,7 +54,7 @@ export const cannotBlockYourself = {
   field: 'id',
 };
 export const forbiddenDeleteDevice = {
-  message: 'You are not authorized to remove this device.',
+  message: 'Cannot delete device that does not belong to the current user.',
   params: 'deviceId',
 };
 

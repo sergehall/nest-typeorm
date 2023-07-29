@@ -83,11 +83,9 @@ export class SecurityDevicesRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async removeDeviceByDeviceId(
-    deviceId: string,
-  ): Promise<SessionDevicesEntity[]> {
+  async removeDeviceByDeviceId(deviceId: string): Promise<boolean> {
     try {
-      return await this.db.query(
+      const isDeleted = await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
       WHERE "deviceId" = $1
@@ -95,6 +93,7 @@ export class SecurityDevicesRawSqlRepository {
       `,
         [deviceId],
       );
+      return isDeleted[1] === 1;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);
