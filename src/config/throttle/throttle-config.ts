@@ -1,21 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base-config';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../configuration';
 import { NumberThrottlerEnums } from './enums/number-throttler.enums';
+import {
+  ThrottlerModuleOptions,
+  ThrottlerOptionsFactory,
+} from '@nestjs/throttler';
 
 @Injectable()
-export class ThrottleConfig extends BaseConfig {
-  constructor(configService: ConfigService<ConfigType, true>) {
-    super(configService);
+export class ThrottleConfig
+  extends BaseConfig
+  implements ThrottlerOptionsFactory
+{
+  createThrottlerOptions(): ThrottlerModuleOptions {
+    return {
+      ttl: this.getThrottleLIMIT(), // Maximum number of requests in the given time frame
+      limit: this.getThrottleTTL(), // Time to keep records of requests in memory (milliseconds)
+    };
   }
-  getThrottleTTL(): number {
+  private getThrottleTTL(): number {
     return this.getValueNumber(
       'THROTTLE_TTL',
       NumberThrottlerEnums.THROTTLE_TTL,
     );
   }
-  getThrottleLIMIT(): number {
+  private getThrottleLIMIT(): number {
     return this.getValueNumber(
       'THROTTLE_LIMIT',
       NumberThrottlerEnums.THROTTLE_LIMIT,

@@ -1,8 +1,8 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { DomainNamesEnums } from '../../enums/domain-names.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { getConfiguration } from '../../../../config/configuration';
 import { EmailsRecoveryCodesEntity } from '../../../demons/entities/emailsRecoveryCodes.entity';
+import Configuration from '../../../../config/configuration';
 
 export class SendRecoveryCodesCommand {
   constructor(public emailAndCode: EmailsRecoveryCodesEntity) {}
@@ -21,7 +21,8 @@ export class SendRecoveryCodesUseCase
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
 
-    const fromEmail = getConfiguration().mail.NODEMAILER_EMAIL;
+    const fromEmail =
+      Configuration.getConfiguration().mailConfig.NODEMAILER_EMAIL;
     const subject = 'Sent recovery code';
     const template = 'index';
     const text = 'Welcome';

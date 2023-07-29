@@ -8,8 +8,8 @@ import { TablesUsersEntity } from '../../entities/tablesUsers.entity';
 import { OrgIdEnums } from '../../enums/org-id.enums';
 import { RolesEnums } from '../../../../ability/enums/roles.enums';
 import * as uuid4 from 'uuid4';
-import { getConfiguration } from '../../../../config/configuration';
 import * as bcrypt from 'bcrypt';
+import Configuration from '../../../../config/configuration';
 
 export class CreateUserCommand {
   constructor(
@@ -55,7 +55,9 @@ export class CreateUserByInstanceUseCase
     return await this.usersRawSqlRepository.createUser(newUser);
   }
   private async hashPassword(password: string): Promise<string> {
-    const saltFactor = Number(getConfiguration().bcrypt.SALT_FACTOR);
+    const saltFactor = Number(
+      Configuration.getConfiguration().bcryptConfig.SALT_FACTOR,
+    );
     const salt = await bcrypt.genSalt(saltFactor);
     return bcrypt.hash(password, salt);
   }

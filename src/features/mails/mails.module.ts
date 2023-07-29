@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MailsService } from './application/mails.service';
 import { mailsProviders } from './infrastructure/mails.provaiders';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { MailsRawSqlRepository } from './infrastructure/mails-raw-sql.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailsAdapter } from './adapters/mails.adapter';
-import { getConfiguration } from '../../config/configuration';
+import Configuration from '../../config/configuration';
 import { SendRegistrationCodesUseCase } from './adapters/use-case/send-registrationCodes.use-case';
 import { SendRecoveryCodesUseCase } from './adapters/use-case/send-recoveryCodes';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const mailsAdapterUseCases = [
   SendRegistrationCodesUseCase,
@@ -18,17 +18,18 @@ const mailsAdapterUseCases = [
 
 @Module({
   imports: [
-    DatabaseModule,
+    MongoDBModule,
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: getConfiguration().mail.MAIL_HOST,
-          port: getConfiguration().mail.EMAIL_PORT,
+          host: Configuration.getConfiguration().mailConfig.MAIL_HOST,
+          port: Configuration.getConfiguration().mailConfig.EMAIL_PORT,
           ignoreTLS: true,
           secure: true,
           auth: {
-            user: getConfiguration().mail.NODEMAILER_EMAIL,
-            pass: getConfiguration().mail.NODEMAILER_APP_PASSWORD,
+            user: Configuration.getConfiguration().mailConfig.NODEMAILER_EMAIL,
+            pass: Configuration.getConfiguration().mailConfig
+              .NODEMAILER_APP_PASSWORD,
           },
         },
         defaults: {

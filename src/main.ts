@@ -6,12 +6,18 @@ import { ConfigType } from './config/configuration';
 import { createApp } from './createApp';
 
 async function bootstrap() {
-  const rawApp = await NestFactory.create<NestExpressApplication>(AppModule);
-  const app = createApp(rawApp);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  createApp(app); // Apply configurations using the createApp function
+
   const configService = app.get(ConfigService<ConfigType>);
-  await app.listen(configService.get('PORT') || 5000, () => {
-    console.log(`Example app listening on port: ${process.env.PORT || 5000}`);
+  const port = configService.get<number>('PORT') || 5000;
+
+  await app.listen(port, () => {
+    console.log(`Example app listening on port: ${port}`);
   });
-  console.log(`Application is running on: ${await app.getUrl()}`);
+
+  const baseUrl = await app.getUrl();
+  console.log(`Application is running on: ${baseUrl}`);
 }
+
 bootstrap();

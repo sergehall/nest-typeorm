@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import { CaslModule } from '../../ability/casl.module';
 import { UsersRepository } from './infrastructure/users.repository';
 import { usersProviders } from './infrastructure/users.providers';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
@@ -20,6 +19,7 @@ import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.validation';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const usersUseCases = [
   CreateUserByMongooseModelUseCase,
@@ -31,7 +31,7 @@ const usersUseCases = [
 const usersRules = [RecoveryCodeExistsRule];
 
 @Module({
-  imports: [DatabaseModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, CaslModule, CqrsModule],
   controllers: [UsersController],
   providers: [
     UsersService,

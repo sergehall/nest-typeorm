@@ -1,6 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { Model } from 'mongoose';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';

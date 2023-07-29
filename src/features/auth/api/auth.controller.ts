@@ -40,12 +40,12 @@ import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-j
 import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
-import jwt_decode from 'jwt-decode';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
 import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
+import jwt_decode from 'jwt-decode';
 
 @SkipThrottle()
 @Controller('auth')

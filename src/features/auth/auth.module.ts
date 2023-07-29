@@ -6,7 +6,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { authProviders } from './infrastructure/auth.providers';
 import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
@@ -32,6 +31,7 @@ import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -51,7 +51,7 @@ const authUseCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, UsersModule, PassportModule, JwtModule, CqrsModule],
+  imports: [MongoDBModule, UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
     LocalStrategy,

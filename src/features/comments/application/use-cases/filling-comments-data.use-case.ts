@@ -1,4 +1,4 @@
-import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';

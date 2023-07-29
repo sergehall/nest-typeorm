@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { UsersDocument } from '../../users/infrastructure/schemas/user.schema';
 import { PostsDocument } from '../../posts/infrastructure/schemas/posts.schema';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { LikeStatusPostsDocument } from '../../posts/infrastructure/schemas/like-status-posts.schemas';
 import { LikeStatusCommentDocument } from '../../comments/infrastructure/schemas/like-status-comments.schema';
 import { CommentsDocument } from '../../comments/infrastructure/schemas/comments.schema';

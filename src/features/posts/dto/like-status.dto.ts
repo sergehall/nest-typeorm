@@ -1,4 +1,4 @@
-import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class LikeStatusDto {
