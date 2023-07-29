@@ -104,10 +104,11 @@ export class SecurityDevicesRawSqlRepository {
     deviceId: string,
   ): Promise<SessionDevicesEntity[]> {
     try {
+      console.log(deviceId, 'deviceId');
       const currentTime = new Date().toISOString();
       return await this.db.query(
         `
-        SELECT "userId", "ip", "title", "lastActiveDate", "expirationDate", "deviceId"
+        SELECT "id", "deviceId", "ip", "title", "lastActiveDate", "expirationDate", "userId"
         FROM public."SecurityDevices"
         WHERE "deviceId" = $1 AND "expirationDate" >= $2
         `,

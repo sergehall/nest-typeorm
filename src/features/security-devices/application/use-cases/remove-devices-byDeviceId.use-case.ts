@@ -22,6 +22,7 @@ export class RemoveDevicesByDeviceIdUseCase
     const device: SessionDevicesEntity[] =
       await this.securityDevicesRawSqlRepository.findDeviceByDeviceId(deviceId);
 
+    console.log(device, 'device');
     if (device.length === 0) {
       throw new NotFoundException('Device not found');
     }

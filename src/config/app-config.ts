@@ -3,7 +3,7 @@ import { envFilePath } from '../detect-env';
 import Configuration from './configuration';
 import { validationSchema } from './validation-schema/validation-schema';
 
-export const AppModuleConfig: ConfigModuleOptions = {
+const AppModuleConfig: ConfigModuleOptions = {
   cache: true,
   isGlobal: true,
   envFilePath,

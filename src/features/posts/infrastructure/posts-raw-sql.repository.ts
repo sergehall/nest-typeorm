@@ -169,7 +169,7 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async totalCountPosts(): Promise<number> {
+  async openTotalCountPosts(): Promise<number> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     try {
