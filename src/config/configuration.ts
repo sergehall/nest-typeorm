@@ -24,11 +24,11 @@ class Configuration {
     return this.readEnvVariableWithDefault('DATABASE_URL', 'localhost');
   }
 
-  private static getUriLocalL(): string {
+  private static getUriHostLocal(): string {
     return this.readEnvVariableWithDefault('PG_URI_LOCAL', 'localhost');
   }
 
-  private static getHostHeroku(): string {
+  private static getUriHostHeroku(): string {
     return this.readEnvVariableWithDefault('PG_HOST_HEROKU', 'localhost');
   }
 
@@ -144,10 +144,6 @@ class Configuration {
     );
   }
 
-  private static getPgNestHerokuDB(): string {
-    return this.readEnvVariableWithDefault('PG_NEST_HEROKU_DATABASE', 'test');
-  }
-
   private static getThrottleLIMIT(): number {
     return Number(
       this.readEnvVariableWithDefault(
@@ -169,12 +165,11 @@ class Configuration {
       dbConfig: {
         pg: {
           url: {
-            PG_HEROKU_NAME_DATABASE: Configuration.getPgNestHerokuDB(),
             DATABASE_URL: Configuration.getDatabaseURL(),
           },
           host: {
-            PG_URI_LOCAL: Configuration.getUriLocalL(),
-            PG_HOST_HEROKU: Configuration.getHostHeroku(),
+            PG_URI_LOCAL: Configuration.getUriHostLocal(),
+            PG_HOST_HEROKU: Configuration.getUriHostHeroku(),
           },
           port: {
             PG_PORT: Configuration.getPgPort(),
