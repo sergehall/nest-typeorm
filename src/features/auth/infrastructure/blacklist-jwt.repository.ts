@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { Model } from 'mongoose';
 
 import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';

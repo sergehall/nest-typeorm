@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
-import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsReturnEntity } from '../../entities/comments-return.entity';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';

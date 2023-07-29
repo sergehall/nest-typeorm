@@ -5,7 +5,6 @@ import { Pagination } from '../common/pagination/pagination';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { saProviders } from './infrastructure/sa.providers';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { CaslModule } from '../../ability/casl.module';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
@@ -30,6 +29,7 @@ import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.rep
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -41,7 +41,7 @@ const saUseCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, CaslModule, CqrsModule],
   controllers: [SaController],
   providers: [
     SaService,

@@ -1,4 +1,3 @@
-import { configModule } from './config/configModule';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,40 +7,33 @@ import { PostsModule } from './features/posts/posts.module';
 import { CommentsModule } from './features/comments/comments.module';
 import { TestingModule } from './features/testing/testing.module';
 import { LoggerMiddleware } from './logger/middleware';
-import { CommentsController } from './features/comments/api/comments.controller';
-import { PostsController } from './features/posts/api/posts.controller';
-import { UsersController } from './features/users/api/users.controller';
 import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './features/security-devices/security-devices.module';
-import { SecurityDevicesController } from './features/security-devices/api/security-devices.controller';
-import { AuthController } from './features/auth/api/auth.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DemonsModule } from './features/demons/demons.module';
 import { MailsModule } from './features/mails/mails.module';
-import { TestingController } from './features/testing/api/testing.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { appProviders } from './app.providers';
 import { SaModule } from './features/sa/sa.module';
-import { BloggerBlogsController } from './features/blogger-blogs/api/blogger-blogs.controller';
-import { SaController } from './features/sa/api/sa.controller';
 import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
-import { getConfiguration } from './config/configuration';
-import { DatabaseModule } from './infrastructure/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ormConfig } from './config/db/orm.config';
+import { ConfigModule } from '@nestjs/config';
+import AppModuleConfig from './config/configModule';
+import { OrmConfig } from './config/db/posgresSql/orm.config';
+import { ThrottleConfig } from './config/throttle/throttle-config';
+import { MongoDBModule } from './config/db/mongo/mongo-db.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(AppModuleConfig),
     TypeOrmModule.forRootAsync({
-      useFactory: async () => ormConfig.herokuPosgreSql,
+      useClass: OrmConfig, // Use the OrmConfig class as the factory
     }),
-    configModule,
-    DatabaseModule,
-    ThrottlerModule.forRoot({
-      ttl: getConfiguration().throttle.THROTTLE_TTL,
-      limit: getConfiguration().throttle.THROTTLE_LIMIT,
+    ThrottlerModule.forRootAsync({
+      useClass: ThrottleConfig, // Use the ThrottleConfig class as the factory
     }),
+    MongoDBModule,
     ScheduleModule.forRoot(),
     UsersModule,
     PostsModule,
@@ -61,17 +53,6 @@ import { ormConfig } from './config/db/orm.config';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(
-        AuthController,
-        SaController,
-        CommentsController,
-        PostsController,
-        UsersController,
-        SecurityDevicesController,
-        BloggerBlogsController,
-        TestingController,
-      );
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // Apply logger middleware to all routes
   }
 }

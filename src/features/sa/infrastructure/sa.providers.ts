@@ -1,11 +1,11 @@
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { Mongoose } from 'mongoose';
 import {
   UsersDocument,
   UsersSchema,
 } from '../../users/infrastructure/schemas/user.schema';
-import { NamesCollectionsEnums } from '../../../infrastructure/database/enums/names-collections.enums';
-import { ConnectionEnums } from '../../../infrastructure/database/enums/connection.enums';
+import { NamesCollectionsEnums } from '../../../config/db/mongo/enums/names-collections.enums';
+import { ConnectionEnums } from '../../../config/db/mongo/enums/connection.enums';
 import {
   EmailsConfirmCodeDocument,
   EmailsConfirmCodeSchema,

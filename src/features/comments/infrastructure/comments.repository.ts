@@ -1,6 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { CommentsDocument } from './schemas/comments.schema';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BanInfo, CommentsEntity } from '../entities/comments.entity';

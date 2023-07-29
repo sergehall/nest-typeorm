@@ -3,7 +3,6 @@ import { SecurityDevicesService } from './application/security-devices.service';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { SecurityDevicesRepository } from './infrastructure/security-devices.repository';
 import { devicesProviders } from './infrastructure/devices.providers';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { BlacklistJwtRepository } from '../auth/infrastructure/blacklist-jwt.repository';
 import { UsersService } from '../users/application/users.service';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
@@ -22,6 +21,7 @@ import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-d
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -32,7 +32,7 @@ const securityDevicesCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, CqrsModule],
+  imports: [MongoDBModule, CqrsModule],
   controllers: [SecurityDevicesController],
   providers: [
     ConvertFiltersForDB,

@@ -1,4 +1,4 @@
-import { StatusLike } from '../../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 

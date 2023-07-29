@@ -3,7 +3,7 @@ import { BanInfo, UsersDocument, UsersModelsType } from './schemas/user.schema';
 import { RegistrationData, UsersEntity } from '../entities/users.entity';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()

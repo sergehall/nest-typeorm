@@ -17,7 +17,7 @@ import { ParseQueryType } from '../../common/parse-query/parse-query';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
-import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import { BlogIdParams } from '../../common/params/blogId.params';
 import { userNotHavePermission } from '../../../exception-filter/errors-messages';
 
@@ -121,7 +121,7 @@ export class PostsService {
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsReturnEntity | null> {
     const post = await this.postsRawSqlRepository.findPostByPostId(id);
-    if (!post) throw new NotFoundException();
+    if (!post) throw new NotFoundException('Not Found posts.');
     const filledPost = await this.preparationPostsForReturn(
       [post],
       currentUserDto,

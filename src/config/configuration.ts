@@ -1,109 +1,234 @@
-import { EnvNamesEnums } from './throttle/enums/env-names.enums';
 import { NumberThrottlerEnums } from './throttle/enums/number-throttler.enums';
+import { EnvNamesEnums } from './enums/envNames.enums';
 
-export const getConfiguration = () => {
-  return {
-    ENV: process.env.NODE_ENV || EnvNamesEnums.DEVELOPMENT,
-    PORT: Number(process.env.PORT) || 5000,
-    db: {
-      pg: {
-        url: {
-          DATABASE_URL: process.env.DATABASE_URL || 'localhost',
-        },
-        host: {
-          local: {
-            PG_URI_LOCAL: process.env.PG_URI_LOCAL || 'localhost',
-          },
-          heroku: {
-            PG_HOST_HEROKU: process.env.PG_HOST_HEROKU || 'localhost',
-          },
-        },
-        port: {
-          PG_PORT: Number(process.env.PG_PORT) || 5432,
-        },
-      },
-      mongo: {
-        local: {
-          MONGO_URI_LOCAL: process.env.MONGO_URI_LOCAL || 'localhost://0.0.0.0',
-        },
-        atlas: {
-          ATLAS_URI: process.env.ATLAS_URI || 'localhost://0.0.0.0',
-        },
-      },
-      nameDatabase: {
-        NEST_DATABASE: process.env.NEST_DATABASE || 'Test-DB',
-        TEST_DATABASE: process.env.TEST_DATABASE || 'Test-DB',
-        DEV_DATABASE: process.env.DEV_DATABASE || 'Test-DB',
-        PROD_NEST_DATABASE: process.env.PROD_NEST_DATABASE || 'Test-DB',
-        PG_NEST_LOCAL_DATABASE: process.env.PG_NEST_LOCAL_DATABASE || 'nest-pg',
-        PG_NEST_HEROKU_DATABASE:
-          process.env.PG_NEST_HEROKU_DATABASE || 'nest-pg',
-      },
-    },
-    mail: {
-      NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL || 'test@gmail.com',
-      NODEMAILER_APP_PASSWORD: process.env.NODEMAILER_APP_PASSWORD || 'test',
-      MAIL_HOST: process.env.MAIL_HOST || 'test.gmail.com',
-      EMAIL_PORT: Number(process.env.EMAIL_PORT) || 465,
-    },
-    jwt: {
-      ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY || 'ACCESS_SECRET',
-      REFRESH_SECRET_KEY: process.env.REFRESH_SECRET_KEY || 'REFRESH_SECRET',
-      EXP_ACC_TIME: process.env.EXP_ACC_TIME || '300s',
-      EXP_REF_TIME: process.env.EXP_REF_TIME || '600s',
-    },
-    auth: {
-      BASIC_AUTH: process.env.BASIC_AUTH || 'BASIC_SECRET',
-      PG_LOCAL_USER_NAME: process.env.PG_LOCAL_USER_NAME || 'postgres',
-      PG_LOCAL_USER_PASSWORD: process.env.PG_LOCAL_USER_PASSWORD || 'sa',
-      PG_HEROKU_USER_NAME: process.env.PG_HEROKU_USER_NAME || 'postgres',
-      PG_HEROKU_USER_PASSWORD: process.env.PG_HEROKU_USER_PASSWORD || 'sa',
-    },
-    throttle: {
-      THROTTLE_TTL:
-        Number(process.env.THROTTLE_TTL) || NumberThrottlerEnums.THROTTLE_TTL,
-      THROTTLE_LIMIT:
-        Number(process.env.THROTTLE_LIMIT) ||
+class Configuration {
+  private static readEnvVariableWithDefault(
+    variable: string,
+    defaultValue: any,
+  ) {
+    return process.env[variable] || defaultValue;
+  }
+
+  private static getEnvName(): string {
+    return this.readEnvVariableWithDefault(
+      'NODE_ENV',
+      EnvNamesEnums.DEVELOPMENT,
+    );
+  }
+
+  private static getPort(): number {
+    return Number(this.readEnvVariableWithDefault('PORT', 5000));
+  }
+
+  private static getDatabaseURL(): string {
+    return this.readEnvVariableWithDefault('DATABASE_URL', 'localhost');
+  }
+
+  private static getUriLocalL(): string {
+    return this.readEnvVariableWithDefault('PG_URI_LOCAL', 'localhost');
+  }
+
+  private static getHostHeroku(): string {
+    return this.readEnvVariableWithDefault('PG_HOST_HEROKU', 'localhost');
+  }
+
+  private static getPgPort(): number {
+    return Number(this.readEnvVariableWithDefault('PG_PORT', 5432));
+  }
+
+  private static getMongoUriLocal(): string {
+    return this.readEnvVariableWithDefault(
+      'MONGO_URI_LOCAL',
+      'localhost://0.0.0.0',
+    );
+  }
+
+  private static getMongoUriAtlas(): string {
+    return this.readEnvVariableWithDefault('ATLAS_URI', 'localhost://0.0.0.0');
+  }
+
+  private static getNestDB(): string {
+    return this.readEnvVariableWithDefault('NEST_DATABASE', 'Test-DB');
+  }
+
+  private static geTestDB(): string {
+    return this.readEnvVariableWithDefault('TEST_DATABASE', 'Test-DB');
+  }
+
+  private static geDevDB(): string {
+    return this.readEnvVariableWithDefault('DEV_DATABASE', 'Test-DB');
+  }
+
+  private static getProdDB(): string {
+    return this.readEnvVariableWithDefault('PROD_NEST_DATABASE', 'Test-DB');
+  }
+
+  private static getPgLocalNameDB(): string {
+    return this.readEnvVariableWithDefault('PG_NEST_LOCAL_DATABASE', 'Test-DB');
+  }
+
+  private static getPgHerokuNameDB(): string {
+    return this.readEnvVariableWithDefault(
+      'PG_HEROKU_NAME_DATABASE',
+      'Test-DB',
+    );
+  }
+
+  private static getNodeMailerEmail(): string {
+    return this.readEnvVariableWithDefault(
+      'NODEMAILER_EMAIL',
+      'test@gmail.com',
+    );
+  }
+
+  private static getNodeMailerAppPassword(): string {
+    return this.readEnvVariableWithDefault('NODEMAILER_APP_PASSWORD', 'test');
+  }
+
+  private static getNodeMailerHost(): string {
+    return this.readEnvVariableWithDefault('MAIL_HOST', 'test.gmail.com');
+  }
+
+  private static getNodeMailerPort(): number {
+    return Number(this.readEnvVariableWithDefault('EMAIL_PORT', 465));
+  }
+
+  private static getAccessSecretKey(): string {
+    return this.readEnvVariableWithDefault(
+      'ACCESS_SECRET_KEY',
+      'ACCESS_SECRET',
+    );
+  }
+
+  private static getRefreshSecretKey(): string {
+    return this.readEnvVariableWithDefault(
+      'REFRESH_SECRET_KEY',
+      'REFRESH_SECRET',
+    );
+  }
+
+  private static getAccessExpTime(): string {
+    return this.readEnvVariableWithDefault('EXP_ACC_TIME', '300s');
+  }
+
+  private static getRefreshExpTime(): string {
+    return this.readEnvVariableWithDefault('EXP_REF_TIME', '600s');
+  }
+
+  private static getBasicAuth(): string {
+    return this.readEnvVariableWithDefault('BASIC_AUTH', 'BASIC_SECRET');
+  }
+
+  private static getPgLocalUserName(): string {
+    return this.readEnvVariableWithDefault('PG_LOCAL_USER_NAME', 'postgres');
+  }
+
+  private static getPgLocalUserPassword(): string {
+    return this.readEnvVariableWithDefault('PG_LOCAL_USER_PASSWORD', 'local');
+  }
+
+  private static getPgHerokuUserName(): string {
+    return this.readEnvVariableWithDefault('PG_HEROKU_USER_NAME', 'postgres');
+  }
+
+  private static getPgHerokuUserPassword(): string {
+    return this.readEnvVariableWithDefault('PG_HEROKU_USER_PASSWORD', 'local');
+  }
+
+  private static getThrottleTTL(): number {
+    return Number(
+      this.readEnvVariableWithDefault(
+        'THROTTLE_TTL',
+        NumberThrottlerEnums.THROTTLE_TTL,
+      ),
+    );
+  }
+
+  private static getPgNestHerokuDB(): string {
+    return this.readEnvVariableWithDefault('PG_NEST_HEROKU_DATABASE', 'test');
+  }
+
+  private static getThrottleLIMIT(): number {
+    return Number(
+      this.readEnvVariableWithDefault(
+        'THROTTLE_LIMIT',
         NumberThrottlerEnums.THROTTLE_LIMIT,
-    },
-    bcrypt: {
-      SALT_FACTOR: Number(process.env.SALT_FACTOR),
-    },
-  };
-};
+      ),
+    );
+  }
 
-export type ConfigurationConfigType = ReturnType<typeof getConfiguration>;
-export type ConfigType = ConfigurationConfigType & {
-  ENV:
-    | EnvNamesEnums.DEVELOPMENT
-    | EnvNamesEnums.PRODUCTION
-    | EnvNamesEnums.TEST;
-  MONGO_URI: string;
-  ATLAS_URI: string;
-  NEST_DATABASE: string;
-  TEST_DATABASE: string;
-  DEV_DATABASE: string;
-  PROD_NEST_DATABASE: string;
-  NODEMAILER_EMAIL: string;
-  NODEMAILER_APP_PASSWORD: string;
-  MAIL_HOST: string;
-  EMAIL_PORT: number;
-  ACCESS_SECRET_KEY: string;
-  REFRESH_SECRET_KEY: string;
-  EXP_ACC_TIME: string;
-  EXP_REF_TIME: string;
-  BASIC_AUTH: string;
-  THROTTLE_TTL: number;
-  THROTTLE_LIMIT: number;
-  PG_URI_LOCAL: string;
-  PG_HOST_HEROKU: string;
-  DATABASE_URL: string;
-  PG_NEST_HEROKU_DATABASE: string;
-  PG_HEROKU_USER_NAME: string;
-  PG_HEROKU_USER_PASSWORD: string;
-  PG_LOCAL_USER_NAME: string;
-  PG_LOCAL_USER_PASSWORD: string;
-  PG_PORT: number;
-  PG_NEST_LOCAL_DATABASE: string;
-  SALT_FACTOR: number;
-};
+  private static getSaltFactor(): number {
+    return Number(this.readEnvVariableWithDefault('SALT_FACTOR', 10));
+  }
+
+  static getConfiguration() {
+    const ENV = Configuration.getEnvName();
+    return {
+      ENV: ENV,
+      PORT: Configuration.getPort(),
+      dbConfig: {
+        pg: {
+          url: {
+            PG_HEROKU_NAME_DATABASE: Configuration.getPgNestHerokuDB(),
+            DATABASE_URL: Configuration.getDatabaseURL(),
+          },
+          host: {
+            PG_URI_LOCAL: Configuration.getUriLocalL(),
+            PG_HOST_HEROKU: Configuration.getHostHeroku(),
+          },
+          port: {
+            PG_PORT: Configuration.getPgPort(),
+          },
+          namesDatabase: {
+            PG_LOCAL_DATABASE: Configuration.getPgLocalNameDB(),
+            PG_HEROKU_NAME_DATABASE: Configuration.getPgHerokuNameDB(),
+          },
+          authConfig: {
+            PG_LOCAL_USER_NAME: Configuration.getPgLocalUserName(),
+            PG_LOCAL_USER_PASSWORD: Configuration.getPgLocalUserPassword(),
+            PG_HEROKU_USER_NAME: Configuration.getPgHerokuUserName(),
+            PG_HEROKU_USER_PASSWORD: Configuration.getPgHerokuUserPassword(),
+          },
+        },
+        mongo: {
+          url: {
+            MONGO_URI_LOCAL: Configuration.getMongoUriLocal(),
+            ATLAS_URI: Configuration.getMongoUriAtlas(),
+          },
+          namesDatabase: {
+            NEST_DATABASE: Configuration.getNestDB(),
+            TEST_DATABASE: Configuration.geTestDB(),
+            DEV_DATABASE: Configuration.geDevDB(),
+            PROD_NEST_DATABASE: Configuration.getProdDB(),
+          },
+        },
+      },
+      mailConfig: {
+        NODEMAILER_EMAIL: Configuration.getNodeMailerEmail(),
+        NODEMAILER_APP_PASSWORD: Configuration.getNodeMailerAppPassword(),
+        MAIL_HOST: Configuration.getNodeMailerHost(),
+        EMAIL_PORT: Configuration.getNodeMailerPort(),
+      },
+      jwtConfig: {
+        ACCESS_SECRET_KEY: Configuration.getAccessSecretKey(),
+        REFRESH_SECRET_KEY: Configuration.getRefreshSecretKey(),
+        EXP_ACC_TIME: Configuration.getAccessExpTime(),
+        EXP_REF_TIME: Configuration.getRefreshExpTime(),
+      },
+      basicAuthConfig: {
+        BASIC_AUTH: Configuration.getBasicAuth(),
+      },
+      throttleConfig: {
+        THROTTLE_TTL: Configuration.getThrottleTTL(),
+        THROTTLE_LIMIT: Configuration.getThrottleLIMIT(),
+      },
+      bcryptConfig: {
+        SALT_FACTOR: Configuration.getSaltFactor(),
+      },
+    };
+  }
+}
+
+export type ConfigType = ReturnType<typeof Configuration.getConfiguration>;
+
+export default Configuration;

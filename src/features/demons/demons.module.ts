@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { DemonsService } from './application/demons.service';
 import { DemonsController } from './api/demons.controller';
 import { demonsProviders } from './infrastructure/demons.providers';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { MailsModule } from '../mails/mails.module';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { UsersService } from '../users/application/users.service';
@@ -27,6 +26,7 @@ import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.rep
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { DemonRemoveDataUsersWithExpiredDateUseCase } from './application/use-case/demon-delete-data-users-with-expired-date.use-case';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
@@ -36,7 +36,7 @@ const demonsUseCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, MailsModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, MailsModule, CaslModule, CqrsModule],
   controllers: [DemonsController],
   providers: [
     MailsAdapter,

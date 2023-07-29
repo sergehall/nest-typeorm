@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { LikeStatusPostEntity } from '../entities/like-status-post.entity';
 import { LikeStatusPostsDocument } from './schemas/like-status-posts.schemas';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { PostsEntity } from '../entities/posts.entity';
-import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PostsReturnEntity } from '../entities/posts-without-ownerInfo.entity';
 

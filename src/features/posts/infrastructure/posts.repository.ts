@@ -3,7 +3,7 @@ import { PostsEntity } from '../entities/posts.entity';
 import { Model } from 'mongoose';
 import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
 import { PaginationDBType } from '../../common/pagination/types/pagination.types';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { BanInfo, PostsDocument } from './schemas/posts.schema';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';

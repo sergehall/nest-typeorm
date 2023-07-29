@@ -7,9 +7,9 @@ import {
   PostsSchema,
   PostsDocument,
 } from '../../posts/infrastructure/schemas/posts.schema';
-import { ConnectionEnums } from '../../../infrastructure/database/enums/connection.enums';
-import { NamesCollectionsEnums } from '../../../infrastructure/database/enums/names-collections.enums';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ConnectionEnums } from '../../../config/db/mongo/enums/connection.enums';
+import { NamesCollectionsEnums } from '../../../config/db/mongo/enums/names-collections.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import {
   LikeStatusPostSchema,
   LikeStatusPostsDocument,

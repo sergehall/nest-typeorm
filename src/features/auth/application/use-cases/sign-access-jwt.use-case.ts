@@ -4,7 +4,7 @@ import * as uuid4 from 'uuid4';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { getConfiguration } from '../../../../config/configuration';
+import { JwtConfig } from '../../../../config/jwt/jwt-config';
 
 export class SignAccessJwtUseCommand {
   constructor(public user: UsersEntity) {}
@@ -14,16 +14,18 @@ export class SignAccessJwtUseCommand {
 export class SignAccessJwtUseCase
   implements ICommandHandler<SignAccessJwtUseCommand>
 {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SignAccessJwtUseCommand): Promise<AccessToken> {
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+
     const deviceId = uuid4().toString();
     const payload = {
       userId: command.user.id,
       email: command.user.email,
       deviceId: deviceId,
     };
-    const ACCESS_SECRET_KEY = getConfiguration().jwt.ACCESS_SECRET_KEY;
-    const EXP_ACC_TIME = getConfiguration().jwt.EXP_ACC_TIME;
+
     if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
       throw new InternalServerErrorException();
     return {

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { bloggerBlogsProviders } from './infrastructure/blogger-blogs.providers';
 import { BloggerBlogsController } from './api/blogger-blogs.controller';
 import { BloggerBlogsService } from './application/blogger-blogs.service';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { PostsService } from '../posts/application/posts.service';
 import { Pagination } from '../common/pagination/pagination';
 import { PostsRepository } from '../posts/infrastructure/posts.repository';
@@ -31,6 +30,7 @@ import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-a
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banStatus-blogs-byBlogId.use-case';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -47,7 +47,7 @@ const bloggersBlogUseCases = [
 const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
-  imports: [DatabaseModule, CqrsModule],
+  imports: [MongoDBModule, CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
     BloggerBlogsService,

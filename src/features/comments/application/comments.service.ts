@@ -27,7 +27,6 @@ export class CommentsService {
     const comment = await this.commentsRawSqlRepository.findCommentByCommentId(
       commentId,
     );
-    console.log(comment, 'comment');
     if (!comment || comment.commentatorInfoIsBanned)
       throw new NotFoundException(
         'Not found comment or commentator is banned.',

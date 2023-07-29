@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { LikeStatusCommentEntity } from '../entities/like-status-comment.entity';
 import { LikeStatusCommentDocument } from './schemas/like-status-comments.schema';
 

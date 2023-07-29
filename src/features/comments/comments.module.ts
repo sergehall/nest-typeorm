@@ -3,7 +3,6 @@ import { CommentsService } from './application/comments.service';
 import { CommentsController } from './api/comments.controller';
 import { Pagination } from '../common/pagination/pagination';
 import { commentsProviders } from './infrastructure/comments.providers';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { CaslModule } from '../../ability/casl.module';
 import { CommentsRepository } from './infrastructure/comments.repository';
 import { LikeStatusCommentsRepository } from './infrastructure/like-status-comments.repository';
@@ -36,6 +35,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -49,7 +49,7 @@ const commentsUseCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, CaslModule, CqrsModule],
   controllers: [CommentsController],
   providers: [
     CommentsService,

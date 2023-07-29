@@ -3,7 +3,6 @@ import { PostsService } from './application/posts.service';
 import { PostsController } from './api/posts.controller';
 import { CommentsService } from '../comments/application/comments.service';
 import { Pagination } from '../common/pagination/pagination';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { CaslModule } from '../../ability/casl.module';
 import { postsProviders } from './infrastructure/posts.providers';
 import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
@@ -37,6 +36,7 @@ import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/cha
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -50,7 +50,7 @@ const postsUseCases = [
 ];
 
 @Module({
-  imports: [DatabaseModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, CaslModule, CqrsModule],
   controllers: [PostsController],
   providers: [
     AuthService,

@@ -5,7 +5,7 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import { StatusLike } from '../../../infrastructure/database/enums/like-status.enums';
+import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class NewestLikes {
   @IsNotEmpty()

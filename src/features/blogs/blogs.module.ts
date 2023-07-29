@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { BlogsService } from './application/blogs.service';
 import { BlogsController } from './api/blogs.controller';
 import { BlogsRepository } from './infrastructure/blogs.repository';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { blogsProviders } from './infrastructure/blogs.providers';
 import { CaslModule } from '../../ability/casl.module';
 import { BloggerBlogsRepository } from '../blogger-blogs/infrastructure/blogger-blogs.repository';
@@ -22,9 +21,10 @@ import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/bl
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 
 @Module({
-  imports: [DatabaseModule, CaslModule, CqrsModule],
+  imports: [MongoDBModule, CaslModule, CqrsModule],
   controllers: [BlogsController],
   providers: [
     AuthService,

@@ -3,7 +3,7 @@ import { FiltersDevicesEntity } from '../entities/filters-devices.entity';
 import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { Model } from 'mongoose';
 import { DevicesDocument } from './schemas/devices.schema';
-import { ProvidersEnums } from '../../../infrastructure/database/enums/providers.enums';
+import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 
 @Injectable()
