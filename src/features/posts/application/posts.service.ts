@@ -39,7 +39,8 @@ export class PostsService {
       posts,
       currentUserDto,
     );
-    const totalCountPosts = await this.postsRawSqlRepository.totalCountPosts();
+    const totalCountPosts =
+      await this.postsRawSqlRepository.openTotalCountPosts();
     const pagesCount = Math.ceil(
       totalCountPosts / queryData.queryPagination.pageSize,
     );

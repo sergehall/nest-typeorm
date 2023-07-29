@@ -16,7 +16,7 @@ export class CreateDeviceUseCase
   implements ICommandHandler<CreateDeviceCommand>
 {
   constructor(
-    private securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+    private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
   async execute(command: CreateDeviceCommand): Promise<boolean> {
     const newDevices: SessionDevicesEntity = {

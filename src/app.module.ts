@@ -19,10 +19,10 @@ import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import AppModuleConfig from './config/configModule';
 import { OrmConfig } from './config/db/posgresSql/orm.config';
 import { ThrottleConfig } from './config/throttle/throttle-config';
 import { MongoDBModule } from './config/db/mongo/mongo-db.module';
+import AppModuleConfig from './config/app-config';
 
 @Module({
   imports: [

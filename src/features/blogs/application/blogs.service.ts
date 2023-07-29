@@ -16,9 +16,11 @@ export class BlogsService {
   async openFindBlogById(blogId: string): Promise<ReturnBloggerBlogsEntity> {
     return await this.bloggerBlogsService.openFindBlogById(blogId);
   }
+
   async openFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {
     return await this.bloggerBlogsService.openFindBlogs(queryData);
   }
+
   async openFindPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueryType,

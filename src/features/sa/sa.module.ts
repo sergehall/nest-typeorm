@@ -30,6 +30,7 @@ import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastruct
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -55,6 +56,7 @@ const saUseCases = [
     PostsRepository,
     PostsRawSqlRepository,
     UsersRawSqlRepository,
+    ExpirationDateCalculator,
     CommentsRawSqlRepository,
     LikeStatusPostsRepository,
     LikeStatusCommentsRepository,

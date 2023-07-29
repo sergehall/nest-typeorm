@@ -32,6 +32,7 @@ import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastruct
 import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
 import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -64,6 +65,7 @@ const authUseCases = [
     SecurityDevicesRepository,
     UsersRawSqlRepository,
     SecurityDevicesService,
+    ExpirationDateCalculator,
     BlacklistJwtRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     ...authUseCases,
