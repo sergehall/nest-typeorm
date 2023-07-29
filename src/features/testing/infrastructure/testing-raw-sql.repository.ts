@@ -4,14 +4,31 @@ import { InternalServerErrorException } from '@nestjs/common';
 
 export class TestingRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
+
   async removeAllDataRawSQL(): Promise<void> {
+    const tablesToDelete = [
+      'SentEmailsTimeConfirmAndRecoverCodes',
+      'SecurityDevices',
+      'BannedUsersForBlogs',
+      'BlacklistJwt',
+      'EmailsConfirmationCodes',
+      'EmailsRecoveryCodes',
+      'LikeStatusComments',
+      'LikeStatusPosts',
+      'Comments',
+      'Posts',
+      'BloggerBlogs',
+      'Users',
+    ];
+
     try {
-      await this.db.query(`
-      DELETE FROM public."SecurityDevices"
-    `);
+      for (const table of tablesToDelete) {
+        const query = `DELETE FROM public."${table}"`;
+        await this.db.query(query);
+      }
     } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      console.error(error.message);
+      throw new InternalServerErrorException('Failed to remove data.');
     }
   }
 }

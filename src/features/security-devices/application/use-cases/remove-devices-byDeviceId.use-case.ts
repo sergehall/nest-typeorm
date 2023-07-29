@@ -22,7 +22,6 @@ export class RemoveDevicesByDeviceIdUseCase
     const device: SessionDevicesEntity[] =
       await this.securityDevicesRawSqlRepository.findDeviceByDeviceId(deviceId);
 
-    console.log(device, 'device');
     if (device.length === 0) {
       throw new NotFoundException('Device not found');
     }
@@ -31,11 +30,8 @@ export class RemoveDevicesByDeviceIdUseCase
       throw new HttpException(forbiddenDeleteDevice, HttpStatus.FORBIDDEN);
     }
 
-    const deleteResult =
-      await this.securityDevicesRawSqlRepository.removeDeviceByDeviceId(
-        deviceId,
-      );
-
-    return deleteResult.length != 0;
+    return await this.securityDevicesRawSqlRepository.removeDeviceByDeviceId(
+      deviceId,
+    );
   }
 }
