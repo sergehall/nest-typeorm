@@ -217,7 +217,7 @@ class Configuration {
         THROTTLE_TTL: Configuration.getThrottleTTL(),
         THROTTLE_LIMIT: Configuration.getThrottleLIMIT(),
       },
-      bcryptConfig: {
+      bcrypt: {
         SALT_FACTOR: Configuration.getSaltFactor(),
       },
     };

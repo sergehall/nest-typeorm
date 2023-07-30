@@ -31,6 +31,7 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
 import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
+import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
 const saUseCases = [
   CreateUserByInstanceUseCase,
@@ -52,6 +53,7 @@ const saUseCases = [
     ConvertFiltersForDB,
     BloggerBlogsRepository,
     UsersRepository,
+    EncryptConfig,
     MailsRawSqlRepository,
     PostsRepository,
     PostsRawSqlRepository,
