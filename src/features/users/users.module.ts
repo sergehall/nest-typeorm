@@ -19,7 +19,7 @@ import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.
 import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.validation';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
@@ -33,7 +33,7 @@ const usersUseCases = [
 const usersRules = [RecoveryCodeExistsRule];
 
 @Module({
-  imports: [MongoDBModule, CaslModule, CqrsModule],
+  imports: [MongoConnectionModule, CaslModule, CqrsModule],
   controllers: [UsersController],
   providers: [
     UsersService,

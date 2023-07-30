@@ -24,7 +24,7 @@ export const demonsProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.CONFIRM_CODE_MODEL,
@@ -34,7 +34,7 @@ export const demonsProviders = [
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
@@ -44,6 +44,6 @@ export const demonsProviders = [
         RefreshTokenBlacklistSchema,
         NamesCollectionsEnums.REFRESH_TOKEN_BL,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

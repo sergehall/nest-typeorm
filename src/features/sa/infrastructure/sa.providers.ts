@@ -48,7 +48,7 @@ export const saProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.CONFIRM_CODE_MODEL,
@@ -58,7 +58,7 @@ export const saProviders = [
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_MODEL,
@@ -68,7 +68,7 @@ export const saProviders = [
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.POST_MODEL,
@@ -78,7 +78,7 @@ export const saProviders = [
         PostsSchema,
         NamesCollectionsEnums.POSTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.LIKE_STATUS_POSTS_MODEL,
@@ -88,7 +88,7 @@ export const saProviders = [
         LikeStatusPostSchema,
         NamesCollectionsEnums.LIKE_STATUS_POST,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.DEVICES_MODEL,
@@ -98,7 +98,7 @@ export const saProviders = [
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.COMMENT_MODEL,
@@ -108,7 +108,7 @@ export const saProviders = [
         CommentsSchema,
         NamesCollectionsEnums.COMMENTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.LIKE_STATUS_COMMENTS_MODEL,
@@ -118,7 +118,7 @@ export const saProviders = [
         LikeStatusCommentSchema,
         NamesCollectionsEnums.LIKE_STATUS_COMMENTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
@@ -128,6 +128,6 @@ export const saProviders = [
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

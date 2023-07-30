@@ -25,7 +25,7 @@ export const devicesProviders = [
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
@@ -35,7 +35,7 @@ export const devicesProviders = [
         RefreshTokenBlacklistSchema,
         NamesCollectionsEnums.REFRESH_TOKEN_BL,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.USER_MODEL,
@@ -45,7 +45,7 @@ export const devicesProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.CONFIRM_CODE_MODEL,
@@ -55,6 +55,6 @@ export const devicesProviders = [
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

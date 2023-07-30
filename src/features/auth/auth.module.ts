@@ -31,7 +31,7 @@ import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
@@ -53,7 +53,13 @@ const authUseCases = [
 ];
 
 @Module({
-  imports: [MongoDBModule, UsersModule, PassportModule, JwtModule, CqrsModule],
+  imports: [
+    MongoConnectionModule,
+    UsersModule,
+    PassportModule,
+    JwtModule,
+    CqrsModule,
+  ],
   controllers: [AuthController],
   providers: [
     LocalStrategy,

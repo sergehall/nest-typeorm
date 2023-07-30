@@ -162,7 +162,7 @@ class Configuration {
     return {
       ENV: ENV,
       PORT: Configuration.getPort(),
-      dbConfig: {
+      db: {
         pg: {
           url: {
             DATABASE_URL: Configuration.getDatabaseURL(),

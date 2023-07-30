@@ -36,7 +36,7 @@ import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/cha
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -50,7 +50,7 @@ const postsUseCases = [
 ];
 
 @Module({
-  imports: [MongoDBModule, CaslModule, CqrsModule],
+  imports: [MongoConnectionModule, CaslModule, CqrsModule],
   controllers: [PostsController],
   providers: [
     AuthService,

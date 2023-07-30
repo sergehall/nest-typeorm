@@ -29,7 +29,7 @@ export const authProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
@@ -39,7 +39,7 @@ export const authProviders = [
         RefreshTokenBlacklistSchema,
         NamesCollectionsEnums.REFRESH_TOKEN_BL,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.DEVICES_MODEL,
@@ -49,7 +49,7 @@ export const authProviders = [
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.CONFIRM_CODE_MODEL,
@@ -59,6 +59,6 @@ export const authProviders = [
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

@@ -21,7 +21,7 @@ import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-d
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -32,7 +32,7 @@ const securityDevicesCases = [
 ];
 
 @Module({
-  imports: [MongoDBModule, CqrsModule],
+  imports: [MongoConnectionModule, CqrsModule],
   controllers: [SecurityDevicesController],
   providers: [
     ConvertFiltersForDB,

@@ -4,10 +4,10 @@ import { TestingController } from './api/testing.controller';
 import { TestingRepository } from './infrastructure/testing.repository';
 import { testingProviders } from './infrastructure/testing.provaiders';
 import { TestingRawSqlRepository } from './infrastructure/testing-raw-sql.repository';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 @Module({
-  imports: [MongoDBModule],
+  imports: [MongoConnectionModule],
   controllers: [TestingController],
   providers: [
     TestingService,

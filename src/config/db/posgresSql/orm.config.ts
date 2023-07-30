@@ -8,19 +8,19 @@ export class OrmConfig implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService<ConfigType, true>) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    const host = this.configService.get('dbConfig', {
+    const host = this.configService.get('db', {
       infer: true,
     }).pg.host.PG_HOST_HEROKU;
-    const port = this.configService.get('dbConfig', {
+    const port = this.configService.get('db', {
       infer: true,
     }).pg.port.PG_PORT;
-    const username = this.configService.get('dbConfig', {
+    const username = this.configService.get('db', {
       infer: true,
     }).pg.authConfig.PG_HEROKU_USER_NAME;
-    const password = this.configService.get('dbConfig', {
+    const password = this.configService.get('db', {
       infer: true,
     }).pg.authConfig.PG_HEROKU_USER_PASSWORD;
-    const database = this.configService.get('dbConfig', {
+    const database = this.configService.get('db', {
       infer: true,
     }).pg.namesDatabase.PG_HEROKU_NAME_DATABASE;
     return {
