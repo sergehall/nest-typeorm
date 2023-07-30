@@ -198,7 +198,7 @@ class Configuration {
           },
         },
       },
-      mailConfig: {
+      mail: {
         NODEMAILER_EMAIL: Configuration.getNodeMailerEmail(),
         NODEMAILER_APP_PASSWORD: Configuration.getNodeMailerAppPassword(),
         MAIL_HOST: Configuration.getNodeMailerHost(),

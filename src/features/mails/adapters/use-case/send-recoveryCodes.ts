@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { DomainNamesEnums } from '../../enums/domain-names.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailsRecoveryCodesEntity } from '../../../demons/entities/emailsRecoveryCodes.entity';
-import Configuration from '../../../../config/configuration';
+import { MailerConfig } from '../../../../config/mailer/mailer-config';
 
 export class SendRecoveryCodesCommand {
   constructor(public emailAndCode: EmailsRecoveryCodesEntity) {}
@@ -12,7 +12,10 @@ export class SendRecoveryCodesCommand {
 export class SendRecoveryCodesUseCase
   implements ICommandHandler<SendRecoveryCodesCommand>
 {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    private mailerService: MailerService,
+    protected mailerConfig: MailerConfig,
+  ) {}
 
   async execute(command: SendRecoveryCodesCommand): Promise<void> {
     const { email, recoveryCode } = command.emailAndCode;
@@ -20,9 +23,7 @@ export class SendRecoveryCodesUseCase
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
-
-    const fromEmail =
-      Configuration.getConfiguration().mailConfig.NODEMAILER_EMAIL;
+    const fromEmail = this.mailerConfig.getNodeMailerEmail('NODEMAILER_EMAIL');
     const subject = 'Sent recovery code';
     const template = 'index';
     const text = 'Welcome';
