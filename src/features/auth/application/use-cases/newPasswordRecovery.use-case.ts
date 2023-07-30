@@ -18,7 +18,7 @@ export class NewPasswordRecoveryUseCase
     protected configService: ConfigService<ConfigType, true>,
   ) {}
   async execute(command: newPasswordRecoveryCommand): Promise<boolean> {
-    const SALT_FACTOR = this.configService.get('bcryptConfig', {
+    const SALT_FACTOR = this.configService.get('bcrypt', {
       infer: true,
     }).SALT_FACTOR;
 

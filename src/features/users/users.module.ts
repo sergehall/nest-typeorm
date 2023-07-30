@@ -21,6 +21,7 @@ import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository
 import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.validation';
 import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
+import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
 const usersUseCases = [
   CreateUserByMongooseModelUseCase,
@@ -43,6 +44,7 @@ const usersRules = [RecoveryCodeExistsRule];
     AuthService,
     UsersRepository,
     JwtService,
+    EncryptConfig,
     ConvertFiltersForDB,
     MailsRawSqlRepository,
     ExpirationDateCalculator,

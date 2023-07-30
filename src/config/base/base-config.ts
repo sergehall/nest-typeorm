@@ -3,6 +3,7 @@ import { JwtConfigType } from '../jwt/jwt-config.types';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ThrottleConfigTypes } from '../throttle/throttle-config.types';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class BaseConfig {
@@ -37,5 +38,13 @@ export class BaseConfig {
       }
     }
     return value;
+  }
+
+  protected async passwordHash(password: string): Promise<string> {
+    const SALT_FACTOR = this.configService.get('bcrypt', {
+      infer: true,
+    }).SALT_FACTOR;
+    const salt = await bcrypt.genSalt(SALT_FACTOR);
+    return bcrypt.hash(password, salt);
   }
 }

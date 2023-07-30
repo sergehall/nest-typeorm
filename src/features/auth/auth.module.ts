@@ -33,6 +33,7 @@ import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecover
 import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
 import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
+import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -60,6 +61,7 @@ const authUseCases = [
     MailsRawSqlRepository,
     JwtConfig,
     AuthService,
+    EncryptConfig,
     UsersRepository,
     BlacklistJwtRepository,
     SecurityDevicesRepository,
