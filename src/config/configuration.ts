@@ -204,16 +204,16 @@ class Configuration {
         MAIL_HOST: Configuration.getNodeMailerHost(),
         EMAIL_PORT: Configuration.getNodeMailerPort(),
       },
-      jwtConfig: {
+      jwt: {
         ACCESS_SECRET_KEY: Configuration.getAccessSecretKey(),
         REFRESH_SECRET_KEY: Configuration.getRefreshSecretKey(),
         EXP_ACC_TIME: Configuration.getAccessExpTime(),
         EXP_REF_TIME: Configuration.getRefreshExpTime(),
       },
-      basicAuthConfig: {
+      basicAuth: {
         BASIC_AUTH: Configuration.getBasicAuth(),
       },
-      throttleConfig: {
+      throttle: {
         THROTTLE_TTL: Configuration.getThrottleTTL(),
         THROTTLE_LIMIT: Configuration.getThrottleLIMIT(),
       },

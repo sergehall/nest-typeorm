@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 export class BaseConfig {
   constructor(protected configService: ConfigService<ConfigType, true>) {}
   protected getValueString(key: JwtConfigType, defaultValue?: string) {
-    const value = this.configService.get('jwtConfig', {
+    const value = this.configService.get('jwt', {
       infer: true,
     })[key];
     if (value.length === 0 || !value) {
@@ -24,7 +24,7 @@ export class BaseConfig {
     return value;
   }
   protected getValueNumber(key: ThrottleConfigTypes, defaultValue?: number) {
-    const value = this.configService.get('throttleConfig', {
+    const value = this.configService.get('throttle', {
       infer: true,
     })[key];
     const parsedValue = Number(value);
