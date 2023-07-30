@@ -52,7 +52,7 @@ export const testingProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.POST_MODEL,
@@ -62,7 +62,7 @@ export const testingProviders = [
         PostsSchema,
         NamesCollectionsEnums.POSTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.COMMENT_MODEL,
@@ -72,7 +72,7 @@ export const testingProviders = [
         CommentsSchema,
         NamesCollectionsEnums.COMMENTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.LIKE_STATUS_POSTS_MODEL,
@@ -82,7 +82,7 @@ export const testingProviders = [
         LikeStatusPostSchema,
         NamesCollectionsEnums.LIKE_STATUS_POST,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.LIKE_STATUS_COMMENTS_MODEL,
@@ -92,7 +92,7 @@ export const testingProviders = [
         LikeStatusCommentSchema,
         NamesCollectionsEnums.LIKE_STATUS_COMMENTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.CONFIRM_CODE_MODEL,
@@ -102,7 +102,7 @@ export const testingProviders = [
         EmailsConfirmCodeSchema,
         NamesCollectionsEnums.EMAILS_CONFIRM_CODES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
@@ -112,7 +112,7 @@ export const testingProviders = [
         RefreshTokenBlacklistSchema,
         NamesCollectionsEnums.REFRESH_TOKEN_BL,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.DEVICES_MODEL,
@@ -122,7 +122,7 @@ export const testingProviders = [
         DevicesSchema,
         NamesCollectionsEnums.DEVICES,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_MODEL,
@@ -132,7 +132,7 @@ export const testingProviders = [
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
@@ -142,6 +142,6 @@ export const testingProviders = [
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

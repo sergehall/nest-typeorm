@@ -37,7 +37,7 @@ export const blogsProviders = [
         BlogSchema,
         NamesCollectionsEnums.BLOGS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_MODEL,
@@ -47,7 +47,7 @@ export const blogsProviders = [
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.POST_MODEL,
@@ -57,7 +57,7 @@ export const blogsProviders = [
         PostsSchema,
         NamesCollectionsEnums.POSTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.LIKE_STATUS_POSTS_MODEL,
@@ -67,7 +67,7 @@ export const blogsProviders = [
         LikeStatusPostSchema,
         NamesCollectionsEnums.LIKE_STATUS_POST,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
@@ -77,7 +77,7 @@ export const blogsProviders = [
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BL_REFRESH_JWT_MODEL,
@@ -87,7 +87,7 @@ export const blogsProviders = [
         RefreshTokenBlacklistSchema,
         NamesCollectionsEnums.REFRESH_TOKEN_BL,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.USER_MODEL,
@@ -97,6 +97,6 @@ export const blogsProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

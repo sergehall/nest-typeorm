@@ -21,7 +21,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { OrmConfig } from './config/db/posgresSql/orm.config';
 import { ThrottleConfig } from './config/throttle/throttle-config';
-import { MongoDBModule } from './config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from './config/db/mongo/mongo-db.module';
 import AppModuleConfig from './config/app-config';
 
 @Module({
@@ -33,7 +33,7 @@ import AppModuleConfig from './config/app-config';
     ThrottlerModule.forRootAsync({
       useClass: ThrottleConfig, // Use the ThrottleConfig class as the factory
     }),
-    MongoDBModule,
+    MongoConnectionModule,
     ScheduleModule.forRoot(),
     UsersModule,
     PostsModule,

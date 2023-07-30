@@ -35,7 +35,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -49,7 +49,7 @@ const commentsUseCases = [
 ];
 
 @Module({
-  imports: [MongoDBModule, CaslModule, CqrsModule],
+  imports: [MongoConnectionModule, CaslModule, CqrsModule],
   controllers: [CommentsController],
   providers: [
     CommentsService,

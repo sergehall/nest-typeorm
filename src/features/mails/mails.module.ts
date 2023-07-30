@@ -9,7 +9,7 @@ import { MailsAdapter } from './adapters/mails.adapter';
 import Configuration from '../../config/configuration';
 import { SendRegistrationCodesUseCase } from './adapters/use-case/send-registrationCodes.use-case';
 import { SendRecoveryCodesUseCase } from './adapters/use-case/send-recoveryCodes';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const mailsAdapterUseCases = [
   SendRegistrationCodesUseCase,
@@ -18,7 +18,7 @@ const mailsAdapterUseCases = [
 
 @Module({
   imports: [
-    MongoDBModule,
+    MongoConnectionModule,
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {

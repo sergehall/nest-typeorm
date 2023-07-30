@@ -1,7 +1,6 @@
 import { ProvidersEnums } from '../../../config/db/mongo/enums/providers.enums';
 import { Mongoose } from 'mongoose';
 import { NamesCollectionsEnums } from '../../../config/db/mongo/enums/names-collections.enums';
-import { ConnectionEnums } from '../../../config/db/mongo/enums/connection.enums';
 import {
   PostsDocument,
   PostsSchema,
@@ -23,6 +22,7 @@ import {
   CommentsDocument,
   CommentsSchema,
 } from '../../comments/infrastructure/schemas/comments.schema';
+import { ConnectionEnums } from '../../../config/db/mongo/enums/connection.enums';
 
 export const bloggerBlogsProviders = [
   {
@@ -33,7 +33,7 @@ export const bloggerBlogsProviders = [
         LikeStatusPostSchema,
         NamesCollectionsEnums.LIKE_STATUS_POST,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.POST_MODEL,
@@ -43,7 +43,7 @@ export const bloggerBlogsProviders = [
         PostsSchema,
         NamesCollectionsEnums.POSTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_MODEL,
@@ -53,7 +53,7 @@ export const bloggerBlogsProviders = [
         BBlogsSchema,
         NamesCollectionsEnums.BBLOGS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.USER_MODEL,
@@ -63,7 +63,7 @@ export const bloggerBlogsProviders = [
         UsersSchema,
         NamesCollectionsEnums.USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.BBLOG_BANNED_USER_MODEL,
@@ -73,7 +73,7 @@ export const bloggerBlogsProviders = [
         BBlogsBannedUsersSchema,
         NamesCollectionsEnums.BBLOGS_BANNED_USERS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
   {
     provide: ProvidersEnums.COMMENT_MODEL,
@@ -83,6 +83,6 @@ export const bloggerBlogsProviders = [
         CommentsSchema,
         NamesCollectionsEnums.COMMENTS,
       ),
-    inject: [ConnectionEnums.ASYNC_CONNECTION],
+    inject: [ConnectionEnums.ASYNC_ATLAS_CONNECTION],
   },
 ];

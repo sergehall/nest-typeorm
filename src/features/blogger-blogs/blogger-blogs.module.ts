@@ -30,7 +30,7 @@ import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-a
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banStatus-blogs-byBlogId.use-case';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { MongoDBModule } from '../../config/db/mongo/mongo-db.module';
+import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -47,7 +47,7 @@ const bloggersBlogUseCases = [
 const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
-  imports: [MongoDBModule, CqrsModule],
+  imports: [MongoConnectionModule, CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
     BloggerBlogsService,
