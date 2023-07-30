@@ -1,4 +1,3 @@
-import { NumberThrottlerEnums } from './throttle/enums/number-throttler.enums';
 import { EnvNamesEnums } from './enums/envNames.enums';
 
 class Configuration {
@@ -136,21 +135,11 @@ class Configuration {
   }
 
   private static getThrottleTTL(): number {
-    return Number(
-      this.readEnvVariableWithDefault(
-        'THROTTLE_TTL',
-        NumberThrottlerEnums.THROTTLE_TTL,
-      ),
-    );
+    return Number(this.readEnvVariableWithDefault('THROTTLE_TTL', 10));
   }
 
   private static getThrottleLIMIT(): number {
-    return Number(
-      this.readEnvVariableWithDefault(
-        'THROTTLE_LIMIT',
-        NumberThrottlerEnums.THROTTLE_LIMIT,
-      ),
-    );
+    return Number(this.readEnvVariableWithDefault('THROTTLE_LIMIT', 5));
   }
 
   private static getSaltFactor(): number {
