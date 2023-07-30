@@ -1,28 +1,17 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
-import { ConfigType } from '../../configuration';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { BaseConfig } from '../../base/base-config';
 
 @Injectable()
-export class OrmConfig implements TypeOrmOptionsFactory {
-  constructor(private configService: ConfigService<ConfigType, true>) {}
-
+export class OrmConfig extends BaseConfig implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    const host = this.configService.get('db', {
-      infer: true,
-    }).pg.host.PG_HOST_HEROKU;
-    const port = this.configService.get('db', {
-      infer: true,
-    }).pg.port.PG_PORT;
-    const username = this.configService.get('db', {
-      infer: true,
-    }).pg.authConfig.PG_HEROKU_USER_NAME;
-    const password = this.configService.get('db', {
-      infer: true,
-    }).pg.authConfig.PG_HEROKU_USER_PASSWORD;
-    const database = this.configService.get('db', {
-      infer: true,
-    }).pg.namesDatabase.PG_HEROKU_NAME_DATABASE;
+    const dbConfig = this.getValueDatabase();
+    const host = dbConfig.pg.host.PG_HOST_HEROKU;
+    const port = dbConfig.pg.port.PG_PORT;
+    const username = dbConfig.pg.authConfig.PG_HEROKU_USER_NAME;
+    const password = dbConfig.pg.authConfig.PG_HEROKU_USER_PASSWORD;
+    const database = dbConfig.pg.namesDatabase.PG_HEROKU_NAME_DATABASE;
+
     return {
       type: 'postgres',
       host,

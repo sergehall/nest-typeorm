@@ -1,33 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../configuration';
-import { MailerPortTypes, MailerTypes } from './mailer.types';
+import { MailerPortTypes, MailerTypes } from './types/mailer.types';
+import { BaseConfig } from '../base/base-config';
 
 @Injectable()
-export class MailerConfig {
-  constructor(protected configService: ConfigService<ConfigType, true>) {}
-
-  getMailHost(key: MailerTypes): string {
-    return this.getValueString(key);
+export class MailerConfig extends BaseConfig {
+  getNodeMailerValue(key: MailerTypes): string {
+    return this.getValueMailer(key);
   }
 
-  getNodeMailerEmail(key: MailerTypes): string {
-    return this.getValueString(key);
-  }
-
-  getNodeMailerAppPassword(key: MailerTypes): string {
-    return this.getValueString(key);
-  }
-
-  getEmailPort(key: MailerPortTypes): number {
-    return this.configService.get<number>(`mail.${key}`, {
-      infer: true,
-    });
-  }
-
-  private getValueString(key: string): string {
-    return this.configService.get<string>(`mail.${key}`, {
-      infer: true,
-    });
+  getMailerPort(key: MailerPortTypes): number {
+    return this.getValueMailerPort(key);
   }
 }

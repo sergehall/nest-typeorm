@@ -1,5 +1,5 @@
 import { ConnectionEnums } from './enums/connection.enums';
-import { MongoConnectionService } from './mongo-db-connection';
+import { MongoConnectionService } from './mongo-connection.service';
 
 export const mongoConnectionProviders = [
   {

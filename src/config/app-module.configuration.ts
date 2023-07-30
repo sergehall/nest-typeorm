@@ -1,14 +1,14 @@
 import { ConfigModuleOptions } from '@nestjs/config';
 import { envFilePath } from '../detect-env';
 import Configuration from './configuration';
-import { validationSchema } from './validation-schema/validation-schema';
+import { validationSchemaConfiguration } from './validation-schema.configuration';
 
-const AppModuleConfig: ConfigModuleOptions = {
+const AppConfigModuleOptions: ConfigModuleOptions = {
   cache: true,
   isGlobal: true,
   envFilePath,
-  validationSchema,
+  validationSchema: validationSchemaConfiguration,
   load: [Configuration.getConfiguration],
 };
 
-export default AppModuleConfig;
+export default AppConfigModuleOptions;
