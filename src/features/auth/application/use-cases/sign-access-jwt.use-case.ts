@@ -1,10 +1,10 @@
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { AccessToken } from '../../dto/accessToken.dto';
 import * as uuid4 from 'uuid4';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
+import { AccessTokenDto } from '../../dto/access-token.dto';
 
 export class SignAccessJwtUseCommand {
   constructor(public user: UsersEntity) {}
@@ -15,7 +15,7 @@ export class SignAccessJwtUseCase
   implements ICommandHandler<SignAccessJwtUseCommand>
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
-  async execute(command: SignAccessJwtUseCommand): Promise<AccessToken> {
+  async execute(command: SignAccessJwtUseCommand): Promise<AccessTokenDto> {
     const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
     const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 

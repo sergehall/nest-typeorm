@@ -25,7 +25,6 @@ import {
 } from '../../../exception-filter/errors-messages';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
-import { AccessToken } from '../dto/accessToken.dto';
 import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../../users/dto/reg-data.dto';
@@ -45,6 +44,7 @@ import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
 import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
+import { AccessTokenDto } from '../dto/access-token.dto';
 import jwt_decode from 'jwt-decode';
 
 @SkipThrottle()
@@ -58,7 +58,7 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
-  ): Promise<AccessToken> {
+  ): Promise<AccessTokenDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const userAgent = req.get('user-agent') || 'None';
     const signedToken = await this.commandBus.execute(
@@ -125,7 +125,7 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
-  ): Promise<AccessToken> {
+  ): Promise<AccessTokenDto> {
     const refreshToken = req.cookies.refreshToken;
     const currentPayload: PayloadDto = jwt_decode(refreshToken);
     const refreshTokenToBlackList = {
