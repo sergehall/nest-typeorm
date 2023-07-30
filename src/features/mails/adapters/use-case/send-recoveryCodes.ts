@@ -19,7 +19,7 @@ export class SendRecoveryCodesUseCase
 
   async execute(command: SendRecoveryCodesCommand): Promise<void> {
     const { email, recoveryCode } = command.emailAndCode;
-    const domainName = DomainNamesEnums.NEST_RAQ_SQL_URL;
+    const domainName = DomainNamesEnums.HEROKU_POSTGRES;
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
