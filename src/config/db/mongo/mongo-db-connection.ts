@@ -4,7 +4,7 @@ import { EnvNamesEnums } from '../../enums/envNames.enums';
 import { Connection, createConnection } from 'mongoose';
 
 @Injectable()
-export class ConnectionProvider {
+export class MongoConnectionProvider {
   async getConnectionByType(connectionType: string): Promise<Connection> {
     switch (connectionType) {
       case 'atlas':

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { mongoConnectionProviders } from './mongo-db.providers';
-import { ConnectionProvider } from './mongo-db-connection';
+import { MongoConnectionProvider } from './mongo-db-connection';
 
 @Module({
-  providers: [ConnectionProvider, ...mongoConnectionProviders],
+  providers: [MongoConnectionProvider, ...mongoConnectionProviders],
   exports: [...mongoConnectionProviders],
 })
 export class MongoConnectionModule {}
