@@ -4,7 +4,7 @@ import { EnvNamesEnums } from '../../enums/envNames.enums';
 import { Connection, createConnection } from 'mongoose';
 
 @Injectable()
-export class MongoConnectionProvider {
+export class MongoConnectionService {
   async getConnectionByType(connectionType: string): Promise<Connection> {
     switch (connectionType) {
       case 'atlas':
@@ -16,7 +16,7 @@ export class MongoConnectionProvider {
     }
   }
 
-  async getAtlasConnection(): Promise<Connection> {
+  private async getAtlasConnection(): Promise<Connection> {
     const { ENV, db } = Configuration.getConfiguration();
     const uri = db.mongo.url.ATLAS_URI;
     let dbName = db.mongo.namesDatabase.DEV_DATABASE;
@@ -33,7 +33,7 @@ export class MongoConnectionProvider {
     throw new BadGatewayException();
   }
 
-  async getLocalConnection(): Promise<Connection> {
+  private async getLocalConnection(): Promise<Connection> {
     const { db } = Configuration.getConfiguration();
     const uri = db.mongo.url.MONGO_URI_LOCAL;
     const dbName = db.mongo.namesDatabase.TEST_DATABASE;
