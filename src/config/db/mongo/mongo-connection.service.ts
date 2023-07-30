@@ -1,10 +1,10 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
-import Configuration from '../../configuration';
-import { EnvNamesEnums } from '../../enums/envNames.enums';
+import { EnvNamesEnums } from '../../env-names.enums/envNames.enums';
 import { Connection, createConnection } from 'mongoose';
+import { BaseConfig } from '../../base/base-config';
 
 @Injectable()
-export class MongoConnectionService {
+export class MongoConnectionService extends BaseConfig {
   async getConnectionByType(connectionType: string): Promise<Connection> {
     switch (connectionType) {
       case 'atlas':
@@ -17,11 +17,12 @@ export class MongoConnectionService {
   }
 
   private async getAtlasConnection(): Promise<Connection> {
-    const { ENV, db } = Configuration.getConfiguration();
-    const uri = db.mongo.url.ATLAS_URI;
-    let dbName = db.mongo.namesDatabase.DEV_DATABASE;
+    const dbConfig = this.getValueDatabase();
+    const ENV = this.getValueENV();
+    const uri = dbConfig.mongo.url.ATLAS_URI;
+    let dbName = dbConfig.mongo.namesDatabase.DEV_DATABASE;
     if (ENV === EnvNamesEnums.PRODUCTION) {
-      dbName = db.mongo.namesDatabase.PROD_NEST_DATABASE;
+      dbName = dbConfig.mongo.namesDatabase.PROD_NEST_DATABASE;
     }
     if (uri && dbName) {
       const connection = await createConnection(uri, {
@@ -34,9 +35,9 @@ export class MongoConnectionService {
   }
 
   private async getLocalConnection(): Promise<Connection> {
-    const { db } = Configuration.getConfiguration();
-    const uri = db.mongo.url.MONGO_URI_LOCAL;
-    const dbName = db.mongo.namesDatabase.TEST_DATABASE;
+    const dbConfig = this.getValueDatabase();
+    const uri = dbConfig.mongo.url.MONGO_URI_LOCAL;
+    const dbName = dbConfig.mongo.namesDatabase.TEST_DATABASE;
     if (uri && dbName) {
       const connection = await createConnection(uri, {
         dbName: dbName,

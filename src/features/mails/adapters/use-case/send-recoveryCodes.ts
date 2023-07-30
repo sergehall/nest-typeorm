@@ -23,7 +23,7 @@ export class SendRecoveryCodesUseCase
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
-    const fromEmail = this.mailerConfig.getNodeMailerEmail('NODEMAILER_EMAIL');
+    const fromEmail = this.mailerConfig.getNodeMailerValue('NODEMAILER_EMAIL');
     const subject = 'Sent recovery code';
     const template = 'index';
     const text = 'Welcome';
