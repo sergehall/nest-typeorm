@@ -1,28 +1,30 @@
 import { ConfigType } from '../configuration';
-import { JwtConfigType } from '../jwt/jwt-config.types';
+import { JwtConfigType } from '../jwt/types/jwt-config.types';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
 import { ThrottleTypes } from '../throttle/types/throttle.types';
 import { MailerPortTypes, MailerTypes } from '../mailer/types/mailer.types';
+import * as bcrypt from 'bcrypt';
+import { DbConfigTypes } from '../db/types/db.types';
+import { EnvNamesEnums } from '../env-names.enums/envNames.enums';
 
 @Injectable()
 export class BaseConfig {
   constructor(protected configService: ConfigService<ConfigType, true>) {}
 
-  protected getValueENV() {
+  protected async getValueENV(): Promise<EnvNamesEnums> {
     return this.configService.get('ENV', {
       infer: true,
     });
   }
 
-  protected getValueDatabase() {
+  protected async getValueDatabase(): Promise<DbConfigTypes> {
     return this.configService.get('db', {
       infer: true,
     });
   }
 
-  protected getValueString(key: JwtConfigType, defaultValue?: string) {
+  protected async getValueString(key: JwtConfigType, defaultValue?: string) {
     const value = this.configService.get('jwt', {
       infer: true,
     })[key];
@@ -46,37 +48,34 @@ export class BaseConfig {
     return bcrypt.hash(password, salt);
   }
 
-  protected getValueThrottle(key: ThrottleTypes): number {
-    return this.configService.get('throttle', {
-      infer: true,
-    })[key];
-  }
-
-  protected getValueMailer(key: MailerTypes): string {
+  protected async getValueMailer(key: MailerTypes): Promise<string> {
     return this.configService.get(`mail`, {
       infer: true,
     })[key];
   }
 
-  protected getValueMailerPort(key: MailerPortTypes): number {
-    return this.configService.get(`mail`, {
+  protected async getValueMailerPort(key: MailerPortTypes): Promise<number> {
+    const value = this.configService.get('mail', {
       infer: true,
     })[key];
+    this.validationNumbersType(value);
+    return value;
   }
 
-  protected getValueNumber(key: ThrottleTypes, defaultValue?: number) {
+  protected async getValueThrottle(key: ThrottleTypes) {
     const value = this.configService.get('throttle', {
       infer: true,
     })[key];
+    this.validationNumbersType(value);
+    return value;
+  }
+
+  protected validationNumbersType(value: any) {
     const parsedValue = Number(value);
     if (isNaN(parsedValue)) {
-      if (defaultValue !== undefined) {
-        return defaultValue;
-      } else {
-        throw new InternalServerErrorException({
-          message: `incorrect configuration , cannot be found ${key}`,
-        });
-      }
+      throw new InternalServerErrorException({
+        message: `incorrect configuration , cannot be found ${value}`,
+      });
     }
     return value;
   }

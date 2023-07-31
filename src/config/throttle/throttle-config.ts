@@ -10,10 +10,13 @@ export class ThrottleConfig
   extends BaseConfig
   implements ThrottlerOptionsFactory
 {
-  createThrottlerOptions(): ThrottlerModuleOptions {
+  async createThrottlerOptions(): Promise<ThrottlerModuleOptions> {
+    const ttl = await this.getValueThrottle('THROTTLE_TTL');
+    const limit = await this.getValueThrottle('THROTTLE_LIMIT');
+
     return {
-      ttl: this.getValueThrottle('THROTTLE_TTL'), // Maximum number of requests in the given time frame
-      limit: this.getValueThrottle('THROTTLE_LIMIT'), // Time to keep records of requests in memory (milliseconds)
+      ttl,
+      limit,
     };
   }
 }

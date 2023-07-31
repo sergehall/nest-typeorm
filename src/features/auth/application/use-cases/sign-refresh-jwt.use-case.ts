@@ -15,8 +15,8 @@ export class SignRefreshJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SineRefreshJwtCommand) {
-    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
-    const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
+    const REFRESH_SECRET_KEY = await this.jwtConfig.getRefSecretKey();
+    const EXP_REF_TIME = await this.jwtConfig.getExpRefTime();
 
     const payload = {
       userId: command.currentUserDto.id,

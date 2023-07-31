@@ -17,7 +17,9 @@ export class SendRegistrationCodesUseCase
   ) {}
 
   async execute(command: SendRegistrationCodesCommand): Promise<void> {
-    const EMAIL_FROM = this.mailerConfig.getNodeMailerValue('NODEMAILER_EMAIL');
+    const EMAIL_FROM = await this.mailerConfig.getNodeMailerValue(
+      'NODEMAILER_EMAIL',
+    );
     const { email, confirmationCode } = command.emailAndCode;
     const domainName = DomainNamesEnums.HEROKU_POSTGRES;
     const path = '/auth/confirm-registration';

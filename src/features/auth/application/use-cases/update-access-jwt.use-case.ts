@@ -22,8 +22,8 @@ export class UpdateAccessJwtUseCase
       deviceId: command.currentPayload.deviceId,
     };
 
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = await this.jwtConfig.getExpAccTime();
 
     if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
       throw new InternalServerErrorException();

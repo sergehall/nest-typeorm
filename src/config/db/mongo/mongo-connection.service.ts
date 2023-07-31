@@ -17,8 +17,8 @@ export class MongoConnectionService extends BaseConfig {
   }
 
   private async getAtlasConnection(): Promise<Connection> {
-    const dbConfig = this.getValueDatabase();
-    const ENV = this.getValueENV();
+    const dbConfig = await this.getValueDatabase();
+    const ENV = await this.getValueENV();
     const uri = dbConfig.mongo.url.ATLAS_URI;
     let dbName = dbConfig.mongo.namesDatabase.DEV_DATABASE;
     if (ENV === EnvNamesEnums.PRODUCTION) {
@@ -35,7 +35,7 @@ export class MongoConnectionService extends BaseConfig {
   }
 
   private async getLocalConnection(): Promise<Connection> {
-    const dbConfig = this.getValueDatabase();
+    const dbConfig = await this.getValueDatabase();
     const uri = dbConfig.mongo.url.MONGO_URI_LOCAL;
     const dbName = dbConfig.mongo.namesDatabase.TEST_DATABASE;
     if (uri && dbName) {

@@ -1,5 +1,4 @@
 import { PayloadDto } from '../../dto/payload.dto';
-import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
@@ -14,15 +13,13 @@ export class ValidAccessJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: ValidAccessJwtCommand): Promise<PayloadDto | null> {
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    if (!ACCESS_SECRET_KEY) throw new InternalServerErrorException();
-    try {
-      const result = await this.jwtService.verify(command.accessToken, {
-        secret: ACCESS_SECRET_KEY,
-      });
-      return result;
-    } catch (err) {
-      return null;
-    }
+    const { accessToken } = command;
+
+    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
+
+    return await this.jwtService
+      .verify(accessToken, { secret: ACCESS_SECRET_KEY })
+      .then((result: string) => result)
+      .catch(() => null);
   }
 }

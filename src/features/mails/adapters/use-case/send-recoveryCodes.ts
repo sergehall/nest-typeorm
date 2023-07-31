@@ -20,10 +20,12 @@ export class SendRecoveryCodesUseCase
   async execute(command: SendRecoveryCodesCommand): Promise<void> {
     const { email, recoveryCode } = command.emailAndCode;
     const domainName = DomainNamesEnums.HEROKU_POSTGRES;
+    const fromEmail = await this.mailerConfig.getNodeMailerValue(
+      'NODEMAILER_EMAIL',
+    );
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
-    const fromEmail = this.mailerConfig.getNodeMailerValue('NODEMAILER_EMAIL');
     const subject = 'Sent recovery code';
     const template = 'index';
     const text = 'Welcome';
