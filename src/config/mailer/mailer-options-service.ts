@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { join } from 'path';
+import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../configuration';
+import { MailerConfig } from './mailer-config';
 
 @Injectable()
-export class MailerOptionsService implements MailerOptionsFactory {
-  constructor(protected configService: ConfigService<ConfigType, true>) {}
+export class MailerOptionsService
+  extends MailerConfig
+  implements MailerOptionsFactory
+{
+  async createMailerOptions(): Promise<MailerOptions> {
+    const host = await this.getNodeMailerValue('MAIL_HOST');
+    const port = await this.getMailerPort('EMAIL_PORT');
+    const user = await this.getNodeMailerValue('NODEMAILER_EMAIL');
+    const pass = await this.getNodeMailerValue('NODEMAILER_APP_PASSWORD');
 
-  createMailerOptions(): MailerOptions {
-    const { MAIL_HOST, EMAIL_PORT, NODEMAILER_EMAIL, NODEMAILER_APP_PASSWORD } =
-      this.configService.get('mail');
     return {
       transport: {
-        host: MAIL_HOST,
-        port: EMAIL_PORT,
+        host: host,
+        port: port,
         ignoreTLS: true,
         secure: true,
         auth: {
-          user: NODEMAILER_EMAIL,
-          pass: NODEMAILER_APP_PASSWORD,
+          user: user,
+          pass: pass,
         },
       },
       defaults: {

@@ -11,14 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly usersService: UsersService,
     private readonly jwtConfig: JwtConfig,
   ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: jwtConfig.getAccSecretKey(),
-      signOptions: {
-        expiresIn: jwtConfig.getExpAccTime(),
-      },
-    });
+    super(JwtStrategy.getJwtOptions(jwtConfig));
   }
 
   async validate(payload: PayloadDto) {
@@ -35,5 +28,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       };
     }
     return false;
+  }
+
+  protected static getJwtOptions(jwtConfig: JwtConfig) {
+    return {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConfig.getAccSecretKey(),
+      signOptions: {
+        expiresIn: jwtConfig.getExpAccTime(),
+      },
+    };
   }
 }

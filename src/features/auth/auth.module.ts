@@ -65,8 +65,8 @@ const authUseCases = [
   providers: [
     LocalStrategy,
     JwtStrategy,
-    MailsRawSqlRepository,
     JwtConfig,
+    MailsRawSqlRepository,
     AuthService,
     EncryptConfig,
     UsersRepository,
