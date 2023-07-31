@@ -186,6 +186,7 @@ export class PostsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;

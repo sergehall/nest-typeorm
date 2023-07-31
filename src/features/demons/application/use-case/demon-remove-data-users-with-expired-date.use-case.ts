@@ -28,29 +28,44 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
     private readonly bannedUsersForBlogsRepository: BannedUsersForBlogsRawSqlRepository,
     private readonly sentEmailsTimeConfCodeRepo: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
-  async execute() {
+  async execute(): Promise<void> {
     try {
-      const oldestUser: TablesUsersEntityWithId[] =
-        await this.usersRawSqlRepository.getOldestUserWithExpirationDate();
-      if (oldestUser.length === 0) return true;
+      const countExpiredDate =
+        await this.usersRawSqlRepository.totalCountOldestUsersWithExpirationDate();
+      if (countExpiredDate === 0) return;
 
-      const { id } = oldestUser[0];
+      // Get the oldest users with expiration dates equal countExpiredDate and it will be limit
+      const oldestUsers: TablesUsersEntityWithId[] =
+        await this.usersRawSqlRepository.getOldestUsersWithExpirationDate(
+          countExpiredDate,
+        );
 
-      await Promise.all([
-        this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(id),
-        this.likeStatusCommentsRepo.removeLikesCommentsByUserId(id),
-        this.likeStatusPostRepository.removeLikesPostsByUserId(id),
-        this.commentsRepository.removeCommentsByUserId(id),
-        this.postsRepository.removePostsByUserId(id),
-        this.bloggerBlogsRepository.removeBlogsByUserId(id),
-        this.securityDevicesRepository.removeDevicesByUseId(id),
-        this.bannedUsersForBlogsRepository.removeBannedUserByUserId(id),
-        this.usersRawSqlRepository.removeUserByUserId(id),
-      ]);
-      return true;
+      // Loop through each oldest user and remove their data
+      for (let i = 0; i < oldestUsers.length; i++) {
+        const userId = oldestUsers[i].id;
+        await this.removeUserData(userId);
+      }
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  // Remove related data for a single user
+  private async removeUserData(userId: string): Promise<void> {
+    // Remove related data for the user
+    await Promise.all([
+      this.securityDevicesRepository.removeDevicesByUseId(userId),
+      this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(userId),
+      this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId),
+      this.likeStatusPostRepository.removeLikesPostsByUserId(userId),
+      this.commentsRepository.removeCommentsByUserId(userId),
+      this.postsRepository.removePostsByUserId(userId),
+      this.bloggerBlogsRepository.removeBlogsByUserId(userId),
+      this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
+    ]);
+
+    // Remove the user itself
+    await this.usersRawSqlRepository.removeUserByUserId(userId);
   }
 }

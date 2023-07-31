@@ -25,7 +25,7 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { DemonRemoveDataUsersWithExpiredDateUseCase } from './application/use-case/demon-delete-data-users-with-expired-date.use-case';
+import { DemonRemoveDataUsersWithExpiredDateUseCase } from './application/use-case/demon-remove-data-users-with-expired-date.use-case';
 import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 
 const demonsUseCases = [

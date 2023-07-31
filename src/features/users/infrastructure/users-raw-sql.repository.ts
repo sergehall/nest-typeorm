@@ -360,29 +360,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async getOldestUserWithExpirationDate() {
-    try {
-      const isConfirmed = true;
-      const currentTime = new Date().toISOString();
-      const orderByDirection = `"createdAt" DESC`;
-      const limit = 1;
-      const offset = 0;
-      return await this.db.query(
-        `
-      SELECT "userId" AS "id"
-      FROM public."Users"
-      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
-      ORDER BY ${orderByDirection}
-      LIMIT $3 OFFSET $4
-      `,
-        [isConfirmed, currentTime, limit, offset],
-      );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async removeUserByUserId(userId: string): Promise<boolean> {
     try {
       return await this.db.query(
@@ -431,6 +408,47 @@ export class UsersRawSqlRepository {
         searchEmailTerm: searchEmailTerm,
         searchLoginTerm: searchLoginTerm,
       };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getOldestUsersWithExpirationDate(countExpiredDate: number) {
+    try {
+      const isConfirmed = true;
+      const currentTime = new Date().toISOString();
+      const orderByDirection = `"createdAt" DESC`;
+      const limit = countExpiredDate;
+      const offset = 0;
+      return await this.db.query(
+        `
+      SELECT "userId" AS "id"
+      FROM public."Users"
+      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
+      ORDER BY ${orderByDirection}
+      LIMIT $3 OFFSET $4
+      `,
+        [isConfirmed, currentTime, limit, offset],
+      );
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountOldestUsersWithExpirationDate(): Promise<number> {
+    const isConfirmed = true;
+    const currentTime = new Date().toISOString();
+    try {
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."Users"
+        WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
+      `,
+        [isConfirmed, currentTime],
+      );
+      return Number(countBlogs[0].count);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
