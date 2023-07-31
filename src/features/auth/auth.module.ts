@@ -34,6 +34,7 @@ import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordR
 import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
+import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
@@ -69,6 +70,7 @@ const authUseCases = [
     AuthService,
     EncryptConfig,
     UsersRepository,
+    DecodeTokenService,
     BlacklistJwtRepository,
     SecurityDevicesRepository,
     UsersRawSqlRepository,
