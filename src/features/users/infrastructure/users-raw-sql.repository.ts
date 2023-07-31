@@ -220,6 +220,7 @@ export class UsersRawSqlRepository {
       );
       return !!user[0];
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
