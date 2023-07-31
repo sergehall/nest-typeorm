@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TestingRawSqlRepository } from './infrastructure/testing-raw-sql.repository';
+import { TestingRawSqlRepository } from '../infrastructure/testing-raw-sql.repository';
 
 @Injectable()
 export class TestingService {
