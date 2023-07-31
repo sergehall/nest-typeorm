@@ -4,11 +4,11 @@ import { BaseConfig } from '../base/base-config';
 
 @Injectable()
 export class MailerConfig extends BaseConfig {
-  getNodeMailerValue(key: MailerTypes): string {
-    return this.getValueMailer(key);
+  async getNodeMailerValue(key: MailerTypes): Promise<string> {
+    return await this.getValueMailer(key);
   }
 
-  getMailerPort(key: MailerPortTypes): number {
-    return this.getValueMailerPort(key);
+  async getMailerPort(key: MailerPortTypes): Promise<number> {
+    return await this.getValueMailerPort(key);
   }
 }

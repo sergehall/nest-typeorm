@@ -16,8 +16,8 @@ export class SignAccessJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SignAccessJwtUseCommand): Promise<AccessTokenDto> {
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = await this.jwtConfig.getExpAccTime();
 
     const deviceId = uuid4().toString();
     const payload = {
