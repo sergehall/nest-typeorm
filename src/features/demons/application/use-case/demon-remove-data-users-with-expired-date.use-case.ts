@@ -30,9 +30,15 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
   ) {}
   async execute(): Promise<void> {
     try {
-      const countExpiredDate =
+      let countExpiredDate =
         await this.usersRawSqlRepository.totalCountOldestUsersWithExpirationDate();
-      if (countExpiredDate === 0) return;
+
+      if (countExpiredDate > 0) {
+        // Limiting the count of expired dates to a maximum value of 100,000
+        countExpiredDate = Math.min(countExpiredDate, 100000);
+      } else {
+        return;
+      }
 
       // Get the oldest users with expiration dates equal countExpiredDate and it will be limit
       const oldestUsers: TablesUsersEntityWithId[] =
