@@ -38,6 +38,7 @@ export class BlogsController {
   ): Promise<ReturnBloggerBlogsEntity> {
     return await this.blogsService.openFindBlogById(params.id);
   }
+
   @Get(':blogId/posts')
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: User })
