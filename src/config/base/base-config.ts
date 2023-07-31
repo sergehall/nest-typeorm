@@ -24,7 +24,7 @@ export class BaseConfig {
     });
   }
 
-  protected async getValueString(key: JwtConfigType, defaultValue?: string) {
+  protected getValueString(key: JwtConfigType, defaultValue?: string): string {
     const value = this.configService.get('jwt', {
       infer: true,
     })[key];

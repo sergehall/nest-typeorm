@@ -12,6 +12,8 @@ import {
   Res,
   Query,
 } from '@nestjs/common';
+import { userAlreadyExists } from '../../../exception-filter/errors-messages';
+import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from '../dto/login.dto';
@@ -19,8 +21,6 @@ import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
 import { PayloadDto } from '../dto/payload.dto';
-import { userAlreadyExists } from '../../../exception-filter/errors-messages';
-import { SkipThrottle } from '@nestjs/throttler';
 import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
 import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
 import { CommandBus } from '@nestjs/cqrs';
@@ -43,6 +43,7 @@ import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
 import { ProfileDto } from '../dto/profile.dto';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -59,7 +60,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const { currentUserDto } = req;
+    const currentUserDto: CurrentUserDto = req.user;
     const userAgent = req.get('user-agent') || 'None';
 
     const signedToken = await this.commandBus.execute(

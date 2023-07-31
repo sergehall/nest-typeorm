@@ -55,7 +55,7 @@ export class PostsController {
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
     return this.postsService.openFindPosts(queryData, currentUserDto);
   }
@@ -140,9 +140,9 @@ export class PostsController {
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
   async removePost(@Request() req: any, @Param() params: IdParams) {
-    const currentUser = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
-      new RemovePostByIdOldCommand(params.id, currentUser),
+      new RemovePostByIdOldCommand(params.id, currentUserDto),
     );
   }
 
@@ -154,7 +154,7 @@ export class PostsController {
     @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new ChangeLikeStatusPostCommand(
         params.postId,
