@@ -19,10 +19,7 @@ import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
 import { PayloadDto } from '../dto/payload.dto';
-import {
-  codeIncorrect,
-  userAlreadyExists,
-} from '../../../exception-filter/errors-messages';
+import { userAlreadyExists } from '../../../exception-filter/errors-messages';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
 import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
@@ -41,10 +38,11 @@ import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
-import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
 import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
+import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
+import { ProfileDto } from '../dto/profile.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -223,28 +221,27 @@ export class AuthController {
   }
 
   @Get('confirm-registration')
-  async confirmRegistrationByCodeFromQuery(@Query() query: any) {
+  async confirmRegistrationByCodeFromQuery(
+    @Query() query: any,
+  ): Promise<boolean> {
     const queryData = ParseQuery.getPaginationData(query);
-    const result = await this.commandBus.execute(
+    console.log(
+      'Congratulations account is confirmed. Send a message not here, into email that has been confirmed.',
+    );
+    return await this.commandBus.execute(
       new ConfirmUserByCodeCommand(queryData.code),
     );
-    if (!result) {
-      throw new HttpException(
-        { message: [codeIncorrect] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return 'Congratulations account is confirmed. Send a message not here. To email that has been confirmed.';
   }
 
   @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Request() req: any) {
+  getProfile(@Request() req: any): ProfileDto {
+    const { email, login, id } = req.user;
     return {
-      email: req.user.email,
-      login: req.user.login,
-      userId: req.user.id,
+      email: email,
+      login: login,
+      userId: id,
     };
   }
 }

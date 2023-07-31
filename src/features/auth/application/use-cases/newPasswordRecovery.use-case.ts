@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { NewPasswordRecoveryDto } from '../../dto/newPasswordRecovery.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigType } from '../../../../config/configuration';
 import { ConfigService } from '@nestjs/config';
+import { NewPasswordRecoveryDto } from '../../dto/new-password-recovery.dto';
 
 export class newPasswordRecoveryCommand {
   constructor(public newPasswordRecoveryDto: NewPasswordRecoveryDto) {}
