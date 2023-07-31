@@ -45,12 +45,15 @@ import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecove
 import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
 import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
-import jwt_decode from 'jwt-decode';
+import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 
 @SkipThrottle()
 @Controller('auth')
 export class AuthController {
-  constructor(protected commandBus: CommandBus) {}
+  constructor(
+    protected commandBus: CommandBus,
+    protected decodeTokenService: DecodeTokenService,
+  ) {}
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -64,12 +67,14 @@ export class AuthController {
     const signedToken = await this.commandBus.execute(
       new SineRefreshJwtCommand(currentUserDto),
     );
-    const newPayload: PayloadDto = jwt_decode(signedToken.refreshToken);
-    if (newPayload) {
-      await this.commandBus.execute(
-        new CreateDeviceCommand(newPayload, ip, userAgent),
-      );
-    }
+
+    const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
+      signedToken.refreshToken,
+    );
+
+    await this.commandBus.execute(
+      new CreateDeviceCommand(payload, ip, userAgent),
+    );
     res.cookie('refreshToken', signedToken.refreshToken);
     // res.cookie('refreshToken', signedToken.refreshToken, {
     //   httpOnly: true,
@@ -127,18 +132,27 @@ export class AuthController {
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
     const refreshToken = req.cookies.refreshToken;
-    const currentPayload: PayloadDto = jwt_decode(refreshToken);
+
+    const currentPayload: PayloadDto =
+      await this.decodeTokenService.toExtractPayload(refreshToken);
+
     const refreshTokenToBlackList = {
       refreshToken: refreshToken,
       expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
     };
+
     await this.commandBus.execute(
       new AddRefreshTokenToBlackListCommand(refreshTokenToBlackList),
     );
+
     const newRefreshToken = await this.commandBus.execute(
       new UpdateRefreshJwtCommand(currentPayload),
     );
-    const newPayload: PayloadDto = jwt_decode(newRefreshToken.refreshToken);
+    const newPayload: PayloadDto =
+      await this.decodeTokenService.toExtractPayload(
+        newRefreshToken.refreshToken,
+      );
+
     const userAgent = req.get('user-agent');
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),
@@ -162,7 +176,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
     const refreshToken = req.cookies.refreshToken;
-    const payload: PayloadDto = jwt_decode(req.cookies.refreshToken);
+    const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
+      refreshToken,
+    );
     const currentJwt: JwtBlacklistDto = {
       refreshToken: refreshToken,
       expirationDate: new Date(payload.exp * 1000).toISOString(),

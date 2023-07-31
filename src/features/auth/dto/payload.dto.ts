@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 
 export class PayloadDto {
   @IsNotEmpty()
@@ -7,6 +13,12 @@ export class PayloadDto {
     message: 'Incorrect userId length! Must be max 50 ch.',
   })
   userId: string;
+  @IsNotEmpty()
+  @Length(6, 20, {
+    message: 'Incorrect email length! Must be min 6, max 30 ch.',
+  })
+  @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
+  email: string;
   @IsNotEmpty()
   @IsString()
   @Length(3, 50, {
