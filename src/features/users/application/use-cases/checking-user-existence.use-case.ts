@@ -14,9 +14,7 @@ export class CheckingUserExistenceUseCase
   async execute(
     command: CheckingUserExistenceCommand,
   ): Promise<TablesUsersEntity | null> {
-    return await this.usersRawSqlRepository.userAlreadyExist(
-      command.login,
-      command.email,
-    );
+    const { login, email } = command;
+    return await this.usersRawSqlRepository.userAlreadyExist(login, email);
   }
 }

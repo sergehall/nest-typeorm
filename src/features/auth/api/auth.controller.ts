@@ -39,7 +39,6 @@ import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-j
 import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ParseQuery } from '../../common/parse-query/parse-query';
 import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
 import { NewPasswordRecoveryDto } from '../dto/newPasswordRecovery.dto';
@@ -62,12 +61,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const currentUserDto: CurrentUserDto = req.user;
+    const { currentUserDto } = req;
     const userAgent = req.get('user-agent') || 'None';
+
     const signedToken = await this.commandBus.execute(
       new SineRefreshJwtCommand(currentUserDto),
     );
-
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       signedToken.refreshToken,
     );
@@ -80,7 +79,9 @@ export class AuthController {
     //   httpOnly: true,
     //   secure: true,
     // });
-    return await this.commandBus.execute(new SignAccessJwtUseCommand(req.user));
+    return await this.commandBus.execute(
+      new SignAccessJwtUseCommand(currentUserDto),
+    );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -90,8 +91,10 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
   ) {
+    const { login, email } = loginDto;
+
     const userExist = await this.commandBus.execute(
-      new CheckingUserExistenceCommand(loginDto.login, loginDto.email),
+      new CheckingUserExistenceCommand(login, email),
     );
     if (userExist) {
       throw new HttpException(
@@ -131,7 +134,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const refreshToken = req.cookies.refreshToken;
+    const { refreshToken } = req.cookies;
 
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(refreshToken);
@@ -175,7 +178,8 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
-    const refreshToken = req.cookies.refreshToken;
+    const { refreshToken } = req.cookies;
+
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       refreshToken,
     );
@@ -195,16 +199,8 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
-    const result = await this.commandBus.execute(
-      new ConfirmUserByCodeCommand(codeDto.code),
-    );
-    if (!result) {
-      throw new HttpException(
-        { message: [codeIncorrect] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return true;
+    const { code } = codeDto;
+    return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 
   @SkipThrottle()

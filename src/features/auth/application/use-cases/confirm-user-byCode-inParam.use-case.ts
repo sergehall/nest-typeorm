@@ -1,5 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { codeIncorrect } from '../../../../exception-filter/errors-messages';
 
 export class ConfirmUserByCodeCommand {
   constructor(public code: string) {}
@@ -28,10 +30,17 @@ export class ConfirmUserByCodeUseCase
       return true;
     }
 
-    return await this.usersRawSqlRepository.confirmUserByConfirmCode(
+    const isConfirm = await this.usersRawSqlRepository.confirmUserByConfirmCode(
       command.code,
       true,
       currentDate,
-    ); // Returning true if the user was successfully updated, otherwise false.
+    );
+    if (!isConfirm) {
+      throw new HttpException(
+        { message: [codeIncorrect] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return isConfirm; // Returning true if the user was successfully updated
   }
 }
