@@ -22,6 +22,7 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
+import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -44,6 +45,7 @@ const securityDevicesCases = [
     UsersRepository,
     MailsRawSqlRepository,
     UsersService,
+    DecodeTokenService,
     BlacklistJwtRepository,
     SecurityDevicesRepository,
     SecurityDevicesRawSqlRepository,
