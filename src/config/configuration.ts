@@ -1,4 +1,4 @@
-import { EnvNamesEnums } from './env-names.enums/envNames.enums';
+import { EnvNamesEnums } from './enums/env-names.enums';
 
 class Configuration {
   private static readEnvVariableWithDefault(

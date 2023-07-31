@@ -17,7 +17,7 @@ async function bootstrap() {
   });
 
   const baseUrl = await app.getUrl();
-  console.log(`Application is running on: ${baseUrl}`);
+  console.log(`Application is running on url: ${baseUrl}`);
 }
 
 bootstrap();
