@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { ThrottleTypes } from '../throttle/types/throttle.types';
 import { MailerPortTypes, MailerTypes } from '../mailer/types/mailer.types';
 import * as bcrypt from 'bcrypt';
-import { DbConfigTypes } from '../db/types/db.types';
-import { EnvNamesEnums } from '../env-names.enums/envNames.enums';
+import { DatabaseConfigTypes } from '../db/types/db.types';
+import { EnvNamesEnums } from '../enums/env-names.enums';
 
 @Injectable()
 export class BaseConfig {
@@ -18,7 +18,7 @@ export class BaseConfig {
     });
   }
 
-  protected async getValueDatabase(): Promise<DbConfigTypes> {
+  protected async getValueDatabase(): Promise<DatabaseConfigTypes> {
     return this.configService.get('db', {
       infer: true,
     });

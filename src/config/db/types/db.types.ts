@@ -1,4 +1,4 @@
-export type DbConfigTypes = {
+export type DatabaseConfigTypes = {
   pg: {
     url: {
       DATABASE_URL: string;
