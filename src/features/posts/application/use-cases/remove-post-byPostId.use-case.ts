@@ -79,7 +79,7 @@ export class RemovePostByPostIdUseCase
     postId: string,
   ): Promise<boolean> {
     try {
-      await this.likeStatusPostRepository.removeLikesPostByPosId(postId);
+      await this.likeStatusPostRepository.removeLikesPostByPostId(postId);
       await this.commentsRepository.removeCommentsByPostId(postId);
       return await this.postsRepository.removePostByPostId(postId);
     } catch (error) {

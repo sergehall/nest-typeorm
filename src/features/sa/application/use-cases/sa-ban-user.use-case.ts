@@ -76,13 +76,13 @@ export class SaBanUserByUserIdUseCase
       // Use Promise.all to execute the commands concurrently
       await Promise.all([
         this.commandBus.execute(
-          new ChangeBanStatusUserBlogsCommand(userId, banInfo.isBanned),
+          new ChangeBanStatusUserCommentsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(
           new ChangeBanStatusUserPostsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(
-          new ChangeBanStatusUserCommentsCommand(userId, banInfo.isBanned),
+          new ChangeBanStatusUserBlogsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(new RemoveDevicesBannedUserCommand(userId)),
         this.usersRawSqlRepository.banUser(userId, banInfo),

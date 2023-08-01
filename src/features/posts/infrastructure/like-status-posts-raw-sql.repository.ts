@@ -150,7 +150,7 @@ export class LikeStatusPostsRawSqlRepository {
         `
         UPDATE public."LikeStatusPosts"
         SET "isBanned" = $2
-        WHERE "userId" = $1
+        WHERE "userId" = $1 OR "postOwnerId" = $1
         `,
         [userId, isBanned],
       );
@@ -160,9 +160,10 @@ export class LikeStatusPostsRawSqlRepository {
     }
   }
 
-  async removeLikesPostsByUserId(userId: string): Promise<boolean> {
+  async removeLikesPostsByUserIdAndPostOwnerId(
+    userId: string,
+  ): Promise<boolean> {
     try {
-      console.log(userId, 'removeLikesPostsByUserId');
       return await this.db.query(
         `
         DELETE FROM public."LikeStatusPosts"
@@ -191,7 +192,7 @@ export class LikeStatusPostsRawSqlRepository {
     }
   }
 
-  async removeLikesPostByPosId(postId: string): Promise<boolean> {
+  async removeLikesPostByPostId(postId: string): Promise<boolean> {
     try {
       return await this.db.query(
         `

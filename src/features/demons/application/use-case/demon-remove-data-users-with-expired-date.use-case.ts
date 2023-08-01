@@ -32,7 +32,7 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
     try {
       let countExpiredDate =
         await this.usersRawSqlRepository.totalCountOldestUsersWithExpirationDate();
-      console.log(countExpiredDate, 'countExpiredDate');
+
       if (countExpiredDate > 0) {
         // Limiting the count of expired dates to a maximum value of 100,000
         countExpiredDate = Math.min(countExpiredDate, 100000);
@@ -40,12 +40,12 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
         return;
       }
 
-      // Get the oldest users with expiration dates equal countExpiredDate and it will be limit
+      // Get the oldest users with expiration dates equal countExpiredDate and it will limit.
       const oldestUsers: TablesUsersEntityWithId[] =
         await this.usersRawSqlRepository.getOldestUsersWithExpirationDate(
           countExpiredDate,
         );
-      console.log(oldestUsers, 'oldestUsers');
+
       // Loop through each oldest user and remove their data
       for (let i = 0; i < oldestUsers.length; i++) {
         const userId = oldestUsers[i].id;
@@ -64,8 +64,12 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
       this.securityDevicesRepository.removeDevicesByUseId(userId),
       this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
       this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(userId),
-      this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId),
-      this.likeStatusPostRepository.removeLikesPostsByUserId(userId),
+      this.likeStatusCommentsRepo.removeLikesCommentsByUserIdAndCommentOwnerId(
+        userId,
+      ),
+      this.likeStatusPostRepository.removeLikesPostsByUserIdAndPostOwnerId(
+        userId,
+      ),
     ]);
     await this.commentsRepository.removeCommentsByUserId(userId);
     await this.postsRepository.removePostsByUserId(userId);

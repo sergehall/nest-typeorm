@@ -51,20 +51,20 @@ export class BanUserForBlogUseCase
       );
     }
 
-    // Step 1: Fetch the user to be banned from the repository.
+    // Fetch the user to be banned from the repository.
     const userForBan = await this.getUserToBan(userToBanId);
 
-    // Step 2: Fetch the blog associated with the ban from the repository.
+    // Fetch the blog associated with the ban from the repository.
     const blogForBan = await this.getBlogForBan(updateBanUserDto.blogId);
 
-    // Step 3: Check if the current user has permission to perform the ban action.
+    // Check if the current user has permission to perform the ban action.
     await this.checkUserPermission(blogForBan.blogOwnerId, currentUserDto);
 
-    // Step 4: Create a BannedUsersForBlogsEntity object that represents the ban entity.
+    // Create a BannedUsersForBlogsEntity object that represents the ban entity.
     const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
       this.createBannedUserEntity(userForBan, updateBanUserDto);
 
-    // Step 5: Execute several commands asynchronously to change the ban status for the user in different scenarios.
+    // Execute several commands asynchronously to change the ban status for the user in different scenarios.
     return await this.executeChangeBanStatusCommands(bannedUserForBlogEntity);
   }
 

@@ -22,10 +22,10 @@ export class ChangeBanStatusCommentsByUserIdBlogIdUseCase
     const { bannedUserForBlogEntity } = command;
     try {
       await Promise.all([
-        this.commentsRawSqlRepository.changeBanStatusCommentsByUserIdBlogId(
+        this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByUserIdBlogId(
           bannedUserForBlogEntity,
         ),
-        this.likeStatusCommentsRawSqlRepository.changeBanStatusLikesCommentsByUserIdBlogId(
+        this.commentsRawSqlRepository.changeBanStatusCommentsByUserIdBlogId(
           bannedUserForBlogEntity,
         ),
       ]);
