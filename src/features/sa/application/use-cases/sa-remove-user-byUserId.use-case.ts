@@ -61,8 +61,12 @@ export class SaRemoveUserByUserIdUseCase
         this.sentEmailsTimeRepo.removeSentEmailsTimeByUserId(userId),
         this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
         this.securityDevicesRepository.removeDevicesByUseId(userId),
-        this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId),
-        this.likeStatusPostsRepository.removeLikesPostsByUserId(userId),
+        this.likeStatusCommentsRepo.removeLikesCommentsByUserIdAndCommentOwnerId(
+          userId,
+        ),
+        this.likeStatusPostsRepository.removeLikesPostsByUserIdAndPostOwnerId(
+          userId,
+        ),
       ]);
       await this.commentsRepository.removeCommentsByUserId(userId);
       await this.postsRepository.removePostsByUserId(userId);

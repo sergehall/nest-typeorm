@@ -81,7 +81,7 @@ export class LikeStatusCommentsRawSqlRepository {
         `
         UPDATE public."LikeStatusComments"
         SET "isBanned" = $3
-        WHERE "userId" = $1 AND "blogId" = $2
+        WHERE "userId" = $1 AND "blogId" = $2 OR "commentOwnerId" = $1 AND "blogId" = $2
         `,
         [
           bannedUserForBlogEntity.userId,
@@ -123,7 +123,7 @@ export class LikeStatusCommentsRawSqlRepository {
         `
         UPDATE public."LikeStatusComments"
         SET "isBanned" = $2
-        WHERE "userId" = $1
+        WHERE "userId" = $1 OR "commentOwnerId" = $1
         `,
         [userId, isBanned],
       );
@@ -133,7 +133,9 @@ export class LikeStatusCommentsRawSqlRepository {
     }
   }
 
-  async removeLikesCommentsByUserId(userId: string): Promise<boolean> {
+  async removeLikesCommentsByUserIdAndCommentOwnerId(
+    userId: string,
+  ): Promise<boolean> {
     try {
       return await this.db.query(
         `
