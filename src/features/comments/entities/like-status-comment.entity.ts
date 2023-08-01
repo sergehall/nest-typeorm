@@ -11,14 +11,19 @@ import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 export class LikeStatusCommentEntity {
   @IsNotEmpty()
   @Length(0, 100, {
-    message: 'Incorrect blogId length! Must be min 0, max 100 ch.',
+    message: 'Incorrect commentId length! Must be min 0, max 100 ch.',
   })
-  blogId: string;
+  commentId: string;
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect commentId length! Must be min 0, max 100 ch.',
   })
-  commentId: string;
+  commentOwnerId: string;
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect blogId length! Must be min 0, max 100 ch.',
+  })
+  blogId: string;
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect userId length! Must be min 0, max 100 ch.',

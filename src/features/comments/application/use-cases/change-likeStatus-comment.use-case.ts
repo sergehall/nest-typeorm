@@ -29,6 +29,7 @@ export class ChangeLikeStatusCommentUseCase
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
   async execute(command: ChangeLikeStatusCommentCommand): Promise<boolean> {
+    const { commentId, likeStatusDto, currentUserDto } = command;
     const findComment =
       await this.commentsRawSqlRepository.findCommentByCommentId(
         command.commentId,
@@ -37,7 +38,7 @@ export class ChangeLikeStatusCommentUseCase
 
     const isBannedCurrentUser =
       await this.bannedUsersForBlogsRawSqlRepository.existenceBannedUser(
-        command.currentUserDto.id,
+        currentUserDto.id,
         findComment.postInfoBlogId,
       );
     if (isBannedCurrentUser) {
@@ -45,11 +46,12 @@ export class ChangeLikeStatusCommentUseCase
     }
 
     const likeStatusCommEntity: LikeStatusCommentEntity = {
+      commentId: commentId,
       blogId: findComment.postInfoBlogId,
-      commentId: command.commentId,
-      userId: command.currentUserDto.id,
-      isBanned: command.currentUserDto.isBanned,
-      likeStatus: command.likeStatusDto.likeStatus,
+      commentOwnerId: findComment.commentatorInfoUserId,
+      userId: currentUserDto.id,
+      isBanned: currentUserDto.isBanned,
+      likeStatus: likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),
     };
 

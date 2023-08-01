@@ -32,7 +32,7 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
     try {
       let countExpiredDate =
         await this.usersRawSqlRepository.totalCountOldestUsersWithExpirationDate();
-
+      console.log(countExpiredDate, 'countExpiredDate');
       if (countExpiredDate > 0) {
         // Limiting the count of expired dates to a maximum value of 100,000
         countExpiredDate = Math.min(countExpiredDate, 100000);
@@ -45,7 +45,7 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
         await this.usersRawSqlRepository.getOldestUsersWithExpirationDate(
           countExpiredDate,
         );
-
+      console.log(oldestUsers, 'oldestUsers');
       // Loop through each oldest user and remove their data
       for (let i = 0; i < oldestUsers.length; i++) {
         const userId = oldestUsers[i].id;
@@ -62,15 +62,14 @@ export class DemonRemoveDataUsersWithExpiredDateUseCase
     // Remove related data for the user
     await Promise.all([
       this.securityDevicesRepository.removeDevicesByUseId(userId),
+      this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
       this.sentEmailsTimeConfCodeRepo.removeSentEmailsTimeByUserId(userId),
       this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId),
       this.likeStatusPostRepository.removeLikesPostsByUserId(userId),
-      this.commentsRepository.removeCommentsByUserId(userId),
-      this.postsRepository.removePostsByUserId(userId),
-      this.bloggerBlogsRepository.removeBlogsByUserId(userId),
-      this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
     ]);
-
+    await this.commentsRepository.removeCommentsByUserId(userId);
+    await this.postsRepository.removePostsByUserId(userId);
+    await this.bloggerBlogsRepository.removeBlogsByUserId(userId);
     // Remove the user itself
     await this.usersRawSqlRepository.removeUserByUserId(userId);
   }

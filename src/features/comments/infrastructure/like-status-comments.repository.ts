@@ -25,6 +25,7 @@ export class LikeStatusCommentsRepository {
           $set: {
             blogId: likeStatusCommEntity.blogId,
             commentId: likeStatusCommEntity.commentId,
+            commentOwnerId: likeStatusCommEntity.commentOwnerId,
             userId: likeStatusCommEntity.userId,
             isBanned: likeStatusCommEntity.isBanned,
             likeStatus: likeStatusCommEntity.likeStatus,

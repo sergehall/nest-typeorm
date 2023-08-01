@@ -72,8 +72,10 @@ export class DemonsService {
     await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
   }
 
-  // every 4 hours
-  @Cron('0 */4 * * *')
+  // // every 4 hours
+  // @Cron('0 */4 * * *')
+  // every 3 min
+  @Cron('*/3 * * * *')
   async clearingUserWithExpirationDate() {
     await this.commandBus.execute(
       new DemonRemoveDataUsersWithExpiredDateCommand(),

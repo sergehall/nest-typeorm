@@ -33,7 +33,7 @@ export class CreateUserByInstanceUseCase
     // Hash the user's password
     const passwordHash = await this.encryptConfig.getPasswordHash(password);
 
-    // Return the expirationDate in ISO format
+    // Return the expirationDate in ISO format for user registration.
     const expirationDate = await this.expirationDateCalculator.createExpDate(
       0,
       2,
