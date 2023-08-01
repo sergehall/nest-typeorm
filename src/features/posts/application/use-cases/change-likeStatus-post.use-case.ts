@@ -41,6 +41,7 @@ export class ChangeLikeStatusPostUseCase
 
     const likeStatusPostEntity: LikeStatusPostEntity = {
       blogId: post.blogId,
+      postOwnerId: post.postOwnerId,
       postId: command.postId,
       userId: command.currentUserDto.id,
       login: command.currentUserDto.login,

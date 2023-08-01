@@ -413,7 +413,9 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async getOldestUsersWithExpirationDate(countExpiredDate: number) {
+  async getOldestUsersWithExpirationDate(
+    countExpiredDate: number,
+  ): Promise<TablesUsersEntityWithId[]> {
     try {
       const isConfirmed = true;
       const currentTime = new Date().toISOString();

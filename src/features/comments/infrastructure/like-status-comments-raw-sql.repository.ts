@@ -12,10 +12,10 @@ export class LikeStatusCommentsRawSqlRepository {
     try {
       const updateLikeStatusComment = await this.db.query(
         `
-      INSERT INTO public."LikeStatusComments" ("blogId", "commentId", "userId", "isBanned", "likeStatus", "createdAt")
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO public."LikeStatusComments" ("blogId", "commentId", "userId", "isBanned", "likeStatus", "createdAt", "commentOwnerId")
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT ( "commentId", "userId" ) 
-      DO UPDATE SET "blogId" = $1, "commentId" = $2, "userId" = $3, "isBanned" = $4, "likeStatus" = $5, "createdAt" = $6
+      DO UPDATE SET "blogId" = $1, "commentId" = $2, "userId" = $3, "isBanned" = $4, "likeStatus" = $5, "createdAt" = $6, "commentOwnerId" = $7
       returning "userId"
       `,
         [
@@ -25,6 +25,7 @@ export class LikeStatusCommentsRawSqlRepository {
           likeStatusCommEntity.isBanned,
           likeStatusCommEntity.likeStatus,
           likeStatusCommEntity.createdAt,
+          likeStatusCommEntity.commentOwnerId,
         ],
       );
       return updateLikeStatusComment[0] != null;
@@ -137,7 +138,7 @@ export class LikeStatusCommentsRawSqlRepository {
       return await this.db.query(
         `
         DELETE FROM public."LikeStatusComments"
-        WHERE "userId" = $1
+        WHERE "userId" = $1 OR "commentOwnerId" = $1
         `,
         [userId],
       );

@@ -56,11 +56,14 @@ export class SaRemoveUserByUserIdUseCase
     userId: string,
   ): Promise<boolean> {
     try {
-      await this.sentEmailsTimeRepo.removeSentEmailsTimeByUserId(userId);
-      await this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId);
-      await this.securityDevicesRepository.removeDevicesByUseId(userId);
-      await this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId);
-      await this.likeStatusPostsRepository.removeLikesPostsByUserId(userId);
+      // Remove related data for the user
+      await Promise.all([
+        this.sentEmailsTimeRepo.removeSentEmailsTimeByUserId(userId),
+        this.bannedUsersForBlogsRepository.removeBannedUserByUserId(userId),
+        this.securityDevicesRepository.removeDevicesByUseId(userId),
+        this.likeStatusCommentsRepo.removeLikesCommentsByUserId(userId),
+        this.likeStatusPostsRepository.removeLikesPostsByUserId(userId),
+      ]);
       await this.commentsRepository.removeCommentsByUserId(userId);
       await this.postsRepository.removePostsByUserId(userId);
       await this.bloggerBlogsRepository.removeBlogsByUserId(userId);

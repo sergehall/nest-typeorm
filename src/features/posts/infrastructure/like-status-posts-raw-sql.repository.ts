@@ -15,11 +15,11 @@ export class LikeStatusPostsRawSqlRepository {
       const updateLikeStatusPost = await this.db.query(
         `
       INSERT INTO public."LikeStatusPosts"
-      ("postId", "userId", "blogId", "isBanned", "login", "likeStatus", "addedAt")
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ("postId", "userId", "blogId", "isBanned", "login", "likeStatus", "addedAt", "postOwnerId")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT ( "postId", "userId" ) 
       DO UPDATE SET "postId" = $1, "userId" = $2, "blogId" = $3,
-       "isBanned" = $4, "login" = $5, "likeStatus" = $6, "addedAt" = $7
+       "isBanned" = $4, "login" = $5, "likeStatus" = $6, "addedAt" = $7, "postOwnerId" = $8
       RETURNING "userId"
       `,
         [
@@ -30,6 +30,7 @@ export class LikeStatusPostsRawSqlRepository {
           likeStatusCommEntity.login,
           likeStatusCommEntity.likeStatus,
           likeStatusCommEntity.addedAt,
+          likeStatusCommEntity.postOwnerId,
         ],
       );
       return updateLikeStatusPost[0] != null;
@@ -106,7 +107,7 @@ export class LikeStatusPostsRawSqlRepository {
     try {
       return await this.db.query(
         `
-        SELECT "postId", "userId", "blogId", "isBanned", "login", "likeStatus", "addedAt"
+        SELECT "postId", "userId", "blogId", "isBanned", "login", "likeStatus", "addedAt", "postOwnerId"
         FROM public."LikeStatusPosts"
         WHERE "postId" = $1 AND "userId" = $2 AND "isBanned" = $3
           `,
@@ -161,10 +162,11 @@ export class LikeStatusPostsRawSqlRepository {
 
   async removeLikesPostsByUserId(userId: string): Promise<boolean> {
     try {
+      console.log(userId, 'removeLikesPostsByUserId');
       return await this.db.query(
         `
         DELETE FROM public."LikeStatusPosts"
-        WHERE "userId" = $1
+        WHERE "userId" = $1 OR "postOwnerId" = $1
         `,
         [userId],
       );
