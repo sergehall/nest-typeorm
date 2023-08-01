@@ -15,10 +15,10 @@ export class SignRefreshJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SineRefreshJwtCommand) {
-    const REFRESH_SECRET_KEY = await this.jwtConfig.getRefSecretKey();
-    const EXP_REF_TIME = await this.jwtConfig.getExpRefTime();
+    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+    const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
 
-    const payload = {
+    const toPayload = {
       userId: command.currentUserDto.id,
       email: command.currentUserDto.email,
       deviceId: uuid4().toString(),
@@ -27,7 +27,7 @@ export class SignRefreshJwtUseCase
     if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
       throw new InternalServerErrorException();
     return {
-      refreshToken: this.jwtService.sign(payload, {
+      refreshToken: this.jwtService.sign(toPayload, {
         secret: REFRESH_SECRET_KEY,
         expiresIn: EXP_REF_TIME,
       }),
