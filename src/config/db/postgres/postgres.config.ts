@@ -5,9 +5,13 @@ import { PgHostTypes } from './types/pg-host.types';
 import { PgPortTypes } from './types/pg-port.types';
 import { PgNamesDbTypes } from './types/pg-names-db.types';
 import { PgAuthTypes } from './types/pg-auth.types';
+import { PgDatabaseUrlTypes } from './types/pg-database-url.types';
 
 @Injectable()
 export class PostgresConfig extends BaseConfig {
+  async getUrl(key: PgDatabaseUrlTypes): Promise<string> {
+    return await this.getValuePgDatabaseUrl(key);
+  }
   async getHost(key: PgHostTypes): Promise<string> {
     return await this.getValuePgHost(key);
   }

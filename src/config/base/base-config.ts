@@ -12,6 +12,7 @@ import { PgPortTypes } from '../db/postgres/types/pg-port.types';
 import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
 import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
+import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
 
 @Injectable()
 export class BaseConfig {
@@ -45,6 +46,19 @@ export class BaseConfig {
     key: PgDomainNameTypes,
   ): Promise<string> {
     return this.configService.get(`db.pg.domain`, {
+      infer: true,
+    })[key];
+  }
+
+  /**
+   * Retrieves the PostgreSQL database host based on the provided key.
+   * @param {PgDatabaseUrlTypes} key - The key to retrieve the url.
+   * @returns {Promise<string>} The PostgreSQL database url.
+   */
+  protected async getValuePgDatabaseUrl(
+    key: PgDatabaseUrlTypes,
+  ): Promise<string> {
+    return this.configService.get(`db.pg.url`, {
       infer: true,
     })[key];
   }
