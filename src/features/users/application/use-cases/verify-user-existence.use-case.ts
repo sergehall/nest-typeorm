@@ -3,16 +3,16 @@ import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.reposi
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { userAlreadyExists } from '../../../../exception-filter/custom-errors-messages';
 
-export class CheckingUserExistenceCommand {
+export class VerifyUserExistenceCommand {
   constructor(public login: string, public email: string) {}
 }
 
-@CommandHandler(CheckingUserExistenceCommand)
-export class CheckingUserExistenceUseCase
-  implements ICommandHandler<CheckingUserExistenceCommand>
+@CommandHandler(VerifyUserExistenceCommand)
+export class VerifyUserExistenceUseCase
+  implements ICommandHandler<VerifyUserExistenceCommand>
 {
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
-  async execute(command: CheckingUserExistenceCommand): Promise<boolean> {
+  async execute(command: VerifyUserExistenceCommand): Promise<boolean> {
     const { login, email } = command;
     const userIsExist = await this.usersRawSqlRepository.userAlreadyExist(
       login,

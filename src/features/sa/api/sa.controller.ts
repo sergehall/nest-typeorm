@@ -25,7 +25,7 @@ import { ParseQuery } from '../../common/query/parse-query';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
-import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
+import { CreateUserCommand } from '../../users/application/use-cases/create-user.use-case';
 import { IdParams } from '../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';

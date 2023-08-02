@@ -25,7 +25,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../dto/reg-data.dto';
-import { CreateUserCommand } from '../application/use-cases/create-user-byInstance.use-case';
+import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../common/query/params/id.params';

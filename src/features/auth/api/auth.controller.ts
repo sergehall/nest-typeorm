@@ -31,7 +31,6 @@ import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jw
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
-import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
 import { ParseQuery } from '../../common/query/parse-query';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
@@ -42,6 +41,7 @@ import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
+import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -90,9 +90,7 @@ export class AuthController {
   ) {
     const { login, email } = loginDto;
 
-    await this.commandBus.execute(
-      new CheckingUserExistenceCommand(login, email),
-    );
+    await this.commandBus.execute(new VerifyUserExistenceCommand(login, email));
 
     const registrationData: RegDataDto = {
       ip: ip,
