@@ -6,7 +6,7 @@ import {
 } from '@nestjs/throttler';
 
 @Injectable()
-export class ThrottleConfig
+export class ThrottlerOptions
   extends BaseConfig
   implements ThrottlerOptionsFactory
 {
