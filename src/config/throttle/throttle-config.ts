@@ -11,8 +11,8 @@ export class ThrottleConfig
   implements ThrottlerOptionsFactory
 {
   async createThrottlerOptions(): Promise<ThrottlerModuleOptions> {
-    const ttl = await this.getValueThrottle('THROTTLE_TTL');
-    const limit = await this.getValueThrottle('THROTTLE_LIMIT');
+    const ttl: number = await this.getValueThrottle('THROTTLE_TTL');
+    const limit: number = await this.getValueThrottle('THROTTLE_LIMIT');
 
     return {
       ttl,

@@ -8,8 +8,8 @@ import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklis
 import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
 import { EmailsRecoveryCodesEntity } from '../entities/emailsRecoveryCodes.entity';
-import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registrationCodes.use-case';
-import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recoveryCodes';
+import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registration-codes.use-case';
+import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recovery-codes';
 import { DemonRemoveEmailConfirmCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-confCode-byId.use-case';
 import { DemonRemoveEmailRecoverCodeByIdCommand } from '../../mails/application/use-cases/remove-emai-recCode-byId.use-case';
 import { DemonRemoveDataUsersWithExpiredDateCommand } from './use-case/demon-remove-data-users-with-expired-date.use-case';
@@ -72,10 +72,8 @@ export class DemonsService {
     await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
   }
 
-  // // every 4 hours
-  // @Cron('0 */4 * * *')
-  // every 3 min
-  @Cron('*/3 * * * *')
+  // // every 3 hours
+  @Cron('0 */3 * * *')
   async clearingUserWithExpirationDate() {
     await this.commandBus.execute(
       new DemonRemoveDataUsersWithExpiredDateCommand(),

@@ -55,6 +55,7 @@ export class SaController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
+
     return this.usersService.saFindUsers(queryData);
   }
 
@@ -67,6 +68,7 @@ export class SaController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.bloggerBlogsService.saFindBlogs(queryData);
   }
 
@@ -88,10 +90,12 @@ export class SaController {
     const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
+
     newUser.roles = RolesEnums.SA;
     const saUser: TablesUsersEntityWithId = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
+
     return {
       id: saUser.id,
       login: saUser.login,
@@ -109,7 +113,8 @@ export class SaController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   async removeUserById(@Request() req: any, @Param() params: IdParams) {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new SaRemoveUserByUserIdCommand(params.id, currentUserDto),
     );
@@ -122,7 +127,8 @@ export class SaController {
     @Request() req: any,
     @Param() params: IdUserIdParams,
   ): Promise<boolean> {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new SaBindBlogWithUserCommand(params, currentUserDto),
     );
