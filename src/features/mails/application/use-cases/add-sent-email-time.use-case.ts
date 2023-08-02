@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sentEmailEmailsConfirmationCodeTime.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
 
 export class AddSentEmailTimeCommand {
   constructor(public codeId: string, public email: string) {}

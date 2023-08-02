@@ -1,24 +1,16 @@
 import { Module } from '@nestjs/common';
-import { bloggerBlogsProviders } from './infrastructure/blogger-blogs.providers';
 import { BloggerBlogsController } from './api/blogger-blogs.controller';
 import { BloggerBlogsService } from './application/blogger-blogs.service';
 import { PostsService } from '../posts/application/posts.service';
-import { Pagination } from '../common/pagination/pagination';
-import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
-import { LikeStatusPostsRepository } from '../posts/infrastructure/like-status-posts.repository';
-import { ConvertFiltersForDB } from '../common/convert-filters/convertFiltersForDB';
-import { BloggerBlogsRepository } from './infrastructure/blogger-blogs.repository';
 import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger-blog.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
 import { FindCommentsCurrentUserUseCase } from './application/use-cases/find-comments-current-user.use-case';
 import { BanUserForBlogUseCase } from './application/use-cases/ban-user-for-blog.use-case';
-import { UsersRepository } from '../users/infrastructure/users.repository';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/add-banned-user-to-ban-list.use-case';
 import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/change-ban-status-owner-blog.use-case';
-import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
@@ -27,10 +19,9 @@ import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-all-banned-users-for-blog.use.case';
-import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banStatus-blogs-byBlogId.use-case';
-import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
+import { SaChangeBanstatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banstatus-blogs-by-blog-id.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
+import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -41,25 +32,18 @@ const bloggersBlogUseCases = [
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
   FindAllBannedUsersForBlogUseCase,
-  SaChangeBanStatusBlogsByBlogIdUseCase,
+  SaChangeBanstatusBlogsByBlogIdUseCase,
   ChangeBanStatusLikesPostForBannedUserUseCase,
 ];
 const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
-  imports: [MongoConnectionModule, CqrsModule],
+  imports: [CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
     BloggerBlogsService,
-    UsersRepository,
-    BloggerBlogsRepository,
     PostsService,
-    Pagination,
-    PostsRepository,
     CaslAbilityFactory,
-    LikeStatusPostsRepository,
-    ConvertFiltersForDB,
-    CommentsRepository,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
@@ -69,7 +53,6 @@ const bloggersBlogRules = [BlogExistsRule];
     BannedUsersForBlogsRawSqlRepository,
     ...bloggersBlogRules,
     ...bloggersBlogUseCases,
-    ...bloggerBlogsProviders,
   ],
 })
 export class BloggerBlogsModule {}

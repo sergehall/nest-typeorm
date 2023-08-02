@@ -1,8 +1,8 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { EmailsConfirmCodeEntity } from '../../demons/entities/emailsConfirmCode.entity';
-import { EmailsRecoveryCodesEntity } from '../../demons/entities/emailsRecoveryCodes.entity';
+import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity';
+import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 
 export class MailsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}

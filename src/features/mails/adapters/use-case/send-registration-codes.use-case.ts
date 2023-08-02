@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { EmailsConfirmCodeEntity } from '../../../demons/entities/emailsConfirmCode.entity';
 import { MailsAdapter } from '../mails.adapter';
+import { EmailsConfirmCodeEntity } from '../../entities/emails-confirm-code.entity';
 
 export class SendRegistrationCodesCommand {
   constructor(public emailAndCode: EmailsConfirmCodeEntity) {}

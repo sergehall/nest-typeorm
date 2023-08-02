@@ -3,8 +3,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
-import { TablesUsersEntityWithId } from '../../entities/userRawSqlWithId.entity';
-import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/errors-messages';
+import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
+import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/custom-errors-messages';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -19,7 +19,7 @@ export class UpdateSentConfirmationCodeUseCase
   ) {}
 
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
-    const user: TablesUsersEntityWithId | null =
+    const user: TablesUsersWithIdEntity | null =
       await this.usersRawSqlRepository.findUserByLoginOrEmail(command.email);
     const expirationDate = new Date(Date.now() + 65 * 60 * 1000).toISOString();
     if (

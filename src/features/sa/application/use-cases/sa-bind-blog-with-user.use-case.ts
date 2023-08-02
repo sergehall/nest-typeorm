@@ -1,5 +1,5 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { IdUserIdParams } from '../../../common/params/idUserId.params';
+import { IdUserIdParams } from '../../../common/query/params/idUserId.params';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
@@ -12,9 +12,9 @@ import {
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
+import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 
 export class SaBindBlogWithUserCommand {
   constructor(
@@ -48,7 +48,7 @@ export class SaBindBlogWithUserUseCase
   }
 
   private async executeBindUserAndBlogCommands(
-    userForBind: TablesUsersEntityWithId,
+    userForBind: TablesUsersWithIdEntity,
     blogForBan: TableBloggerBlogsRawSqlEntity,
   ): Promise<boolean> {
     try {
@@ -90,7 +90,7 @@ export class SaBindBlogWithUserUseCase
   }
 
   private async getUserForBind(userId: string) {
-    const userForBind: TablesUsersEntityWithId | null =
+    const userForBind: TablesUsersWithIdEntity | null =
       await this.usersRawSqlRepository.saFindUserByUserId(userId);
     if (!userForBind) {
       throw new NotFoundException('Not found user.');

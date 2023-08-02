@@ -21,23 +21,23 @@ import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/application/users.service';
 import { Action } from '../../../ability/roles/action.enum';
-import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { ParseQuery } from '../../common/query/parse-query';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user-byInstance.use-case';
-import { IdParams } from '../../common/params/id.params';
+import { IdParams } from '../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
-import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-byBlogId.use-case';
+import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-by-blog-id.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { IdUserIdParams } from '../../common/params/idUserId.params';
-import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-byUserId.use-case';
+import { IdUserIdParams } from '../../common/query/params/idUserId.params';
+import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-user.use-case';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -87,12 +87,12 @@ export class SaController {
       userAgent: userAgent,
     };
 
-    const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
+    const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 
     newUser.roles = RolesEnums.SA;
-    const saUser: TablesUsersEntityWithId = await this.commandBus.execute(
+    const saUser: TablesUsersWithIdEntity = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
 

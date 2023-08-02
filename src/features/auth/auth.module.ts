@@ -6,19 +6,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
-import { UsersRepository } from '../users/infrastructure/users.repository';
-import { authProviders } from './infrastructure/auth.providers';
 import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
-import { SecurityDevicesRepository } from '../security-devices/infrastructure/security-devices.repository';
-import { BlacklistJwtRepository } from './infrastructure/blacklist-jwt.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
-import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-byCode-inParam.use-case';
 import { UpdateSentConfirmationCodeUseCase } from '../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { AddRefreshTokenToBlackListUseCase } from './application/use-cases/add-refresh-token-to-blackList.use-case';
 import { ValidatePasswordUseCase } from './application/use-cases/validate-password.use-case';
 import { SignAccessJwtUseCase } from './application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtUseCase } from './application/use-cases/update-access-jwt.use-case';
@@ -29,19 +23,20 @@ import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jw
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
-import { PasswordRecoveryUseCase } from './application/use-cases/passwordRecovery.use-case';
-import { NewPasswordRecoveryUseCase } from './application/use-cases/newPasswordRecovery.use-case';
-import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
+import { PasswordRecoveryViaEmailConfirmationUseCase } from './application/use-cases/password-recovery-via-email-confirmation.use-case';
+import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
+import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
+import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 
 const authUseCases = [
   CreateUserByInstanceUseCase,
+  AddRefreshTokenToBlacklistUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,
-  AddRefreshTokenToBlackListUseCase,
   ValidatePasswordUseCase,
   SignAccessJwtUseCase,
   UpdateAccessJwtUseCase,
@@ -49,18 +44,12 @@ const authUseCases = [
   UpdateRefreshJwtUseCase,
   ValidAccessJwtUseCase,
   ValidRefreshJwtUseCase,
-  PasswordRecoveryUseCase,
-  NewPasswordRecoveryUseCase,
+  PasswordRecoveryViaEmailConfirmationUseCase,
+  ChangePasswordByRecoveryCodeUseCase,
 ];
 
 @Module({
-  imports: [
-    MongoConnectionModule,
-    UsersModule,
-    PassportModule,
-    JwtModule,
-    CqrsModule,
-  ],
+  imports: [UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
     LocalStrategy,
@@ -69,17 +58,13 @@ const authUseCases = [
     MailsRawSqlRepository,
     AuthService,
     EncryptConfig,
-    UsersRepository,
     DecodeTokenService,
-    BlacklistJwtRepository,
-    SecurityDevicesRepository,
     UsersRawSqlRepository,
     SecurityDevicesService,
     ExpirationDateCalculator,
     BlacklistJwtRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     ...authUseCases,
-    ...authProviders,
   ],
   exports: [AuthService],
 })

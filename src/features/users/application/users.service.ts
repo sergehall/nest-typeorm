@@ -1,19 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
-import { Pagination } from '../../common/pagination/pagination';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
-import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { ReturnUsersBanInfoEntity } from '../../sa/entities/return-users-banInfo.entity';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    protected convertFiltersForDB: ConvertFiltersForDB,
-    protected pagination: Pagination,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
-  ) {}
+  constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
 
   async saFindUsers(queryData: ParseQueryType): Promise<PaginationTypes> {
     const arrUsers = await this.usersRawSqlRepository.saFindUsers(queryData);
@@ -55,14 +49,14 @@ export class UsersService {
 
   async findUserByUserId(
     userId: string,
-  ): Promise<TablesUsersEntityWithId | null> {
+  ): Promise<TablesUsersWithIdEntity | null> {
     return await this.usersRawSqlRepository.findUserByUserId(userId);
   }
 
   private async transformedArrUsersForSa(
-    usersArr: TablesUsersEntityWithId[],
+    usersArr: TablesUsersWithIdEntity[],
   ): Promise<ReturnUsersBanInfoEntity[]> {
-    return usersArr.map((user: TablesUsersEntityWithId) => ({
+    return usersArr.map((user: TablesUsersWithIdEntity) => ({
       id: user.id,
       login: user.login,
       email: user.email,

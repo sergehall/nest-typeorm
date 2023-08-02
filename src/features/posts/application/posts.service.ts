@@ -5,27 +5,23 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Pagination } from '../../common/pagination/pagination';
 import {
   NewestLikes,
-  PostsReturnEntity,
+  ReturnPostsEntity,
 } from '../entities/posts-without-ownerInfo.entity';
-import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
-import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
 import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
-import { BlogIdParams } from '../../common/params/blogId.params';
-import { userNotHavePermission } from '../../../exception-filter/errors-messages';
+import { BlogIdParams } from '../../common/query/params/blogId.params';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { TablesPostsEntity } from '../entities/tables-posts-entity';
+import { userNotHavePermission } from '../../../exception-filter/custom-errors-messages';
 
 @Injectable()
 export class PostsService {
   constructor(
-    protected convertFiltersForDB: ConvertFiltersForDB,
-    protected pagination: Pagination,
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
   ) {}
@@ -33,7 +29,7 @@ export class PostsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const posts: PostsRawSqlEntity[] =
+    const posts: TablesPostsEntity[] =
       await this.postsRawSqlRepository.openFindPosts(queryData);
     const filledPosts = await this.preparationPostsForReturn(
       posts,
@@ -58,7 +54,7 @@ export class PostsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const posts: PostsRawSqlEntity[] | null =
+    const posts: TablesPostsEntity[] | null =
       await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
     if (!posts || posts.length === 0) {
       return {
@@ -91,7 +87,7 @@ export class PostsService {
     queryData: ParseQueryType,
     currentUserDto: CurrentUserDto,
   ): Promise<PaginationTypes> {
-    const posts: PostsRawSqlEntity[] | null =
+    const posts: TablesPostsEntity[] | null =
       await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
     if (!posts || posts.length === 0) {
       throw new NotFoundException('BlogId not found');
@@ -120,7 +116,7 @@ export class PostsService {
   async openFindPostByPostId(
     id: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsReturnEntity | null> {
+  ): Promise<ReturnPostsEntity | null> {
     const post = await this.postsRawSqlRepository.findPostByPostId(id);
     if (!post) throw new NotFoundException('Not Found posts.');
     const filledPost = await this.preparationPostsForReturn(
@@ -131,15 +127,15 @@ export class PostsService {
   }
 
   async preparationPostsForReturn(
-    postArray: PostsRawSqlEntity[],
+    postArray: TablesPostsEntity[],
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsReturnEntity[]> {
+  ): Promise<ReturnPostsEntity[]> {
     try {
-      const filledPosts: PostsReturnEntity[] = [];
+      const filledPosts: ReturnPostsEntity[] = [];
       for (const i in postArray) {
         const postId = postArray[i].id;
         const isBanned = false;
-        const currentPost: PostsRawSqlEntity = postArray[i];
+        const currentPost: TablesPostsEntity = postArray[i];
         if (postArray[i].dependencyIsBanned) {
           continue;
         }

@@ -16,11 +16,10 @@ import {
 import { UsersService } from '../application/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { ParseQuery } from '../../common/parse-query/parse-query';
+import { ParseQuery } from '../../common/query/parse-query';
 import { Action } from '../../../ability/roles/action.enum';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
-import { User } from '../infrastructure/schemas/user.schema';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -29,7 +28,7 @@ import { RegDataDto } from '../dto/reg-data.dto';
 import { CreateUserCommand } from '../application/use-cases/create-user-byInstance.use-case';
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
-import { IdParams } from '../../common/params/id.params';
+import { IdParams } from '../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/currentUser.dto';
 
 @SkipThrottle()
@@ -43,7 +42,7 @@ export class UsersController {
   @Get()
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
 
@@ -52,7 +51,7 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUserByUserId(@Param() params: IdParams) {
     return this.usersService.findUserByUserId(params.id);
   }
@@ -60,7 +59,7 @@ export class UsersController {
   @Post()
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.CREATE, subject: User })
+  @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async createUser(
     @Request() req: any,
     @Body() createUserDto: CreateUserDto,

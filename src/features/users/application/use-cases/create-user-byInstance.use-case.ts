@@ -2,14 +2,14 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { RegDataDto } from '../../dto/reg-data.dto';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
-import { TablesUsersEntityWithId } from '../../entities/userRawSqlWithId.entity';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
-import { TablesUsersEntity } from '../../entities/tablesUsers.entity';
 import { OrgIdEnums } from '../../enums/org-id.enums';
 import { RolesEnums } from '../../../../ability/enums/roles.enums';
 import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import * as uuid4 from 'uuid4';
+import { TablesUsersEntity } from '../../entities/tables-users.entity';
+import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 
 export class CreateUserCommand {
   constructor(
@@ -26,7 +26,7 @@ export class CreateUserByInstanceUseCase
     private readonly expirationDateCalculator: ExpirationDateCalculator,
     private readonly encryptConfig: EncryptConfig,
   ) {}
-  async execute(command: CreateUserCommand): Promise<TablesUsersEntityWithId> {
+  async execute(command: CreateUserCommand): Promise<TablesUsersWithIdEntity> {
     const { login, email, password } = command.createUserDto;
     const { ip, userAgent } = command.registrationData;
 

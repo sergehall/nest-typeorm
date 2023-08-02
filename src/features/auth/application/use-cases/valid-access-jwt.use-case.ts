@@ -15,7 +15,7 @@ export class ValidAccessJwtUseCase
   async execute(command: ValidAccessJwtCommand): Promise<PayloadDto | null> {
     const { accessToken } = command;
 
-    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
 
     return await this.jwtService
       .verify(accessToken, { secret: ACCESS_SECRET_KEY })

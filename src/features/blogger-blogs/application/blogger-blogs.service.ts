@@ -1,16 +1,7 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PaginationDto } from '../../common/pagination/dto/pagination.dto';
-import { QueryArrType } from '../../common/convert-filters/types/convert-filter.types';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
-import { ConvertFiltersForDB } from '../../common/convert-filters/convertFiltersForDB';
-import { Pagination } from '../../common/pagination/pagination';
-import { BloggerBlogsRepository } from '../infrastructure/blogger-blogs.repository';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
@@ -18,9 +9,6 @@ import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entit
 @Injectable()
 export class BloggerBlogsService {
   constructor(
-    protected convertFiltersForDB: ConvertFiltersForDB,
-    protected pagination: Pagination,
-    protected bloggerBlogsRepository: BloggerBlogsRepository,
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
@@ -122,51 +110,5 @@ export class BloggerBlogsService {
       totalCount: totalCount,
       items: blogs,
     };
-  }
-
-  async findBannedUsers(
-    blogId: string,
-    queryPagination: PaginationDto,
-    searchFilters: QueryArrType,
-    currentUser: CurrentUserDto,
-  ): Promise<PaginationTypes> {
-    const blog = await this.bloggerBlogsRepository.findBlogById(blogId);
-    if (!blog) throw new NotFoundException();
-    if (blog.blogOwnerInfo.userId !== currentUser.id)
-      throw new ForbiddenException();
-    const field = queryPagination.sortBy;
-    const convertedFilters = await this.convertFiltersForDB.convert(
-      searchFilters,
-    );
-    const pagination = await this.pagination.convert(queryPagination, field);
-    const bannedUsers = await this.bloggerBlogsRepository.findBannedUsers(
-      pagination,
-      convertedFilters,
-    );
-    const totalCount =
-      await this.bloggerBlogsRepository.countBannedUsersDocuments(
-        convertedFilters,
-      );
-    const pagesCount = Math.ceil(totalCount / queryPagination.pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: queryPagination.pageNumber,
-      pageSize: queryPagination.pageSize,
-      totalCount: totalCount,
-      items: bannedUsers,
-    };
-  }
-  async changeBanStatusOwnerBlog(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    return await this.bloggerBlogsRepository.changeBanStatusOwnerBlog(
-      userId,
-      isBanned,
-    );
-  }
-  async removeBlogById(blogId: string): Promise<boolean> {
-    return await this.bloggerBlogsRawSqlRepository.removeBlogById(blogId);
   }
 }

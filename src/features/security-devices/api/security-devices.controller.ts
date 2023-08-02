@@ -12,10 +12,10 @@ import { SecurityDevicesService } from '../application/security-devices.service'
 import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import { RemoveDevicesExceptCurrentCommand } from '../application/use-cases/remove-devices-exceptCurrent.use-case';
+import { RemoveDevicesExceptCurrentCommand } from '../application/use-cases/remove-devices-except-current.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-byDeviceId.use-case';
-import { DeviceIdParams } from '../../common/params/deviceId.params';
+import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-by-deviceId.use-case';
+import { DeviceIdParams } from '../../common/query/params/deviceId.params';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 

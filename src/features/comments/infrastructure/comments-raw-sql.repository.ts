@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class CommentsRawSqlRepository {

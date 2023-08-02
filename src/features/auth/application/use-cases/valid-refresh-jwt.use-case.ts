@@ -15,7 +15,7 @@ export class ValidRefreshJwtUseCase
   async execute(command: ValidRefreshJwtCommand): Promise<PayloadDto | null> {
     const { refreshToken } = command;
 
-    const REFRESH_SECRET_KEY = await this.jwtConfig.getRefSecretKey();
+    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
 
     return await this.jwtService
       .verify(refreshToken, { secret: REFRESH_SECRET_KEY })

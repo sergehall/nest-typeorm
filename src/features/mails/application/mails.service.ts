@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailsRawSqlRepository } from '../infrastructure/mails-raw-sql.repository';
-import { EmailsConfirmCodeEntity } from '../../demons/entities/emailsConfirmCode.entity';
-import { EmailsRecoveryCodesEntity } from '../../demons/entities/emailsRecoveryCodes.entity';
+import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity';
+import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 
 @Injectable()
 export class MailsService {

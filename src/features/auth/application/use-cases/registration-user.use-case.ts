@@ -4,8 +4,8 @@ import * as uuid4 from 'uuid4';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
-import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
-import { EmailsConfirmCodeEntity } from '../../../demons/entities/emailsConfirmCode.entity';
+import { EmailsConfirmCodeEntity } from '../../../mails/entities/emails-confirm-code.entity';
+import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 
 export class RegistrationUserCommand {
   constructor(
@@ -13,6 +13,7 @@ export class RegistrationUserCommand {
     public registrationData: RegDataDto,
   ) {}
 }
+
 @CommandHandler(RegistrationUserCommand)
 export class RegistrationUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
@@ -23,10 +24,11 @@ export class RegistrationUserUseCase
   ) {}
   async execute(
     command: RegistrationUserCommand,
-  ): Promise<TablesUsersEntityWithId> {
-    const newUser: TablesUsersEntityWithId = await this.commandBus.execute(
+  ): Promise<TablesUsersWithIdEntity> {
+    const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
       new CreateUserCommand(command.createUserDto, command.registrationData),
     );
+
     const newConfirmationCode: EmailsConfirmCodeEntity = {
       codeId: uuid4().toString(),
       email: newUser.email,
@@ -34,6 +36,7 @@ export class RegistrationUserUseCase
       expirationDate: newUser.expirationDate,
       createdAt: new Date().toISOString(),
     };
+
     await this.mailsRawSqlRepository.createEmailConfirmCode(
       newConfirmationCode,
     );

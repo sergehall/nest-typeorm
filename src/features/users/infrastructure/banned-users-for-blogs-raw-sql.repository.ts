@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../common/query/parse-query';
 
 export class BannedUsersForBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}

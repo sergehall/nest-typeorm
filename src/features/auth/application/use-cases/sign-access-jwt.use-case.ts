@@ -16,19 +16,21 @@ export class SignAccessJwtUseCase
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: SignAccessJwtUseCommand): Promise<AccessTokenDto> {
-    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = await this.jwtConfig.getExpAccTime();
+    const { currentUserDto } = command;
 
-    const payload = {
-      userId: command.currentUserDto.id,
-      email: command.currentUserDto.email,
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+
+    const payloadData = {
+      userId: currentUserDto.id,
+      email: currentUserDto.email,
       deviceId: uuid4().toString(),
     };
 
     if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
       throw new InternalServerErrorException();
     return {
-      accessToken: this.jwtService.sign(payload, {
+      accessToken: this.jwtService.sign(payloadData, {
         secret: ACCESS_SECRET_KEY,
         expiresIn: EXP_ACC_TIME,
       }),

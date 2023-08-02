@@ -6,29 +6,21 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-
+import { userSuperAdmin } from '../../sa/dto/super-admin.dto';
+import { BaseConfig } from '../../../config/base/base-config';
 import {
   loginOrPassInvalid,
-  moAnyAuthHeaders,
-} from '../../../exception-filter/errors-messages';
-import { OrgIdEnums } from '../../users/enums/org-id.enums';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../../../config/configuration';
-import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+  noAuthHeadersError,
+} from '../../../exception-filter/custom-errors-messages';
 
 @Injectable()
-export class BaseAuthGuard implements CanActivate {
-  constructor(private configService: ConfigService<ConfigType, true>) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+export class BaseAuthGuard extends BaseConfig implements CanActivate {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const exceptedAuthInput =
-      'Basic ' + this.configService.get('basicAuth').BASIC_AUTH;
+    const basicAuth = await this.getValueBasicAuth('BASIC_AUTH');
+    const exceptedAuthInput = 'Basic ' + basicAuth;
     if (!request.headers || !request.headers.authorization) {
-      throw new UnauthorizedException([moAnyAuthHeaders]);
+      throw new UnauthorizedException([noAuthHeadersError]);
     } else {
       if (request.headers.authorization != exceptedAuthInput) {
         throw new HttpException(
@@ -38,15 +30,7 @@ export class BaseAuthGuard implements CanActivate {
           HttpStatus.UNAUTHORIZED,
         );
       }
-      const saUser: CurrentUserDto = new CurrentUserDto();
-      saUser.id = 'id.SA';
-      saUser.login = 'login.SA';
-      saUser.email = 'SA@email.com';
-      saUser.orgId = OrgIdEnums.IT_INCUBATOR;
-      saUser.roles = RolesEnums.SA;
-      saUser.isBanned = false;
-      saUser.payloadExp = 'infinity.SA';
-      request.user = { ...saUser };
+      request.user = userSuperAdmin;
       return true;
     }
   }
