@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { MailerConfig } from '../../../config/mailer/mailer-config';
-import { DomainNamesEnums } from '../enums/domain-names.enums';
+import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 
 @Injectable()
 export class MailsAdapter {
-  constructor(protected mailerConfig: MailerConfig) {}
+  constructor(
+    protected mailerConfig: MailerConfig,
+    protected postgresConfig: PostgresConfig,
+  ) {}
 
   async createSendMailOptionsForRecoveryCode(
     email: string,
     recoveryCode: string,
   ) {
-    const domainName = DomainNamesEnums.DOMAIN_HEROKU_POSTGRES;
+    const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const fromEmail = await this.mailerConfig.getNodeMailerValue(
       'NODEMAILER_EMAIL',
     );
@@ -43,15 +46,14 @@ export class MailsAdapter {
     email: string,
     confirmationCode: string,
   ) {
-    const EMAIL_FROM = await this.mailerConfig.getNodeMailerValue(
+    const nodemailerEmail = await this.mailerConfig.getNodeMailerValue(
       'NODEMAILER_EMAIL',
     );
-
-    const domainName = DomainNamesEnums.DOMAIN_HEROKU_POSTGRES;
+    const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + confirmationCode;
     const fullURL = domainName + path + parameter;
-    const fromEmail = EMAIL_FROM;
+    const fromEmail = nodemailerEmail;
     const subject = 'Registration by confirmation code';
     const template = 'index';
     const text = 'Welcome';

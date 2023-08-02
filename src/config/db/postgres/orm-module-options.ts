@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PostgresConfig } from './postgres.config';
 
 @Injectable()
-export class OrmOptions
+export class OrmModuleOptions
   extends PostgresConfig
   implements TypeOrmOptionsFactory
 {
