@@ -6,13 +6,11 @@ import {
   Request,
   HttpCode,
   Body,
-  HttpException,
   Ip,
   HttpStatus,
   Res,
   Query,
 } from '@nestjs/common';
-import { userAlreadyExists } from '../../../exception-filter/errors-messages';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -92,19 +90,15 @@ export class AuthController {
   ) {
     const { login, email } = loginDto;
 
-    const userExist = await this.commandBus.execute(
+    await this.commandBus.execute(
       new CheckingUserExistenceCommand(login, email),
     );
-    if (userExist) {
-      throw new HttpException(
-        { message: [userAlreadyExists] },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+
     const registrationData: RegDataDto = {
       ip: ip,
       userAgent: req.get('user-agent') || 'None',
     };
+
     const newUser = await this.commandBus.execute(
       new RegistrationUserCommand(loginDto, registrationData),
     );
@@ -133,7 +127,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const { refreshToken } = req.cookies;
+    const refreshToken = req.cookies;
 
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(refreshToken);
@@ -177,7 +171,7 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
-    const { refreshToken } = req.cookies;
+    const refreshToken = req.cookies;
 
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       refreshToken,
@@ -206,9 +200,8 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
-    return await this.commandBus.execute(
-      new PasswordRecoveryCommand(emailDto.email),
-    );
+    const { email } = emailDto;
+    return await this.commandBus.execute(new PasswordRecoveryCommand(email));
   }
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)

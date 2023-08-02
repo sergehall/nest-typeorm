@@ -134,6 +134,10 @@ class Configuration {
     return this.readEnvVariableWithDefault('PG_HEROKU_USER_PASSWORD', 'local');
   }
 
+  private static getPgHerokuDomain(): string {
+    return this.readEnvVariableWithDefault('PG_DOMAIN_HEROKU', 'local');
+  }
+
   private static getThrottleTTL(): number {
     return Number(this.readEnvVariableWithDefault('THROTTLE_TTL', 10));
   }
@@ -172,6 +176,9 @@ class Configuration {
             PG_LOCAL_USER_PASSWORD: Configuration.getPgLocalUserPassword(),
             PG_HEROKU_USER_NAME: Configuration.getPgHerokuUserName(),
             PG_HEROKU_USER_PASSWORD: Configuration.getPgHerokuUserPassword(),
+          },
+          domain: {
+            PG_DOMAIN_HEROKU: Configuration.getPgHerokuDomain(),
           },
         },
         mongo: {

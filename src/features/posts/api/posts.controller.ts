@@ -57,6 +57,7 @@ export class PostsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return this.postsService.openFindPosts(queryData, currentUserDto);
   }
 
@@ -66,6 +67,7 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindPostByPostId(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto | null = req.user;
+
     return await this.postsService.openFindPostByPostId(
       params.id,
       currentUserDto,
@@ -82,6 +84,7 @@ export class PostsController {
   ) {
     const currentUserDto: CurrentUserDto = req.user;
     const { blogId, ...createPostDto } = createPostWithBlogIdDto;
+
     return await this.commandBus.execute(
       new CreatePostCommand(blogId, createPostDto, currentUserDto),
     );
@@ -95,6 +98,7 @@ export class PostsController {
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
     );
@@ -110,6 +114,7 @@ export class PostsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.commentsService.findCommentsByPostId(
       params.postId,
       queryData,
@@ -131,6 +136,7 @@ export class PostsController {
       postId: params.id,
       blogId: blogId,
     };
+
     return await this.commandBus.execute(
       new UpdatePostByPostIdCommand(idBlogId, updatePostDto, currentUserDto),
     );
@@ -141,6 +147,7 @@ export class PostsController {
   @Delete(':id')
   async removePost(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new RemovePostByIdOldCommand(params.id, currentUserDto),
     );
@@ -155,6 +162,7 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new ChangeLikeStatusPostCommand(
         params.postId,

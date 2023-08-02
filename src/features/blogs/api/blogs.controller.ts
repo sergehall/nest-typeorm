@@ -28,6 +28,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.blogsService.openFindBlogs(queryData);
   }
 
@@ -49,6 +50,7 @@ export class BlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.blogsService.openFindPostsByBlogId(
       params,
       queryData,

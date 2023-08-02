@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Ip,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -31,6 +30,7 @@ import { CreateUserCommand } from '../application/use-cases/create-user-byInstan
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../common/params/id.params';
+import { CurrentUserDto } from '../dto/currentUser.dto';
 
 @SkipThrottle()
 @Controller('users')
@@ -46,6 +46,7 @@ export class UsersController {
   @CheckAbilities({ action: Action.READ, subject: User })
   async findUsers(@Query() query: any) {
     const queryData = ParseQuery.getPaginationData(query);
+
     return this.usersService.findUsers(queryData);
   }
 
@@ -69,9 +70,11 @@ export class UsersController {
       ip: ip,
       userAgent: req.get('user-agent') || 'None',
     };
+
     const newUser = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
+
     return {
       id: newUser.id,
       login: newUser.login,
@@ -87,20 +90,21 @@ export class UsersController {
     @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const currentUser = req.user;
-    const result = await this.commandBus.execute(
-      new UpdateUserCommand(params.id, updateUserDto, currentUser),
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new UpdateUserCommand(params.id, updateUserDto, currentUserDto),
     );
-    if (!result) throw new NotFoundException();
-    return result;
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
   async removeUserById(@Request() req: any, @Param() params: IdParams) {
-    const currentUser = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
-      new RemoveUserByIdCommand(params.id, currentUser),
+      new RemoveUserByIdCommand(params.id, currentUserDto),
     );
   }
 }

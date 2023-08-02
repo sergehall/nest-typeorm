@@ -42,6 +42,7 @@ export class CommentsController {
   @CheckAbilities({ action: Action.CREATE, subject: User })
   async findCommentById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return this.commentsService.findCommentById(params.id, currentUserDto);
   }
 
@@ -54,6 +55,7 @@ export class CommentsController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new UpdateCommentCommand(
         params.commentId,
@@ -68,6 +70,7 @@ export class CommentsController {
   @Delete(':commentId')
   async removeComment(@Request() req: any, @Param() params: CommentIdParams) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new RemoveCommentCommand(params.commentId, currentUserDto),
     );
@@ -82,6 +85,7 @@ export class CommentsController {
     @Body() likeStatusDto: LikeStatusDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new ChangeLikeStatusCommentCommand(
         params.commentId,

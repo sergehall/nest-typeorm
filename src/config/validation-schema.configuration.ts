@@ -62,6 +62,13 @@ export const validationSchemaConfiguration = Joi.object({
   PG_HEROKU_NAME_DATABASE: Joi.string()
     .pattern(new RegExp('^[-a-zA-Z0-9]{14}$'))
     .required(),
+  PG_DOMAIN_HEROKU: Joi.string()
+    .pattern(
+      new RegExp(
+        '^https:\\/\\/([a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}(:[0-9]+)?(\\/.*)?$',
+      ),
+    )
+    .required(),
 }).options({
   abortEarly: false,
   messages: {

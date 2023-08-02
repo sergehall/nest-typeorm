@@ -27,6 +27,7 @@ import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/bl
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { DemonRemoveDataUsersWithExpiredDateUseCase } from './application/use-case/demon-remove-data-users-with-expired-date.use-case';
 import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
+import { MailerConfig } from '../../config/mailer/mailer-config';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
@@ -40,6 +41,7 @@ const demonsUseCases = [
   controllers: [DemonsController],
   providers: [
     MailsAdapter,
+    MailerConfig,
     DemonsService,
     MailsRawSqlRepository,
     UsersService,

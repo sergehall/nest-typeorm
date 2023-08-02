@@ -13,10 +13,12 @@ export class AddSentEmailTimeUseCase
     protected sentEmailsTimeConfirmAndRecoverCodesRepository: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
   async execute(command: AddSentEmailTimeCommand) {
+    const { codeId, email } = command;
     const currentTime = new Date().toISOString();
+
     return await this.sentEmailsTimeConfirmAndRecoverCodesRepository.addConfirmationCode(
-      command.codeId,
-      command.email,
+      codeId,
+      email,
       currentTime,
     );
   }

@@ -17,12 +17,12 @@ export class MongoConnectionService extends BaseConfig {
   }
 
   private async getAtlasConnection(): Promise<Connection> {
-    const dbConfig = await this.getValueDatabase();
+    const mongoDbConfig = await this.getValueMongoDatabase();
     const ENV = await this.getValueENV();
-    const uri = dbConfig.mongo.url.ATLAS_URI;
-    let dbName = dbConfig.mongo.namesDatabase.DEV_DATABASE;
+    const uri = mongoDbConfig.url.ATLAS_URI;
+    let dbName = mongoDbConfig.namesDatabase.DEV_DATABASE;
     if (ENV === EnvNamesEnums.PRODUCTION) {
-      dbName = dbConfig.mongo.namesDatabase.PROD_NEST_DATABASE;
+      dbName = mongoDbConfig.namesDatabase.PROD_NEST_DATABASE;
     }
     if (uri && dbName) {
       const connection = await createConnection(uri, {
@@ -35,9 +35,9 @@ export class MongoConnectionService extends BaseConfig {
   }
 
   private async getLocalConnection(): Promise<Connection> {
-    const dbConfig = await this.getValueDatabase();
-    const uri = dbConfig.mongo.url.MONGO_URI_LOCAL;
-    const dbName = dbConfig.mongo.namesDatabase.TEST_DATABASE;
+    const mongoDbConfig = await this.getValueMongoDatabase();
+    const uri = mongoDbConfig.url.MONGO_URI_LOCAL;
+    const dbName = mongoDbConfig.namesDatabase.TEST_DATABASE;
     if (uri && dbName) {
       const connection = await createConnection(uri, {
         dbName: dbName,

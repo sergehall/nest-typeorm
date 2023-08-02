@@ -255,7 +255,8 @@ export class UsersRawSqlRepository {
       UPDATE public."Users"
       SET  "passwordHash" = $2
       WHERE "confirmationCode" = $1
-      RETURNING *`,
+      RETURNING *
+      `,
         [recoveryCode, newPasswordHash],
       );
       return updateUserPassword[0];
@@ -264,12 +265,9 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async userAlreadyExist(
-    login: string,
-    email: string,
-  ): Promise<TablesUsersEntity | null> {
+  async userAlreadyExist(login: string, email: string): Promise<boolean> {
     try {
-      const user = await this.db.query(
+      const user: TablesUsersEntityWithId[] = await this.db.query(
         `
         SELECT "userId", "login", "email", "passwordHash", "createdAt", "orgId",
          "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
@@ -279,7 +277,7 @@ export class UsersRawSqlRepository {
       `,
         [login.toLocaleLowerCase(), email.toLocaleLowerCase()],
       );
-      return user[0] ? user[0] : null;
+      return user.length !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

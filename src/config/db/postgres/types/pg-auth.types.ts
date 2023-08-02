@@ -1,0 +1,5 @@
+export type PgAuthTypes =
+  | 'PG_HEROKU_USER_NAME'
+  | 'PG_HEROKU_USER_PASSWORD'
+  | 'PG_LOCAL_USER_NAME'
+  | 'PG_LOCAL_USER_PASSWORD';

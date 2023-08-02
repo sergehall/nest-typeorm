@@ -55,6 +55,7 @@ export class BloggerBlogsController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto = req.user;
+
     const queryData = ParseQuery.getPaginationData(query);
     return await this.bBloggerService.findBlogsCurrentUser(
       currentUserDto,
@@ -67,6 +68,7 @@ export class BloggerBlogsController {
   async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.commandBus.execute(
       new FindCommentsCurrentUserCommand(queryData, currentUserDto),
     );
@@ -79,6 +81,7 @@ export class BloggerBlogsController {
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
   ) {
     const currentUserDto = req.user;
+
     return await this.commandBus.execute(
       new CreateBloggerBlogCommand(createBBlogsDto, currentUserDto),
     );
@@ -93,6 +96,7 @@ export class BloggerBlogsController {
     @Body() updateBlogDto: CreateBloggerBlogsDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new UpdateBlogByIdCommand(params.id, updateBlogDto, currentUserDto),
     );
@@ -108,6 +112,7 @@ export class BloggerBlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.postsService.findPostsByBlogId(
       params,
       queryData,
@@ -123,6 +128,7 @@ export class BloggerBlogsController {
     @Body() createPostDto: CreatePostDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new CreatePostCommand(params.blogId, createPostDto, currentUserDto),
     );
@@ -137,6 +143,7 @@ export class BloggerBlogsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData = ParseQuery.getPaginationData(query);
+
     return await this.commandBus.execute(
       new FindAllBannedUsersForBlogCommand(
         params.id,
@@ -155,6 +162,7 @@ export class BloggerBlogsController {
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new UpdatePostByPostIdCommand(params, updatePostDto, currentUserDto),
     );
@@ -169,6 +177,7 @@ export class BloggerBlogsController {
     @Body() updateBanUserDto: UpdateBanUserDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new BanUserForBlogCommand(params.id, updateBanUserDto, currentUserDto),
     );
@@ -181,7 +190,8 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
   ): Promise<boolean> {
-    const currentUserDto = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new RemovePostByPostIdCommand(params, currentUserDto),
     );
@@ -192,6 +202,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtAuthGuard)
   async removeBlogById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new RemoveBlogByIdCommand(params.id, currentUserDto),
     );
