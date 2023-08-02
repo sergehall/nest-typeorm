@@ -9,6 +9,7 @@ import { SendRecoveryCodesUseCase } from './adapters/use-case/send-recovery-code
 import { MongoConnectionModule } from '../../config/db/mongo/mongo-db.module';
 import { MailerConfig } from '../../config/mailer/mailer-config';
 import { MailerOptionsService } from '../../config/mailer/mailer-options-service';
+import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 
 const mailsAdapterUseCases = [
   SendRegistrationCodesUseCase,
@@ -24,6 +25,7 @@ const mailsAdapterUseCases = [
   ],
   providers: [
     MailerConfig,
+    PostgresConfig,
     MailsService,
     MailsAdapter,
     MailsRawSqlRepository,

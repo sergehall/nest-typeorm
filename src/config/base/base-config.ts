@@ -36,6 +36,11 @@ export class BaseConfig {
     });
   }
 
+  /**
+   * Retrieves the PostgreSQL database domain name based on the provided key.
+   * @param {PgDomainNameTypes} key - The key to retrieve the domain name.
+   * @returns {Promise<string>} The PostgreSQL database domain name.
+   */
   protected async getValuePgDomainName(
     key: PgDomainNameTypes,
   ): Promise<string> {
@@ -44,12 +49,24 @@ export class BaseConfig {
     })[key];
   }
 
+  /**
+   * Retrieves the PostgreSQL database host based on the provided key.
+   * @param {PgHostTypes} key - The key to retrieve the host.
+   * @returns {Promise<string>} The PostgreSQL database host.
+   */
   protected async getValuePgHost(key: PgHostTypes): Promise<string> {
     return this.configService.get(`db.pg.host`, {
       infer: true,
     })[key];
   }
 
+  /**
+   * Retrieves the PostgreSQL database port based on the provided key.
+   * It also validates that the retrieved value is a number.
+   * @param {PgPortTypes} key - The key to retrieve the port.
+   * @returns {Promise<number>} The PostgreSQL database port.
+   * @throws {InternalServerErrorException} If the value is not a valid number.
+   */
   protected async getValuePgPort(key: PgPortTypes): Promise<number> {
     const value = this.configService.get('db.pg.port', {
       infer: true,
@@ -58,12 +75,22 @@ export class BaseConfig {
     return value;
   }
 
+  /**
+   * Retrieves the PostgreSQL database name based on the provided key.
+   * @param {PgNamesDbTypes} key - The key to retrieve the database name.
+   * @returns {Promise<string>} The PostgreSQL database name.
+   */
   protected async getValuePgNameDb(key: PgNamesDbTypes): Promise<string> {
     return this.configService.get('db.pg.namesDatabase', {
       infer: true,
     })[key];
   }
 
+  /**
+   * Retrieves the PostgreSQL database authentication configuration based on the provided key.
+   * @param {PgAuthTypes} key - The key to retrieve the authentication configuration.
+   * @returns {Promise<string>} The PostgreSQL database authentication configuration.
+   */
   protected async getValuePgAuth(key: PgAuthTypes): Promise<string> {
     return this.configService.get('db.pg.authConfig', {
       infer: true,

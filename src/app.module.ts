@@ -20,15 +20,15 @@ import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { OrmOptions } from './config/db/postgres/orm.config';
 import { ThrottleConfig } from './config/throttle/throttle-config';
 import { MongoConnectionModule } from './config/db/mongo/mongo-db.module';
+import { OrmModuleOptions } from './config/db/postgres/orm-module-options';
 
 @Module({
   imports: [
     ConfigModule.forRoot(AppConfigModuleOptions),
     TypeOrmModule.forRootAsync({
-      useClass: OrmOptions, // Use the OrmOptions class as the factory
+      useClass: OrmModuleOptions, // Use the OrmOptions class as the factory
     }),
     ThrottlerModule.forRootAsync({
       useClass: ThrottleConfig, // Use the ThrottleConfig class as the factory
