@@ -7,20 +7,20 @@ import { CaslModule } from '../../ability/casl.module';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CreateUserByInstanceUseCase } from './application/use-cases/create-user-byInstance.use-case';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
-import { CheckingUserExistenceUseCase } from './application/use-cases/checking-user-existence.use-case';
+import { VerifyUserExistenceUseCase } from './application/use-cases/verify-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.validation';
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
 const usersUseCases = [
-  CreateUserByInstanceUseCase,
+  CreateUserUseCase,
   UpdateUserUseCase,
   RemoveUserByIdUseCase,
-  CheckingUserExistenceUseCase,
+  VerifyUserExistenceUseCase,
 ];
 const usersRules = [RecoveryCodeExistsRule];
 

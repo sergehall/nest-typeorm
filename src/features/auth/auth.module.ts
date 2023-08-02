@@ -11,7 +11,7 @@ import { JwtConfig } from '../../config/jwt/jwt-config';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
-import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
+import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UpdateSentConfirmationCodeUseCase } from '../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { ValidatePasswordUseCase } from './application/use-cases/validate-password.use-case';
 import { SignAccessJwtUseCase } from './application/use-cases/sign-access-jwt.use-case';
@@ -32,7 +32,7 @@ import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-r
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 
 const authUseCases = [
-  CreateUserByInstanceUseCase,
+  CreateUserUseCase,
   AddRefreshTokenToBlacklistUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,

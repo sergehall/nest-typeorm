@@ -18,7 +18,7 @@ export class CreateUserCommand {
   ) {}
 }
 @CommandHandler(CreateUserCommand)
-export class CreateUserByInstanceUseCase
+export class CreateUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
   constructor(
@@ -36,8 +36,8 @@ export class CreateUserByInstanceUseCase
     // Return the expirationDate in ISO format for user registration.
     const expirationDate = await this.expirationDateCalculator.createExpDate(
       0,
-      1,
       0,
+      20,
     );
 
     // Prepare the user object with the necessary properties

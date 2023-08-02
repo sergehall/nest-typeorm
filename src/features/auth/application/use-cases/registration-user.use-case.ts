@@ -3,7 +3,7 @@ import { RegDataDto } from '../../../users/dto/reg-data.dto';
 import * as uuid4 from 'uuid4';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateUserCommand } from '../../../users/application/use-cases/create-user-byInstance.use-case';
+import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { EmailsConfirmCodeEntity } from '../../../mails/entities/emails-confirm-code.entity';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 

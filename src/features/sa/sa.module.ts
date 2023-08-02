@@ -6,7 +6,7 @@ import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.
 import { SaController } from './api/sa.controller';
 import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CreateUserByInstanceUseCase } from '../users/application/use-cases/create-user-byInstance.use-case';
+import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
@@ -25,7 +25,7 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 
 const saUseCases = [
-  CreateUserByInstanceUseCase,
+  CreateUserUseCase,
   SaChangeRoleUseCase,
   SaBanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
