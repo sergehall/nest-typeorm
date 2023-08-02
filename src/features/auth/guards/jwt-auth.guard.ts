@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { jwtIncorrect } from '../../../exception-filter/errors-messages';
+import { jwtIncorrect } from '../../../exception-filter/custom-errors-messages';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

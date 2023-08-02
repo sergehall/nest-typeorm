@@ -8,15 +8,14 @@ import {
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { IdParams } from '../../common/params/id.params';
-import { ParseQuery } from '../../common/parse-query/parse-query';
+import { IdParams } from '../../common/query/params/id.params';
+import { ParseQuery } from '../../common/query/parse-query';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
-import { User } from '../../users/infrastructure/schemas/user.schema';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { BlogIdParams } from '../../common/params/blogId.params';
+import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 @SkipThrottle()
@@ -25,7 +24,7 @@ export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
 
   @Get()
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
     const queryData = ParseQuery.getPaginationData(query);
 
@@ -33,7 +32,7 @@ export class BlogsController {
   }
 
   @Get(':id')
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindBlogById(
     @Param() params: IdParams,
   ): Promise<ReturnBloggerBlogsEntity> {
@@ -42,7 +41,7 @@ export class BlogsController {
 
   @Get(':blogId/posts')
   @UseGuards(NoneStatusGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPostsByBlogId(
     @Request() req: any,
     @Param() params: BlogIdParams,

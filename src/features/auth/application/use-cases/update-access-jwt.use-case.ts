@@ -17,13 +17,15 @@ export class UpdateAccessJwtUseCase
     private readonly jwtConfig: JwtConfig,
   ) {}
   async execute(command: UpdateAccessJwtCommand): Promise<AccessTokenDto> {
+    const { currentPayload } = command;
+
     const payload = {
-      userId: command.currentPayload.userId,
-      deviceId: command.currentPayload.deviceId,
+      userId: currentPayload.userId,
+      deviceId: currentPayload.deviceId,
     };
 
-    const ACCESS_SECRET_KEY = await this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = await this.jwtConfig.getExpAccTime();
+    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 
     if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
       throw new InternalServerErrorException();

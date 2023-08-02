@@ -20,7 +20,6 @@ import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { MongoConnectionModule } from './config/db/mongo/mongo-db.module';
 import { OrmModuleOptions } from './config/db/postgres/orm-module-options';
 import { ThrottlerOptions } from './config/throttle/throttler-options';
 
@@ -33,7 +32,6 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     ThrottlerModule.forRootAsync({
       useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
     }),
-    MongoConnectionModule,
     ScheduleModule.forRoot(),
     CaslModule,
     UsersModule,

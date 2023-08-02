@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { userAlreadyExists } from '../../../../exception-filter/errors-messages';
+import { userAlreadyExists } from '../../../../exception-filter/custom-errors-messages';
 
 export class CheckingUserExistenceCommand {
   constructor(public login: string, public email: string) {}

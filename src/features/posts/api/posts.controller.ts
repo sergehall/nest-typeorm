@@ -14,12 +14,11 @@ import {
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { CommentsService } from '../../comments/application/comments.service';
-import { ParseQuery } from '../../common/parse-query/parse-query';
+import { ParseQuery } from '../../common/query/parse-query';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
-import { User } from '../../users/infrastructure/schemas/user.schema';
 import { LikeStatusDto } from '../dto/like-status.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -31,13 +30,13 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CreatePostCommand } from '../application/use-cases/create-post.use-case';
 import { RemovePostByIdOldCommand } from '../application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
-import { PostIdParams } from '../../common/params/postId.params';
-import { IdParams } from '../../common/params/id.params';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { PostIdParams } from '../../common/query/params/postId.params';
+import { IdParams } from '../../common/query/params/id.params';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-withBlogId.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
-import { BlogIdPostIdParams } from '../../common/params/blogId-postId.params';
+import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.params';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 
 @SkipThrottle()
 @Controller('posts')
@@ -50,7 +49,7 @@ export class PostsController {
   @Get()
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPosts(
     @Request() req: any,
     @Query() query: any,
@@ -64,7 +63,7 @@ export class PostsController {
   @Get(':id')
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPostByPostId(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto | null = req.user;
 
@@ -77,7 +76,7 @@ export class PostsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.CREATE, subject: User })
+  @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async createPost(
     @Request() req: any,
     @Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto,
@@ -106,7 +105,7 @@ export class PostsController {
   @Get(':postId/comments')
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
-  @CheckAbilities({ action: Action.READ, subject: User })
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findCommentsByPostId(
     @Request() req: any,
     @Param() params: PostIdParams,

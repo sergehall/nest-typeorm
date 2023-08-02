@@ -1,11 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ConvertFiltersForDB } from '../../../common/convert-filters/convertFiltersForDB';
-import { Pagination } from '../../../common/pagination/pagination';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { TablesCommentsRawSqlEntity } from '../../../comments/entities/tables-comments-raw-sql.entity';
 import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
-import { ParseQueryType } from '../../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../../common/query/parse-query';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -20,8 +18,6 @@ export class FindCommentsCurrentUserUseCase
 {
   constructor(
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
-    protected convertFiltersForDB: ConvertFiltersForDB,
-    protected pagination: Pagination,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: FindCommentsCurrentUserCommand) {

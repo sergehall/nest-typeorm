@@ -1,7 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 import { Action } from './roles/action.enum';
-import { User } from '../features/users/infrastructure/schemas/user.schema';
 import { Subject } from '@casl/ability';
+import { CurrentUserDto } from '../features/users/dto/currentUser.dto';
 
 export interface RequiredRule {
   action: Action;
@@ -15,7 +15,7 @@ export const CheckAbilities = (...requirements: RequiredRule[]) =>
 
 export class ReadUserAbility implements RequiredRule {
   action = Action.READ;
-  subject = User;
+  subject = CurrentUserDto;
 }
 
 // example in Controller under the decorator @Post, @Get, ...

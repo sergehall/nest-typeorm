@@ -4,15 +4,15 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { PostsRawSqlEntity } from '../entities/posts-raw-sql.entity';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
-import { BlogIdParams } from '../../common/params/blogId.params';
+import { ParseQueryType } from '../../common/query/parse-query';
+import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { TablesPostsEntity } from '../entities/tables-posts-entity';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async openFindPosts(queryData: ParseQueryType): Promise<PostsRawSqlEntity[]> {
+  async openFindPosts(queryData: ParseQueryType): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     try {
@@ -44,7 +44,7 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async findPostByPostId(postId: string): Promise<PostsRawSqlEntity | null> {
+  async findPostByPostId(postId: string): Promise<TablesPostsEntity | null> {
     try {
       const dependencyIsBanned = false;
       const banInfoIsBanned = false;
@@ -71,7 +71,7 @@ export class PostsRawSqlRepository {
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueryType,
-  ): Promise<PostsRawSqlEntity[] | null> {
+  ): Promise<TablesPostsEntity[] | null> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     try {
@@ -108,8 +108,8 @@ export class PostsRawSqlRepository {
   }
 
   async createPost(
-    postsRawSqlEntity: PostsRawSqlEntity,
-  ): Promise<PostsRawSqlEntity> {
+    postsRawSqlEntity: TablesPostsEntity,
+  ): Promise<TablesPostsEntity> {
     try {
       const insertNewPost = await this.db.query(
         `

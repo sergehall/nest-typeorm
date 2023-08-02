@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { EmailsRecoveryCodesEntity } from '../../../demons/entities/emailsRecoveryCodes.entity';
 import { MailsAdapter } from '../mails.adapter';
+import { EmailsRecoveryCodesEntity } from '../../entities/emails-recovery-codes.entity';
 
 export class SendRecoveryCodesCommand {
   constructor(public emailAndCode: EmailsRecoveryCodesEntity) {}

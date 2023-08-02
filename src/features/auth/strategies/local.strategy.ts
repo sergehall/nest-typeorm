@@ -1,15 +1,15 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import {
-  errorMessageType,
-  loginOrEmailInvalid,
-  passwordInvalid,
-  validatePasswordFailed,
-} from '../../../exception-filter/errors-messages';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
-import { TablesUsersEntity } from '../../users/entities/tablesUsers.entity';
+import { TablesUsersEntity } from '../../users/entities/tables-users.entity';
+import {
+  invalidLoginOrEmailLengthError,
+  passwordInvalid,
+  validatePasswordFailed,
+} from '../../../exception-filter/custom-errors-messages';
+import { CustomErrorsMessagesType } from '../../../exception-filter/types/custom-errors-messages.types';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -23,13 +23,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<TablesUsersEntity | null> {
-    const messages: errorMessageType[] = [];
+    const messages: CustomErrorsMessagesType[] = [];
 
     this.validateLength(
       loginOrEmail.toString(),
       3,
       20,
-      loginOrEmailInvalid,
+      invalidLoginOrEmailLengthError,
       messages,
     );
     this.validateLength(password.toString(), 6, 20, passwordInvalid, messages);
@@ -59,8 +59,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     value: string,
     min: number,
     max: number,
-    errorMessage: errorMessageType,
-    messages: errorMessageType[],
+    errorMessage: CustomErrorsMessagesType,
+    messages: CustomErrorsMessagesType[],
   ): void {
     if (value.length < min || value.length > max) {
       messages.push(errorMessage);

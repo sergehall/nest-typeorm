@@ -13,7 +13,6 @@ import {
 import { CommentsService } from '../application/comments.service';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { LikeStatusDto } from '../dto/like-status.dto';
-import { User } from '../../users/infrastructure/schemas/user.schema';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
@@ -24,8 +23,8 @@ import { ChangeLikeStatusCommentCommand } from '../application/use-cases/change-
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
 import { RemoveCommentCommand } from '../application/use-cases/remove-comment.use-case';
-import { IdParams } from '../../common/params/id.params';
-import { CommentIdParams } from '../../common/params/commentId.params';
+import { IdParams } from '../../common/query/params/id.params';
+import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @SkipThrottle()
@@ -39,7 +38,7 @@ export class CommentsController {
   @Get(':id')
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.CREATE, subject: User })
+  @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async findCommentById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
 

@@ -5,10 +5,10 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { jwtCookiesIncorrect } from '../../../exception-filter/errors-messages';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidRefreshJwtCommand } from '../application/use-cases/valid-refresh-jwt.use-case';
 import { BlacklistJwtRawSqlRepository } from '../infrastructure/blacklist-jwt-raw-sql.repository';
+import { jwtCookiesIncorrect } from '../../../exception-filter/custom-errors-messages';
 
 @Injectable()
 export class CookiesJwtVerificationGuard implements CanActivate {

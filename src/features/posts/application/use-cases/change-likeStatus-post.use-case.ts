@@ -1,12 +1,12 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { LikeStatusPostEntity } from '../../entities/like-status-post.entity';
+import { TablesLikeStatusPostEntity } from '../../entities/tables-like-status-post.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 
 export class ChangeLikeStatusPostCommand {
   constructor(
@@ -26,7 +26,7 @@ export class ChangeLikeStatusPostUseCase
     protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: ChangeLikeStatusPostCommand) {
-    const post: PostsRawSqlEntity | null =
+    const post: TablesPostsEntity | null =
       await this.postsRawSqlRepository.findPostByPostId(command.postId);
     if (!post) throw new NotFoundException('Not found post.');
 
@@ -39,7 +39,7 @@ export class ChangeLikeStatusPostUseCase
       throw new ForbiddenException('You are not allowed to like this post.');
     }
 
-    const likeStatusPostEntity: LikeStatusPostEntity = {
+    const likeStatusPostEntity: TablesLikeStatusPostEntity = {
       blogId: post.blogId,
       postOwnerId: post.postOwnerId,
       postId: command.postId,

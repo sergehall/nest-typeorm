@@ -2,9 +2,9 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { PostsRepository } from '../../infrastructure/posts.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 
 export class RemovePostByIdOldCommand {
   constructor(public id: string, public currentUserDto: CurrentUserDto) {}
@@ -16,25 +16,24 @@ export class RemovePostByIdOldUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRepository: PostsRepository,
+    protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
   async execute(
     command: RemovePostByIdOldCommand,
   ): Promise<boolean | undefined> {
-    const postToDelete = await this.postsRepository.findPostById(
-      command.currentUserDto.id,
-    );
+    const { id, currentUserDto } = command;
+    const postToDelete = await this.postsRawSqlRepository.findPostByPostId(id);
     if (!postToDelete) {
-      throw new NotFoundException();
+      throw new NotFoundException('Not found post.');
     }
     const ability = this.caslAbilityFactory.createForUserId({
-      id: command.currentUserDto.id,
+      id: currentUserDto.id,
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: postToDelete.postOwnerInfo.userId,
+        id: postToDelete.postOwnerId,
       });
-      return await this.postsRepository.removePost(command.id);
+      return await this.postsRawSqlRepository.removePostByPostId(id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

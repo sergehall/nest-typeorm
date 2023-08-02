@@ -10,10 +10,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../../dto/create-post.dto';
+import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 
 export class CreatePostCommand {
   constructor(
@@ -59,7 +59,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         id: blog.blogOwnerId,
       });
       // User has the permission, proceed with creating the post
-      const newPost: PostsRawSqlEntity = {
+      const newPost: TablesPostsEntity = {
         id: uuid4().toString(),
         title: createPostDto.title,
         shortDescription: createPostDto.shortDescription,
@@ -74,7 +74,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         banInfoBanReason: null,
       };
       // Create and return the new post
-      const createdNewPost: PostsRawSqlEntity =
+      const createdNewPost: TablesPostsEntity =
         await this.postsRawSqlRepository.createPost(newPost);
 
       return {

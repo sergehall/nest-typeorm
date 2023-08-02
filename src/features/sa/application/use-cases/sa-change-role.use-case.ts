@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { TablesUsersEntity } from '../../../users/entities/tablesUsers.entity';
-import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
+import { TablesUsersEntity } from '../../../users/entities/tables-users.entity';
+import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 
 export class ChangeRoleCommand {
-  constructor(public newUser: TablesUsersEntityWithId) {}
+  constructor(public newUser: TablesUsersWithIdEntity) {}
 }
 
 @CommandHandler(ChangeRoleCommand)

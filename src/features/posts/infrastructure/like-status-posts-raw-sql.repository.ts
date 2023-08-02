@@ -1,7 +1,7 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
-import { LikeStatusPostEntity } from '../entities/like-status-post.entity';
+import { TablesLikeStatusPostEntity } from '../entities/tables-like-status-post.entity';
 import { LikeStatusCommentEntity } from '../../comments/entities/like-status-comment.entity';
 import { NewestLikes } from '../entities/posts-without-ownerInfo.entity';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
@@ -9,7 +9,7 @@ import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-u
 export class LikeStatusPostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
   async updateLikeStatusPosts(
-    likeStatusCommEntity: LikeStatusPostEntity,
+    likeStatusCommEntity: TablesLikeStatusPostEntity,
   ): Promise<boolean> {
     try {
       const updateLikeStatusPost = await this.db.query(

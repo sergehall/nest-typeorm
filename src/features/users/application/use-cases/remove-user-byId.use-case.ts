@@ -6,12 +6,12 @@ import {
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../dto/currentUser.dto';
+import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 
 export class RemoveUserByIdCommand {
-  constructor(public id: string, public currentUser: CurrentUserDto) {}
+  constructor(public id: string, public currentUserDto: CurrentUserDto) {}
 }
 
 @CommandHandler(RemoveUserByIdCommand)
@@ -20,17 +20,20 @@ export class RemoveUserByIdUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRepository: UsersRepository,
+    protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
   async execute(command: RemoveUserByIdCommand) {
-    const userToDelete = await this.usersRepository.findUserByUserId(
+    const { id, currentUserDto } = command;
+
+    const userToDelete = await this.usersRawSqlRepository.findUserByUserId(
       command.id,
     );
     if (!userToDelete) throw new NotFoundException('Not found user.');
+
     try {
-      const ability = this.caslAbilityFactory.createSaUser(command.currentUser);
+      const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToDelete);
-      return this.usersRepository.removeUserById(command.id);
+      return this.usersRawSqlRepository.removeUserByUserId(id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(

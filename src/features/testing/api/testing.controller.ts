@@ -6,6 +6,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 @Controller('testing')
 export class TestingController {
   constructor(private readonly testingService: TestingService) {}
+
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeAllDataRawSQL(): Promise<void> {

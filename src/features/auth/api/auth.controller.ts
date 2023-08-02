@@ -25,23 +25,23 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../../users/dto/reg-data.dto';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-byCode-inParam.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
 import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
-import { AddRefreshTokenToBlackListCommand } from '../application/use-cases/add-refresh-token-to-blackList.use-case';
 import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { CheckingUserExistenceCommand } from '../../users/application/use-cases/checking-user-existence.use-case';
-import { ParseQuery } from '../../common/parse-query/parse-query';
-import { PasswordRecoveryCommand } from '../application/use-cases/passwordRecovery.use-case';
-import { newPasswordRecoveryCommand } from '../application/use-cases/newPasswordRecovery.use-case';
+import { ParseQuery } from '../../common/query/parse-query';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
 import { ProfileDto } from '../dto/profile.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
+import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
+import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
+import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -138,7 +138,7 @@ export class AuthController {
     };
 
     await this.commandBus.execute(
-      new AddRefreshTokenToBlackListCommand(refreshTokenToBlackList),
+      new AddRefreshTokenToBlacklistCommand(refreshTokenToBlackList),
     );
 
     const newRefreshToken = await this.commandBus.execute(
@@ -181,7 +181,7 @@ export class AuthController {
       expirationDate: new Date(payload.exp * 1000).toISOString(),
     };
     await this.commandBus.execute(
-      new AddRefreshTokenToBlackListCommand(currentJwt),
+      new AddRefreshTokenToBlacklistCommand(currentJwt),
     );
     await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
@@ -201,8 +201,12 @@ export class AuthController {
   @Post('password-recovery')
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
     const { email } = emailDto;
-    return await this.commandBus.execute(new PasswordRecoveryCommand(email));
+
+    return await this.commandBus.execute(
+      new PasswordRecoveryViaEmailConfirmationCommand(email),
+    );
   }
+
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
@@ -210,7 +214,7 @@ export class AuthController {
     @Body() newPasswordRecoveryDto: NewPasswordRecoveryDto,
   ): Promise<boolean> {
     return await this.commandBus.execute(
-      new newPasswordRecoveryCommand(newPasswordRecoveryDto),
+      new ChangePasswordByRecoveryCodeCommand(newPasswordRecoveryDto),
     );
   }
 

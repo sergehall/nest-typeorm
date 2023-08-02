@@ -7,7 +7,7 @@ import {
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CommentsReturnEntity } from '../../entities/comments-return.entity';
+import { ReturnCommentsEntity } from '../../entities/comments-return.entity';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
@@ -30,7 +30,7 @@ export class CreateCommentUseCase
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
-  async execute(command: CreateCommentCommand): Promise<CommentsReturnEntity> {
+  async execute(command: CreateCommentCommand): Promise<ReturnCommentsEntity> {
     const post = await this.postsRawSqlRepository.findPostByPostId(
       command.postId,
     );

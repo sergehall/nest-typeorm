@@ -13,6 +13,7 @@ import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
 import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
+import { BasicAuthTypes } from './types/basic-auth.types';
 
 @Injectable()
 export class BaseConfig {
@@ -25,6 +26,16 @@ export class BaseConfig {
     return this.configService.get('ENV', {
       infer: true,
     });
+  }
+
+  /**
+   * Retrieves the value of the 'ENV' environment variable and returns it as a Promise of `EnvNamesEnums`.
+   * @returns {Promise<EnvNamesEnums>} The value of the 'ENV' environment variable.
+   */
+  protected async getValueBasicAuth(key: BasicAuthTypes): Promise<string> {
+    return this.configService.get('basicAuth', {
+      infer: true,
+    })[key];
   }
 
   /**

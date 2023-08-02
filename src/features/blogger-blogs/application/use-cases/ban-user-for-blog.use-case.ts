@@ -16,10 +16,10 @@ import { AddBannedUserToBanListCommand } from './add-banned-user-to-ban-list.use
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
+import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import * as uuid4 from 'uuid4';
-import { TablesUsersEntityWithId } from '../../../users/entities/userRawSqlWithId.entity';
-import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/application/use-cases/change-banStatus-posts -by-userId-blogId.use-case';
-import { cannotBlockYourself } from '../../../../exception-filter/errors-messages';
+import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
+import { cannotBlockYourself } from '../../../../exception-filter/custom-errors-messages';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -69,8 +69,8 @@ export class BanUserForBlogUseCase
   }
 
   // Fetches the user to be banned from the repository based on the provided user ID.
-  private async getUserToBan(userId: string): Promise<TablesUsersEntityWithId> {
-    const userToBan: TablesUsersEntityWithId | null =
+  private async getUserToBan(userId: string): Promise<TablesUsersWithIdEntity> {
+    const userToBan: TablesUsersWithIdEntity | null =
       await this.usersRawSqlRepository.findUserByUserId(userId);
     if (!userToBan) throw new NotFoundException('Not found user.');
     return userToBan;
@@ -87,7 +87,7 @@ export class BanUserForBlogUseCase
 
   // Creates a new instance of BannedUsersForBlogsEntity using the user and DTO information.
   private createBannedUserEntity(
-    userToBan: TablesUsersEntityWithId,
+    userToBan: TablesUsersWithIdEntity,
     updateBanUserDto: UpdateBanUserDto,
   ): BannedUsersForBlogsEntity {
     return {

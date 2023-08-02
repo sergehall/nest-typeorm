@@ -8,12 +8,12 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BlogIdPostIdParams } from '../../../common/params/blogId-postId.params';
+import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { PostsRawSqlEntity } from '../../entities/posts-raw-sql.entity';
 import { UpdatePostDto } from '../../dto/update-post.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 
 export class UpdatePostByPostIdCommand {
   constructor(
@@ -42,7 +42,7 @@ export class UpdatePostByPostIdUseCase
       throw new NotFoundException('Not found blog.');
     }
 
-    const post: PostsRawSqlEntity | null =
+    const post: TablesPostsEntity | null =
       await this.postsRawSqlRepository.findPostByPostId(params.postId);
 
     if (!post) {

@@ -4,10 +4,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { TablesUsersEntityWithId } from '../../users/entities/userRawSqlWithId.entity';
+import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -415,7 +415,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async changeIntoBlogBlogOwner(
     blogId: string,
-    userForBind: TablesUsersEntityWithId,
+    userForBind: TablesUsersWithIdEntity,
   ): Promise<boolean> {
     try {
       return await this.db.query(

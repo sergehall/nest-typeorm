@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Pagination } from '../../common/pagination/pagination';
 import { CommandBus } from '@nestjs/cqrs';
 import { FillingCommentsDataCommand } from './use-cases/filling-comments-data.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../infrastructure/comments-raw-sql.repository';
 import { FilledCommentEntity } from '../entities/filledComment.entity';
-import { CommentsReturnEntity } from '../entities/comments-return.entity';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { ReturnCommentsEntity } from '../entities/comments-return.entity';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { PostsRawSqlRepository } from '../../posts/infrastructure/posts-raw-sql.repository';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
@@ -14,7 +13,6 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 @Injectable()
 export class CommentsService {
   constructor(
-    protected pagination: Pagination,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected commandBus: CommandBus,
@@ -23,7 +21,7 @@ export class CommentsService {
   async findCommentById(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<CommentsReturnEntity> {
+  ): Promise<ReturnCommentsEntity> {
     const comment = await this.commentsRawSqlRepository.findCommentByCommentId(
       commentId,
     );
@@ -86,7 +84,7 @@ export class CommentsService {
     const pagesCount = Math.ceil(
       totalCountComments / queryData.queryPagination.pageSize,
     );
-    const commentsWithoutPostInfo: CommentsReturnEntity[] = filledComments.map(
+    const commentsWithoutPostInfo: ReturnCommentsEntity[] = filledComments.map(
       (currentComment: FilledCommentEntity) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { postInfo, ...commentWithoutPostInfo } = currentComment;

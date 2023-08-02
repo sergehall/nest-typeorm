@@ -5,11 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { TablesUsersEntity } from '../entities/tablesUsers.entity';
-import { ParseQueryType } from '../../common/parse-query/parse-query';
+import { TablesUsersEntity } from '../entities/tables-users.entity';
+import { ParseQueryType } from '../../common/query/parse-query';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
-import { TablesUsersEntityWithId } from '../entities/userRawSqlWithId.entity';
 import { BanInfoDto } from '../dto/banInfo.dto';
+import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -17,7 +17,7 @@ export class UsersRawSqlRepository {
 
   async saFindUsers(
     queryData: ParseQueryType,
-  ): Promise<TablesUsersEntityWithId[]> {
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const limit = queryData.queryPagination.pageSize;
@@ -44,7 +44,7 @@ export class UsersRawSqlRepository {
 
   async findUserByUserId(
     userId: string,
-  ): Promise<TablesUsersEntityWithId | null> {
+  ): Promise<TablesUsersWithIdEntity | null> {
     const isBanned = false;
     try {
       const user = await this.db.query(
@@ -66,7 +66,7 @@ export class UsersRawSqlRepository {
 
   async saFindUserByUserId(
     userId: string,
-  ): Promise<TablesUsersEntityWithId | null> {
+  ): Promise<TablesUsersWithIdEntity | null> {
     try {
       const user = await this.db.query(
         `
@@ -86,7 +86,7 @@ export class UsersRawSqlRepository {
 
   async findUsers(
     queryData: ParseQueryType,
-  ): Promise<TablesUsersEntityWithId[]> {
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const limit = queryData.queryPagination.pageSize;
@@ -115,7 +115,7 @@ export class UsersRawSqlRepository {
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<TablesUsersEntityWithId | null> {
+  ): Promise<TablesUsersWithIdEntity | null> {
     try {
       const user = await this.db.query(
         `
@@ -135,7 +135,7 @@ export class UsersRawSqlRepository {
 
   async createUser(
     tablesUsersEntity: TablesUsersEntity,
-  ): Promise<TablesUsersEntityWithId> {
+  ): Promise<TablesUsersWithIdEntity> {
     try {
       const insertNewUser = await this.db.query(
         `
@@ -183,7 +183,7 @@ export class UsersRawSqlRepository {
 
   async findUserByConfirmationCode(
     confirmationCode: string,
-  ): Promise<TablesUsersEntityWithId | null> {
+  ): Promise<TablesUsersWithIdEntity | null> {
     try {
       const currentTime = new Date().toISOString();
       const query = `
@@ -229,7 +229,7 @@ export class UsersRawSqlRepository {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<TablesUsersEntityWithId[]> {
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const updateUser = await this.db.query(
         `
@@ -248,7 +248,7 @@ export class UsersRawSqlRepository {
   async updateUserPasswordHashByRecoveryCode(
     recoveryCode: string,
     newPasswordHash: string,
-  ): Promise<TablesUsersEntityWithId[]> {
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const updateUserPassword = await this.db.query(
         `
@@ -267,7 +267,7 @@ export class UsersRawSqlRepository {
 
   async userAlreadyExist(login: string, email: string): Promise<boolean> {
     try {
-      const user: TablesUsersEntityWithId[] = await this.db.query(
+      const user: TablesUsersWithIdEntity[] = await this.db.query(
         `
         SELECT "userId", "login", "email", "passwordHash", "createdAt", "orgId",
          "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
@@ -413,7 +413,7 @@ export class UsersRawSqlRepository {
 
   async getOldestUsersWithExpirationDate(
     countExpiredDate: number,
-  ): Promise<TablesUsersEntityWithId[]> {
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const isConfirmed = true;
       const currentTime = new Date().toISOString();
