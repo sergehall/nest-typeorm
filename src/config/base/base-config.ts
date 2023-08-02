@@ -13,7 +13,7 @@ import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
 import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
-import { BasicAuthTypes } from './types/basic-auth.types';
+import { BasicAuthTypes } from '../sa/types/basic-auth.types';
 
 @Injectable()
 export class BaseConfig {
