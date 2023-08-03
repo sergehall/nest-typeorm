@@ -13,7 +13,7 @@ export class LoginDto {
   })
   password: string;
   @IsNotEmpty()
-  @Length(6, 20, {
+  @Length(6, 50, {
     message: 'Incorrect email length! Must be min 6, max 30 ch.',
   })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
