@@ -20,20 +20,25 @@ export class UsersRawSqlRepository {
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
+      const direction = preparedQuery.direction;
+      const sortBy = queryData.queryPagination.sortBy;
+      const searchEmailTerm = preparedQuery.searchEmailTerm;
+      const searchLoginTerm = preparedQuery.searchLoginTerm;
       const limit = queryData.queryPagination.pageSize;
       const offset = preparedQuery.offset;
       console.log(preparedQuery.direction, 'direction');
       console.log(queryData.queryPagination.sortBy, 'sortBy');
+      console.log('searchEmailTerm', searchEmailTerm, 'searchEmailTerm');
+      console.log('searchLoginTerm', searchLoginTerm, 'searchLoginTerm');
       console.log(limit, 'limit');
       console.log(offset, 'offset');
-      console.log(preparedQuery.searchEmailTerm, 'searchEmailTerm');
-      console.log(preparedQuery.searchLoginTerm, 'searchLoginTerm');
+
       const users = await this.db.query(
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
-        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+        ORDER BY "${sortBy}" ${direction}
       `,
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
       );
@@ -48,12 +53,7 @@ export class UsersRawSqlRepository {
         ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
         LIMIT $3 OFFSET $4
       `,
-        [
-          preparedQuery.searchEmailTerm,
-          preparedQuery.searchLoginTerm,
-          limit,
-          offset,
-        ],
+        [searchEmailTerm, searchLoginTerm, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -107,24 +107,20 @@ export class UsersRawSqlRepository {
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
+      const searchEmailTerm = preparedQuery.searchEmailTerm;
+      const searchLoginTerm = preparedQuery.searchLoginTerm;
       const limit = queryData.queryPagination.pageSize;
-      const offset = queryData.queryPagination.pageNumber - 1;
+      const offset = preparedQuery.offset;
       const isBanned = false;
       return await this.db.query(
         `
       SELECT "userId" as "id", "login", "email", "createdAt"
       FROM public."Users"
-      WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" = $3
+      WHERE ("email" LIKE $1 OR "login" LIKE $2) AND "isBanned" = $3
       ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
       LIMIT $4 OFFSET $5
     `,
-        [
-          preparedQuery.searchEmailTerm,
-          preparedQuery.searchLoginTerm,
-          isBanned,
-          limit,
-          offset,
-        ],
+        [searchEmailTerm, searchLoginTerm, isBanned, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -141,7 +137,7 @@ export class UsersRawSqlRepository {
         "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed",
          "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
-        WHERE "email" = $1 or "login" = $1
+        WHERE "email" = $1 OR "login" = $1
       `,
         [loginOrEmail.toLocaleLowerCase()],
       );
@@ -308,7 +304,7 @@ export class UsersRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 AND "login" like $2
+        WHERE "email" like $1 OR "login" like $2
         AND  "isBanned" in (${preparedQuery.banCondition})
       `,
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
@@ -322,18 +318,16 @@ export class UsersRawSqlRepository {
   async totalCountUsers(queryData: ParseQueryType): Promise<number> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
+      const searchEmailTerm = preparedQuery.searchEmailTerm;
+      const searchLoginTerm = preparedQuery.searchLoginTerm;
       const isBanned = false;
       const totalCount = await this.db.query(
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND  "isBanned" = $3
+        WHERE ("email" like $1 OR "login" like $2) AND  "isBanned" = $3
         `,
-        [
-          preparedQuery.searchEmailTerm,
-          preparedQuery.searchLoginTerm,
-          isBanned,
-        ],
+        [searchEmailTerm, searchLoginTerm, isBanned],
       );
       return Number(totalCount[0].count);
     } catch (error) {
@@ -444,29 +438,28 @@ export class UsersRawSqlRepository {
         : 'DESC';
 
       const orderByWithDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
+
       const banCondition =
         queryData.banStatus === ''
           ? [true, false]
           : queryData.banStatus === 'true'
           ? [true]
           : [false];
-      let searchEmailTerm =
-        queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
+
+      const searchLoginTerm =
+        queryData.searchLoginTerm.length !== 0
+          ? `%${queryData.searchLoginTerm}%`
           : '%%';
-      if (searchEmailTerm.length + searchEmailTerm.length === 0) {
-        searchEmailTerm = '%%';
-      }
-      let searchLoginTerm =
-        queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
-          : '';
-      if (searchLoginTerm.length + searchLoginTerm.length === 0) {
-        searchLoginTerm = '%%';
-      }
+
+      const searchEmailTerm =
+        queryData.searchEmailTerm.length !== 0
+          ? `%${queryData.searchEmailTerm}%`
+          : '%%';
+
       const offset =
         (queryData.queryPagination.pageNumber - 1) *
         queryData.queryPagination.pageSize;
+
       return {
         direction: direction,
         orderByWithDirection: orderByWithDirection,
