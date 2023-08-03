@@ -116,11 +116,13 @@ export class CommentsRawSqlRepository {
         `
       UPDATE public."Comments"
       SET "commentatorInfoIsBanned" = $2
-      WHERE "commentatorInfoUserId" = $1 OR "postInfoBlogOwnerId" = 1$`,
+      WHERE "commentatorInfoUserId" = $1 OR "postInfoBlogOwnerId" = $1
+      `,
         [userId, isBanned],
       );
       return !!updateComments[0];
     } catch (error) {
+      console.log('+++++++++');
       throw new InternalServerErrorException(error.message);
     }
   }
