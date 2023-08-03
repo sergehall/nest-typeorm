@@ -21,20 +21,22 @@ export class VerifyUserExistenceUseCase
       login,
       email,
     );
-    if (userIsExist[0]) {
-      if (userIsExist[0].email === email) {
-        throw new HttpException(
-          { message: [userEmailAlreadyExists] },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      if (userIsExist[0].login === login) {
-        throw new HttpException(
-          { message: [userLoginAlreadyExists] },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    if (userIsExist.length === 0) {
+      return false;
     }
-    return userIsExist.length === 0;
+
+    if (userIsExist[0].email === email) {
+      throw new HttpException(
+        { message: [userEmailAlreadyExists] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (userIsExist[0].login === login) {
+      throw new HttpException(
+        { message: [userLoginAlreadyExists] },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return true;
   }
 }
