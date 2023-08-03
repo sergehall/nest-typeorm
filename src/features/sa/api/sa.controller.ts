@@ -29,7 +29,6 @@ import { CreateUserCommand } from '../../users/application/use-cases/create-user
 import { IdParams } from '../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
-import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-by-blog-id.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../common/query/params/idUserId.params';
@@ -91,7 +90,6 @@ export class SaController {
       new CreateUserCommand(createUserDto, registrationData),
     );
 
-    newUser.roles = RolesEnums.SA;
     const saUser: TablesUsersWithIdEntity = await this.commandBus.execute(
       new ChangeRoleCommand(newUser),
     );
