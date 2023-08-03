@@ -25,13 +25,13 @@ export class VerifyUserExistenceUseCase
       return false;
     }
 
-    if (userIsExist[0].email === email) {
+    const existingUser = userIsExist[0];
+    if (existingUser.email === email) {
       throw new HttpException(
         { message: [userEmailAlreadyExists] },
         HttpStatus.BAD_REQUEST,
       );
-    }
-    if (userIsExist[0].login === login) {
+    } else if (existingUser.login === login) {
       throw new HttpException(
         { message: [userLoginAlreadyExists] },
         HttpStatus.BAD_REQUEST,
