@@ -26,14 +26,20 @@ export class UsersRawSqlRepository {
       console.log(queryData.queryPagination.sortBy, 'sortBy');
       console.log(limit, 'limit');
       console.log(offset, 'offset');
-      console.log(
-        preparedQuery.searchEmailTerm,
-        '  preparedQuery.searchEmailTerm',
+      console.log(preparedQuery.searchEmailTerm, 'searchEmailTerm');
+      console.log(preparedQuery.searchLoginTerm, 'searchLoginTerm');
+      const users = await this.db.query(
+        `
+        SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        FROM public."Users"
+        WHERE "email" like $1 AND "login" like $2
+        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+      `,
+        [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
       );
-      console.log(
-        preparedQuery.searchLoginTerm,
-        'preparedQuery.searchLoginTerm',
-      );
+      console.log('--------------------------------------');
+      console.log(users);
+      console.log('--------------------------------------');
       return await this.db.query(
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
@@ -458,10 +464,8 @@ export class UsersRawSqlRepository {
       if (searchLoginTerm.length + searchLoginTerm.length === 0) {
         searchLoginTerm = '%%';
       }
-      let offset = queryData.queryPagination.pageNumber;
-      if (offset === 1) {
-        offset = 0;
-      }
+      const offset = queryData.queryPagination.pageNumber - 1;
+
       return {
         direction: direction,
         orderByWithDirection: orderByWithDirection,
