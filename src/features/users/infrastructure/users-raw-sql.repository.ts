@@ -26,8 +26,8 @@ export class UsersRawSqlRepository {
       const searchLoginTerm = preparedQuery.searchLoginTerm;
       const limit = queryData.queryPagination.pageSize;
       const offset = preparedQuery.offset;
-      console.log(preparedQuery.direction, 'direction');
-      console.log(queryData.queryPagination.sortBy, 'sortBy');
+      console.log(direction, 'direction');
+      console.log(sortBy, 'sortBy');
       console.log('searchEmailTerm', searchEmailTerm, 'searchEmailTerm');
       console.log('searchLoginTerm', searchLoginTerm, 'searchLoginTerm');
       console.log(limit, 'limit');
@@ -40,7 +40,7 @@ export class UsersRawSqlRepository {
         WHERE "email" like $1 OR "login" like $2
         ORDER BY "${sortBy}" ${direction}
       `,
-        [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
+        [searchEmailTerm, searchLoginTerm],
       );
       console.log('--------------------------------------');
       console.log(users);
@@ -50,7 +50,7 @@ export class UsersRawSqlRepository {
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
-        ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $3 OFFSET $4
       `,
         [searchEmailTerm, searchLoginTerm, limit, offset],
@@ -300,14 +300,17 @@ export class UsersRawSqlRepository {
   async totalCountUsersForSa(queryData: ParseQueryType): Promise<number> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
+      const searchEmailTerm = preparedQuery.searchEmailTerm;
+      const searchLoginTerm = preparedQuery.searchLoginTerm;
+      const banCondition = preparedQuery.banCondition;
       const totalCount = await this.db.query(
         `
         SELECT count(*)
         FROM public."Users"
         WHERE "email" like $1 OR "login" like $2
-        AND  "isBanned" in (${preparedQuery.banCondition})
+        AND  "isBanned" in (${banCondition})
       `,
-        [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
+        [searchEmailTerm, searchLoginTerm],
       );
       return Number(totalCount[0].count);
     } catch (error) {
