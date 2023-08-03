@@ -22,12 +22,12 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { SaBanUnbanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
+import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 
 const saUseCases = [
   CreateUserUseCase,
   SaChangeRoleUseCase,
-  SaBanUnbanUserByUserIdUseCase,
+  SaBanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserUseCase,
   SaRemoveUserByUserIdUseCase,

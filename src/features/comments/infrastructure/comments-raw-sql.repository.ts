@@ -122,7 +122,6 @@ export class CommentsRawSqlRepository {
       );
       return !!updateComments[0];
     } catch (error) {
-      console.log('+++++++++');
       throw new InternalServerErrorException(error.message);
     }
   }
