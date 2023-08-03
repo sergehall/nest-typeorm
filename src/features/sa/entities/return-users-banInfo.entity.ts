@@ -29,9 +29,6 @@ export class ReturnUsersBanInfoEntity {
   @Matches('^[a-zA-Z0-9_-]*$')
   login: string;
   @IsNotEmpty()
-  @Length(6, 20, {
-    message: 'Incorrect email length! Must be min 6, max 20 ch.',
-  })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;
   @IsNotEmpty()

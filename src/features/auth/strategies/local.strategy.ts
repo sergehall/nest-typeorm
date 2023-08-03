@@ -28,7 +28,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     this.validateLength(
       loginOrEmail.toString(),
       3,
-      20,
+      50,
       invalidLoginOrEmailLengthError,
       messages,
     );
