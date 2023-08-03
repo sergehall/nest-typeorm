@@ -76,7 +76,7 @@ export class ParseQuery {
         : queryBanStatus === 'notBanned'
         ? 'false'
         : '';
-    console.log(query.sortBy, '----------query.sortBy---------');
+
     const sortBy = allowedSortingFields.includes(query.sortBy)
       ? query.sortBy
       : 'createdAt';

@@ -37,7 +37,9 @@ export class UsersRawSqlRepository {
 
       const users = await this.db.query(
         `
-        SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
         WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
         ORDER BY "${sortBy}" ${direction}
@@ -49,9 +51,11 @@ export class UsersRawSqlRepository {
       console.log('--------------------------------------');
       return await this.db.query(
         `
-        SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
-        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
+        WHERE ("email" LIKE $1 OR "login" LIKE $2) AND "isBanned" in (${banCondition})
         ORDER BY "${sortBy}" ${direction}
         LIMIT $3 OFFSET $4
       `,
@@ -453,13 +457,13 @@ export class UsersRawSqlRepository {
 
       const searchLoginTerm =
         queryData.searchLoginTerm.length !== 0
-          ? `%${queryData.searchLoginTerm}%`
-          : '%%';
+          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
+          : '%';
 
       const searchEmailTerm =
         queryData.searchEmailTerm.length !== 0
-          ? `%${queryData.searchEmailTerm}%`
-          : '%%';
+          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
+          : '%';
 
       const offset =
         (queryData.queryPagination.pageNumber - 1) *
