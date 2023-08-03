@@ -153,6 +153,7 @@ export class UsersRawSqlRepository {
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersWithIdEntity> {
     try {
+      console.log(tablesUsersEntity, '------------------------');
       const insertNewUser = await this.db.query(
         `
         INSERT INTO public."Users"
@@ -193,6 +194,7 @@ export class UsersRawSqlRepository {
       );
       return { id: insertNewUser[0].id, ...tablesUsersEntity };
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
