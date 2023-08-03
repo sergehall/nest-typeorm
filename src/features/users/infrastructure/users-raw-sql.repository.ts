@@ -27,28 +27,7 @@ export class UsersRawSqlRepository {
       const searchLoginTerm = preparedQuery.searchLoginTerm;
       const limit = queryData.queryPagination.pageSize;
       const offset = preparedQuery.offset;
-      console.log(direction, 'direction');
-      console.log(sortBy, 'sortBy');
-      console.log(searchEmailTerm, 'searchEmailTerm');
-      console.log(searchLoginTerm, 'searchLoginTerm');
-      console.log(preparedQuery.banCondition, 'banCondition');
-      console.log(limit, 'limit');
-      console.log(offset, 'offset');
 
-      const users = await this.db.query(
-        `
-        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-        FROM public."Users"
-        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
-        ORDER BY "${sortBy}" ${direction}
-      `,
-        [searchEmailTerm, searchLoginTerm],
-      );
-      console.log('--------------------------------------');
-      console.log(users);
-      console.log('--------------------------------------');
       return await this.db.query(
         `
         SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
@@ -369,6 +348,7 @@ export class UsersRawSqlRepository {
   async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     try {
       const { isBanned, banReason, banDate } = banInfo;
+      console.log(isBanned, banReason, banDate);
       const updatePosts = await this.db.query(
         `
       UPDATE public."Users"
@@ -376,6 +356,20 @@ export class UsersRawSqlRepository {
       WHERE "userId" = $1`,
         [userId, isBanned, banDate, banReason],
       );
+
+      const user = await this.db.query(
+        `
+        SELECT 
+        "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+        WHERE "userId" = $1
+        `,
+        [userId],
+      );
+      console.log(user, 'banUser');
+      console.log(updatePosts, 'updatePosts');
       return updatePosts[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
