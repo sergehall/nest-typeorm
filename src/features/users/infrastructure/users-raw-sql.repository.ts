@@ -21,7 +21,7 @@ export class UsersRawSqlRepository {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const limit = queryData.queryPagination.pageSize;
-      const offset = queryData.queryPagination.pageNumber - 1;
+      const offset = preparedQuery.offset;
       console.log(preparedQuery.direction, 'direction');
       console.log(queryData.queryPagination.sortBy, 'sortBy');
       console.log(limit, 'limit');
@@ -458,12 +458,17 @@ export class UsersRawSqlRepository {
       if (searchLoginTerm.length + searchLoginTerm.length === 0) {
         searchLoginTerm = '%%';
       }
+      let offset = queryData.queryPagination.pageNumber;
+      if (offset === 1) {
+        offset = 0;
+      }
       return {
         direction: direction,
         orderByWithDirection: orderByWithDirection,
         banCondition: banCondition,
         searchEmailTerm: searchEmailTerm,
         searchLoginTerm: searchLoginTerm,
+        offset: offset,
       };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
