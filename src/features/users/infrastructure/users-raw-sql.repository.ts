@@ -29,8 +29,8 @@ export class UsersRawSqlRepository {
       const offset = preparedQuery.offset;
       console.log(direction, 'direction');
       console.log(sortBy, 'sortBy');
-      console.log('searchEmailTerm', searchEmailTerm, 'searchEmailTerm');
-      console.log('searchLoginTerm', searchLoginTerm, 'searchLoginTerm');
+      console.log(searchEmailTerm, 'searchEmailTerm');
+      console.log(searchLoginTerm, 'searchLoginTerm');
       console.log(preparedQuery.banCondition, 'banCondition');
       console.log(limit, 'limit');
       console.log(offset, 'offset');
@@ -39,7 +39,7 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
+        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
         ORDER BY "${sortBy}" ${direction}
       `,
         [searchEmailTerm, searchLoginTerm],
@@ -312,7 +312,7 @@ export class UsersRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
+        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
       `,
         [searchEmailTerm, searchLoginTerm],
       );
