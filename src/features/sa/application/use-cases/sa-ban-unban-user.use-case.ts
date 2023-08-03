@@ -20,7 +20,7 @@ import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../exception-filter/custom-errors-messages';
 
-export class SaBanUserByUserIdCommand {
+export class SaBanUnbanUserByUserIdCommand {
   constructor(
     public id: string,
     public saBanUserDto: SaBanUserDto,
@@ -28,9 +28,9 @@ export class SaBanUserByUserIdCommand {
   ) {}
 }
 
-@CommandHandler(SaBanUserByUserIdCommand)
-export class SaBanUserByUserIdUseCase
-  implements ICommandHandler<SaBanUserByUserIdCommand>
+@CommandHandler(SaBanUnbanUserByUserIdCommand)
+export class SaBanUnbanUserByUserIdUseCase
+  implements ICommandHandler<SaBanUnbanUserByUserIdCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
@@ -38,8 +38,7 @@ export class SaBanUserByUserIdUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: SaBanUserByUserIdCommand): Promise<boolean> {
-    const { isBanned, banReason } = command.saBanUserDto;
+  async execute(command: SaBanUnbanUserByUserIdCommand): Promise<boolean> {
     const { currentUserDto } = command;
     const { id } = command;
 
@@ -57,10 +56,11 @@ export class SaBanUserByUserIdUseCase
 
     await this.checkUserPermission(currentUserDto, userToBan);
 
+    const { isBanned, banReason } = command.saBanUserDto;
     const banInfo: BanInfoDto = {
-      isBanned: isBanned,
-      banDate: new Date().toISOString(),
-      banReason: banReason,
+      isBanned,
+      banDate: isBanned ? new Date().toISOString() : null,
+      banReason: isBanned ? banReason : null,
     };
 
     await this.executeChangeBanStatusCommands(userToBan.id, banInfo);
@@ -85,7 +85,7 @@ export class SaBanUserByUserIdUseCase
           new ChangeBanStatusUserBlogsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(new RemoveDevicesBannedUserCommand(userId)),
-        this.usersRawSqlRepository.banUser(userId, banInfo),
+        this.usersRawSqlRepository.banUnbanUser(userId, banInfo),
       ]);
       return true;
     } catch (error) {

@@ -345,10 +345,10 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     try {
       const { isBanned, banReason, banDate } = banInfo;
-      console.log(isBanned, banReason, banDate);
+
       const updatePosts = await this.db.query(
         `
       UPDATE public."Users"

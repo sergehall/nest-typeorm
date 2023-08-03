@@ -8,7 +8,6 @@ import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
-import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
@@ -23,11 +22,12 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
+import { SaBanUnbanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 
 const saUseCases = [
   CreateUserUseCase,
   SaChangeRoleUseCase,
-  SaBanUserByUserIdUseCase,
+  SaBanUnbanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserUseCase,
   SaRemoveUserByUserIdUseCase,
