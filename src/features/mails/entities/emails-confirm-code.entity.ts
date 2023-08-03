@@ -7,9 +7,6 @@ export class EmailsConfirmCodeEntity {
   })
   codeId: string;
   @IsNotEmpty()
-  @Length(6, 20, {
-    message: 'Incorrect email length! Must be min 6, max 30 ch.',
-  })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;
   @IsNotEmpty()

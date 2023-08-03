@@ -19,6 +19,7 @@ export class BaseAuthGuard extends SaConfig implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const basicAuth = await this.getBasicAuth('BASIC_AUTH');
     const exceptedAuthInput = 'Basic ' + basicAuth;
+
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
     } else {

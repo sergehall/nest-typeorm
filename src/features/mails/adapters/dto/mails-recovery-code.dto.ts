@@ -3,9 +3,6 @@ import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 export class MailsRecoveryCodeDto {
   @IsNotEmpty()
   @IsString()
-  @Length(6, 20, {
-    message: 'Incorrect email length! Must be min 6, max 20 ch.',
-  })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;
   @IsNotEmpty()

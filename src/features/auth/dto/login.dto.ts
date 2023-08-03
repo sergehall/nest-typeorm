@@ -13,8 +13,6 @@ export class LoginDto {
   })
   password: string;
   @IsNotEmpty({ message: 'Email should not be empty' })
-  @Matches(/^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/, {
-    message: 'Invalid email format',
-  })
+  @Matches(' ^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;
 }

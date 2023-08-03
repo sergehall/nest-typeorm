@@ -14,10 +14,7 @@ export class CurrentUserDto {
   })
   @Matches('^[a-zA-Z0-9_-]*$')
   login: string;
-  @IsNotEmpty()
-  @Length(6, 30, {
-    message: 'Incorrect email length! Must be min 6, max 30 ch.',
-  })
+  @IsNotEmpty({ message: 'Email should not be empty' })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   email: string;
   @IsNotEmpty()
