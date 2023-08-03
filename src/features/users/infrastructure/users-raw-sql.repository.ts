@@ -32,7 +32,7 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 AND "login" like $2
+        WHERE "email" like $1 OR "login" like $2
         ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
       `,
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
@@ -44,7 +44,7 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 AND "login" like $2
+        WHERE "email" like $1 OR "login" like $2
         ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
         LIMIT $3 OFFSET $4
       `,
