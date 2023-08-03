@@ -1,7 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { userAlreadyExists } from '../../../../exception-filter/custom-errors-messages';
+import {
+  userEmailAlreadyExists,
+  userLoginAlreadyExists,
+} from '../../../../exception-filter/custom-errors-messages';
 
 export class VerifyUserExistenceCommand {
   constructor(public login: string, public email: string) {}
@@ -18,12 +21,20 @@ export class VerifyUserExistenceUseCase
       login,
       email,
     );
-    if (userIsExist) {
-      throw new HttpException(
-        { message: [userAlreadyExists] },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (userIsExist[0]) {
+      if (userIsExist[0].email === email) {
+        throw new HttpException(
+          { message: [userEmailAlreadyExists] },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (userIsExist[0].login === login) {
+        throw new HttpException(
+          { message: [userLoginAlreadyExists] },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
-    return userIsExist;
+    return userIsExist.length === 0;
   }
 }

@@ -36,7 +36,7 @@ import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { SaBanUnbanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
+import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -135,18 +135,14 @@ export class SaController {
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async saBanUnbanUserById(
+  async saBanUserById(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateSaBanDto: SaBanUserDto,
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUnbanUserByUserIdCommand(
-        params.id,
-        updateSaBanDto,
-        currentUserDto,
-      ),
+      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 
@@ -174,11 +170,7 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUnbanUserByUserIdCommand(
-        params.id,
-        updateSaBanDto,
-        currentUserDto,
-      ),
+      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 }

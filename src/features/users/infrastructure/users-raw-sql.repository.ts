@@ -267,9 +267,12 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async userAlreadyExist(login: string, email: string): Promise<boolean> {
+  async userAlreadyExist(
+    login: string,
+    email: string,
+  ): Promise<TablesUsersWithIdEntity[]> {
     try {
-      const user: TablesUsersWithIdEntity[] = await this.db.query(
+      return await this.db.query(
         `
         SELECT "userId", "login", "email", "passwordHash", "createdAt", "orgId",
          "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
@@ -279,7 +282,6 @@ export class UsersRawSqlRepository {
       `,
         [login.toLocaleLowerCase(), email.toLocaleLowerCase()],
       );
-      return user.length !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

@@ -20,7 +20,7 @@ import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../exception-filter/custom-errors-messages';
 
-export class SaBanUnbanUserByUserIdCommand {
+export class SaBanUserByUserIdCommand {
   constructor(
     public id: string,
     public saBanUserDto: SaBanUserDto,
@@ -28,9 +28,9 @@ export class SaBanUnbanUserByUserIdCommand {
   ) {}
 }
 
-@CommandHandler(SaBanUnbanUserByUserIdCommand)
-export class SaBanUnbanUserByUserIdUseCase
-  implements ICommandHandler<SaBanUnbanUserByUserIdCommand>
+@CommandHandler(SaBanUserByUserIdCommand)
+export class SaBanUserByUserIdUseCase
+  implements ICommandHandler<SaBanUserByUserIdCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
@@ -38,7 +38,7 @@ export class SaBanUnbanUserByUserIdUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: SaBanUnbanUserByUserIdCommand): Promise<boolean> {
+  async execute(command: SaBanUserByUserIdCommand): Promise<boolean> {
     const { currentUserDto } = command;
     const { id } = command;
 
