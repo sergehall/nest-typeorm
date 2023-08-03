@@ -137,16 +137,6 @@ export class UsersRawSqlRepository {
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersWithIdEntity> {
     try {
-      console.log(
-        tablesUsersEntity.login,
-        '------------login-----',
-        tablesUsersEntity.email,
-        '-----------email------',
-      );
-      console.log(
-        tablesUsersEntity,
-        '-----------------------tablesUsersEntity------------------',
-      );
       const insertNewUser = await this.db.query(
         `
         INSERT INTO public."Users"
@@ -343,7 +333,8 @@ export class UsersRawSqlRepository {
       UPDATE public."Users"
       SET  "roles" = $2
       WHERE "userId" = $1
-      RETURNING *`,
+      RETURNING "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+      `,
         [userId, roles],
       );
       return updateUserRole[0][0];
