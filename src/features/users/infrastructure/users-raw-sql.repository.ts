@@ -22,11 +22,23 @@ export class UsersRawSqlRepository {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const limit = queryData.queryPagination.pageSize;
       const offset = queryData.queryPagination.pageNumber - 1;
+      console.log(preparedQuery.direction, 'direction');
+      console.log(queryData.queryPagination.sortBy, 'sortBy');
+      console.log(limit, 'limit');
+      console.log(offset, 'offset');
+      console.log(
+        preparedQuery.searchEmailTerm,
+        '  preparedQuery.searchEmailTerm',
+      );
+      console.log(
+        preparedQuery.searchLoginTerm,
+        'preparedQuery.searchLoginTerm',
+      );
       return await this.db.query(
         `
-        SELECT "userId" as "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+        SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2
+        WHERE "email" like $1 AND "login" like $2
         ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
         LIMIT $3 OFFSET $4
       `,
@@ -290,7 +302,7 @@ export class UsersRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2
+        WHERE "email" like $1 AND "login" like $2
         AND  "isBanned" in (${preparedQuery.banCondition})
       `,
         [preparedQuery.searchEmailTerm, preparedQuery.searchLoginTerm],
@@ -432,15 +444,18 @@ export class UsersRawSqlRepository {
           : queryData.banStatus === 'true'
           ? [true]
           : [false];
-      const searchEmailTerm =
+      let searchEmailTerm =
         queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
           ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
-          : '';
+          : '%%';
+      if (searchEmailTerm.length + searchEmailTerm.length === 0) {
+        searchEmailTerm = '%%';
+      }
       let searchLoginTerm =
         queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
           ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
           : '';
-      if (searchEmailTerm.length + searchLoginTerm.length === 0) {
+      if (searchLoginTerm.length + searchLoginTerm.length === 0) {
         searchLoginTerm = '%%';
       }
       return {
