@@ -137,6 +137,16 @@ export class UsersRawSqlRepository {
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersWithIdEntity> {
     try {
+      console.log(
+        tablesUsersEntity.login,
+        '------------login-----',
+        tablesUsersEntity.email,
+        '-----------email------',
+      );
+      console.log(
+        tablesUsersEntity,
+        '-----------------------tablesUsersEntity------------------',
+      );
       const insertNewUser = await this.db.query(
         `
         INSERT INTO public."Users"
@@ -373,44 +383,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  private async prepQueryRawSql(queryData: ParseQueryType) {
-    try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-
-      const orderByWithDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
-      const banCondition =
-        queryData.banStatus === ''
-          ? [true, false]
-          : queryData.banStatus === 'true'
-          ? [true]
-          : [false];
-      const searchEmailTerm =
-        queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
-          : '';
-      let searchLoginTerm =
-        queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
-          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
-          : '';
-      if (searchEmailTerm.length + searchLoginTerm.length === 0) {
-        searchLoginTerm = '%%';
-      }
-      return {
-        direction: direction,
-        orderByWithDirection: orderByWithDirection,
-        banCondition: banCondition,
-        searchEmailTerm: searchEmailTerm,
-        searchLoginTerm: searchLoginTerm,
-      };
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async getOldestUsersWithExpirationDate(
     countExpiredDate: number,
   ): Promise<TablesUsersWithIdEntity[]> {
@@ -449,6 +421,44 @@ export class UsersRawSqlRepository {
         [isConfirmed, currentTime],
       );
       return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async prepQueryRawSql(queryData: ParseQueryType) {
+    try {
+      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+        queryData.queryPagination.sortDirection,
+      )
+        ? 'ASC'
+        : 'DESC';
+
+      const orderByWithDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
+      const banCondition =
+        queryData.banStatus === ''
+          ? [true, false]
+          : queryData.banStatus === 'true'
+          ? [true]
+          : [false];
+      const searchEmailTerm =
+        queryData.searchEmailTerm.toLocaleLowerCase().length !== 0
+          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
+          : '';
+      let searchLoginTerm =
+        queryData.searchLoginTerm.toLocaleLowerCase().length !== 0
+          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
+          : '';
+      if (searchEmailTerm.length + searchLoginTerm.length === 0) {
+        searchLoginTerm = '%%';
+      }
+      return {
+        direction: direction,
+        orderByWithDirection: orderByWithDirection,
+        banCondition: banCondition,
+        searchEmailTerm: searchEmailTerm,
+        searchLoginTerm: searchLoginTerm,
+      };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
