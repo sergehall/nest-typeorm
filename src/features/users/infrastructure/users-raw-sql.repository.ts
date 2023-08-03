@@ -51,7 +51,7 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
+        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
         ORDER BY "${sortBy}" ${direction}
         LIMIT $3 OFFSET $4
       `,
