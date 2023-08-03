@@ -464,8 +464,9 @@ export class UsersRawSqlRepository {
       if (searchLoginTerm.length + searchLoginTerm.length === 0) {
         searchLoginTerm = '%%';
       }
-      const offset = queryData.queryPagination.pageNumber - 1;
-
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
       return {
         direction: direction,
         orderByWithDirection: orderByWithDirection,
