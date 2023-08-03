@@ -39,10 +39,10 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in $3
+        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
         ORDER BY "${sortBy}" ${direction}
       `,
-        [searchEmailTerm, searchLoginTerm, banCondition],
+        [searchEmailTerm, searchLoginTerm],
       );
       console.log('--------------------------------------');
       console.log(users);
@@ -115,7 +115,7 @@ export class UsersRawSqlRepository {
       const direction = preparedQuery.direction;
       const limit = queryData.queryPagination.pageSize;
       const offset = preparedQuery.offset;
-      const banCondition = preparedQuery.banCondition;
+      const isBanned = false;
       return await this.db.query(
         `
       SELECT "userId" as "id", "login", "email", "createdAt"
@@ -124,7 +124,7 @@ export class UsersRawSqlRepository {
       ORDER BY "${sortBy}" ${direction}
       LIMIT $4 OFFSET $5
     `,
-        [searchEmailTerm, searchLoginTerm, banCondition, limit, offset],
+        [searchEmailTerm, searchLoginTerm, isBanned, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -313,9 +313,9 @@ export class UsersRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in $3
+        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
       `,
-        [searchEmailTerm, searchLoginTerm, banCondition],
+        [searchEmailTerm, searchLoginTerm],
       );
       return Number(totalCount[0].count);
     } catch (error) {
@@ -333,9 +333,9 @@ export class UsersRawSqlRepository {
         `
         SELECT count(*)
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in $3
+        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
         `,
-        [searchEmailTerm, searchLoginTerm, banCondition],
+        [searchEmailTerm, searchLoginTerm],
       );
       return Number(totalCount[0].count);
     } catch (error) {
@@ -445,8 +445,6 @@ export class UsersRawSqlRepository {
         ? 'ASC'
         : 'DESC';
 
-      const orderByWithDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
-
       const banCondition =
         queryData.banStatus === ''
           ? [true, false]
@@ -473,11 +471,10 @@ export class UsersRawSqlRepository {
       return {
         sortBy: sortBy,
         direction: direction,
-        orderByWithDirection: orderByWithDirection,
+        offset: offset,
         banCondition: banCondition,
         searchEmailTerm: searchEmailTerm,
         searchLoginTerm: searchLoginTerm,
-        offset: offset,
       };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
