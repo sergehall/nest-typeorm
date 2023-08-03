@@ -356,20 +356,6 @@ export class UsersRawSqlRepository {
       WHERE "userId" = $1`,
         [userId, isBanned, banDate, banReason],
       );
-
-      const user = await this.db.query(
-        `
-        SELECT 
-        "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
-        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-        FROM public."Users"
-        WHERE "userId" = $1
-        `,
-        [userId],
-      );
-      console.log(user, 'banUser');
-      console.log(updatePosts, 'updatePosts');
       return updatePosts[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
