@@ -155,7 +155,6 @@ export class UsersRawSqlRepository {
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersWithIdEntity> {
     try {
-      console.log(tablesUsersEntity, '------------------------');
       const insertNewUser = await this.db.query(
         `
         INSERT INTO public."Users"
