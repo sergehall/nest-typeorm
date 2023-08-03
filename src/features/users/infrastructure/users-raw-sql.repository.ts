@@ -30,6 +30,7 @@ export class UsersRawSqlRepository {
       console.log(sortBy, 'sortBy');
       console.log('searchEmailTerm', searchEmailTerm, 'searchEmailTerm');
       console.log('searchLoginTerm', searchLoginTerm, 'searchLoginTerm');
+      console.log(preparedQuery.banCondition, 'banCondition');
       console.log(limit, 'limit');
       console.log(offset, 'offset');
 
@@ -300,8 +301,6 @@ export class UsersRawSqlRepository {
   async totalCountUsersForSa(queryData: ParseQueryType): Promise<number> {
     try {
       const preparedQuery = await this.prepQueryRawSql(queryData);
-      const direction = preparedQuery.direction;
-      const sortBy = preparedQuery.sortBy;
       const searchEmailTerm = preparedQuery.searchEmailTerm;
       const searchLoginTerm = preparedQuery.searchLoginTerm;
       const banCondition = preparedQuery.banCondition;
@@ -310,7 +309,6 @@ export class UsersRawSqlRepository {
         SELECT count(*)
         FROM public."Users"
         WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
-        ORDER BY "${sortBy}" ${direction}
       `,
         [searchEmailTerm, searchLoginTerm],
       );
