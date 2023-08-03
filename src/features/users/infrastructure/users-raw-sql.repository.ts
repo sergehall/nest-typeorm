@@ -39,10 +39,10 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
+        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in $3
         ORDER BY "${sortBy}" ${direction}
       `,
-        [searchEmailTerm, searchLoginTerm],
+        [searchEmailTerm, searchLoginTerm, banCondition],
       );
       console.log('--------------------------------------');
       console.log(users);
@@ -111,6 +111,8 @@ export class UsersRawSqlRepository {
       const preparedQuery = await this.prepQueryRawSql(queryData);
       const searchEmailTerm = preparedQuery.searchEmailTerm;
       const searchLoginTerm = preparedQuery.searchLoginTerm;
+      const sortBy = preparedQuery.sortBy;
+      const direction = preparedQuery.direction;
       const limit = queryData.queryPagination.pageSize;
       const offset = preparedQuery.offset;
       const banCondition = preparedQuery.banCondition;
@@ -119,7 +121,7 @@ export class UsersRawSqlRepository {
       SELECT "userId" as "id", "login", "email", "createdAt"
       FROM public."Users"
       WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" in $3
-      ORDER BY "${queryData.queryPagination.sortBy}" ${preparedQuery.direction}
+      ORDER BY "${sortBy}" ${direction}
       LIMIT $4 OFFSET $5
     `,
         [searchEmailTerm, searchLoginTerm, banCondition, limit, offset],
