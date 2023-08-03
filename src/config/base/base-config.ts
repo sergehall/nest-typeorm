@@ -29,8 +29,8 @@ export class BaseConfig {
   }
 
   /**
-   * Retrieves the value of the 'ENV' environment variable and returns it as a Promise of `EnvNamesEnums`.
-   * @returns {Promise<EnvNamesEnums>} The value of the 'ENV' environment variable.
+   * Retrieves the value of the 'basicAuth' environment variable and returns it as a Promise of `string`.
+   * @returns {Promise<BasicAuthTypes>} The value of the 'string' environment variable.
    */
   protected async getValueBasicAuth(key: BasicAuthTypes): Promise<string> {
     return this.configService.get('basicAuth', {
@@ -39,7 +39,7 @@ export class BaseConfig {
   }
 
   /**
-   * Retrieves the value of the 'db' configuration property and returns it as a Promise of `DatabaseConfigTypes`.
+   * Retrieves the value of the 'db' configuration property and returns it as a Promise of `MongoDatabaseConfigTypes`.
    * @returns {Promise<MongoDatabaseConfigTypes>} The value of the 'db' configuration property.
    */
   protected async getValueMongoDatabase(): Promise<MongoDatabaseConfigTypes> {
