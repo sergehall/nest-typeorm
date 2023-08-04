@@ -22,7 +22,6 @@ export class ConfirmUserByCodeUseCase
 
     const userToUpdateConfirmCode =
       await this.usersRawSqlRepository.findUserByConfirmationCode(code);
-
     if (
       !userToUpdateConfirmCode ||
       userToUpdateConfirmCode.isConfirmed ||
@@ -36,11 +35,19 @@ export class ConfirmUserByCodeUseCase
     }
 
     try {
-      return await this.usersRawSqlRepository.confirmUserByConfirmCode(
-        code,
-        true,
-        currentDate,
+      const userIsConfirmed =
+        await this.usersRawSqlRepository.confirmUserByConfirmCode(
+          code,
+          true,
+          currentDate,
+        );
+      if (!userIsConfirmed) {
+        return false;
+      }
+      console.log(
+        'Congratulations account is confirmed. Send a message not here, into email that has been confirmed.',
       );
+      return true;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

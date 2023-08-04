@@ -54,14 +54,14 @@ export class ParseQueriesService {
 
   private async parseCode(query: any): Promise<string> {
     const code = query.code?.toString();
-    return code && code.length !== 0 ? `%${code.toLowerCase()}%` : '%';
+    return code && code.length !== 0 ? code.toLowerCase() : '';
   }
 
   private async parseConfirmationCode(query: any): Promise<string> {
     const confirmationCode = query.confirmationCode?.toString();
     return confirmationCode && confirmationCode.length !== 0
-      ? `%${confirmationCode.toLowerCase()}%`
-      : '%';
+      ? confirmationCode.toLowerCase()
+      : '';
   }
 
   private async parseSortDirection(query: any): Promise<SortDirectionType> {

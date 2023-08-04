@@ -190,18 +190,20 @@ export class UsersRawSqlRepository {
   ): Promise<TablesUsersWithIdEntity | null> {
     try {
       const currentTime = new Date().toISOString();
+
       const query = `
         SELECT 
         "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
         "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
         "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
-        WHERE "confirmationCode" = $1
+        WHERE "confirmationCode" = $1 
         AND (
           ("isConfirmed" = false AND "expirationDate" > $2)
           OR "isConfirmed" = true
         )
         `;
+
       const user = await this.db.query(query, [confirmationCode, currentTime]);
       return user[0] || null;
     } catch (error) {
@@ -219,10 +221,11 @@ export class UsersRawSqlRepository {
         `
       UPDATE public."Users"
       SET  "isConfirmed" = $2, "isConfirmedDate" = $3
-      WHERE "confirmationCode" = $1`,
+      WHERE "confirmationCode" = $1
+      `,
         [confirmationCode, isConfirmed, isConfirmedDate],
       );
-      return !!user[0];
+      return user[1] === 1;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

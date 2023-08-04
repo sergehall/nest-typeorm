@@ -197,6 +197,17 @@ export class AuthController {
 
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Get('confirm-registration')
+  async confirmRegistrationByCodeFromQuery(@Query() query: any) {
+    const queryData = await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(
+      new ConfirmUserByCodeCommand(queryData.code),
+    );
+  }
+
+  @SkipThrottle()
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
     const { email } = emailDto;
@@ -214,19 +225,6 @@ export class AuthController {
   ): Promise<boolean> {
     return await this.commandBus.execute(
       new ChangePasswordByRecoveryCodeCommand(newPasswordRecoveryDto),
-    );
-  }
-
-  @Get('confirm-registration')
-  async confirmRegistrationByCodeFromQuery(
-    @Query() query: any,
-  ): Promise<boolean> {
-    const queryData = await this.parseQueriesService.getQueriesData(query);
-    console.log(
-      'Congratulations account is confirmed. Send a message not here, into email that has been confirmed.',
-    );
-    return await this.commandBus.execute(
-      new ConfirmUserByCodeCommand(queryData.code),
     );
   }
 
