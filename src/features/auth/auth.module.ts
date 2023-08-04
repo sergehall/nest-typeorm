@@ -32,6 +32,7 @@ import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-r
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { appProviders } from '../../app.providers';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -51,10 +52,18 @@ const authUseCases = [
 ];
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule, CqrsModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 10, // 10 sec
+      limit: 5, // 5 requests per ttl
+    }),
+    UsersModule,
+    PassportModule,
+    JwtModule,
+    CqrsModule,
+  ],
   controllers: [AuthController],
   providers: [
-    ...appProviders,
     LocalStrategy,
     JwtStrategy,
     JwtConfig,
