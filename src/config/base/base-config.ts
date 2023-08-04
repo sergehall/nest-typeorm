@@ -96,7 +96,7 @@ export class BaseConfig {
     const value = this.configService.get('db.pg.port', {
       infer: true,
     })[key];
-    this.validationNumbersType(value);
+    await this.validationNumbersType(value);
     return value;
   }
 
