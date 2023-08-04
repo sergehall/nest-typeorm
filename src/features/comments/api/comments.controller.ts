@@ -18,7 +18,6 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
-import { SkipThrottle } from '@nestjs/throttler';
 import { ChangeLikeStatusCommentCommand } from '../application/use-cases/change-likeStatus-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
@@ -27,7 +26,6 @@ import { IdParams } from '../../common/query/params/id.params';
 import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
-@SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(

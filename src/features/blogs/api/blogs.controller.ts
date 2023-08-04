@@ -7,7 +7,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { SkipThrottle } from '@nestjs/throttler';
 import { IdParams } from '../../common/query/params/id.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
@@ -19,7 +18,6 @@ import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-bl
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-@SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
   constructor(

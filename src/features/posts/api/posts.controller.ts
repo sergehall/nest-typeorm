@@ -22,7 +22,6 @@ import { LikeStatusDto } from '../dto/like-status.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
-import { SkipThrottle } from '@nestjs/throttler';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -38,7 +37,6 @@ import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.para
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-@SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(

@@ -20,7 +20,6 @@ import { Action } from '../../../ability/roles/action.enum';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
-import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegDataDto } from '../dto/reg-data.dto';
@@ -32,7 +31,6 @@ import { CurrentUserDto } from '../dto/currentUser.dto';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-@SkipThrottle()
 @Controller('users')
 export class UsersController {
   constructor(
