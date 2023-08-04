@@ -169,11 +169,12 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
-    const refreshToken = req.cookies;
+    const refreshToken = req.cookies.refreshToken;
 
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       refreshToken,
     );
+
     const currentJwt: JwtBlacklistDto = {
       refreshToken: refreshToken,
       expirationDate: new Date(payload.exp * 1000).toISOString(),

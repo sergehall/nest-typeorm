@@ -18,13 +18,12 @@ export class NoneStatusGuard implements CanActivate {
       return true;
     }
     const accessToken = request.headers.authorization.split(' ')[1];
-    const checkInBL = await this.blacklistJwtRawSqlRepository.findJWT(
-      accessToken,
-    );
+    const jwtExistInBlackList =
+      await this.blacklistJwtRawSqlRepository.JwtExistInBlackList(accessToken);
     const payload = await this.commandBus.execute(
       new ValidAccessJwtCommand(accessToken),
     );
-    if (!checkInBL && payload) {
+    if (!jwtExistInBlackList && payload) {
       const user = await this.usersService.findUserByUserId(payload.userId);
       if (user && !user.isBanned) {
         request.user = {
