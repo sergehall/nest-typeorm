@@ -11,7 +11,6 @@ import {
   Res,
   Query,
 } from '@nestjs/common';
-import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from '../dto/login.dto';
@@ -43,7 +42,6 @@ import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-// @SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -117,7 +115,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.OK)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('refresh-token')
@@ -161,7 +158,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('logout')
@@ -187,7 +183,6 @@ export class AuthController {
     return true;
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
@@ -195,7 +190,6 @@ export class AuthController {
     return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {
@@ -206,7 +200,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
@@ -217,7 +210,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
   async newPassword(
@@ -228,7 +220,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@Request() req: any): ProfileDto {

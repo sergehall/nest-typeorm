@@ -181,7 +181,7 @@ export class BaseConfig {
     const value = this.configService.get('mail', {
       infer: true,
     })[key];
-    this.validationNumbersType(value);
+    await this.validationNumbersType(value);
     return value;
   }
 
@@ -192,11 +192,11 @@ export class BaseConfig {
    * @returns {Promise<any>} The value of the specified key from the 'throttle' configuration property.
    * @throws {InternalServerErrorException} If the value is not a valid number.
    */
-  protected async getValueThrottle(key: ThrottleTypes) {
+  protected async getValueThrottle(key: ThrottleTypes): Promise<number> {
     const value = this.configService.get('throttle', {
       infer: true,
     })[key];
-    this.validationNumbersType(value);
+    await this.validationNumbersType(value);
     return value;
   }
 
@@ -206,11 +206,11 @@ export class BaseConfig {
    * @returns {any} The original value if it can be converted to a number.
    * @throws {InternalServerErrorException} If the value cannot be converted to a number.
    */
-  protected validationNumbersType(value: any) {
+  protected async validationNumbersType(value: any): Promise<number> {
     const parsedValue = Number(value);
     if (isNaN(parsedValue)) {
       throw new InternalServerErrorException({
-        message: `incorrect configuration , cannot be found ${value}`,
+        message: `incorrect configuration , cannot be found ${value}. Or isNaN(parsedValue)`,
       });
     }
     return value;
