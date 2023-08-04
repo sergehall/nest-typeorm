@@ -14,7 +14,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
-import { SkipThrottle } from '@nestjs/throttler';
 import { SaService } from '../application/sa.service';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
@@ -38,7 +37,6 @@ import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-i
 import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-@SkipThrottle()
 @Controller('sa')
 export class SaController {
   constructor(

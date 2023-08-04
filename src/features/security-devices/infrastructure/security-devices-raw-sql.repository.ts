@@ -83,6 +83,7 @@ export class SecurityDevicesRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async removeDeviceByDeviceId(deviceId: string): Promise<boolean> {
     try {
       const isDeleted = await this.db.query(
@@ -99,6 +100,7 @@ export class SecurityDevicesRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async findDeviceByDeviceId(
     deviceId: string,
   ): Promise<SessionDevicesEntity[]> {

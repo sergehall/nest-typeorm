@@ -12,7 +12,6 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BloggerBlogsService } from '../application/blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
@@ -41,7 +40,6 @@ import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
-@SkipThrottle()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(

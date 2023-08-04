@@ -8,11 +8,9 @@ import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from './casl-ability.factory';
 import { CHECK_ABILITY, RequiredRule } from './abilities.decorator';
 import { ForbiddenError } from '@casl/ability';
-import { SkipThrottle } from '@nestjs/throttler';
 import { RolesEnums } from './enums/roles.enums';
 
 @Injectable()
-@SkipThrottle()
 export class AbilitiesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
