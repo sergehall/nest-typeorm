@@ -13,7 +13,7 @@ export class AddRefreshTokenToBlacklistUseCase
     private blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
   ) {}
   async execute(command: AddRefreshTokenToBlacklistCommand): Promise<boolean> {
-    return await this.blacklistJwtRawSqlRepository.addJWT(
+    return await this.blacklistJwtRawSqlRepository.addJwt(
       command.refreshTokenToBlackList,
     );
   }

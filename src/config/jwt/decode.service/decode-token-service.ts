@@ -6,7 +6,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 export class DecodeTokenService {
   constructor(private jwtService: JwtService) {}
   async toExtractPayload(token: string): Promise<PayloadDto> {
-    console.log(token, 'token');
     const payload = this.jwtService.decode(token) as {
       [key: string]: any;
     } | null;

@@ -19,10 +19,11 @@ export class CookiesJwtVerificationGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies?.['refreshToken'];
+
     const jwtExistInBlackList =
       await this.blacklistJwtRawSqlRepository.JwtExistInBlackList(refreshToken);
 
-    if (refreshToken || !jwtExistInBlackList) {
+    if (refreshToken && !jwtExistInBlackList) {
       await this.commandBus.execute(new ValidRefreshJwtCommand(refreshToken));
       return true;
     }

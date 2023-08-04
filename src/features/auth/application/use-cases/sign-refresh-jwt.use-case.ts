@@ -5,16 +5,16 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 
-export class SineRefreshJwtCommand {
+export class SignRefreshJwtCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
 }
 
-@CommandHandler(SineRefreshJwtCommand)
+@CommandHandler(SignRefreshJwtCommand)
 export class SignRefreshJwtUseCase
-  implements ICommandHandler<SineRefreshJwtCommand>
+  implements ICommandHandler<SignRefreshJwtCommand>
 {
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
-  async execute(command: SineRefreshJwtCommand) {
+  async execute(command: SignRefreshJwtCommand) {
     const { currentUserDto } = command;
 
     const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();

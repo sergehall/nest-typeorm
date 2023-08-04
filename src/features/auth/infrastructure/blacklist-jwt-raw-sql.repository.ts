@@ -5,7 +5,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 
 export class BlacklistJwtRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addJWT(jwtBlacklistDto: JwtBlacklistDto): Promise<boolean> {
+  async addJwt(jwtBlacklistDto: JwtBlacklistDto): Promise<boolean> {
     try {
       const result = await this.db.query(
         `
