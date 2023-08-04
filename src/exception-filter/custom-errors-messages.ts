@@ -3,7 +3,7 @@ export const jwtIncorrect = {
   field: 'headers.authorization',
 };
 export const jwtCookiesIncorrect = {
-  message: 'Invalid or expired JWT refreshToken in request.cookies.',
+  message: 'Invalid, expired or must be provided jwt in cookies.',
   field: 'request.cookies',
 };
 export const codeIncorrect = {

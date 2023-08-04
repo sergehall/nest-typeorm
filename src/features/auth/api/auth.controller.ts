@@ -29,7 +29,7 @@ import { CreateDeviceCommand } from '../../security-devices/application/use-case
 import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
 import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
-import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
+import { SignRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
@@ -63,7 +63,7 @@ export class AuthController {
     const userAgent = req.get('user-agent') || 'None';
 
     const signedToken = await this.commandBus.execute(
-      new SineRefreshJwtCommand(currentUserDto),
+      new SignRefreshJwtCommand(currentUserDto),
     );
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       signedToken.refreshToken,
