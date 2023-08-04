@@ -99,6 +99,7 @@ export class BloggerBlogsService {
     const totalCount =
       await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
         currentUserDto.id,
+        queryData,
       );
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
