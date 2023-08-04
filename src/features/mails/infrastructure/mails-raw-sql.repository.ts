@@ -8,18 +8,13 @@ export class MailsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
   async createEmailConfirmCode(
     newConfirmationCode: EmailsConfirmCodeEntity,
-  ): Promise<EmailsConfirmCodeEntity> {
+  ): Promise<string> {
     try {
       return await this.db.query(
         `
-        INSERT INTO public."EmailsConfirmationCodes"
-        ( "codeId", 
-          "email", 
-          "confirmationCode", 
-          "expirationDate",
-          "createdAt")
+        INSERT INTO public."EmailsConfirmationCodes"("codeId", "email", "confirmationCode", "expirationDate", "createdAt")
           VALUES ($1, $2, $3, $4, $5)
-          RETURNING *
+          RETURNING "codeId"
          `,
         [
           newConfirmationCode.codeId,
@@ -30,6 +25,7 @@ export class MailsRawSqlRepository {
         ],
       );
     } catch (error) {
+      console.log(error.message);
       throw new ForbiddenException(error.message);
     }
   }
