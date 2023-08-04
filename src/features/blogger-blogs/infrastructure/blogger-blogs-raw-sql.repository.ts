@@ -17,6 +17,7 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
+
     try {
       const blog = await this.db.query(
         `
@@ -29,6 +30,7 @@ export class BloggerBlogsRawSqlRepository {
       `,
         [blogId, dependencyIsBanned, banInfoIsBanned],
       );
+
       // Return the first blog if found, if not found return null
       return blog[0] || null;
     } catch (error) {
@@ -50,7 +52,9 @@ export class BloggerBlogsRawSqlRepository {
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-
+      console.log(id, 'id');
+      console.log(sortBy, 'sortBy');
+      console.log(direction, 'direction');
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
