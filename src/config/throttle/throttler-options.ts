@@ -24,8 +24,8 @@ export class ThrottlerOptions
       'limit',
     );
     return {
-      ttl,
-      limit,
+      ttl: ttl,
+      limit: limit,
     };
   }
 }
