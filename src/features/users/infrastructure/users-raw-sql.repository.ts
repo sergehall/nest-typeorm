@@ -205,6 +205,7 @@ export class UsersRawSqlRepository {
         `;
 
       const user = await this.db.query(query, [confirmationCode, currentTime]);
+
       return user[0] || null;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
