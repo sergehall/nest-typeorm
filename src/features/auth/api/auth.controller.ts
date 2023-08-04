@@ -41,6 +41,7 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +50,8 @@ export class AuthController {
     protected commandBus: CommandBus,
     protected decodeTokenService: DecodeTokenService,
   ) {}
+
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -80,6 +83,7 @@ export class AuthController {
     );
   }
 
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async registration(
@@ -107,6 +111,7 @@ export class AuthController {
     };
   }
 
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async registrationEmailResending(@Body() emailDto: EmailDto) {
@@ -183,6 +188,7 @@ export class AuthController {
     return true;
   }
 
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
