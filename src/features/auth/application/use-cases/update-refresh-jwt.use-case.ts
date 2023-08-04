@@ -16,14 +16,14 @@ export class UpdateRefreshJwtUseCase
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: UpdateRefreshJwtCommand): Promise<RefreshTokenDto> {
     const { currentPayload } = command;
+    const payload = {
+      userId: currentPayload.userId,
+      deviceId: currentPayload.deviceId,
+    };
+
     try {
       const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
       const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
-
-      const payload = {
-        userId: currentPayload.userId,
-        deviceId: currentPayload.deviceId,
-      };
 
       return {
         refreshToken: this.jwtService.sign(payload, {

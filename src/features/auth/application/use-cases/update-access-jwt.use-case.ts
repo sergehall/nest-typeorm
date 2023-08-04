@@ -19,12 +19,12 @@ export class UpdateAccessJwtUseCase
   async execute(command: UpdateAccessJwtCommand): Promise<AccessTokenDto> {
     const { currentPayload } = command;
 
-    try {
-      const payload = {
-        userId: currentPayload.userId,
-        deviceId: currentPayload.deviceId,
-      };
+    const payload = {
+      userId: currentPayload.userId,
+      deviceId: currentPayload.deviceId,
+    };
 
+    try {
       const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
       const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 
