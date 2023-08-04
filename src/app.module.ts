@@ -29,8 +29,9 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     TypeOrmModule.forRootAsync({
       useClass: OrmModuleOptions, // Use the OrmOptions class as the factory
     }),
-    ThrottlerModule.forRootAsync({
-      useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5, // 5 requests per ttl
     }),
     ScheduleModule.forRoot(),
     CaslModule,
