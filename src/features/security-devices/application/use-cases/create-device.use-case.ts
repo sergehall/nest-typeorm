@@ -27,8 +27,6 @@ export class CreateDeviceUseCase
       expirationDate: new Date(command.newPayload.exp * 1000).toISOString(),
       deviceId: command.newPayload.deviceId,
     };
-    return await this.securityDevicesRawSqlRepository.createOrUpdateDevice(
-      newDevices,
-    );
+    return await this.securityDevicesRawSqlRepository.createDevice(newDevices);
   }
 }
