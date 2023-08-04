@@ -19,21 +19,26 @@ export class UpdateAccessJwtUseCase
   async execute(command: UpdateAccessJwtCommand): Promise<AccessTokenDto> {
     const { currentPayload } = command;
 
-    const payload = {
-      userId: currentPayload.userId,
-      deviceId: currentPayload.deviceId,
-    };
+    try {
+      const payload = {
+        userId: currentPayload.userId,
+        deviceId: currentPayload.deviceId,
+      };
 
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+      const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+      const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 
-    if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
-      throw new InternalServerErrorException();
-    return {
-      accessToken: this.jwtService.sign(payload, {
-        secret: ACCESS_SECRET_KEY,
-        expiresIn: EXP_ACC_TIME,
-      }),
-    };
+      if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
+        throw new InternalServerErrorException();
+      return {
+        accessToken: this.jwtService.sign(payload, {
+          secret: ACCESS_SECRET_KEY,
+          expiresIn: EXP_ACC_TIME,
+        }),
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

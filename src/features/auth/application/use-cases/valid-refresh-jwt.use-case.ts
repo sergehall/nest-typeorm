@@ -17,9 +17,9 @@ export class ValidRefreshJwtUseCase
 
     const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
 
-    return await this.jwtService
-      .verify(refreshToken, { secret: REFRESH_SECRET_KEY })
-      .then((result: string) => result)
-      .catch(() => null);
+    const result = await this.jwtService.verify(refreshToken, {
+      secret: REFRESH_SECRET_KEY,
+    });
+    return result;
   }
 }

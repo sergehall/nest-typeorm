@@ -17,9 +17,9 @@ export class ValidAccessJwtUseCase
 
     const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
 
-    return await this.jwtService
-      .verify(accessToken, { secret: ACCESS_SECRET_KEY })
-      .then((result: string) => result)
-      .catch(() => null);
+    const result = await this.jwtService.verify(accessToken, {
+      secret: ACCESS_SECRET_KEY,
+    });
+    return result;
   }
 }
