@@ -11,6 +11,7 @@ import {
   Res,
   Query,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from '../dto/login.dto';
@@ -41,7 +42,6 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -160,6 +160,14 @@ export class AuthController {
     );
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('registration-confirmation')
+  async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
+    const { code } = codeDto;
+    console.log('registration-confirmation');
+    return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
+  }
+
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
@@ -184,14 +192,6 @@ export class AuthController {
     await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
     return true;
-  }
-
-  @UseGuards(ThrottlerGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('registration-confirmation')
-  async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
-    const { code } = codeDto;
-    return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 
   @SkipThrottle()
