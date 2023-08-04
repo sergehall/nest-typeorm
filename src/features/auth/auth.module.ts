@@ -31,6 +31,7 @@ import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token
 import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
+import { appProviders } from '../../app.providers';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -53,6 +54,7 @@ const authUseCases = [
   imports: [UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
+    ...appProviders,
     LocalStrategy,
     JwtStrategy,
     JwtConfig,
