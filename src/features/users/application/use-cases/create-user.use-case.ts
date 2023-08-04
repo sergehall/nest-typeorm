@@ -17,6 +17,7 @@ export class CreateUserCommand {
     public registrationData: RegDataDto,
   ) {}
 }
+
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
