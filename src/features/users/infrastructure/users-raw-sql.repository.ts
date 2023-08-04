@@ -94,22 +94,21 @@ export class UsersRawSqlRepository {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
       const sortBy = queryData.queryPagination.sortBy;
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
-      const isBanned = false;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
       return await this.db.query(
         `
       SELECT "userId" as "id", "login", "email", "createdAt"
       FROM public."Users"
-      WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" in $3
+      WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" in (${banCondition})
       ORDER BY "${sortBy}" ${direction}
-      LIMIT $4 OFFSET $5
+      LIMIT $3 OFFSET $4
     `,
-        [searchEmailTerm, searchLoginTerm, isBanned, limit, offset],
+        [searchEmailTerm, searchLoginTerm, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
