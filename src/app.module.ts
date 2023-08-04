@@ -30,7 +30,7 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
       useClass: OrmModuleOptions, // Use the OrmOptions class as the factory
     }),
     ThrottlerModule.forRoot({
-      ttl: 10,
+      ttl: 10, // 10 sec
       limit: 5, // 5 requests per ttl
     }),
     ScheduleModule.forRoot(),
@@ -48,7 +48,7 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     TestingModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ...appProviders],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
