@@ -48,24 +48,33 @@ export class BloggerBlogsRawSqlRepository {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
       const { id } = currentUserDto;
+      const searchNameTerm = queryData.searchNameTerm;
       const sortBy = queryData.queryPagination.sortBy;
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-      console.log(id, 'id');
-      console.log(sortBy, 'sortBy');
-      console.log(direction, 'direction');
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
+        WHERE "dependencyIsBanned" = $1 
+        AND "banInfoIsBanned" = $2 
+        AND "blogOwnerId" = $3
+        AND "name" ILIKE $4
         ORDER BY "${sortBy}" ${direction}
-        LIMIT $4 OFFSET $5
+        LIMIT $5 OFFSET $6
         `,
-        [blogOwnerBanStatus, banInfoBanStatus, id, limit, offset],
+        [
+          blogOwnerBanStatus,
+          banInfoBanStatus,
+          id,
+          searchNameTerm,
+          limit,
+          offset,
+        ],
       );
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -163,18 +172,25 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async totalCountBlogsByUserId(blogOwnerId: string): Promise<number> {
+  async totalCountBlogsByUserId(
+    blogOwnerId: string,
+    queryData: ParseQueriesType,
+  ): Promise<number> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
+      const searchNameTerm = queryData.searchNameTerm;
 
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
+        WHERE "dependencyIsBanned" = $1 
+        AND "banInfoIsBanned" = $2 
+        AND "blogOwnerId" = $3
+        AND "name" ILIKE $4
       `,
-        [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId],
+        [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId, searchNameTerm],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
