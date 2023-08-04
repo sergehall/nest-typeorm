@@ -12,12 +12,14 @@ import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/bl
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
+import { ParseQueriesService } from '../common/query/parse-queries.service';
 
 @Module({
   imports: [CaslModule, CqrsModule],
   controllers: [BlogsController],
   providers: [
     AuthService,
+    ParseQueriesService,
     UsersService,
     BlogsService,
     BloggerBlogsService,

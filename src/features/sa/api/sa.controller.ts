@@ -21,7 +21,6 @@ import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/application/users.service';
 import { Action } from '../../../ability/roles/action.enum';
-import { ParseQuery } from '../../common/query/parse-query';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
@@ -37,12 +36,14 @@ import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 @SkipThrottle()
 @Controller('sa')
 export class SaController {
   constructor(
     private saService: SaService,
+    private parseQueriesService: ParseQueriesService,
     private usersService: UsersService,
     private bloggerBlogsService: BloggerBlogsService,
     private commandBus: CommandBus,
@@ -53,7 +54,7 @@ export class SaController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindUsers(@Query() query: any) {
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return this.usersService.saFindUsers(queryData);
   }
@@ -66,7 +67,7 @@ export class SaController {
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.bloggerBlogsService.saFindBlogs(queryData);
   }

@@ -31,7 +31,6 @@ import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jw
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { SineRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
-import { ParseQuery } from '../../common/query/parse-query';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
@@ -42,11 +41,13 @@ import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 @SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
+    protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
     protected decodeTokenService: DecodeTokenService,
   ) {}
@@ -220,7 +221,7 @@ export class AuthController {
   async confirmRegistrationByCodeFromQuery(
     @Query() query: any,
   ): Promise<boolean> {
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData = await this.parseQueriesService.getQueriesData(query);
     console.log(
       'Congratulations account is confirmed. Send a message not here, into email that has been confirmed.',
     );

@@ -9,7 +9,6 @@ import {
 import { BlogsService } from '../application/blogs.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { IdParams } from '../../common/query/params/id.params';
-import { ParseQuery } from '../../common/query/parse-query';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -17,16 +16,22 @@ import { Action } from '../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
-  constructor(protected blogsService: BlogsService) {}
+  constructor(
+    protected blogsService: BlogsService,
+    private parseQueriesService: ParseQueriesService,
+  ) {}
 
   @Get()
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindBlogs(@Query() query: any): Promise<PaginationTypes> {
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData: ParseQueriesType =
+      await this.parseQueriesService.getQueriesData(query);
 
     return await this.blogsService.openFindBlogs(queryData);
   }
@@ -48,7 +53,8 @@ export class BlogsController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData: ParseQueriesType =
+      await this.parseQueriesService.getQueriesData(query);
 
     return await this.blogsService.openFindPostsByBlogId(
       params,

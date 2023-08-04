@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueryType } from '../../common/query/parse-query';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 export class BannedUsersForBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -61,15 +61,16 @@ export class BannedUsersForBlogsRawSqlRepository {
 
   async findBannedUsers(
     blogId: string,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
       const isBanned = true;
-      const direction = this.getSortingDirection(queryData);
-      const searchLoginTerm = this.getSearchLoginTerm(
-        queryData.searchLoginTerm,
-      );
-      const sortBy = this.mapSortByField(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const sortBy =
+        queryData.queryPagination.sortBy === 'createdAt'
+          ? 'banDate'
+          : queryData.queryPagination.sortBy;
       const limit = queryData.queryPagination.pageSize;
       const offset = queryData.queryPagination.pageNumber - 1;
 
@@ -134,21 +135,5 @@ export class BannedUsersForBlogsRawSqlRepository {
       console.log(error.message);
       throw new NotFoundException(error.message);
     }
-  }
-
-  private getSortingDirection(queryData: ParseQueryType): 'ASC' | 'DESC' {
-    return [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-      queryData.queryPagination.sortDirection,
-    )
-      ? 'ASC'
-      : 'DESC';
-  }
-
-  private getSearchLoginTerm(searchLoginTerm: string): string {
-    return searchLoginTerm.length !== 0 ? `%${searchLoginTerm}%` : '%%';
-  }
-
-  private mapSortByField(sortBy: string): string {
-    return sortBy === 'createdAt' ? 'banDate' : sortBy;
   }
 }

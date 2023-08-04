@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -12,7 +12,7 @@ export class BloggerBlogsService {
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
-  async openFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {
+  async openFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
     const blogs: TableBloggerBlogsRawSqlEntity[] =
       await this.bloggerBlogsRawSqlRepository.openFindBlogs(queryData);
 
@@ -51,7 +51,7 @@ export class BloggerBlogsService {
     return await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
   }
 
-  async saFindBlogs(queryData: ParseQueryType): Promise<PaginationTypes> {
+  async saFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
     const blogs: TableBloggerBlogsRawSqlEntity[] =
       await this.bloggerBlogsRawSqlRepository.saFindBlogs(queryData);
 
@@ -89,7 +89,7 @@ export class BloggerBlogsService {
 
   async findBlogsCurrentUser(
     currentUserDto: CurrentUserDto,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<PaginationTypes> {
     const blogs: TableBloggerBlogsRawSqlEntity[] =
       await this.bloggerBlogsRawSqlRepository.findBlogsCurrentUser(

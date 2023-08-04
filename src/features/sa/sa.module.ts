@@ -23,6 +23,7 @@ import { ExpirationDateCalculator } from '../common/calculator/expiration-date-c
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
+import { ParseQueriesService } from '../common/query/parse-queries.service';
 
 const saUseCases = [
   CreateUserUseCase,
@@ -37,6 +38,7 @@ const saUseCases = [
   imports: [CaslModule, CqrsModule],
   controllers: [SaController],
   providers: [
+    ParseQueriesService,
     SaService,
     UsersService,
     BloggerBlogsService,
