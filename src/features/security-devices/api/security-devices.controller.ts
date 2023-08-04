@@ -18,7 +18,6 @@ import { DeviceIdParams } from '../../common/query/params/deviceId.params';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 
-// @SkipThrottle()
 @Controller('security')
 export class SecurityDevicesController {
   constructor(
