@@ -48,11 +48,12 @@ export class BloggerBlogsRawSqlRepository {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
       const { id } = currentUserDto;
-      const searchNameTerm = queryData.searchNameTerm;
+      const searchNameTerm = queryData.searchNameTerm.toLowerCase();
       const sortBy = queryData.queryPagination.sortBy;
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
@@ -60,7 +61,7 @@ export class BloggerBlogsRawSqlRepository {
         WHERE "dependencyIsBanned" = $1 
         AND "banInfoIsBanned" = $2 
         AND "blogOwnerId" = $3
-        AND "name" ILIKE $4
+        AND LOWER("name") ILIKE $4
         ORDER BY "${sortBy}" ${direction}
         LIMIT $5 OFFSET $6
         `,
@@ -180,7 +181,6 @@ export class BloggerBlogsRawSqlRepository {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
       const searchNameTerm = queryData.searchNameTerm;
-
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
