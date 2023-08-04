@@ -55,7 +55,7 @@ export class FindAllBannedUsersForBlogUseCase
     // Transform the banned user data into return format
     const transformedBannedUsers: ReturnBannedUsersForBlogEntity[] =
       bannedUsers.map((user: BannedUsersForBlogsEntity) => ({
-        id: user.id,
+        id: user.userId,
         login: user.login,
         banInfo: {
           isBanned: user.isBanned,
