@@ -28,8 +28,6 @@ export class UpdateAccessJwtUseCase
       const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
       const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 
-      if (!ACCESS_SECRET_KEY || !EXP_ACC_TIME)
-        throw new InternalServerErrorException();
       return {
         accessToken: this.jwtService.sign(payload, {
           secret: ACCESS_SECRET_KEY,
