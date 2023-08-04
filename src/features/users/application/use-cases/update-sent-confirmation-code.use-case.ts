@@ -36,8 +36,8 @@ export class UpdateSentConfirmationCodeUseCase
         0,
       );
 
-      await this.usersRawSqlRepository.updateUserConfirmationCode(
-        user.id,
+      await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
+        user.email,
         confirmationCode,
         expirationDate,
       );

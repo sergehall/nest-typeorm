@@ -27,7 +27,7 @@ export class PasswordRecoveryViaEmailConfirmationUseCase
       expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString(),
     };
-    await this.usersRawSqlRepository.updateUserConfirmationCode(
+    await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
       email,
       newConfirmationCode.recoveryCode,
       newConfirmationCode.expirationDate,

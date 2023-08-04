@@ -229,7 +229,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async updateUserConfirmationCode(
+  async updateUserConfirmationCodeByEmail(
     email: string,
     confirmationCode: string,
     expirationDate: string,
@@ -238,9 +238,10 @@ export class UsersRawSqlRepository {
       const updateUser = await this.db.query(
         `
       UPDATE public."Users"
-      SET  "confirmationCode" = $2, "expirationDate" = $3
+      SET "confirmationCode" = $2, "expirationDate" = $3
       WHERE "email" = $1
-      RETURNING *`,
+      RETURNING *
+      `,
         [email, confirmationCode, expirationDate],
       );
       return updateUser[0];
