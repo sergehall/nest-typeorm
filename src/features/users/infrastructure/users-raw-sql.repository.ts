@@ -6,27 +6,28 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { TablesUsersEntity } from '../entities/tables-users.entity';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 @Injectable()
 export class UsersRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async saFindUsers(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const direction = preparedQuery.direction;
+      const direction = queryData.queryPagination.sortDirection;
       const sortBy = queryData.queryPagination.sortBy;
-      const banCondition = preparedQuery.banCondition;
-      const searchEmailTerm = preparedQuery.searchEmailTerm;
-      const searchLoginTerm = preparedQuery.searchLoginTerm;
+      const banCondition = queryData.banStatus;
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
       const limit = queryData.queryPagination.pageSize;
-      const offset = preparedQuery.offset;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
 
       return await this.db.query(
         `
@@ -88,16 +89,17 @@ export class UsersRawSqlRepository {
   }
 
   async findUsers(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const searchEmailTerm = preparedQuery.searchEmailTerm;
-      const searchLoginTerm = preparedQuery.searchLoginTerm;
-      const sortBy = preparedQuery.sortBy;
-      const direction = preparedQuery.direction;
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset = preparedQuery.offset;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
       const isBanned = false;
       return await this.db.query(
         `
@@ -287,12 +289,11 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async totalCountUsersForSa(queryData: ParseQueryType): Promise<number> {
+  async totalCountUsersForSa(queryData: ParseQueriesType): Promise<number> {
     try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const searchEmailTerm = preparedQuery.searchEmailTerm;
-      const searchLoginTerm = preparedQuery.searchLoginTerm;
-      const banCondition = preparedQuery.banCondition;
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -307,12 +308,11 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async totalCountUsers(queryData: ParseQueryType): Promise<number> {
+  async totalCountUsers(queryData: ParseQueriesType): Promise<number> {
     try {
-      const preparedQuery = await this.prepQueryRawSql(queryData);
-      const searchEmailTerm = preparedQuery.searchEmailTerm;
-      const searchLoginTerm = preparedQuery.searchLoginTerm;
-      const banCondition = preparedQuery.banCondition;
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -417,50 +417,6 @@ export class UsersRawSqlRepository {
         [isConfirmed, currentTime],
       );
       return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async prepQueryRawSql(queryData: ParseQueryType) {
-    try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-
-      const banCondition =
-        queryData.banStatus === ''
-          ? [true, false]
-          : queryData.banStatus === 'true'
-          ? [true]
-          : [false];
-
-      const searchLoginTerm =
-        queryData.searchLoginTerm.length !== 0
-          ? `%${queryData.searchLoginTerm.toLocaleLowerCase()}%`
-          : '%';
-
-      const searchEmailTerm =
-        queryData.searchEmailTerm.length !== 0
-          ? `%${queryData.searchEmailTerm.toLocaleLowerCase()}%`
-          : '%';
-
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
-
-      const sortBy = queryData.queryPagination.sortBy;
-
-      return {
-        sortBy: sortBy,
-        direction: direction,
-        offset: offset,
-        banCondition: banCondition,
-        searchEmailTerm: searchEmailTerm,
-        searchLoginTerm: searchLoginTerm,
-      };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

@@ -3,11 +3,11 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { TablesCommentsRawSqlEntity } from '../../../comments/entities/tables-comments-raw-sql.entity';
 import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
-import { ParseQueryType } from '../../../common/query/parse-query';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
-    public queryData: ParseQueryType,
+    public queryData: ParseQueriesType,
     public currentUserDto: CurrentUserDto,
   ) {}
 }

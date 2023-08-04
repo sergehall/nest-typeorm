@@ -26,6 +26,7 @@ import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/l
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banstatus-posts-by-blogid.use-case';
 import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banstatus-posts.use-case';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
+import { ParseQueriesService } from '../common/query/parse-queries.service';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -46,6 +47,7 @@ const postsUseCases = [
     JwtConfig,
     JwtService,
     PostsService,
+    ParseQueriesService,
     CommentsService,
     MailsRawSqlRepository,
     UsersService,

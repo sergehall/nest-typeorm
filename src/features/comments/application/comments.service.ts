@@ -5,10 +5,10 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../infrastructure/comments-raw-sql.repository';
 import { FilledCommentEntity } from '../entities/filledComment.entity';
 import { ReturnCommentsEntity } from '../entities/comments-return.entity';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { PostsRawSqlRepository } from '../../posts/infrastructure/posts-raw-sql.repository';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 @Injectable()
 export class CommentsService {
@@ -52,7 +52,7 @@ export class CommentsService {
 
   async findCommentsByPostId(
     postId: string,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
     const post = await this.postsRawSqlRepository.findPostByPostId(postId);

@@ -4,10 +4,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -40,7 +40,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async findBlogsCurrentUser(
     currentUserDto: CurrentUserDto,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
       const blogOwnerBanStatus = false;
@@ -72,7 +72,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async openFindBlogs(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
       const blogOwnerBanStatus = false;
@@ -108,7 +108,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async totalCountBlogs(queryData: ParseQueryType): Promise<number> {
+  async totalCountBlogs(queryData: ParseQueriesType): Promise<number> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -131,7 +131,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saTotalCountBlogs(queryData: ParseQueryType): Promise<number> {
+  async saTotalCountBlogs(queryData: ParseQueriesType): Promise<number> {
     try {
       const searchNameTerm =
         queryData.searchNameTerm.length !== 0
@@ -152,7 +152,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async saFindBlogs(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
       const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(

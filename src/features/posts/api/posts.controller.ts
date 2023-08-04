@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { CommentsService } from '../../comments/application/comments.service';
-import { ParseQuery } from '../../common/query/parse-query';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -37,11 +36,13 @@ import { UpdatePostWithBlogIdDto } from '../dto/update-post-withBlogId.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
 import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
+    protected parseQueriesService: ParseQueriesService,
     protected postsService: PostsService,
     protected commentsService: CommentsService,
     protected commandBus: CommandBus,
@@ -55,7 +56,7 @@ export class PostsController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return this.postsService.openFindPosts(queryData, currentUserDto);
   }
@@ -112,7 +113,7 @@ export class PostsController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commentsService.findCommentsByPostId(
       params.postId,

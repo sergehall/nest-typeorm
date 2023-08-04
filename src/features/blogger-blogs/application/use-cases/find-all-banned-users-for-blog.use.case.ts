@@ -1,5 +1,4 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ParseQueryType } from '../../../common/query/parse-query';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
@@ -11,11 +10,12 @@ import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructu
 import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { ReturnBannedUsersForBlogEntity } from '../../entities/return-banned-users-for-blog.entity';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 
 export class FindAllBannedUsersForBlogCommand {
   constructor(
     public blogId: string,
-    public queryData: ParseQueryType,
+    public queryData: ParseQueriesType,
     public currentUser: CurrentUserDto,
   ) {}
 }

@@ -16,7 +16,6 @@ import {
 import { UsersService } from '../application/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { ParseQuery } from '../../common/query/parse-query';
 import { Action } from '../../../ability/roles/action.enum';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
@@ -30,13 +29,16 @@ import { UpdateUserCommand } from '../application/use-cases/update-user.use-case
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/currentUser.dto';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 @SkipThrottle()
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService,
-    private commandBus: CommandBus,
+    protected usersService: UsersService,
+    protected commandBus: CommandBus,
+    protected parseQueries: ParseQueriesService,
   ) {}
 
   @Get()
@@ -44,7 +46,9 @@ export class UsersController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUsers(@Query() query: any) {
-    const queryData = ParseQuery.getPaginationData(query);
+    const queryData: ParseQueriesType = await this.parseQueries.getQueriesData(
+      query,
+    );
 
     return this.usersService.findUsers(queryData);
   }

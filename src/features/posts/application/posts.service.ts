@@ -10,7 +10,6 @@ import {
   ReturnPostsEntity,
 } from '../entities/posts-without-ownerInfo.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
 import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
@@ -18,6 +17,7 @@ import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { userNotHavePermission } from '../../../exception-filter/custom-errors-messages';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 @Injectable()
 export class PostsService {
@@ -26,7 +26,7 @@ export class PostsService {
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
   ) {}
   async openFindPosts(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
     const posts: TablesPostsEntity[] =
@@ -51,7 +51,7 @@ export class PostsService {
 
   async openFindPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
     const posts: TablesPostsEntity[] | null =
@@ -84,7 +84,7 @@ export class PostsService {
   }
   async findPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto,
   ): Promise<PaginationTypes> {
     const posts: TablesPostsEntity[] | null =

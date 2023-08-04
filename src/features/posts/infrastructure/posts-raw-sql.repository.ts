@@ -4,15 +4,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ParseQueryType } from '../../common/query/parse-query';
-import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
+import { BlogIdParams } from '../../common/query/params/blogId.params';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 export class PostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async openFindPosts(queryData: ParseQueryType): Promise<TablesPostsEntity[]> {
+  async openFindPosts(
+    queryData: ParseQueriesType,
+  ): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     try {
@@ -70,7 +72,7 @@ export class PostsRawSqlRepository {
 
   async findPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TablesPostsEntity[] | null> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;

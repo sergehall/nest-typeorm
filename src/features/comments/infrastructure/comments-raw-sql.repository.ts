@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.entity';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
-import { ParseQueryType } from '../../common/query/parse-query';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 
 export class CommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -50,20 +50,19 @@ export class CommentsRawSqlRepository {
   }
 
   async findCommentsByCommentatorId(
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
     commentatorInfoUserId: string,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     const commentatorInfoIsBanned = false;
     const banInfoIsBanned = false;
     const limit = queryData.queryPagination.pageSize;
-    const offset = queryData.queryPagination.pageNumber - 1;
+    const offset =
+      (queryData.queryPagination.pageNumber - 1) *
+      queryData.queryPagination.pageSize;
+    const sortBy = queryData.queryPagination.sortBy;
+    const direction = queryData.queryPagination.sortDirection;
+
     try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", 
@@ -72,7 +71,7 @@ export class CommentsRawSqlRepository {
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
-        ORDER BY ${orderByDirection}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
           `,
         [
@@ -152,19 +151,20 @@ export class CommentsRawSqlRepository {
 
   async findCommentsByPostId(
     postId: string,
-    queryData: ParseQueryType,
+    queryData: ParseQueriesType,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
       const offset = queryData.queryPagination.pageNumber - 1;
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
-      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${queryData.queryPagination.sortDirection}`;
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Comments"
         WHERE "postInfoPostId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
-        ORDER BY ${orderByDirection}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
           `,
         [

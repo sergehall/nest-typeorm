@@ -22,6 +22,7 @@ import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-a
 import { SaChangeBanstatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/sa-change-banstatus-blogs-by-blog-id.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
+import { ParseQueriesService } from '../common/query/parse-queries.service';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -41,9 +42,10 @@ const bloggersBlogRules = [BlogExistsRule];
   imports: [CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
+    CaslAbilityFactory,
+    ParseQueriesService,
     BloggerBlogsService,
     PostsService,
-    CaslAbilityFactory,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
