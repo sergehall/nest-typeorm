@@ -45,26 +45,21 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
+      const { id } = currentUserDto;
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
         WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogOwnerId" = $3
-        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
         `,
-        [
-          blogOwnerBanStatus,
-          banInfoBanStatus,
-          currentUserDto.id,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber - 1,
-        ],
+        [blogOwnerBanStatus, banInfoBanStatus, id, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -77,31 +72,22 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-      const searchNameTerm =
-        queryData.searchNameTerm.length !== 0
-          ? `%${queryData.searchNameTerm}%`
-          : '%%';
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+      const searchNameTerm = queryData.searchNameTerm;
+
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
         WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         AND "name" ILIKE $3
-        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
         `,
-        [
-          blogOwnerBanStatus,
-          banInfoBanStatus,
-          searchNameTerm,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber - 1,
-        ],
+        [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -112,10 +98,8 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
-      const searchNameTerm =
-        queryData.searchNameTerm.length !== 0
-          ? `%${queryData.searchNameTerm}%`
-          : '%';
+      const searchNameTerm = queryData.searchNameTerm;
+
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
@@ -133,10 +117,8 @@ export class BloggerBlogsRawSqlRepository {
 
   async saTotalCountBlogs(queryData: ParseQueriesType): Promise<number> {
     try {
-      const searchNameTerm =
-        queryData.searchNameTerm.length !== 0
-          ? `%${queryData.searchNameTerm}%`
-          : '%';
+      const searchNameTerm = queryData.searchNameTerm;
+
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
@@ -155,29 +137,22 @@ export class BloggerBlogsRawSqlRepository {
     queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-      const searchNameTerm =
-        queryData.searchNameTerm.length !== 0
-          ? `%${queryData.searchNameTerm}%`
-          : '%%';
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+      const searchNameTerm = queryData.searchNameTerm;
+
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership", 
         "blogOwnerId", "blogOwnerLogin", "banInfoIsBanned", "banInfoBanDate"
         FROM public."BloggerBlogs"
         WHERE "name" ILIKE $1
-        ORDER BY "${queryData.queryPagination.sortBy}" ${direction}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $2 OFFSET $3
         `,
-        [
-          searchNameTerm,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber - 1,
-        ],
+        [searchNameTerm, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -188,6 +163,7 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
+
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
@@ -228,15 +204,16 @@ export class BloggerBlogsRawSqlRepository {
     newBlog: TableBloggerBlogsRawSqlEntity,
   ): Promise<boolean> {
     try {
+      const { id, name, description, websiteUrl } = newBlog;
       const updatedBlogById = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
       SET  "name" = $2, "description" = $3, "websiteUrl" = $4
       WHERE "id" = $1
       RETURNING *`,
-        [newBlog.id, newBlog.name, newBlog.description, newBlog.websiteUrl],
+        [id, name, description, websiteUrl],
       );
-      return updatedBlogById.length !== 0;
+      return updatedBlogById[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -274,23 +251,6 @@ export class BloggerBlogsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeBlogById(blogId: string): Promise<boolean> {
-    try {
-      const comment = await this.db.query(
-        `
-        DELETE FROM public."BloggerBlogs"
-        WHERE "id" = $1
-        RETURNING "id"
-          `,
-        [blogId],
-      );
-      return comment[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
     }
   }
 
@@ -417,6 +377,7 @@ export class BloggerBlogsRawSqlRepository {
     blogId: string,
     userForBind: TablesUsersWithIdEntity,
   ): Promise<boolean> {
+    const { id, login } = userForBind;
     try {
       return await this.db.query(
         `
@@ -424,7 +385,7 @@ export class BloggerBlogsRawSqlRepository {
         SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
         WHERE "id" = $1
         `,
-        [blogId, userForBind.id, userForBind.login],
+        [blogId, id, login],
       );
     } catch (error) {
       console.log(error.message);

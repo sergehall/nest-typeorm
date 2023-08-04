@@ -17,13 +17,13 @@ export class PostsRawSqlRepository {
   ): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
+    const sortBy = queryData.queryPagination.sortBy;
+    const direction = queryData.queryPagination.sortDirection;
+    const limit = queryData.queryPagination.pageSize;
+    const offset =
+      (queryData.queryPagination.pageNumber - 1) *
+      queryData.queryPagination.pageSize;
     try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
       return await this.db.query(
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
@@ -31,15 +31,10 @@ export class PostsRawSqlRepository {
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
         WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        ORDER BY ${orderByDirection}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $3 OFFSET $4
         `,
-        [
-          postOwnerIsBanned,
-          banInfoBanStatus,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber - 1,
-        ],
+        [postOwnerIsBanned, banInfoBanStatus, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -76,31 +71,25 @@ export class PostsRawSqlRepository {
   ): Promise<TablesPostsEntity[] | null> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
+    const { blogId } = params;
+    const sortBy = queryData.queryPagination.sortBy;
+    const limit = queryData.queryPagination.pageSize;
+    const direction = queryData.queryPagination.sortDirection;
+    const offset =
+      (queryData.queryPagination.pageNumber - 1) *
+      queryData.queryPagination.pageSize;
     try {
-      const direction = [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
-        queryData.queryPagination.sortDirection,
-      )
-        ? 'ASC'
-        : 'DESC';
-      const orderByDirection = `"${queryData.queryPagination.sortBy}" ${direction}`;
-      // Return posts if found, if not found actuate catch (error)
       return await this.db.query(
         `
         SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
          "postOwnerId", "dependencyIsBanned",
          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
-        WHERE "blogId" = $5 AND "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        ORDER BY ${orderByDirection}
-        LIMIT $3 OFFSET $4
+        WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+        ORDER BY "${sortBy}" ${direction}
+        LIMIT $4 OFFSET $5
         `,
-        [
-          postOwnerIsBanned,
-          banInfoBanStatus,
-          queryData.queryPagination.pageSize,
-          queryData.queryPagination.pageNumber - 1,
-          params.blogId,
-        ],
+        [blogId, postOwnerIsBanned, banInfoBanStatus, limit, offset],
       );
     } catch (error) {
       console.log(error.message);

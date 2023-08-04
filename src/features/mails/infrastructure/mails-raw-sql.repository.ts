@@ -72,14 +72,15 @@ export class MailsRawSqlRepository {
 
   async findEmailRecCodeByOldestDate(): Promise<EmailsRecoveryCodesEntity[]> {
     try {
-      const orderByDirection = `"createdAt" DESC`;
+      const sortBy = 'createdAt';
+      const direction = 'DESC';
       const limit = 1;
       const offset = 0;
       return await this.db.query(
         `
         SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt"
         FROM public."EmailsRecoveryCodes"
-        ORDER BY ${orderByDirection}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $1 OFFSET $2
          `,
         [limit, offset],

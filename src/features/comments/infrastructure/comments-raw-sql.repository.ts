@@ -154,11 +154,15 @@ export class CommentsRawSqlRepository {
     queryData: ParseQueriesType,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
-      const offset = queryData.queryPagination.pageNumber - 1;
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
+
       const sortBy = queryData.queryPagination.sortBy;
       const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
       return await this.db.query(
         `
         SELECT "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
@@ -167,13 +171,7 @@ export class CommentsRawSqlRepository {
         ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
           `,
-        [
-          postId,
-          commentatorInfoIsBanned,
-          banInfoIsBanned,
-          queryData.queryPagination.pageSize,
-          offset,
-        ],
+        [postId, commentatorInfoIsBanned, banInfoIsBanned, limit, offset],
       );
     } catch (error) {
       console.log(error.message);
@@ -290,21 +288,6 @@ export class CommentsRawSqlRepository {
       WHERE "postInfoBlogId" = $1
       `,
         [blogId, isBanned],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async deleteLikePostUserByUserId(userId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."LikeStatusPosts"
-        WHERE "userId" = $1
-        `,
-        [userId],
       );
     } catch (error) {
       console.log(error.message);
