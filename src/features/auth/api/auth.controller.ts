@@ -43,6 +43,7 @@ import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
