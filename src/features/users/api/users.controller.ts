@@ -30,7 +30,9 @@ import { IdParams } from '../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/currentUser.dto';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('users')
 export class UsersController {
   constructor(

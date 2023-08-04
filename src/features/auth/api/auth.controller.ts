@@ -41,7 +41,7 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
 import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -51,7 +51,6 @@ export class AuthController {
     protected decodeTokenService: DecodeTokenService,
   ) {}
 
-  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -83,7 +82,6 @@ export class AuthController {
     );
   }
 
-  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async registration(
@@ -111,7 +109,6 @@ export class AuthController {
     };
   }
 
-  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async registrationEmailResending(@Body() emailDto: EmailDto) {
@@ -163,6 +160,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('logout')
@@ -196,6 +194,7 @@ export class AuthController {
     return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
   async confirmRegistrationByCodeFromQuery(@Query() query: any) {
@@ -206,6 +205,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
@@ -216,6 +216,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
   async newPassword(
@@ -226,6 +227,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@Request() req: any): ProfileDto {

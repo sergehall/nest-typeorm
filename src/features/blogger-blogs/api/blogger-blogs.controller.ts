@@ -39,7 +39,9 @@ import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-
 
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(

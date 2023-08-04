@@ -17,7 +17,9 @@ import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-
 import { DeviceIdParams } from '../../common/query/params/deviceId.params';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('security')
 export class SecurityDevicesController {
   constructor(

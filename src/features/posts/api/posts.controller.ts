@@ -36,7 +36,9 @@ import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
 import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
