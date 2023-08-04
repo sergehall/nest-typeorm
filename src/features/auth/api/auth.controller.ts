@@ -126,7 +126,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const refreshToken = req.cookies;
+    const refreshToken = req.cookies.refreshToken;
 
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(refreshToken);
@@ -147,7 +147,6 @@ export class AuthController {
       await this.decodeTokenService.toExtractPayload(
         newRefreshToken.refreshToken,
       );
-
     const userAgent = req.get('user-agent');
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),

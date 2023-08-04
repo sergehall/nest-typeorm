@@ -16,22 +16,26 @@ export class UpdateRefreshJwtUseCase
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: UpdateRefreshJwtCommand): Promise<RefreshTokenDto> {
     const { currentPayload } = command;
+    try {
+      const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+      const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
 
-    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
-    const EXP_REF_TIME = this.jwtConfig.getRefSecretKey();
+      const payload = {
+        userId: currentPayload.userId,
+        deviceId: currentPayload.deviceId,
+      };
 
-    const payload = {
-      userId: currentPayload.userId,
-      deviceId: currentPayload.deviceId,
-    };
-
-    if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
-      throw new InternalServerErrorException();
-    return {
-      refreshToken: this.jwtService.sign(payload, {
-        secret: REFRESH_SECRET_KEY,
-        expiresIn: EXP_REF_TIME,
-      }),
-    };
+      if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
+        throw new InternalServerErrorException();
+      return {
+        refreshToken: this.jwtService.sign(payload, {
+          secret: REFRESH_SECRET_KEY,
+          expiresIn: EXP_REF_TIME,
+        }),
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
