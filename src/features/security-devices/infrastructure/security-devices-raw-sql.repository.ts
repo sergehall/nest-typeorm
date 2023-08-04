@@ -8,37 +8,6 @@ import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.e
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  // async createDevice(newDevices: SessionDevicesEntity): Promise<boolean> {
-  //   try {
-  //     const createDevice = await this.db.query(
-  //       `
-  //     INSERT INTO public."SecurityDevices"
-  //     ("userId",
-  //      "deviceId",
-  //      "ip",
-  //      "title",
-  //      "lastActiveDate",
-  //      "expirationDate"
-  //      )
-  //     VALUES ($1, $2, $3, $4, $5, $6)
-  //     RETURNING "userId"
-  //     `,
-  //       [
-  //         newDevices.userId,
-  //         newDevices.deviceId,
-  //         newDevices.ip,
-  //         newDevices.title,
-  //         newDevices.lastActiveDate,
-  //         newDevices.expirationDate,
-  //       ],
-  //     );
-  //     return createDevice[0] != null;
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
-
   async createOrUpdateDevice(
     newDevices: SessionDevicesEntity,
   ): Promise<boolean> {
