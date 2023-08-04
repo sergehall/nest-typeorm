@@ -65,14 +65,13 @@ export class BannedUsersForBlogsRawSqlRepository {
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
       const isBanned = true;
-      const direction = queryData.queryPagination.sortDirection;
       const searchLoginTerm = queryData.searchLoginTerm;
-      const sortBy =
-        queryData.queryPagination.sortBy === 'createdAt'
-          ? 'banDate'
-          : queryData.queryPagination.sortBy;
+      const sortBy = queryData.queryPagination.sortBy;
+      const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset = queryData.queryPagination.pageNumber - 1;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
 
       return await this.db.query(
         `
