@@ -13,16 +13,6 @@ export class ThrottlerOptions
   async createThrottlerOptions(): Promise<ThrottlerModuleOptions> {
     const ttl: number = await this.getValueThrottle('THROTTLE_TTL');
     const limit: number = await this.getValueThrottle('THROTTLE_LIMIT');
-    console.log(
-      '----------------------------------------------------',
-      ttl,
-      'ttl',
-    );
-    console.log(
-      '----------------------------------------------------',
-      limit,
-      'limit',
-    );
     return {
       ttl: ttl,
       limit: limit,

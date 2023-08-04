@@ -36,7 +36,9 @@ import { PaginationTypes } from '../../common/pagination/types/pagination.types'
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('sa')
 export class SaController {
   constructor(

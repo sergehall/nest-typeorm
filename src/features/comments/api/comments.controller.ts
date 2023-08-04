@@ -25,7 +25,9 @@ import { RemoveCommentCommand } from '../application/use-cases/remove-comment.us
 import { IdParams } from '../../common/query/params/id.params';
 import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(

@@ -29,6 +29,9 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     TypeOrmModule.forRootAsync({
       useClass: OrmModuleOptions, // Use the OrmOptions class as the factory
     }),
+    ThrottlerModule.forRootAsync({
+      useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
+    }),
     ScheduleModule.forRoot(),
     CaslModule,
     AuthModule,
@@ -44,7 +47,7 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     TestingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ...appProviders],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

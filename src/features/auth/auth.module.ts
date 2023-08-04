@@ -31,8 +31,6 @@ import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token
 import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
-import { appProviders } from '../../app.providers';
-import { ThrottlerModule } from '@nestjs/throttler';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -52,16 +50,7 @@ const authUseCases = [
 ];
 
 @Module({
-  imports: [
-    ThrottlerModule.forRoot({
-      ttl: 10, // 10 sec
-      limit: 5, // 5 requests per ttl
-    }),
-    UsersModule,
-    PassportModule,
-    JwtModule,
-    CqrsModule,
-  ],
+  imports: [UsersModule, PassportModule, JwtModule, CqrsModule],
   controllers: [AuthController],
   providers: [
     LocalStrategy,
