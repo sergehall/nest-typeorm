@@ -37,7 +37,7 @@ export class BlacklistJwtRawSqlRepository {
       return false;
     }
   }
-  async findJWT(jwt: string): Promise<boolean> {
+  async JwtExistInBlackList(jwt: string): Promise<boolean> {
     try {
       const findJwt = await this.db.query(
         `

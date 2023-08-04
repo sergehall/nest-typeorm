@@ -19,16 +19,12 @@ export class CookiesJwtVerificationGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies?.['refreshToken'];
-    if (refreshToken) {
-      const verifyJwt = await this.commandBus.execute(
-        new ValidRefreshJwtCommand(refreshToken),
-      );
-      const checkInBL = await this.blacklistJwtRawSqlRepository.findJWT(
-        refreshToken,
-      );
-      if (verifyJwt && !checkInBL) {
-        return true;
-      }
+    const jwtExistInBlackList =
+      await this.blacklistJwtRawSqlRepository.JwtExistInBlackList(refreshToken);
+
+    if (refreshToken || !jwtExistInBlackList) {
+      await this.commandBus.execute(new ValidRefreshJwtCommand(refreshToken));
+      return true;
     }
     throw new HttpException(
       { message: [jwtCookiesIncorrect] },

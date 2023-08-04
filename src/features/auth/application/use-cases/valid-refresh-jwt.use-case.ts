@@ -2,6 +2,8 @@ import { PayloadDto } from '../../dto/payload.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { jwtCookiesIncorrect } from '../../../../exception-filter/custom-errors-messages';
 
 export class ValidRefreshJwtCommand {
   constructor(public refreshToken: string) {}
@@ -14,12 +16,19 @@ export class ValidRefreshJwtUseCase
   constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
   async execute(command: ValidRefreshJwtCommand): Promise<PayloadDto | null> {
     const { refreshToken } = command;
-
     const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
 
-    const result = await this.jwtService.verify(refreshToken, {
-      secret: REFRESH_SECRET_KEY,
-    });
-    return result;
+    try {
+      const result = await this.jwtService.verify(refreshToken, {
+        secret: REFRESH_SECRET_KEY,
+      });
+      return result;
+    } catch (error) {
+      console.log(error.message);
+      throw new HttpException(
+        { message: [jwtCookiesIncorrect] },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 }
