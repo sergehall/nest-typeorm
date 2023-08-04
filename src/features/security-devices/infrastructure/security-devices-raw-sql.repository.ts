@@ -8,11 +8,9 @@ import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.e
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async createOrUpdateDevice(
-    newDevices: SessionDevicesEntity,
-  ): Promise<boolean> {
+  async createDevice(newDevices: SessionDevicesEntity): Promise<boolean> {
     try {
-      const createOrUpdateDevice = await this.db.query(
+      const createDevice = await this.db.query(
         `
       INSERT INTO public."SecurityDevices"
       ("userId",
@@ -23,8 +21,6 @@ export class SecurityDevicesRawSqlRepository {
        "expirationDate"
        )
       VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT ( "userId", "title" ) 
-      DO UPDATE SET "userId" = $1, "deviceId" = $2, "ip" = $3, "title" = $4, "lastActiveDate" = $5, "expirationDate" = $6
       RETURNING "userId"
       `,
         [
@@ -36,12 +32,47 @@ export class SecurityDevicesRawSqlRepository {
           newDevices.expirationDate,
         ],
       );
-      return createOrUpdateDevice[0] != null;
+      return createDevice[0] != null;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  // async createOrUpdateDevice(
+  //   newDevices: SessionDevicesEntity,
+  // ): Promise<boolean> {
+  //   try {
+  //     const createOrUpdateDevice = await this.db.query(
+  //       `
+  //     INSERT INTO public."SecurityDevices"
+  //     ("userId",
+  //      "deviceId",
+  //      "ip",
+  //      "title",
+  //      "lastActiveDate",
+  //      "expirationDate"
+  //      )
+  //     VALUES ($1, $2, $3, $4, $5, $6)
+  //     ON CONFLICT ( "userId", "title" )
+  //     DO UPDATE SET "userId" = $1, "deviceId" = $2, "ip" = $3, "title" = $4, "lastActiveDate" = $5, "expirationDate" = $6
+  //     RETURNING "userId"
+  //     `,
+  //       [
+  //         newDevices.userId,
+  //         newDevices.deviceId,
+  //         newDevices.ip,
+  //         newDevices.title,
+  //         newDevices.lastActiveDate,
+  //         newDevices.expirationDate,
+  //       ],
+  //     );
+  //     return createOrUpdateDevice[0] != null;
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async findDevices(
     payload: PayloadDto,
@@ -103,8 +134,8 @@ export class SecurityDevicesRawSqlRepository {
     deviceId: string,
   ): Promise<SessionDevicesEntity[]> {
     try {
-      console.log(deviceId, 'deviceId');
       const currentTime = new Date().toISOString();
+
       return await this.db.query(
         `
         SELECT "id", "deviceId", "ip", "title", "lastActiveDate", "expirationDate", "userId"

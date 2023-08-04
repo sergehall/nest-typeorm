@@ -139,44 +139,35 @@ export class UsersRawSqlRepository {
     tablesUsersEntity: TablesUsersEntity,
   ): Promise<TablesUsersWithIdEntity> {
     try {
-      const insertNewUser = await this.db.query(
-        `
-        INSERT INTO public."Users"
-        ( "login", 
-          "email", 
-          "passwordHash", 
-          "createdAt", 
-          "orgId", 
-          "roles", 
-          "isBanned", 
-          "banDate", 
-          "banReason", 
-          "confirmationCode", 
-          "expirationDate", 
-          "isConfirmed", 
-          "isConfirmedDate",
-          "ip",
-          "userAgent")
+      const query = `
+        INSERT INTO public."Users" 
+        ( "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
+          "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", 
+          "isConfirmed", "isConfirmedDate", "ip", "userAgent")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-          RETURNING "userId" AS "id"`,
-        [
-          tablesUsersEntity.login,
-          tablesUsersEntity.email,
-          tablesUsersEntity.passwordHash,
-          tablesUsersEntity.createdAt,
-          tablesUsersEntity.orgId,
-          tablesUsersEntity.roles,
-          tablesUsersEntity.isBanned,
-          tablesUsersEntity.banDate,
-          tablesUsersEntity.banReason,
-          tablesUsersEntity.confirmationCode,
-          tablesUsersEntity.expirationDate,
-          tablesUsersEntity.isConfirmed,
-          tablesUsersEntity.isConfirmedDate,
-          tablesUsersEntity.ip,
-          tablesUsersEntity.userAgent,
-        ],
-      );
+          RETURNING "userId" AS "id"
+          `;
+
+      const parameters = [
+        tablesUsersEntity.login,
+        tablesUsersEntity.email,
+        tablesUsersEntity.passwordHash,
+        tablesUsersEntity.createdAt,
+        tablesUsersEntity.orgId,
+        tablesUsersEntity.roles,
+        tablesUsersEntity.isBanned,
+        tablesUsersEntity.banDate,
+        tablesUsersEntity.banReason,
+        tablesUsersEntity.confirmationCode,
+        tablesUsersEntity.expirationDate,
+        tablesUsersEntity.isConfirmed,
+        tablesUsersEntity.isConfirmedDate,
+        tablesUsersEntity.ip,
+        tablesUsersEntity.userAgent,
+      ];
+
+      const insertNewUser = await this.db.query(query, parameters);
+      // Because I delegated the creation of the user ID to the database itself.
       return { id: insertNewUser[0].id, ...tablesUsersEntity };
     } catch (error) {
       console.log(error.message);
