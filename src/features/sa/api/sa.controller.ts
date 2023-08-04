@@ -81,7 +81,7 @@ export class SaController {
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
   ) {
-    const userAgent = req.get('user-agent') || 'None user-agent';
+    const userAgent = req.get('user-agent') || 'None';
     const registrationData = {
       ip: ip,
       userAgent: userAgent,

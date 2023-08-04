@@ -24,7 +24,7 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 export class BlogsController {
   constructor(
     protected blogsService: BlogsService,
-    private parseQueriesService: ParseQueriesService,
+    protected parseQueriesService: ParseQueriesService,
   ) {}
 
   @Get()

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { DemonsService } from './application/demons.service';
-import { DemonsController } from './api/demons.controller';
 import { MailsModule } from '../mails/mails.module';
 import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
 import { UsersService } from '../users/application/users.service';
@@ -33,7 +32,7 @@ const demonsUseCases = [
 
 @Module({
   imports: [MailsModule, CaslModule, CqrsModule],
-  controllers: [DemonsController],
+  controllers: [],
   providers: [
     MailsAdapter,
     MailerConfig,

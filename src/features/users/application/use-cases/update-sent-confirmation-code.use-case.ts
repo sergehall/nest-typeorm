@@ -5,6 +5,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/custom-errors-messages';
+import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -16,18 +17,25 @@ export class UpdateSentConfirmationCodeUseCase
   constructor(
     private readonly mailsRepository: MailsRawSqlRepository,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly expirationDateCalculator: ExpirationDateCalculator,
   ) {}
 
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
     const user: TablesUsersWithIdEntity | null =
       await this.usersRawSqlRepository.findUserByLoginOrEmail(command.email);
-    const expirationDate = new Date(Date.now() + 65 * 60 * 1000).toISOString();
     if (
       user &&
       !user.isConfirmed &&
       user.expirationDate > new Date().toISOString()
     ) {
       const confirmationCode = uuid4().toString();
+      // Return the expirationDate in ISO format for user registration.
+      const expirationDate = await this.expirationDateCalculator.createExpDate(
+        0,
+        1,
+        0,
+      );
+
       await this.usersRawSqlRepository.updateUserConfirmationCode(
         user.id,
         confirmationCode,
@@ -41,7 +49,6 @@ export class UpdateSentConfirmationCodeUseCase
         expirationDate,
         createdAt: new Date().toISOString(),
       };
-
       await this.mailsRepository.createEmailConfirmCode(
         newEmailConfirmationCode,
       );
