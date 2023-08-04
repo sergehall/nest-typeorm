@@ -25,8 +25,6 @@ export class UpdateRefreshJwtUseCase
         deviceId: currentPayload.deviceId,
       };
 
-      if (!REFRESH_SECRET_KEY || !EXP_REF_TIME)
-        throw new InternalServerErrorException();
       return {
         refreshToken: this.jwtService.sign(payload, {
           secret: REFRESH_SECRET_KEY,

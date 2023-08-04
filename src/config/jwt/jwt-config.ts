@@ -10,9 +10,9 @@ export class JwtConfig extends BaseConfig {
     return this.getValueString('REFRESH_SECRET_KEY', 'SECRET_KEY');
   }
   getExpAccTime(): string {
-    return this.getValueString('EXP_ACC_TIME', '30s');
+    return this.getValueString('EXP_ACC_TIME', '10s');
   }
   getExpRefTime(): string {
-    return this.getValueString('EXP_REF_TIME', '60s');
+    return this.getValueString('EXP_REF_TIME', '20s');
   }
 }
