@@ -44,13 +44,67 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       throw new NotFoundException('Blog not found');
     }
 
+    await this.checkUserPermission(blog, currentUserDto);
+
+    // User has the permission, proceed with creating the post
+    const newPost: TablesPostsEntity = await this.getTablesPostsEntity(
+      blog,
+      createPostDto,
+      currentUserDto,
+    );
+
+    // Create and return the new post
+    const createdNewPost: TablesPostsEntity =
+      await this.postsRawSqlRepository.createPost(newPost);
+
+    return {
+      id: createdNewPost.id,
+      title: createdNewPost.title,
+      shortDescription: createdNewPost.shortDescription,
+      content: createdNewPost.content,
+      blogId: createdNewPost.blogId,
+      blogName: createdNewPost.blogName,
+      createdAt: createdNewPost.createdAt,
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    };
+  }
+
+  private async getTablesPostsEntity(
+    blog: TableBloggerBlogsRawSqlEntity,
+    createPostDto: CreatePostDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<TablesPostsEntity> {
+    return {
+      id: uuid4().toString(),
+      title: createPostDto.title,
+      shortDescription: createPostDto.shortDescription,
+      content: createPostDto.content,
+      blogId: blog.id,
+      blogName: blog.name,
+      createdAt: new Date().toISOString(),
+      postOwnerId: currentUserDto.id,
+      dependencyIsBanned: false,
+      banInfoIsBanned: false,
+      banInfoBanDate: null,
+      banInfoBanReason: null,
+    };
+  }
+
+  private async checkUserPermission(
+    blog: TableBloggerBlogsRawSqlEntity,
+    currentUserDto: CurrentUserDto,
+  ) {
     // Check if the user is banned from posting in this blog
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         currentUserDto.id,
-        blogId,
+        blog.id,
       );
-
     // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
     if (userIsBannedForBlog)
       throw new HttpException(
@@ -67,44 +121,10 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
         id: blog.blogOwnerId,
       });
-      // User has the permission, proceed with creating the post
-      const newPost: TablesPostsEntity = {
-        id: uuid4().toString(),
-        title: createPostDto.title,
-        shortDescription: createPostDto.shortDescription,
-        content: createPostDto.content,
-        blogId: blogId,
-        blogName: blog.name,
-        createdAt: new Date().toISOString(),
-        postOwnerId: currentUserDto.id,
-        dependencyIsBanned: false,
-        banInfoIsBanned: false,
-        banInfoBanDate: null,
-        banInfoBanReason: null,
-      };
-      // Create and return the new post
-      const createdNewPost: TablesPostsEntity =
-        await this.postsRawSqlRepository.createPost(newPost);
-
-      return {
-        id: createdNewPost.id,
-        title: createdNewPost.title,
-        shortDescription: createdNewPost.shortDescription,
-        content: createdNewPost.content,
-        blogId: createdNewPost.blogId,
-        blogName: createdNewPost.blogName,
-        createdAt: createdNewPost.createdAt,
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
-        },
-      };
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(
-          'You do not have permission to create a post for this blog.',
+          'Leaving comments for this user is not allowed. ' + error.message,
         );
       }
       throw new InternalServerErrorException(error.message);

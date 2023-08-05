@@ -47,14 +47,14 @@ export class RemovePostByPostIdUseCase
       await this.postsRepository.findPostByPostId(params.postId);
     if (!postToRemove) throw new NotFoundException('Not found post.');
 
-    this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
+    await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
 
     await this.executeRemovePostByPostIdCommands(postToRemove.id);
 
     return true;
   }
 
-  private checkUserPermission(
+  private async checkUserPermission(
     postOwnerId: string,
     currentUserDto: CurrentUserDto,
   ) {
