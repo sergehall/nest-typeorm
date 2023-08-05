@@ -44,14 +44,14 @@ export class FindAllBannedUsersForBlogUseCase
 
     // Check user's permission to ban the user
     await this.checkUserPermission(currentUser.id, blog.blogOwnerId);
-    console.log('+++++++');
+
     // Find all banned users for the blog
     const bannedUsers: BannedUsersForBlogsEntity[] =
       await this.bannedUsersForBlogsRawSqlRepository.findBannedUsers(
         blogId,
         queryData,
       );
-    console.log('---------');
+
     // Transform the banned user data into return format
     const transformedBannedUsers: ReturnBannedUsersForBlogEntity[] =
       bannedUsers.map((user: BannedUsersForBlogsEntity) => ({

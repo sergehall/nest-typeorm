@@ -48,7 +48,7 @@ export class SecurityDevicesRawSqlRepository {
   ): Promise<ReturnSecurityDeviceEntity[]> {
     try {
       const currentTime = new Date().toISOString();
-      const limit = 100;
+      const limit = 1000;
       const offset = 0;
       return await this.db.query(
         `

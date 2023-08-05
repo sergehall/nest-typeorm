@@ -8,9 +8,13 @@ import { TablesCommentsRawSqlEntity } from '../entities/tables-comments-raw-sql.
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 export class CommentsRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
   async createComment(
     tablesCommentsRawSqlEntity: TablesCommentsRawSqlEntity,
   ): Promise<TablesCommentsRawSqlEntity> {
@@ -55,11 +59,11 @@ export class CommentsRawSqlRepository {
   ): Promise<TablesCommentsRawSqlEntity[]> {
     const commentatorInfoIsBanned = false;
     const banInfoIsBanned = false;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const limit = queryData.queryPagination.pageSize;
     const offset =
       (queryData.queryPagination.pageNumber - 1) *
       queryData.queryPagination.pageSize;
-    const sortBy = queryData.queryPagination.sortBy;
     const direction = queryData.queryPagination.sortDirection;
 
     try {
@@ -156,8 +160,7 @@ export class CommentsRawSqlRepository {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
-
-      const sortBy = queryData.queryPagination.sortBy;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset =
@@ -227,26 +230,6 @@ export class CommentsRawSqlRepository {
         WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
         [commentatorInfoUserId, commentatorInfoIsBanned, banInfoIsBanned],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountCommentsByBlogOwnerId(
-    postInfoBlogOwnerId: string,
-  ): Promise<number> {
-    const commentatorInfoIsBanned = false;
-    const banInfoIsBanned = false;
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Comments"
-        WHERE "postInfoBlogOwnerId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
-      `,
-        [postInfoBlogOwnerId, commentatorInfoIsBanned, banInfoIsBanned],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
@@ -357,5 +340,20 @@ export class CommentsRawSqlRepository {
       console.log(error.message);
       throw new NotFoundException(error.message);
     }
+  }
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+      sortBy,
+      [
+        'content',
+        'postInfoTitle',
+        'postInfoBlogName',
+        'commentatorInfoUserLogin',
+        'commentatorInfoIsBanned',
+        'banInfoIsBanned',
+        'banInfoBanDate',
+      ],
+      'createdAt',
+    );
   }
 }

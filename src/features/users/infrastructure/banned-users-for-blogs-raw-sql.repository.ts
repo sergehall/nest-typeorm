@@ -69,19 +69,11 @@ export class BannedUsersForBlogsRawSqlRepository {
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
       const isBanned = true;
-      const sortByQuery = queryData.queryPagination.sortBy;
-      const sortBy = await this.keyArrayProcessor.getKeyFromArrayOrDefault(
-        sortByQuery,
-        ['login', 'banReason', 'isBanned'],
-        'banDate',
-      );
-      console.log(sortBy, 'sortBy');
       const searchLoginTerm = queryData.searchLoginTerm;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
       return await this.db.query(
         `
@@ -145,5 +137,12 @@ export class BannedUsersForBlogsRawSqlRepository {
       console.log(error.message);
       throw new NotFoundException(error.message);
     }
+  }
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+      sortBy,
+      ['login', 'banReason', 'isBanned'],
+      'banDate',
+    );
   }
 }

@@ -16,6 +16,7 @@ import { RecoveryCodeExistsRule } from '../../pipes/recoveryCode-exists-rule.val
 import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -36,6 +37,7 @@ const usersRules = [RecoveryCodeExistsRule];
     AuthService,
     JwtService,
     EncryptConfig,
+    KeyArrayProcessor,
     MailsRawSqlRepository,
     ExpirationDateCalculator,
     ...usersRules,

@@ -16,6 +16,7 @@ import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-j
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-by-deviceId.use-case';
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-except-current.use-case';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const securityDevicesCases = [
   CreateDeviceUseCase,
@@ -33,12 +34,13 @@ const securityDevicesCases = [
     UsersRawSqlRepository,
     JwtConfig,
     CaslAbilityFactory,
-    MailsRawSqlRepository,
     UsersService,
+    KeyArrayProcessor,
     DecodeTokenService,
+    SecurityDevicesService,
     SecurityDevicesRawSqlRepository,
     BlacklistJwtRawSqlRepository,
-    SecurityDevicesService,
+    MailsRawSqlRepository,
     ...securityDevicesCases,
   ],
 })
