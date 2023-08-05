@@ -7,7 +7,7 @@ import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comme
 import { TablesCommentsRawSqlEntity } from '../../../comments/entities/tables-comments-raw-sql.entity';
 import { FilledCommentEntity } from '../../../comments/entities/filledComment.entity';
 import { FillingCommentsDataCommand } from '../../../comments/application/use-cases/filling-comments-data.use-case';
-import { ReturnCommentsEntity } from '../../../comments/entities/comments-return.entity';
+import { ReturnCommentsEntity } from '../../../comments/entities/return-comments.entity';
 
 export class FindPostsByPostIdCommand {
   constructor(

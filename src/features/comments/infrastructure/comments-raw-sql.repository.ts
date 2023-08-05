@@ -17,17 +17,17 @@ export class CommentsRawSqlRepository {
   ) {}
   async createComment(
     tablesCommentsRawSqlEntity: TablesCommentsRawSqlEntity,
-  ): Promise<TablesCommentsRawSqlEntity> {
+  ): Promise<TablesCommentsRawSqlEntity[]> {
     try {
-      const insertNewComment = await this.db.query(
+      return await this.db.query(
         `
         INSERT INTO public."Comments"(
-        "id", "content", "createdAt", 
-        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
-        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
-        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-        RETURNING "id", "content", "createdAt" "commentatorInfoUserId", "commentatorInfoUserLogin"
+          "id", "content", "createdAt", 
+          "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          RETURNING *
           `,
         [
           tablesCommentsRawSqlEntity.id,
@@ -46,7 +46,6 @@ export class CommentsRawSqlRepository {
           tablesCommentsRawSqlEntity.banInfoBanReason,
         ],
       );
-      return insertNewComment[0];
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
