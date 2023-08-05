@@ -13,20 +13,24 @@ export class BannedUsersForBlogsRawSqlRepository {
     @InjectDataSource() private readonly db: DataSource,
     protected keyArrayProcessor: KeyArrayProcessor,
   ) {}
-  async addBannedUserToBanList(
+  async addBannedOrDeleteUnBannedUser(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
-    try {
-      const updateLikeStatusPost = await this.db.query(
-        `
+    const isBanned = bannedUserForBlogEntity.isBanned;
+
+    if (isBanned) {
+      const insertOrUpdateQuery = `
       INSERT INTO public."BannedUsersForBlogs"
       ("id", "blogId", "userId", "login", "isBanned", "banDate", "banReason")
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT ( "blogId", "userId" ) 
-      DO UPDATE SET "isBanned" = $5, "banDate" = $6, "banReason" = $7
-      RETURNING "id"
-      `,
-        [
+      ON CONFLICT ("blogId", "userId")
+      DO UPDATE SET "isBanned" = excluded."isBanned", "banDate" = excluded."banDate", "banReason" = excluded."banReason"
+      WHERE excluded."isBanned" = true
+      RETURNING "id";
+    `;
+
+      try {
+        const insertOrUpdateResult = await this.db.query(insertOrUpdateQuery, [
           bannedUserForBlogEntity.id,
           bannedUserForBlogEntity.blogId,
           bannedUserForBlogEntity.userId,
@@ -34,25 +38,43 @@ export class BannedUsersForBlogsRawSqlRepository {
           bannedUserForBlogEntity.isBanned,
           bannedUserForBlogEntity.banDate,
           bannedUserForBlogEntity.banReason,
-        ],
-      );
-      return updateLikeStatusPost[0] != null;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+        ]);
+
+        return insertOrUpdateResult[0].length > 0;
+      } catch (error) {
+        console.log(error.message);
+        throw new InternalServerErrorException(error.message);
+      }
+    } else {
+      const deleteQuery = `
+      DELETE FROM public."BannedUsersForBlogs"
+      WHERE "blogId" = $1 AND "userId" = $2
+      RETURNING "id";
+    `;
+
+      try {
+        const deleteResult = await this.db.query(deleteQuery, [
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.userId,
+        ]);
+
+        return deleteResult[0].length > 0;
+      } catch (error) {
+        console.log(error.message);
+        throw new InternalServerErrorException(error.message);
+      }
     }
   }
 
   async userIsBanned(userId: string, blogId: string): Promise<boolean> {
     try {
-      const isBanned = true;
       const bannedUser: BannedUsersForBlogsEntity[] = await this.db.query(
         `
       SELECT "id"
       FROM public."BannedUsersForBlogs"
-      WHERE "userId" = $1 AND "blogId" = $2 AND "isBanned" = $3
+      WHERE "userId" = $1 AND "blogId" = $2
       `,
-        [userId, blogId, isBanned],
+        [userId, blogId],
       );
       // Check if user found is not equal to zero
       return bannedUser.length !== 0;
@@ -68,7 +90,6 @@ export class BannedUsersForBlogsRawSqlRepository {
     queryData: ParseQueriesType,
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
-      const isBanned = true;
       const searchLoginTerm = queryData.searchLoginTerm;
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
@@ -79,13 +100,11 @@ export class BannedUsersForBlogsRawSqlRepository {
         `
         SELECT "id", "blogId", "userId", "login", "isBanned", "banDate", "banReason"
         FROM public."BannedUsersForBlogs"
-        WHERE "isBanned" = $1 
-        AND "blogId" = $2
-        AND "login" ILIKE $3
+        WHERE "blogId" = $1 AND "login" ILIKE $2
         ORDER BY "${sortBy}" ${direction}
-        LIMIT $4 OFFSET $5
+        LIMIT $3 OFFSET $4
         `,
-        [isBanned, blogId, searchLoginTerm, limit, offset],
+        [blogId, searchLoginTerm, limit, offset],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -94,14 +113,13 @@ export class BannedUsersForBlogsRawSqlRepository {
 
   async countBannedUsersForBlog(blogId: string): Promise<number> {
     try {
-      const isBanned = true;
       const countBannedUsers = await this.db.query(
         `
         SELECT count(*)
         FROM public."BannedUsersForBlogs"
-        WHERE "isBanned" = $1  AND "blogId" = $2
+        WHERE "blogId" = $1
       `,
-        [isBanned, blogId],
+        [blogId],
       );
       return Number(countBannedUsers[0].count);
     } catch (error) {
@@ -141,7 +159,7 @@ export class BannedUsersForBlogsRawSqlRepository {
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
-      ['login', 'banReason', 'isBanned'],
+      ['login', 'banReason'],
       'banDate',
     );
   }
