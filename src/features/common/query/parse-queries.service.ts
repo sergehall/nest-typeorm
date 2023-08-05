@@ -66,7 +66,7 @@ export class ParseQueriesService {
 
   private async parseSortDirection(query: any): Promise<SortDirectionType> {
     const querySortDirection = query?.sortDirection;
-    return [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
+    return ['ascending', 'ASCENDING', 'asc', 'ASC', -1].includes(
       querySortDirection,
     )
       ? 'ASC'

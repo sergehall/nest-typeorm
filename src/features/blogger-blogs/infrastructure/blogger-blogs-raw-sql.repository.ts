@@ -48,17 +48,19 @@ export class BloggerBlogsRawSqlRepository {
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
-    try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
-      const { id } = currentUserDto;
-      const searchNameTerm = queryData.searchNameTerm;
-      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+    const blogOwnerBanStatus = false;
+    const banInfoBanStatus = false;
+    const { id } = currentUserDto;
+    const searchNameTerm = queryData.searchNameTerm;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+    const direction = queryData.queryPagination.sortDirection;
+    const limit = queryData.queryPagination.pageSize;
+    const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      console.log(id, 'id');
+    console.log(sortBy, 'sortBy');
+    console.log(direction, 'direction');
+    console.log(sortBy, 'sortBy');
+    try {
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
