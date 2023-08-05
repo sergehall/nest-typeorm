@@ -51,35 +51,35 @@ export class BloggerBlogsRawSqlRepository {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const { id } = currentUserDto;
-    const searchNameTerm = queryData.searchNameTerm;
+    const searchNameTerm = queryData.searchNameTerm.toLocaleLowerCase();
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-    //
-    // `
-    //     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-    //     FROM public."BloggerBlogs"
-    //     WHERE "dependencyIsBanned" = $1
-    //     AND "banInfoIsBanned" = $2
-    //     AND "blogOwnerId" = $3
-    //     AND LOWER("name") ILIKE $4  -- Convert "name" column to lowercase for comparison
-    //     ORDER BY LOWER("${sortBy}") ${direction} -- Convert "sortBy" to lowercase for sorting
-    //     LIMIT $5
-    //     OFFSET $6
-    //     `,
 
     const query = `
-    SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-    FROM public."BloggerBlogs"
-    WHERE "dependencyIsBanned" = $1 
-    AND "banInfoIsBanned" = $2 
-    AND "blogOwnerId" = $3
-    AND "name" COLLATE "C" LIKE $4 -- Case-sensitive collation
-    ORDER BY "name" COLLATE "C" ${direction} -- Case-sensitive collation
-    LIMIT $5 
-    OFFSET $6
-    `;
+        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+        FROM public."BloggerBlogs"
+        WHERE "dependencyIsBanned" = $1
+        AND "banInfoIsBanned" = $2
+        AND "blogOwnerId" = $3
+        AND LOWER("name") LIKE $4
+        ORDER BY "${sortBy}" ${direction}
+        LIMIT $5
+        OFFSET $6
+        `;
+
+    // const query = `
+    // SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+    // FROM public."BloggerBlogs"
+    // WHERE "dependencyIsBanned" = $1
+    // AND "banInfoIsBanned" = $2
+    // AND "blogOwnerId" = $3
+    // AND "name" COLLATE "C" LIKE $4 -- Case-sensitive collation
+    // ORDER BY "name" COLLATE "C" ${direction} -- Case-sensitive collation
+    // LIMIT $5
+    // OFFSET $6
+    // `;
 
     try {
       return await this.db.query(query, [
