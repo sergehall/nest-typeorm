@@ -22,6 +22,7 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { RemoveEmailConfirmCodeByIdUseCase } from './application/use-case/remove-emai-confirm-code-by-id.use-case';
 import { RemoveEmailRecoverCodeByIdUseCase } from './application/use-case/remove-emai-rec-code-by-id.use-case';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
@@ -38,11 +39,12 @@ const demonsUseCases = [
     MailerConfig,
     PostgresConfig,
     DemonsService,
-    MailsRawSqlRepository,
     UsersService,
+    KeyArrayProcessor,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
+    MailsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     LikeStatusPostsRawSqlRepository,

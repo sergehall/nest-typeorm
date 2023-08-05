@@ -25,6 +25,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const commentsUseCases = [
   CreateCommentUseCase,
@@ -47,6 +48,7 @@ const commentsUseCases = [
     PostsService,
     AuthService,
     UsersService,
+    KeyArrayProcessor,
     MailsRawSqlRepository,
     UsersRawSqlRepository,
     PostsRawSqlRepository,

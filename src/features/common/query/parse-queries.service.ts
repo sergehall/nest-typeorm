@@ -13,6 +13,18 @@ export class ParseQueriesService {
     return parseInt(query.pageSize, 10) || 10;
   }
 
+  private async parseCode(query: any): Promise<string> {
+    return query?.code?.toString() || '';
+  }
+
+  private async parseConfirmationCode(query: any): Promise<string> {
+    return query?.confirmationCode?.toString() || '';
+  }
+
+  private async parseSortBy(query: any): Promise<string> {
+    return query?.sortBy?.toString() || '';
+  }
+
   private async parseSearchNameTerm(query: any): Promise<string> {
     const queryName = query.searchNameTerm?.toString();
     return queryName && queryName.length !== 0
@@ -52,18 +64,6 @@ export class ParseQueriesService {
       : '%';
   }
 
-  private async parseCode(query: any): Promise<string> {
-    const code = query.code?.toString();
-    return code && code.length !== 0 ? code.toLowerCase() : '';
-  }
-
-  private async parseConfirmationCode(query: any): Promise<string> {
-    const confirmationCode = query.confirmationCode?.toString();
-    return confirmationCode && confirmationCode.length !== 0
-      ? confirmationCode.toLowerCase()
-      : '';
-  }
-
   private async parseSortDirection(query: any): Promise<SortDirectionType> {
     const querySortDirection = query?.sortDirection;
     return [-1, 'ascending', 'ASCENDING', 'asc', 'ASC'].includes(
@@ -83,23 +83,6 @@ export class ParseQueriesService {
     } else {
       return [true, false];
     }
-  }
-
-  private async parseSortBy(query: any): Promise<string> {
-    // An array of allowed sorting fields
-    const allowedSortingFields = [
-      'login',
-      'email',
-      'name',
-      'websiteUrl',
-      'description',
-      'shortDescription',
-      'title',
-      'blogName',
-      'content',
-    ];
-    const sortBy = query.sortBy?.toString();
-    return allowedSortingFields.includes(sortBy) ? sortBy : 'createdAt';
   }
 
   async getQueriesData(query: any): Promise<ParseQueriesType> {

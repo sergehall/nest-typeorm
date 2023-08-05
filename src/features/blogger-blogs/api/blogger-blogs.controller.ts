@@ -141,7 +141,7 @@ export class BloggerBlogsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users/blog/:id')
-  async findBannedUsers(
+  async findBannedUsersForBlog(
     @Request() req: any,
     @Param() params: IdParams,
     @Query() query: any,
