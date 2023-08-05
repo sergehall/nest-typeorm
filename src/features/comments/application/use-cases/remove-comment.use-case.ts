@@ -26,7 +26,7 @@ export class RemoveCommentUseCase
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected caslAbilityFactory: CaslAbilityFactory,
   ) {}
-  async execute(command: RemoveCommentCommand) {
+  async execute(command: RemoveCommentCommand): Promise<boolean> {
     const { commentId, currentUserDto } = command;
 
     const findComment =

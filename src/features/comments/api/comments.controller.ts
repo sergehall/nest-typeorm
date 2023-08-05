@@ -54,7 +54,7 @@ export class CommentsController {
     @Request() req: any,
     @Param() params: CommentIdParams,
     @Body() updateCommentDto: UpdateCommentDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -69,7 +69,10 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':commentId')
-  async removeComment(@Request() req: any, @Param() params: CommentIdParams) {
+  async removeComment(
+    @Request() req: any,
+    @Param() params: CommentIdParams,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -84,7 +87,7 @@ export class CommentsController {
     @Request() req: any,
     @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
