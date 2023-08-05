@@ -67,7 +67,7 @@ export class BloggerBlogsRawSqlRepository {
         AND "banInfoIsBanned" = $2
         AND "blogOwnerId" = $3
         AND "name" ILIKE $4
-        ORDER BY "${sortBy}" ${direction}
+        ORDER BY "${sortBy}" COLLATE "C" ${direction}
         LIMIT $5
         OFFSET $6
         `;
@@ -443,6 +443,41 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
+    const arrName = [
+      {
+        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
+        name: 'Timma',
+        description: 'description',
+        websiteUrl: 'https://someurl.com',
+        createdAt: '2023-08-05T06:37:38.037Z',
+        isMembership: false,
+      },
+      {
+        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
+        name: 'Tima',
+        description: 'description',
+        websiteUrl: 'https://someurl.com',
+        createdAt: '2023-08-05T06:37:38.037Z',
+        isMembership: false,
+      },
+      {
+        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
+        name: 'timm',
+        description: 'description',
+        websiteUrl: 'https://someurl.com',
+        createdAt: '2023-08-05T06:37:38.037Z',
+        isMembership: false,
+      },
+      {
+        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
+        name: 'Tim',
+        description: 'description',
+        websiteUrl: 'https://someurl.com',
+        createdAt: '2023-08-05T06:37:38.037Z',
+        isMembership: false,
+      },
+    ];
+
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
       [
