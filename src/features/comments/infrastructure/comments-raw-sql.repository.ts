@@ -104,7 +104,7 @@ export class CommentsRawSqlRepository {
       WHERE "id" = $1`,
         [commentId, updateCommentDto.content],
       );
-      return !!updateUser[0];
+      return updateUser[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

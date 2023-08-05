@@ -28,7 +28,7 @@ export class UpdateCommentUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
-  async execute(command: UpdateCommentCommand) {
+  async execute(command: UpdateCommentCommand): Promise<boolean> {
     const { commentId, updateCommentDto, currentUserDto } = command;
 
     const findComment =
