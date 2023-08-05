@@ -21,23 +21,22 @@ export class BannedUsersForBlogsRawSqlRepository {
     if (isBanned) {
       const insertOrUpdateQuery = `
       INSERT INTO public."BannedUsersForBlogs"
-      ("id", "blogId", "userId", "login", "isBanned", "banDate", "banReason")
+      ("id", "login", "isBanned", "banDate", "banReason", "blogId", "userId")
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT ("blogId", "userId")
-      DO UPDATE SET "isBanned" = excluded."isBanned", "banDate" = excluded."banDate", "banReason" = excluded."banReason"
-      WHERE excluded."isBanned" = true
+      ON CONFLICT ("blogId", "userId", "isBanned")
+      DO UPDATE SET "banDate" = $4, "banReason" = $5
       RETURNING "id";
     `;
 
       try {
         const insertOrUpdateResult = await this.db.query(insertOrUpdateQuery, [
           bannedUserForBlogEntity.id,
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.userId,
           bannedUserForBlogEntity.login,
           bannedUserForBlogEntity.isBanned,
           bannedUserForBlogEntity.banDate,
           bannedUserForBlogEntity.banReason,
+          bannedUserForBlogEntity.blogId,
+          bannedUserForBlogEntity.userId,
         ]);
 
         return insertOrUpdateResult[0].length > 0;
@@ -70,7 +69,7 @@ export class BannedUsersForBlogsRawSqlRepository {
     try {
       const bannedUser: BannedUsersForBlogsEntity[] = await this.db.query(
         `
-      SELECT "id"
+      SELECT "id", "login", "isBanned", "banDate", "banReason", "blogId", "userId"
       FROM public."BannedUsersForBlogs"
       WHERE "userId" = $1 AND "blogId" = $2
       `,
