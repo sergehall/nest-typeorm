@@ -26,6 +26,7 @@ import { IdParams } from '../../common/query/params/id.params';
 import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';
 
 @SkipThrottle()
 @Controller('comments')
@@ -41,8 +42,9 @@ export class CommentsController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async findCommentById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
-
-    return this.commentsService.findCommentById(params.id, currentUserDto);
+    return await this.commandBus.execute(
+      new FindCommentByIdCommand(params.id, currentUserDto),
+    );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
