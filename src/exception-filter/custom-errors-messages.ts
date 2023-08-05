@@ -1,5 +1,5 @@
 export const jwtIncorrect = {
-  message: 'Invalid or expired JWT refreshToken in headers.authorization.',
+  message: 'Invalid or expired JWT.',
   field: 'headers.authorization',
 };
 export const jwtCookiesIncorrect = {

@@ -26,7 +26,7 @@ import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';
-import { ReturnCommentsEntity } from '../entities/comments-return.entity';
+import { ReturnCommentsEntity } from '../entities/return-comments.entity';
 
 @SkipThrottle()
 @Controller('comments')

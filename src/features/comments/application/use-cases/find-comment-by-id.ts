@@ -4,8 +4,8 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { FilledCommentEntity } from '../../entities/filledComment.entity';
 import { FillingCommentsDataCommand } from './filling-comments-data.use-case';
-import { ReturnCommentsEntity } from '../../entities/comments-return.entity';
 import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
+import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
 
 export class FindCommentByIdCommand {
   constructor(

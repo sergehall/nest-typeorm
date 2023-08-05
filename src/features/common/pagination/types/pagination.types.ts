@@ -2,9 +2,9 @@ import { ReturnPostsEntity } from '../../../posts/entities/posts-without-ownerIn
 import { TablesUsersEntity } from '../../../users/entities/tables-users.entity';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../../../blogger-blogs/entities/return-blogger-blogs.entity';
-import { ReturnCommentsEntity } from '../../../comments/entities/comments-return.entity';
 import { ReturnBannedUsersForBlogEntity } from '../../../blogger-blogs/entities/return-banned-users-for-blog.entity';
 import { ReturnUsersBanInfoEntity } from '../../../sa/entities/return-users-banInfo.entity';
+import { ReturnCommentsEntity } from '../../../comments/entities/return-comments.entity';
 
 export type PaginationTypes = {
   pagesCount: number;

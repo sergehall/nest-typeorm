@@ -100,11 +100,11 @@ export class PostsController {
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const currentUserDto: CurrentUserDto = req.user;
-
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
     );
   }
+
   @Get(':postId/comments')
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
