@@ -1,6 +1,7 @@
 import { LikeStatusDto } from '../../dto/like-status.dto';
 import {
-  ForbiddenException,
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(
@@ -36,14 +38,17 @@ export class ChangeLikeStatusCommentUseCase
       );
     if (!findComment) throw new NotFoundException('Not found comment.');
 
-    const isBannedCurrentUser =
-      await this.bannedUsersForBlogsRawSqlRepository.existenceBannedUser(
+    const userIsBannedForBlog =
+      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         currentUserDto.id,
         findComment.postInfoBlogId,
       );
-    if (isBannedCurrentUser) {
-      throw new ForbiddenException('You are not allowed to like this comment.');
-    }
+
+    if (userIsBannedForBlog)
+      throw new HttpException(
+        { message: userNotHavePermissionForBlog },
+        HttpStatus.BAD_REQUEST,
+      );
 
     const likeStatusCommEntity: LikeStatusCommentEntity = {
       commentId: commentId,

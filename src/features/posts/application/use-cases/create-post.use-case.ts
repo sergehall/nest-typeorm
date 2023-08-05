@@ -1,5 +1,7 @@
 import {
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +16,8 @@ import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.reposi
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../../dto/create-post.dto';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
+import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
 
 export class CreatePostCommand {
   constructor(
@@ -29,6 +33,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRawSqlRepository: PostsRawSqlRepository,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
   async execute(command: CreatePostCommand) {
     const { blogId, currentUserDto, createPostDto } = command;
@@ -40,14 +45,18 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     }
 
     // Check if the user is banned from posting in this blog
-    const isUserBanned =
-      await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
+    const userIsBannedForBlog =
+      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         currentUserDto.id,
         blogId,
       );
-    if (isUserBanned)
-      // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
-      throw new ForbiddenException('You are banned from posting in this blog');
+
+    // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
+    if (userIsBannedForBlog)
+      throw new HttpException(
+        { message: userNotHavePermissionForBlog },
+        HttpStatus.BAD_REQUEST,
+      );
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({

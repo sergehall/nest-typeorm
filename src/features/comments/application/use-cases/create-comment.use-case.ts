@@ -1,5 +1,5 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
 import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
@@ -9,6 +9,8 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
+import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
+import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 
 export class CreateCommentCommand {
   constructor(
@@ -25,6 +27,7 @@ export class CreateCommentUseCase
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
+    protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
   async execute(command: CreateCommentCommand): Promise<ReturnCommentsEntity> {
     const post = await this.postsRawSqlRepository.findPostByPostId(
@@ -32,14 +35,16 @@ export class CreateCommentUseCase
     );
     if (!post) throw new NotFoundException('Not found post.');
 
-    const isBannedUserForBlog =
-      await this.bloggerBlogsRawSqlRepository.isBannedUserForBlog(
+    const userIsBannedForBlog =
+      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         command.currentUser.id,
         post.blogId,
       );
-    if (isBannedUserForBlog)
-      throw new ForbiddenException(
-        'You are not allowed to create comment for this blog.',
+
+    if (userIsBannedForBlog)
+      throw new HttpException(
+        { message: userNotHavePermissionForBlog },
+        HttpStatus.BAD_REQUEST,
       );
 
     const newComment: TablesCommentsRawSqlEntity[] =

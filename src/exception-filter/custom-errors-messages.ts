@@ -43,6 +43,11 @@ export const userNotHavePermission = {
   message: 'You do not have permission. The blog does not belong to you.',
   params: 'blogId',
 };
+export const userNotHavePermissionForBlog = {
+  message:
+    'Leaving comments for this user is not allowed, and accessing the blog is restricted.',
+  params: 'blogId',
+};
 export const emailNotExistsOrIsConfirmed = {
   message: 'The email does not exist or the user is already confirmed.',
   field: 'email',

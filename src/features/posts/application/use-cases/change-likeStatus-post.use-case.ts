@@ -1,5 +1,5 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { TablesLikeStatusPostEntity } from '../../entities/tables-like-status-post.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
@@ -7,6 +7,7 @@ import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.reposi
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
+import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
 
 export class ChangeLikeStatusPostCommand {
   constructor(
@@ -30,14 +31,17 @@ export class ChangeLikeStatusPostUseCase
       await this.postsRawSqlRepository.findPostByPostId(command.postId);
     if (!post) throw new NotFoundException('Not found post.');
 
-    const isBannedCurrentUser =
-      await this.bannedUsersForBlogsRawSqlRepository.existenceBannedUser(
+    // Check if the user is banned from posting in this blog
+    const userIsBannedForBlog =
+      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         command.currentUserDto.id,
         post.blogId,
       );
-    if (isBannedCurrentUser) {
-      throw new ForbiddenException('You are not allowed to like this post.');
-    }
+    if (userIsBannedForBlog)
+      throw new HttpException(
+        { message: userNotHavePermissionForBlog },
+        HttpStatus.BAD_REQUEST,
+      );
 
     const likeStatusPostEntity: TablesLikeStatusPostEntity = {
       blogId: post.blogId,
