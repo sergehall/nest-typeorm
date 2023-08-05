@@ -160,7 +160,7 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "name" LIKE $1
+        WHERE "name" ILIKE $1
       `,
         [searchNameTerm],
       );
@@ -209,8 +209,8 @@ export class BloggerBlogsRawSqlRepository {
         `
         SELECT count(*)
         FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 
-        AND "banInfoIsBanned" = $2 
+        WHERE "dependencyIsBanned" = $1
+        AND "banInfoIsBanned" = $2
         AND "blogOwnerId" = $3
         AND "name" ILIKE $4
       `,
