@@ -205,28 +205,6 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async isBannedUserForBlog(
-    blogOwnerId: string,
-    blogId: string,
-  ): Promise<boolean> {
-    const banInfoIsBanned = true;
-    try {
-      const blog: TableBloggerBlogsRawSqlEntity[] = await this.db.query(
-        `
-      SELECT "id", "createdAt", "isMembership", 
-        "blogOwnerId", "dependencyIsBanned",
-        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
-        "name", "description", "websiteUrl"
-      FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "blogOwnerId" = $2 AND "banInfoIsBanned" = $3
-      `,
-        [blogId, blogOwnerId, banInfoIsBanned],
-      );
-      return blog.length !== 0;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
   async updatedBlogById(
     newBlog: TableBloggerBlogsRawSqlEntity,
   ): Promise<boolean> {
