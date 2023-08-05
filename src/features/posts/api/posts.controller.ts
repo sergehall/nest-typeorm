@@ -13,7 +13,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { CommentsService } from '../../comments/application/comments.service';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -46,7 +45,6 @@ export class PostsController {
   constructor(
     protected parseQueriesService: ParseQueriesService,
     protected postsService: PostsService,
-    protected commentsService: CommentsService,
     protected commandBus: CommandBus,
   ) {}
   @Get()
@@ -57,7 +55,7 @@ export class PostsController {
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginationTypes> {
-    const currentUserDto: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return this.postsService.openFindPosts(queryData, currentUserDto);
