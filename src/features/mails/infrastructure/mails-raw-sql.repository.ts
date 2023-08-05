@@ -3,9 +3,13 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity';
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 export class MailsRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
   async createEmailConfirmCode(
     newConfirmationCode: EmailsConfirmCodeEntity,
   ): Promise<string> {

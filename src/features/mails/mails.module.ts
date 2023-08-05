@@ -8,6 +8,7 @@ import { SendRecoveryCodesUseCase } from './adapters/use-case/send-recovery-code
 import { MailerConfig } from '../../config/mailer/mailer-config';
 import { MailerOptionsService } from '../../config/mailer/mailer-options-service';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const mailsAdapterUseCases = [
   SendRegistrationCodesUseCase,
@@ -25,6 +26,7 @@ const mailsAdapterUseCases = [
     PostgresConfig,
     MailsService,
     MailsAdapter,
+    KeyArrayProcessor,
     MailsRawSqlRepository,
     ...mailsAdapterUseCases,
   ],

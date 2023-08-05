@@ -10,20 +10,24 @@ import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 @Injectable()
 export class UsersRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
 
   async saFindUsers(
     queryData: ParseQueriesType,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
-      const direction = queryData.queryPagination.sortDirection;
-      const sortBy = queryData.queryPagination.sortBy;
-      const banCondition = queryData.banStatus;
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset =
         (queryData.queryPagination.pageNumber - 1) *
@@ -95,7 +99,7 @@ export class UsersRawSqlRepository {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
       const banCondition = queryData.banStatus;
-      const sortBy = queryData.queryPagination.sortBy;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
@@ -289,6 +293,7 @@ export class UsersRawSqlRepository {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
       const banCondition = queryData.banStatus;
+
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -308,6 +313,7 @@ export class UsersRawSqlRepository {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
       const banCondition = queryData.banStatus;
+
       const totalCount = await this.db.query(
         `
         SELECT count(*)
@@ -415,5 +421,27 @@ export class UsersRawSqlRepository {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+      sortBy,
+      [
+        'userId',
+        'login',
+        'email',
+        'orgId',
+        'roles',
+        'isBanned',
+        'banDate',
+        'banReason',
+        'expirationDate',
+        'isConfirmed',
+        'isConfirmedDate',
+        'ip',
+        'userAgent',
+      ],
+      'createdAt',
+    );
   }
 }

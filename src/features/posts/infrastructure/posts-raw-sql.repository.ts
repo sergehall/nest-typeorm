@@ -8,16 +8,20 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 export class PostsRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
 
   async openFindPosts(
     queryData: ParseQueriesType,
   ): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
-    const sortBy = queryData.queryPagination.sortBy;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
     const limit = queryData.queryPagination.pageSize;
     const offset =
@@ -72,7 +76,7 @@ export class PostsRawSqlRepository {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     const { blogId } = params;
-    const sortBy = queryData.queryPagination.sortBy;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const limit = queryData.queryPagination.pageSize;
     const direction = queryData.queryPagination.sortDirection;
     const offset =
@@ -297,5 +301,22 @@ export class PostsRawSqlRepository {
       console.log(error.message);
       throw new NotFoundException(error.message);
     }
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+      sortBy,
+      [
+        'title',
+        'shortDescription',
+        'content',
+        'blogName',
+        'dependencyIsBanned',
+        'banInfoIsBanned',
+        'banInfoBanDate',
+        'banInfoBanReason',
+      ],
+      'createdAt',
+    );
   }
 }

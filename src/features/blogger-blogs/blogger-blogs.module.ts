@@ -47,6 +47,7 @@ const bloggersBlogRules = [BlogExistsRule];
     ParseQueriesService,
     BloggerBlogsService,
     PostsService,
+    KeyArrayProcessor,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
