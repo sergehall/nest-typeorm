@@ -57,9 +57,6 @@ export class BloggerBlogsRawSqlRepository {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    console.log(searchNameTerm, 'searchNameTerm');
-    console.log(sortBy, 'sortBy');
-    console.log(direction, 'direction');
     const query = `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
@@ -80,20 +77,6 @@ export class BloggerBlogsRawSqlRepository {
       limit,
       offset,
     ];
-    const blogs = await this.db.query(
-      `
-        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-        FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1
-        AND "banInfoIsBanned" = $2
-        AND "blogOwnerId" = $3
-        AND "name" ILIKE $4
-        LIMIT $5
-        OFFSET $6
-        `,
-      params,
-    );
-    console.log(blogs);
 
     try {
       return await this.db.query(query, params);
@@ -186,7 +169,7 @@ export class BloggerBlogsRawSqlRepository {
         "blogOwnerId", "blogOwnerLogin", "banInfoIsBanned", "banInfoBanDate"
         FROM public."BloggerBlogs"
         WHERE "name" ILIKE $1
-        ORDER BY "${sortBy}" ${direction}
+        ORDER BY "${sortBy}" COLLATE "C" ${direction}
         LIMIT $2 OFFSET $3
         `,
         [searchNameTerm, limit, offset],
@@ -443,41 +426,6 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
-    const arrName = [
-      {
-        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
-        name: 'Timma',
-        description: 'description',
-        websiteUrl: 'https://someurl.com',
-        createdAt: '2023-08-05T06:37:38.037Z',
-        isMembership: false,
-      },
-      {
-        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
-        name: 'Tima',
-        description: 'description',
-        websiteUrl: 'https://someurl.com',
-        createdAt: '2023-08-05T06:37:38.037Z',
-        isMembership: false,
-      },
-      {
-        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
-        name: 'timm',
-        description: 'description',
-        websiteUrl: 'https://someurl.com',
-        createdAt: '2023-08-05T06:37:38.037Z',
-        isMembership: false,
-      },
-      {
-        id: 'e79e4b32-b8f7-4b5f-b197-f68bade3caea',
-        name: 'Tim',
-        description: 'description',
-        websiteUrl: 'https://someurl.com',
-        createdAt: '2023-08-05T06:37:38.037Z',
-        isMembership: false,
-      },
-    ];
-
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
       [
