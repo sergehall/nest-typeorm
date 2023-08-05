@@ -4,6 +4,8 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { FilledCommentEntity } from '../../entities/filledComment.entity';
 import { FillingCommentsDataCommand } from './filling-comments-data.use-case';
+import { ReturnCommentsEntity } from '../../entities/comments-return.entity';
+import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 
 export class FindCommentByIdCommand {
   constructor(
@@ -20,12 +22,13 @@ export class FindCommentByIdUseCase
     protected commandBus: CommandBus,
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
   ) {}
-  async execute(command: FindCommentByIdCommand) {
+  async execute(
+    command: FindCommentByIdCommand,
+  ): Promise<ReturnCommentsEntity> {
     const { commentId, currentUserDto } = command;
 
-    const comment = await this.commentsRawSqlRepository.findCommentByCommentId(
-      commentId,
-    );
+    const comment: TablesCommentsRawSqlEntity | null =
+      await this.commentsRawSqlRepository.findCommentByCommentId(commentId);
 
     if (!comment || comment.commentatorInfoIsBanned)
       throw new NotFoundException(

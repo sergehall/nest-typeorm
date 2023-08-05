@@ -10,7 +10,6 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
-import { CommentsService } from '../application/comments.service';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { LikeStatusDto } from '../dto/like-status.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
@@ -27,20 +26,21 @@ import { CommentIdParams } from '../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';
+import { ReturnCommentsEntity } from '../entities/comments-return.entity';
 
 @SkipThrottle()
 @Controller('comments')
 export class CommentsController {
-  constructor(
-    protected commentsService: CommentsService,
-    protected commandBus: CommandBus,
-  ) {}
+  constructor(protected commandBus: CommandBus) {}
 
   @Get(':id')
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
-  async findCommentById(@Request() req: any, @Param() params: IdParams) {
+  async findCommentById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<ReturnCommentsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new FindCommentByIdCommand(params.id, currentUserDto),
