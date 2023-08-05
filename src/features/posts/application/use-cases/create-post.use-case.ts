@@ -55,7 +55,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     if (userIsBannedForBlog)
       throw new HttpException(
         { message: userNotHavePermissionForBlog },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.FORBIDDEN,
       );
 
     // Check if the user has the permission to create a post in this blog
