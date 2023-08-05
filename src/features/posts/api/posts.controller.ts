@@ -117,6 +117,7 @@ export class PostsController {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData: ParseQueriesType =
       await this.parseQueriesService.getQueriesData(query);
+
     return await this.commandBus.execute(
       new FindPostsByPostIdCommand(params.postId, queryData, currentUserDto),
     );
@@ -160,7 +161,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
