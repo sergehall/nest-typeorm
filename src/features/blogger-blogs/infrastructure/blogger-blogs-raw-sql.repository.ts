@@ -65,8 +65,8 @@ export class BloggerBlogsRawSqlRepository {
         WHERE "dependencyIsBanned" = $1 
         AND "banInfoIsBanned" = $2 
         AND "blogOwnerId" = $3
-        AND UPPER("name") ILIKE $4
-        ORDER BY "${sortBy}" ${direction}
+        AND LOWER("name") ILIKE LOWER($4)
+        ORDER BY LOWER("${sortBy}") ${direction}
         LIMIT $5 
         OFFSET $6
         `,
