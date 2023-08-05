@@ -8,9 +8,13 @@ import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-r
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 export class BloggerBlogsRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
 
   async findBlogById(
     blogId: string,
@@ -48,12 +52,13 @@ export class BloggerBlogsRawSqlRepository {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
       const { id } = currentUserDto;
-      const searchNameTerm = queryData.searchNameTerm.toLowerCase();
-      const sortBy = queryData.queryPagination.sortBy;
+      const searchNameTerm = queryData.searchNameTerm;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
+      console.log(id, 'id');
       return await this.db.query(
         `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
@@ -62,7 +67,7 @@ export class BloggerBlogsRawSqlRepository {
         AND "banInfoIsBanned" = $2 
         AND "blogOwnerId" = $3
         AND "name" ILIKE $4
-        ORDER BY "${sortBy}"${direction}
+        ORDER BY "${sortBy}" ${direction}
         LIMIT $5 
         OFFSET $6
         `,
@@ -70,7 +75,7 @@ export class BloggerBlogsRawSqlRepository {
           blogOwnerBanStatus,
           banInfoBanStatus,
           id,
-          searchNameTerm.toUpperCase(),
+          searchNameTerm,
           limit,
           offset,
         ],
@@ -87,11 +92,11 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
-      const sortBy = queryData.queryPagination.sortBy;
+      const searchNameTerm = queryData.searchNameTerm;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-      const searchNameTerm = queryData.searchNameTerm;
 
       return await this.db.query(
         `
@@ -152,11 +157,11 @@ export class BloggerBlogsRawSqlRepository {
     queryData: ParseQueriesType,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
-      const sortBy = queryData.queryPagination.sortBy;
+      const searchNameTerm = queryData.searchNameTerm;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-      const searchNameTerm = queryData.searchNameTerm;
 
       return await this.db.query(
         `
@@ -182,6 +187,7 @@ export class BloggerBlogsRawSqlRepository {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
       const searchNameTerm = queryData.searchNameTerm;
+
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
@@ -226,6 +232,7 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<boolean> {
     try {
       const { id, name, description, websiteUrl } = newBlog;
+
       const updatedBlogById = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
@@ -288,6 +295,7 @@ export class BloggerBlogsRawSqlRepository {
       `,
         [userId, isBanned],
       );
+
       return result[1] !== 0;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -300,6 +308,7 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<boolean> {
     try {
       const isBannedDate = new Date().toISOString();
+
       const updateBanStatusBlog = await this.db.query(
         `
       UPDATE public."BloggerBlogs"
@@ -350,6 +359,7 @@ export class BloggerBlogsRawSqlRepository {
     try {
       const dependencyIsBanned = false;
       const banInfoIsBanned = false;
+
       const blog = await this.db.query(
         `
       SELECT "id", "createdAt", "isMembership", 
@@ -399,6 +409,7 @@ export class BloggerBlogsRawSqlRepository {
     userForBind: TablesUsersWithIdEntity,
   ): Promise<boolean> {
     const { id, login } = userForBind;
+
     try {
       return await this.db.query(
         `
@@ -412,5 +423,18 @@ export class BloggerBlogsRawSqlRepository {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+      sortBy,
+      [
+        'blogOwnerLogin',
+        'dependencyIsBanned',
+        'banInfoIsBanned',
+        'banInfoBanDate',
+      ],
+      'createdAt',
+    );
   }
 }
