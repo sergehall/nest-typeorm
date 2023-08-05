@@ -25,12 +25,6 @@ export class ParseQueriesService {
     return query?.sortBy?.toString() || '';
   }
 
-  private async parseSearchNameTerm(query: any): Promise<string> {
-    const queryName = query.searchNameTerm?.toString();
-    return queryName && queryName.length !== 0
-      ? `%${queryName.toLowerCase()}%`
-      : '%';
-  }
   private async parseSearchLoginTerm(query: any): Promise<string> {
     const queryLogin = query.searchLoginTerm?.toString();
     return queryLogin && queryLogin.length !== 0
@@ -45,23 +39,24 @@ export class ParseQueriesService {
       : '%';
   }
 
+  private async parseSearchNameTerm(query: any): Promise<string> {
+    const queryName = query.searchNameTerm?.toString();
+    return queryName && queryName.length !== 0 ? `%${queryName}%` : '%';
+  }
+
   private async parseTitle(query: any): Promise<string> {
     const title = query.title?.toString();
-    return title && title.length !== 0 ? `%${title.toLowerCase()}%` : '%';
+    return title && title.length !== 0 ? `%${title}%` : '%';
   }
 
   private async parseUserName(query: any): Promise<string> {
     const userName = query.userName?.toString();
-    return userName && userName.length !== 0
-      ? `%${userName.toLowerCase()}%`
-      : '%';
+    return userName && userName.length !== 0 ? `%${userName}%` : '%';
   }
 
   private async parseSearchTitle(query: any): Promise<string> {
     const searchTitle = query.searchTitle?.toString();
-    return searchTitle && searchTitle.length !== 0
-      ? `%${searchTitle.toLowerCase()}%`
-      : '%';
+    return searchTitle && searchTitle.length !== 0 ? `%${searchTitle}%` : '%';
   }
 
   private async parseSortDirection(query: any): Promise<SortDirectionType> {
