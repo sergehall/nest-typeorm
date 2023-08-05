@@ -124,7 +124,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(
-          'Leaving comments for this user is not allowed. ' + error.message,
+          'Leaving post for this user is not allowed. ' + error.message,
         );
       }
       throw new InternalServerErrorException(error.message);
