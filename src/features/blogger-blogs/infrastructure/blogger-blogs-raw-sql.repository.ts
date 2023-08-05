@@ -57,9 +57,6 @@ export class BloggerBlogsRawSqlRepository {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    console.log(sortBy, 'sortBy');
-    console.log(direction, 'direction');
-    console.log(sortBy, 'sortBy');
     try {
       return await this.db.query(
         `
@@ -431,10 +428,15 @@ export class BloggerBlogsRawSqlRepository {
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
       [
+        'isMembership',
         'blogOwnerLogin',
         'dependencyIsBanned',
         'banInfoIsBanned',
         'banInfoBanDate',
+        'banInfoBanReason',
+        'name',
+        'description',
+        'websiteUrl',
       ],
       'createdAt',
     );
