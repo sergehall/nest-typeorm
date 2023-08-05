@@ -74,7 +74,7 @@ export class BloggerBlogsRawSqlRepository {
           blogOwnerBanStatus,
           banInfoBanStatus,
           id,
-          searchNameTerm,
+          searchNameTerm.toUpperCase(),
           limit,
           offset,
         ],

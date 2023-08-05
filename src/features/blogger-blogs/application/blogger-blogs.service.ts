@@ -99,13 +99,13 @@ export class BloggerBlogsService {
         queryData,
       );
 
-    const totalCount =
+    const totalCount: number =
       await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
         currentUserDto.id,
         queryData,
       );
 
-    const pagesCount = Math.ceil(totalCount / pageSize);
+    const pagesCount: number = Math.ceil(totalCount / pageSize);
     return {
       pagesCount: pagesCount,
       page: pageNumber,
