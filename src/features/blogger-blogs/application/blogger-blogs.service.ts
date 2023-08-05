@@ -91,23 +91,25 @@ export class BloggerBlogsService {
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesType,
   ): Promise<PaginationTypes> {
+    const { pageSize, pageNumber } = queryData.queryPagination;
+
     const blogs: TableBloggerBlogsRawSqlEntity[] =
       await this.bloggerBlogsRawSqlRepository.findBlogsCurrentUser(
         currentUserDto,
         queryData,
       );
+
     const totalCount =
       await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
         currentUserDto.id,
         queryData,
       );
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+
+    const pagesCount = Math.ceil(totalCount / pageSize);
     return {
       pagesCount: pagesCount,
-      page: queryData.queryPagination.pageNumber,
-      pageSize: queryData.queryPagination.pageSize,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount: totalCount,
       items: blogs,
     };
