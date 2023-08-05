@@ -17,9 +17,16 @@ export class ValidAccessJwtUseCase
 
     const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
 
-    const result = await this.jwtService.verify(accessToken, {
-      secret: ACCESS_SECRET_KEY,
-    });
-    return result;
+    try {
+      const payload: PayloadDto = await this.jwtService.verify(accessToken, {
+        secret: ACCESS_SECRET_KEY,
+      });
+
+      // Token verification was successful, return the payload
+      return payload;
+    } catch (error) {
+      console.log(error.message);
+      return null; // Token verification failed, return null
+    }
   }
 }
