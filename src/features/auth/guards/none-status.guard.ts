@@ -15,7 +15,7 @@ export class NoneStatusGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    if (request.headers || request.headers.authorization) {
+    if (request.headers && request.headers.authorization) {
       const accessToken = request.headers.authorization.split(' ')[1];
 
       const jwtExistInBlackList: boolean =
