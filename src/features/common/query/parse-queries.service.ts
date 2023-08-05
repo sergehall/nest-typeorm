@@ -41,7 +41,9 @@ export class ParseQueriesService {
 
   private async parseSearchNameTerm(query: any): Promise<string> {
     const queryName = query.searchNameTerm?.toString();
-    return queryName && queryName.length !== 0 ? `%${queryName}%` : '%';
+    return queryName && queryName.length !== 0
+      ? `%${queryName.toLowerCase()}%`
+      : '%';
   }
 
   private async parseTitle(query: any): Promise<string> {
