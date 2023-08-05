@@ -23,6 +23,7 @@ import { SaChangeBanstatusBlogsByBlogIdUseCase } from '../sa/application/use-cas
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
@@ -50,6 +51,7 @@ const bloggersBlogRules = [BlogExistsRule];
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
+    KeyArrayProcessor,
     LikeStatusPostsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,

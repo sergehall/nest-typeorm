@@ -96,8 +96,8 @@ export class BanUserForBlogUseCase
       blogId: updateBanUserDto.blogId,
       login: userToBan.login,
       isBanned: updateBanUserDto.isBanned,
-      banDate: new Date().toISOString(),
       banReason: updateBanUserDto.banReason,
+      banDate: new Date().toISOString(),
     };
   }
 

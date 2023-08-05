@@ -6,9 +6,13 @@ import {
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 export class BannedUsersForBlogsRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly db: DataSource,
+    protected keyArrayProcessor: KeyArrayProcessor,
+  ) {}
   async addBannedUserToBanList(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
@@ -65,8 +69,14 @@ export class BannedUsersForBlogsRawSqlRepository {
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
       const isBanned = true;
+      const sortByQuery = queryData.queryPagination.sortBy;
+      const sortBy = await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+        sortByQuery,
+        ['login', 'banReason', 'isBanned'],
+        'banDate',
+      );
+      console.log(sortBy, 'sortBy');
       const searchLoginTerm = queryData.searchLoginTerm;
-      const sortBy = queryData.queryPagination.sortBy;
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset =
@@ -77,7 +87,8 @@ export class BannedUsersForBlogsRawSqlRepository {
         `
         SELECT "id", "blogId", "userId", "login", "isBanned", "banDate", "banReason"
         FROM public."BannedUsersForBlogs"
-        WHERE "isBanned" = $1 AND "blogId" = $2
+        WHERE "isBanned" = $1 
+        AND "blogId" = $2
         AND "login" ILIKE $3
         ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5

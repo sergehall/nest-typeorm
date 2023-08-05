@@ -27,6 +27,7 @@ import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/cha
 import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banstatus-posts.use-case';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const postsUseCases = [
   CreatePostUseCase,
@@ -47,6 +48,7 @@ const postsUseCases = [
     JwtConfig,
     JwtService,
     PostsService,
+    KeyArrayProcessor,
     ParseQueriesService,
     CommentsService,
     MailsRawSqlRepository,

@@ -24,6 +24,7 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 
 const saUseCases = [
   CreateUserUseCase,
@@ -43,6 +44,7 @@ const saUseCases = [
     UsersService,
     BloggerBlogsService,
     EncryptConfig,
+    KeyArrayProcessor,
     MailsRawSqlRepository,
     PostsRawSqlRepository,
     UsersRawSqlRepository,
