@@ -47,7 +47,7 @@ export class ChangeLikeStatusCommentUseCase
     if (userIsBannedForBlog)
       throw new HttpException(
         { message: userNotHavePermissionForBlog },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.FORBIDDEN,
       );
 
     const likeStatusCommEntity: LikeStatusCommentEntity = {

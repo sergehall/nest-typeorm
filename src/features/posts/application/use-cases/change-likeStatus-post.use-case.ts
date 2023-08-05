@@ -40,7 +40,7 @@ export class ChangeLikeStatusPostUseCase
     if (userIsBannedForBlog)
       throw new HttpException(
         { message: userNotHavePermissionForBlog },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.FORBIDDEN,
       );
 
     const likeStatusPostEntity: TablesLikeStatusPostEntity = {
