@@ -54,8 +54,7 @@ export class BannedUsersForBlogsRawSqlRepository {
       `,
         [userId, blogId, isBanned],
       );
-      // Return true if bannedUser found, if not found return false.
-      console.log(bannedUser);
+      // Check if user found is not equal to zero
       return bannedUser.length !== 0;
     } catch (error) {
       console.log(error.message);

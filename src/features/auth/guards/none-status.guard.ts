@@ -4,6 +4,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt.use-case';
 import { BlacklistJwtRawSqlRepository } from '../infrastructure/blacklist-jwt-raw-sql.repository';
 import { PayloadDto } from '../dto/payload.dto';
+import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
@@ -18,28 +19,31 @@ export class NoneStatusGuard implements CanActivate {
     if (request.headers && request.headers.authorization) {
       const accessToken = request.headers.authorization.split(' ')[1];
 
+      const payload: PayloadDto = await this.commandBus.execute(
+        new ValidAccessJwtCommand(accessToken),
+      );
+
       const jwtExistInBlackList: boolean =
         await this.blacklistJwtRawSqlRepository.JwtExistInBlackList(
           accessToken,
         );
 
-      const payload: PayloadDto = await this.commandBus.execute(
-        new ValidAccessJwtCommand(accessToken),
-      );
-
       if (!jwtExistInBlackList && payload) {
-        const user = await this.usersService.findUserByUserId(payload.userId);
-        if (user && !user.isBanned) {
-          request.user = {
-            id: user.id,
-            login: user.login,
-            email: user.email,
-            orgId: user.orgId,
-            roles: user.roles,
-            isBanned: user.isBanned,
-            payloadExp: new Date(payload.exp * 1000).toISOString(),
-          };
-        }
+        const user: TablesUsersWithIdEntity | null =
+          await this.usersService.findUserByUserId(payload.userId);
+
+        request.user =
+          user && !user.isBanned
+            ? {
+                id: user.id,
+                login: user.login,
+                email: user.email,
+                orgId: user.orgId,
+                roles: user.roles,
+                isBanned: user.isBanned,
+                payloadExp: new Date(payload.exp * 1000).toISOString(),
+              }
+            : null;
         return true;
       }
     }

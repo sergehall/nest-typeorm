@@ -16,7 +16,7 @@ export class CreateCommentCommand {
   constructor(
     public postId: string,
     public createCommentDto: CreateCommentDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 @CommandHandler(CreateCommentCommand)
@@ -30,17 +30,16 @@ export class CreateCommentUseCase
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
   async execute(command: CreateCommentCommand): Promise<ReturnCommentsEntity> {
-    const post = await this.postsRawSqlRepository.findPostByPostId(
-      command.postId,
-    );
+    const { postId, createCommentDto, currentUserDto } = command;
+
+    const post = await this.postsRawSqlRepository.findPostByPostId(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        command.currentUser.id,
+        currentUserDto.id,
         post.blogId,
       );
-
     if (userIsBannedForBlog)
       throw new HttpException(
         { message: userNotHavePermissionForBlog },
@@ -50,15 +49,15 @@ export class CreateCommentUseCase
     const newComment: TablesCommentsRawSqlEntity[] =
       await this.commentsRawSqlRepository.createComment({
         id: uuid4().toString(),
-        content: command.createCommentDto.content,
+        content: createCommentDto.content,
         createdAt: new Date().toISOString(),
         postInfoPostId: post.id,
         postInfoTitle: post.title,
         postInfoBlogId: post.blogId,
         postInfoBlogName: post.blogName,
         postInfoBlogOwnerId: post.postOwnerId,
-        commentatorInfoUserId: command.currentUser.id,
-        commentatorInfoUserLogin: command.currentUser.login,
+        commentatorInfoUserId: currentUserDto.id,
+        commentatorInfoUserLogin: currentUserDto.login,
         commentatorInfoIsBanned: false,
         banInfoIsBanned: false,
         banInfoBanDate: null,

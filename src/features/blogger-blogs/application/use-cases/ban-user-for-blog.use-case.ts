@@ -20,6 +20,7 @@ import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../posts/ap
 import * as uuid4 from 'uuid4';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../exception-filter/custom-errors-messages';
+import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 
 export class BanUserForBlogCommand {
   constructor(
@@ -77,7 +78,9 @@ export class BanUserForBlogUseCase
   }
 
   // Fetches the blog associated with the ban from the repository based on the provided blog ID.
-  private async getBlogForBan(blogId: string) {
+  private async getBlogForBan(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity> {
     const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogByBlogId(
       blogId,
     );
