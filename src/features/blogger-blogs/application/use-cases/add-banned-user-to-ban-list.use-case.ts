@@ -13,7 +13,7 @@ export class AddBannedUserToBanListUseCase
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
   async execute(command: AddBannedUserToBanListCommand): Promise<boolean> {
-    return await this.bannedUsersForBlogsRawSqlRepository.addBannedUserToBanList(
+    return await this.bannedUsersForBlogsRawSqlRepository.addBannedOrDeleteUnBannedUser(
       command.bannedUserForBlogEntity,
     );
   }
