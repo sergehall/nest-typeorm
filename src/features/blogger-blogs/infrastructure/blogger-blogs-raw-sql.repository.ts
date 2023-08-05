@@ -51,7 +51,7 @@ export class BloggerBlogsRawSqlRepository {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const { id } = currentUserDto;
-    const searchNameTerm = queryData.searchNameTerm.toLocaleLowerCase();
+    const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
     const limit = queryData.queryPagination.pageSize;
@@ -63,33 +63,37 @@ export class BloggerBlogsRawSqlRepository {
         WHERE "dependencyIsBanned" = $1
         AND "banInfoIsBanned" = $2
         AND "blogOwnerId" = $3
-        AND LOWER("name") LIKE $4
+        AND "name" LIKE $4
         ORDER BY "${sortBy}" ${direction}
         LIMIT $5
         OFFSET $6
         `;
 
-    // const query = `
-    // SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-    // FROM public."BloggerBlogs"
-    // WHERE "dependencyIsBanned" = $1
-    // AND "banInfoIsBanned" = $2
-    // AND "blogOwnerId" = $3
-    // AND "name" COLLATE "C" LIKE $4 -- Case-sensitive collation
-    // ORDER BY "name" COLLATE "C" ${direction} -- Case-sensitive collation
-    // LIMIT $5
-    // OFFSET $6
-    // `;
+    const params = [
+      blogOwnerBanStatus,
+      banInfoBanStatus,
+      id,
+      searchNameTerm,
+      limit,
+      offset,
+    ];
+    const blogs = await this.db.query(
+      `
+        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+        FROM public."BloggerBlogs"
+        WHERE "dependencyIsBanned" = $1
+        AND "banInfoIsBanned" = $2
+        AND "blogOwnerId" = $3
+        AND "name" LIKE $4
+        LIMIT $5
+        OFFSET $6
+        `,
+      params,
+    );
+    console.log(blogs);
 
     try {
-      return await this.db.query(query, [
-        blogOwnerBanStatus,
-        banInfoBanStatus,
-        id,
-        searchNameTerm,
-        limit,
-        offset,
-      ]);
+      return await this.db.query(query, params);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
