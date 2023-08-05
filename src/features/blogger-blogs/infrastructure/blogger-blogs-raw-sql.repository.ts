@@ -57,6 +57,9 @@ export class BloggerBlogsRawSqlRepository {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
+    console.log(searchNameTerm, 'searchNameTerm');
+    console.log(sortBy, 'sortBy');
+    console.log(direction, 'direction');
     const query = `
         SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."BloggerBlogs"
