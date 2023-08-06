@@ -154,7 +154,8 @@ export class CommentsRawSqlRepository {
       return null;
     }
   }
-  async findCommentsCurrentUserNotExist(
+
+  async findCommentsByUserNotExist(
     postId: string,
     queryData: ParseQueriesType,
   ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
@@ -171,39 +172,40 @@ export class CommentsRawSqlRepository {
         queryData.queryPagination.pageSize;
 
       const query = `
-      SELECT
-        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
-        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
-        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
-        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
-        (
-          SELECT COUNT(*)
-          FROM public."Comments"
-          WHERE "postInfoPostId" = $1
-          AND "commentatorInfoIsBanned" = $2
-          AND "banInfoIsBanned" = $3
-        ) AS "numberOfComments",
-        COALESCE(lsc_like."numberOfLikes", 0) AS "numberOfLikes",
-        COALESCE(lsc_dislike."numberOfDislikes", 0) AS "numberOfDislikes",
-        'None' AS "likeStatus"
-      FROM public."Comments" c
-      LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfLikes"
-        FROM public."LikeStatusComments"
-        WHERE "likeStatus" = 'Like' AND "isBanned" = $6
-        GROUP BY "commentId"
-      ) lsc_like ON c."id" = lsc_like."commentId"
-      LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
-        FROM public."LikeStatusComments"
-        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $6
-        GROUP BY "commentId"
-      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
-      WHERE c."postInfoPostId" = $1
-        AND c."commentatorInfoIsBanned" = $2
-        AND c."banInfoIsBanned" = $3
-      ORDER BY "${sortBy}" ${direction}
-      LIMIT $4 OFFSET $5`;
+        SELECT
+          c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+          c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+          c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+          c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+          (
+            SELECT COUNT(*)
+            FROM public."Comments"
+            WHERE "postInfoPostId" = $1
+            AND "commentatorInfoIsBanned" = $2
+            AND "banInfoIsBanned" = $3
+          ) AS "numberOfComments",
+          COALESCE((
+            SELECT COUNT(*)
+            FROM public."LikeStatusComments"
+            WHERE "commentId" = c."id"
+            AND "likeStatus" = 'Like'
+            AND "isBanned" = $6
+          )::integer, 0) AS "numberOfLikes",
+          COALESCE((
+            SELECT COUNT(*)
+            FROM public."LikeStatusComments"
+            WHERE "commentId" = c."id"
+            AND "likeStatus" = 'Dislike'
+            AND "isBanned" = $6
+          )::integer, 0) AS "numberOfDislikes",
+          'None' AS "likeStatus"
+        FROM public."Comments" c
+        WHERE c."postInfoPostId" = $1
+          AND c."commentatorInfoIsBanned" = $2
+          AND c."banInfoIsBanned" = $3
+        ORDER BY "${sortBy}" ${direction}
+        LIMIT $4 OFFSET $5
+        `;
 
       const parameters = [
         postId,
@@ -221,7 +223,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentsCurrentUserExist(
+  async findCommentsByUserExist(
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto,
@@ -251,8 +253,8 @@ export class CommentsRawSqlRepository {
           AND "commentatorInfoIsBanned" = $2
           AND "banInfoIsBanned" = $3
         ) AS "numberOfComments",
-        COALESCE(lsc_like."numberOfLikes", 0) AS "numberOfLikes",
-        COALESCE(lsc_dislike."numberOfDislikes", 0) AS "numberOfDislikes",
+        COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
+        COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",
         COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
       FROM public."Comments" c
       LEFT JOIN (
