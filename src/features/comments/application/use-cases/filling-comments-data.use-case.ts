@@ -37,6 +37,13 @@ export class FillingCommentsDataUseCase
 
         // If a currentUserDto is provided in the command, fetch the like status for the current user
         if (currentUserDto) {
+          // const commentLikesDislikesLikesStatus =
+          //   await this.likeStatusCommentsRawSqlRepository.findCommentAndCountLikesDislikesLikeStatus(
+          //     commentId,
+          //     currentUserDto.id,
+          //     isBanned,
+          //   );
+
           const currentComment =
             await this.likeStatusCommentsRawSqlRepository.findOne(
               commentId,

@@ -114,9 +114,7 @@ export class PostsRawSqlRepository {
              "postOwnerId", "dependencyIsBanned",
              "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          returning 
-          "id", "title", "shortDescription", "content", "blogId", "blogName", 
-          "createdAt"
+          RETURNING "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
           `,
         [
           postsRawSqlEntity.id,

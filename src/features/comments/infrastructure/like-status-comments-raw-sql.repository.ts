@@ -6,6 +6,7 @@ import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-u
 
 export class LikeStatusCommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
+
   async updateLikeStatusComment(
     likeStatusCommEntity: LikeStatusCommentEntity,
   ): Promise<boolean> {
@@ -53,6 +54,42 @@ export class LikeStatusCommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+  async findCommentAndCountLikesDislikesLikeStatus(
+    commentId: string,
+    userId: string,
+    isBanned: boolean,
+  ) {
+    try {
+      return await this.db.query(
+        `
+      SELECT "commentId", "userId", "blogId", "isBanned", "likeStatus", "createdAt",
+      (
+        SELECT COUNT(*) 
+        FROM public."LikeStatusComments"
+        WHERE "commentId" = $1 AND "likeStatus" = 'Like'
+      ) AS "numberOfLikes",
+      (
+        SELECT COUNT(*) 
+        FROM public."LikeStatusComments"
+        WHERE "commentId" = $1 AND "likeStatus" = 'Dislike'
+      ) AS "numberOfDislikes",
+      (
+        SELECT "likeStatus"
+        FROM public."LikeStatusComments"
+        WHERE "commentId" = $1 AND "userId" = $2
+        LIMIT 1
+      ) AS "likeStatus"
+      FROM public."LikeStatusComments"
+      WHERE "commentId" = $1 AND "userId" = $2 AND "isBanned" = $3
+        `,
+        [commentId, userId, isBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async countLikesDislikes(
     commentId: string,
     isBanned: boolean,

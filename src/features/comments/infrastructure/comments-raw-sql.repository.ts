@@ -9,6 +9,8 @@ import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CommentsLikesStatusLikesDislikesTotalComments } from '../entities/comment-likes-dislikes-likes-status';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -149,6 +151,90 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       return null;
+    }
+  }
+
+  async findComments(
+    postId: string,
+    queryData: ParseQueriesType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const isBanned = false;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
+
+      const comments = await this.db.query(
+        `
+        SELECT
+          "id", "content", "createdAt", "postInfoPostId", "postInfoTitle",
+          "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned",
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason",
+            (SELECT COUNT(*) FROM public."Comments" 
+              WHERE "postInfoPostId" = $1
+              AND "commentatorInfoIsBanned" = $2
+              AND "banInfoIsBanned" = $3 ) AS "numberOfComments"
+        FROM public."Comments"
+        WHERE "postInfoPostId" = $1
+          AND "commentatorInfoIsBanned" = $2
+          AND "banInfoIsBanned" = $3
+        ORDER BY "${sortBy}" ${direction}
+        LIMIT $4 OFFSET $5`,
+        [postId, commentatorInfoIsBanned, banInfoIsBanned, limit, offset],
+      );
+
+      let query = `
+          SELECT 
+            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Like') AS "numberOfLikes",
+            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Dislike') AS "numberOfDislikes"
+          FROM public."LikeStatusComments"
+          WHERE "commentId" = $1 AND "isBanned" = $2
+          LIMIT 1
+          `;
+
+      if (currentUserDto?.id) {
+        query = `
+          SELECT "likeStatus",
+            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Like') AS "numberOfLikes",
+            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Dislike') AS "numberOfDislikes"
+          FROM public."LikeStatusComments"
+          WHERE "commentId" = $1 AND "isBanned" = $2 AND "userId" = $3
+          LIMIT 1
+          `;
+      }
+
+      // Loop through the comments and fetch the likeStatus, numberOfLikes, and numberOfDislikes for each comment
+      comments.map((comment: { id: string }) => comment.id);
+      for (const comment of comments) {
+        const { id } = comment;
+        const parameters = [id, isBanned];
+        if (currentUserDto?.id) {
+          parameters.push(currentUserDto.id);
+        }
+
+        const result = await this.db.query(query, parameters);
+
+        if (result && result.length > 0) {
+          comment.likeStatus = result[0].likeStatus || 'None';
+          comment.numberOfLikes = parseInt(result[0].numberOfLikes, 10);
+          comment.numberOfDislikes = parseInt(result[0].numberOfDislikes, 10);
+        } else {
+          comment.likeStatus = 'None';
+          comment.numberOfLikes = 0;
+          comment.numberOfDislikes = 0;
+        }
+      }
+      return comments;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
