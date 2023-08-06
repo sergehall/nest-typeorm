@@ -31,19 +31,21 @@ export class FindCommentsByPostIdUseCase
     if (!post) throw new NotFoundException('Not found post.');
 
     let comments: CommentsLikesStatusLikesDislikesTotalComments[];
-    if (currentUserDto) {
-      comments =
-        await this.commentsRawSqlRepository.findCommentsCurrentUserExist(
+    switch (currentUserDto) {
+      case null:
+        comments =
+          await this.commentsRawSqlRepository.findCommentsByUserNotExist(
+            postId,
+            queryData,
+          );
+        break;
+      default:
+        comments = await this.commentsRawSqlRepository.findCommentsByUserExist(
           postId,
           queryData,
           currentUserDto,
         );
-    } else {
-      comments =
-        await this.commentsRawSqlRepository.findCommentsCurrentUserNotExist(
-          postId,
-          queryData,
-        );
+        break;
     }
 
     if (comments.length === 0) {
@@ -55,11 +57,8 @@ export class FindCommentsByPostIdUseCase
         items: [],
       };
     }
-
     const transformedComments = await this.transformedComments(comments);
-
     const totalCountComments = Number(comments[0].numberOfComments);
-
     const pagesCount = Math.ceil(
       totalCountComments / queryData.queryPagination.pageSize,
     );
