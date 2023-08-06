@@ -10,6 +10,10 @@ import {
 } from 'class-validator';
 
 class CommentatorInfo {
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId length! Must be min 0, max 100 ch.',
+  })
   userId: string;
   @IsNotEmpty()
   @Length(3, 10, {
