@@ -17,6 +17,7 @@ export class CommentsRawSqlRepository {
     @InjectDataSource() private readonly db: DataSource,
     protected keyArrayProcessor: KeyArrayProcessor,
   ) {}
+
   async createComment(
     tablesCommentsRawSqlEntity: TablesCommentsRawSqlEntity,
   ): Promise<TablesCommentsRawSqlEntity[]> {
@@ -153,16 +154,15 @@ export class CommentsRawSqlRepository {
       return null;
     }
   }
-
-  async findComments(
+  async findCommentsCurrentUserNotExist(
     postId: string,
     queryData: ParseQueriesType,
-    currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
       const isBanned = false;
+
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
@@ -170,68 +170,125 @@ export class CommentsRawSqlRepository {
         (queryData.queryPagination.pageNumber - 1) *
         queryData.queryPagination.pageSize;
 
-      const comments = await this.db.query(
-        `
-        SELECT
-          "id", "content", "createdAt", "postInfoPostId", "postInfoTitle",
-          "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
-          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned",
-          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason",
-            (SELECT COUNT(*) FROM public."Comments" 
-              WHERE "postInfoPostId" = $1
-              AND "commentatorInfoIsBanned" = $2
-              AND "banInfoIsBanned" = $3 ) AS "numberOfComments"
-        FROM public."Comments"
-        WHERE "postInfoPostId" = $1
+      const query = `
+      SELECT
+        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        (
+          SELECT COUNT(*)
+          FROM public."Comments"
+          WHERE "postInfoPostId" = $1
           AND "commentatorInfoIsBanned" = $2
           AND "banInfoIsBanned" = $3
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $4 OFFSET $5`,
-        [postId, commentatorInfoIsBanned, banInfoIsBanned, limit, offset],
-      );
+        ) AS "numberOfComments",
+        COALESCE(lsc_like."numberOfLikes", 0) AS "numberOfLikes",
+        COALESCE(lsc_dislike."numberOfDislikes", 0) AS "numberOfDislikes",
+        'None' AS "likeStatus"
+      FROM public."Comments" c
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $6
+        GROUP BY "commentId"
+      ) lsc_like ON c."id" = lsc_like."commentId"
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $6
+        GROUP BY "commentId"
+      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
+      WHERE c."postInfoPostId" = $1
+        AND c."commentatorInfoIsBanned" = $2
+        AND c."banInfoIsBanned" = $3
+      ORDER BY "${sortBy}" ${direction}
+      LIMIT $4 OFFSET $5`;
 
-      let query = `
-          SELECT 
-            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Like') AS "numberOfLikes",
-            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Dislike') AS "numberOfDislikes"
-          FROM public."LikeStatusComments"
-          WHERE "commentId" = $1 AND "isBanned" = $2
-          LIMIT 1
-          `;
+      const parameters = [
+        postId,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+        limit,
+        offset,
+        isBanned,
+      ];
 
-      if (currentUserDto?.id) {
-        query = `
-          SELECT "likeStatus",
-            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Like') AS "numberOfLikes",
-            (SELECT COUNT(*) FROM public."LikeStatusComments" WHERE "commentId" = $1 AND "likeStatus" = 'Dislike') AS "numberOfDislikes"
-          FROM public."LikeStatusComments"
-          WHERE "commentId" = $1 AND "isBanned" = $2 AND "userId" = $3
-          LIMIT 1
-          `;
-      }
+      return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
-      // Loop through the comments and fetch the likeStatus, numberOfLikes, and numberOfDislikes for each comment
-      comments.map((comment: { id: string }) => comment.id);
-      for (const comment of comments) {
-        const { id } = comment;
-        const parameters = [id, isBanned];
-        if (currentUserDto?.id) {
-          parameters.push(currentUserDto.id);
-        }
+  async findCommentsCurrentUserExist(
+    postId: string,
+    queryData: ParseQueriesType,
+    currentUserDto: CurrentUserDto,
+  ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const isBanned = false;
 
-        const result = await this.db.query(query, parameters);
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
 
-        if (result && result.length > 0) {
-          comment.likeStatus = result[0].likeStatus || 'None';
-          comment.numberOfLikes = parseInt(result[0].numberOfLikes, 10);
-          comment.numberOfDislikes = parseInt(result[0].numberOfDislikes, 10);
-        } else {
-          comment.likeStatus = 'None';
-          comment.numberOfLikes = 0;
-          comment.numberOfDislikes = 0;
-        }
-      }
-      return comments;
+      const query = `
+      SELECT
+        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        (
+          SELECT COUNT(*)
+          FROM public."Comments"
+          WHERE "postInfoPostId" = $1
+          AND "commentatorInfoIsBanned" = $2
+          AND "banInfoIsBanned" = $3
+        ) AS "numberOfComments",
+        COALESCE(lsc_like."numberOfLikes", 0) AS "numberOfLikes",
+        COALESCE(lsc_dislike."numberOfDislikes", 0) AS "numberOfDislikes",
+        COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
+      FROM public."Comments" c
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_like ON c."id" = lsc_like."commentId"
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
+      LEFT JOIN (
+        SELECT "commentId", "likeStatus"
+        FROM public."LikeStatusComments"
+        WHERE "userId" = $4 AND "isBanned" = $5
+      ) lsc_user ON c."id" = lsc_user."commentId"
+      WHERE c."postInfoPostId" = $1
+        AND c."commentatorInfoIsBanned" = $2
+        AND c."banInfoIsBanned" = $3
+      ORDER BY "${sortBy}" ${direction}
+      LIMIT $6 OFFSET $7`;
+
+      const parameters = [
+        postId,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+        currentUserDto.id,
+        isBanned,
+        limit,
+        offset,
+      ];
+
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
