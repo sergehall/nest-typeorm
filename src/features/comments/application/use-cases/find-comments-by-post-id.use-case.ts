@@ -26,6 +26,7 @@ export class FindCommentsByPostIdUseCase
   ) {}
   async execute(command: FindCommentsByPostIdCommand) {
     const { postId, queryData, currentUserDto } = command;
+    const { pageNumber, pageSize } = queryData.queryPagination;
 
     const post = await this.postsRawSqlRepository.findPostByPostId(postId);
     if (!post) throw new NotFoundException('Not found post.');
@@ -50,23 +51,26 @@ export class FindCommentsByPostIdUseCase
 
     if (comments.length === 0) {
       return {
-        pagesCount: queryData.queryPagination.pageNumber,
-        page: queryData.queryPagination.pageNumber,
-        pageSize: queryData.queryPagination.pageSize,
-        totalCount: queryData.queryPagination.pageNumber - 1,
+        pagesCount: pageNumber,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: pageNumber - 1,
         items: [],
       };
     }
+
     const transformedComments = await this.transformedComments(comments);
+
     const totalCountComments = Number(comments[0].numberOfComments);
+
     const pagesCount = Math.ceil(
       totalCountComments / queryData.queryPagination.pageSize,
     );
 
     return {
       pagesCount: pagesCount,
-      page: queryData.queryPagination.pageNumber,
-      pageSize: queryData.queryPagination.pageSize,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount: totalCountComments,
       items: transformedComments,
     };
