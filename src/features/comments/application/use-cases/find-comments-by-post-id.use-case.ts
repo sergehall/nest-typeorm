@@ -30,12 +30,21 @@ export class FindCommentsByPostIdUseCase
     const post = await this.postsRawSqlRepository.findPostByPostId(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
-    const comments: CommentsLikesStatusLikesDislikesTotalComments[] =
-      await this.commentsRawSqlRepository.findComments(
-        postId,
-        queryData,
-        currentUserDto,
-      );
+    let comments: CommentsLikesStatusLikesDislikesTotalComments[];
+    if (currentUserDto) {
+      comments =
+        await this.commentsRawSqlRepository.findCommentsCurrentUserExist(
+          postId,
+          queryData,
+          currentUserDto,
+        );
+    } else {
+      comments =
+        await this.commentsRawSqlRepository.findCommentsCurrentUserNotExist(
+          postId,
+          queryData,
+        );
+    }
 
     if (comments.length === 0) {
       return {

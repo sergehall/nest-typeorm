@@ -25,7 +25,6 @@ export class ValidAccessJwtUseCase
       // Token verification was successful, return the payload
       return payload;
     } catch (error) {
-      console.log('ValidAccessJwtUseCase. ', error.message);
       return null; // Token verification failed, return null
     }
   }
