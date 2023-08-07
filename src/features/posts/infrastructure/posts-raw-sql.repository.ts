@@ -148,7 +148,7 @@ export class PostsRawSqlRepository {
     postsWithLikes.forEach(
       (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
         const postId = row.id;
-
+        // console.log(postsWithLikes);
         if (!postWithLikes[postId]) {
           postWithLikes[postId] = {
             id: row.id,
@@ -172,6 +172,7 @@ export class PostsRawSqlRepository {
             postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
           }
         }
+
         if (row.likeStatus === LikeStatusEnums.LIKE) {
           const likeStatus = {
             addedAt: row.addedAt,
