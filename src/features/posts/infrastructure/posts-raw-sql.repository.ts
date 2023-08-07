@@ -90,7 +90,7 @@ export class PostsRawSqlRepository {
               "postId", "userId", "likeStatus", "addedAt", "login",
               ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3
+            WHERE "isBanned" = $3 AND "likeStatus" = 'Like'
             ),
             PostsWithLikes AS (
               SELECT
@@ -98,7 +98,7 @@ export class PostsRawSqlRepository {
                 p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
                 p."banInfoBanDate", p."banInfoBanReason",
                 COALESCE(l."userId") AS "userId",
-                COALESCE(l."likeStatus", 'None') AS "likeStatus",
+                COALESCE(l."likeStatus") AS "likeStatus",
                 COALESCE(l."addedAt", '') AS "addedAt",
                 COALESCE(l.login, '') AS "login",
                 COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
