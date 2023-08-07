@@ -6,7 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class LikeStatusCommentEntity {
   @IsNotEmpty()
@@ -36,7 +36,7 @@ export class LikeStatusCommentEntity {
     message:
       'Incorrect likeStatus length! Must be min 4, max 7 ch. Type of Like, Dislike or None',
   })
-  likeStatus: StatusLike;
+  likeStatus: LikeStatusEnums;
   @IsNotEmpty()
   @MinLength(0)
   @MaxLength(100)

@@ -1,4 +1,3 @@
-import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import {
   IsEnum,
   IsNotEmpty,
@@ -8,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 class CommentatorInfo {
   @IsNotEmpty()
@@ -31,10 +31,10 @@ export class LikesInfo {
   @IsNumber()
   dislikesCount: number;
   @IsNotEmpty()
-  @IsEnum(StatusLike, {
+  @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  myStatus: StatusLike;
+  myStatus: LikeStatusEnums;
 }
 
 export class ReturnCommentsEntity {

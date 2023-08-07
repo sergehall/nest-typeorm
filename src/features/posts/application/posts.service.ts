@@ -5,25 +5,27 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  NewestLikes,
-  ReturnPostsEntity,
-} from '../entities/posts-without-ownerInfo.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
-import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { userNotHavePermission } from '../../../exception-filter/custom-errors-messages';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { CommandBus } from '@nestjs/cqrs';
+import {
+  NewestLikes,
+  ReturnPostsEntity,
+} from '../entities/return-posts-entity.entity';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 @Injectable()
 export class PostsService {
   constructor(
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
+    protected commandBus: CommandBus,
   ) {}
   async openFindPosts(
     queryData: ParseQueriesType,
@@ -82,6 +84,7 @@ export class PostsService {
       items: filledPosts,
     };
   }
+
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueriesType,
@@ -157,7 +160,7 @@ export class PostsService {
             dislike,
           );
         // getting the status of the post owner
-        let ownLikeStatus = StatusLike.NONE;
+        let ownLikeStatus = LikeStatusEnums.NONE;
         if (currentUserDto) {
           const findOwnPost =
             await this.likeStatusPostsRawSqlRepository.findOne(
@@ -171,7 +174,7 @@ export class PostsService {
         }
         // getting 3 last likes
         const limitLikes = 3;
-        const likeStatus = StatusLike.LIKE;
+        const likeStatus = LikeStatusEnums.LIKE;
         const newestLikes: NewestLikes[] =
           await this.likeStatusPostsRawSqlRepository.findNewestLikes(
             postId,

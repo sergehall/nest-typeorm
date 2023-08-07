@@ -6,6 +6,7 @@ import { ParseQueriesType } from '../../../common/query/types/parse-query.types'
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
 import { CommentsNumberOfLikesDislikesLikesStatus } from '../../entities/comment-likes-dislikes-likes-status';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 
 export class FindCommentsByPostIdCommand {
   constructor(
@@ -24,7 +25,9 @@ export class FindCommentsByPostIdUseCase
     private readonly commentsRawSqlRepository: CommentsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindCommentsByPostIdCommand) {
+  async execute(
+    command: FindCommentsByPostIdCommand,
+  ): Promise<PaginationTypes> {
     const { postId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

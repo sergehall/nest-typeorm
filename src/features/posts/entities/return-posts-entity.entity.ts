@@ -1,11 +1,12 @@
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
   Length,
   Matches,
 } from 'class-validator';
-import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class NewestLikes {
   @IsNotEmpty()
@@ -19,9 +20,6 @@ export class NewestLikes {
   })
   login: string;
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect addedAt length! Must be min 1, max 100 ch.',
-  })
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
@@ -45,7 +43,11 @@ export class ExtendedLikesInfo {
   @Length(4, 7, {
     message: 'Incorrect myStatus length! Must be min 4, max 7 ch.',
   })
-  myStatus: StatusLike;
+  @IsNotEmpty()
+  @IsEnum(LikeStatusEnums, {
+    message: 'Incorrect myStatus must be type of Like, Dislike or None.',
+  })
+  myStatus: LikeStatusEnums;
   newestLikes: NewestLikes[];
 }
 

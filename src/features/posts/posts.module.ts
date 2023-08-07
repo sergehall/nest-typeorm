@@ -28,8 +28,10 @@ import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-bans
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { FindPostsUseCase } from './application/use-cases/find-posts.use-case';
 
 const postsUseCases = [
+  FindPostsUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
   RemovePostByPostIdUseCase,
