@@ -139,16 +139,15 @@ export class PostsRawSqlRepository {
               WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
             )
           SELECT
-            pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName",
-            pwl."createdAt", pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned",
-            pwl."banInfoBanDate", pwl."banInfoBanReason",
-            pwl."userId", 
-            pwl."likeStatus", 
-            pwl."myStatus",
-            pwl."addedAt",
-            pwl."login",
+            pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
+            pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
             pwl."likesCount"::integer,
             pwl."dislikesCount"::integer,
+            pwl."myStatus",
+            pwl."userId", 
+            pwl."addedAt",
+            pwl."login",
+            pwl."likeStatus",
             tp."numberOfPosts"::integer
           FROM PostsWithLikes pwl, TotalPosts tp
         `;

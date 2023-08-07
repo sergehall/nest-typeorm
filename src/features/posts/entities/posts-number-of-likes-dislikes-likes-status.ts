@@ -78,34 +78,39 @@ export class PostsNumbersOfPostsLikesDislikesLikesStatus {
     message: 'Incorrect id length! Must be min 1, max 100 ch.',
   })
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect userId length! Must be min 1, max 100 ch.',
-  })
-  likeStatus: LikeStatusEnums;
+  likesCount: number;
+  @IsNotEmpty()
+  dislikesCount: number;
   @IsNotEmpty()
   @Length(0, 100, {
-    message: 'Incorrect userId length! Must be min 1, max 100 ch.',
+    message: 'Incorrect myStatus length! Must be min 1, max 100 ch.',
   })
   myStatus: LikeStatusEnums;
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId! Must be max 15 ch.',
+  })
+  userId: string;
   @IsNotEmpty()
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
   addedAt: string;
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect login length! Must be min 1, max 100 ch.',
+  @Length(3, 10, {
+    message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })
+  @Matches('^[a-zA-Z0-9_-]*$')
   login: string;
-  userId: string;
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId length! Must be min 1, max 100 ch.',
+  })
+  likeStatus: LikeStatusEnums;
   @IsNotEmpty()
   @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  @IsNotEmpty()
-  likesCount: number;
-  @IsNotEmpty()
-  dislikesCount: number;
   @IsNotEmpty()
   numberOfPosts: number;
 }
