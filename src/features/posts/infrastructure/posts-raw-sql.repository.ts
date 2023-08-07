@@ -173,9 +173,9 @@ export class PostsRawSqlRepository {
         }
         if (row.likeStatus === LikeStatusEnums.LIKE) {
           const likeStatus = {
-            userId: row.userId,
-            login: row.login,
             addedAt: row.addedAt,
+            login: row.login,
+            userId: row.userId,
           };
           postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
         }
