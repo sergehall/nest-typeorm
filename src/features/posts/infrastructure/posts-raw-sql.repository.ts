@@ -90,7 +90,7 @@ export class PostsRawSqlRepository {
               "postId", "userId", "likeStatus", "addedAt", "login",
               ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3
+            WHERE "isBanned" = $3 AND "likeStatus" = 'Like'
             ),
             PostsWithLikes AS (
               SELECT
