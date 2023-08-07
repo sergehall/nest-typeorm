@@ -10,7 +10,7 @@ import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-u
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { CommentsLikesStatusLikesDislikesTotalComments } from '../entities/comment-likes-dislikes-likes-status';
+import { CommentsNumberOfLikesDislikesLikesStatus } from '../entities/comment-likes-dislikes-likes-status';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -158,7 +158,7 @@ export class CommentsRawSqlRepository {
   async findCommentsByUserNotExist(
     postId: string,
     queryData: ParseQueriesType,
-  ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
+  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
@@ -177,12 +177,14 @@ export class CommentsRawSqlRepository {
           c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
           c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
           c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+          CAST(
           (
             SELECT COUNT(*)
             FROM public."Comments"
             WHERE "postInfoPostId" = $1
             AND "commentatorInfoIsBanned" = $2
             AND "banInfoIsBanned" = $3
+            ) AS integer
           ) AS "numberOfComments",
           COALESCE((
             SELECT COUNT(*)
@@ -227,7 +229,7 @@ export class CommentsRawSqlRepository {
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto,
-  ): Promise<CommentsLikesStatusLikesDislikesTotalComments[]> {
+  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
@@ -246,12 +248,14 @@ export class CommentsRawSqlRepository {
         c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
         c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
         c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        CAST(
         (
           SELECT COUNT(*)
           FROM public."Comments"
           WHERE "postInfoPostId" = $1
           AND "commentatorInfoIsBanned" = $2
           AND "banInfoIsBanned" = $3
+          ) AS integer
         ) AS "numberOfComments",
         COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
         COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",

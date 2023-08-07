@@ -4,8 +4,8 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
-import { CommentsLikesStatusLikesDislikesTotalComments } from '../../entities/comment-likes-dislikes-likes-status';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
+import { CommentsNumberOfLikesDislikesLikesStatus } from '../../entities/comment-likes-dislikes-likes-status';
 
 export class FindCommentsByPostIdCommand {
   constructor(
@@ -31,7 +31,7 @@ export class FindCommentsByPostIdUseCase
     const post = await this.postsRawSqlRepository.findPostByPostId(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
-    let comments: CommentsLikesStatusLikesDislikesTotalComments[];
+    let comments: CommentsNumberOfLikesDislikesLikesStatus[];
     switch (currentUserDto) {
       case null:
         comments =
@@ -59,9 +59,10 @@ export class FindCommentsByPostIdUseCase
       };
     }
 
-    const transformedComments = await this.transformedComments(comments);
+    const transformedComments: ReturnCommentsEntity[] =
+      await this.transformedComments(comments);
 
-    const totalCountComments = Number(comments[0].numberOfComments);
+    const totalCountComments: number = comments[0].numberOfComments;
 
     const pagesCount = Math.ceil(
       totalCountComments / queryData.queryPagination.pageSize,
@@ -77,11 +78,11 @@ export class FindCommentsByPostIdUseCase
   }
 
   private async transformedComments(
-    comments: CommentsLikesStatusLikesDislikesTotalComments[],
+    comments: CommentsNumberOfLikesDislikesLikesStatus[],
   ): Promise<ReturnCommentsEntity[]> {
     return comments.map(
       (
-        comment: CommentsLikesStatusLikesDislikesTotalComments,
+        comment: CommentsNumberOfLikesDislikesLikesStatus,
       ): ReturnCommentsEntity => ({
         id: comment.id,
         content: comment.content,
