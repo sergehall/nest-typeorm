@@ -88,7 +88,7 @@ export class PostsRawSqlRepository {
           WITH LastThreeLikes AS (
             SELECT
               "postId", "userId", "likeStatus", "addedAt", "login",
-              ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" ASC) AS rn
+              ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
             WHERE "isBanned" = $3
             ),
