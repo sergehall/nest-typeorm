@@ -27,6 +27,7 @@ export class PostsService {
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
+
   async openFindPosts(
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
