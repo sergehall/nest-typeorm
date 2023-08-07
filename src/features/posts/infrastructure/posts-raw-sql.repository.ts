@@ -167,7 +167,7 @@ export class PostsRawSqlRepository {
           };
         }
         if (currentUserDto) {
-          if (row.userId === currentUserDto.id) {
+          if (row.postOwnerId === currentUserDto.id) {
             postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
           }
         }
