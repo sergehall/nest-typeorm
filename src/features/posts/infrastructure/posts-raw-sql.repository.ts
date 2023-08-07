@@ -90,21 +90,21 @@ export class PostsRawSqlRepository {
               "postId", "userId", "likeStatus", "addedAt", "login",
               ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3 AND "likeStatus" = 'Like'
+            WHERE "isBanned" = $3
             ),
             PostsWithLikes AS (
               SELECT
                 p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
                 p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
                 p."banInfoBanDate", p."banInfoBanReason",
-                COALESCE(l."userId") AS "userId",
-                COALESCE(l."likeStatus") AS "likeStatus",
+                COALESCE(CAST(l."userId" AS text), '0') AS "userId",
+                COALESCE(l."likeStatus", 'None') AS "likeStatus",
                 COALESCE(l."addedAt", '') AS "addedAt",
                 COALESCE(l.login, '') AS "login",
                 COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
                 COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
               FROM public."Posts" p
-              LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= 3
+              LEFT JOIN LastThreeLikes l ON p.id = l."postId"
               LEFT JOIN (
                 SELECT "postId", COUNT(*) AS "numberOfLikes"
                 FROM public."LikeStatusPosts"
@@ -143,6 +143,7 @@ export class PostsRawSqlRepository {
     postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
+    console.log(postsWithLikes);
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
     postsWithLikes.forEach(
@@ -166,7 +167,7 @@ export class PostsRawSqlRepository {
             },
           };
         }
-
+        console.log(row.likeStatus, 'row.likeStatus');
         if (currentUserDto) {
           if (row.userId === currentUserDto.id) {
             postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
