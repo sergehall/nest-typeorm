@@ -34,7 +34,7 @@ export class PostsRawSqlRepository {
       );
 
       const postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[] =
-        await this.getPostsWithLikes(bannedFlags, pagingParams);
+        await this.getPostsWithLikes(bannedFlags, pagingParams, currentUserDto);
 
       const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
         postsWithLikes,
@@ -73,38 +73,44 @@ export class PostsRawSqlRepository {
   private async getPostsWithLikes(
     bannedFlags: BannedFlagsDto,
     pagingParams: PagingParamsDto,
+    currentUserDto: CurrentUserDto | null,
   ): Promise<PostsNumbersOfPostsLikesDislikesLikesStatus[]> {
     const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
+    const countLastLikes = 3;
+    const likeStatus = 'Like';
 
     const parameters = [
       dependencyIsBanned,
       banInfoIsBanned,
       isBanned,
+      countLastLikes,
+      likeStatus,
       limit,
       offset,
     ];
+
     const query = `
           WITH LastThreeLikes AS (
             SELECT
               "postId", "userId", "likeStatus", "addedAt", "login",
               ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3
+            WHERE "isBanned" = $3 AND "likeStatus" = $5
             ),
             PostsWithLikes AS (
               SELECT
                 p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
                 p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
                 p."banInfoBanDate", p."banInfoBanReason",
-                COALESCE(l."userId") AS "userId",
-                COALESCE(l."likeStatus") AS "likeStatus",
+                COALESCE(CAST(l."userId" AS text), '0') AS "userId",
+                COALESCE(l."likeStatus", 'None') AS "likeStatus",
                 COALESCE(l."addedAt" ) AS "addedAt",
                 COALESCE(l.login ) AS "login",
                 COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
                 COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
               FROM public."Posts" p
-              LEFT JOIN LastThreeLikes l ON p.id = l."postId"
+              LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
               LEFT JOIN (
                 SELECT "postId", COUNT(*) AS "numberOfLikes"
                 FROM public."LikeStatusPosts"
@@ -119,17 +125,20 @@ export class PostsRawSqlRepository {
               ) lsc_dislike ON p.id = lsc_dislike."postId"
               WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2
               ORDER BY "${sortBy}" ${direction}
-              LIMIT $4 OFFSET $5
+              LIMIT $6 OFFSET $7
             ),TotalPosts AS (
               SELECT COUNT(*) AS "numberOfPosts"
               FROM public."Posts"
               WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
             )
           SELECT
-            pwl.id, pwl.title, pwl."shortDescription", pwl.content, pwl."blogId", pwl."blogName",
+            pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName",
             pwl."createdAt", pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned",
             pwl."banInfoBanDate", pwl."banInfoBanReason",
-            pwl."userId", pwl."likeStatus", pwl."addedAt", pwl."login",
+            pwl."userId", 
+            pwl."likeStatus", 
+            pwl."addedAt",
+            pwl."login",
             pwl."likesCount"::integer,
             pwl."dislikesCount"::integer,
             tp."numberOfPosts"::integer
@@ -144,7 +153,7 @@ export class PostsRawSqlRepository {
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-
+    console.log(postsWithLikes);
     postsWithLikes.forEach(
       (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
         const postId = row.id;

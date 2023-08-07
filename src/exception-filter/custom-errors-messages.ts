@@ -26,6 +26,10 @@ export const userEmailAlreadyExists = {
   message: 'User already exists. Invalid email.',
   field: 'email',
 };
+export const loginOrEmailAlreadyExists = {
+  message: 'Login or Email already exists.',
+  field: 'field',
+};
 export const invalidLoginOrEmailLengthError = {
   message:
     'Invalid login or email length. Must be between 3 and 20 characters.',
