@@ -90,7 +90,7 @@ export class PostsRawSqlRepository {
               "postId", "userId", "likeStatus", "addedAt", "login",
               ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
             FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3 AND "likeStatus" = 'Like'
+            WHERE "isBanned" = $3
             ),
             PostsWithLikes AS (
               SELECT
@@ -166,8 +166,9 @@ export class PostsRawSqlRepository {
             },
           };
         }
+
         if (currentUserDto) {
-          if (row.postOwnerId === currentUserDto.id) {
+          if (row.userId === currentUserDto.id) {
             postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
           }
         }
