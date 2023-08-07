@@ -86,6 +86,7 @@ export class PostsRawSqlRepository {
       isBanned,
       countLastLikes,
       likeStatus,
+      currentUserDto?.id,
       limit,
       offset,
     ];
@@ -107,6 +108,7 @@ export class PostsRawSqlRepository {
                 COALESCE(l."likeStatus", 'None') AS "likeStatus",
                 COALESCE(l."addedAt" ) AS "addedAt",
                 COALESCE(l.login ) AS "login",
+                COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
                 COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
                 COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
               FROM public."Posts" p
@@ -123,9 +125,14 @@ export class PostsRawSqlRepository {
                 WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
                 GROUP BY "postId"
               ) lsc_dislike ON p.id = lsc_dislike."postId"
+              LEFT JOIN (
+                SELECT "postId", "likeStatus"
+                FROM public."LikeStatusPosts"
+                WHERE "userId" = $6 AND "isBanned" = $3
+              ) lsc_myStatus ON p.id = lsc_myStatus."postId"
               WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2
               ORDER BY "${sortBy}" ${direction}
-              LIMIT $6 OFFSET $7
+              LIMIT $7 OFFSET $8
             ),TotalPosts AS (
               SELECT COUNT(*) AS "numberOfPosts"
               FROM public."Posts"
@@ -137,6 +144,7 @@ export class PostsRawSqlRepository {
             pwl."banInfoBanDate", pwl."banInfoBanReason",
             pwl."userId", 
             pwl."likeStatus", 
+            pwl."myStatus",
             pwl."addedAt",
             pwl."login",
             pwl."likesCount"::integer,
@@ -153,11 +161,11 @@ export class PostsRawSqlRepository {
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-    console.log(postsWithLikes);
+
     postsWithLikes.forEach(
       (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
         const postId = row.id;
-        // console.log(postsWithLikes);
+
         if (!postWithLikes[postId]) {
           postWithLikes[postId] = {
             id: row.id,
@@ -177,9 +185,7 @@ export class PostsRawSqlRepository {
         }
 
         if (currentUserDto) {
-          if (row.userId === currentUserDto.id) {
-            postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
-          }
+          postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
         }
 
         if (row.likeStatus === LikeStatusEnums.LIKE) {

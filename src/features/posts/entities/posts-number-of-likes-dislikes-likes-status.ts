@@ -83,6 +83,11 @@ export class PostsNumbersOfPostsLikesDislikesLikesStatus {
   })
   likeStatus: LikeStatusEnums;
   @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId length! Must be min 1, max 100 ch.',
+  })
+  myStatus: LikeStatusEnums;
+  @IsNotEmpty()
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
