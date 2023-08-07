@@ -1,10 +1,10 @@
-import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 import { IsEnum, IsNotEmpty } from 'class-validator';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class LikeStatusDto {
   @IsNotEmpty()
-  @IsEnum(StatusLike, {
+  @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  likeStatus: StatusLike;
+  likeStatus: LikeStatusEnums;
 }

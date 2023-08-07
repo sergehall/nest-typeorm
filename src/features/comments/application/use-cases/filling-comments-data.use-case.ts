@@ -1,10 +1,10 @@
-import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { FilledCommentEntity } from '../../entities/filledComment.entity';
+import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 
 export class FillingCommentsDataCommand {
   constructor(
@@ -33,7 +33,7 @@ export class FillingCommentsDataUseCase
       for (const comment of commentsArray) {
         const commentId = comment.id;
         const isBanned = false;
-        let ownLikeStatus = StatusLike.NONE;
+        let ownLikeStatus = LikeStatusEnums.NONE;
 
         // If a currentUserDto is provided in the command, fetch the like status for the current user
         if (currentUserDto) {
@@ -50,7 +50,7 @@ export class FillingCommentsDataUseCase
               currentUserDto.id,
               isBanned,
             );
-          ownLikeStatus = currentComment[0]?.likeStatus || StatusLike.NONE;
+          ownLikeStatus = currentComment[0]?.likeStatus || LikeStatusEnums.NONE;
         }
 
         // Get the count of likes for the current comment.

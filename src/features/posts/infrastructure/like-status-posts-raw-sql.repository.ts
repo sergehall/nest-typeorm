@@ -3,8 +3,8 @@ import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { TablesLikeStatusPostEntity } from '../entities/tables-like-status-post.entity';
 import { LikeStatusCommentEntity } from '../../comments/entities/like-status-comment.entity';
-import { NewestLikes } from '../entities/posts-without-ownerInfo.entity';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { NewestLikes } from '../entities/return-posts-entity.entity';
 
 export class LikeStatusPostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}

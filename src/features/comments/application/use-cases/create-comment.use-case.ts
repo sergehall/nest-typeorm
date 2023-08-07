@@ -1,7 +1,6 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
 import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
-import { StatusLike } from '../../../../config/db/mongo/enums/like-status.enums';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
@@ -11,6 +10,7 @@ import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
 import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 
 export class CreateCommentCommand {
   constructor(
@@ -75,7 +75,7 @@ export class CreateCommentUseCase
       likesInfo: {
         likesCount: 0,
         dislikesCount: 0,
-        myStatus: StatusLike.NONE,
+        myStatus: LikeStatusEnums.NONE,
       },
     };
   }

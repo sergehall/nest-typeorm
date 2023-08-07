@@ -38,6 +38,7 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { FindCommentsByPostIdCommand } from '../../comments/application/use-cases/find-comments-by-post-id.use-case';
+import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -57,8 +58,9 @@ export class PostsController {
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = await this.parseQueriesService.getQueriesData(query);
-
-    return this.postsService.openFindPosts(queryData, currentUserDto);
+    return await this.commandBus.execute(
+      new FindPostsCommand(queryData, currentUserDto),
+    );
   }
 
   @Get(':id')
