@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,6 +13,7 @@ import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -174,7 +177,15 @@ export class UsersRawSqlRepository {
       // Because I delegated the creation of the user ID to the database itself.
       return { id: insertNewUser[0].id, ...tablesUsersEntity };
     } catch (error) {
-      console.log(error.message);
+      if (
+        error.message.includes('duplicate key value violates unique constraint')
+      ) {
+        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
+        throw new HttpException(
+          { message: [loginOrEmailAlreadyExists] },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
