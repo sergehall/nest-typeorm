@@ -97,10 +97,10 @@ export class PostsRawSqlRepository {
                 p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
                 p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
                 p."banInfoBanDate", p."banInfoBanReason",
-                COALESCE(CAST(l."userId" AS text), '0') AS "userId",
-                COALESCE(l."likeStatus", 'None') AS "likeStatus",
-                COALESCE(l."addedAt", '') AS "addedAt",
-                COALESCE(l.login, '') AS "login",
+                COALESCE(l."userId") AS "userId",
+                COALESCE(l."likeStatus") AS "likeStatus",
+                COALESCE(l."addedAt" ) AS "addedAt",
+                COALESCE(l.login ) AS "login",
                 COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
                 COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
               FROM public."Posts" p
