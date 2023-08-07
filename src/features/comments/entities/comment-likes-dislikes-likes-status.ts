@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { StatusLike } from '../../../config/db/mongo/enums/like-status.enums';
 
-export class CommentsLikesStatusLikesDislikesTotalComments {
+export class CommentsNumberOfLikesDislikesLikesStatus {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id length! Must be min 0, max 100 ch.',
@@ -88,13 +88,7 @@ export class CommentsLikesStatusLikesDislikesTotalComments {
   @Length(0, 100, {
     message: 'Incorrect numberOfComments length! Must be min 0, max 100 ch.',
   })
-  numberOfComments: string;
-  @IsNotEmpty()
-  @Length(4, 7, {
-    message:
-      'Incorrect likeStatus length! Must be min 4, max 7 ch. Type of Like, Dislike or None',
-  })
-  likeStatus: StatusLike;
+  numberOfComments: number;
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect numberOfLikes length! Must be min 0, max 100 ch.',
@@ -105,4 +99,10 @@ export class CommentsLikesStatusLikesDislikesTotalComments {
     message: 'Incorrect numberOfDislikes length! Must be min 0, max 100 ch.',
   })
   numberOfDislikes: number;
+  @IsNotEmpty()
+  @Length(4, 7, {
+    message:
+      'Incorrect likeStatus length! Must be min 4, max 7 ch. Type of Like, Dislike or None',
+  })
+  likeStatus: StatusLike;
 }
