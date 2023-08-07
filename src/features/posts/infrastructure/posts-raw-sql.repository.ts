@@ -143,7 +143,6 @@ export class PostsRawSqlRepository {
     postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
-    console.log(postsWithLikes);
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
     postsWithLikes.forEach(
@@ -167,7 +166,7 @@ export class PostsRawSqlRepository {
             },
           };
         }
-        console.log(row.likeStatus, 'row.likeStatus');
+
         if (currentUserDto) {
           if (row.userId === currentUserDto.id) {
             postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus;
