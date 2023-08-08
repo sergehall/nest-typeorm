@@ -132,16 +132,25 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async newCommentByIdAndCountOfLikesDislikesComments(
+  async findCommentByIdAndCountOfLikesDislikesComments(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<TablesCommentsCountOfLikesDislikesComments> {
+  ): Promise<TablesCommentsCountOfLikesDislikesComments | null> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
       const isBanned = false;
-      const comment = await this.db.query(
-        `SELECT
+
+      const parameters = [
+        commentId,
+        currentUserDto?.id,
+        isBanned,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+      ];
+
+      const query = `
+        SELECT
             c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
             c."postInfoBlogId", c."postInfoBlogName",
             c."postInfoBlogOwnerId", c."commentatorInfoUserId", c."commentatorInfoUserLogin",
@@ -166,16 +175,11 @@ export class CommentsRawSqlRepository {
                 c."id" = $1
                 AND c."commentatorInfoIsBanned" = $4
                 AND c."banInfoIsBanned" = $5;
-      `,
-        [
-          commentId,
-          currentUserDto?.id,
-          isBanned,
-          commentatorInfoIsBanned,
-          banInfoIsBanned,
-        ],
-      );
-      return comment[0];
+      `;
+
+      const comment = await this.db.query(query, parameters);
+
+      return comment[0] ? comment[0] : null;
     } catch (error) {
       console.log(error.message);
       if (error.message.includes('invalid input syntax for type uuid:')) {
