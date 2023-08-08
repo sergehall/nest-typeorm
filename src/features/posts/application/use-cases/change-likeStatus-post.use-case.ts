@@ -28,7 +28,7 @@ export class ChangeLikeStatusPostUseCase
   ) {}
   async execute(command: ChangeLikeStatusPostCommand): Promise<boolean> {
     const post: TablesPostsEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(command.postId);
+      await this.postsRawSqlRepository.getPostById(command.postId);
     if (!post) throw new NotFoundException('Not found post.');
 
     // Check if the user is banned from posting in this blog

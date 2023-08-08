@@ -43,7 +43,7 @@ export class UpdatePostByPostIdUseCase
     }
 
     const post: TablesPostsEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(params.postId);
+      await this.postsRawSqlRepository.getPostById(params.postId);
 
     if (!post) {
       throw new NotFoundException('Not found post.');

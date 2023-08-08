@@ -117,19 +117,6 @@ export class PostsService {
     };
   }
 
-  async openFindPostByPostId(
-    id: string,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity | null> {
-    const post = await this.postsRawSqlRepository.findPostByPostId(id);
-    if (!post) throw new NotFoundException('Not Found posts.');
-    const filledPost = await this.preparationPostsForReturn(
-      [post],
-      currentUserDto,
-    );
-    return filledPost[0];
-  }
-
   async preparationPostsForReturn(
     postArray: TablesPostsEntity[],
     currentUserDto: CurrentUserDto | null,

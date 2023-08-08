@@ -10,12 +10,14 @@ import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { PostsNumbersOfPostsLikesDislikesLikesStatus } from '../entities/posts-number-of-likes-dislikes-likes-status';
 import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../dto/paging-params.dto';
 import { ReturnPostsNumberOfPostsEntity } from '../entities/return-posts-number-of-posts.entity';
+import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
+import { PostsNumbersOfPostsLikesDislikesLikesStatus } from '../entities/posts-number-of-likes-dislikes-likes-status';
+import { TablesPostNumbersOfPostsLikesDislikesLikesStatus } from '../../comments/entities/tables-post-cout-likes-dislikes-status';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -77,6 +79,86 @@ export class PostsRawSqlRepository {
       isBanned: false,
     };
   }
+  private async getPostWithLikes(
+    postId: string,
+    bannedFlags: BannedFlagsDto,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<TablesPostNumbersOfPostsLikesDislikesLikesStatus[]> {
+    const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
+    const countLastLikes = 3;
+    const likeStatus = 'Like';
+
+    const parameters = [
+      dependencyIsBanned,
+      banInfoIsBanned,
+      isBanned,
+      countLastLikes,
+      likeStatus,
+      currentUserDto?.id,
+      postId,
+    ];
+
+    const query = `
+          WITH LastThreeLikes AS (
+            SELECT
+              "postId", "userId", "likeStatus", "addedAt", "login",
+              ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
+            FROM public."LikeStatusPosts"
+            WHERE "isBanned" = $3 AND "likeStatus" = $5
+          ),
+          PostsWithLikes AS (
+    SELECT
+      p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
+      p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
+      p."banInfoBanDate", p."banInfoBanReason",
+      COALESCE(CAST(l."userId" AS text), '0') AS "userId",
+      COALESCE(l."likeStatus", 'None') AS "likeStatus",
+      COALESCE(l."addedAt" ) AS "addedAt",
+      COALESCE(l.login ) AS "login",
+      COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
+      COALESCE(lsc_like."likesCount", 0) AS "likesCount",
+      COALESCE(lsc_dislike."dislikesCount", 0) AS "dislikesCount"
+      FROM public."Posts" p
+      LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
+      LEFT JOIN (
+        SELECT "postId", COUNT(*) AS "likesCount"
+        FROM public."LikeStatusPosts"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $3
+        GROUP BY "postId"
+      ) lsc_like ON p.id = lsc_like."postId"
+      LEFT JOIN (
+        SELECT "postId", COUNT(*) AS "dislikesCount"
+        FROM public."LikeStatusPosts"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
+        GROUP BY "postId"
+      ) lsc_dislike ON p.id = lsc_dislike."postId"
+      LEFT JOIN (
+        SELECT "postId", "likeStatus"
+        FROM public."LikeStatusPosts"
+        WHERE "userId" = $6 AND "isBanned" = $3
+      ) lsc_myStatus ON p.id = lsc_myStatus."postId"
+      WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2 AND p.id = $7
+    )
+    SELECT
+      pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
+      pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
+      pwl."likesCount"::integer,
+      pwl."dislikesCount"::integer,
+      pwl."myStatus",
+      pwl."userId", 
+      pwl."addedAt",
+      pwl."login",
+      pwl."likeStatus"
+    FROM PostsWithLikes pwl
+  `;
+
+    try {
+      return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   private async getPostsWithLikes(
     bannedFlags: BannedFlagsDto,
@@ -117,18 +199,18 @@ export class PostsRawSqlRepository {
             COALESCE(l."addedAt" ) AS "addedAt",
             COALESCE(l.login ) AS "login",
             COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
-            COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
-            COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
+            COALESCE(lsc_like."likesCount", 0) AS "likesCount",
+            COALESCE(lsc_dislike."dislikesCount", 0) AS "dislikesCount"
           FROM public."Posts" p
           LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
           LEFT JOIN (
-            SELECT "postId", COUNT(*) AS "numberOfLikes"
+            SELECT "postId", COUNT(*) AS "likesCount"
             FROM public."LikeStatusPosts"
             WHERE "likeStatus" = 'Like' AND "isBanned" = $3
             GROUP BY "postId"
           ) lsc_like ON p.id = lsc_like."postId"
           LEFT JOIN (
-            SELECT "postId", COUNT(*) AS "numberOfDislikes"
+            SELECT "postId", COUNT(*) AS "dislikesCount"
             FROM public."LikeStatusPosts"
             WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
             GROUP BY "postId"
@@ -160,53 +242,12 @@ export class PostsRawSqlRepository {
         FROM PostsWithLikes pwl, TotalPosts tp
         `;
 
-    return await this.db.query(query, parameters);
-  }
-
-  private async processPostsWithLikes(
-    postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[],
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity[]> {
-    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-
-    postsWithLikes.forEach(
-      (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
-        const postId = row.id;
-
-        if (!postWithLikes[postId]) {
-          postWithLikes[postId] = {
-            id: row.id,
-            title: row.title,
-            shortDescription: row.shortDescription,
-            content: row.content,
-            blogId: row.blogId,
-            blogName: row.blogName,
-            createdAt: row.createdAt,
-            extendedLikesInfo: {
-              likesCount: row.likesCount,
-              dislikesCount: row.dislikesCount,
-              myStatus: LikeStatusEnums.NONE,
-              newestLikes: [],
-            },
-          };
-        }
-
-        if (currentUserDto) {
-          postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
-        }
-
-        if (row.likeStatus === LikeStatusEnums.LIKE) {
-          const likeStatus = {
-            addedAt: row.addedAt,
-            login: row.login,
-            userId: row.userId,
-          };
-          postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
-        }
-      },
-    );
-
-    return Object.values(postWithLikes);
+    try {
+      return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async openFindPosts(
@@ -239,15 +280,41 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async findPostByPostId(postId: string): Promise<TablesPostsEntity | null> {
+  async findPostByPostId(
+    postId: string,
+    queryData: ParseQueriesType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnPostsEntity> {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+
+    try {
+      const postWithLikes: TablesPostNumbersOfPostsLikesDislikesLikesStatus[] =
+        await this.getPostWithLikes(postId, bannedFlags, currentUserDto);
+
+      const post: ReturnPostsEntity[] = await this.processPostWithLikes(
+        postWithLikes,
+      );
+
+      return post[0];
+    } catch (error) {
+      console.log(error.message);
+      if (error.message.includes('invalid input syntax for type uuid:')) {
+        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
+        throw new NotFoundException('Not found post.');
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getPostById(postId: string): Promise<TablesPostsEntity | null> {
     try {
       const dependencyIsBanned = false;
       const banInfoIsBanned = false;
       const post = await this.db.query(
         `
-      SELECT "id", "title", "shortDescription", "content", 
-      "blogId", "blogName", "createdAt", 
-      "postOwnerId", "dependencyIsBanned", 
+      SELECT "id", "title", "shortDescription", "content",
+      "blogId", "blogName", "createdAt",
+      "postOwnerId", "dependencyIsBanned",
       "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
       FROM public."Posts"
       WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
@@ -510,5 +577,90 @@ export class PostsRawSqlRepository {
       ],
       'createdAt',
     );
+  }
+
+  private async processPostsWithLikes(
+    postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnPostsEntity[]> {
+    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
+
+    postsWithLikes.forEach(
+      (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
+        const postId = row.id;
+
+        if (!postWithLikes[postId]) {
+          postWithLikes[postId] = {
+            id: row.id,
+            title: row.title,
+            shortDescription: row.shortDescription,
+            content: row.content,
+            blogId: row.blogId,
+            blogName: row.blogName,
+            createdAt: row.createdAt,
+            extendedLikesInfo: {
+              likesCount: row.likesCount,
+              dislikesCount: row.dislikesCount,
+              myStatus: LikeStatusEnums.NONE,
+              newestLikes: [],
+            },
+          };
+        }
+
+        if (currentUserDto) {
+          postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
+        }
+
+        if (row.likeStatus === LikeStatusEnums.LIKE) {
+          const likeStatus = {
+            addedAt: row.addedAt,
+            login: row.login,
+            userId: row.userId,
+          };
+          postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
+        }
+      },
+    );
+
+    return Object.values(postWithLikes);
+  }
+
+  private async processPostWithLikes(
+    post: TablesPostNumbersOfPostsLikesDislikesLikesStatus[],
+  ): Promise<ReturnPostsEntity[]> {
+    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
+
+    post.forEach((row: TablesPostNumbersOfPostsLikesDislikesLikesStatus) => {
+      const postId = row.id;
+
+      if (!postWithLikes[postId]) {
+        postWithLikes[postId] = {
+          id: row.id,
+          title: row.title,
+          shortDescription: row.shortDescription,
+          content: row.content,
+          blogId: row.blogId,
+          blogName: row.blogName,
+          createdAt: row.createdAt,
+          extendedLikesInfo: {
+            likesCount: row.likesCount,
+            dislikesCount: row.dislikesCount,
+            myStatus: row.myStatus,
+            newestLikes: [],
+          },
+        };
+      }
+
+      if (row.likeStatus === LikeStatusEnums.LIKE) {
+        const likeStatus = {
+          addedAt: row.addedAt,
+          login: row.login,
+          userId: row.userId,
+        };
+        postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
+      }
+    });
+
+    return Object.values(postWithLikes);
   }
 }
