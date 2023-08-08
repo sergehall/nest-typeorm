@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsString,
   Length,
   Matches,
@@ -103,14 +104,11 @@ export class PostsNumbersOfPostsLikesDislikesLikesStatus {
   @Matches('^[a-zA-Z0-9_-]*$')
   login: string;
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect userId length! Must be min 1, max 100 ch.',
-  })
-  likeStatus: LikeStatusEnums;
-  @IsNotEmpty()
   @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
+  likeStatus: LikeStatusEnums;
   @IsNotEmpty()
+  @IsNumber()
   numberOfPosts: number;
 }
