@@ -32,7 +32,7 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<ReturnCommentsEntity> {
     const { postId, createCommentDto, currentUserDto } = command;
 
-    const post = await this.postsRawSqlRepository.findPostByPostId(postId);
+    const post = await this.postsRawSqlRepository.getPostById(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
     const userIsBannedForBlog =

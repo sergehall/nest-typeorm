@@ -44,7 +44,7 @@ export class RemovePostByPostIdUseCase
     if (!blog) throw new NotFoundException('Not found blog.');
 
     const postToRemove: TablesPostsEntity | null =
-      await this.postsRepository.findPostByPostId(params.postId);
+      await this.postsRepository.getPostById(params.postId);
     if (!postToRemove) throw new NotFoundException('Not found post.');
 
     await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);

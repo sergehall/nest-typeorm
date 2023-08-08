@@ -29,9 +29,11 @@ import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { FindPostsUseCase } from './application/use-cases/find-posts.use-case';
+import { FindPostByIdUseCase } from './application/use-cases/find-post-by-id.use-case';
 
 const postsUseCases = [
   FindPostsUseCase,
+  FindPostByIdUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
   RemovePostByPostIdUseCase,

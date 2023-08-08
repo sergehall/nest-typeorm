@@ -12,7 +12,6 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
-import { PostsService } from '../application/posts.service';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -39,13 +38,13 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { FindCommentsByPostIdCommand } from '../../comments/application/use-cases/find-comments-by-post-id.use-case';
 import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
+import { FindPostByIdCommand } from '../application/use-cases/find-post-by-id.use-case';
 
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
     protected parseQueriesService: ParseQueriesService,
-    protected postsService: PostsService,
     protected commandBus: CommandBus,
   ) {}
   @Get()
@@ -67,12 +66,16 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindPostByPostId(@Request() req: any, @Param() params: IdParams) {
+  async openFindPostByPostId(
+    @Request() req: any,
+    @Query() query: any,
+    @Param() params: IdParams,
+  ) {
     const currentUserDto: CurrentUserDto | null = req.user;
+    const queryData = await this.parseQueriesService.getQueriesData(query);
 
-    return await this.postsService.openFindPostByPostId(
-      params.id,
-      currentUserDto,
+    return await this.commandBus.execute(
+      new FindPostByIdCommand(params.id, queryData, currentUserDto),
     );
   }
 

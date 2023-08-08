@@ -13,7 +13,7 @@ export class PostExistsRule implements ValidatorConstraintInterface {
 
   async validate(value: string): Promise<boolean> {
     try {
-      const post = await this.postsRawSqlRepository.findPostByPostId(value);
+      const post = await this.postsRawSqlRepository.getPostById(value);
       return !!post; // Returns true if the post exists, false otherwise.
     } catch (e) {
       return false;

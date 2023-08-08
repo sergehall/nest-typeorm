@@ -22,7 +22,7 @@ export class RemovePostByIdOldUseCase
     command: RemovePostByIdOldCommand,
   ): Promise<boolean | undefined> {
     const { id, currentUserDto } = command;
-    const postToDelete = await this.postsRawSqlRepository.findPostByPostId(id);
+    const postToDelete = await this.postsRawSqlRepository.getPostById(id);
     if (!postToDelete) {
       throw new NotFoundException('Not found post.');
     }
