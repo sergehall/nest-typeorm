@@ -104,7 +104,7 @@ export class BloggerBlogsRawSqlRepository {
         FROM public."BloggerBlogs"
         WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         AND "name" ILIKE $3
-        ORDER BY "${sortBy}" ${direction}
+        ORDER BY "${sortBy}" COLLATE "C" ${direction}
         LIMIT $4 OFFSET $5
         `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm, limit, offset],
