@@ -25,11 +25,11 @@ export class FindCommentByIdUseCase
     const { commentId, currentUserDto } = command;
 
     const comment: TablesCommentsCountOfLikesDislikesComments =
-      await this.commentsRawSqlRepository.newCommentsByIdAndCountOfLikesDislikesComments(
+      await this.commentsRawSqlRepository.newCommentByIdAndCountOfLikesDislikesComments(
         commentId,
         currentUserDto,
       );
-
+    console.log(comment);
     return {
       id: comment.id,
       content: comment.content,

@@ -132,7 +132,7 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async newCommentsByIdAndCountOfLikesDislikesComments(
+  async newCommentByIdAndCountOfLikesDislikesComments(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<TablesCommentsCountOfLikesDislikesComments> {
@@ -142,22 +142,12 @@ export class CommentsRawSqlRepository {
       const isBanned = false;
       const comment = await this.db.query(
         `SELECT
-            c."id",
-            c."content",
-            c."createdAt",
-            c."postInfoPostId",
-            c."postInfoTitle",
-            c."postInfoBlogId",
-            c."postInfoBlogName",
-            c."postInfoBlogOwnerId",
-            c."commentatorInfoUserId",
-            c."commentatorInfoUserLogin",
-            c."commentatorInfoIsBanned",
-            c."banInfoIsBanned",
-            c."banInfoBanDate",
-            c."banInfoBanReason",
-            lc."countLikes",
-            lc."countDislikes",
+            c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+            c."postInfoBlogId", c."postInfoBlogName",
+            c."postInfoBlogOwnerId", c."commentatorInfoUserId", c."commentatorInfoUserLogin",
+            c."commentatorInfoIsBanned", c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+            COALESCE(lc."countLikes", 0) AS "countLikes",
+            COALESCE(lc."countDislikes", 0) AS "countDislikes",
             COALESCE(ls."likeStatus", 'None') AS "myStatus"
             FROM public."Comments" c
             LEFT JOIN (
