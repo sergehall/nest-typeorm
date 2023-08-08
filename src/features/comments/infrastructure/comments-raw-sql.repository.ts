@@ -214,6 +214,81 @@ export class CommentsRawSqlRepository {
       return null;
     }
   }
+  async findCommentsByUserNotExist2(
+    postId: string,
+    queryData: ParseQueriesType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const isBanned = false;
+
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
+      const query = `
+      SELECT
+        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        CAST(
+        (
+          SELECT COUNT(*)
+          FROM public."Comments"
+          WHERE "postInfoPostId" = $1
+          AND "commentatorInfoIsBanned" = $2
+          AND "banInfoIsBanned" = $3
+          ) AS integer
+        ) AS "numberOfComments",
+        COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
+        COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",
+        COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
+      FROM public."Comments" c
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_like ON c."id" = lsc_like."commentId"
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
+      LEFT JOIN (
+        SELECT "commentId", "likeStatus"
+        FROM public."LikeStatusComments"
+        WHERE "userId" = $4 AND "isBanned" = $5
+      ) lsc_user ON c."id" = lsc_user."commentId"
+      WHERE c."postInfoPostId" = $1
+        AND c."commentatorInfoIsBanned" = $2
+        AND c."banInfoIsBanned" = $3
+      ORDER BY "${sortBy}" ${direction}
+      LIMIT $6 OFFSET $7`;
+
+      const parameters = [
+        postId,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+        currentUserDto?.id,
+        isBanned,
+        limit,
+        offset,
+      ];
+
+      return await this.db.query(query, parameters);
+      // return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async findCommentsByUserNotExist(
     postId: string,
@@ -277,8 +352,10 @@ export class CommentsRawSqlRepository {
         offset,
         isBanned,
       ];
-
-      return await this.db.query(query, parameters);
+      const result = await this.db.query(query, parameters);
+      console.log(result);
+      return result;
+      // return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
