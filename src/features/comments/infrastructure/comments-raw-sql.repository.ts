@@ -214,7 +214,7 @@ export class CommentsRawSqlRepository {
       return null;
     }
   }
-  async findCommentsByUserNotExist2(
+  async findComments(
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
@@ -230,6 +230,7 @@ export class CommentsRawSqlRepository {
       const offset =
         (queryData.queryPagination.pageNumber - 1) *
         queryData.queryPagination.pageSize;
+
       const query = `
       SELECT
         c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
@@ -283,7 +284,6 @@ export class CommentsRawSqlRepository {
       ];
 
       return await this.db.query(query, parameters);
-      // return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
