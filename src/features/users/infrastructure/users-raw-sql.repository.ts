@@ -134,7 +134,7 @@ export class UsersRawSqlRepository {
         FROM public."Users"
         WHERE "email" = $1 OR "login" = $1
       `,
-        [loginOrEmail.toLocaleLowerCase()],
+        [loginOrEmail],
       );
       return user[0] ? user[0] : null;
     } catch (error) {
@@ -174,6 +174,7 @@ export class UsersRawSqlRepository {
       ];
 
       const insertNewUser = await this.db.query(query, parameters);
+
       // Because I delegated the creation of the user ID to the database itself.
       return { id: insertNewUser[0].id, ...tablesUsersEntity };
     } catch (error) {
