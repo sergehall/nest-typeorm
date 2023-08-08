@@ -64,6 +64,10 @@ export const cannotBlockYourself = {
   message: 'You cannot block yourself.',
   field: 'id',
 };
+export const notFoundComment = {
+  message: 'Not found comment.',
+  field: 'params.commentId',
+};
 export const forbiddenDeleteDevice = {
   message: 'Cannot delete a device that does not belong to the current user.',
   params: 'deviceId',

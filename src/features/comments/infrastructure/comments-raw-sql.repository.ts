@@ -11,6 +11,8 @@ import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommentsNumberOfLikesDislikesLikesStatus } from '../entities/comment-likes-dislikes-likes-status';
+import { TablesCommentsCountOfLikesDislikesComments } from '../entities/comment-by-id-count-likes-dislikes';
+import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -127,6 +129,69 @@ export class CommentsRawSqlRepository {
       );
       return !!updateComments[0];
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async newCommentsByIdAndCountOfLikesDislikesComments(
+    commentId: string,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<TablesCommentsCountOfLikesDislikesComments> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const isBanned = false;
+      const comment = await this.db.query(
+        `SELECT
+            c."id",
+            c."content",
+            c."createdAt",
+            c."postInfoPostId",
+            c."postInfoTitle",
+            c."postInfoBlogId",
+            c."postInfoBlogName",
+            c."postInfoBlogOwnerId",
+            c."commentatorInfoUserId",
+            c."commentatorInfoUserLogin",
+            c."commentatorInfoIsBanned",
+            c."banInfoIsBanned",
+            c."banInfoBanDate",
+            c."banInfoBanReason",
+            lc."countLikes",
+            lc."countDislikes",
+            COALESCE(ls."likeStatus", 'None') AS "myStatus"
+            FROM public."Comments" c
+            LEFT JOIN (
+                SELECT "commentId",
+                    SUM(CASE WHEN "likeStatus" = 'Like' THEN 1 ELSE 0 END)::integer AS "countLikes",
+                    SUM(CASE WHEN "likeStatus" = 'Dislike' THEN 1 ELSE 0 END)::integer AS "countDislikes"
+                FROM public."LikeStatusComments"
+                GROUP BY "commentId"
+            ) lc ON c."id" = lc."commentId"
+            LEFT JOIN (
+                SELECT "commentId", "likeStatus"
+                FROM public."LikeStatusComments"
+                WHERE "userId" = $2 AND "isBanned" = $3
+            ) ls ON c."id" = ls."commentId"
+            WHERE 
+                c."id" = $1
+                AND c."commentatorInfoIsBanned" = $4
+                AND c."banInfoIsBanned" = $5;
+      `,
+        [
+          commentId,
+          currentUserDto?.id,
+          isBanned,
+          commentatorInfoIsBanned,
+          banInfoIsBanned,
+        ],
+      );
+      return comment[0];
+    } catch (error) {
+      console.log(error.message);
+      if (error.message.includes('invalid input syntax for type uuid:')) {
+        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
+        throw new NotFoundException('Not found comment.');
+      }
       throw new InternalServerErrorException(error.message);
     }
   }

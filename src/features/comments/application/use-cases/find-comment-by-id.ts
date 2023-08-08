@@ -1,11 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
-import { FilledCommentEntity } from '../../entities/filledComment.entity';
-import { FillingCommentsDataCommand } from './filling-comments-data.use-case';
-import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
+import { TablesCommentsCountOfLikesDislikesComments } from '../../entities/comment-by-id-count-likes-dislikes';
 
 export class FindCommentByIdCommand {
   constructor(
@@ -27,30 +24,24 @@ export class FindCommentByIdUseCase
   ): Promise<ReturnCommentsEntity> {
     const { commentId, currentUserDto } = command;
 
-    const comment: TablesCommentsRawSqlEntity | null =
-      await this.commentsRawSqlRepository.findCommentByCommentId(commentId);
-
-    if (!comment || comment.commentatorInfoIsBanned)
-      throw new NotFoundException(
-        'Not found comment or commentator is banned.',
+    const comment: TablesCommentsCountOfLikesDislikesComments =
+      await this.commentsRawSqlRepository.newCommentsByIdAndCountOfLikesDislikesComments(
+        commentId,
+        currentUserDto,
       );
 
-    const filledComments: FilledCommentEntity[] = await this.commandBus.execute(
-      new FillingCommentsDataCommand([comment], currentUserDto),
-    );
-
     return {
-      id: filledComments[0].id,
-      content: filledComments[0].content,
-      createdAt: filledComments[0].createdAt,
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
       commentatorInfo: {
-        userId: filledComments[0].commentatorInfo.userId,
-        userLogin: filledComments[0].commentatorInfo.userLogin,
+        userId: comment.commentatorInfoUserId,
+        userLogin: comment.commentatorInfoUserLogin,
       },
       likesInfo: {
-        likesCount: filledComments[0].likesInfo.likesCount,
-        dislikesCount: filledComments[0].likesInfo.dislikesCount,
-        myStatus: filledComments[0].likesInfo.myStatus,
+        likesCount: comment.countLikes,
+        dislikesCount: comment.countDislikes,
+        myStatus: comment.myStatus,
       },
     };
   }
