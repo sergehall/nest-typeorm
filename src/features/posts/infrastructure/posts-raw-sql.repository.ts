@@ -36,14 +36,22 @@ export class PostsRawSqlRepository {
       const postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[] =
         await this.getPostsWithLikes(bannedFlags, pagingParams, currentUserDto);
 
+      if (postsWithLikes.length === 0) {
+        return {
+          posts: [],
+          numberOfPosts: 0,
+        };
+      }
+
       const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
         postsWithLikes,
         currentUserDto,
       );
 
+      const numberOfPosts = postsWithLikes[0].numberOfPosts;
       return {
         posts,
-        numberOfPosts: postsWithLikes[0].numberOfPosts,
+        numberOfPosts: numberOfPosts,
       };
     } catch (error) {
       console.log(error.message);
@@ -92,64 +100,64 @@ export class PostsRawSqlRepository {
     ];
 
     const query = `
-          WITH LastThreeLikes AS (
-            SELECT
-              "postId", "userId", "likeStatus", "addedAt", "login",
-              ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
-            FROM public."LikeStatusPosts"
-            WHERE "isBanned" = $3 AND "likeStatus" = $5
-            ),
-            PostsWithLikes AS (
-              SELECT
-                p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
-                p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
-                p."banInfoBanDate", p."banInfoBanReason",
-                COALESCE(CAST(l."userId" AS text), '0') AS "userId",
-                COALESCE(l."likeStatus", 'None') AS "likeStatus",
-                COALESCE(l."addedAt" ) AS "addedAt",
-                COALESCE(l.login ) AS "login",
-                COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
-                COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
-                COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
-              FROM public."Posts" p
-              LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
-              LEFT JOIN (
-                SELECT "postId", COUNT(*) AS "numberOfLikes"
-                FROM public."LikeStatusPosts"
-                WHERE "likeStatus" = 'Like' AND "isBanned" = $3
-                GROUP BY "postId"
-              ) lsc_like ON p.id = lsc_like."postId"
-              LEFT JOIN (
-                SELECT "postId", COUNT(*) AS "numberOfDislikes"
-                FROM public."LikeStatusPosts"
-                WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
-                GROUP BY "postId"
-              ) lsc_dislike ON p.id = lsc_dislike."postId"
-              LEFT JOIN (
-                SELECT "postId", "likeStatus"
-                FROM public."LikeStatusPosts"
-                WHERE "userId" = $6 AND "isBanned" = $3
-              ) lsc_myStatus ON p.id = lsc_myStatus."postId"
-              WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2
-              ORDER BY "${sortBy}" ${direction}
-              LIMIT $7 OFFSET $8
-            ),TotalPosts AS (
-              SELECT COUNT(*) AS "numberOfPosts"
-              FROM public."Posts"
-              WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-            )
+      WITH LastThreeLikes AS (
+        SELECT
+          "postId", "userId", "likeStatus", "addedAt", "login",
+          ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
+        FROM public."LikeStatusPosts"
+        WHERE "isBanned" = $3 AND "likeStatus" = $5
+        ),
+        PostsWithLikes AS (
           SELECT
-            pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
-            pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
-            pwl."likesCount"::integer,
-            pwl."dislikesCount"::integer,
-            pwl."myStatus",
-            pwl."userId", 
-            pwl."addedAt",
-            pwl."login",
-            pwl."likeStatus",
-            tp."numberOfPosts"::integer
-          FROM PostsWithLikes pwl, TotalPosts tp
+            p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
+            p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
+            p."banInfoBanDate", p."banInfoBanReason",
+            COALESCE(CAST(l."userId" AS text), '0') AS "userId",
+            COALESCE(l."likeStatus", 'None') AS "likeStatus",
+            COALESCE(l."addedAt" ) AS "addedAt",
+            COALESCE(l.login ) AS "login",
+            COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
+            COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
+            COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
+          FROM public."Posts" p
+          LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
+          LEFT JOIN (
+            SELECT "postId", COUNT(*) AS "numberOfLikes"
+            FROM public."LikeStatusPosts"
+            WHERE "likeStatus" = 'Like' AND "isBanned" = $3
+            GROUP BY "postId"
+          ) lsc_like ON p.id = lsc_like."postId"
+          LEFT JOIN (
+            SELECT "postId", COUNT(*) AS "numberOfDislikes"
+            FROM public."LikeStatusPosts"
+            WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
+            GROUP BY "postId"
+          ) lsc_dislike ON p.id = lsc_dislike."postId"
+          LEFT JOIN (
+            SELECT "postId", "likeStatus"
+            FROM public."LikeStatusPosts"
+            WHERE "userId" = $6 AND "isBanned" = $3
+          ) lsc_myStatus ON p.id = lsc_myStatus."postId"
+          WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2
+          ORDER BY "${sortBy}" ${direction}
+          LIMIT $7 OFFSET $8
+        ),TotalPosts AS (
+          SELECT COUNT(*) AS "numberOfPosts"
+          FROM public."Posts"
+          WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
+        )
+        SELECT
+          pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
+          pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
+          pwl."likesCount"::integer,
+          pwl."dislikesCount"::integer,
+          pwl."myStatus",
+          pwl."userId", 
+          pwl."addedAt",
+          pwl."login",
+          pwl."likeStatus",
+          tp."numberOfPosts"::integer
+        FROM PostsWithLikes pwl, TotalPosts tp
         `;
 
     return await this.db.query(query, parameters);
@@ -200,130 +208,6 @@ export class PostsRawSqlRepository {
 
     return Object.values(postWithLikes);
   }
-  // async findPostsByUserExist(
-  //   queryData: ParseQueriesType,
-  //   currentUserDto: CurrentUserDto | null,
-  // ): Promise<{ posts: ReturnPostsEntity[]; numberOfPosts: number }> {
-  //   try {
-  //     const dependencyIsBanned = false;
-  //     const banInfoIsBanned = false;
-  //     const isBanned = false;
-  //
-  //     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-  //     const direction = queryData.queryPagination.sortDirection;
-  //     const limit = queryData.queryPagination.pageSize;
-  //     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-  //
-  //     const query = `
-  //       WITH LastThreeLikes AS (
-  //         SELECT
-  //           "postId", "userId", "likeStatus", "addedAt", "login",
-  //           ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
-  //         FROM public."LikeStatusPosts"
-  //         WHERE "isBanned" = $3
-  //         ),
-  //         PostsWithLikes AS (
-  //           SELECT
-  //             p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
-  //             p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
-  //             p."banInfoBanDate", p."banInfoBanReason",
-  //             COALESCE(l."userId") AS "userId",
-  //             COALESCE(l."likeStatus", 'None') AS "likeStatus",
-  //             COALESCE(l."addedAt", '') AS "addedAt",
-  //             COALESCE(l.login, '') AS "login",
-  //             COALESCE(lsc_like."numberOfLikes", 0) AS "likesCount",
-  //             COALESCE(lsc_dislike."numberOfDislikes", 0) AS "dislikesCount"
-  //           FROM public."Posts" p
-  //           LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= 3
-  //           LEFT JOIN (
-  //             SELECT "postId", COUNT(*) AS "numberOfLikes"
-  //             FROM public."LikeStatusPosts"
-  //             WHERE "likeStatus" = 'Like' AND "isBanned" = $3
-  //             GROUP BY "postId"
-  //           ) lsc_like ON p.id = lsc_like."postId"
-  //           LEFT JOIN (
-  //             SELECT "postId", COUNT(*) AS "numberOfDislikes"
-  //             FROM public."LikeStatusPosts"
-  //             WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3
-  //             GROUP BY "postId"
-  //           ) lsc_dislike ON p.id = lsc_dislike."postId"
-  //           WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2
-  //           ORDER BY "${sortBy}" ${direction}
-  //           LIMIT $4 OFFSET $5
-  //         ),TotalPosts AS (
-  //           SELECT COUNT(*) AS "numberOfPosts"
-  //           FROM public."Posts"
-  //           WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-  //         )
-  //       SELECT
-  //         pwl.id, pwl.title, pwl."shortDescription", pwl.content, pwl."blogId", pwl."blogName",
-  //         pwl."createdAt", pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned",
-  //         pwl."banInfoBanDate", pwl."banInfoBanReason",
-  //         pwl."userId", pwl."likeStatus", pwl."addedAt", pwl."login",
-  //         pwl."likesCount"::integer,
-  //         pwl."dislikesCount"::integer,
-  //         tp."numberOfPosts"::integer
-  //       FROM PostsWithLikes pwl, TotalPosts tp
-  //     `;
-  //
-  //     const parameters = [
-  //       dependencyIsBanned,
-  //       banInfoIsBanned,
-  //       isBanned,
-  //       limit,
-  //       offset,
-  //     ];
-  //
-  //     const result = await this.db.query(query, parameters);
-  //
-  //     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-  //
-  //     result.forEach((row: PostsNumberOfLikesDislikesLikesStatus) => {
-  //       const postId = row.id;
-  //
-  //       if (!postWithLikes[postId]) {
-  //         postWithLikes[postId] = {
-  //           id: row.id,
-  //           title: row.title,
-  //           shortDescription: row.shortDescription,
-  //           content: row.content,
-  //           blogId: row.blogId,
-  //           blogName: row.blogName,
-  //           createdAt: row.createdAt,
-  //           extendedLikesInfo: {
-  //             likesCount: row.likesCount, // Update this with the actual likes count
-  //             dislikesCount: row.dislikesCount, // Update this with the actual dislikes count
-  //             myStatus: LikeStatusEnums.NONE, // Update this with the actual status for the current user
-  //             newestLikes: [],
-  //           },
-  //         };
-  //       }
-  //       if (currentUserDto) {
-  //         if (row.userId === currentUserDto.id) {
-  //           postWithLikes[postId].extendedLikesInfo.myStatus = row.likeStatus; // Update the user's status for the post
-  //         }
-  //       }
-  //       if (row.likeStatus === LikeStatusEnums.LIKE) {
-  //         const likeStatus = {
-  //           userId: row.userId,
-  //           login: row.login,
-  //           addedAt: row.addedAt,
-  //         };
-  //         postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
-  //       }
-  //     });
-  //
-  //     const posts: ReturnPostsEntity[] = Object.values(postWithLikes);
-  //
-  //     return {
-  //       posts,
-  //       numberOfPosts: posts.length > 0 ? result[0].numberOfPosts : 0,
-  //     };
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
 
   async openFindPosts(
     queryData: ParseQueriesType,
