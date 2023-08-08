@@ -164,6 +164,7 @@ export class CommentsRawSqlRepository {
                     SUM(CASE WHEN "likeStatus" = 'Like' THEN 1 ELSE 0 END)::integer AS "countLikes",
                     SUM(CASE WHEN "likeStatus" = 'Dislike' THEN 1 ELSE 0 END)::integer AS "countDislikes"
                 FROM public."LikeStatusComments"
+                WHERE "isBanned" = $3
                 GROUP BY "commentId"
             ) lc ON c."id" = lc."commentId"
             LEFT JOIN (
