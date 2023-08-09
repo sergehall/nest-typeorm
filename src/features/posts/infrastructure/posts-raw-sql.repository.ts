@@ -250,37 +250,7 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async openFindPosts(
-    queryData: ParseQueriesType,
-  ): Promise<TablesPostsEntity[]> {
-    const dependencyIsBanned = false;
-    const banInfoIsBanned = false;
-    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-    const direction = queryData.queryPagination.sortDirection;
-    const limit = queryData.queryPagination.pageSize;
-    const offset =
-      (queryData.queryPagination.pageNumber - 1) *
-      queryData.queryPagination.pageSize;
-
-    try {
-      return await this.db.query(
-        `
-        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
-         "postOwnerId", "dependencyIsBanned",
-         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-        FROM public."Posts"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $3 OFFSET $4
-        `,
-        [dependencyIsBanned, banInfoIsBanned, limit, offset],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findPostByPostId(
+  async findPostByPostIdWithLikes(
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,

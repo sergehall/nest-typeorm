@@ -26,7 +26,7 @@ export class FindPostByIdUseCase
   ): Promise<ReturnPostsEntity | null> {
     const { postId, queryData, currentUserDto } = command;
     const post: ReturnPostsEntity | null =
-      await this.postsRawSqlRepository.findPostByPostId(
+      await this.postsRawSqlRepository.findPostByPostIdWithLikes(
         postId,
         queryData,
         currentUserDto,
