@@ -26,20 +26,14 @@ export class FindCommentsCurrentUserUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
     const { id } = currentUserDto;
 
-    // const comments: TablesCommentsRawSqlEntity[] =
-    //   await this.commentsRawSqlRepository.findCommentsByCommentatorId(
-    //     id,
-    //     queryData,
-    //   );
-
-    const comment2: CommentsNumberOfLikesDislikesLikesStatus[] =
+    const comments: CommentsNumberOfLikesDislikesLikesStatus[] =
       await this.commentsRawSqlRepository.findCommentByCommentatorIdAndCountOfLikesDislikesComments(
         id,
         queryData,
         currentUserDto,
       );
 
-    if (comment2.length === 0) {
+    if (comments.length === 0) {
       return {
         pagesCount: 0,
         page: 1,
@@ -49,17 +43,10 @@ export class FindCommentsCurrentUserUseCase
       };
     }
 
-    const totalCount: number = comment2[0].numberOfComments;
+    const totalCount: number = comments[0].numberOfComments;
 
     const transformedComments: ReturnCommentsEntity[] =
-      await this.transformedComments(comment2);
-
-    // const filledComments = await this.commandBus.execute(
-    //   new FillingCommentsDataCommand(comments, command.currentUserDto),
-    // );
-
-    // const totalCountComments =
-    //   await this.commentsRawSqlRepository.totalCountCommentsByCommentatorId(id);
+      await this.transformedComments(comments);
 
     const pagesCount = Math.ceil(
       totalCount / command.queryData.queryPagination.pageSize,
