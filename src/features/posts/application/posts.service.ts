@@ -55,8 +55,7 @@ export class PostsService {
     );
     const totalCountPosts: number =
       await this.postsRawSqlRepository.totalCountPostsByBlogId(params);
-    console.log(totalCountPosts, 'totalCountPosts');
-    console.log(pageSize, 'pageSize');
+
     const pagesCount: number = Math.ceil(totalCountPosts / pageSize);
     return {
       pagesCount: pagesCount,
