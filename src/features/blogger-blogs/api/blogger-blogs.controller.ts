@@ -59,6 +59,7 @@ export class BloggerBlogsController {
 
     const queryData: ParseQueriesType =
       await this.parseQueriesService.getQueriesData(query);
+
     return await this.bBloggerService.findBlogsCurrentUser(
       currentUserDto,
       queryData,

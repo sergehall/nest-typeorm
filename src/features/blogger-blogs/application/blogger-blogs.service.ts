@@ -28,7 +28,9 @@ export class BloggerBlogsService {
       };
     }
 
-    const totalCount = blogs.length;
+    const totalCount = await this.bloggerBlogsRawSqlRepository.saOpenCountBlogs(
+      queryData,
+    );
     const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {

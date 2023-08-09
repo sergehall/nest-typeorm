@@ -388,21 +388,6 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async removeCommentsByUserId(userId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."Comments"
-        WHERE "commentatorInfoUserId" = $1
-          `,
-        [userId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   async changeIntoCommentsBlogOwner(
     blogId: string,
     userId: string,
@@ -419,6 +404,21 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeCommentsByUserId(userId: string): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."Comments"
+        WHERE "commentatorInfoUserId" = $1
+          `,
+        [userId],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new NotFoundException(error.message);
     }
   }
 
