@@ -1,14 +1,14 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 import { ReturnCommentsWithPostInfoEntity } from '../../entities/return-comments-with-post-info.entity';
+import { TablesCommentsEntity } from '../../entities/tables-comments.entity';
 
 export class FillingCommentsDataCommand {
   constructor(
-    public commentsArray: TablesCommentsRawSqlEntity[],
+    public commentsArray: TablesCommentsEntity[],
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }

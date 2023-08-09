@@ -5,12 +5,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
 import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
+import { TablesCommentsEntity } from '../../entities/tables-comments.entity';
 
 export class CreateCommentCommand {
   constructor(
@@ -46,7 +46,7 @@ export class CreateCommentUseCase
         HttpStatus.FORBIDDEN,
       );
 
-    const newComment: TablesCommentsRawSqlEntity[] =
+    const newComment: TablesCommentsEntity[] =
       await this.commentsRawSqlRepository.createComment({
         id: uuid4().toString(),
         content: createCommentDto.content,

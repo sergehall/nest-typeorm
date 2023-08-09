@@ -17,7 +17,7 @@ import { PagingParamsDto } from '../dto/paging-params.dto';
 import { ReturnPostsNumberOfPostsEntity } from '../entities/return-posts-number-of-posts.entity';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
 import { PostsNumbersOfPostsLikesDislikesLikesStatus } from '../entities/posts-number-of-likes-dislikes-likes-status';
-import { TablesPostNumbersOfPostsLikesDislikesLikesStatus } from '../../comments/entities/tables-post-cout-likes-dislikes-status';
+import { TablesPostNumbersOfPostsLikesDislikesLikesStatus } from '../../comments/entities/tables-post-count-likes-dislikes-status';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -74,6 +74,7 @@ export class PostsRawSqlRepository {
 
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
+      commentatorInfoIsBanned: false,
       dependencyIsBanned: false,
       banInfoIsBanned: false,
       isBanned: false,
