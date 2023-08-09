@@ -35,9 +35,10 @@ export class PostsService {
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
-    const posts: TablesPostsEntity[] | null =
+    const posts: TablesPostsEntity[] =
       await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
-    if (!posts || posts.length === 0) {
+
+    if (posts.length === 0) {
       return {
         pagesCount: queryData.queryPagination.pageNumber,
         page: queryData.queryPagination.pageNumber,

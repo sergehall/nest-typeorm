@@ -333,7 +333,7 @@ export class PostsRawSqlRepository {
   async findPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueriesType,
-  ): Promise<TablesPostsEntity[] | null> {
+  ): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;
     const { blogId } = params;
@@ -343,23 +343,38 @@ export class PostsRawSqlRepository {
     const offset =
       (queryData.queryPagination.pageNumber - 1) *
       queryData.queryPagination.pageSize;
+
     try {
-      return await this.db.query(
-        `
-        SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
-         "postOwnerId", "dependencyIsBanned",
-         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+      const parameters = [
+        blogId,
+        postOwnerIsBanned,
+        banInfoBanStatus,
+        limit,
+        offset,
+      ];
+
+      const query = `
+       SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
+       "postOwnerId", "dependencyIsBanned",
+       "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
         FROM public."Posts"
+        LEFT JOIN (
+            SELECT 1 AS empty
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM public."Posts"
+                WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+            )
+        ) AS empty_check ON empty_check.empty = 1
         WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
         ORDER BY "${sortBy}" ${direction}
         LIMIT $4 OFFSET $5
-        `,
-        [blogId, postOwnerIsBanned, banInfoBanStatus, limit, offset],
-      );
+        `;
+
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
-      // If an error occurs, return null instead of throwing an exception
-      return null;
+      throw new InternalServerErrorException(error.message);
     }
   }
 
