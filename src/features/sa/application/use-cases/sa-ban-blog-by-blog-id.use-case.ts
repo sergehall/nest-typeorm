@@ -46,7 +46,7 @@ export class SaBanBlogByBlogIUseCase
       );
     }
 
-    this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
+    await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
     await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
     return true;
@@ -75,11 +75,11 @@ export class SaBanBlogByBlogIUseCase
     }
   }
 
-  private checkUserPermission(
+  private async checkUserPermission(
     currentUserDto: CurrentUserDto,
     blogOwnerId: string,
   ) {
-    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
+    const ability = await this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: blogOwnerId,

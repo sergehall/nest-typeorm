@@ -22,7 +22,7 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
-    const parameters = [blogId, dependencyIsBanned, banInfoIsBanned];
+
     const query = `
         SELECT "id", "createdAt", "isMembership", 
          "blogOwnerId", "dependencyIsBanned",
@@ -40,11 +40,16 @@ export class BloggerBlogsRawSqlRepository {
         WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
         `;
 
+    const parameters = [blogId, dependencyIsBanned, banInfoIsBanned];
+
     try {
       const result = await this.db.query(query, parameters);
 
-      // Return the first blog if found, if not found return null
-      return result[0] ? result[0] : null;
+      if (result && result.length > 0) {
+        return result[0];
+      } else {
+        return null;
+      }
     } catch (error) {
       console.log(error.message);
       // if not blogId not UUID will be error, and return null
