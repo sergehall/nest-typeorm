@@ -1,6 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikeStatusCommentEntity } from '../entities/like-status-comment.entity';
+import { TablesLikeStatusCommentsEntity } from '../entities/tables-like-status-comments.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
@@ -8,7 +8,7 @@ export class LikeStatusCommentsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async updateLikeStatusComment(
-    likeStatusCommEntity: LikeStatusCommentEntity,
+    likeStatusCommEntity: TablesLikeStatusCommentsEntity,
   ): Promise<boolean> {
     try {
       const updateLikeStatusComment = await this.db.query(
@@ -39,7 +39,7 @@ export class LikeStatusCommentsRawSqlRepository {
     commentId: string,
     userId: string,
     isBanned: boolean,
-  ): Promise<LikeStatusCommentEntity[]> {
+  ): Promise<TablesLikeStatusCommentsEntity[]> {
     try {
       return await this.db.query(
         `

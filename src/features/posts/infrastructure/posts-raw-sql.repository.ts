@@ -41,7 +41,7 @@ export class PostsRawSqlRepository {
       if (postsWithLikes.length === 0) {
         return {
           posts: [],
-          numberOfPosts: 0,
+          countPosts: 0,
         };
       }
 
@@ -50,10 +50,10 @@ export class PostsRawSqlRepository {
         currentUserDto,
       );
 
-      const numberOfPosts = postsWithLikes[0].numberOfPosts;
+      const countPosts = postsWithLikes[0].countPosts;
       return {
         posts,
-        numberOfPosts: numberOfPosts,
+        countPosts: countPosts,
       };
     } catch (error) {
       console.log(error.message);
@@ -225,7 +225,7 @@ export class PostsRawSqlRepository {
           ORDER BY "${sortBy}" ${direction}
           LIMIT $7 OFFSET $8
         ),TotalPosts AS (
-          SELECT COUNT(*) AS "numberOfPosts"
+          SELECT COUNT(*) AS "countPosts"
           FROM public."Posts"
           WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
         )
@@ -239,7 +239,7 @@ export class PostsRawSqlRepository {
           pwl."addedAt",
           pwl."login",
           pwl."likeStatus",
-          tp."numberOfPosts"::integer
+          tp."countPosts"::integer
         FROM PostsWithLikes pwl, TotalPosts tp
         `;
 

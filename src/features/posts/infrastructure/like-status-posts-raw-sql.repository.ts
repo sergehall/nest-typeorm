@@ -2,7 +2,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { TablesLikeStatusPostEntity } from '../entities/tables-like-status-post.entity';
-import { LikeStatusCommentEntity } from '../../comments/entities/like-status-comment.entity';
+import { TablesLikeStatusCommentsEntity } from '../../comments/entities/tables-like-status-comments.entity';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { NewestLikes } from '../entities/return-posts-entity.entity';
 
@@ -103,7 +103,7 @@ export class LikeStatusPostsRawSqlRepository {
     postId: string,
     userId: string,
     isBanned: boolean,
-  ): Promise<LikeStatusCommentEntity[]> {
+  ): Promise<TablesLikeStatusCommentsEntity[]> {
     try {
       return await this.db.query(
         `

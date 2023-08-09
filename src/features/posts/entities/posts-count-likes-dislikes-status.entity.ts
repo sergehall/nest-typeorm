@@ -112,5 +112,5 @@ export class PostsCountLikesDislikesStatusEntity {
   likeStatus: LikeStatusEnums;
   @IsNotEmpty()
   @IsNumber()
-  numberOfPosts: number;
+  countPosts: number;
 }
