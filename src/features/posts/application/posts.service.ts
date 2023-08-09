@@ -30,30 +30,6 @@ export class PostsService {
     protected commandBus: CommandBus,
   ) {}
 
-  async openFindPosts(
-    queryData: ParseQueriesType,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PaginationTypes> {
-    const posts: TablesPostsEntity[] =
-      await this.postsRawSqlRepository.openFindPosts(queryData);
-    const filledPosts = await this.preparationPostsForReturn(
-      posts,
-      currentUserDto,
-    );
-    const totalCountPosts =
-      await this.postsRawSqlRepository.openTotalCountPosts();
-    const pagesCount = Math.ceil(
-      totalCountPosts / queryData.queryPagination.pageSize,
-    );
-    return {
-      pagesCount: pagesCount,
-      page: queryData.queryPagination.pageNumber,
-      pageSize: queryData.queryPagination.pageSize,
-      totalCount: totalCountPosts,
-      items: filledPosts,
-    };
-  }
-
   async openFindPostsByBlogId(
     params: BlogIdParams,
     queryData: ParseQueriesType,

@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, Validate } from 'class-validator';
-import { BlogExistsRule } from '../../../pipes/blog-exist-rule.validation';
+import { BlogExistsBadRequestRule } from '../../../pipes/blog-exist-rule.validation';
 
 export class CreatePostWithBlogIdDto {
   @IsNotEmpty()
@@ -21,6 +21,6 @@ export class CreatePostWithBlogIdDto {
   @Length(0, 100, {
     message: 'Incorrect blogId length! Must be max 100 ch.',
   })
-  @Validate(BlogExistsRule)
+  @Validate(BlogExistsBadRequestRule)
   blogId: string;
 }
