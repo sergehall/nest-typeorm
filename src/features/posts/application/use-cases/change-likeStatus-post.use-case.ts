@@ -1,5 +1,5 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
-import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { TablesLikeStatusPostsEntity } from '../../entities/tables-like-status-posts.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
@@ -38,10 +38,7 @@ export class ChangeLikeStatusPostUseCase
         post.blogId,
       );
     if (userIsBannedForBlog)
-      throw new HttpException(
-        { message: userNotHavePermissionForBlog },
-        HttpStatus.FORBIDDEN,
-      );
+      throw new ForbiddenException(userNotHavePermissionForBlog);
 
     const likeStatusPostEntity: TablesLikeStatusPostsEntity = {
       blogId: post.blogId,

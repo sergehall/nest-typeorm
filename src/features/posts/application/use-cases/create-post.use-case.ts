@@ -1,7 +1,5 @@
 import {
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,7 +15,7 @@ import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/t
 import { CreatePostDto } from '../../dto/create-post.dto';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
+import { userNotHavePermissionForPost } from '../../../../exception-filter/custom-errors-messages';
 
 export class CreatePostCommand {
   constructor(
@@ -107,10 +105,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       );
     // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
     if (userIsBannedForBlog)
-      throw new HttpException(
-        { message: userNotHavePermissionForBlog },
-        HttpStatus.FORBIDDEN,
-      );
+      throw new ForbiddenException(userNotHavePermissionForPost);
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({

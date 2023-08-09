@@ -161,12 +161,8 @@ export class CommentsRawSqlRepository {
         limit,
         offset,
       ];
-      const result = await this.db.query(query, parameters);
-      console.log(
-        result,
-        'result findCommentByCommentatorIdAndCountOfLikesDislikesComments',
-      );
-      return result;
+
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

@@ -52,6 +52,11 @@ export const userNotHavePermissionForBlog = {
     'Leaving comments for this user is not allowed, and accessing the blog is restricted.',
   params: 'blogId',
 };
+export const userNotHavePermissionForPost = {
+  message:
+    'Leaving posts for this user is not allowed, and accessing the blog is restricted.',
+  params: 'blogId',
+};
 export const emailNotExistsOrIsConfirmed = {
   message: 'The email does not exist or the user is already confirmed.',
   field: 'email',
@@ -63,10 +68,6 @@ export const cannotBlockOwnBlog = {
 export const cannotBlockYourself = {
   message: 'You cannot block yourself.',
   field: 'id',
-};
-export const notFoundComment = {
-  message: 'Not found comment.',
-  field: 'params.commentId',
 };
 export const forbiddenDeleteDevice = {
   message: 'Cannot delete a device that does not belong to the current user.',
