@@ -27,8 +27,8 @@ export class CommentsRawSqlRepository {
       return await this.db.query(
         `
         INSERT INTO public."Comments"(
-          "id", "content", "createdAt", 
-          "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+          "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId",
+          "postInfoBlogName", "postInfoBlogOwnerId", 
           "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -124,19 +124,19 @@ export class CommentsRawSqlRepository {
           AND "commentatorInfoIsBanned" = $2
           AND "banInfoIsBanned" = $3
           ) AS integer
-        ) AS "numberOfComments",
-        COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
-        COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",
+        ) AS "countComments",
+        COALESCE(lsc_like."countLikes"::integer, 0) AS "countLikes",
+        COALESCE(lsc_dislike."countDislikes"::integer, 0) AS "countDislikes",
         COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
       FROM public."Comments" c
       LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        SELECT "commentId", COUNT(*) AS "countLikes"
         FROM public."LikeStatusComments"
         WHERE "likeStatus" = 'Like' AND "isBanned" = $5
         GROUP BY "commentId"
       ) lsc_like ON c."id" = lsc_like."commentId"
       LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        SELECT "commentId", COUNT(*) AS "countDislikes"
         FROM public."LikeStatusComments"
         WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
         GROUP BY "commentId"
@@ -162,7 +162,10 @@ export class CommentsRawSqlRepository {
         offset,
       ];
       const result = await this.db.query(query, parameters);
-      console.log(result, 'result');
+      console.log(
+        result,
+        'result findCommentByCommentatorIdAndCountOfLikesDislikesComments',
+      );
       return result;
     } catch (error) {
       console.log(error.message);
