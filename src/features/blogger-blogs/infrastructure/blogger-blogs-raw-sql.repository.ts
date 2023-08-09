@@ -9,6 +9,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { TablesBloggerBlogsTotalBlogs } from '../entities/tables-blogger-blogs-total-blogs';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -88,7 +89,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async openFindBlogs(
     queryData: ParseQueriesType,
-  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+  ): Promise<TablesBloggerBlogsTotalBlogs[]> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -100,12 +101,21 @@ export class BloggerBlogsRawSqlRepository {
 
       return await this.db.query(
         `
-        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-        FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        AND "name" ILIKE $3
-        ORDER BY "${sortBy}" COLLATE "C" ${direction}
-        LIMIT $4 OFFSET $5
+          WITH FilteredBlogs AS (
+              SELECT
+                  "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
+                  COUNT(*) OVER() AS "totalBlogs"
+              FROM public."BloggerBlogs"
+              WHERE
+                  "dependencyIsBanned" = $1 AND
+                  "banInfoIsBanned" = $2 AND
+                  "name" ILIKE $3
+          )
+          SELECT
+              "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "totalBlogs"::integer
+          FROM FilteredBlogs
+          ORDER BY "${sortBy}" COLLATE "C" ${direction}
+          LIMIT $4 OFFSET $5;
         `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm, limit, offset],
       );
@@ -125,7 +135,7 @@ export class BloggerBlogsRawSqlRepository {
         SELECT count(*)
         FROM public."BloggerBlogs"
         WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        AND "name" LIKE $3
+        AND "name" ILIKE $3
       `,
         [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
       );
