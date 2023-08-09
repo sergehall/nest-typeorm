@@ -60,7 +60,7 @@ export class CreateCommentUseCase
         banInfoBanDate: null,
         banInfoBanReason: null,
       });
-
+    console.log(newComment);
     return {
       id: newComment[0].id,
       content: newComment[0].content,
