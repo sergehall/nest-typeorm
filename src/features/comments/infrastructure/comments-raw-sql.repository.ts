@@ -58,8 +58,8 @@ export class CommentsRawSqlRepository {
   }
 
   async findCommentsByCommentatorId(
-    queryData: ParseQueriesType,
     commentatorInfoUserId: string,
+    queryData: ParseQueriesType,
   ): Promise<TablesCommentsRawSqlEntity[]> {
     const commentatorInfoIsBanned = false;
     const banInfoIsBanned = false;
@@ -69,27 +69,25 @@ export class CommentsRawSqlRepository {
       (queryData.queryPagination.pageNumber - 1) *
       queryData.queryPagination.pageSize;
     const direction = queryData.queryPagination.sortDirection;
-
+    const query = `
+          SELECT "id", "content", "createdAt", 
+          "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
+           "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+          FROM public."Comments"
+          WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+          ORDER BY "${sortBy}" ${direction}
+          LIMIT $4 OFFSET $5
+            `;
+    const parameters = [
+      commentatorInfoUserId,
+      commentatorInfoIsBanned,
+      banInfoIsBanned,
+      limit,
+      offset,
+    ];
     try {
-      return await this.db.query(
-        `
-        SELECT "id", "content", "createdAt", 
-        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId",
-         "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
-         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-        FROM public."Comments"
-        WHERE "commentatorInfoUserId" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $4 OFFSET $5
-          `,
-        [
-          commentatorInfoUserId,
-          commentatorInfoIsBanned,
-          banInfoIsBanned,
-          limit,
-          offset,
-        ],
-      );
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -132,89 +130,83 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async findCommentByIdAndCountOfLikesDislikesComments(
-    commentId: string,
+  async findCommentByCommentatorIdAndCountOfLikesDislikesComments(
+    commentatorInfoUserId: string,
+    queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<TablesCommentsCountOfLikesDislikesComments | null> {
+  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
     try {
       const commentatorInfoIsBanned = false;
       const banInfoIsBanned = false;
       const isBanned = false;
 
-      const parameters = [
-        commentId,
-        currentUserDto?.id,
-        isBanned,
-        commentatorInfoIsBanned,
-        banInfoIsBanned,
-      ];
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
 
       const query = `
-        SELECT
-            c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
-            c."postInfoBlogId", c."postInfoBlogName",
-            c."postInfoBlogOwnerId", c."commentatorInfoUserId", c."commentatorInfoUserLogin",
-            c."commentatorInfoIsBanned", c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
-            COALESCE(lc."countLikes", 0) AS "countLikes",
-            COALESCE(lc."countDislikes", 0) AS "countDislikes",
-            COALESCE(ls."likeStatus", 'None') AS "myStatus"
-            FROM public."Comments" c
-            LEFT JOIN (
-                SELECT "commentId",
-                    SUM(CASE WHEN "likeStatus" = 'Like' THEN 1 ELSE 0 END)::integer AS "countLikes",
-                    SUM(CASE WHEN "likeStatus" = 'Dislike' THEN 1 ELSE 0 END)::integer AS "countDislikes"
-                FROM public."LikeStatusComments"
-                WHERE "isBanned" = $3
-                GROUP BY "commentId"
-            ) lc ON c."id" = lc."commentId"
-            LEFT JOIN (
-                SELECT "commentId", "likeStatus"
-                FROM public."LikeStatusComments"
-                WHERE "userId" = $2 AND "isBanned" = $3
-            ) ls ON c."id" = ls."commentId"
-            WHERE 
-                c."id" = $1
-                AND c."commentatorInfoIsBanned" = $4
-                AND c."banInfoIsBanned" = $5;
-      `;
+      SELECT
+        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        CAST(
+        (
+          SELECT COUNT(*)
+          FROM public."Comments"
+          WHERE "commentatorInfoUserId" = $1
+          AND "commentatorInfoIsBanned" = $2
+          AND "banInfoIsBanned" = $3
+          ) AS integer
+        ) AS "numberOfComments",
+        COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
+        COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",
+        COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
+      FROM public."Comments" c
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_like ON c."id" = lsc_like."commentId"
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
+        GROUP BY "commentId"
+      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
+      LEFT JOIN (
+        SELECT "commentId", "likeStatus"
+        FROM public."LikeStatusComments"
+        WHERE "userId" = $4 AND "isBanned" = $5
+      ) lsc_user ON c."id" = lsc_user."commentId"
+      WHERE c."commentatorInfoUserId" = $1
+        AND c."commentatorInfoIsBanned" = $2
+        AND c."banInfoIsBanned" = $3
+      ORDER BY "${sortBy}" ${direction}
+      LIMIT $6 OFFSET $7`;
 
-      const comment = await this.db.query(query, parameters);
+      const parameters = [
+        commentatorInfoUserId,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+        currentUserDto?.id,
+        isBanned,
+        limit,
+        offset,
+      ];
 
-      return comment[0] ? comment[0] : null;
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
-      if (error.message.includes('invalid input syntax for type uuid:')) {
-        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
-        throw new NotFoundException('Not found comment.');
-      }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async findCommentByCommentId(
-    commentId: string,
-  ): Promise<TablesCommentsRawSqlEntity | null> {
-    try {
-      const commentatorInfoIsBanned = false;
-      const banInfoIsBanned = false;
-      const comment = await this.db.query(
-        `
-        SELECT "id", "content", "createdAt", 
-        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
-        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
-        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-        FROM public."Comments"
-        WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
-          `,
-        [commentId, commentatorInfoIsBanned, banInfoIsBanned],
-      );
-      return comment[0];
-    } catch (error) {
-      console.log(error.message);
-      return null;
-    }
-  }
-  async findComments(
+  async findCommentsByPostIdAndCountOfLikesDislikes(
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
@@ -287,6 +279,89 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findCommentByIdAndCountOfLikesDislikesComments(
+    commentId: string,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<TablesCommentsCountOfLikesDislikesComments | null> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const isBanned = false;
+
+      const query = `
+        SELECT
+            c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+            c."postInfoBlogId", c."postInfoBlogName",
+            c."postInfoBlogOwnerId", c."commentatorInfoUserId", c."commentatorInfoUserLogin",
+            c."commentatorInfoIsBanned", c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+            COALESCE(lc."countLikes", 0) AS "countLikes",
+            COALESCE(lc."countDislikes", 0) AS "countDislikes",
+            COALESCE(ls."likeStatus", 'None') AS "myStatus"
+            FROM public."Comments" c
+            LEFT JOIN (
+                SELECT "commentId",
+                    SUM(CASE WHEN "likeStatus" = 'Like' THEN 1 ELSE 0 END)::integer AS "countLikes",
+                    SUM(CASE WHEN "likeStatus" = 'Dislike' THEN 1 ELSE 0 END)::integer AS "countDislikes"
+                FROM public."LikeStatusComments"
+                WHERE "isBanned" = $3
+                GROUP BY "commentId"
+            ) lc ON c."id" = lc."commentId"
+            LEFT JOIN (
+                SELECT "commentId", "likeStatus"
+                FROM public."LikeStatusComments"
+                WHERE "userId" = $2 AND "isBanned" = $3
+            ) ls ON c."id" = ls."commentId"
+            WHERE 
+                c."id" = $1
+                AND c."commentatorInfoIsBanned" = $4
+                AND c."banInfoIsBanned" = $5;
+      `;
+
+      const parameters = [
+        commentId,
+        currentUserDto?.id,
+        isBanned,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+      ];
+
+      const comment = await this.db.query(query, parameters);
+
+      return comment[0] ? comment[0] : null;
+    } catch (error) {
+      console.log(error.message);
+      if (error.message.includes('invalid input syntax for type uuid:')) {
+        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
+        throw new NotFoundException('Not found comment.');
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findCommentByCommentId(
+    commentId: string,
+  ): Promise<TablesCommentsRawSqlEntity | null> {
+    try {
+      const commentatorInfoIsBanned = false;
+      const banInfoIsBanned = false;
+      const comment = await this.db.query(
+        `
+        SELECT "id", "content", "createdAt", 
+        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        FROM public."Comments"
+        WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+          `,
+        [commentId, commentatorInfoIsBanned, banInfoIsBanned],
+      );
+      return comment[0];
+    } catch (error) {
+      console.log(error.message);
+      return null;
     }
   }
 
@@ -438,7 +513,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentsByPostId(
+  async findCommentsByPostId2(
     postId: string,
     queryData: ParseQueriesType,
   ): Promise<TablesCommentsRawSqlEntity[]> {

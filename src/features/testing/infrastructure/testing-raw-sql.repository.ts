@@ -1,11 +1,12 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
+@Injectable()
 export class TestingRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async removeAllDataRawSQL(): Promise<void> {
+  async removeAllData(): Promise<void> {
     const tablesToDelete = [
       'SentEmailsTimeConfirmAndRecoverCodes',
       'SecurityDevices',
@@ -32,3 +33,37 @@ export class TestingRawSqlRepository {
     }
   }
 }
+
+// export class TestingRawSqlRepository {
+//   constructor(
+//     @InjectEntityManager() private readonly entityManager: EntityManager,
+//   ) {}
+//
+//   async removeAllData(): Promise<void> {
+//     const tablesToDelete = [
+//       'SecurityDevices',
+//       'SentEmailsTimeConfirmAndRecoverCodes',
+//       'BannedUsersForBlogs',
+//       'BlacklistJwt',
+//       'EmailsConfirmationCodes',
+//       'EmailsRecoveryCodes',
+//       'LikeStatusComments',
+//       'LikeStatusPosts',
+//       'Comments',
+//       'Posts',
+//       'BloggerBlogs',
+//       'Users',
+//     ];
+//
+//     try {
+//       for (const table of tablesToDelete) {
+//         console.log(table);
+//         const repository = this.entityManager.getRepository(table);
+//         await repository.clear();
+//       }
+//     } catch (error) {
+//       console.error(error.message);
+//       throw new InternalServerErrorException('Failed to remove data.');
+//     }
+//   }
+// }

@@ -5,6 +5,6 @@ import { TestingRawSqlRepository } from '../infrastructure/testing-raw-sql.repos
 export class TestingService {
   constructor(protected testingRawSqlRepository: TestingRawSqlRepository) {}
   async removeAllDataRawSQL(): Promise<void> {
-    return await this.testingRawSqlRepository.removeAllDataRawSQL();
+    return await this.testingRawSqlRepository.removeAllData();
   }
 }
