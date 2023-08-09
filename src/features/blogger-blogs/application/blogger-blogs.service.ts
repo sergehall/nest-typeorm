@@ -13,30 +13,28 @@ export class BloggerBlogsService {
   ) {}
 
   async openFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
+    const { pageNumber, pageSize } = queryData.queryPagination;
+
     const blogs: ReturnBloggerBlogsEntity[] =
-      await this.bloggerBlogsRawSqlRepository.openFindBlogsTotalBlogs(
-        queryData,
-      );
+      await this.bloggerBlogsRawSqlRepository.openFindBlogs(queryData);
 
     if (blogs.length === 0) {
       return {
         pagesCount: 0,
-        page: queryData.queryPagination.pageNumber,
-        pageSize: queryData.queryPagination.pageSize,
+        page: pageNumber,
+        pageSize: pageSize,
         totalCount: 0,
         items: [],
       };
     }
 
     const totalCount = blogs.length;
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: queryData.queryPagination.pageNumber,
-      pageSize: queryData.queryPagination.pageSize,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount: totalCount,
       items: blogs,
     };

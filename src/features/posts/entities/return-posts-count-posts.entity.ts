@@ -1,6 +1,6 @@
 import { ReturnPostsEntity } from './return-posts-entity.entity';
 
-export class ReturnPostsNumberOfPostsEntity {
+export class ReturnPostsCountPostsEntity {
   posts: ReturnPostsEntity[];
   countPosts: number;
 }

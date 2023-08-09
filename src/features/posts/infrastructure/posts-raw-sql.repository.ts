@@ -14,10 +14,10 @@ import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../dto/paging-params.dto';
-import { ReturnPostsNumberOfPostsEntity } from '../entities/return-posts-number-of-posts.entity';
+import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-posts.entity';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
-import { PostsCountLikesDislikesStatusEntity } from '../entities/posts-count-likes-dislikes-status.entity';
+import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -27,7 +27,7 @@ export class PostsRawSqlRepository {
   async findPostsAndTotalCountPosts(
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsNumberOfPostsEntity> {
+  ): Promise<ReturnPostsCountPostsEntity> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
@@ -35,7 +35,7 @@ export class PostsRawSqlRepository {
         queryData,
       );
 
-      const postsWithLikes: PostsCountLikesDislikesStatusEntity[] =
+      const postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[] =
         await this.getPostsWithLikes(bannedFlags, pagingParams, currentUserDto);
 
       if (postsWithLikes.length === 0) {
@@ -165,7 +165,7 @@ export class PostsRawSqlRepository {
     bannedFlags: BannedFlagsDto,
     pagingParams: PagingParamsDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsCountLikesDislikesStatusEntity[]> {
+  ): Promise<PostsCountPostsLikesDislikesStatusEntity[]> {
     const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
     const countLastLikes = 3;
@@ -570,12 +570,12 @@ export class PostsRawSqlRepository {
   }
 
   private async processPostsWithLikes(
-    postsWithLikes: PostsCountLikesDislikesStatusEntity[],
+    postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
-    postsWithLikes.forEach((row: PostsCountLikesDislikesStatusEntity) => {
+    postsWithLikes.forEach((row: PostsCountPostsLikesDislikesStatusEntity) => {
       const postId = row.id;
 
       if (!postWithLikes[postId]) {

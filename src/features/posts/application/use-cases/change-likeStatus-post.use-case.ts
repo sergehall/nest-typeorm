@@ -1,6 +1,6 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
 import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
-import { TablesLikeStatusPostEntity } from '../../entities/tables-like-status-post.entity';
+import { TablesLikeStatusPostsEntity } from '../../entities/tables-like-status-posts.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
@@ -43,7 +43,7 @@ export class ChangeLikeStatusPostUseCase
         HttpStatus.FORBIDDEN,
       );
 
-    const likeStatusPostEntity: TablesLikeStatusPostEntity = {
+    const likeStatusPostEntity: TablesLikeStatusPostsEntity = {
       blogId: post.blogId,
       postOwnerId: post.postOwnerId,
       postId: command.postId,

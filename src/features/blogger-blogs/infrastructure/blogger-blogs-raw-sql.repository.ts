@@ -99,7 +99,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async openFindBlogsTotalBlogs(
+  async openFindBlogs(
     queryData: ParseQueriesType,
   ): Promise<ReturnBloggerBlogsEntity[]> {
     try {
@@ -111,11 +111,13 @@ export class BloggerBlogsRawSqlRepository {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
+      console.log(limit, 'limit');
+      console.log(offset, 'offset');
+
       const parameters = [
         blogOwnerBanStatus,
         banInfoBanStatus,
         searchNameTerm,
-        limit,
         offset,
       ];
 
@@ -133,7 +135,7 @@ export class BloggerBlogsRawSqlRepository {
             "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM FilteredBlogs
         ORDER BY "${sortBy}" COLLATE "C" ${direction}
-        LIMIT $4 OFFSET $5
+        OFFSET $4
       `;
 
       return await this.db.query(query, parameters);
