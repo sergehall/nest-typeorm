@@ -32,7 +32,7 @@ export class FindCommentsCurrentUserUseCase
         queryData,
         currentUserDto,
       );
-    console.log(comments, 'comments');
+    console.log(comments, 'comments. FindCommentsCurrentUserUseCase');
     if (comments.length === 0) {
       return {
         pagesCount: 0,
