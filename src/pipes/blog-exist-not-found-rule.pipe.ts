@@ -8,13 +8,13 @@ export class BlogExistNotFoundRule implements PipeTransform {
     private bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
-  async transform(value: string): Promise<TableBloggerBlogsRawSqlEntity> {
+  async transform(value: string): Promise<string> {
     const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(value);
     if (!blog) {
       throw new NotFoundException(`Blog with id ${value} not found`);
     }
 
-    return blog;
+    return blog.id;
   }
 }
