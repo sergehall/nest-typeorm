@@ -15,7 +15,6 @@ import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
-import { BlogExistsRule } from '../../pipes/blog-exist-rule.validation';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-all-banned-users-for-blog.use.case';
@@ -37,7 +36,6 @@ const bloggersBlogUseCases = [
   SaChangeBanstatusBlogsByBlogIdUseCase,
   ChangeBanStatusLikesPostForBannedUserUseCase,
 ];
-const bloggersBlogRules = [BlogExistsRule];
 
 @Module({
   imports: [CqrsModule],
@@ -56,7 +54,6 @@ const bloggersBlogRules = [BlogExistsRule];
     LikeStatusPostsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
-    ...bloggersBlogRules,
     ...bloggersBlogUseCases,
   ],
 })

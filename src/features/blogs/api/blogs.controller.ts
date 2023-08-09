@@ -13,11 +13,11 @@ import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { BlogExistNotFoundRule } from '../../../pipes/blog-exist-not-found-rule.validation';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -49,11 +49,12 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPostsByBlogId(
     @Request() req: any,
-    @Param() params: BlogIdParams,
+    @Param('blogId', BlogExistNotFoundRule) blogId: string,
     @Query() query: any,
   ): Promise<PaginationTypes> {
+    const params = { blogId: blogId };
     const currentUserDto: CurrentUserDto | null = req.user;
-    console.log('++++++++++');
+
     const queryData: ParseQueriesType =
       await this.parseQueriesService.getQueriesData(query);
 
