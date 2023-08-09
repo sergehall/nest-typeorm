@@ -22,22 +22,29 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
+    const parameters = [blogId, dependencyIsBanned, banInfoIsBanned];
+    const query = `
+        SELECT "id", "createdAt", "isMembership", 
+         "blogOwnerId", "dependencyIsBanned",
+         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
+         "name", "description", "websiteUrl"
+        FROM public."BloggerBlogs"
+        LEFT JOIN (
+            SELECT 1 AS empty
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM public."BloggerBlogs"
+                WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+            )
+        ) AS empty_check ON empty_check.empty = 1
+        WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+        `;
 
     try {
-      const blog = await this.db.query(
-        `
-      SELECT "id", "createdAt", "isMembership", 
-      "blogOwnerId", "dependencyIsBanned",
-      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
-      "name", "description", "websiteUrl"
-      FROM public."BloggerBlogs"
-      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
-      `,
-        [blogId, dependencyIsBanned, banInfoIsBanned],
-      );
+      const result = await this.db.query(query, parameters);
 
       // Return the first blog if found, if not found return null
-      return blog[0] || null;
+      return result[0] ? result[0] : null;
     } catch (error) {
       console.log(error.message);
       // if not blogId not UUID will be error, and return null
