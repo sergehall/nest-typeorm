@@ -87,7 +87,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async openFindBlogs(
+  async openFindBlogsTotalBlogs(
     queryData: ParseQueriesType,
   ): Promise<TablesBloggerBlogsTotalBlogs[]> {
     try {
@@ -99,48 +99,43 @@ export class BloggerBlogsRawSqlRepository {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      return await this.db.query(
-        `
-          WITH FilteredBlogs AS (
-              SELECT
-                  "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
-                  COUNT(*) OVER() AS "totalBlogs"
-              FROM public."BloggerBlogs"
-              WHERE
-                  "dependencyIsBanned" = $1 AND
-                  "banInfoIsBanned" = $2 AND
-                  "name" ILIKE $3
-          )
-          SELECT
-              "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "totalBlogs"::integer
-          FROM FilteredBlogs
-          ORDER BY "${sortBy}" COLLATE "C" ${direction}
-          LIMIT $4 OFFSET $5;
-        `,
-        [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm, limit, offset],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
+      const parameters = [
+        blogOwnerBanStatus,
+        banInfoBanStatus,
+        searchNameTerm,
+        limit,
+        offset,
+      ];
 
-  async totalCountBlogs(queryData: ParseQueriesType): Promise<number> {
-    try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
-      const searchNameTerm = queryData.searchNameTerm;
+      const mainQuery = `
+        WITH FilteredBlogs AS (
+            SELECT
+                "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
+                COUNT(*) OVER() AS "totalBlogs"
+            FROM public."BloggerBlogs"
+            WHERE
+                "dependencyIsBanned" = $1 AND
+                "banInfoIsBanned" = $2 AND
+                "name" ILIKE $3
+        )
+        SELECT
+            "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "totalBlogs"::integer
+        FROM FilteredBlogs
+        ORDER BY "${sortBy}" COLLATE "C" ${direction}
+        LIMIT $4 OFFSET $5
+    `;
 
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-        AND "name" ILIKE $3
-      `,
-        [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
-      );
-      return Number(countBlogs[0].count);
+      const query = `
+        SELECT json_agg(result) FROM (
+            ${mainQuery}
+        ) AS result
+    `;
+
+      const result = await this.db.query(query, parameters);
+
+      return result[0].json_agg !== null ? result[0] : [];
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
