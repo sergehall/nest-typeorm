@@ -27,7 +27,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
         currentUserDto,
       );
 
-    const totalCount = postsAndNumberOfPosts.numberOfPosts;
+    const totalCount = postsAndNumberOfPosts.countPosts;
 
     if (totalCount === 0) {
       return {

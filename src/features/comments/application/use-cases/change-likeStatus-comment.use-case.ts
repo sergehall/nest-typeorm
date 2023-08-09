@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { LikeStatusCommentEntity } from '../../entities/like-status-comment.entity';
+import { TablesLikeStatusCommentsEntity } from '../../entities/tables-like-status-comments.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
@@ -50,7 +50,7 @@ export class ChangeLikeStatusCommentUseCase
         HttpStatus.FORBIDDEN,
       );
 
-    const likeStatusCommEntity: LikeStatusCommentEntity = {
+    const likeStatusCommEntity: TablesLikeStatusCommentsEntity = {
       commentId: commentId,
       blogId: findComment.postInfoBlogId,
       commentOwnerId: findComment.commentatorInfoUserId,
