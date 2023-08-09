@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
-export class TablesLikeStatusPostEntity {
+export class TablesLikeStatusPostsEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect blogId length! Must be min 0, max 100 ch.',

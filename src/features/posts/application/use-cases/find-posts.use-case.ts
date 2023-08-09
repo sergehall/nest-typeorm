@@ -2,7 +2,7 @@ import { ParseQueriesType } from '../../../common/query/types/parse-query.types'
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { ReturnPostsNumberOfPostsEntity } from '../../entities/return-posts-number-of-posts.entity';
+import { ReturnPostsCountPostsEntity } from '../../entities/return-posts-count-posts.entity';
 
 export class FindPostsCommand {
   constructor(
@@ -21,7 +21,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndNumberOfPosts: ReturnPostsNumberOfPostsEntity =
+    const postsAndNumberOfPosts: ReturnPostsCountPostsEntity =
       await this.postsRawSqlRepository.findPostsAndTotalCountPosts(
         queryData,
         currentUserDto,
