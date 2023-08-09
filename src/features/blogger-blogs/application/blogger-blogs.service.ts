@@ -28,14 +28,16 @@ export class BloggerBlogsService {
       };
     }
 
-    const blogs = blogsTotalBlogs.map((blog: TablesBloggerBlogsTotalBlogs) => ({
-      id: blog.id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership,
-    }));
+    const blogs: ReturnBloggerBlogsEntity[] = blogsTotalBlogs.map(
+      (blog: TablesBloggerBlogsTotalBlogs) => ({
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+        isMembership: blog.isMembership,
+      }),
+    );
 
     const totalCount = blogsTotalBlogs[0].totalBlogs;
     const pagesCount = Math.ceil(

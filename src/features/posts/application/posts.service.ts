@@ -19,12 +19,14 @@ import {
   ReturnPostsEntity,
 } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
+import { BloggerBlogsRawSqlRepository } from '../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 
 @Injectable()
 export class PostsService {
   constructor(
     protected postsRawSqlRepository: PostsRawSqlRepository,
     protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
+    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
 
