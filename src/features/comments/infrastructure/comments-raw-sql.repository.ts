@@ -9,11 +9,10 @@ import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-u
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { CommentsNumberOfLikesDislikesLikesStatus } from '../entities/comment-likes-dislikes-likes-status';
-import { TablesCommentsCountOfLikesDislikesComments } from '../entities/comment-by-id-count-likes-dislikes';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
+import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -98,7 +97,7 @@ export class CommentsRawSqlRepository {
     commentatorInfoUserId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
+  ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
@@ -174,7 +173,7 @@ export class CommentsRawSqlRepository {
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<CommentsNumberOfLikesDislikesLikesStatus[]> {
+  ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {
       const { pageSize, pageNumber, sortBy, sortDirection } =
         queryData.queryPagination;
@@ -201,19 +200,19 @@ export class CommentsRawSqlRepository {
           AND "commentatorInfoIsBanned" = $2
           AND "banInfoIsBanned" = $3
           ) AS integer
-        ) AS "numberOfComments",
-        COALESCE(lsc_like."numberOfLikes"::integer, 0) AS "numberOfLikes",
-        COALESCE(lsc_dislike."numberOfDislikes"::integer, 0) AS "numberOfDislikes",
+        ) AS "countComments",
+        COALESCE(lsc_like."countLikes"::integer, 0) AS "countLikes",
+        COALESCE(lsc_dislike."countDislikes"::integer, 0) AS "countDislikes",
         COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
       FROM public."Comments" c
       LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfLikes"
+        SELECT "commentId", COUNT(*) AS "countLikes"
         FROM public."LikeStatusComments"
         WHERE "likeStatus" = 'Like' AND "isBanned" = $5
         GROUP BY "commentId"
       ) lsc_like ON c."id" = lsc_like."commentId"
       LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "numberOfDislikes"
+        SELECT "commentId", COUNT(*) AS "countDislikes"
         FROM public."LikeStatusComments"
         WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
         GROUP BY "commentId"
@@ -249,7 +248,7 @@ export class CommentsRawSqlRepository {
   async findCommentByIdAndCountOfLikesDislikesComments(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<TablesCommentsCountOfLikesDislikesComments | null> {
+  ): Promise<CommentsCountLikesDislikesEntity | null> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
@@ -263,7 +262,7 @@ export class CommentsRawSqlRepository {
             c."commentatorInfoIsBanned", c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
             COALESCE(lc."countLikes", 0) AS "countLikes",
             COALESCE(lc."countDislikes", 0) AS "countDislikes",
-            COALESCE(ls."likeStatus", 'None') AS "myStatus"
+            COALESCE(ls."likeStatus", 'None') AS "likeStatus"
             FROM public."Comments" c
             LEFT JOIN (
                 SELECT "commentId",

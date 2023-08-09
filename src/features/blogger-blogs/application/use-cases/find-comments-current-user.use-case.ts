@@ -2,9 +2,9 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { CommentsNumberOfLikesDislikesLikesStatus } from '../../../comments/entities/comment-likes-dislikes-likes-status';
 import { ReturnCommentsEntity } from '../../../comments/entities/return-comments.entity';
 import { ReturnCommentsWithPostInfoEntity } from '../../../comments/entities/return-comments-with-post-info.entity';
+import { CommentsCountLikesDislikesEntity } from '../../../comments/entities/comments-count-likes-dislikes.entity';
 
 export class FindCommentsCurrentUserCommand {
   constructor(
@@ -26,7 +26,7 @@ export class FindCommentsCurrentUserUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
     const { id } = currentUserDto;
 
-    const comments: CommentsNumberOfLikesDislikesLikesStatus[] =
+    const comments: CommentsCountLikesDislikesEntity[] =
       await this.commentsRawSqlRepository.findCommentByCommentatorIdAndCountOfLikesDislikesComments(
         id,
         queryData,
@@ -43,7 +43,7 @@ export class FindCommentsCurrentUserUseCase
       };
     }
 
-    const totalCount: number = comments[0].numberOfComments;
+    const totalCount: number = comments[0].countComments;
 
     const transformedComments: ReturnCommentsEntity[] =
       await this.transformedComments(comments);
@@ -62,11 +62,11 @@ export class FindCommentsCurrentUserUseCase
   }
 
   private async transformedComments(
-    comments: CommentsNumberOfLikesDislikesLikesStatus[],
+    comments: CommentsCountLikesDislikesEntity[],
   ): Promise<ReturnCommentsWithPostInfoEntity[]> {
     return comments.map(
       (
-        comment: CommentsNumberOfLikesDislikesLikesStatus,
+        comment: CommentsCountLikesDislikesEntity,
       ): ReturnCommentsWithPostInfoEntity => ({
         id: comment.id,
         content: comment.content,
@@ -76,8 +76,8 @@ export class FindCommentsCurrentUserUseCase
           userLogin: comment.commentatorInfoUserLogin,
         },
         likesInfo: {
-          likesCount: comment.numberOfLikes,
-          dislikesCount: comment.numberOfDislikes,
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
           myStatus: comment.likeStatus,
         },
         postInfo: {

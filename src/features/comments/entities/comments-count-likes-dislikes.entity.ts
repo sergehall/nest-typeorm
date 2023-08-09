@@ -1,6 +1,8 @@
 import {
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsString,
   Length,
   Matches,
@@ -9,7 +11,7 @@ import {
 } from 'class-validator';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
-export class CommentsNumberOfLikesDislikesLikesStatus {
+export class CommentsCountLikesDislikesEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id length! Must be min 0, max 100 ch.',
@@ -88,21 +90,16 @@ export class CommentsNumberOfLikesDislikesLikesStatus {
   @Length(0, 100, {
     message: 'Incorrect numberOfComments length! Must be min 0, max 100 ch.',
   })
-  numberOfComments: number;
+  countComments: number;
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect numberOfLikes length! Must be min 0, max 100 ch.',
-  })
-  numberOfLikes: number;
+  @IsNumber()
+  countLikes: number;
   @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect numberOfDislikes length! Must be min 0, max 100 ch.',
-  })
-  numberOfDislikes: number;
+  @IsNumber()
+  countDislikes: number;
   @IsNotEmpty()
-  @Length(4, 7, {
-    message:
-      'Incorrect likeStatus length! Must be min 4, max 7 ch. Type of Like, Dislike or None',
+  @IsEnum(LikeStatusEnums, {
+    message: 'Incorrect myStatus must be type of Like, Dislike or None.',
   })
   likeStatus: LikeStatusEnums;
 }

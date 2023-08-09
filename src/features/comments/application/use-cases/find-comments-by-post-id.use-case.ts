@@ -5,8 +5,8 @@ import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-s
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
-import { CommentsNumberOfLikesDislikesLikesStatus } from '../../entities/comment-likes-dislikes-likes-status';
 import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
+import { CommentsCountLikesDislikesEntity } from '../../entities/comments-count-likes-dislikes.entity';
 
 export class FindCommentsByPostIdCommand {
   constructor(
@@ -54,7 +54,7 @@ export class FindCommentsByPostIdUseCase
     const transformedComments: ReturnCommentsEntity[] =
       await this.transformedComments(comments);
 
-    const totalCountComments: number = comments[0].numberOfComments;
+    const totalCountComments: number = comments[0].countComments;
 
     const pagesCount = Math.ceil(
       totalCountComments / queryData.queryPagination.pageSize,
@@ -70,12 +70,10 @@ export class FindCommentsByPostIdUseCase
   }
 
   private async transformedComments(
-    comments: CommentsNumberOfLikesDislikesLikesStatus[],
+    comments: CommentsCountLikesDislikesEntity[],
   ): Promise<ReturnCommentsEntity[]> {
     return comments.map(
-      (
-        comment: CommentsNumberOfLikesDislikesLikesStatus,
-      ): ReturnCommentsEntity => ({
+      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
         id: comment.id,
         content: comment.content,
         createdAt: comment.createdAt,
@@ -84,8 +82,8 @@ export class FindCommentsByPostIdUseCase
           userLogin: comment.commentatorInfoUserLogin,
         },
         likesInfo: {
-          likesCount: comment.numberOfLikes,
-          dislikesCount: comment.numberOfDislikes,
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
           myStatus: comment.likeStatus,
         },
       }),
