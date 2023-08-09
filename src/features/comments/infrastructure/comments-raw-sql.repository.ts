@@ -161,8 +161,9 @@ export class CommentsRawSqlRepository {
         limit,
         offset,
       ];
-
-      return await this.db.query(query, parameters);
+      const result = await this.db.query(query, parameters);
+      console.log(result, 'result');
+      return result;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

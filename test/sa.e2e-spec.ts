@@ -14,6 +14,7 @@ const generateRandomString = (size: number): string => {
 
 describe('SaController (e2e)', () => {
   let mongoMemoryServer: MongoMemoryServer;
+  let moduleFixture: TestingModule;
   let app: INestApplication;
   let server: any;
 
@@ -40,6 +41,26 @@ describe('SaController (e2e)', () => {
     await app.close();
     await mongoMemoryServer.stop();
   });
+  // beforeAll(async () => {
+  //   moduleFixture = await Test.createTestingModule({
+  //     imports: [
+  //       AppModule,
+  //       TypeOrmModule.forRootAsync({
+  //         useClass: OrmModuleOptions,
+  //       }),
+  //     ],
+  //   }).compile();
+  //
+  //   app = moduleFixture.createNestApplication();
+  //   app = createApp(app);
+  //   await app.init();
+  //   server = app.getHttpServer();
+  // });
+  //
+  // afterAll(async () => {
+  //   await app.close();
+  //   await moduleFixture.close();
+  // });
 
   describe('Create User by SA => POST => /sa/users', () => {
     const url = '/sa/users';
@@ -155,9 +176,58 @@ describe('SaController (e2e)', () => {
 
       expect.setState({ user: { ...user, password: inputData.password } });
     });
-    it('should ', async () => {
-      const { user } = expect.getState();
-    });
-    //TODO: check the creation of a user with an existing login \email
+
+    // it('should check the creation of a user with an existing login and email', async () => {
+    //   // First, create a user with a specific login and email
+    //   const existingUser: CreateUserDto = {
+    //     login: 'user',
+    //     email: 'user@example.com',
+    //     password: 'password123',
+    //   };
+    //
+    //   const createUserResponse = await request(server)
+    //     .post(url)
+    //     .auth(sa.login, sa.password)
+    //     .send(existingUser);
+    //
+    //   expect(createUserResponse.status).toBe(201);
+    //
+    //   // Now, attempt to create another user with the same login and email
+    //   const duplicateUser: CreateUserDto = {
+    //     login: 'existingUser', // Same login as above
+    //     email: 'existingUser@example.com', // Same email as above
+    //     password: 'anotherPassword',
+    //   };
+    //
+    //   const duplicateResponse = await request(server)
+    //     .post(url)
+    //     .auth(sa.login, sa.password)
+    //     .send(duplicateUser);
+    //
+    //   // Check that the response status is 400 (Bad Request) due to duplicate login/email
+    //   expect(duplicateResponse.status).toBe(400);
+    //
+    //   // // Check error messages for login and email constraints
+    //   // expect(duplicateResponse.body).toEqual({
+    //   //   errorsMessages: [
+    //   //     {
+    //   //       message: 'Login or email already exists',
+    //   //       field: 'login',
+    //   //     },
+    //   //     {
+    //   //       message: 'Login or email already exists',
+    //   //       field: 'email',
+    //   //     },
+    //   //     {
+    //   //       message: 'length! Must be min 3, max 10 ch.',
+    //   //       field: 'login',
+    //   //     },
+    //   //     {
+    //   //       message: "@Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')", // Add your expected message here
+    //   //       field: 'email',
+    //   //     },
+    //   //   ],
+    //   // });
+    // });
   });
 });
