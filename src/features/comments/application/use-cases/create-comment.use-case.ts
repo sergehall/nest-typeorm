@@ -1,5 +1,5 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
-import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
@@ -41,10 +41,7 @@ export class CreateCommentUseCase
         post.blogId,
       );
     if (userIsBannedForBlog)
-      throw new HttpException(
-        { message: userNotHavePermissionForBlog },
-        HttpStatus.FORBIDDEN,
-      );
+      throw new ForbiddenException(userNotHavePermissionForBlog);
 
     const newComment: TablesCommentsEntity[] =
       await this.commentsRawSqlRepository.createComment({

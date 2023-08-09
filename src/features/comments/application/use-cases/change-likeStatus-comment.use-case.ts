@@ -1,7 +1,6 @@
 import { LikeStatusDto } from '../../dto/like-status.dto';
 import {
-  HttpException,
-  HttpStatus,
+  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -45,10 +44,7 @@ export class ChangeLikeStatusCommentUseCase
       );
 
     if (userIsBannedForBlog)
-      throw new HttpException(
-        { message: userNotHavePermissionForBlog },
-        HttpStatus.FORBIDDEN,
-      );
+      throw new ForbiddenException(userNotHavePermissionForBlog);
 
     const likeStatusCommEntity: TablesLikeStatusCommentsEntity = {
       commentId: commentId,
