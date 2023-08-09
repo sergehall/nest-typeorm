@@ -35,14 +35,16 @@ export class PostsService {
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PaginationTypes> {
+    const { pageSize, pageNumber } = queryData.queryPagination;
+
     const posts: TablesPostsEntity[] =
       await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
 
     if (posts.length === 0) {
       return {
-        pagesCount: queryData.queryPagination.pageNumber,
-        page: queryData.queryPagination.pageNumber,
-        pageSize: queryData.queryPagination.pageSize,
+        pagesCount: pageNumber,
+        page: pageNumber,
+        pageSize: pageSize,
         totalCount: 0,
         items: [],
       };
@@ -53,9 +55,9 @@ export class PostsService {
     );
     const totalCountPosts =
       await this.postsRawSqlRepository.totalCountPostsByBlogId(params);
-    const pagesCount = Math.ceil(
-      totalCountPosts / queryData.queryPagination.pageSize,
-    );
+    console.log(totalCountPosts, 'totalCountPosts');
+    console.log(pageSize, 'pageSize');
+    const pagesCount = Math.ceil(totalCountPosts / pageSize);
     return {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,
