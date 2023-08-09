@@ -16,8 +16,8 @@ import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../dto/paging-params.dto';
 import { ReturnPostsNumberOfPostsEntity } from '../entities/return-posts-number-of-posts.entity';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
-import { PostsNumbersOfPostsLikesDislikesLikesStatus } from '../entities/posts-number-of-likes-dislikes-likes-status';
-import { TablesPostNumbersOfPostsLikesDislikesLikesStatus } from '../../comments/entities/tables-post-count-likes-dislikes-status';
+import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
+import { PostsCountLikesDislikesStatusEntity } from '../entities/posts-count-likes-dislikes-status.entity';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -35,7 +35,7 @@ export class PostsRawSqlRepository {
         queryData,
       );
 
-      const postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[] =
+      const postsWithLikes: PostsCountLikesDislikesStatusEntity[] =
         await this.getPostsWithLikes(bannedFlags, pagingParams, currentUserDto);
 
       if (postsWithLikes.length === 0) {
@@ -84,7 +84,7 @@ export class PostsRawSqlRepository {
     postId: string,
     bannedFlags: BannedFlagsDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<TablesPostNumbersOfPostsLikesDislikesLikesStatus[]> {
+  ): Promise<PostCountLikesDislikesStatusEntity[]> {
     const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
     const countLastLikes = 3;
     const likeStatus = 'Like';
@@ -165,7 +165,7 @@ export class PostsRawSqlRepository {
     bannedFlags: BannedFlagsDto,
     pagingParams: PagingParamsDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsNumbersOfPostsLikesDislikesLikesStatus[]> {
+  ): Promise<PostsCountLikesDislikesStatusEntity[]> {
     const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
     const countLastLikes = 3;
@@ -259,7 +259,7 @@ export class PostsRawSqlRepository {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
     try {
-      const postWithLikes: TablesPostNumbersOfPostsLikesDislikesLikesStatus[] =
+      const postWithLikes: PostCountLikesDislikesStatusEntity[] =
         await this.getPostWithLikes(postId, bannedFlags, currentUserDto);
 
       if (postWithLikes && postWithLikes.length < 0) {
@@ -570,57 +570,55 @@ export class PostsRawSqlRepository {
   }
 
   private async processPostsWithLikes(
-    postsWithLikes: PostsNumbersOfPostsLikesDislikesLikesStatus[],
+    postsWithLikes: PostsCountLikesDislikesStatusEntity[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
-    postsWithLikes.forEach(
-      (row: PostsNumbersOfPostsLikesDislikesLikesStatus) => {
-        const postId = row.id;
+    postsWithLikes.forEach((row: PostsCountLikesDislikesStatusEntity) => {
+      const postId = row.id;
 
-        if (!postWithLikes[postId]) {
-          postWithLikes[postId] = {
-            id: row.id,
-            title: row.title,
-            shortDescription: row.shortDescription,
-            content: row.content,
-            blogId: row.blogId,
-            blogName: row.blogName,
-            createdAt: row.createdAt,
-            extendedLikesInfo: {
-              likesCount: row.likesCount,
-              dislikesCount: row.dislikesCount,
-              myStatus: LikeStatusEnums.NONE,
-              newestLikes: [],
-            },
-          };
-        }
+      if (!postWithLikes[postId]) {
+        postWithLikes[postId] = {
+          id: row.id,
+          title: row.title,
+          shortDescription: row.shortDescription,
+          content: row.content,
+          blogId: row.blogId,
+          blogName: row.blogName,
+          createdAt: row.createdAt,
+          extendedLikesInfo: {
+            likesCount: row.likesCount,
+            dislikesCount: row.dislikesCount,
+            myStatus: LikeStatusEnums.NONE,
+            newestLikes: [],
+          },
+        };
+      }
 
-        if (currentUserDto) {
-          postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
-        }
+      if (currentUserDto) {
+        postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
+      }
 
-        if (row.likeStatus === LikeStatusEnums.LIKE) {
-          const likeStatus = {
-            addedAt: row.addedAt,
-            userId: row.userId,
-            login: row.login,
-          };
-          postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
-        }
-      },
-    );
+      if (row.likeStatus === LikeStatusEnums.LIKE) {
+        const likeStatus = {
+          addedAt: row.addedAt,
+          userId: row.userId,
+          login: row.login,
+        };
+        postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
+      }
+    });
 
     return Object.values(postWithLikes);
   }
 
   private async processPostWithLikes(
-    post: TablesPostNumbersOfPostsLikesDislikesLikesStatus[],
+    post: PostCountLikesDislikesStatusEntity[],
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
-    post.forEach((row: TablesPostNumbersOfPostsLikesDislikesLikesStatus) => {
+    post.forEach((row: PostCountLikesDislikesStatusEntity) => {
       const postId = row.id;
 
       if (!postWithLikes[postId]) {
