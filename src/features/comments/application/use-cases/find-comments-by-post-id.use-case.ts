@@ -51,11 +51,12 @@ export class FindCommentsByPostIdUseCase
     //     );
     //     break;
     // }
-    const comments = await this.commentsRawSqlRepository.findComments(
-      postId,
-      queryData,
-      currentUserDto,
-    );
+    const comments =
+      await this.commentsRawSqlRepository.findCommentsByPostIdAndCountOfLikesDislikes(
+        postId,
+        queryData,
+        currentUserDto,
+      );
 
     if (comments.length === 0) {
       return {

@@ -3,8 +3,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { TablesCommentsRawSqlEntity } from '../../entities/tables-comments-raw-sql.entity';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
-import { FilledCommentEntity } from '../../entities/filledComment.entity';
 import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
+import { ReturnCommentsWithPostInfoEntity } from '../../entities/return-comments-with-post-info.entity';
 
 export class FillingCommentsDataCommand {
   constructor(
@@ -23,11 +23,11 @@ export class FillingCommentsDataUseCase
 
   async execute(
     command: FillingCommentsDataCommand,
-  ): Promise<FilledCommentEntity[]> {
+  ): Promise<ReturnCommentsWithPostInfoEntity[]> {
     try {
       const { commentsArray, currentUserDto } = command;
 
-      const filledComments: FilledCommentEntity[] = [];
+      const filledComments: ReturnCommentsWithPostInfoEntity[] = [];
 
       // Loop through each comment in the commentsArray provided in the command.
       for (const comment of commentsArray) {
@@ -61,7 +61,7 @@ export class FillingCommentsDataUseCase
         );
 
         // Create a FilledCommentEntity object with all the relevant information for the current comment.
-        const filledComment: FilledCommentEntity = {
+        const filledComment: ReturnCommentsWithPostInfoEntity = {
           id: comment.id,
           content: comment.content,
           createdAt: comment.createdAt,

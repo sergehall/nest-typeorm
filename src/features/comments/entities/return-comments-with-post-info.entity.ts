@@ -58,7 +58,7 @@ export class LikesInfo {
   myStatus: LikeStatusEnums;
 }
 
-export class FilledCommentEntity {
+export class ReturnCommentsWithPostInfoEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id length! Must be min 0, max 100 ch.',
