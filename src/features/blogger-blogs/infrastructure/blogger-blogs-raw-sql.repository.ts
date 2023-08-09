@@ -9,7 +9,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
-import { TablesBloggerBlogsTotalBlogs } from '../entities/tables-blogger-blogs-total-blogs';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -101,7 +101,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async openFindBlogsTotalBlogs(
     queryData: ParseQueriesType,
-  ): Promise<TablesBloggerBlogsTotalBlogs[]> {
+  ): Promise<ReturnBloggerBlogsEntity[]> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -119,11 +119,10 @@ export class BloggerBlogsRawSqlRepository {
         offset,
       ];
 
-      const mainQuery = `
+      const query = `
         WITH FilteredBlogs AS (
             SELECT
-                "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
-                COUNT(*) OVER() AS "totalBlogs"
+                "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
             FROM public."BloggerBlogs"
             WHERE
                 "dependencyIsBanned" = $1 AND
@@ -131,21 +130,13 @@ export class BloggerBlogsRawSqlRepository {
                 "name" ILIKE $3
         )
         SELECT
-            "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "totalBlogs"::integer
+            "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM FilteredBlogs
         ORDER BY "${sortBy}" COLLATE "C" ${direction}
         LIMIT $4 OFFSET $5
-    `;
+      `;
 
-      const query = `
-        SELECT json_agg(result) FROM (
-            ${mainQuery}
-        ) AS result
-    `;
-
-      const result = await this.db.query(query, parameters);
-
-      return result[0].json_agg !== null ? result[0].json_agg : [];
+      return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

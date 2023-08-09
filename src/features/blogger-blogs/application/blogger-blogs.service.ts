@@ -5,7 +5,6 @@ import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-ra
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { TablesBloggerBlogsTotalBlogs } from '../entities/tables-blogger-blogs-total-blogs';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -14,11 +13,12 @@ export class BloggerBlogsService {
   ) {}
 
   async openFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
-    const blogsTotalBlogs: TablesBloggerBlogsTotalBlogs[] =
+    const blogs: ReturnBloggerBlogsEntity[] =
       await this.bloggerBlogsRawSqlRepository.openFindBlogsTotalBlogs(
         queryData,
       );
-    if (blogsTotalBlogs.length === 0) {
+
+    if (blogs.length === 0) {
       return {
         pagesCount: 0,
         page: queryData.queryPagination.pageNumber,
@@ -28,18 +28,7 @@ export class BloggerBlogsService {
       };
     }
 
-    const blogs: ReturnBloggerBlogsEntity[] = blogsTotalBlogs.map(
-      (blog: TablesBloggerBlogsTotalBlogs) => ({
-        id: blog.id,
-        name: blog.name,
-        description: blog.description,
-        websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
-        isMembership: blog.isMembership,
-      }),
-    );
-
-    const totalCount = blogsTotalBlogs[0].totalBlogs;
+    const totalCount = blogs.length;
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
     );
