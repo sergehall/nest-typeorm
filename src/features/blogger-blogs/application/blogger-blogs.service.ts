@@ -15,7 +15,18 @@ export class BloggerBlogsService {
 
   async openFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
     const blogsTotalBlogs: TablesBloggerBlogsTotalBlogs[] =
-      await this.bloggerBlogsRawSqlRepository.openFindBlogs(queryData);
+      await this.bloggerBlogsRawSqlRepository.openFindBlogsTotalBlogs(
+        queryData,
+      );
+    if (blogsTotalBlogs.length === 0) {
+      return {
+        pagesCount: 0,
+        page: queryData.queryPagination.pageNumber,
+        pageSize: queryData.queryPagination.pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
 
     const blogs = blogsTotalBlogs.map((blog: TablesBloggerBlogsTotalBlogs) => ({
       id: blog.id,
