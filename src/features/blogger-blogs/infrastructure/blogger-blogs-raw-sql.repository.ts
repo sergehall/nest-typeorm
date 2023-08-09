@@ -133,7 +133,7 @@ export class BloggerBlogsRawSqlRepository {
 
       const result = await this.db.query(query, parameters);
 
-      return result[0].json_agg !== null ? result[0] : [];
+      return result[0].json_agg !== null ? result[0].json_agg : [];
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
