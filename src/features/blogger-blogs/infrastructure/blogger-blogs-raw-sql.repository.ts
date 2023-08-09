@@ -111,13 +111,11 @@ export class BloggerBlogsRawSqlRepository {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      console.log(limit, 'limit');
-      console.log(offset, 'offset');
-
       const parameters = [
         blogOwnerBanStatus,
         banInfoBanStatus,
         searchNameTerm,
+        limit,
         offset,
       ];
 
@@ -135,12 +133,33 @@ export class BloggerBlogsRawSqlRepository {
             "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM FilteredBlogs
         ORDER BY "${sortBy}" COLLATE "C" ${direction}
-        OFFSET $4
+        LIMIT $4 OFFSET $5
       `;
 
       return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saOpenCountBlogs(queryData: ParseQueriesType): Promise<number> {
+    const blogOwnerBanStatus = false;
+    const banInfoBanStatus = false;
+    const searchNameTerm = queryData.searchNameTerm;
+    try {
+      const countBlogs = await this.db.query(
+        `
+        SELECT COUNT(*)
+        FROM public."BloggerBlogs"
+        WHERE "dependencyIsBanned" = $1
+          AND "banInfoIsBanned" = $2
+          AND "name" ILIKE $3;
+      `,
+        [blogOwnerBanStatus, banInfoBanStatus, searchNameTerm],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
