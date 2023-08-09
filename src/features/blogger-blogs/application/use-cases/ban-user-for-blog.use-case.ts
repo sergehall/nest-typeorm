@@ -64,6 +64,7 @@ export class BanUserForBlogUseCase
     // Create a BannedUsersForBlogsEntity object that represents the ban entity.
     const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
       this.createBannedUserEntity(userForBan, updateBanUserDto);
+    console.log(bannedUserForBlogEntity, 'bannedUserForBlogEntity');
 
     // Execute several commands asynchronously to change the ban status for the user in different scenarios.
     return await this.executeChangeBanStatusCommands(bannedUserForBlogEntity);
