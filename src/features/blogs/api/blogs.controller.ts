@@ -53,6 +53,7 @@ export class BlogsController {
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const currentUserDto: CurrentUserDto | null = req.user;
+    console.log('++++++++++');
     const queryData: ParseQueriesType =
       await this.parseQueriesService.getQueriesData(query);
 
