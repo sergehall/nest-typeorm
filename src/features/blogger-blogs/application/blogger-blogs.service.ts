@@ -44,9 +44,11 @@ export class BloggerBlogsService {
 
   async openFindBlogById(blogId: string): Promise<ReturnBloggerBlogsEntity> {
     const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
+
     return {
       id: blog.id,
       name: blog.name,
@@ -63,8 +65,20 @@ export class BloggerBlogsService {
   }
 
   async saFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
+    const { pageNumber, pageSize } = queryData.queryPagination;
+
     const blogs: TableBloggerBlogsRawSqlEntity[] =
       await this.bloggerBlogsRawSqlRepository.saFindBlogs(queryData);
+
+    if (blogs.length === 0) {
+      return {
+        pagesCount: 0,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
 
     const transformedArrBlogs = blogs.map(
       (blog: TableBloggerBlogsRawSqlEntity) => ({
@@ -84,15 +98,16 @@ export class BloggerBlogsService {
         },
       }),
     );
+
     const totalCount =
       await this.bloggerBlogsRawSqlRepository.saTotalCountBlogs(queryData);
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+
+    const pagesCount = Math.ceil(totalCount / pageSize);
+
     return {
       pagesCount: pagesCount,
-      page: queryData.queryPagination.pageNumber,
-      pageSize: queryData.queryPagination.pageSize,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount: totalCount,
       items: transformedArrBlogs,
     };
