@@ -14,7 +14,6 @@ export class BlogExistNotFoundRule implements PipeTransform {
     if (!blog) {
       throw new NotFoundException(`Blog with id ${value} not found`);
     }
-
     return value;
   }
 }

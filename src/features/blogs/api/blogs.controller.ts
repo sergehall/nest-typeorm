@@ -7,7 +7,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { IdParams } from '../../common/query/params/id.params';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -39,9 +38,9 @@ export class BlogsController {
   @Get(':id')
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindBlogById(
-    @Param() params: IdParams,
+    @Param('id', BlogExistNotFoundRule) blogId: string,
   ): Promise<ReturnBloggerBlogsEntity> {
-    return await this.blogsService.openFindBlogById(params.id);
+    return await this.blogsService.openFindBlogById(blogId);
   }
 
   @Get(':blogId/posts')

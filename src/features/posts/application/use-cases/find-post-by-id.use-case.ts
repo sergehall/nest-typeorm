@@ -3,6 +3,7 @@ import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.reposi
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
+import { NotFoundException } from '@nestjs/common';
 
 export class FindPostByIdCommand {
   constructor(
@@ -20,12 +21,19 @@ export class FindPostByIdUseCase
     private readonly postsRawSqlRepository: PostsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindPostByIdCommand): Promise<ReturnPostsEntity> {
+  async execute(
+    command: FindPostByIdCommand,
+  ): Promise<ReturnPostsEntity | null> {
     const { postId, queryData, currentUserDto } = command;
-    return await this.postsRawSqlRepository.findPostByPostId(
-      postId,
-      queryData,
-      currentUserDto,
-    );
+    const post: ReturnPostsEntity | null =
+      await this.postsRawSqlRepository.findPostByPostId(
+        postId,
+        queryData,
+        currentUserDto,
+      );
+
+    if (!post) throw new NotFoundException('Not found post.');
+
+    return post;
   }
 }

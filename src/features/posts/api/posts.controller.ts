@@ -78,6 +78,23 @@ export class PostsController {
       new FindPostByIdCommand(params.id, queryData, currentUserDto),
     );
   }
+  @Get(':postId/comments')
+  @UseGuards(AbilitiesGuard)
+  @UseGuards(NoneStatusGuard)
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  async findCommentsByPostId(
+    @Request() req: any,
+    @Param() params: PostIdParams,
+    @Query() query: any,
+  ): Promise<PaginationTypes> {
+    const currentUserDto: CurrentUserDto | null = req.user;
+    const queryData: ParseQueriesType =
+      await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(
+      new FindCommentsByPostIdCommand(params.postId, queryData, currentUserDto),
+    );
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -105,24 +122,6 @@ export class PostsController {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
-    );
-  }
-
-  @Get(':postId/comments')
-  @UseGuards(AbilitiesGuard)
-  @UseGuards(NoneStatusGuard)
-  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findCommentsByPostId(
-    @Request() req: any,
-    @Param() params: PostIdParams,
-    @Query() query: any,
-  ): Promise<PaginationTypes> {
-    const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData: ParseQueriesType =
-      await this.parseQueriesService.getQueriesData(query);
-
-    return await this.commandBus.execute(
-      new FindCommentsByPostIdCommand(params.postId, queryData, currentUserDto),
     );
   }
 

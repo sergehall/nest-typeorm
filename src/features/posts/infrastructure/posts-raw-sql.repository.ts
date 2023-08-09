@@ -284,12 +284,16 @@ export class PostsRawSqlRepository {
     postId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<ReturnPostsEntity | null> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
     try {
       const postWithLikes: TablesPostNumbersOfPostsLikesDislikesLikesStatus[] =
         await this.getPostWithLikes(postId, bannedFlags, currentUserDto);
+
+      if (postWithLikes && postWithLikes.length < 0) {
+        return null;
+      }
 
       const post: ReturnPostsEntity[] = await this.processPostWithLikes(
         postWithLikes,
