@@ -457,16 +457,16 @@ export class PostsRawSqlRepository {
   }
 
   async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
+    const dependencyIsBanned = false;
+    const banInfoIsBanned = false;
     try {
       const countBlogs = await this.db.query(
         `
         SELECT count(*)
         FROM public."Posts"
-        WHERE "blogId" = $3 AND "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
+        WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
       `,
-        [postOwnerIsBanned, banInfoBanStatus, params.blogId],
+        [params.blogId, dependencyIsBanned, banInfoIsBanned],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
