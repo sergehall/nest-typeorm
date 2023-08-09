@@ -42,25 +42,26 @@ export class CreateCommentUseCase
       );
     if (userIsBannedForBlog)
       throw new ForbiddenException(userNotHavePermissionForBlog);
-
+    const entityComment = {
+      id: uuid4().toString(),
+      content: createCommentDto.content,
+      createdAt: new Date().toISOString(),
+      postInfoPostId: post.id,
+      postInfoTitle: post.title,
+      postInfoBlogId: post.blogId,
+      postInfoBlogName: post.blogName,
+      postInfoBlogOwnerId: post.postOwnerId,
+      commentatorInfoUserId: currentUserDto.id,
+      commentatorInfoUserLogin: currentUserDto.login,
+      commentatorInfoIsBanned: false,
+      banInfoIsBanned: false,
+      banInfoBanDate: null,
+      banInfoBanReason: null,
+    };
+    console.log(entityComment);
     const newComment: TablesCommentsEntity[] =
-      await this.commentsRawSqlRepository.createComment({
-        id: uuid4().toString(),
-        content: createCommentDto.content,
-        createdAt: new Date().toISOString(),
-        postInfoPostId: post.id,
-        postInfoTitle: post.title,
-        postInfoBlogId: post.blogId,
-        postInfoBlogName: post.blogName,
-        postInfoBlogOwnerId: post.postOwnerId,
-        commentatorInfoUserId: currentUserDto.id,
-        commentatorInfoUserLogin: currentUserDto.login,
-        commentatorInfoIsBanned: false,
-        banInfoIsBanned: false,
-        banInfoBanDate: null,
-        banInfoBanReason: null,
-      });
-    console.log(newComment);
+      await this.commentsRawSqlRepository.createComment(entityComment);
+    console.log(newComment, 'newComment');
     return {
       id: newComment[0].id,
       content: newComment[0].content,
