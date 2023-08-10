@@ -23,8 +23,10 @@ import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/l
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { BanUnbanUserForBlogUseCase } from './application/use-cases/ban-unban-user-for-blog';
 
 const bloggersBlogUseCases = [
+  BanUnbanUserForBlogUseCase,
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,

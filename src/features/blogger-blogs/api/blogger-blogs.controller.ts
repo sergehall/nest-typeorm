@@ -28,7 +28,6 @@ import { IdParams } from '../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.params';
 import { FindAllNotBannedCommentsCommand } from '../application/use-cases/find-all-not-banned-comments.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
-import { BanUserForBlogCommand } from '../application/use-cases/ban-user-for-blog.use-case';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { PostsService } from '../../posts/application/posts.service';
@@ -41,6 +40,7 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
+import { BanUnbanUserForBlogCommand } from '../application/use-cases/ban-unban-user-for-blog';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -187,7 +187,11 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new BanUserForBlogCommand(params.id, updateBanUserDto, currentUserDto),
+      new BanUnbanUserForBlogCommand(
+        params.id,
+        updateBanUserDto,
+        currentUserDto,
+      ),
     );
   }
 

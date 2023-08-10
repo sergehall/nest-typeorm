@@ -11,6 +11,7 @@ import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
+import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -430,6 +431,86 @@ export class BloggerBlogsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async BanUnbanUserForBlog(
+    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+  ) {
+    const { id, login, userId, blogId, isBanned, banDate, banReason } =
+      bannedUserForBlogEntity;
+    try {
+      await this.db.transaction(async (client) => {
+        // Update LikeStatusPosts table
+        await client.query(
+          `
+        UPDATE public."LikeStatusPosts"
+        SET "isBanned" = $3
+        WHERE "userId" = $1 AND "blogId" = $2
+        `,
+          [userId, blogId, isBanned],
+        );
+
+        // Update LikeStatusComments table
+        await client.query(
+          `
+        UPDATE public."LikeStatusComments"
+        SET "isBanned" = $3
+        WHERE ("userId" = $1 AND "blogId" = $2) OR ("commentOwnerId" = $1 AND "blogId" = $2)
+        `,
+          [userId, blogId, isBanned],
+        );
+
+        // Update Comments table
+        await client.query(
+          `
+        UPDATE public."Comments"
+        SET "banInfoIsBanned" = $3, "banInfoBanDate" = $4, "banInfoBanReason" = $5 
+        WHERE "commentatorInfoUserId" = $1 AND "postInfoBlogId" = $2
+        `,
+          [userId, blogId, isBanned, banDate, banReason],
+        );
+        if (isBanned) {
+          // Insert or Update BannedUsersForBlogs table
+          await client.query(
+            `
+          INSERT INTO public."BannedUsersForBlogs"
+          ("id", "login", "isBanned", "banDate", "banReason", "blogId", "userId")
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT ("blogId", "userId", "isBanned")
+          DO UPDATE SET "banDate" = $4, "banReason" = $5
+          RETURNING "id";
+        `,
+            [id, login, isBanned, banDate, banReason, blogId, userId],
+          );
+        } else {
+          // Delete record from BannedUsersForBlogs table if unBan user
+          await client.query(
+            `
+          DELETE FROM public."BannedUsersForBlogs"
+          WHERE "blogId" = $1 AND "userId" = $2
+          RETURNING "id";
+        `,
+            [blogId, userId],
+          );
+        }
+      });
+      if (isBanned) {
+        // Successful User Ban Message
+        console.log(
+          `User ${userId} Ban Successful 🚫✅\n\n For blog ${blogId}.`,
+        );
+      } else {
+        // Successful User unBan Message
+        console.log(`User Unban Successful 🚫🔓\n\n For blog ${blogId}.`);
+      }
+      return true;
+    } catch (error) {
+      console.error(
+        `Error occurred while banning user ${userId} for blog ${blogId}:`,
+        error,
+      );
+      return false;
     }
   }
 

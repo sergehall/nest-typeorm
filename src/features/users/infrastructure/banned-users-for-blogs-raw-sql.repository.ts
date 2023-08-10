@@ -16,7 +16,8 @@ export class BannedUsersForBlogsRawSqlRepository {
   async addBannedOrDeleteUnBannedUser(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
-    const isBanned = bannedUserForBlogEntity.isBanned;
+    const { id, login, userId, blogId, isBanned, banDate, banReason } =
+      bannedUserForBlogEntity;
 
     if (isBanned) {
       const insertOrUpdateQuery = `
@@ -30,13 +31,13 @@ export class BannedUsersForBlogsRawSqlRepository {
 
       try {
         const insertOrUpdateResult = await this.db.query(insertOrUpdateQuery, [
-          bannedUserForBlogEntity.id,
-          bannedUserForBlogEntity.login,
-          bannedUserForBlogEntity.isBanned,
-          bannedUserForBlogEntity.banDate,
-          bannedUserForBlogEntity.banReason,
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.userId,
+          id,
+          login,
+          isBanned,
+          banDate,
+          banReason,
+          blogId,
+          userId,
         ]);
 
         return insertOrUpdateResult[0].length > 0;
@@ -52,12 +53,9 @@ export class BannedUsersForBlogsRawSqlRepository {
     `;
 
       try {
-        const deleteResult = await this.db.query(deleteQuery, [
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.userId,
-        ]);
+        const result = await this.db.query(deleteQuery, [blogId, userId]);
 
-        return deleteResult[0].length > 0;
+        return result[0].length > 0;
       } catch (error) {
         console.log(error.message);
         throw new InternalServerErrorException(error.message);

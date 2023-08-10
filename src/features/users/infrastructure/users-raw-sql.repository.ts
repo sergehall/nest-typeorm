@@ -13,7 +13,6 @@ import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity'
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
-import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -536,6 +535,7 @@ export class UsersRawSqlRepository {
         for our community.`,
         );
       } else {
+        // Successful User unBan Message
         console.log(`User Unban Successful 🚫🔓\n\nThe user with ID ${userId} 
         has been successfully unbanned. They can now access the platform and perform 
         actions as usual. We appreciate your attention to ensuring a fair and 
