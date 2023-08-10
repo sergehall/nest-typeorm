@@ -508,7 +508,7 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while banning user ${userId} for blog ${blogId}:`,
         error,
       );
-      throw new InternalServerErrorException(error.message);
+      return false;
     }
   }
 
@@ -590,7 +590,7 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while banning blog for blog ID ${blogId}:`,
         error,
       );
-      throw new InternalServerErrorException(error.message);
+      return false;
     }
   }
 
@@ -640,7 +640,7 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.id}:`,
         error,
       );
-      throw new InternalServerErrorException(error.message);
+      return false;
     }
   }
 
