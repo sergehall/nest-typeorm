@@ -43,6 +43,7 @@ export class LikeStatusPostsRawSqlRepository {
   async changeBanStatusLikesPostsByUserIdBlogId(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
+    const { userId, blogId, isBanned } = bannedUserForBlogEntity;
     try {
       return await this.db.query(
         `
@@ -50,11 +51,7 @@ export class LikeStatusPostsRawSqlRepository {
         SET "isBanned" = $3
         WHERE "userId" = $1 AND "blogId" = $2
         `,
-        [
-          bannedUserForBlogEntity.userId,
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.isBanned,
-        ],
+        [userId, blogId, isBanned],
       );
     } catch (error) {
       console.log(error.message);

@@ -419,19 +419,15 @@ export class CommentsRawSqlRepository {
   async changeBanStatusCommentsByUserIdBlogId(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
+    const { userId, blogId, isBanned, banDate, banReason } =
+      bannedUserForBlogEntity;
     try {
       return await this.db.query(
         `
       UPDATE public."Comments"
       SET "banInfoIsBanned" = $3, "banInfoBanDate" = $4, "banInfoBanReason" = $5 
       WHERE "commentatorInfoUserId" = $1 AND "postInfoBlogId" = $2`,
-        [
-          bannedUserForBlogEntity.userId,
-          bannedUserForBlogEntity.blogId,
-          bannedUserForBlogEntity.isBanned,
-          bannedUserForBlogEntity.banDate,
-          bannedUserForBlogEntity.banReason,
-        ],
+        [userId, blogId, isBanned, banDate, banReason],
       );
     } catch (error) {
       console.log(error.message);
