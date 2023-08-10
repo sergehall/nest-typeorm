@@ -21,7 +21,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
-  async execute(command: UpdateUserCommand) {
+  async execute(command: UpdateUserCommand): Promise<boolean> {
     const { id, updateUserDto, currentUserDto } = command;
 
     const userToUpdate: TablesUsersWithIdEntity | null =
@@ -34,8 +34,8 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
     await this.checkUserPermission(userToUpdate, currentUserDto);
 
     // Call DB  to update user
-    console.log(updateUserDto);
-    return `This action update a #${id} user`;
+    console.log(updateUserDto, `This action update a #${id} user`);
+    return true;
   }
   private async checkUserPermission(
     userToUpdate: TablesUsersWithIdEntity,

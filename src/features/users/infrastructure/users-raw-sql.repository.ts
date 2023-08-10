@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -380,16 +379,18 @@ export class UsersRawSqlRepository {
 
   async removeUserByUserId(userId: string): Promise<boolean> {
     try {
-      return await this.db.query(
+      const deleteUserByUseId = await this.db.query(
         `
         DELETE FROM public."Users"
         WHERE "userId" = $1
           `,
         [userId],
       );
+      console.log(deleteUserByUseId, 'deleteUserByUseId');
+      return deleteUserByUseId[1] === 1;
     } catch (error) {
       console.log(error.message);
-      throw new NotFoundException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
