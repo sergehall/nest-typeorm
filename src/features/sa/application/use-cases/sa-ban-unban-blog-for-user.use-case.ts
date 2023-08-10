@@ -43,7 +43,7 @@ export class SaBanUnbanBlogForUserUseCase
 
     await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
-    return this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
+    return await this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
       blogId,
       saBanBlogDto,
     );

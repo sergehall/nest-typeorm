@@ -33,11 +33,11 @@ import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
 import { SaBanUnbanBlogForUserCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
+import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -147,7 +147,7 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
+      new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 
@@ -175,7 +175,7 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanUserByUserIdCommand(params.id, updateSaBanDto, currentUserDto),
+      new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
   }
 }
