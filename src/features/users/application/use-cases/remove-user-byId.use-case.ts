@@ -33,7 +33,8 @@ export class RemoveUserByIdUseCase
     try {
       const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, userToDelete);
-      return this.usersRawSqlRepository.removeUserByUserId(id);
+
+      return await this.usersRawSqlRepository.removeUserByUserId(id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(

@@ -97,7 +97,7 @@ export class UsersController {
     @Param() params: IdParams,
     @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -108,7 +108,10 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
-  async removeUserById(@Request() req: any, @Param() params: IdParams) {
+  async removeUserById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
