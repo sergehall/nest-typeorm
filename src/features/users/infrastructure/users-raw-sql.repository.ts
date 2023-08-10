@@ -360,7 +360,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+  async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     try {
       const { isBanned, banReason, banDate } = banInfo;
 
@@ -368,7 +368,8 @@ export class UsersRawSqlRepository {
         `
       UPDATE public."Users"
       SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
-      WHERE "userId" = $1`,
+      WHERE "userId" = $1
+      `,
         [userId, isBanned, banDate, banReason],
       );
       return updatePosts[1] === 1;
