@@ -117,9 +117,9 @@ export class CommentsRawSqlRepository {
         `    
             SELECT "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"  
             FROM public."Comments"
-            WHERE c."commentatorInfoUserId" = $1
-                AND c."commentatorInfoIsBanned" = $2
-                AND c."banInfoIsBanned" = $3
+            WHERE "commentatorInfoUserId" = $1
+                AND "commentatorInfoIsBanned" = $2
+                AND "banInfoIsBanned" = $3
            `,
         [commentatorInfoUserId, commentatorInfoIsBanned, banInfoIsBanned],
       );
