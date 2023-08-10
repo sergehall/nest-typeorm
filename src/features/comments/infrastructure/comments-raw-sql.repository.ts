@@ -93,6 +93,7 @@ export class CommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async findCommentByCommentatorIdAndCountOfLikesDislikesComments(
     commentatorInfoUserId: string,
     queryData: ParseQueriesType,
@@ -108,22 +109,77 @@ export class CommentsRawSqlRepository {
       const direction = sortDirection;
       const limit = pageSize;
       const offset = (pageNumber - 1) * limit;
-      console.log(sortBy, 'sortBy');
-      console.log(direction, 'direction');
-      console.log(limit, 'limit');
-      console.log(offset, 'offset');
-      console.log(commentatorInfoUserId, 'commentatorInfoUserId');
-      const comm = await this.db.query(
-        `    
-            SELECT "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"  
-            FROM public."Comments"
-            WHERE "commentatorInfoUserId" = $1
-                AND "commentatorInfoIsBanned" = $2
-                AND "banInfoIsBanned" = $3
-           `,
-        [commentatorInfoUserId, commentatorInfoIsBanned, banInfoIsBanned],
-      );
-      console.log(comm, 'comm------------------');
+
+      const query = `
+      SELECT
+        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
+        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
+        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
+        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
+        CAST(
+        (
+          SELECT COUNT(*)
+          FROM public."Comments"
+          WHERE "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+          ) AS integer
+        ) AS "countComments",
+        COALESCE(lsc_like."countLikes"::integer, 0) AS "countLikes",
+        COALESCE(lsc_dislike."countDislikes"::integer, 0) AS "countDislikes",
+        COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
+      FROM public."Comments" c
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "countLikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Like' AND "isBanned" = $4
+        GROUP BY "commentId"
+      ) lsc_like ON c."id" = lsc_like."commentId"
+      LEFT JOIN (
+        SELECT "commentId", COUNT(*) AS "countDislikes"
+        FROM public."LikeStatusComments"
+        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $4
+        GROUP BY "commentId"
+      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
+      LEFT JOIN (
+        SELECT "commentId", "likeStatus"
+        FROM public."LikeStatusComments"
+        WHERE "userId" = $1 AND "isBanned" = $4
+      ) lsc_user ON c."id" = lsc_user."commentId"
+      WHERE  c."commentatorInfoIsBanned" = $2 AND c."banInfoIsBanned" = $3
+      ORDER BY "${sortBy}" ${direction}
+      LIMIT $5 OFFSET $6`;
+
+      const parameters = [
+        currentUserDto?.id,
+        commentatorInfoIsBanned,
+        banInfoIsBanned,
+        isBanned,
+        limit,
+        offset,
+      ];
+
+      return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findCommentByCommentatorIdAndCountOfLikesDislikesComments2(
+    commentatorInfoUserId: string,
+    queryData: ParseQueriesType,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<CommentsCountLikesDislikesEntity[]> {
+    try {
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
+        bannedFlags;
+      const { pageNumber, pageSize, sortDirection } = queryData.queryPagination;
+
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = sortDirection;
+      const limit = pageSize;
+      const offset = (pageNumber - 1) * limit;
+
       const query = `
       SELECT
         c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",

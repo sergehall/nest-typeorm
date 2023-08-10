@@ -23,6 +23,8 @@ export class BannedUsersForBlogsRawSqlRepository {
       INSERT INTO public."BannedUsersForBlogs"
       ("id", "login", "isBanned", "banDate", "banReason", "blogId", "userId")
       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ON CONFLICT ("blogId", "userId", "isBanned")
+      DO UPDATE SET "banDate" = $4, "banReason" = $5
       RETURNING "id";
     `;
 

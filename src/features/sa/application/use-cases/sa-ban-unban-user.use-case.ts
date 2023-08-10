@@ -50,9 +50,7 @@ export class SaBanUserByUserIdUseCase
     }
 
     const userToBan = await this.usersRawSqlRepository.saFindUserByUserId(id);
-    if (!userToBan) {
-      throw new NotFoundException('Not found user.');
-    }
+    if (!userToBan) throw new NotFoundException('Not found user.');
 
     await this.checkUserPermission(currentUserDto, userToBan);
 
