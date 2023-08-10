@@ -49,7 +49,8 @@ export class SaBanUserByUserIdUseCase
       );
     }
 
-    const userToBan = await this.usersRawSqlRepository.saFindUserByUserId(id);
+    const userToBan: TablesUsersWithIdEntity | null =
+      await this.usersRawSqlRepository.saFindUserByUserId(id);
     if (!userToBan) throw new NotFoundException('Not found user.');
 
     await this.checkUserPermission(currentUserDto, userToBan);
@@ -60,13 +61,6 @@ export class SaBanUserByUserIdUseCase
       banDate: isBanned ? new Date().toISOString() : null,
       banReason: isBanned ? banReason : null,
     };
-
-    // const banUser = await this.usersRawSqlRepository.banUser(
-    //   userToBan.id,
-    //   banInfo,
-    // );
-
-    // await this.executeChangeBanStatusCommands(userToBan.id, banInfo);
 
     return await this.usersRawSqlRepository.banUser(userToBan.id, banInfo);
   }

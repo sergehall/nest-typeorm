@@ -48,8 +48,11 @@ export class SaBanBlogByBlogIUseCase
 
     await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
-    await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
-    return true;
+    // await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
+    return this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
+      blogId,
+      saBanBlogDto,
+    );
   }
 
   private async executeChangeBanStatusCommands(
@@ -59,13 +62,13 @@ export class SaBanBlogByBlogIUseCase
     try {
       await Promise.all([
         this.commandBus.execute(
-          new ChangeBanStatusBlogsByBlogIdCommand(blogId, isBanned),
+          new ChangeBanStatusCommentsByBlogIdCommand(blogId, isBanned),
         ),
         this.commandBus.execute(
           new ChangeBanStatusPostsByBlogIdCommand(blogId, isBanned),
         ),
         this.commandBus.execute(
-          new ChangeBanStatusCommentsByBlogIdCommand(blogId, isBanned),
+          new ChangeBanStatusBlogsByBlogIdCommand(blogId, isBanned),
         ),
       ]);
       return true;
