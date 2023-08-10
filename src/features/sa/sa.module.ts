@@ -11,7 +11,6 @@ import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
-import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaRemoveUserByUserIdUseCase } from './application/use-cases/sa-remove-user-by-user-id.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
@@ -28,17 +27,20 @@ import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user
 import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/old/sa-ban-user-by-user-id.use-case';
 import { SaBanBlogByBlogIUseCase } from './application/use-cases/old/sa-ban-blog-by-blog-id.use-case';
+import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
+import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
 
 const saUseCases = [
   CreateUserUseCase,
   SaChangeRoleUseCase,
-  SaBindBlogWithUserUseCase,
   SaRemoveUserByUserIdUseCase,
   SaBanUnbanBlogForUserUseCase,
   SaBanUnbanUserUseCase,
   AddBannedUserToBanListUseCase,
   SaBanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
+  SaBindBlogWithUserByIdUseCase,
+  SaBindBlogWithUserUseCase,
 ];
 
 @Module({
