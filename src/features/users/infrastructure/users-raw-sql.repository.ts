@@ -511,7 +511,6 @@ export class UsersRawSqlRepository {
           `
       DELETE FROM public."SecurityDevices"
       WHERE "userId" = $1
-      RETURNING "userId"
       `,
           [userId],
         );
@@ -528,14 +527,14 @@ export class UsersRawSqlRepository {
       if (isBanned) {
         // Successful User Ban Message
         console.log(
-          `User Ban Successful 🚫✅\n
+          `User Ban Successful 🚫✅
           The user with ID ${userId} has been successfully banned.
           This action was taken due to "${banReason}".
           Thank you for maintaining a safe environment for our community.`,
         );
       } else {
         // Successful User unBan Message
-        console.log(`User Unban Successful 🔓✅\n
+        console.log(`User Unban Successful 🔓✅
         The user with ID ${userId} has been successfully unbanned. 
         They can now access the platform and perform actions as usual. 
         We appreciate your attention to ensuring a fair and inclusive community environment.`);
@@ -544,7 +543,7 @@ export class UsersRawSqlRepository {
     } catch (error) {
       // Error in User Ban Message
       console.error(
-        `User Ban Error ❌❗\n
+        `User Ban Error ❌❗
         We encountered an issue while attempting to ban the user with ID ${userId}. 
         Unfortunately, we couldn't complete the ban operation at this time. 
         Please try again later or contact our support team for assistance. 
