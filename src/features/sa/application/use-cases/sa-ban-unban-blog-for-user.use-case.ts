@@ -13,7 +13,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { cannotBlockOwnBlog } from '../../../../exception-filter/custom-errors-messages';
 
-export class SaBanUnbanBlogForUserCommand {
+export class SaBanUnbanBlogCommand {
   constructor(
     public blogId: string,
     public saBanBlogDto: SaBanBlogDto,
@@ -21,15 +21,15 @@ export class SaBanUnbanBlogForUserCommand {
   ) {}
 }
 
-@CommandHandler(SaBanUnbanBlogForUserCommand)
-export class SaBanUnbanBlogForUserUseCase
-  implements ICommandHandler<SaBanUnbanBlogForUserCommand>
+@CommandHandler(SaBanUnbanBlogCommand)
+export class SaBanUnbanBlogUseCase
+  implements ICommandHandler<SaBanUnbanBlogCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
-  async execute(command: SaBanUnbanBlogForUserCommand) {
+  async execute(command: SaBanUnbanBlogCommand) {
     const { blogId, saBanBlogDto, currentUserDto } = command;
 
     const blogForBan = await this.saGetBlogForBan(blogId);
@@ -43,7 +43,7 @@ export class SaBanUnbanBlogForUserUseCase
 
     await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
-    return await this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
+    return await this.bloggerBlogsRawSqlRepository.saBanUnbanBlog(
       blogId,
       saBanBlogDto,
     );

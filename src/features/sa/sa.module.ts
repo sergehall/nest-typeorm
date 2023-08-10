@@ -22,19 +22,19 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
-import { SaBanUnbanBlogForUserUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/old/sa-ban-user-by-user-id.use-case';
 import { SaBanBlogByBlogIUseCase } from './application/use-cases/old/sa-ban-blog-by-blog-id.use-case';
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
+import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 
 const saUseCases = [
   CreateUserUseCase,
   SaChangeRoleUseCase,
   SaRemoveUserByUserIdUseCase,
-  SaBanUnbanBlogForUserUseCase,
+  SaBanUnbanBlogUseCase,
   SaBanUnbanUserUseCase,
   AddBannedUserToBanListUseCase,
   SaBanUserByUserIdUseCase,

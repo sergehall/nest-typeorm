@@ -35,7 +35,7 @@ import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-i
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
-import { SaBanUnbanBlogForUserCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
+import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 
@@ -123,6 +123,34 @@ export class SaController {
     );
   }
 
+  @Put('blogs/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saBanBlog(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() saBanBlogDto: SaBanBlogDto,
+  ): Promise<boolean> {
+    const currentUserDto = req.user;
+    return await this.commandBus.execute(
+      new SaBanUnbanBlogCommand(params.id, saBanBlogDto, currentUserDto),
+    );
+  }
+
+  @Put('users/:id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saBanUnbanUser(
+    @Request() req: any,
+    @Param() params: IdParams,
+    @Body() updateSaBanDto: SaBanUserDto,
+  ): Promise<boolean> {
+    const currentUserDto = req.user;
+    return await this.commandBus.execute(
+      new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
+    );
+  }
+
   @Put('blogs/:id/bind-with-user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
@@ -134,34 +162,6 @@ export class SaController {
 
     return await this.commandBus.execute(
       new SaBindBlogWithUserCommand(params, currentUserDto),
-    );
-  }
-
-  @Put('users/:id/ban')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async saBanUserById(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() updateSaBanDto: SaBanUserDto,
-  ): Promise<boolean> {
-    const currentUserDto = req.user;
-    return await this.commandBus.execute(
-      new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
-    );
-  }
-
-  @Put('blogs/:id/ban')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async saBanBlogsByBlogId(
-    @Request() req: any,
-    @Param() params: IdParams,
-    @Body() saBanBlogDto: SaBanBlogDto,
-  ): Promise<boolean> {
-    const currentUserDto = req.user;
-    return await this.commandBus.execute(
-      new SaBanUnbanBlogForUserCommand(params.id, saBanBlogDto, currentUserDto),
     );
   }
 

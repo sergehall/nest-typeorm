@@ -82,7 +82,7 @@ export class SaBanUserByUserIdUseCase
           new ChangeBanStatusUserBlogsCommand(userId, banInfo.isBanned),
         ),
         this.commandBus.execute(new RemoveDevicesBannedUserCommand(userId)),
-        this.usersRawSqlRepository.saBanUnbanUser(userId, banInfo),
+        this.usersRawSqlRepository.banUnbanUser(userId, banInfo),
       ]);
       return true;
     } catch (error) {

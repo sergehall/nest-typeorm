@@ -359,7 +359,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     try {
       const { isBanned, banReason, banDate } = banInfo;
 
@@ -386,7 +386,6 @@ export class UsersRawSqlRepository {
           `,
         [userId],
       );
-      console.log(deleteUserByUseId, 'deleteUserByUseId');
       return deleteUserByUseId[1] === 1;
     } catch (error) {
       console.log(error.message);
@@ -459,7 +458,7 @@ export class UsersRawSqlRepository {
     );
   }
 
-  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+  async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     const { isBanned, banReason, banDate } = banInfo;
     try {
       await this.db.transaction(async (client) => {
@@ -536,7 +535,7 @@ export class UsersRawSqlRepository {
         );
       } else {
         // Successful User unBan Message
-        console.log(`User Unban Successful 🚫🔓\n\nThe user with ID ${userId} 
+        console.log(`User Unban Successful 🔓✅\n\nThe user with ID ${userId} 
         has been successfully unbanned. They can now access the platform and perform 
         actions as usual. We appreciate your attention to ensuring a fair and 
         inclusive community environment.`);

@@ -179,7 +179,7 @@ export class BloggerBlogsController {
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async banUserForBlog(
+  async banUnbanBlogForUse(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateBanUserDto: UpdateBanUserDto,

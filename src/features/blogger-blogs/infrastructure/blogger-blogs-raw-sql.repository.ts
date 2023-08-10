@@ -434,9 +434,9 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async BanUnbanUserForBlog(
+  async banUnbanBlogForUser(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
-  ) {
+  ): Promise<boolean> {
     const { id, login, userId, blogId, isBanned, banDate, banReason } =
       bannedUserForBlogEntity;
     try {
@@ -502,7 +502,7 @@ export class BloggerBlogsRawSqlRepository {
         );
       } else {
         // Successful User unBan Message
-        console.log(`User Unban Successful 🚫🔓\n\n For blog ${blogId}.`);
+        console.log(`User ${userId} Unban for blog ${blogId}. 🔓✅\n\n`);
       }
       return true;
     } catch (error) {
@@ -514,7 +514,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async banUnbanBlogForUser(
+  async saBanUnbanBlog(
     blogId: string,
     saBanBlogDto: SaBanBlogDto,
   ): Promise<boolean> {
