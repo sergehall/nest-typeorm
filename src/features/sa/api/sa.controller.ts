@@ -27,7 +27,6 @@ import { CreateUserCommand } from '../../users/application/use-cases/create-user
 import { IdParams } from '../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
-import { SaBanBlogByBlogIdCommand } from '../application/use-cases/sa-ban-blog-by-blog-id.use-case';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../common/query/params/idUserId.params';
 import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
@@ -38,6 +37,7 @@ import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
+import { SaBanUnbanBlogForUserCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -161,7 +161,7 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
-      new SaBanBlogByBlogIdCommand(params.id, saBanBlogDto, currentUserDto),
+      new SaBanUnbanBlogForUserCommand(params.id, saBanBlogDto, currentUserDto),
     );
   }
 
