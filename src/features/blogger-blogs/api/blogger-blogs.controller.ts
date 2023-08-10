@@ -40,7 +40,7 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
-import { BanUnbanUserForBlogCommand } from '../application/use-cases/ban-unban-user-for-blog';
+import { BanUnbanBlogForUserCommand } from '../application/use-cases/ban-unban-user-for-blog';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -187,7 +187,7 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new BanUnbanUserForBlogCommand(
+      new BanUnbanBlogForUserCommand(
         params.id,
         updateBanUserDto,
         currentUserDto,

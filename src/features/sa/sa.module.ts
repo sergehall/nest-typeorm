@@ -25,6 +25,7 @@ import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrast
 import { SaBanUserByUserIdUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { SaBanUnbanBlogForUserUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 
 const saUseCases = [
   CreateUserUseCase,
@@ -33,6 +34,7 @@ const saUseCases = [
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserUseCase,
   SaRemoveUserByUserIdUseCase,
+  SaBanUnbanBlogForUserUseCase,
 ];
 
 @Module({

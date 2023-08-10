@@ -1,23 +1,19 @@
 import { SaBanBlogDto } from '../../dto/sa-ban-blog.dto';
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import {
   ForbiddenException,
   HttpException,
   HttpStatus,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenError } from '@casl/ability';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { ChangeBanStatusPostsByBlogIdCommand } from '../../../posts/application/use-cases/change-banstatus-posts-by-blogid.use-case';
-import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
-import { ChangeBanStatusBlogsByBlogIdCommand } from './sa-change-banstatus-blogs-by-blog-id.use-case';
 import { cannotBlockOwnBlog } from '../../../../exception-filter/custom-errors-messages';
 
-export class SaBanBlogByBlogIdCommand {
+export class SaBanUnbanBlogForUserCommand {
   constructor(
     public blogId: string,
     public saBanBlogDto: SaBanBlogDto,
@@ -25,16 +21,15 @@ export class SaBanBlogByBlogIdCommand {
   ) {}
 }
 
-@CommandHandler(SaBanBlogByBlogIdCommand)
-export class SaBanBlogByBlogIUseCase
-  implements ICommandHandler<SaBanBlogByBlogIdCommand>
+@CommandHandler(SaBanUnbanBlogForUserCommand)
+export class SaBanUnbanBlogForUserUseCase
+  implements ICommandHandler<SaBanUnbanBlogForUserCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    private readonly commandBus: CommandBus,
   ) {}
-  async execute(command: SaBanBlogByBlogIdCommand) {
+  async execute(command: SaBanUnbanBlogForUserCommand) {
     const { blogId, saBanBlogDto, currentUserDto } = command;
 
     const blogForBan = await this.saGetBlogForBan(blogId);
@@ -48,30 +43,17 @@ export class SaBanBlogByBlogIUseCase
 
     await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
 
-    await this.executeChangeBanStatusCommands(blogId, saBanBlogDto.isBanned);
+    return this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
+      blogId,
+      saBanBlogDto,
+    );
   }
 
-  private async executeChangeBanStatusCommands(
-    blogId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      await Promise.all([
-        this.commandBus.execute(
-          new ChangeBanStatusCommentsByBlogIdCommand(blogId, isBanned),
-        ),
-        this.commandBus.execute(
-          new ChangeBanStatusPostsByBlogIdCommand(blogId, isBanned),
-        ),
-        this.commandBus.execute(
-          new ChangeBanStatusBlogsByBlogIdCommand(blogId, isBanned),
-        ),
-      ]);
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
+  private async saGetBlogForBan(blogId: string) {
+    const blogForBan =
+      await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
+    if (!blogForBan) throw new NotFoundException('Not found blog.');
+    return blogForBan;
   }
 
   private async checkUserPermission(
@@ -88,12 +70,5 @@ export class SaBanBlogByBlogIUseCase
         'You are not allowed to ban a user for this blog. ' + error.message,
       );
     }
-  }
-
-  private async saGetBlogForBan(blogId: string) {
-    const blogForBan =
-      await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
-    if (!blogForBan) throw new NotFoundException('Not found blog.');
-    return blogForBan;
   }
 }
