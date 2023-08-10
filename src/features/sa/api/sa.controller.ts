@@ -30,7 +30,6 @@ import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../common/query/params/idUserId.params';
 import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
-import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
@@ -38,6 +37,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
 import { SaBanUnbanBlogForUserCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
+import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 
 @SkipThrottle()
 @Controller('sa')

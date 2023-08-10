@@ -596,6 +596,56 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
+  async saBindBlogWithUserUseCase(
+    userForBind: TablesUsersWithIdEntity,
+    blogForBind: TableBloggerBlogsRawSqlEntity,
+  ) {
+    try {
+      await this.db.transaction(async (client) => {
+        // Update Comments table
+        await client.query(
+          `
+        UPDATE public."Comments"
+        SET "postInfoBlogOwnerId" = $2
+        WHERE "postInfoBlogId" = $1
+        `,
+          [blogForBind.id, userForBind.id],
+        );
+
+        // Update Posts table
+        await client.query(
+          `
+        UPDATE public."Posts"
+        SET "postOwnerId" = $2
+        WHERE "blogId" = $1
+        `,
+          [blogForBind.id, userForBind.id],
+        );
+
+        // Update BloggerBlogs table
+        await client.query(
+          `
+        UPDATE public."BloggerBlogs"
+        SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
+        WHERE "id" = $1
+        `,
+          [blogForBind.id, userForBind.id, userForBind.login],
+        );
+      });
+
+      console.log(
+        `"🔗 Blog ${blogForBind.id} has been successfully bound with user ${userForBind.id}. 🔗"`,
+      );
+      return true;
+    } catch (error) {
+      console.error(
+        `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.id}:`,
+        error,
+      );
+      return false;
+    }
+  }
+
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
