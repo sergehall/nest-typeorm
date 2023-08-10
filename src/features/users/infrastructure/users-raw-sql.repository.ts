@@ -528,26 +528,27 @@ export class UsersRawSqlRepository {
       if (isBanned) {
         // Successful User Ban Message
         console.log(
-          `User Ban Successful 🚫✅\n\nThe user with ID ${userId} has been successfully banned. 
-        They will no longer be able to access the platform or perform any actions. 
-        This action was taken due to "${banReason}". Thank you for maintaining a safe environment 
-        for our community.`,
+          `User Ban Successful 🚫✅\n
+          The user with ID ${userId} has been successfully banned.
+          This action was taken due to "${banReason}".
+          Thank you for maintaining a safe environment for our community.`,
         );
       } else {
         // Successful User unBan Message
-        console.log(`User Unban Successful 🔓✅\n\nThe user with ID ${userId} 
-        has been successfully unbanned. They can now access the platform and perform 
-        actions as usual. We appreciate your attention to ensuring a fair and 
-        inclusive community environment.`);
+        console.log(`User Unban Successful 🔓✅\n
+        The user with ID ${userId} has been successfully unbanned. 
+        They can now access the platform and perform actions as usual. 
+        We appreciate your attention to ensuring a fair and inclusive community environment.`);
       }
       return true;
     } catch (error) {
       // Error in User Ban Message
       console.error(
-        `User Ban Error ❌❗\n\nWe encountered an issue while attempting to ban the user 
-        with ID ${userId}. Unfortunately, we couldn't complete the ban operation at this time.
-         Please try again later or contact our support team for assistance.
-          We apologize for any inconvenience this may have caused. ${error.message}`,
+        `User Ban Error ❌❗\n
+        We encountered an issue while attempting to ban the user with ID ${userId}. 
+        Unfortunately, we couldn't complete the ban operation at this time. 
+        Please try again later or contact our support team for assistance. 
+        We apologize for any inconvenience this may have caused. ${error.message}`,
       );
       throw new InternalServerErrorException(error.message);
     }
