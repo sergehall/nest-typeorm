@@ -508,7 +508,7 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while banning user ${userId} for blog ${blogId}:`,
         error,
       );
-      return false;
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -590,14 +590,14 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while banning blog for blog ID ${blogId}:`,
         error,
       );
-      return false;
+      throw new InternalServerErrorException(error.message);
     }
   }
 
-  async saBindBlogWithUserUseCase(
+  async saBindBlogWithUser(
     userForBind: TablesUsersWithIdEntity,
     blogForBind: TableBloggerBlogsRawSqlEntity,
-  ) {
+  ): Promise<boolean> {
     try {
       await this.db.transaction(async (client) => {
         // Update Comments table
@@ -640,7 +640,7 @@ export class BloggerBlogsRawSqlRepository {
         `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.id}:`,
         error,
       );
-      return false;
+      throw new InternalServerErrorException(error.message);
     }
   }
 

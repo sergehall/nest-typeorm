@@ -36,7 +36,7 @@ export class SaBindBlogWithUserUseCase
 
     await this.checkUserPermission(currentUserDto, userId);
 
-    return await this.bloggerBlogsRawSqlRepository.saBindBlogWithUserUseCase(
+    return await this.bloggerBlogsRawSqlRepository.saBindBlogWithUser(
       userForBind,
       blogForBan,
     );
@@ -58,7 +58,9 @@ export class SaBindBlogWithUserUseCase
     }
   }
 
-  private async getUserForBind(userId: string) {
+  private async getUserForBind(
+    userId: string,
+  ): Promise<TablesUsersWithIdEntity> {
     const userForBind: TablesUsersWithIdEntity | null =
       await this.usersRawSqlRepository.saFindUserByUserId(userId);
     if (!userForBind) {
@@ -67,7 +69,9 @@ export class SaBindBlogWithUserUseCase
     return userForBind;
   }
 
-  private async getBlogForBind(blogId: string) {
+  private async getBlogForBind(
+    blogId: string,
+  ): Promise<TableBloggerBlogsRawSqlEntity> {
     const blogForBind: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
     if (!blogForBind) {
