@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
 import { ReturnUsersBanInfoEntity } from '../../sa/entities/return-users-banInfo.entity';
 import { PaginationTypes } from '../../common/pagination/types/pagination.types';
@@ -17,6 +17,7 @@ export class UsersService {
     const totalCount = await this.usersRawSqlRepository.totalCountUsersForSa(
       queryData,
     );
+
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
     );
@@ -47,10 +48,14 @@ export class UsersService {
     };
   }
 
-  async findUserByUserId(
-    userId: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
-    return await this.usersRawSqlRepository.findUserByUserId(userId);
+  async findUserByUserId(userId: string): Promise<TablesUsersWithIdEntity> {
+    const userById: TablesUsersWithIdEntity | null =
+      await this.usersRawSqlRepository.findUserByUserId(userId);
+
+    if (!userById)
+      throw new NotFoundException(`Not found user by id: ${userId}`);
+
+    return userById;
   }
 
   private async transformedArrUsersForSa(

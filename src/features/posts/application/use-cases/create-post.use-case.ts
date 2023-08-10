@@ -16,6 +16,8 @@ import { CreatePostDto } from '../../dto/create-post.dto';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../exception-filter/custom-errors-messages';
+import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
+import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 
 export class CreatePostCommand {
   constructor(
@@ -33,7 +35,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand) {
+  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
     const { blogId, currentUserDto, createPostDto } = command;
 
     const blog: TableBloggerBlogsRawSqlEntity | null =
@@ -66,7 +68,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       extendedLikesInfo: {
         likesCount: 0,
         dislikesCount: 0,
-        myStatus: 'None',
+        myStatus: LikeStatusEnums.NONE,
         newestLikes: [],
       },
     };

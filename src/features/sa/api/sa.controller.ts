@@ -37,6 +37,7 @@ import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-i
 import { SaBanUserByUserIdCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -53,7 +54,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saFindUsers(@Query() query: any) {
+  async saFindUsers(@Query() query: any): Promise<PaginationTypes> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return this.usersService.saFindUsers(queryData);
@@ -80,7 +81,7 @@ export class SaController {
     @Request() req: any,
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
-  ) {
+  ): Promise<ReturnUsersBanInfoEntity> {
     const userAgent = req.get('user-agent') || 'None';
     const registrationData = {
       ip: ip,
@@ -111,7 +112,10 @@ export class SaController {
   @Delete('users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async removeUserById(@Request() req: any, @Param() params: IdParams) {
+  async removeUserById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

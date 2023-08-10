@@ -94,7 +94,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentByCommentatorIdAndCountOfLikesDislikesComments(
+  async findAllNotBannedCommentsAndCountLikesDislikes(
     commentatorInfoUserId: string,
     queryData: ParseQueriesType,
     currentUserDto: CurrentUserDto | null,

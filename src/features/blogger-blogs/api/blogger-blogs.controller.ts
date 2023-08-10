@@ -26,7 +26,7 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { IdParams } from '../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../common/query/params/blogId-postId.params';
-import { FindCommentsCurrentUserCommand } from '../application/use-cases/find-comments-current-user.use-case';
+import { FindAllNotBannedCommentsCommand } from '../application/use-cases/find-all-not-banned-comments.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
 import { BanUserForBlogCommand } from '../application/use-cases/ban-user-for-blog.use-case';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -39,6 +39,8 @@ import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
+import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -74,7 +76,7 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new FindCommentsCurrentUserCommand(queryData, currentUserDto),
+      new FindAllNotBannedCommentsCommand(queryData, currentUserDto),
     );
   }
 
@@ -83,7 +85,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
-  ) {
+  ): Promise<ReturnBloggerBlogsEntity> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -131,7 +133,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Body() createPostDto: CreatePostDto,
-  ) {
+  ): Promise<ReturnPostsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
