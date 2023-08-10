@@ -102,14 +102,28 @@ export class CommentsRawSqlRepository {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
         bannedFlags;
+      const { pageNumber, pageSize, sortDirection } = queryData.queryPagination;
 
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
-
+      const direction = sortDirection;
+      const limit = pageSize;
+      const offset = (pageNumber - 1) * limit;
+      console.log(sortBy, 'sortBy');
+      console.log(direction, 'direction');
+      console.log(limit, 'limit');
+      console.log(offset, 'offset');
+      console.log(commentatorInfoUserId, 'commentatorInfoUserId');
+      const comm = await this.db.query(
+        `    
+            SELECT "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"  
+            FROM public."Comments"
+            WHERE c."commentatorInfoUserId" = $1
+                AND c."commentatorInfoIsBanned" = $2
+                AND c."banInfoIsBanned" = $3
+           `,
+        [commentatorInfoUserId, commentatorInfoIsBanned, banInfoIsBanned],
+      );
+      console.log(comm, 'comm------------------');
       const query = `
       SELECT
         c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
