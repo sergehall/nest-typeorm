@@ -31,6 +31,9 @@ import { CurrentUserDto } from '../dto/currentUser.dto';
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
+import { ReturnUserDto } from '../dto/return-user.dto';
 
 @SkipThrottle()
 @Controller('users')
@@ -45,7 +48,7 @@ export class UsersController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUsers(@Query() query: any) {
+  async findUsers(@Query() query: any): Promise<PaginationTypes> {
     const queryData: ParseQueriesType = await this.parseQueries.getQueriesData(
       query,
     );
@@ -56,8 +59,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUserByUserId(@Param() params: IdParams) {
-    return this.usersService.findUserByUserId(params.id);
+  async findUserByUserId(
+    @Param() params: IdParams,
+  ): Promise<TablesUsersWithIdEntity> {
+    return await this.usersService.findUserByUserId(params.id);
   }
 
   @Post()
@@ -68,13 +73,13 @@ export class UsersController {
     @Request() req: any,
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
-  ) {
+  ): Promise<ReturnUserDto> {
     const registrationData: RegDataDto = {
       ip: ip,
       userAgent: req.get('user-agent') || 'None',
     };
 
-    const newUser = await this.commandBus.execute(
+    const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 

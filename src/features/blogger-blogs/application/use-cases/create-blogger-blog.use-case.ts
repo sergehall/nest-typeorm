@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
+import { ReturnBloggerBlogsEntity } from '../../entities/return-blogger-blogs.entity';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -27,7 +28,9 @@ export class CreateBloggerBlogUseCase
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreateBloggerBlogCommand) {
+  async execute(
+    command: CreateBloggerBlogCommand,
+  ): Promise<ReturnBloggerBlogsEntity> {
     this.checkPermission(command.currentUser);
 
     const blogsEntity = this.createBlogsEntity(
@@ -39,7 +42,7 @@ export class CreateBloggerBlogUseCase
       blogsEntity,
     );
 
-    return this.getBlogResponse(newBlog);
+    return await this.getBlogResponse(newBlog);
   }
 
   private createBlogsEntity(
@@ -77,9 +80,9 @@ export class CreateBloggerBlogUseCase
     }
   }
 
-  private getBlogResponse(
+  private async getBlogResponse(
     blog: TableBloggerBlogsRawSqlEntity,
-  ): Partial<TableBloggerBlogsRawSqlEntity> {
+  ): Promise<ReturnBloggerBlogsEntity> {
     const { id, name, description, websiteUrl, createdAt, isMembership } = blog;
     return { id, name, description, websiteUrl, createdAt, isMembership };
   }

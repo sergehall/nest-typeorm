@@ -6,28 +6,28 @@ import { ReturnCommentsEntity } from '../../../comments/entities/return-comments
 import { ReturnCommentsWithPostInfoEntity } from '../../../comments/entities/return-comments-with-post-info.entity';
 import { CommentsCountLikesDislikesEntity } from '../../../comments/entities/comments-count-likes-dislikes.entity';
 
-export class FindCommentsCurrentUserCommand {
+export class FindAllNotBannedCommentsCommand {
   constructor(
     public queryData: ParseQueriesType,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(FindCommentsCurrentUserCommand)
-export class FindCommentsCurrentUserUseCase
-  implements ICommandHandler<FindCommentsCurrentUserCommand>
+@CommandHandler(FindAllNotBannedCommentsCommand)
+export class FindAllNotBannedCommentsUseCase
+  implements ICommandHandler<FindAllNotBannedCommentsCommand>
 {
   constructor(
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindCommentsCurrentUserCommand) {
+  async execute(command: FindAllNotBannedCommentsCommand) {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
     const { id } = currentUserDto;
 
     const comments: CommentsCountLikesDislikesEntity[] =
-      await this.commentsRawSqlRepository.findCommentByCommentatorIdAndCountOfLikesDislikesComments(
+      await this.commentsRawSqlRepository.findAllNotBannedCommentsAndCountLikesDislikes(
         id,
         queryData,
         currentUserDto,

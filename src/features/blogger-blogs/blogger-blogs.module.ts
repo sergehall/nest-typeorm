@@ -7,7 +7,7 @@ import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
-import { FindCommentsCurrentUserUseCase } from './application/use-cases/find-comments-current-user.use-case';
+import { FindAllNotBannedCommentsUseCase } from './application/use-cases/find-all-not-banned-comments.use-case';
 import { BanUserForBlogUseCase } from './application/use-cases/ban-user-for-blog.use-case';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/add-banned-user-to-ban-list.use-case';
 import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/change-ban-status-owner-blog.use-case';
@@ -28,7 +28,7 @@ const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,
-  FindCommentsCurrentUserUseCase,
+  FindAllNotBannedCommentsUseCase,
   BanUserForBlogUseCase,
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
