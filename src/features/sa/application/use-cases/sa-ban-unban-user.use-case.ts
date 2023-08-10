@@ -56,7 +56,10 @@ export class SaBanUnbanUserUseCase
       banReason: isBanned ? banReason : null,
     };
 
-    return await this.usersRawSqlRepository.banUnbanUser(userToBan.id, banInfo);
+    return await this.usersRawSqlRepository.saBanUnbanUser(
+      userToBan.id,
+      banInfo,
+    );
   }
 
   private async checkUserPermission(
