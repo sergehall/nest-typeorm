@@ -1,11 +1,12 @@
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../dto/currentUser.dto';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
+import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 
 export class UpdateUserCommand {
   constructor(
@@ -23,16 +24,26 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
   async execute(command: UpdateUserCommand) {
     const { id, updateUserDto, currentUserDto } = command;
 
-    const userToUpdate = await this.usersRawSqlRepository.findUserByUserId(id);
-    if (!userToUpdate || userToUpdate.id !== currentUserDto.id)
-      throw new ForbiddenException('You are not allowed to update this user.');
+    const userToUpdate: TablesUsersWithIdEntity | null =
+      await this.usersRawSqlRepository.findUserByUserId(id);
 
+    if (!userToUpdate) {
+      throw new NotFoundException('Not found user');
+    }
+
+    await this.checkUserPermission(userToUpdate, currentUserDto);
+
+    // Call DB  to update user
+    console.log(updateUserDto);
+    return `This action update a #${id} user`;
+  }
+  private async checkUserPermission(
+    userToUpdate: TablesUsersWithIdEntity,
+    currentUserDto: CurrentUserDto,
+  ) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);
-      console.log(updateUserDto, 'updateUserDto');
-      // Call DB  to update user
-      return `This action update a #${id} user`;
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
