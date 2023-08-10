@@ -13,6 +13,7 @@ import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity'
 import { ParseQueriesType } from '../../common/query/types/parse-query.types';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
+import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -363,7 +364,7 @@ export class UsersRawSqlRepository {
     try {
       const { isBanned, banReason, banDate } = banInfo;
 
-      const updatePosts = await this.db.query(
+      const updateUser = await this.db.query(
         `
       UPDATE public."Users"
       SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
@@ -371,7 +372,7 @@ export class UsersRawSqlRepository {
       `,
         [userId, isBanned, banDate, banReason],
       );
-      return updatePosts[1] === 1;
+      return updateUser[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -457,5 +458,87 @@ export class UsersRawSqlRepository {
       ],
       'createdAt',
     );
+  }
+
+  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+    const { isBanned, banReason, banDate } = banInfo;
+    try {
+      await this.db.transaction(async (client) => {
+        await client.query(
+          `
+      UPDATE public."Comments"
+      SET "commentatorInfoIsBanned" = $2
+      WHERE "commentatorInfoUserId" = $1 OR "postInfoBlogOwnerId" = $1
+      `,
+          [userId, isBanned],
+        );
+
+        await client.query(
+          `
+      UPDATE public."LikeStatusComments"
+      SET "isBanned" = $2
+      WHERE "userId" = $1 OR "commentOwnerId" = $1
+      `,
+          [userId, isBanned],
+        );
+
+        await client.query(
+          `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "postOwnerId" = $1
+      `,
+          [userId, isBanned],
+        );
+
+        await client.query(
+          `
+      UPDATE public."LikeStatusPosts"
+      SET "isBanned" = $2
+      WHERE "userId" = $1 OR "postOwnerId" = $1
+      `,
+          [userId, isBanned],
+        );
+
+        await client.query(
+          `
+      UPDATE public."BloggerBlogs"
+      SET "dependencyIsBanned" = $2
+      WHERE "blogOwnerId" = $1
+      `,
+          [userId, isBanned],
+        );
+
+        await client.query(
+          `
+      DELETE FROM public."SecurityDevices"
+      WHERE "userId" = $1
+      RETURNING "userId"
+      `,
+          [userId],
+        );
+
+        await client.query(
+          `
+      UPDATE public."Users"
+      SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
+      WHERE "userId" = $1
+      `,
+          [userId, isBanned, banDate, banReason],
+        );
+      });
+
+      // Successful User Ban Message
+      console.log(
+        `User Ban Successful 🚫✅\n\nThe user with ID ${userId} has been successfully banned. They will no longer be able to access the platform or perform any actions. This action was taken due to "${banReason}". Thank you for maintaining a safe environment for our community.`,
+      );
+      return true;
+    } catch (error) {
+      // Error in User Ban Message
+      console.error(
+        `User Ban Error ❌❗\n\nWe encountered an issue while attempting to ban the user with ID ${userId}. Unfortunately, we couldn't complete the ban operation at this time. Please try again later or contact our support team for assistance. We apologize for any inconvenience this may have caused. ${error.message}`,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
