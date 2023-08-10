@@ -58,10 +58,10 @@ export class CreateCommentUseCase
       banInfoBanDate: null,
       banInfoBanReason: null,
     };
-    console.log(entityComment);
+
     const newComment: TablesCommentsEntity[] =
       await this.commentsRawSqlRepository.createComment(entityComment);
-    console.log(newComment, 'newComment');
+
     return {
       id: newComment[0].id,
       content: newComment[0].content,
