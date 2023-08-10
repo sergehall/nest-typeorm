@@ -459,7 +459,7 @@ export class UsersRawSqlRepository {
     );
   }
 
-  async banUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     const { isBanned, banReason, banDate } = banInfo;
     try {
       await this.db.transaction(async (client) => {

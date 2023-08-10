@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 
 export class ChangeBanStatusBlogsByBlogIdCommand {
   constructor(public blogId: string, public isBanned: boolean) {}
 }
 @CommandHandler(ChangeBanStatusBlogsByBlogIdCommand)
-export class SaChangeBanstatusBlogsByBlogIdUseCase
+export class SaChangeBanStatusBlogsByBlogIdUseCase
   implements ICommandHandler<ChangeBanStatusBlogsByBlogIdCommand>
 {
   constructor(

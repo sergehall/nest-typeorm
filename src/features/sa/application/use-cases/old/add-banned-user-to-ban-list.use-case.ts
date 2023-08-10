@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
+import { BannedUsersForBlogsRawSqlRepository } from '../../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { BannedUsersForBlogsEntity } from '../../../../blogger-blogs/entities/banned-users-for-blogs.entity';
 
 export class AddBannedUserToBanListCommand {
   constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}

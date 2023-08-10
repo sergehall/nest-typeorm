@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
+import { BloggerBlogsRawSqlRepository } from '../../../infrastructure/blogger-blogs-raw-sql.repository';
 
 export class ChangeBanStatusUserBlogsCommand {
   constructor(public userId: string, public isBanned: boolean) {}
