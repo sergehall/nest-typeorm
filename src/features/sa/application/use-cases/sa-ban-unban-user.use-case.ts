@@ -61,9 +61,14 @@ export class SaBanUserByUserIdUseCase
       banReason: isBanned ? banReason : null,
     };
 
-    await this.executeChangeBanStatusCommands(userToBan.id, banInfo);
+    // const banUser = await this.usersRawSqlRepository.banUser(
+    //   userToBan.id,
+    //   banInfo,
+    // );
 
-    return true;
+    // await this.executeChangeBanStatusCommands(userToBan.id, banInfo);
+
+    return await this.usersRawSqlRepository.banUser(userToBan.id, banInfo);
   }
 
   private async executeChangeBanStatusCommands(
