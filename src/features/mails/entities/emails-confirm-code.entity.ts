@@ -1,4 +1,5 @@
-import { IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, Length, Matches } from 'class-validator';
+import { MailingStatus } from '../enums/status.enums';
 
 export class EmailsConfirmCodeEntity {
   @IsNotEmpty()
@@ -30,4 +31,11 @@ export class EmailsConfirmCodeEntity {
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
   createdAt: string;
+  @IsNotEmpty()
+  @Length(4, 7, {
+    message:
+      'Incorrect status length! Must be min 4, max 7 ch. Type of Like, Dislike or None',
+  })
+  @IsEnum(MailingStatus)
+  status: MailingStatus;
 }

@@ -32,6 +32,7 @@ import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-r
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { MailsService } from '../mails/application/mails.service';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -61,6 +62,7 @@ const authUseCases = [
     MailsRawSqlRepository,
     AuthService,
     EncryptConfig,
+    MailsService,
     KeyArrayProcessor,
     DecodeTokenService,
     UsersRawSqlRepository,

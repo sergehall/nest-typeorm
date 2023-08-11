@@ -1,23 +1,26 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity';
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { MailingStatus } from '../enums/status.enums';
 
 export class MailsRawSqlRepository {
-  constructor(
-    @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
-  ) {}
+  constructor(@InjectDataSource() private readonly db: DataSource) {}
   async createEmailConfirmCode(
     newConfirmationCode: EmailsConfirmCodeEntity,
   ): Promise<string> {
     try {
+      console.log(newConfirmationCode, 'newConfirmationCode');
       return await this.db.query(
         `
-        INSERT INTO public."EmailsConfirmationCodes"("codeId", "email", "confirmationCode", "expirationDate", "createdAt")
-          VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO public."EmailsConfirmationCodes"
+        ("codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status")
+          VALUES ($1, $2, $3, $4, $5, $6)
           RETURNING "codeId"
          `,
         [
@@ -26,6 +29,7 @@ export class MailsRawSqlRepository {
           newConfirmationCode.confirmationCode,
           newConfirmationCode.expirationDate,
           newConfirmationCode.createdAt,
+          newConfirmationCode.status,
         ],
       );
     } catch (error) {
@@ -39,8 +43,8 @@ export class MailsRawSqlRepository {
     try {
       const query = `
         INSERT INTO public."EmailsRecoveryCodes" 
-        ("codeId", "email", "recoveryCode", "expirationDate", "createdAt")
-        VALUES ($1, $2, $3, $4, $5)
+        ("codeId", "email", "recoveryCode", "expirationDate", "createdAt",  "status")
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
         `;
       const values = [
@@ -49,28 +53,105 @@ export class MailsRawSqlRepository {
         newRecoveryCode.recoveryCode,
         newRecoveryCode.expirationDate,
         newRecoveryCode.createdAt,
+        newRecoveryCode.status,
       ];
       return await this.db.query(query, values);
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
   }
+
   async findEmailConfCodeByOldestDate(): Promise<EmailsConfirmCodeEntity[]> {
     try {
       const orderByDirection = `"createdAt" DESC`;
       const limit = 1;
       const offset = 0;
+      const status = MailingStatus.PENDING;
+
       return await this.db.query(
         `
-        SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt"
+        SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsConfirmationCodes"
+        WHERE "status" = $1
         ORDER BY ${orderByDirection}
-        LIMIT $1 OFFSET $2
+        LIMIT $2 OFFSET $3
          `,
-        [limit, offset],
+        [status, limit, offset],
       );
     } catch (error) {
       throw new ForbiddenException(error.message);
+    }
+  }
+
+  async findOldestConfCode(): Promise<EmailsConfirmCodeEntity | null> {
+    try {
+      const pendingStatus = MailingStatus.PENDING;
+      const sendingStatus = MailingStatus.SENDING;
+      const orderByDirection = `"createdAt" ASC`;
+      const limit = 1;
+
+      // Construct the query using a CTE to select the oldest pending code
+      // and update its status to "sending"
+      const query = `
+      WITH oldest_pending AS (
+        SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status"
+        FROM public."EmailsConfirmationCodes"
+        WHERE "status" = $1
+        ORDER BY ${orderByDirection}
+        LIMIT $3
+        FOR UPDATE SKIP LOCKED
+      )
+      UPDATE public."EmailsConfirmationCodes"
+      SET "status" = $2
+      FROM oldest_pending
+      WHERE public."EmailsConfirmationCodes"."codeId" = oldest_pending."codeId"
+      RETURNING oldest_pending.*;
+    `;
+
+      const values = [pendingStatus, sendingStatus, limit];
+
+      const result = await this.db.query(query, values);
+
+      // Adjust this part based on the actual structure of the result
+      // and return the updated confirmation code or null
+      return result[0][0] ? result[0][0] : null;
+    } catch (error) {
+      console.log(error.message);
+      // Handle any errors that occur during the process
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateEmailStatusToSent(codeId: string): Promise<void> {
+    try {
+      const status: MailingStatus = MailingStatus.SENT;
+      await this.db.query(
+        `
+        UPDATE public."EmailsConfirmationCodes"
+        SET "status" = $1
+        WHERE "codeId" = $2
+        `,
+        [status, codeId],
+      );
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
+
+  async clearingSentEmails() {
+    const status: MailingStatus = MailingStatus.SENT;
+    try {
+      return await this.db.query(
+        `
+        DELETE FROM public."EmailsConfirmationCodes"
+        WHERE "status" = $1
+        RETURNING "codeId"
+          `,
+        [status],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -82,7 +163,7 @@ export class MailsRawSqlRepository {
       const offset = 0;
       return await this.db.query(
         `
-        SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt"
+        SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsRecoveryCodes"
         ORDER BY "${sortBy}" ${direction}
         LIMIT $1 OFFSET $2
@@ -93,6 +174,7 @@ export class MailsRawSqlRepository {
       throw new ForbiddenException(error.message);
     }
   }
+
   async removeEmailConfirmCodesByCodeId(codeId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(
@@ -109,6 +191,7 @@ export class MailsRawSqlRepository {
       throw new NotFoundException(error.message);
     }
   }
+
   async removeEmailRecoverCodesByCodeId(codeId: string): Promise<boolean> {
     try {
       const comment = await this.db.query(

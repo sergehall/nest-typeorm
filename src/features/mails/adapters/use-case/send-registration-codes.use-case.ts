@@ -15,7 +15,7 @@ export class SendRegistrationCodesUseCase
     private mailerService: MailerService,
   ) {}
 
-  async execute(command: SendRegistrationCodesCommand): Promise<void> {
+  async execute(command: SendRegistrationCodesCommand): Promise<boolean> {
     const { email, confirmationCode } = command.emailAndCode;
 
     const sendMailOptions =
@@ -27,8 +27,10 @@ export class SendRegistrationCodesUseCase
     try {
       const success = await this.mailerService.sendMail(sendMailOptions);
       console.log(success);
+      return true; // Email sent successfully
     } catch (error) {
       console.log(error);
+      return false; // Error occurred while sending email
     }
   }
 }

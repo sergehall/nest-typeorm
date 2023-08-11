@@ -7,11 +7,9 @@ import {
 
 export class SentEmailsTimeConfirmAndRecoverCodesRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addConfirmationCode(
-    codeId: string,
-    email: string,
-    currentTime: string,
-  ) {
+  async addConfirmationCode(codeId: string, email: string) {
+    const currentTime = new Date().toISOString();
+
     try {
       return await this.db.query(
         `
@@ -31,12 +29,13 @@ export class SentEmailsTimeConfirmAndRecoverCodesRepository {
 
   async removeSentEmailsTimeByUserId(userId: string): Promise<boolean> {
     try {
+      const currentTime = new Date().toISOString();
       return await this.db.query(
         `
         DELETE FROM public."SentEmailsTimeConfirmAndRecoverCodes"
-        WHERE "userId" = $1
+        WHERE "userId" = $1 OR "expirationDate" < $2
           `,
-        [userId],
+        [userId, currentTime],
       );
     } catch (error) {
       console.log(error.message);

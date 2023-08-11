@@ -6,6 +6,7 @@ import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.reposi
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/custom-errors-messages';
 import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
+import { MailingStatus } from '../../../mails/enums/status.enums';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -48,6 +49,7 @@ export class UpdateSentConfirmationCodeUseCase
         confirmationCode,
         expirationDate,
         createdAt: new Date().toISOString(),
+        status: MailingStatus.PENDING,
       };
       await this.mailsRepository.createEmailConfirmCode(
         newEmailConfirmationCode,
