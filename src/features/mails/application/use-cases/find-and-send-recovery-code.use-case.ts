@@ -1,14 +1,14 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { EmailsConfirmCodeEntity } from '../../entities/emails-confirm-code.entity';
-import { SendRegistrationCodesCommand } from '../../adapters/use-case/send-registration-codes.use-case';
 import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
+import { SendRecoveryCodesCommand } from '../../adapters/use-case/send-recovery-codes';
+import { EmailsRecoveryCodesEntity } from '../../entities/emails-recovery-codes.entity';
 
-export class SendConfirmationCodeCommand {}
+export class FindAndSendRecoveryCodeCommand {}
 
-@CommandHandler(SendConfirmationCodeCommand)
-export class SendConfirmationCodeUseCase
-  implements ICommandHandler<SendConfirmationCodeCommand>
+@CommandHandler(FindAndSendRecoveryCodeCommand)
+export class FindAndSendRecoveryCodeUseCase
+  implements ICommandHandler<FindAndSendRecoveryCodeCommand>
 {
   constructor(
     protected mailsRawSqlRepository: MailsRawSqlRepository,
@@ -17,17 +17,15 @@ export class SendConfirmationCodeUseCase
   ) {}
 
   async execute(): Promise<void> {
-    const emailAndCode: EmailsConfirmCodeEntity | null =
-      await this.mailsRawSqlRepository.findOldestConfCode();
+    const emailAndCode: EmailsRecoveryCodesEntity | null =
+      await this.mailsRawSqlRepository.findOldestRecoveryCode();
 
     if (emailAndCode) {
-      await this.commandBus.execute(
-        new SendRegistrationCodesCommand(emailAndCode),
-      );
+      await this.commandBus.execute(new SendRecoveryCodesCommand(emailAndCode));
 
       const { codeId, email } = emailAndCode;
       await this.sentEmailsTimeRepository.addConfirmationCode(codeId, email);
-      await this.mailsRawSqlRepository.updateEmailStatusToSent(codeId);
+      await this.mailsRawSqlRepository.updateRecoveryCodesStatusToSent(codeId);
     }
   }
 }

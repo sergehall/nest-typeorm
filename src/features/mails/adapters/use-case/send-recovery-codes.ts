@@ -16,7 +16,7 @@ export class SendRecoveryCodesUseCase
     protected mailerService: MailerService,
   ) {}
 
-  async execute(command: SendRecoveryCodesCommand): Promise<void> {
+  async execute(command: SendRecoveryCodesCommand): Promise<boolean> {
     const { email, recoveryCode } = command.emailAndCode;
 
     const sendMailOptions =
@@ -28,8 +28,10 @@ export class SendRecoveryCodesUseCase
     try {
       const success = await this.mailerService.sendMail(sendMailOptions);
       console.log(success);
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   }
 }

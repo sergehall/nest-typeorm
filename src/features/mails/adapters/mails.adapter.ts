@@ -20,7 +20,7 @@ export class MailsAdapter {
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
-    const subject = 'Sent recovery code';
+    const subject = 'Recovery code';
     const template = 'index';
     const text = 'Welcome';
     const html = `
