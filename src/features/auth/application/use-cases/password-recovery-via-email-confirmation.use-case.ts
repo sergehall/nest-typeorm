@@ -3,6 +3,7 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import * as uuid4 from 'uuid4';
 import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { EmailsRecoveryCodesEntity } from '../../../mails/entities/emails-recovery-codes.entity';
+import { MailingStatus } from '../../../mails/enums/status.enums';
 
 export class PasswordRecoveryViaEmailConfirmationCommand {
   constructor(public email: string) {}
@@ -26,6 +27,7 @@ export class PasswordRecoveryViaEmailConfirmationUseCase
       recoveryCode: uuid4().toString(),
       expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString(),
+      status: MailingStatus.PENDING,
     };
     await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
       email,

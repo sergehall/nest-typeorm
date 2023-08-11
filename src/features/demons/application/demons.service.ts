@@ -6,47 +6,35 @@ import { AddSentEmailTimeCommand } from '../../mails/application/use-cases/add-s
 import { BlacklistJwtRawSqlRepository } from '../../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
-import { SendRegistrationCodesCommand } from '../../mails/adapters/use-case/send-registration-codes.use-case';
 import { SendRecoveryCodesCommand } from '../../mails/adapters/use-case/send-recovery-codes';
 import { RemoveDataUsersWithExpiredDateCommand } from './use-case/remove-data-users-with-expired-date.use-case';
-import { RemoveEmailConfirmCodeByIdCommand } from './use-case/remove-emai-confirm-code-by-id.use-case';
 import { RemoveEmailRecoverCodeByIdCommand } from './use-case/remove-emai-rec-code-by-id.use-case';
-import { EmailsConfirmCodeEntity } from '../../mails/entities/emails-confirm-code.entity';
 import { EmailsRecoveryCodesEntity } from '../../mails/entities/emails-recovery-codes.entity';
+import { SendConfirmationCodeCommand } from '../../mails/application/use-cases/send-confirmation-code';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 
 @Injectable()
 export class DemonsService {
   constructor(
-    protected mailService: MailsService,
+    protected mailsService: MailsService,
     protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
     protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
     protected usersRawSqlRepository: UsersRawSqlRepository,
+    protected mailsRawSqlRepository: MailsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
+
   // every sec
   @Cron('* * * * * *')
-  async sendAndDeleteConfirmationCode() {
-    const emailAndCode: EmailsConfirmCodeEntity[] =
-      await this.mailService.findEmailConfCodeByOldestDate();
-
-    if (emailAndCode.length > 0) {
-      const { codeId, email } = emailAndCode[0];
-
-      await this.commandBus.execute(
-        new RemoveEmailConfirmCodeByIdCommand(codeId),
-      );
-      await this.commandBus.execute(
-        new SendRegistrationCodesCommand(emailAndCode[0]),
-      );
-      await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
-    }
+  async sendConfirmationCodes() {
+    await this.commandBus.execute(new SendConfirmationCodeCommand());
   }
 
   // every sec
   @Cron('* * * * * *')
   async sendAndDeleteRecoveryCode() {
     const emailAndCode: EmailsRecoveryCodesEntity[] =
-      await this.mailService.findEmailRecCodeByOldestDate();
+      await this.mailsService.findEmailRecCodeByOldestDate();
     if (emailAndCode.length > 0) {
       const { email, codeId } = emailAndCode[0];
 
@@ -71,6 +59,14 @@ export class DemonsService {
   async clearingDevicesWithExpiredDate() {
     await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
   }
+
+  // // // every 1 hour
+  // // @Cron('0 * * * *')
+  // // every sec
+  // @Cron('* * * * * *')
+  // async clearingSentEmails() {
+  //   await this.mailsRawSqlRepository.clearingSentEmails();
+  // }
 
   // every 30 min
   @Cron('*/30 * * * *')
