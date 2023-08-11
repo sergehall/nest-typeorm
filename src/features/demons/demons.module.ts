@@ -15,13 +15,13 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { RemoveDataUsersWithExpiredDateUseCase } from './application/use-case/remove-data-users-with-expired-date.use-case';
 import { MailerConfig } from '../../config/mailer/mailer-config';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
-import { FindAndSendConfirmationCodeUseCase } from '../mails/application/use-case/find-and-send-confirmation-code.use-case';
-import { FindAndSendRecoveryCodeUseCase } from '../mails/application/use-case/find-and-send-recovery-code.use-case';
+import { RemoveDataUsersWithExpiredDateUseCase } from './application/use-case/remove-data-users-with-expired-date.use-case';
+import { FindAndSendConfirmationCodeUseCase } from './application/use-case/find-and-send-confirmation-code.use-case';
+import { FindAndSendRecoveryCodeUseCase } from './application/use-case/find-and-send-recovery-code.use-case';
 import { SendRecoveryCodesUseCase } from '../mails/adapters/use-case/send-recovery-codes';
 import { SendRegistrationCodesUseCase } from '../mails/adapters/use-case/send-registration-codes.use-case';
 
