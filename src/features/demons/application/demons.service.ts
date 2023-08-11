@@ -6,8 +6,8 @@ import { SecurityDevicesRawSqlRepository } from '../../security-devices/infrastr
 import { UsersRawSqlRepository } from '../../users/infrastructure/users-raw-sql.repository';
 import { RemoveDataUsersWithExpiredDateCommand } from './use-case/remove-data-users-with-expired-date.use-case';
 import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
-import { FindAndSendConfirmationCommand } from './use-case/find-and-send-confirmation-code.use-case';
-import { FindAndSendRecoveryCodeCommand } from './use-case/find-and-send-recovery-code.use-case';
+import { FindAndSendConfirmationCommand } from '../../mails/application/use-case/find-and-send-confirmation-code.use-case';
+import { FindAndSendRecoveryCodeCommand } from '../../mails/application/use-case/find-and-send-recovery-code.use-case';
 
 @Injectable()
 export class DemonsService {

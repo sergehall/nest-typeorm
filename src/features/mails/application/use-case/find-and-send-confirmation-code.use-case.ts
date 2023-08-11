@@ -1,8 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { EmailsConfirmCodeEntity } from '../../../mails/entities/emails-confirm-code.entity';
-import { SendRegistrationCodesCommand } from '../../../mails/adapters/use-case/send-registration-codes.use-case';
-import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
-import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../../mails/infrastructure/sent-email-confirmation-code-time.repository';
+import { EmailsConfirmCodeEntity } from '../../entities/emails-confirm-code.entity';
+import { SendRegistrationCodesCommand } from '../../adapters/use-case/send-registration-codes.use-case';
+import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
 
 export class FindAndSendConfirmationCommand {}
 
@@ -21,7 +21,6 @@ export class FindAndSendConfirmationCodeUseCase
       await this.mailsRawSqlRepository.findOldestConfCode();
 
     if (emailAndCode) {
-      // console.log(emailAndCode, 'RegistrationCodes');
       await this.commandBus.execute(
         new SendRegistrationCodesCommand(emailAndCode),
       );

@@ -20,18 +20,8 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { RemoveDataUsersWithExpiredDateUseCase } from './application/use-case/remove-data-users-with-expired-date.use-case';
-import { FindAndSendConfirmationCodeUseCase } from './application/use-case/find-and-send-confirmation-code.use-case';
-import { FindAndSendRecoveryCodeUseCase } from './application/use-case/find-and-send-recovery-code.use-case';
-import { SendRecoveryCodesUseCase } from '../mails/adapters/use-case/send-recovery-codes';
-import { SendRegistrationCodesUseCase } from '../mails/adapters/use-case/send-registration-codes.use-case';
 
-const demonsUseCases = [
-  RemoveDataUsersWithExpiredDateUseCase,
-  FindAndSendConfirmationCodeUseCase,
-  FindAndSendRecoveryCodeUseCase,
-  SendRecoveryCodesUseCase,
-  SendRegistrationCodesUseCase,
-];
+const demonsUseCases = [RemoveDataUsersWithExpiredDateUseCase];
 
 @Module({
   imports: [MailsModule, CaslModule, CqrsModule],
