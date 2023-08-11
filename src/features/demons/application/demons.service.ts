@@ -33,28 +33,16 @@ export class DemonsService {
     await this.commandBus.execute(new FindAndSendRecoveryCodeCommand());
   }
 
-  // // every sec
-  // @Cron('* * * * * *')
-  // async sendAndDeleteRecoveryCode() {
-  //   const emailAndCode: EmailsRecoveryCodesEntity[] =
-  //     await this.mailsService.findEmailRecCodeByOldestDate();
-  //   if (emailAndCode.length > 0) {
-  //     const { email, codeId } = emailAndCode[0];
-  //
-  //     await this.commandBus.execute(
-  //       new RemoveEmailRecoverCodeByIdCommand(codeId),
-  //     );
-  //     await this.commandBus.execute(
-  //       new SendRecoveryCodesCommand(emailAndCode[0]),
-  //     );
-  //     await this.commandBus.execute(new AddSentEmailTimeCommand(codeId, email));
-  //   }
-  // }
-
   // every 30 min
   @Cron('*/30 * * * *')
   async clearingInvalidJWTFromBlackList() {
     await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
+  }
+
+  // every 30 min
+  @Cron('*/30 * * * *')
+  async clearingUserWithExpirationDate() {
+    await this.commandBus.execute(new RemoveDataUsersWithExpiredDateCommand());
   }
 
   // every 1 hour
@@ -64,16 +52,8 @@ export class DemonsService {
   }
 
   // // // every 1 hour
-  // // @Cron('0 * * * *')
-  // // every sec
-  // @Cron('* * * * * *')
-  // async clearingSentEmails() {
-  //   await this.mailsRawSqlRepository.clearingSentEmails();
-  // }
-
-  // every 30 min
-  @Cron('*/30 * * * *')
-  async clearingUserWithExpirationDate() {
-    await this.commandBus.execute(new RemoveDataUsersWithExpiredDateCommand());
+  @Cron('0 * * * *')
+  async clearingSentEmails() {
+    await this.mailsRawSqlRepository.clearingSentEmails();
   }
 }

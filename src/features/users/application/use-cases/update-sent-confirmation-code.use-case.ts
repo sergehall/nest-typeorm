@@ -6,7 +6,7 @@ import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.reposi
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/custom-errors-messages';
 import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
-import { MailingStatus } from '../../../mails/enums/status.enums';
+import { MailsService } from '../../../mails/application/mails.service';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -17,6 +17,7 @@ export class UpdateSentConfirmationCodeUseCase
 {
   constructor(
     private readonly mailsRepository: MailsRawSqlRepository,
+    private readonly mailsService: MailsService,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
     private readonly expirationDateCalculator: ExpirationDateCalculator,
   ) {}
@@ -29,7 +30,10 @@ export class UpdateSentConfirmationCodeUseCase
       !user.isConfirmed &&
       user.expirationDate > new Date().toISOString()
     ) {
+      const { email } = user;
+
       const confirmationCode = uuid4().toString();
+
       // Return the expirationDate in ISO format for user registration.
       const expirationDate = await this.expirationDateCalculator.createExpDate(
         0,
@@ -37,23 +41,18 @@ export class UpdateSentConfirmationCodeUseCase
         0,
       );
 
-      await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
-        user.email,
+      await this.mailsService.updateConfirmationCode(
+        email,
         confirmationCode,
         expirationDate,
       );
 
-      const newEmailConfirmationCode = {
-        codeId: uuid4().toString(),
-        email: user.email,
+      await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
+        email,
         confirmationCode,
         expirationDate,
-        createdAt: new Date().toISOString(),
-        status: MailingStatus.PENDING,
-      };
-      await this.mailsRepository.createEmailConfirmCode(
-        newEmailConfirmationCode,
       );
+
       return true;
     } else {
       throw new HttpException(

@@ -25,6 +25,8 @@ import { RemoveEmailRecoverCodeByIdUseCase } from './application/use-case/remove
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { FindAndSendConfirmationCodeUseCase } from '../mails/application/use-cases/find-and-send-confirmation-code.use-case';
 import { FindAndSendRecoveryCodeUseCase } from '../mails/application/use-cases/find-and-send-recovery-code.use-case';
+import { SendRegistrationCodesUseCase } from '../mails/adapters/use-case/send-registration-codes.use-case';
+import { SendRecoveryCodesUseCase } from '../mails/adapters/use-case/send-recovery-codes';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
@@ -33,6 +35,8 @@ const demonsUseCases = [
   RemoveDataUsersWithExpiredDateUseCase,
   FindAndSendConfirmationCodeUseCase,
   FindAndSendRecoveryCodeUseCase,
+  SendRegistrationCodesUseCase,
+  SendRecoveryCodesUseCase,
 ];
 
 @Module({
