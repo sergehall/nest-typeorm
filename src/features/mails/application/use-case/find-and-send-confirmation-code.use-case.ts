@@ -1,6 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailsConfirmCodeEntity } from '../../entities/emails-confirm-code.entity';
-import { SendRegistrationCodesCommand } from '../../adapters/use-case/send-registration-codes.use-case';
+import { SendRegistrationCodesCommand } from './send-registration-codes.use-case';
 import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
 

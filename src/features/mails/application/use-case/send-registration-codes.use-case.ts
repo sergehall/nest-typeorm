@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { MailsAdapter } from '../mails.adapter';
+import { MailsAdapter } from '../../adapters/mails.adapter';
 import { EmailsConfirmCodeEntity } from '../../entities/emails-confirm-code.entity';
 
 export class SendRegistrationCodesCommand {

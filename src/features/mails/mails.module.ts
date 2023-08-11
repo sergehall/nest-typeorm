@@ -10,8 +10,8 @@ import { SentEmailsTimeConfirmAndRecoverCodesRepository } from './infrastructure
 import { CqrsModule } from '@nestjs/cqrs';
 import { FindAndSendConfirmationCodeUseCase } from './application/use-case/find-and-send-confirmation-code.use-case';
 import { FindAndSendRecoveryCodeUseCase } from './application/use-case/find-and-send-recovery-code.use-case';
-import { SendRecoveryCodesUseCase } from './adapters/use-case/send-recovery-codes';
-import { SendRegistrationCodesUseCase } from './adapters/use-case/send-registration-codes.use-case';
+import { SendRecoveryCodesUseCase } from './application/use-case/send-recovery-codes';
+import { SendRegistrationCodesUseCase } from './application/use-case/send-registration-codes.use-case';
 
 const mailsUseCases = [
   FindAndSendConfirmationCodeUseCase,

@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
-import { SendRecoveryCodesCommand } from '../../adapters/use-case/send-recovery-codes';
+import { SendRecoveryCodesCommand } from './send-recovery-codes';
 import { EmailsRecoveryCodesEntity } from '../../entities/emails-recovery-codes.entity';
 
 export class FindAndSendRecoveryCodeCommand {}
