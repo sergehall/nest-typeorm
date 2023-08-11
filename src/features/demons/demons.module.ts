@@ -23,14 +23,16 @@ import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrast
 import { RemoveEmailConfirmCodeByIdUseCase } from './application/use-case/remove-emai-confirm-code-by-id.use-case';
 import { RemoveEmailRecoverCodeByIdUseCase } from './application/use-case/remove-emai-rec-code-by-id.use-case';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
-import { SendConfirmationCodeUseCase } from '../mails/application/use-cases/send-confirmation-code';
+import { FindAndSendConfirmationCodeUseCase } from '../mails/application/use-cases/find-and-send-confirmation-code.use-case';
+import { FindAndSendRecoveryCodeUseCase } from '../mails/application/use-cases/find-and-send-recovery-code.use-case';
 
 const demonsUseCases = [
   AddSentEmailTimeUseCase,
   RemoveEmailConfirmCodeByIdUseCase,
   RemoveEmailRecoverCodeByIdUseCase,
   RemoveDataUsersWithExpiredDateUseCase,
-  SendConfirmationCodeUseCase,
+  FindAndSendConfirmationCodeUseCase,
+  FindAndSendRecoveryCodeUseCase,
 ];
 
 @Module({

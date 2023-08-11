@@ -15,7 +15,6 @@ export class MailsRawSqlRepository {
     newConfirmationCode: EmailsConfirmCodeEntity,
   ): Promise<string> {
     try {
-      console.log(newConfirmationCode, 'newConfirmationCode');
       return await this.db.query(
         `
         INSERT INTO public."EmailsConfirmationCodes"
@@ -61,28 +60,6 @@ export class MailsRawSqlRepository {
     }
   }
 
-  async findEmailConfCodeByOldestDate(): Promise<EmailsConfirmCodeEntity[]> {
-    try {
-      const orderByDirection = `"createdAt" DESC`;
-      const limit = 1;
-      const offset = 0;
-      const status = MailingStatus.PENDING;
-
-      return await this.db.query(
-        `
-        SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status"
-        FROM public."EmailsConfirmationCodes"
-        WHERE "status" = $1
-        ORDER BY ${orderByDirection}
-        LIMIT $2 OFFSET $3
-         `,
-        [status, limit, offset],
-      );
-    } catch (error) {
-      throw new ForbiddenException(error.message);
-    }
-  }
-
   async findOldestConfCode(): Promise<EmailsConfirmCodeEntity | null> {
     try {
       const pendingStatus = MailingStatus.PENDING;
@@ -122,12 +99,67 @@ export class MailsRawSqlRepository {
     }
   }
 
-  async updateEmailStatusToSent(codeId: string): Promise<void> {
+  async findOldestRecoveryCode(): Promise<EmailsRecoveryCodesEntity | null> {
+    try {
+      const pendingStatus = MailingStatus.PENDING;
+      const sendingStatus = MailingStatus.SENDING;
+      const orderByDirection = `"createdAt" ASC`;
+      const limit = 1;
+
+      // Construct the query using a CTE to select the oldest pending code
+      // and update its status to "sending"
+      const query = `
+      WITH oldest_pending AS (
+        SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt", "status"
+        FROM public."EmailsRecoveryCodes"
+        WHERE "status" = $1
+        ORDER BY ${orderByDirection}
+        LIMIT $3
+        FOR UPDATE SKIP LOCKED
+      )
+      UPDATE public."EmailsRecoveryCodes"
+      SET "status" = $2
+      FROM oldest_pending
+      WHERE public."EmailsRecoveryCodes"."codeId" = oldest_pending."codeId"
+      RETURNING oldest_pending.*;
+    `;
+
+      const values = [pendingStatus, sendingStatus, limit];
+
+      const result = await this.db.query(query, values);
+
+      // Adjust this part based on the actual structure of the result
+      // and return the updated recovery code or null
+      return result[0][0] ? result[0][0] : null;
+    } catch (error) {
+      console.log(error.message);
+      // Handle any errors that occur during the process
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateConfirmationCodesStatusToSent(codeId: string): Promise<void> {
     try {
       const status: MailingStatus = MailingStatus.SENT;
       await this.db.query(
         `
         UPDATE public."EmailsConfirmationCodes"
+        SET "status" = $1
+        WHERE "codeId" = $2
+        `,
+        [status, codeId],
+      );
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
+
+  async updateRecoveryCodesStatusToSent(codeId: string): Promise<void> {
+    try {
+      const status: MailingStatus = MailingStatus.SENT;
+      await this.db.query(
+        `
+        UPDATE public."EmailsRecoveryCodes"
         SET "status" = $1
         WHERE "codeId" = $2
         `,
