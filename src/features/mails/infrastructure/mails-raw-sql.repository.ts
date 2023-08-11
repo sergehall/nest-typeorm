@@ -11,16 +11,17 @@ import { MailingStatus } from '../enums/status.enums';
 
 export class MailsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async createEmailConfirmCode(
+
+  async insertEmailConfirmationCode2(
     newConfirmationCode: EmailsConfirmCodeEntity,
-  ): Promise<string> {
+  ): Promise<EmailsConfirmCodeEntity> {
     try {
-      return await this.db.query(
+      const insert = await this.db.query(
         `
         INSERT INTO public."EmailsConfirmationCodes"
         ("codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status")
           VALUES ($1, $2, $3, $4, $5, $6)
-          RETURNING "codeId"
+          RETURNING *
          `,
         [
           newConfirmationCode.codeId,
@@ -31,14 +32,16 @@ export class MailsRawSqlRepository {
           newConfirmationCode.status,
         ],
       );
+      return insert[0];
     } catch (error) {
       console.log(error.message);
       throw new ForbiddenException(error.message);
     }
   }
-  async createEmailRecoveryCode(
+
+  async insertEmailRecoveryCode(
     newRecoveryCode: EmailsRecoveryCodesEntity,
-  ): Promise<EmailsRecoveryCodesEntity[]> {
+  ): Promise<EmailsRecoveryCodesEntity> {
     try {
       const query = `
         INSERT INTO public."EmailsRecoveryCodes" 
@@ -54,9 +57,13 @@ export class MailsRawSqlRepository {
         newRecoveryCode.createdAt,
         newRecoveryCode.status,
       ];
-      return await this.db.query(query, values);
+
+      const insert = await this.db.query(query, values);
+      return insert[0];
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      console.log(error.message);
+      // Handle any errors that occur during the process
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -184,26 +191,6 @@ export class MailsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findEmailRecCodeByOldestDate(): Promise<EmailsRecoveryCodesEntity[]> {
-    try {
-      const sortBy = 'createdAt';
-      const direction = 'DESC';
-      const limit = 1;
-      const offset = 0;
-      return await this.db.query(
-        `
-        SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt", "status"
-        FROM public."EmailsRecoveryCodes"
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $1 OFFSET $2
-         `,
-        [limit, offset],
-      );
-    } catch (error) {
-      throw new ForbiddenException(error.message);
     }
   }
 

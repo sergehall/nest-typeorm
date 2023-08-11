@@ -13,21 +13,66 @@ export class MailsService {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ) {
+  ): Promise<boolean> {
     const emailConfirmCodeEntity: EmailsConfirmCodeEntity =
-      await this.createEmailConfirmCodeEntity(
+      await this.createEmailConfirmCode(
         email,
         confirmationCode,
         expirationDate,
       );
-    await this.addConfirmCodeToSendingTables(emailConfirmCodeEntity);
+
+    await this.insertEmailConfirmationCode(emailConfirmCodeEntity);
+    return true;
   }
 
-  async findEmailRecCodeByOldestDate(): Promise<EmailsRecoveryCodesEntity[]> {
-    return await this.mailsRawSqlRepository.findEmailRecCodeByOldestDate();
+  async updateConfirmationCode(
+    email: string,
+    confirmationCode: string,
+    expirationDate: string,
+  ): Promise<EmailsConfirmCodeEntity> {
+    const newEmailConfirmCodeEntity: EmailsConfirmCodeEntity =
+      await this.createEmailConfirmCode(
+        email,
+        confirmationCode,
+        expirationDate,
+      );
+
+    await this.insertEmailConfirmationCode(newEmailConfirmCodeEntity);
+    return newEmailConfirmCodeEntity;
   }
 
-  private async createEmailConfirmCodeEntity(
+  async updateRecoveryCode(
+    email: string,
+    confirmationCode: string,
+    expirationDate: string,
+  ): Promise<EmailsRecoveryCodesEntity> {
+    const newEmailRecoveryCode: EmailsRecoveryCodesEntity =
+      await this.createEmailRecoveryCode(
+        email,
+        confirmationCode,
+        expirationDate,
+      );
+
+    await this.insertEmailRecoveryCode(newEmailRecoveryCode);
+    return newEmailRecoveryCode;
+  }
+
+  async createEmailRecoveryCode(
+    email: string,
+    recoveryCode: string,
+    expirationDate: string,
+  ): Promise<EmailsRecoveryCodesEntity> {
+    return {
+      codeId: uuid4().toString(),
+      email: email,
+      recoveryCode: recoveryCode,
+      expirationDate: expirationDate,
+      createdAt: new Date().toISOString(),
+      status: MailingStatus.PENDING,
+    };
+  }
+
+  async createEmailConfirmCode(
     email: string,
     confirmationCode: string,
     expirationDate: string,
@@ -42,11 +87,19 @@ export class MailsService {
     };
   }
 
-  private async addConfirmCodeToSendingTables(
-    emailConfirmCodeEntity: EmailsConfirmCodeEntity,
-  ): Promise<string> {
-    return await this.mailsRawSqlRepository.createEmailConfirmCode(
-      emailConfirmCodeEntity,
+  async insertEmailRecoveryCode(
+    newRecoveryCode: EmailsRecoveryCodesEntity,
+  ): Promise<EmailsRecoveryCodesEntity> {
+    return await this.mailsRawSqlRepository.insertEmailRecoveryCode(
+      newRecoveryCode,
+    );
+  }
+
+  async insertEmailConfirmationCode(
+    newConfirmationCode: EmailsConfirmCodeEntity,
+  ): Promise<EmailsConfirmCodeEntity> {
+    return await this.mailsRawSqlRepository.insertEmailConfirmationCode2(
+      newConfirmationCode,
     );
   }
 }

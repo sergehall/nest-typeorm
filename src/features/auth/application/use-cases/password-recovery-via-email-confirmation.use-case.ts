@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import * as uuid4 from 'uuid4';
-import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
 import { EmailsRecoveryCodesEntity } from '../../../mails/entities/emails-recovery-codes.entity';
-import { MailingStatus } from '../../../mails/enums/status.enums';
+import { MailsService } from '../../../mails/application/mails.service';
+import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
 
 export class PasswordRecoveryViaEmailConfirmationCommand {
   constructor(public email: string) {}
@@ -15,29 +15,36 @@ export class PasswordRecoveryViaEmailConfirmationUseCase
 {
   constructor(
     protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected mailsRawSqlRepository: MailsRawSqlRepository,
+    protected expirationDateCalculator: ExpirationDateCalculator,
+    protected mailsService: MailsService,
   ) {}
   async execute(
     command: PasswordRecoveryViaEmailConfirmationCommand,
   ): Promise<boolean> {
     const { email } = command;
-    const newConfirmationCode: EmailsRecoveryCodesEntity = {
-      codeId: uuid4().toString(),
-      email: email,
-      recoveryCode: uuid4().toString(),
-      expirationDate: new Date(Date.now() + 65 * 60 * 1000).toISOString(),
-      createdAt: new Date().toISOString(),
-      status: MailingStatus.PENDING,
-    };
+
+    const recoveryCode = uuid4().toString();
+
+    // Return the expirationDate in ISO format for user registration.
+    const expirationDate = await this.expirationDateCalculator.createExpDate(
+      0,
+      1,
+      0,
+    );
+
+    const newConfirmationCode: EmailsRecoveryCodesEntity =
+      await this.mailsService.updateRecoveryCode(
+        email,
+        recoveryCode,
+        expirationDate,
+      );
+
     await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
       email,
       newConfirmationCode.recoveryCode,
       newConfirmationCode.expirationDate,
     );
-    const createEmailRecCode =
-      await this.mailsRawSqlRepository.createEmailRecoveryCode(
-        newConfirmationCode,
-      );
-    return createEmailRecCode.length !== 0;
+
+    return true;
   }
 }
