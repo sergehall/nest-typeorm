@@ -5,7 +5,6 @@ import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.rep
 import { UsersService } from '../users/application/users.service';
 import { CaslModule } from '../../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
-import { AddSentEmailTimeUseCase } from '../mails/application/use-cases/add-sent-email-time.use-case';
 import { MailsAdapter } from '../mails/adapters/mails.adapter';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
@@ -20,23 +19,18 @@ import { RemoveDataUsersWithExpiredDateUseCase } from './application/use-case/re
 import { MailerConfig } from '../../config/mailer/mailer-config';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { RemoveEmailConfirmCodeByIdUseCase } from './application/use-case/remove-emai-confirm-code-by-id.use-case';
-import { RemoveEmailRecoverCodeByIdUseCase } from './application/use-case/remove-emai-rec-code-by-id.use-case';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
-import { FindAndSendConfirmationCodeUseCase } from '../mails/application/use-cases/find-and-send-confirmation-code.use-case';
-import { FindAndSendRecoveryCodeUseCase } from '../mails/application/use-cases/find-and-send-recovery-code.use-case';
-import { SendRegistrationCodesUseCase } from '../mails/adapters/use-case/send-registration-codes.use-case';
+import { FindAndSendConfirmationCodeUseCase } from '../mails/application/use-case/find-and-send-confirmation-code.use-case';
+import { FindAndSendRecoveryCodeUseCase } from '../mails/application/use-case/find-and-send-recovery-code.use-case';
 import { SendRecoveryCodesUseCase } from '../mails/adapters/use-case/send-recovery-codes';
+import { SendRegistrationCodesUseCase } from '../mails/adapters/use-case/send-registration-codes.use-case';
 
 const demonsUseCases = [
-  AddSentEmailTimeUseCase,
-  RemoveEmailConfirmCodeByIdUseCase,
-  RemoveEmailRecoverCodeByIdUseCase,
   RemoveDataUsersWithExpiredDateUseCase,
   FindAndSendConfirmationCodeUseCase,
   FindAndSendRecoveryCodeUseCase,
-  SendRegistrationCodesUseCase,
   SendRecoveryCodesUseCase,
+  SendRegistrationCodesUseCase,
 ];
 
 @Module({
