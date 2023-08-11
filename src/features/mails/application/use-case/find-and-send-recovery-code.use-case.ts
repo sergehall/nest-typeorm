@@ -1,8 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
-import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../../mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { SendRecoveryCodesCommand } from '../../../mails/adapters/use-case/send-recovery-codes';
-import { EmailsRecoveryCodesEntity } from '../../../mails/entities/emails-recovery-codes.entity';
+import { MailsRawSqlRepository } from '../../infrastructure/mails-raw-sql.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
+import { SendRecoveryCodesCommand } from '../../adapters/use-case/send-recovery-codes';
+import { EmailsRecoveryCodesEntity } from '../../entities/emails-recovery-codes.entity';
 
 export class FindAndSendRecoveryCodeCommand {}
 
@@ -21,10 +21,10 @@ export class FindAndSendRecoveryCodeUseCase
       await this.mailsRawSqlRepository.findOldestRecoveryCode();
 
     if (emailAndCode) {
-      console.log(emailAndCode, 'RecoveryCodes');
       await this.commandBus.execute(new SendRecoveryCodesCommand(emailAndCode));
 
       const { codeId, email } = emailAndCode;
+
       await this.sentEmailsTimeRepository.addConfirmationCode(codeId, email);
       await this.mailsRawSqlRepository.updateRecoveryCodesStatusToSent(codeId);
     }

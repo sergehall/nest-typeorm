@@ -68,15 +68,14 @@ export class MailsRawSqlRepository {
   }
 
   async findOldestConfCode(): Promise<EmailsConfirmCodeEntity | null> {
-    try {
-      const pendingStatus = MailingStatus.PENDING;
-      const sendingStatus = MailingStatus.SENDING;
-      const orderByDirection = `"createdAt" ASC`;
-      const limit = 1;
+    const pendingStatus = MailingStatus.PENDING;
+    const sendingStatus = MailingStatus.SENDING;
+    const orderByDirection = `"createdAt" ASC`;
+    const limit = 1;
 
-      // Construct the query using a CTE to select the oldest pending code
-      // and update its status to "sending"
-      const query = `
+    // Construct the query using a CTE to select the oldest pending code
+    // and update its status to "sending"
+    const query = `
       WITH oldest_pending AS (
         SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsConfirmationCodes"
@@ -92,9 +91,10 @@ export class MailsRawSqlRepository {
       RETURNING oldest_pending.*;
     `;
 
-      const values = [pendingStatus, sendingStatus, limit];
+    const parameters = [pendingStatus, sendingStatus, limit];
 
-      const result = await this.db.query(query, values);
+    try {
+      const result = await this.db.query(query, parameters);
 
       // Adjust this part based on the actual structure of the result
       // and return the updated confirmation code or null
@@ -107,15 +107,14 @@ export class MailsRawSqlRepository {
   }
 
   async findOldestRecoveryCode(): Promise<EmailsRecoveryCodesEntity | null> {
-    try {
-      const pendingStatus = MailingStatus.PENDING;
-      const sendingStatus = MailingStatus.SENDING;
-      const orderByDirection = `"createdAt" ASC`;
-      const limit = 1;
+    const pendingStatus = MailingStatus.PENDING;
+    const sendingStatus = MailingStatus.SENDING;
+    const orderByDirection = `"createdAt" ASC`;
+    const limit = 1;
 
-      // Construct the query using a CTE to select the oldest pending code
-      // and update its status to "sending"
-      const query = `
+    // Construct the query using a CTE to select the oldest pending code
+    // and update its status to "sending"
+    const query = `
       WITH oldest_pending AS (
         SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsRecoveryCodes"
@@ -131,9 +130,9 @@ export class MailsRawSqlRepository {
       RETURNING oldest_pending.*;
     `;
 
-      const values = [pendingStatus, sendingStatus, limit];
-
-      const result = await this.db.query(query, values);
+    const parameters = [pendingStatus, sendingStatus, limit];
+    try {
+      const result = await this.db.query(query, parameters);
 
       // Adjust this part based on the actual structure of the result
       // and return the updated recovery code or null
