@@ -27,7 +27,7 @@ export class DataCleanupService {
 
   async removeDataUsersWithExpiredDate(): Promise<void> {
     try {
-      return await this.usersRawSqlRepository.removeUserData();
+      return await this.usersRawSqlRepository.removeUsersData();
     } catch (error) {
       console.error('Error while removing expired user data:', error.message);
       throw new InternalServerErrorException(

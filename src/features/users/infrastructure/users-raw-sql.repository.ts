@@ -393,49 +393,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async getOldestUsersWithExpirationDate(
-    countExpiredDate: number,
-  ): Promise<TablesUsersWithIdEntity[]> {
-    try {
-      const isConfirmed = false;
-      const currentTime = new Date().toISOString();
-      const orderByDirection = `"createdAt" DESC`;
-      const limit = countExpiredDate;
-      const offset = 0;
-      return await this.db.query(
-        `
-      SELECT "userId" AS "id"
-      FROM public."Users"
-      WHERE "isConfirmed" = $1 AND "expirationDate" <= $2
-      ORDER BY ${orderByDirection}
-      LIMIT $3 OFFSET $4
-      `,
-        [isConfirmed, currentTime, limit, offset],
-      );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountOldestUsersWithExpirationDate(): Promise<number> {
-    const isConfirmed = true;
-    const currentTime = new Date().toISOString();
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Users"
-        WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
-      `,
-        [isConfirmed, currentTime],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
       sortBy,
@@ -552,7 +509,8 @@ export class UsersRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async removeUserData(): Promise<void> {
+
+  async removeUsersData(): Promise<void> {
     try {
       await this.db.transaction(async (client) => {
         const allUsersWithExpiredDate: TablesUsersWithIdEntity[] =
@@ -570,6 +528,21 @@ export class UsersRawSqlRepository {
             this.deleteUserData(user.id, client),
           ),
         );
+      });
+    } catch (error) {
+      {
+        console.error(`Error while removing data for users: ${error.message}`);
+        throw new InternalServerErrorException(
+          `Error while removing data for users`,
+        );
+      }
+    }
+  }
+
+  async removeUserDataByUserId(userId: string): Promise<void> {
+    try {
+      await this.db.transaction(async (client) => {
+        await this.deleteUserData(userId, client);
       });
     } catch (error) {
       {
