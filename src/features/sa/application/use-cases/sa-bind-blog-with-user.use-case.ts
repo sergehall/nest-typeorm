@@ -1,5 +1,5 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { IdUserIdParams } from '../../../common/query/params/idUserId.params';
+import { IdUserIdParams } from '../../../../common/query/params/idUserId.params';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';

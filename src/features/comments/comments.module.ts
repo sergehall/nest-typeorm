@@ -24,7 +24,7 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { FindCommentByIdUseCase } from './application/use-cases/find-comment-by-id';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { FindCommentsByPostIdUseCase } from './application/use-cases/find-comments-by-post-id.use-case';

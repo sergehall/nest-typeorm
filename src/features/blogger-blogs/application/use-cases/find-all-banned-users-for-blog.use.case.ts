@@ -7,10 +7,10 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../../common/pagination/types/pagination.types';
 import { ReturnBannedUsersForBlogEntity } from '../../entities/return-banned-users-for-blog.entity';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 
 export class FindAllBannedUsersForBlogCommand {
   constructor(

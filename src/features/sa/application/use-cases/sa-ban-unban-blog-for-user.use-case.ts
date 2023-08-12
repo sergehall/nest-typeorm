@@ -11,7 +11,7 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenError } from '@casl/ability';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { cannotBlockOwnBlog } from '../../../../exception-filter/custom-errors-messages';
+import { cannotBlockOwnBlog } from '../../../../common/filters/custom-errors-messages';
 
 export class SaBanUnbanBlogCommand {
   constructor(

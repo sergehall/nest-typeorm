@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { SessionDevicesEntity } from '../../entities/security-device.entity';
-import { forbiddenDeleteDevice } from '../../../../exception-filter/custom-errors-messages';
+import { forbiddenDeleteDevice } from '../../../../common/filters/custom-errors-messages';
 
 export class RemoveDevicesByDeviceIdCommand {
   constructor(public deviceId: string, public currentPayload: PayloadDto) {}

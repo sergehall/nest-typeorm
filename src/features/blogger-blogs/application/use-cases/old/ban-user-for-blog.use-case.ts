@@ -19,7 +19,7 @@ import { BannedUsersForBlogsEntity } from '../../../entities/banned-users-for-bl
 import { ChangeBanStatusLikesPostsForBannedUserCommand } from '../../../../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import * as uuid4 from 'uuid4';
 import { TablesUsersWithIdEntity } from '../../../../users/entities/tables-user-with-id.entity';
-import { cannotBlockYourself } from '../../../../../exception-filter/custom-errors-messages';
+import { cannotBlockYourself } from '../../../../../common/filters/custom-errors-messages';
 import { TableBloggerBlogsRawSqlEntity } from '../../../entities/table-blogger-blogs-raw-sql.entity';
 
 export class BanUserForBlogCommand {

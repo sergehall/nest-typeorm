@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
+import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';

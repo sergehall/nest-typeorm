@@ -4,7 +4,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import {
   userEmailAlreadyExists,
   userLoginAlreadyExists,
-} from '../../../../exception-filter/custom-errors-messages';
+} from '../../../../common/filters/custom-errors-messages';
 
 export class VerifyUserExistenceCommand {
   constructor(public login: string, public email: string) {}

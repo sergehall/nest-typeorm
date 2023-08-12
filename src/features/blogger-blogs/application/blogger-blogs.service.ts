@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 
 @Injectable()
 export class BloggerBlogsService {

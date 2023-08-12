@@ -5,7 +5,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { codeIncorrect } from '../../../../exception-filter/custom-errors-messages';
+import { codeIncorrect } from '../../../../common/filters/custom-errors-messages';
 
 export class ConfirmUserByCodeCommand {
   constructor(public code: string) {}

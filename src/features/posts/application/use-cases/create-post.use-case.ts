@@ -15,7 +15,7 @@ import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/t
 import { CreatePostDto } from '../../dto/create-post.dto';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { userNotHavePermissionForPost } from '../../../../exception-filter/custom-errors-messages';
+import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
 import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 

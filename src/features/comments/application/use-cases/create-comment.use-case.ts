@@ -7,7 +7,7 @@ import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-s
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
-import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
+import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
 import { TablesCommentsEntity } from '../../entities/tables-comments.entity';

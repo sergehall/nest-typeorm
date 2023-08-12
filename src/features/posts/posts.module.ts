@@ -26,8 +26,8 @@ import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/l
 import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banstatus-posts-by-blogid.use-case';
 import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banstatus-posts.use-case';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
-import { ParseQueriesService } from '../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { FindPostsUseCase } from './application/use-cases/find-posts.use-case';
 import { FindPostByIdUseCase } from './application/use-cases/find-post-by-id.use-case';
 

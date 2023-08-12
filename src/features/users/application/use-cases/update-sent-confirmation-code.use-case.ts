@@ -4,8 +4,8 @@ import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-s
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
-import { emailNotExistsOrIsConfirmed } from '../../../../exception-filter/custom-errors-messages';
-import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
+import { emailNotExistsOrIsConfirmed } from '../../../../common/filters/custom-errors-messages';
+import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
 import { MailsService } from '../../../mails/application/mails.service';
 
 export class UpdateSentConfirmationCodeCommand {

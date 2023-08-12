@@ -18,7 +18,7 @@ import { BannedUsersForBlogsRawSqlRepository } from '../features/users/infrastru
 import { MailerConfig } from '../config/mailer/mailer-config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../features/mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { KeyArrayProcessor } from '../features/common/query/get-key-from-array-or-default';
+import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { RemoveDataUsersWithExpiredDateUseCase } from '../features/users/application/use-cases/remove-data-users-with-expired-date.use-case';
 
 const schedulingUseCases = [RemoveDataUsersWithExpiredDateUseCase];

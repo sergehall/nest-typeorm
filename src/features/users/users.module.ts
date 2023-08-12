@@ -13,10 +13,10 @@ import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.
 import { VerifyUserExistenceUseCase } from './application/use-cases/verify-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { RecoveryCodeExistsRule } from '../../pipes/recovery-code-exists-rule.validation';
-import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
-import { ParseQueriesService } from '../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 
 const usersUseCases = [
   CreateUserUseCase,

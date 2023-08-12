@@ -17,11 +17,11 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { ExpirationDateCalculator } from '../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { ParseQueriesService } from '../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/old/sa-ban-user-by-user-id.use-case';

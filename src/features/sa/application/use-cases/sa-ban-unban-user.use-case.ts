@@ -13,7 +13,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
-import { cannotBlockYourself } from '../../../../exception-filter/custom-errors-messages';
+import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
 
 export class SaBanUnbanUserCommand {
   constructor(

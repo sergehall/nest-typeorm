@@ -2,10 +2,10 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../../common/pagination/types/pagination.types';
 import { CommentsCountLikesDislikesEntity } from '../../entities/comments-count-likes-dislikes.entity';
 
 export class FindCommentsByPostIdCommand {
