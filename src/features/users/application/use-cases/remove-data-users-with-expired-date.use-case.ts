@@ -74,7 +74,6 @@ export class RemoveDataUsersWithExpiredDateUseCase
     await this.commentsRepository.removeCommentsByUserId(userId);
     await this.postsRepository.removePostsByUserId(userId);
     await this.bloggerBlogsRepository.removeBlogsByUserId(userId);
-    // Remove the user itself
     await this.usersRawSqlRepository.removeUserByUserId(userId);
   }
 }

@@ -1,62 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { CommandBus } from '@nestjs/cqrs';
-import { BlacklistJwtRawSqlRepository } from '../features/auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { SecurityDevicesRawSqlRepository } from '../features/security-devices/infrastructure/security-devices-raw-sql.repository';
-import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { RemoveDataUsersWithExpiredDateCommand } from '../features/users/application/use-cases/remove-data-users-with-expired-date.use-case';
-import { MailsRawSqlRepository } from '../features/mails/infrastructure/mails-raw-sql.repository';
-import { FindAndSendConfirmationCommand } from '../features/mails/application/use-case/find-and-send-confirmation-code.use-case';
-import { FindAndSendRecoveryCodeCommand } from '../features/mails/application/use-case/find-and-send-recovery-code.use-case';
-import { ClearSentEmailCodesCommand } from '../features/mails/application/use-case/clear-sent-email-codes.use-case';
+import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
+import { MailsService } from '../features/mails/application/mails.service';
 
 @Injectable()
 export class ScheduledTasksService {
   constructor(
-    protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
-    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected mailsRawSqlRepository: MailsRawSqlRepository,
-    protected commandBus: CommandBus,
+    protected dataCleanupService: DataCleanupService,
+    protected mailsService: MailsService,
   ) {}
 
   // every sec
   @Cron('* * * * * *')
   async sendCurrentConfirmationCodes() {
-    await this.commandBus.execute(new FindAndSendConfirmationCommand());
+    await this.mailsService.sendCurrentConfirmationCodes();
   }
 
   // every sec
   @Cron('* * * * * *')
   async sendCurrentRecoveryCodes() {
-    await this.commandBus.execute(new FindAndSendRecoveryCodeCommand());
+    await this.mailsService.sendCurrentRecoveryCodes();
   }
 
   // every 30 min
   @Cron('*/30 * * * *')
-  async clearingInvalidJWTFromBlackList() {
-    await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
+  async removeInvalidJWTFromBlackList() {
+    await this.dataCleanupService.removeInvalidJWTFromBlackList();
+  }
+
+  // // every 30 min
+  @Cron('*/30 * * * *')
+  async removeUserWithExpirationDate() {
+    await this.dataCleanupService.removeDataUsersWithExpiredDate();
   }
 
   // every 30 min
   @Cron('*/30 * * * *')
-  async clearingUserWithExpirationDate() {
-    await this.commandBus.execute(new RemoveDataUsersWithExpiredDateCommand());
+  async removeSentEmails() {
+    await this.dataCleanupService.removeSentEmailCodes();
   }
 
   // every 30 min
   @Cron('*/30 * * * *')
-  async clearingSentEmails() {
-    await this.mailsRawSqlRepository.clearingSentEmails();
-  }
-
-  // every 30 min
-  @Cron('*/30 * * * *')
-  async clearingDevicesWithExpiredDate() {
-    const command = new ClearSentEmailCodesCommand([
-      'EmailsConfirmationCodes',
-      'EmailsRecoveryCodes',
-    ]);
-    await this.commandBus.execute(command);
+  async removeDevicesWithExpiredDate() {
+    await this.dataCleanupService.removeDevicesWithExpiredDate();
   }
 }

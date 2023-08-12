@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { TablesUsersEntity } from '../entities/tables-users.entity';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
@@ -397,7 +397,7 @@ export class UsersRawSqlRepository {
     countExpiredDate: number,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
-      const isConfirmed = true;
+      const isConfirmed = false;
       const currentTime = new Date().toISOString();
       const orderByDirection = `"createdAt" DESC`;
       const limit = countExpiredDate;
@@ -406,7 +406,7 @@ export class UsersRawSqlRepository {
         `
       SELECT "userId" AS "id"
       FROM public."Users"
-      WHERE "isConfirmed" <> $1 AND "expirationDate" <= $2
+      WHERE "isConfirmed" = $1 AND "expirationDate" <= $2
       ORDER BY ${orderByDirection}
       LIMIT $3 OFFSET $4
       `,
@@ -550,6 +550,88 @@ export class UsersRawSqlRepository {
         We apologize for any inconvenience this may have caused. ${error.message}`,
       );
       throw new InternalServerErrorException(error.message);
+    }
+  }
+  async removeUserData(): Promise<void> {
+    try {
+      await this.db.transaction(async (client) => {
+        const allUsersWithExpiredDate: TablesUsersWithIdEntity[] =
+          await client.query(
+            `
+                SELECT "userId" AS "id"
+                FROM public."Users"
+                WHERE "isConfirmed" = $1 AND "expirationDate" <= $2
+                `,
+            [false, new Date().toISOString()],
+          );
+
+        await Promise.all(
+          allUsersWithExpiredDate.map((user) =>
+            this.deleteUserData(user.id, client),
+          ),
+        );
+      });
+    } catch (error) {
+      {
+        console.error(`Error while removing data for users: ${error.message}`);
+        throw new InternalServerErrorException(
+          `Error while removing data for users`,
+        );
+      }
+    }
+  }
+
+  private async deleteUserData(
+    userId: string,
+    client: EntityManager,
+  ): Promise<void> {
+    try {
+      // Concurrently delete security devices, banned users, and sent emails
+      await Promise.all([
+        client.query(
+          `DELETE FROM public."SecurityDevices" WHERE "userId" = $1`,
+          [userId],
+        ),
+        client.query(
+          `DELETE FROM public."BannedUsersForBlogs" WHERE "userId" = $1`,
+          [userId],
+        ),
+        client.query(
+          `DELETE FROM public."SentEmailsTimeConfirmAndRecoverCodes" WHERE "userId" = $1`,
+          [userId],
+        ),
+        client.query(
+          `DELETE FROM public."LikeStatusComments" WHERE "userId" = $1 OR "commentOwnerId" = $1`,
+          [userId],
+        ),
+        client.query(
+          `DELETE FROM public."LikeStatusPosts" WHERE "userId" = $1 OR "postOwnerId" = $1`,
+          [userId],
+        ),
+      ]);
+
+      await client.query(
+        `DELETE FROM public."Comments" WHERE "commentatorInfoUserId" = $1`,
+        [userId],
+      );
+      await client.query(
+        `DELETE FROM public."Posts" WHERE "postOwnerId" = $1`,
+        [userId],
+      );
+      await client.query(
+        `DELETE FROM public."BloggerBlogs" WHERE "blogOwnerId" = $1`,
+        [userId],
+      );
+      await client.query(`DELETE FROM public."Users" WHERE "userId" = $1`, [
+        userId,
+      ]);
+    } catch (error) {
+      console.error(
+        `Error while removing data for user ${userId}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        `Error while removing data for user ${userId}`,
+      );
     }
   }
 }

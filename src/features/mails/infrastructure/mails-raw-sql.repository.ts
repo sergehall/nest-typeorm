@@ -201,7 +201,6 @@ export class MailsRawSqlRepository {
       const query = `
       DELETE FROM public."${tableName}"
       WHERE "status" = $1 OR "expirationDate" < $2
-      RETURNING "codeId"
     `;
 
       const queryParams = [status, currentTime];
