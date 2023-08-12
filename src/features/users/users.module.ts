@@ -12,11 +12,11 @@ import { UpdateUserUseCase } from './application/use-cases/update-user.use-case'
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { VerifyUserExistenceUseCase } from './application/use-cases/verify-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
-import { RecoveryCodeExistsRule } from '../../common/pipes/recovery-code-exists-rule.validation';
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { RecoveryCodeExistsRule } from '../../common/validators/recovery-code-exists.rule';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -24,6 +24,7 @@ const usersUseCases = [
   RemoveUserByIdUseCase,
   VerifyUserExistenceUseCase,
 ];
+
 const usersRules = [RecoveryCodeExistsRule];
 
 @Module({

@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, MaxLength, Validate } from 'class-validator';
-import { RecoveryCodeExistsRule } from '../../../common/pipes/recovery-code-exists-rule.validation';
+import { RecoveryCodeExistsRule } from '../../../common/validators/recovery-code-exists.rule';
 
 export class NewPasswordRecoveryDto {
   @IsNotEmpty()

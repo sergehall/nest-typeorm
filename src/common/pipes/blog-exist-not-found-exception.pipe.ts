@@ -3,7 +3,7 @@ import { BloggerBlogsRawSqlRepository } from '../../features/blogger-blogs/infra
 import { TableBloggerBlogsRawSqlEntity } from '../../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
 @Injectable()
-export class BlogExistNotFoundRule implements PipeTransform {
+export class BlogExistNotFoundExceptionPipe implements PipeTransform {
   constructor(
     private bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
