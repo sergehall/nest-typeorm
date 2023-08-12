@@ -505,21 +505,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async removePostsByUserId(userId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."Posts"
-        WHERE "postOwnerId" = $1
-          `,
-        [userId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   async removePostsByBlogId(blogId: string): Promise<boolean> {
     try {
       return await this.db.query(

@@ -473,21 +473,6 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async removeCommentsByUserId(userId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."Comments"
-        WHERE "commentatorInfoUserId" = $1
-          `,
-        [userId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   async removeCommentsByBlogId(blogId: string): Promise<boolean> {
     try {
       return await this.db.query(

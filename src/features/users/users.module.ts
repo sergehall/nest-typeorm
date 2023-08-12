@@ -10,22 +10,21 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
-import { VerifyUserExistenceUseCase } from './application/use-cases/verify-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { RecoveryCodeExistsRule } from '../../common/validators/recovery-code-exists.rule';
+import { VerifyUserLoginEmailExistenceRule } from '../../common/validators/verify-user-login-email-existence.rule';
 
 const usersUseCases = [
   CreateUserUseCase,
   UpdateUserUseCase,
   RemoveUserByIdUseCase,
-  VerifyUserExistenceUseCase,
 ];
 
-const usersRules = [RecoveryCodeExistsRule];
+const usersRules = [RecoveryCodeExistsRule, VerifyUserLoginEmailExistenceRule];
 
 @Module({
   imports: [CaslModule, CqrsModule],

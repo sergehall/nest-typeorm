@@ -124,21 +124,6 @@ export class BannedUsersForBlogsRawSqlRepository {
     }
   }
 
-  async removeBannedUserByUserId(userId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."BannedUsersForBlogs"
-        WHERE "userId" = $1
-          `,
-        [userId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   async removeBannedUserByBlogId(blogId: string): Promise<boolean> {
     try {
       return await this.db.query(

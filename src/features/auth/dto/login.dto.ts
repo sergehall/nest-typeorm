@@ -1,4 +1,5 @@
-import { IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsNotEmpty, Length, Matches, Validate } from 'class-validator';
+import { VerifyUserLoginEmailExistenceRule } from '../../../common/validators/verify-user-login-email-existence.rule';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -6,6 +7,7 @@ export class LoginDto {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })
   @Matches('^[a-zA-Z0-9_-]*$')
+  @Validate(VerifyUserLoginEmailExistenceRule)
   login: string;
   @IsNotEmpty()
   @Length(6, 20, {
@@ -14,5 +16,6 @@ export class LoginDto {
   password: string;
   @IsNotEmpty({ message: 'Email should not be empty' })
   @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
+  @Validate(VerifyUserLoginEmailExistenceRule)
   email: string;
 }

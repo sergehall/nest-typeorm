@@ -54,41 +54,6 @@ export class LikeStatusCommentsRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-  async findCommentAndCountLikesDislikesLikeStatus(
-    commentId: string,
-    userId: string,
-    isBanned: boolean,
-  ) {
-    try {
-      return await this.db.query(
-        `
-      SELECT "commentId", "userId", "blogId", "isBanned", "likeStatus", "createdAt",
-      (
-        SELECT COUNT(*) 
-        FROM public."LikeStatusComments"
-        WHERE "commentId" = $1 AND "likeStatus" = 'Like'
-      ) AS "numberOfLikes",
-      (
-        SELECT COUNT(*) 
-        FROM public."LikeStatusComments"
-        WHERE "commentId" = $1 AND "likeStatus" = 'Dislike'
-      ) AS "numberOfDislikes",
-      (
-        SELECT "likeStatus"
-        FROM public."LikeStatusComments"
-        WHERE "commentId" = $1 AND "userId" = $2
-        LIMIT 1
-      ) AS "likeStatus"
-      FROM public."LikeStatusComments"
-      WHERE "commentId" = $1 AND "userId" = $2 AND "isBanned" = $3
-        `,
-        [commentId, userId, isBanned],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
 
   async countLikesDislikes(
     commentId: string,
@@ -160,23 +125,6 @@ export class LikeStatusCommentsRawSqlRepository {
         WHERE "userId" = $1 OR "commentOwnerId" = $1
         `,
         [userId, isBanned],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeLikesCommentsByUserIdAndCommentOwnerId(
-    userId: string,
-  ): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."LikeStatusComments"
-        WHERE "userId" = $1 OR "commentOwnerId" = $1
-        `,
-        [userId],
       );
     } catch (error) {
       console.log(error.message);
