@@ -12,12 +12,14 @@ import { FindAndSendConfirmationCodeUseCase } from './application/use-case/find-
 import { FindAndSendRecoveryCodeUseCase } from './application/use-case/find-and-send-recovery-code.use-case';
 import { SendRecoveryCodesUseCase } from './application/use-case/send-recovery-codes';
 import { SendRegistrationCodesUseCase } from './application/use-case/send-registration-codes.use-case';
+import { ClearSentEmailCodesUseCase } from './application/use-case/clear-sent-email-codes.use-case';
 
 const mailsUseCases = [
   FindAndSendConfirmationCodeUseCase,
   FindAndSendRecoveryCodeUseCase,
   SendRegistrationCodesUseCase,
   SendRecoveryCodesUseCase,
+  ClearSentEmailCodesUseCase,
 ];
 
 @Module({

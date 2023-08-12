@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity';
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 import { MailingStatus } from '../enums/status.enums';
+import { SentEmailTableNames } from '../application/types/sent-email-table-names';
 
 export class MailsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -72,9 +73,10 @@ export class MailsRawSqlRepository {
     const orderByDirection = `"createdAt" ASC`;
     const limit = 1;
 
-    // Construct the query using a CTE to select the oldest pending code
-    // and update its status to "sending"
-    const query = `
+    try {
+      // Construct the query using a CTE to select the oldest pending code
+      // and update its status to "sending"
+      const query = `
       WITH oldest_pending AS (
         SELECT "codeId", "email", "confirmationCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsConfirmationCodes"
@@ -90,9 +92,7 @@ export class MailsRawSqlRepository {
       RETURNING oldest_pending.*;
     `;
 
-    const parameters = [pendingStatus, sendingStatus, limit];
-
-    try {
+      const parameters = [pendingStatus, sendingStatus, limit];
       const result = await this.db.query(query, parameters);
 
       // Adjust this part based on the actual structure of the result
@@ -111,9 +111,10 @@ export class MailsRawSqlRepository {
     const orderByDirection = `"createdAt" ASC`;
     const limit = 1;
 
-    // Construct the query using a CTE to select the oldest pending code
-    // and update its status to "sending"
-    const query = `
+    try {
+      // Construct the query using a CTE to select the oldest pending code
+      // and update its status to "sending"
+      const query = `
       WITH oldest_pending AS (
         SELECT "codeId", "email", "recoveryCode", "expirationDate", "createdAt", "status"
         FROM public."EmailsRecoveryCodes"
@@ -129,8 +130,7 @@ export class MailsRawSqlRepository {
       RETURNING oldest_pending.*;
     `;
 
-    const parameters = [pendingStatus, sendingStatus, limit];
-    try {
+      const parameters = [pendingStatus, sendingStatus, limit];
       const result = await this.db.query(query, parameters);
 
       // Adjust this part based on the actual structure of the result
@@ -155,7 +155,8 @@ export class MailsRawSqlRepository {
         [status, codeId],
       );
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -189,6 +190,28 @@ export class MailsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async clearSentEmailCodes(tableName: SentEmailTableNames) {
+    const status: MailingStatus = MailingStatus.SENT;
+    const currentTime = new Date().toISOString();
+
+    try {
+      const query = `
+      DELETE FROM public."${tableName}"
+      WHERE "status" = $1 OR "expirationDate" < $2
+      RETURNING "codeId"
+    `;
+
+      const queryParams = [status, currentTime];
+
+      return await this.db.query(query, queryParams);
+    } catch (error) {
+      console.error('Error while clearing email codes:', error.message);
+      throw new InternalServerErrorException(
+        'Error while clearing email codes.',
+      );
     }
   }
 }
