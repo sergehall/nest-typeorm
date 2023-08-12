@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { ReturnCommentsEntity } from '../../../comments/entities/return-comments.entity';
 import { ReturnCommentsWithPostInfoEntity } from '../../../comments/entities/return-comments-with-post-info.entity';
 import { CommentsCountLikesDislikesEntity } from '../../../comments/entities/comments-count-likes-dislikes.entity';

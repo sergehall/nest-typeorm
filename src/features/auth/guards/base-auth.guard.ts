@@ -11,7 +11,7 @@ import { userSuperAdmin } from '../../sa/dto/super-admin.dto';
 import {
   loginOrPassInvalid,
   noAuthHeadersError,
-} from '../../../exception-filter/custom-errors-messages';
+} from '../../../common/filters/custom-errors-messages';
 
 @Injectable()
 export class BaseAuthGuard extends SaConfig implements CanActivate {

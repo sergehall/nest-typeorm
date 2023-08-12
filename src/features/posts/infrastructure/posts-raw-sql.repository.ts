@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
-import { BlogIdParams } from '../../common/query/params/blogId.params';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { BlogIdParams } from '../../../common/query/params/blogId.params';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../dto/paging-params.dto';
 import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-posts.entity';
-import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
+import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 

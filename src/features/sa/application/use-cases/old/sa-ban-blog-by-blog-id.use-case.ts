@@ -14,7 +14,7 @@ import { CurrentUserDto } from '../../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { ChangeBanStatusPostsByBlogIdCommand } from '../../../../posts/application/use-cases/change-banstatus-posts-by-blogid.use-case';
 import { ChangeBanStatusCommentsByBlogIdCommand } from '../../../../comments/application/use-cases/change-banStatus-comments-by-blogId.use-case';
-import { cannotBlockOwnBlog } from '../../../../../exception-filter/custom-errors-messages';
+import { cannotBlockOwnBlog } from '../../../../../common/filters/custom-errors-messages';
 import { ChangeBanStatusBlogsByBlogIdCommand } from './sa-change-ban-status-blogs-by-blog-id.use-case';
 
 export class SaBanBlogByBlogIdCommand {

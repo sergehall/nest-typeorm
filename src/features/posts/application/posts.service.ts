@@ -8,11 +8,11 @@ import {
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
-import { BlogIdParams } from '../../common/query/params/blogId.params';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { BlogIdParams } from '../../../common/query/params/blogId.params';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
-import { userNotHavePermission } from '../../../exception-filter/custom-errors-messages';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { userNotHavePermission } from '../../../common/filters/custom-errors-messages';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   NewestLikes,

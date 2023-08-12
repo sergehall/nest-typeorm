@@ -20,8 +20,8 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-all-banned-users-for-blog.use.case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
-import { ParseQueriesService } from '../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { BanUnbanBlogForUserUseCase } from './application/use-cases/ban-unban-user-for-blog.use-case';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/old/sa-change-ban-status-blogs-by-blog-id.use-case';
 

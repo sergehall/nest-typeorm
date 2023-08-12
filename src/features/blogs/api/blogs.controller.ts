@@ -7,14 +7,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistNotFoundRule } from '../../../pipes/blog-exist-not-found-rule.pipe';
 

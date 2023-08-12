@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './exception-filter/http-exception.filter';
+import { CustomHttpExceptionFilter } from './common/filters/custom-http-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import { TrimPipe } from './pipes/trim-pipe';
 
@@ -24,7 +24,7 @@ function setupContainer(app: INestApplication): void {
  * @param app The INestApplication instance of the NestJS application.
  */
 function setupExceptionFilter(app: INestApplication): void {
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new CustomHttpExceptionFilter());
 }
 
 /**

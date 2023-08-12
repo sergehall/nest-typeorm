@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
 import { ReturnUsersBanInfoEntity } from '../../sa/entities/return-users-banInfo.entity';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 
 @Injectable()
 export class UsersService {

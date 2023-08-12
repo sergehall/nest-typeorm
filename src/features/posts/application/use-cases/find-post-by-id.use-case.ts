@@ -1,6 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
 import { NotFoundException } from '@nestjs/common';

@@ -10,9 +10,9 @@ import { TablesUsersEntity } from '../entities/tables-users.entity';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
-import { loginOrEmailAlreadyExists } from '../../../exception-filter/custom-errors-messages';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
+import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 
 @Injectable()
 export class UsersRawSqlRepository {

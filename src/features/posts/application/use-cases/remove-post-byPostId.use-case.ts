@@ -8,7 +8,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
+import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';

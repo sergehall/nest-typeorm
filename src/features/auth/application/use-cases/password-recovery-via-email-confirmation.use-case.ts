@@ -3,7 +3,7 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import * as uuid4 from 'uuid4';
 import { EmailsRecoveryCodesEntity } from '../../../mails/entities/emails-recovery-codes.entity';
 import { MailsService } from '../../../mails/application/mails.service';
-import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
 
 export class PasswordRecoveryViaEmailConfirmationCommand {
   constructor(public email: string) {}

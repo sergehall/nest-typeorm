@@ -7,7 +7,7 @@ import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.reposi
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
-import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
+import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 
 export class ChangeLikeStatusPostCommand {
   constructor(

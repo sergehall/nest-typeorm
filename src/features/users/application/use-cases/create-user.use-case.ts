@@ -5,7 +5,7 @@ import { RegistrationUserCommand } from '../../../auth/application/use-cases/reg
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { OrgIdEnums } from '../../enums/org-id.enums';
 import { RolesEnums } from '../../../../ability/enums/roles.enums';
-import { ExpirationDateCalculator } from '../../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import * as uuid4 from 'uuid4';
 import { TablesUsersEntity } from '../../entities/tables-users.entity';

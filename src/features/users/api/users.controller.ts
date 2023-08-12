@@ -26,12 +26,12 @@ import { RegDataDto } from '../dto/reg-data.dto';
 import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
-import { IdParams } from '../../common/query/params/id.params';
+import { IdParams } from '../../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/currentUser.dto';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PaginationTypes } from '../../common/pagination/types/pagination.types';
+import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { ReturnUserDto } from '../dto/return-user.dto';
 

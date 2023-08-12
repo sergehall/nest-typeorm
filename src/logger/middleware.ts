@@ -1,9 +1,9 @@
 import { Injectable, Logger, NestMiddleware, UseFilters } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { HttpExceptionFilter } from '../exception-filter/http-exception.filter';
+import { CustomHttpExceptionFilter } from '../common/filters/custom-http-exception.filter';
 
 @Injectable()
-@UseFilters(HttpExceptionFilter)
+@UseFilters(CustomHttpExceptionFilter)
 export class LoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
   use(req: Request, res: Response, next: NextFunction) {

@@ -21,8 +21,8 @@ import { ChangeLikeStatusCommentCommand } from '../application/use-cases/change-
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
 import { RemoveCommentCommand } from '../application/use-cases/remove-comment.use-case';
-import { IdParams } from '../../common/query/params/id.params';
-import { CommentIdParams } from '../../common/query/params/commentId.params';
+import { IdParams } from '../../../common/query/params/id.params';
+import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';

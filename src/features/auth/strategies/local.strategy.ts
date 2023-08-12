@@ -8,8 +8,8 @@ import {
   invalidLoginOrEmailLengthError,
   passwordInvalid,
   validatePasswordFailed,
-} from '../../../exception-filter/custom-errors-messages';
-import { CustomErrorsMessagesType } from '../../../exception-filter/types/custom-errors-messages.types';
+} from '../../../common/filters/custom-errors-messages';
+import { CustomErrorsMessagesType } from '../../../common/filters/types/custom-errors-messages.types';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {

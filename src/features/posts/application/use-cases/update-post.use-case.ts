@@ -8,7 +8,7 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
+import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { UpdatePostDto } from '../../dto/update-post.dto';

@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 
 export class BannedUsersForBlogsRawSqlRepository {
   constructor(

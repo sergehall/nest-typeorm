@@ -10,7 +10,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { userNotHavePermissionForBlog } from '../../../../exception-filter/custom-errors-messages';
+import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(

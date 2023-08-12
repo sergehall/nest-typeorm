@@ -1,4 +1,4 @@
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';

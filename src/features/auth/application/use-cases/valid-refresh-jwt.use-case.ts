@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { jwtCookiesIncorrect } from '../../../../exception-filter/custom-errors-messages';
+import { jwtCookiesIncorrect } from '../../../../common/filters/custom-errors-messages';
 
 export class ValidRefreshJwtCommand {
   constructor(public refreshToken: string) {}
