@@ -168,19 +168,4 @@ export class SecurityDevicesRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
-
-  async removeDevicesByUseId(userId: string) {
-    try {
-      return await this.db.query(
-        `
-      DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1
-      `,
-        [userId],
-      );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
 }

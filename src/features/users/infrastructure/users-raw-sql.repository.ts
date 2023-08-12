@@ -279,9 +279,8 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async userAlreadyExist(
-    login: string,
-    email: string,
+  async loginOrEmailAlreadyExist(
+    key: string,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
       return await this.db.query(
@@ -292,7 +291,7 @@ export class UsersRawSqlRepository {
         FROM public."Users"
         WHERE "login" = $1 OR "email" = $2
       `,
-        [login.toLocaleLowerCase(), email.toLocaleLowerCase()],
+        [key.toLocaleLowerCase(), key.toLocaleLowerCase()],
       );
     } catch (error) {
       throw new InternalServerErrorException(error.message);

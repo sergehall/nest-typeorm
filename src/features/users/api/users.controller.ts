@@ -74,6 +74,7 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @Ip() ip: string,
   ): Promise<ReturnUserDto> {
+    console.log('0000000');
     const registrationData: RegDataDto = {
       ip: ip,
       userAgent: req.get('user-agent') || 'None',

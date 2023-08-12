@@ -40,7 +40,6 @@ import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
-import { VerifyUserExistenceCommand } from '../../users/application/use-cases/verify-user-existence.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 
 @SkipThrottle()
@@ -90,10 +89,6 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
   ) {
-    const { login, email } = loginDto;
-
-    await this.commandBus.execute(new VerifyUserExistenceCommand(login, email));
-
     const registrationData: RegDataDto = {
       ip: ip,
       userAgent: req.get('user-agent') || 'None',
