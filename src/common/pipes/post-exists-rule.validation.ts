@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { PostsRawSqlRepository } from '../features/posts/infrastructure/posts-raw-sql.repository';
+import { PostsRawSqlRepository } from '../../features/posts/infrastructure/posts-raw-sql.repository';
 
 @ValidatorConstraint({ name: 'PostExists', async: true })
 @Injectable()

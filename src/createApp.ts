@@ -7,7 +7,7 @@ import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import { CustomHttpExceptionFilter } from './common/filters/custom-http-exception.filter';
 import * as cookieParser from 'cookie-parser';
-import { TrimPipe } from './pipes/trim-pipe';
+import { TrimPipe } from './common/pipes/trim.pipe';
 
 /**
  * Configure the IoC container for the NestJS application.

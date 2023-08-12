@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../../features/users/infrastructure/users-raw-sql.repository';
 
 @ValidatorConstraint({ name: 'RecoveryCodeExists', async: true })
 @Injectable()

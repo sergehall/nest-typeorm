@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, Validate } from 'class-validator';
-import { BlogExistsBadRequestRule } from '../../../pipes/blog-exist-rule.validation';
+import { BlogExistsBadRequestRule } from '../../../common/pipes/blog-exist-rule.validation';
 
 export class UpdatePostWithBlogIdDto {
   @IsNotEmpty()
