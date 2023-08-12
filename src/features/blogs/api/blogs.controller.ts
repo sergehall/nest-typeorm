@@ -16,7 +16,7 @@ import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-bl
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BlogExistNotFoundRule } from '../../../common/pipes/blog-exist-not-found-rule.pipe';
+import { BlogExistNotFoundExceptionPipe } from '../../../common/pipes/blog-exist-not-found-exception.pipe';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -38,7 +38,7 @@ export class BlogsController {
   @Get(':id')
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindBlogById(
-    @Param('id', BlogExistNotFoundRule) blogId: string,
+    @Param('id', BlogExistNotFoundExceptionPipe) blogId: string,
   ): Promise<ReturnBloggerBlogsEntity> {
     return await this.blogsService.openFindBlogById(blogId);
   }
@@ -48,7 +48,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPostsByBlogId(
     @Request() req: any,
-    @Param('blogId', BlogExistNotFoundRule) blogId: string,
+    @Param('blogId', BlogExistNotFoundExceptionPipe) blogId: string,
     @Query() query: any,
   ): Promise<PaginationTypes> {
     const params = { blogId: blogId };
