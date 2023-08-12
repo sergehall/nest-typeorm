@@ -12,7 +12,7 @@ import { LoggerMiddleware } from './logger/middleware';
 import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './features/security-devices/security-devices.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { DemonsModule } from './features/demons/demons.module';
+import { SchedulingModule } from './scheduling/scheduling.module';
 import { MailsModule } from './features/mails/mails.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SaModule } from './features/sa/sa.module';
@@ -40,7 +40,7 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
     BlogsModule,
     PostsModule,
     CommentsModule,
-    DemonsModule,
+    SchedulingModule,
     MailsModule,
     BloggerBlogsModule,
     SecurityDevicesModule,
