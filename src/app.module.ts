@@ -8,7 +8,6 @@ import { UsersModule } from './features/users/users.module';
 import { PostsModule } from './features/posts/posts.module';
 import { CommentsModule } from './features/comments/comments.module';
 import { TestingModule } from './features/testing/testing.module';
-import { LoggerMiddleware } from './logger/middleware';
 import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './features/security-devices/security-devices.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -22,6 +21,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { OrmModuleOptions } from './config/db/postgres/orm-module-options';
 import { ThrottlerOptions } from './config/throttle/throttler-options';
+import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
 
 @Module({
   imports: [
@@ -51,6 +51,6 @@ import { ThrottlerOptions } from './config/throttle/throttler-options';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*'); // Apply logger middleware to all routes
+    consumer.apply(HttpLoggingMiddleware).forRoutes('*'); // Apply logger middleware to all routes
   }
 }
