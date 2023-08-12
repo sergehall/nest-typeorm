@@ -20,10 +20,10 @@ export class BlacklistJwtRawSqlRepository {
       return false;
     }
   }
-  async clearingInvalidJWTFromBlackList(): Promise<boolean> {
+  async clearingInvalidJWTFromBlackList(): Promise<void> {
     try {
       const currentTime = new Date().toISOString();
-      const removeCurrentDevice = await this.db.query(
+      return await this.db.query(
         `
       DELETE FROM public."BlacklistJwt"
       WHERE "expirationDate" < $1
@@ -31,10 +31,9 @@ export class BlacklistJwtRawSqlRepository {
       `,
         [currentTime],
       );
-      return removeCurrentDevice[0] != null;
     } catch (e) {
       console.log(e);
-      return false;
+      throw new InternalServerErrorException();
     }
   }
   async JwtExistInBlackList(jwt: string): Promise<boolean> {

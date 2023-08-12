@@ -142,7 +142,7 @@ export class SecurityDevicesRawSqlRepository {
       return await this.db.query(
         `
       DELETE FROM public."SecurityDevices"
-      WHERE "expirationDate" <= $1
+      WHERE "expirationDate" < $1
       `,
         [currentTime],
       );

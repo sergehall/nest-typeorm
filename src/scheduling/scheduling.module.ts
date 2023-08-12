@@ -20,6 +20,7 @@ import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../features/mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { RemoveDataUsersWithExpiredDateUseCase } from '../features/users/application/use-cases/remove-data-users-with-expired-date.use-case';
+import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 
 const schedulingUseCases = [RemoveDataUsersWithExpiredDateUseCase];
 
@@ -32,6 +33,7 @@ const schedulingUseCases = [RemoveDataUsersWithExpiredDateUseCase];
     PostgresConfig,
     ScheduledTasksService,
     UsersService,
+    DataCleanupService,
     KeyArrayProcessor,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,

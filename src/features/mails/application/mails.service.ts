@@ -4,10 +4,24 @@ import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity'
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 import * as uuid4 from 'uuid4';
 import { MailingStatus } from '../enums/status.enums';
+import { FindAndSendConfirmationCommand } from './use-case/find-and-send-confirmation-code.use-case';
+import { FindAndSendRecoveryCodeCommand } from './use-case/find-and-send-recovery-code.use-case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class MailsService {
-  constructor(private mailsRawSqlRepository: MailsRawSqlRepository) {}
+  constructor(
+    private mailsRawSqlRepository: MailsRawSqlRepository,
+    protected commandBus: CommandBus,
+  ) {}
+
+  async sendCurrentConfirmationCodes() {
+    return await this.commandBus.execute(new FindAndSendConfirmationCommand());
+  }
+
+  async sendCurrentRecoveryCodes() {
+    return await this.commandBus.execute(new FindAndSendRecoveryCodeCommand());
+  }
 
   async registerSendEmail(
     email: string,

@@ -37,7 +37,7 @@ export class CreateUserUseCase
     // Return the expirationDate in ISO format for user registration.
     const expirationDate = await this.expirationDateCalculator.createExpDate(
       0,
-      3,
+      2,
       0,
     );
 

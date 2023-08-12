@@ -22,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
 import { OrmModuleOptions } from './config/db/postgres/orm-module-options';
 import { ThrottlerOptions } from './config/throttle/throttler-options';
 import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
+import { DataCleanupModule } from './data-cleanup/data-cleanup.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
     BloggerBlogsModule,
     SecurityDevicesModule,
     TestingModule,
+    DataCleanupModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],
