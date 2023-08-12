@@ -8,6 +8,7 @@ import { RemoveDataUsersWithExpiredDateCommand } from '../features/users/applica
 import { MailsRawSqlRepository } from '../features/mails/infrastructure/mails-raw-sql.repository';
 import { FindAndSendConfirmationCommand } from '../features/mails/application/use-case/find-and-send-confirmation-code.use-case';
 import { FindAndSendRecoveryCodeCommand } from '../features/mails/application/use-case/find-and-send-recovery-code.use-case';
+import { ClearSentEmailCodesCommand } from '../features/mails/application/use-case/clear-sent-email-codes.use-case';
 
 @Injectable()
 export class ScheduledTasksService {
@@ -49,9 +50,13 @@ export class ScheduledTasksService {
     await this.mailsRawSqlRepository.clearingSentEmails();
   }
 
-  // every 1 hour
-  @Cron('0 * * * *')
+  // every 30 min
+  @Cron('*/30 * * * *')
   async clearingDevicesWithExpiredDate() {
-    await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
+    const command = new ClearSentEmailCodesCommand([
+      'EmailsConfirmationCodes',
+      'EmailsRecoveryCodes',
+    ]);
+    await this.commandBus.execute(command);
   }
 }
