@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
+import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../../../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../../../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
+import { BannedUsersForBlogsRawSqlRepository } from '../../infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../../mails/infrastructure/sent-email-confirmation-code-time.repository';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
+import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 
 export class RemoveDataUsersWithExpiredDateCommand {}
 
