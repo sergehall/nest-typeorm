@@ -16,7 +16,7 @@ import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-bl
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BlogExistNotFoundRule } from '../../../pipes/blog-exist-not-found-rule.pipe';
+import { BlogExistNotFoundRule } from '../../../common/pipes/blog-exist-not-found-rule.pipe';
 
 @SkipThrottle()
 @Controller('blogs')

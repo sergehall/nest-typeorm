@@ -12,7 +12,7 @@ import { UpdateUserUseCase } from './application/use-cases/update-user.use-case'
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { VerifyUserExistenceUseCase } from './application/use-cases/verify-user-existence.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
-import { RecoveryCodeExistsRule } from '../../pipes/recovery-code-exists-rule.validation';
+import { RecoveryCodeExistsRule } from '../../common/pipes/recovery-code-exists-rule.validation';
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
