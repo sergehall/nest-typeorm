@@ -41,7 +41,7 @@ export class HttpLoggingMiddleware implements NestMiddleware {
     const { statusCode, statusMessage } = res;
     const contentLength = res.getHeader('content-length');
     const logMessage = `${method} ${url} ${statusCode} ${statusMessage} ${contentLength} - ${userAgent} ${ip}`;
-    this.logger.log(logMessage);
+    // this.logger.log(logMessage);
   }
 
   // Handle errors and log HTTP exceptions
