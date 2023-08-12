@@ -1,7 +1,6 @@
 import {
   ForbiddenException,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -190,40 +189,6 @@ export class MailsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeEmailConfirmCodesByCodeId(codeId: string): Promise<boolean> {
-    try {
-      const comment = await this.db.query(
-        `
-        DELETE FROM public."EmailsConfirmationCodes"
-        WHERE "codeId" = $1
-        RETURNING "codeId"
-          `,
-        [codeId],
-      );
-      return comment[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
-  async removeEmailRecoverCodesByCodeId(codeId: string): Promise<boolean> {
-    try {
-      const comment = await this.db.query(
-        `
-        DELETE FROM public."EmailsRecoveryCodes"
-        WHERE "codeId" = $1
-        RETURNING "codeId"
-          `,
-        [codeId],
-      );
-      return comment[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
     }
   }
 }
