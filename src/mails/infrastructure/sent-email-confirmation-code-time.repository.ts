@@ -1,10 +1,12 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
+import * as uuid4 from 'uuid4';
 
 export class SentEmailsTimeConfirmAndRecoverCodesRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addConfirmationCode(codeId: string, email: string) {
+  async addConfirmationCode(email: string) {
+    const codeId = uuid4().toString();
     const currentTime = new Date().toISOString();
 
     try {

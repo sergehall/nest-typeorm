@@ -20,7 +20,7 @@ export class SendRecoveryCodesUseCase
     const { email, recoveryCode } = command.emailAndCode;
 
     const sendMailOptions =
-      await this.mailsAdapter.createSendMailOptionsForRecoveryCode(
+      await this.mailsAdapter.buildMailOptionsForRecoveryCode(
         email,
         recoveryCode,
       );

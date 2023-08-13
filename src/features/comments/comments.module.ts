@@ -6,7 +6,7 @@ import { PostsService } from '../posts/application/posts.service';
 import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-banStatus-comments.use-case';
 import { CqrsModule } from '@nestjs/cqrs';

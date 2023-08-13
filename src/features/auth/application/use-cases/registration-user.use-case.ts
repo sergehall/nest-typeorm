@@ -3,7 +3,7 @@ import { RegDataDto } from '../../../users/dto/reg-data.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
-import { MailsService } from '../../../mails/application/mails.service';
+import { MailsService } from '../../../../mails/application/mails.service';
 
 export class RegistrationUserCommand {
   constructor(
@@ -27,12 +27,9 @@ export class RegistrationUserUseCase
       new CreateUserCommand(command.createUserDto, command.registrationData),
     );
 
-    const { email, confirmationCode, expirationDate } = newUser;
-    await this.mailsService.registerSendEmail(
-      email,
-      confirmationCode,
-      expirationDate,
-    );
+    const { email, confirmationCode } = newUser;
+
+    await this.mailsService.registrationSendCode(email, confirmationCode);
 
     return newUser;
   }

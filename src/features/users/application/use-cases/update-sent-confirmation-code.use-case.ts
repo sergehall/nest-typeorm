@@ -1,12 +1,12 @@
 import * as uuid4 from 'uuid4';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MailsRawSqlRepository } from '../../../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
 import { emailNotExistsOrIsConfirmed } from '../../../../common/filters/custom-errors-messages';
 import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
-import { MailsService } from '../../../mails/application/mails.service';
+import { MailsService } from '../../../../mails/application/mails.service';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}

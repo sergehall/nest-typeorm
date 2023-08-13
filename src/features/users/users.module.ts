@@ -4,7 +4,7 @@ import { UsersController } from './api/users.controller';
 import { AuthService } from '../auth/application/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { CaslModule } from '../../ability/casl.module';
-import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
-import { MailsService } from '../features/mails/application/mails.service';
+import { MailsService } from '../mails/application/mails.service';
 
 @Injectable()
 export class ScheduledTasksService {
@@ -9,12 +9,6 @@ export class ScheduledTasksService {
     protected dataCleanupService: DataCleanupService,
     protected mailsService: MailsService,
   ) {}
-
-  // every sec
-  @Cron('* * * * * *')
-  async sendCurrentConfirmationCodes() {
-    await this.mailsService.sendCurrentConfirmationCodes();
-  }
 
   // every sec
   @Cron('* * * * * *')

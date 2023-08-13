@@ -3,23 +3,23 @@ import { MailsService } from './application/mails.service';
 import { MailsRawSqlRepository } from './infrastructure/mails-raw-sql.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailsAdapter } from './adapters/mails.adapter';
-import { MailerConfig } from '../../config/mailer/mailer-config';
-import { MailerOptionsService } from '../../config/mailer/mailer-options-service';
-import { PostgresConfig } from '../../config/db/postgres/postgres.config';
+import { MailerConfig } from '../config/mailer/mailer-config';
+import { MailerOptionsService } from '../config/mailer/mailer-options-service';
+import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { SentEmailsTimeConfirmAndRecoverCodesRepository } from './infrastructure/sent-email-confirmation-code-time.repository';
 import { CqrsModule } from '@nestjs/cqrs';
-import { FindAndSendConfirmationCodeUseCase } from './application/use-case/find-and-send-confirmation-code.use-case';
 import { FindAndSendRecoveryCodeUseCase } from './application/use-case/find-and-send-recovery-code.use-case';
 import { SendRecoveryCodesUseCase } from './application/use-case/send-recovery-codes';
-import { SendRegistrationCodesUseCase } from './application/use-case/send-registration-codes.use-case';
 import { ClearSentEmailCodesUseCase } from './application/use-case/clear-sent-email-codes.use-case';
+import { RegistrationSendCodeUseCase } from './application/use-case/send-codes.use-case';
+import { EmailSendingUseCase } from './application/use-case/email-sending-use-case';
 
 const mailsUseCases = [
-  FindAndSendConfirmationCodeUseCase,
   FindAndSendRecoveryCodeUseCase,
-  SendRegistrationCodesUseCase,
+  EmailSendingUseCase,
   SendRecoveryCodesUseCase,
   ClearSentEmailCodesUseCase,
+  RegistrationSendCodeUseCase,
 ];
 
 @Module({
