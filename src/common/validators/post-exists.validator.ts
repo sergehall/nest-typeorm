@@ -8,7 +8,7 @@ import { PostsRawSqlRepository } from '../../features/posts/infrastructure/posts
 
 @ValidatorConstraint({ name: 'PostExists', async: true })
 @Injectable()
-export class PostExistsRule implements ValidatorConstraintInterface {
+export class PostExistsValidator implements ValidatorConstraintInterface {
   constructor(private postsRawSqlRepository: PostsRawSqlRepository) {}
 
   async validate(value: string): Promise<boolean> {
@@ -21,6 +21,6 @@ export class PostExistsRule implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `Post id: ${args.value} doesn't exist`;
+    return `Post id:${args.value} doesn't exist`;
   }
 }

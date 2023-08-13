@@ -21,9 +21,9 @@ import { FindAllBannedUsersForBlogUseCase } from './application/use-cases/find-a
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { BanUnbanBlogForUserUseCase } from './application/use-cases/ban-unban-user-for-blog.use-case';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/old/sa-change-ban-status-blogs-by-blog-id.use-case';
+import { KeyResolver } from '../../common/query/key-resolver';
 
 const bloggersBlogUseCases = [
   BanUnbanBlogForUserUseCase,
@@ -47,12 +47,11 @@ const bloggersBlogUseCases = [
     ParseQueriesService,
     BloggerBlogsService,
     PostsService,
-    KeyArrayProcessor,
+    KeyResolver,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
-    KeyArrayProcessor,
     LikeStatusPostsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,

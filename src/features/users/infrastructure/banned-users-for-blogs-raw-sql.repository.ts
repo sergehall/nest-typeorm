@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
+import { KeyResolver } from '../../../common/query/key-resolver';
 
 export class BannedUsersForBlogsRawSqlRepository {
   constructor(
     @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
+    protected keyResolver: KeyResolver,
   ) {}
   async addBannedOrDeleteUnBannedUser(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
@@ -139,7 +139,7 @@ export class BannedUsersForBlogsRawSqlRepository {
     }
   }
   private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+    return await this.keyResolver.resolveKey(
       sortBy,
       ['login', 'banReason'],
       'banDate',

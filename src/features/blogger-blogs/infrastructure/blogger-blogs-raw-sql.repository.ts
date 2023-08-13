@@ -8,15 +8,15 @@ import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-r
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
+import { KeyResolver } from '../../../common/query/key-resolver';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
     @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
+    protected keyResolver: KeyResolver,
   ) {}
 
   async findBlogById(
@@ -630,7 +630,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+    return await this.keyResolver.resolveKey(
       sortBy,
       [
         'isMembership',

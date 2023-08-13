@@ -4,7 +4,7 @@ import { SecurityDevicesRawSqlRepository } from '../features/security-devices/in
 import { CqrsModule } from '@nestjs/cqrs';
 import { BlacklistJwtRawSqlRepository } from '../features/auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
+import { KeyResolver } from '../common/query/key-resolver';
 
 @Module({
   imports: [CqrsModule],
@@ -13,7 +13,7 @@ import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default
     UsersRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     BlacklistJwtRawSqlRepository,
-    KeyArrayProcessor,
+    KeyResolver,
   ],
 })
 export class DataCleanupModule {}

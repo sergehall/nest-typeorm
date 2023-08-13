@@ -30,8 +30,8 @@ import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token
 import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { MailsService } from '../../mails/application/mails.service';
+import { KeyResolver } from '../../common/query/key-resolver';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -61,7 +61,7 @@ const authUseCases = [
     AuthService,
     EncryptConfig,
     MailsService,
-    KeyArrayProcessor,
+    KeyResolver,
     DecodeTokenService,
     UsersRawSqlRepository,
     SecurityDevicesService,

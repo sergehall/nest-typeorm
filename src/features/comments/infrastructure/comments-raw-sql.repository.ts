@@ -7,17 +7,17 @@ import {
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';
+import { KeyResolver } from '../../../common/query/key-resolver';
 
 export class CommentsRawSqlRepository {
   constructor(
     @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
+    protected keyResolver: KeyResolver,
   ) {}
 
   async createComment(
@@ -513,7 +513,7 @@ export class CommentsRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+    return await this.keyResolver.resolveKey(
       sortBy,
       [
         'content',
