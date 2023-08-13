@@ -23,13 +23,15 @@ export class RegistrationUserUseCase
   async execute(
     command: RegistrationUserCommand,
   ): Promise<TablesUsersWithIdEntity> {
+    const { createUserDto, registrationData } = command;
+
     const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
-      new CreateUserCommand(command.createUserDto, command.registrationData),
+      new CreateUserCommand(createUserDto, registrationData),
     );
 
     const { email, confirmationCode } = newUser;
 
-    await this.mailsService.registrationSendCode(email, confirmationCode);
+    await this.mailsService.sendConfirmationCode(email, confirmationCode);
 
     return newUser;
   }

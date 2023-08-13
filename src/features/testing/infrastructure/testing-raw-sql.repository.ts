@@ -8,7 +8,7 @@ export class TestingRawSqlRepository {
 
   async removeAllData(): Promise<void> {
     const tablesToDelete = [
-      'SentEmailsTimeConfirmAndRecoverCodes',
+      'SentCodeLog',
       'SecurityDevices',
       'BannedUsersForBlogs',
       'BlacklistJwt',

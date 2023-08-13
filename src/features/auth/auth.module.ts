@@ -8,7 +8,6 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
 import { JwtConfig } from '../../config/jwt/jwt-config';
-import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
@@ -59,7 +58,6 @@ const authUseCases = [
     JwtStrategy,
     JwtConfig,
     ParseQueriesService,
-    MailsRawSqlRepository,
     AuthService,
     EncryptConfig,
     MailsService,
