@@ -502,7 +502,7 @@ export class UsersRawSqlRepository {
                 `,
             [isConfirmed, currentTime],
           );
-        console.log(allUsersWithExpiredDate, 'allUsersWithExpiredDate');
+
         await Promise.all(
           allUsersWithExpiredDate.map((user) =>
             this.deleteUserData(user.id, client),
