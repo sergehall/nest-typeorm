@@ -6,7 +6,7 @@ import { CaslModule } from '../../ability/casl.module';
 import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';

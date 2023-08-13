@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { MailerConfig } from '../../../config/mailer/mailer-config';
-import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
+import { MailerConfig } from '../../config/mailer/mailer-config';
+import { PostgresConfig } from '../../config/db/postgres/postgres.config';
+import { ConfirmationCodeEmailOptions } from '../application/dto/confirmation-code-email-options';
 
 @Injectable()
 export class MailsAdapter {
@@ -9,10 +10,10 @@ export class MailsAdapter {
     protected postgresConfig: PostgresConfig,
   ) {}
 
-  async createSendMailOptionsForRecoveryCode(
+  async buildMailOptionsForRecoveryCode(
     email: string,
     recoveryCode: string,
-  ) {
+  ): Promise<ConfirmationCodeEmailOptions> {
     const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const fromEmail = await this.mailerConfig.getNodeMailerValue(
       'NODEMAILER_EMAIL',
@@ -42,10 +43,10 @@ export class MailsAdapter {
     };
   }
 
-  async createSendMailOptionsForConfirmationCode(
+  async buildMailOptionsForConfirmationCode(
     email: string,
     confirmationCode: string,
-  ) {
+  ): Promise<ConfirmationCodeEmailOptions> {
     const nodemailerEmail = await this.mailerConfig.getNodeMailerValue(
       'NODEMAILER_EMAIL',
     );

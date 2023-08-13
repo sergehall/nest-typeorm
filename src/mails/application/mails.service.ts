@@ -4,9 +4,9 @@ import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity'
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 import * as uuid4 from 'uuid4';
 import { MailingStatus } from '../enums/status.enums';
-import { FindAndSendConfirmationCommand } from './use-case/find-and-send-confirmation-code.use-case';
 import { FindAndSendRecoveryCodeCommand } from './use-case/find-and-send-recovery-code.use-case';
 import { CommandBus } from '@nestjs/cqrs';
+import { RegistrationSendCodeCommand } from './use-case/send-codes.use-case';
 
 @Injectable()
 export class MailsService {
@@ -15,28 +15,14 @@ export class MailsService {
     protected commandBus: CommandBus,
   ) {}
 
-  async sendCurrentConfirmationCodes() {
-    return await this.commandBus.execute(new FindAndSendConfirmationCommand());
-  }
-
   async sendCurrentRecoveryCodes() {
     return await this.commandBus.execute(new FindAndSendRecoveryCodeCommand());
   }
 
-  async registerSendEmail(
-    email: string,
-    confirmationCode: string,
-    expirationDate: string,
-  ): Promise<boolean> {
-    const emailConfirmCodeEntity: EmailsConfirmCodeEntity =
-      await this.createEmailConfirmCode(
-        email,
-        confirmationCode,
-        expirationDate,
-      );
-
-    await this.insertEmailConfirmationCode(emailConfirmCodeEntity);
-    return true;
+  async registrationSendCode(email: string, confirmationCode: string) {
+    return await this.commandBus.execute(
+      new RegistrationSendCodeCommand(email, confirmationCode),
+    );
   }
 
   async updateConfirmationCode(

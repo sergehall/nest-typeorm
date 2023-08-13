@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import * as uuid4 from 'uuid4';
-import { EmailsRecoveryCodesEntity } from '../../../mails/entities/emails-recovery-codes.entity';
-import { MailsService } from '../../../mails/application/mails.service';
+import { EmailsRecoveryCodesEntity } from '../../../../mails/entities/emails-recovery-codes.entity';
+import { MailsService } from '../../../../mails/application/mails.service';
 import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
 
 export class PasswordRecoveryViaEmailConfirmationCommand {

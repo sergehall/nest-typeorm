@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from '../users/application/users.service';
-import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { CaslModule } from '../../ability/casl.module';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { SaController } from './api/sa.controller';
@@ -19,7 +19,7 @@ import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastruct
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
-import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../mails/infrastructure/sent-email-confirmation-code-time.repository';
+import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../mails/infrastructure/sent-email-confirmation-code-time.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';

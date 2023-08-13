@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlacklistJwtRawSqlRepository } from '../features/auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { ClearSentEmailCodesCommand } from '../features/mails/application/use-case/clear-sent-email-codes.use-case';
+import { ClearSentEmailCodesCommand } from '../mails/application/use-case/clear-sent-email-codes.use-case';
 import { SecurityDevicesRawSqlRepository } from '../features/security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
 

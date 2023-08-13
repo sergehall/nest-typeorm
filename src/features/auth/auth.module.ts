@@ -8,7 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
 import { JwtConfig } from '../../config/jwt/jwt-config';
-import { MailsRawSqlRepository } from '../mails/infrastructure/mails-raw-sql.repository';
+import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
@@ -32,7 +32,7 @@ import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-r
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
-import { MailsService } from '../mails/application/mails.service';
+import { MailsService } from '../../mails/application/mails.service';
 
 const authUseCases = [
   CreateUserUseCase,

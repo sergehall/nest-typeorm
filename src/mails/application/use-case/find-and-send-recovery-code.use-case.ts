@@ -23,10 +23,10 @@ export class FindAndSendRecoveryCodeUseCase
     if (emailAndCode) {
       await this.commandBus.execute(new SendRecoveryCodesCommand(emailAndCode));
 
-      const { codeId, email } = emailAndCode;
+      const { email } = emailAndCode;
 
-      await this.sentEmailsTimeRepository.addConfirmationCode(codeId, email);
-      await this.mailsRawSqlRepository.updateRecoveryCodesStatusToSent(codeId);
+      await this.sentEmailsTimeRepository.addConfirmationCode(email);
+      // await this.mailsRawSqlRepository.updateRecoveryCodesStatusToSent(codeId);
     }
   }
 }

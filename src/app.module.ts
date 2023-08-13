@@ -12,7 +12,7 @@ import { CaslModule } from './ability/casl.module';
 import { SecurityDevicesModule } from './features/security-devices/security-devices.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SchedulingModule } from './scheduling/scheduling.module';
-import { MailsModule } from './features/mails/mails.module';
+import { MailsModule } from './mails/mails.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SaModule } from './features/sa/sa.module';
 import { BlogsModule } from './features/blogs/blogs.module';
