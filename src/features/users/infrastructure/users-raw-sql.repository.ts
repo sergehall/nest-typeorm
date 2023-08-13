@@ -461,15 +461,13 @@ export class UsersRawSqlRepository {
       if (isBanned) {
         // Successful User Ban Message
         console.log(
-          `User Ban Successful 🚫✅
-          The user with ID ${userId} has been successfully banned.
+          `User Ban 🚫 Successful. The user with ID ${userId} has been successfully banned.
           This action was taken due to "${banReason}".
           Thank you for maintaining a safe environment for our community.`,
         );
       } else {
         // Successful User unBan Message
-        console.log(`User Unban Successful 🔓✅
-        The user with ID ${userId} has been successfully unbanned. 
+        console.log(`User Unban 🔓 Successful. The user with ID ${userId} has been successfully unbanned. 
         They can now access the platform and perform actions as usual. 
         We appreciate your attention to ensuring a fair and inclusive community environment.`);
       }
