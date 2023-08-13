@@ -46,8 +46,8 @@ import { ParseQueriesService } from '../../../common/query/parse-queries.service
 @Controller('auth')
 export class AuthController {
   constructor(
-    protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
+    protected parseQueriesService: ParseQueriesService,
     protected decodeTokenService: DecodeTokenService,
   ) {}
 

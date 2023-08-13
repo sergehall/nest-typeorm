@@ -2,7 +2,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailSendingCommand } from './email-sending-use-case';
 import { SentCodeLogRepository } from '../../infrastructure/sent-code-log.repository';
 import { ConfirmationCodeEmailOptions } from '../dto/confirmation-code-email-options';
-import { MailOptionsBuilder } from '../../adapters/mail-options-builder';
+import { MailOptionsBuilder } from '../../mail-options/mail-options-builder';
 
 export class SendRecoveryCodesCommand {
   constructor(public email: string, public recoveryCode: string) {}
