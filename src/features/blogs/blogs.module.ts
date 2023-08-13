@@ -13,7 +13,7 @@ import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.rep
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
+import { KeyResolver } from '../../common/query/key-resolver';
 
 @Module({
   imports: [CaslModule, CqrsModule],
@@ -24,7 +24,7 @@ import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-defa
     UsersService,
     BlogsService,
     PostsService,
-    KeyArrayProcessor,
+    KeyResolver,
     BloggerBlogsService,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,

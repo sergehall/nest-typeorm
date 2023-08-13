@@ -8,7 +8,9 @@ import { UsersRawSqlRepository } from '../../features/users/infrastructure/users
 
 @ValidatorConstraint({ name: 'RecoveryCodeExists', async: true })
 @Injectable()
-export class RecoveryCodeExistsRule implements ValidatorConstraintInterface {
+export class RecoveryCodeExistsValidator
+  implements ValidatorConstraintInterface
+{
   constructor(private readonly usersRawSqlRepository: UsersRawSqlRepository) {}
 
   async validate(value: string): Promise<boolean> {

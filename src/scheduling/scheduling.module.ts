@@ -15,10 +15,10 @@ import { BloggerBlogsRawSqlRepository } from '../features/blogger-blogs/infrastr
 import { BannedUsersForBlogsRawSqlRepository } from '../features/users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { MailerConfig } from '../config/mailer/mailer-config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
-import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 import { SentCodeLogRepository } from '../mails/infrastructure/sent-code-log.repository';
 import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
+import { KeyResolver } from '../common/query/key-resolver';
 
 @Module({
   imports: [MailsModule, CaslModule, CqrsModule],
@@ -30,7 +30,7 @@ import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
     ScheduledTasksService,
     UsersService,
     DataCleanupService,
-    KeyArrayProcessor,
+    KeyResolver,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,

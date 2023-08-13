@@ -6,11 +6,9 @@ import {
 } from 'class-validator';
 import { UsersRawSqlRepository } from '../../features/users/infrastructure/users-raw-sql.repository';
 
-@ValidatorConstraint({ name: 'VerifyUserLoginEmailExistenceRule', async: true })
+@ValidatorConstraint({ name: 'LoginEmailExistsValidator', async: true })
 @Injectable()
-export class VerifyUserLoginEmailExistenceRule
-  implements ValidatorConstraintInterface
-{
+export class LoginEmailExistsValidator implements ValidatorConstraintInterface {
   constructor(private readonly usersRawSqlRepository: UsersRawSqlRepository) {}
 
   async validate(value: any, args: ValidationArguments): Promise<boolean> {

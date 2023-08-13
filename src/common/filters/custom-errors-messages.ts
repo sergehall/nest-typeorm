@@ -18,14 +18,6 @@ export const noAuthHeadersError = {
   message: 'No authentication headers found.',
   field: 'headers.authorization',
 };
-export const userLoginAlreadyExists = {
-  message: 'User already exists. Invalid login.',
-  field: 'login',
-};
-export const userEmailAlreadyExists = {
-  message: 'User already exists. Invalid email.',
-  field: 'email',
-};
 export const loginOrEmailAlreadyExists = {
   message: 'Login or Email already exists.',
   field: 'field',

@@ -19,7 +19,6 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { SaBanUserByUserIdUseCase } from './application/use-cases/old/sa-ban-user-by-user-id.use-case';
@@ -28,6 +27,7 @@ import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
+import { KeyResolver } from '../../common/query/key-resolver';
 
 const saUseCases = [
   CreateUserUseCase,
@@ -51,7 +51,7 @@ const saUseCases = [
     UsersService,
     BloggerBlogsService,
     EncryptConfig,
-    KeyArrayProcessor,
+    KeyResolver,
     SentCodeLogRepository,
     PostsRawSqlRepository,
     UsersRawSqlRepository,

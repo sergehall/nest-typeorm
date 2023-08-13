@@ -13,9 +13,9 @@ import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { KeyArrayProcessor } from '../../common/query/get-key-from-array-or-default';
-import { RecoveryCodeExistsRule } from '../../common/validators/recovery-code-exists.rule';
-import { VerifyUserLoginEmailExistenceRule } from '../../common/validators/verify-user-login-email-existence.rule';
+import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
+import { RecoveryCodeExistsValidator } from '../../common/validators/recovery-code-exists.validator';
+import { KeyResolver } from '../../common/query/key-resolver';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -23,7 +23,7 @@ const usersUseCases = [
   RemoveUserByIdUseCase,
 ];
 
-const usersRules = [RecoveryCodeExistsRule, VerifyUserLoginEmailExistenceRule];
+const usersRules = [RecoveryCodeExistsValidator, LoginEmailExistsValidator];
 
 @Module({
   imports: [CaslModule, CqrsModule],
@@ -36,7 +36,7 @@ const usersRules = [RecoveryCodeExistsRule, VerifyUserLoginEmailExistenceRule];
     AuthService,
     JwtService,
     EncryptConfig,
-    KeyArrayProcessor,
+    KeyResolver,
     ExpirationDateCalculator,
     ...usersRules,
     ...usersUseCases,

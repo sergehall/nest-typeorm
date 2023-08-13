@@ -7,9 +7,9 @@ import { Injectable } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../features/blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
-@ValidatorConstraint({ name: 'BlogExistsBadRequestRule', async: true })
+@ValidatorConstraint({ name: 'BlogExistsValidator', async: true })
 @Injectable()
-export class BlogExistsBadRequestRule implements ValidatorConstraintInterface {
+export class BlogExistsValidator implements ValidatorConstraintInterface {
   constructor(
     private bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
@@ -25,6 +25,6 @@ export class BlogExistsBadRequestRule implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `Blog id: ${args.value} doesn't exist`;
+    return `Blog id:${args.value} doesn't exist`;
   }
 }

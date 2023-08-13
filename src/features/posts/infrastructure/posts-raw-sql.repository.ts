@@ -8,7 +8,6 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
@@ -18,11 +17,12 @@ import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-post
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
+import { KeyResolver } from '../../../common/query/key-resolver';
 
 export class PostsRawSqlRepository {
   constructor(
     @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
+    protected keyResolver: KeyResolver,
   ) {}
   async findPostsAndTotalCountPosts(
     queryData: ParseQueriesType,
@@ -538,7 +538,7 @@ export class PostsRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+    return await this.keyResolver.resolveKey(
       sortBy,
       [
         'title',

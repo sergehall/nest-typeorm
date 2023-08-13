@@ -11,14 +11,14 @@ import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyArrayProcessor } from '../../../common/query/get-key-from-array-or-default';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
+import { KeyResolver } from '../../../common/query/key-resolver';
 
 @Injectable()
 export class UsersRawSqlRepository {
   constructor(
     @InjectDataSource() private readonly db: DataSource,
-    protected keyArrayProcessor: KeyArrayProcessor,
+    protected keyResolver: KeyResolver,
   ) {}
 
   async saFindUsers(
@@ -393,7 +393,7 @@ export class UsersRawSqlRepository {
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyArrayProcessor.getKeyFromArrayOrDefault(
+    return await this.keyResolver.resolveKey(
       sortBy,
       [
         'userId',
