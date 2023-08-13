@@ -4,7 +4,7 @@ import { BaseConfig } from '../base/base-config';
 
 @Injectable()
 export class MailerConfig extends BaseConfig {
-  async getNodeMailerValue(key: MailerTypes): Promise<string> {
+  async getNodeMailer(key: MailerTypes): Promise<string> {
     return await this.getValueMailer(key);
   }
 

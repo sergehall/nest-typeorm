@@ -1,6 +1,5 @@
 import * as uuid4 from 'uuid4';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MailsRawSqlRepository } from '../../../../mails/infrastructure/mails-raw-sql.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
@@ -16,7 +15,6 @@ export class UpdateSentConfirmationCodeUseCase
   implements ICommandHandler<UpdateSentConfirmationCodeCommand>
 {
   constructor(
-    private readonly mailsRepository: MailsRawSqlRepository,
     private readonly mailsService: MailsService,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
     private readonly expirationDateCalculator: ExpirationDateCalculator,
@@ -39,12 +37,6 @@ export class UpdateSentConfirmationCodeUseCase
         0,
         1,
         0,
-      );
-
-      await this.mailsService.updateConfirmationCode(
-        email,
-        confirmationCode,
-        expirationDate,
       );
 
       await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(

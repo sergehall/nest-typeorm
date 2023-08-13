@@ -4,20 +4,18 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { ConfirmationCodeEmailOptions } from '../application/dto/confirmation-code-email-options';
 
 @Injectable()
-export class MailsAdapter {
+export class MailOptionsBuilder {
   constructor(
     protected mailerConfig: MailerConfig,
     protected postgresConfig: PostgresConfig,
   ) {}
 
-  async buildMailOptionsForRecoveryCode(
+  async buildOptionsForRecoveryCode(
     email: string,
     recoveryCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
     const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const fromEmail = await this.mailerConfig.getNodeMailerValue(
-      'NODEMAILER_EMAIL',
-    );
+    const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
@@ -32,6 +30,7 @@ export class MailsAdapter {
       name: email,
       fullURL,
     };
+
     return {
       to: email,
       from: fromEmail,
@@ -43,18 +42,15 @@ export class MailsAdapter {
     };
   }
 
-  async buildMailOptionsForConfirmationCode(
+  async buildOptionsForConfirmationCode(
     email: string,
     confirmationCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
-    const nodemailerEmail = await this.mailerConfig.getNodeMailerValue(
-      'NODEMAILER_EMAIL',
-    );
+    const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
     const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + confirmationCode;
     const fullURL = domainName + path + parameter;
-    const fromEmail = nodemailerEmail;
     const subject = 'Registration by confirmation code';
     const template = 'index';
     const text = 'Welcome';

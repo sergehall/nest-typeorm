@@ -1,7 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastructure/sent-email-confirmation-code-time.repository';
-import { MailsAdapter } from '../../adapters/mails.adapter';
 import { EmailSendingCommand } from './email-sending-use-case';
+import { SentCodeLogRepository } from '../../infrastructure/sent-code-log.repository';
+import { ConfirmationCodeEmailOptions } from '../dto/confirmation-code-email-options';
+import { MailOptionsBuilder } from '../../adapters/mail-options-builder';
 
 export class SendRecoveryCodesCommand {
   constructor(public email: string, public recoveryCode: string) {}
@@ -13,20 +14,21 @@ export class SendRecoveryCodesUseCase
 {
   constructor(
     protected commandBus: CommandBus,
-    protected mailsAdapter: MailsAdapter,
-    protected sentEmailsTimeRepository: SentEmailsTimeConfirmAndRecoverCodesRepository,
+    protected mailOptionsBuilder: MailOptionsBuilder,
+    protected sentCodeLogRepository: SentCodeLogRepository,
   ) {}
 
   async execute(command: SendRecoveryCodesCommand): Promise<void> {
     const { email, recoveryCode } = command;
 
-    const mailOptions = await this.mailsAdapter.buildMailOptionsForRecoveryCode(
-      email,
-      recoveryCode,
-    );
+    const mailOptions: ConfirmationCodeEmailOptions =
+      await this.mailOptionsBuilder.buildOptionsForRecoveryCode(
+        email,
+        recoveryCode,
+      );
 
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 
-    await this.sentEmailsTimeRepository.addConfirmationCode(email);
+    await this.sentCodeLogRepository.addTime(email);
   }
 }

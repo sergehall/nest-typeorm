@@ -10,10 +10,10 @@ export class MailerOptionsService
   implements MailerOptionsFactory
 {
   async createMailerOptions(): Promise<MailerOptions> {
-    const host = await this.getNodeMailerValue('MAIL_HOST');
+    const host = await this.getNodeMailer('MAIL_HOST');
     const port = await this.getMailerPort('EMAIL_PORT');
-    const user = await this.getNodeMailerValue('NODEMAILER_EMAIL');
-    const pass = await this.getNodeMailerValue('NODEMAILER_APP_PASSWORD');
+    const user = await this.getNodeMailer('NODEMAILER_EMAIL');
+    const pass = await this.getNodeMailer('NODEMAILER_APP_PASSWORD');
 
     return {
       transport: {

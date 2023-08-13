@@ -3,7 +3,6 @@ import { SecurityDevicesService } from './application/security-devices.service';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { UsersService } from '../users/application/users.service';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
-import { MailsRawSqlRepository } from '../../mails/infrastructure/mails-raw-sql.repository';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -40,7 +39,6 @@ const securityDevicesCases = [
     SecurityDevicesService,
     SecurityDevicesRawSqlRepository,
     BlacklistJwtRawSqlRepository,
-    MailsRawSqlRepository,
     ...securityDevicesCases,
   ],
 })
