@@ -238,7 +238,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async updateUserConfirmationCodeByEmail(
+  async updateCodeAndExpirationByEmail(
     email: string,
     confirmationCode: string,
     expirationDate: string,
@@ -392,28 +392,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyResolver.resolveKey(
-      sortBy,
-      [
-        'userId',
-        'login',
-        'email',
-        'orgId',
-        'roles',
-        'isBanned',
-        'banDate',
-        'banReason',
-        'expirationDate',
-        'isConfirmed',
-        'isConfirmedDate',
-        'ip',
-        'userAgent',
-      ],
-      'createdAt',
-    );
-  }
-
   async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     const { isBanned, banReason, banDate } = banInfo;
     try {
@@ -512,16 +490,19 @@ export class UsersRawSqlRepository {
   async removeUsersData(): Promise<void> {
     try {
       await this.db.transaction(async (client) => {
+        const isConfirmed = false;
+        const currentTime = new Date().toISOString();
+
         const allUsersWithExpiredDate: TablesUsersWithIdEntity[] =
           await client.query(
             `
                 SELECT "userId" AS "id"
                 FROM public."Users"
-                WHERE "isConfirmed" = $1 AND "expirationDate" <= $2
+                WHERE "isConfirmed" = $1 AND "expirationDate" < $2
                 `,
-            [false, new Date().toISOString()],
+            [isConfirmed, currentTime],
           );
-
+        console.log(allUsersWithExpiredDate, 'allUsersWithExpiredDate');
         await Promise.all(
           allUsersWithExpiredDate.map((user) =>
             this.deleteUserData(user.id, client),
@@ -569,7 +550,12 @@ export class UsersRawSqlRepository {
           [userId],
         ),
         client.query(
-          `DELETE FROM public."SentEmailsTimeConfirmAndRecoverCodes" WHERE "userId" = $1`,
+          `
+          DELETE FROM public."SentCodeLog"
+          WHERE "email" IN (
+            SELECT "email" FROM public."Users" WHERE "userId" = $1
+          )
+          `,
           [userId],
         ),
         client.query(
@@ -605,5 +591,27 @@ export class UsersRawSqlRepository {
         `Error while removing data for user ${userId}`,
       );
     }
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      [
+        'userId',
+        'login',
+        'email',
+        'orgId',
+        'roles',
+        'isBanned',
+        'banDate',
+        'banReason',
+        'expirationDate',
+        'isConfirmed',
+        'isConfirmedDate',
+        'ip',
+        'userAgent',
+      ],
+      'createdAt',
+    );
   }
 }

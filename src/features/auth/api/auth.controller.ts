@@ -160,7 +160,6 @@ export class AuthController {
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
     const { code } = codeDto;
-    console.log('registration-confirmation');
     return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 

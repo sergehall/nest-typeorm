@@ -31,7 +31,7 @@ export class PasswordRecoveryUseCase
 
     await this.mailsService.sendRecoveryCode(email, recoveryCode);
 
-    await this.usersRawSqlRepository.updateUserConfirmationCodeByEmail(
+    await this.usersRawSqlRepository.updateCodeAndExpirationByEmail(
       email,
       recoveryCode,
       expirationDate,
