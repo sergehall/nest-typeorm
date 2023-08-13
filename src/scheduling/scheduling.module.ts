@@ -18,7 +18,7 @@ import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { KeyArrayProcessor } from '../common/query/get-key-from-array-or-default';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 import { SentCodeLogRepository } from '../mails/infrastructure/sent-code-log.repository';
-import { MailOptionsBuilder } from '../mails/adapters/mail-options-builder';
+import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
 
 @Module({
   imports: [MailsModule, CaslModule, CqrsModule],

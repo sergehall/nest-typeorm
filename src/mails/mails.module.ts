@@ -9,7 +9,7 @@ import { EmailSendingUseCase } from './application/use-case/email-sending-use-ca
 import { SendConfirmationCodesUseCase } from './application/use-case/send-confirmation-codes.use-case';
 import { SendRecoveryCodesUseCase } from './application/use-case/send-recovery-codes.use-case';
 import { SentCodeLogRepository } from './infrastructure/sent-code-log.repository';
-import { MailOptionsBuilder } from './adapters/mail-options-builder';
+import { MailOptionsBuilder } from './mail-options/mail-options-builder';
 
 const mailsUseCases = [
   EmailSendingUseCase,
