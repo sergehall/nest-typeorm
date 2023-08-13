@@ -4,9 +4,9 @@ import { EmailsConfirmCodeEntity } from '../entities/emails-confirm-code.entity'
 import { EmailsRecoveryCodesEntity } from '../entities/emails-recovery-codes.entity';
 import * as uuid4 from 'uuid4';
 import { MailingStatus } from '../enums/status.enums';
-import { FindAndSendRecoveryCodeCommand } from './use-case/find-and-send-recovery-code.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegistrationSendCodeCommand } from './use-case/send-codes.use-case';
+import { SendRecoveryCodesCommand } from './use-case/send-recovery-codes.use-case';
+import { SendConfirmationCodesCommand } from './use-case/send-confirmation-codes.use-case';
 
 @Injectable()
 export class MailsService {
@@ -15,13 +15,15 @@ export class MailsService {
     protected commandBus: CommandBus,
   ) {}
 
-  async sendCurrentRecoveryCodes() {
-    return await this.commandBus.execute(new FindAndSendRecoveryCodeCommand());
-  }
-
   async registrationSendCode(email: string, confirmationCode: string) {
     return await this.commandBus.execute(
-      new RegistrationSendCodeCommand(email, confirmationCode),
+      new SendConfirmationCodesCommand(email, confirmationCode),
+    );
+  }
+
+  async sendRecoveryCode(email: string, recoveryCode: string) {
+    return await this.commandBus.execute(
+      new SendRecoveryCodesCommand(email, recoveryCode),
     );
   }
 

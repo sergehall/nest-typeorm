@@ -23,7 +23,7 @@ import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jw
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
-import { PasswordRecoveryViaEmailConfirmationUseCase } from './application/use-cases/password-recovery-via-email-confirmation.use-case';
+import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
 import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
@@ -47,7 +47,7 @@ const authUseCases = [
   UpdateRefreshJwtUseCase,
   ValidAccessJwtUseCase,
   ValidRefreshJwtUseCase,
-  PasswordRecoveryViaEmailConfirmationUseCase,
+  PasswordRecoveryUseCase,
   ChangePasswordByRecoveryCodeUseCase,
 ];
 

@@ -3,13 +3,13 @@ import { SentEmailsTimeConfirmAndRecoverCodesRepository } from '../../infrastruc
 import { MailsAdapter } from '../../adapters/mails.adapter';
 import { EmailSendingCommand } from './email-sending-use-case';
 
-export class RegistrationSendCodeCommand {
+export class SendConfirmationCodesCommand {
   constructor(public email: string, public confirmationCode: string) {}
 }
 
-@CommandHandler(RegistrationSendCodeCommand)
-export class RegistrationSendCodeUseCase
-  implements ICommandHandler<RegistrationSendCodeCommand>
+@CommandHandler(SendConfirmationCodesCommand)
+export class SendConfirmationCodesUseCase
+  implements ICommandHandler<SendConfirmationCodesCommand>
 {
   constructor(
     protected commandBus: CommandBus,
@@ -17,7 +17,7 @@ export class RegistrationSendCodeUseCase
     protected sentEmailsTimeRepository: SentEmailsTimeConfirmAndRecoverCodesRepository,
   ) {}
 
-  async execute(command: RegistrationSendCodeCommand): Promise<void> {
+  async execute(command: SendConfirmationCodesCommand): Promise<void> {
     const { email, confirmationCode } = command;
 
     const mailOptions =

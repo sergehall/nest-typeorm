@@ -39,7 +39,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
-import { PasswordRecoveryViaEmailConfirmationCommand } from '../application/use-cases/password-recovery-via-email-confirmation.use-case';
+import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 
 @SkipThrottle()
@@ -207,9 +207,7 @@ export class AuthController {
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
     const { email } = emailDto;
 
-    return await this.commandBus.execute(
-      new PasswordRecoveryViaEmailConfirmationCommand(email),
-    );
+    return await this.commandBus.execute(new PasswordRecoveryCommand(email));
   }
 
   @SkipThrottle()
