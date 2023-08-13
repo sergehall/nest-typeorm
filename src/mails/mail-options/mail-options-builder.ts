@@ -19,12 +19,11 @@ export class MailOptionsBuilder {
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
-    const subject = 'Recovery code';
+    const subject = 'Your Recovery Code for Account Access';
     const template = 'index';
     const text = 'Welcome';
     const html = `
-      <h1 style="color: dimgrey">Click on the link below to confirm your email address.</h1>
-      <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm email.</a></div>`;
+      <h1 style="color: dimgrey">Your Recovery Code for Account Access</h1><p>Did you forget your password? Use the recovery code provided below to reset your password and regain access to your account.</p><p><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}>Click here to reset your password</a></p>`;
 
     const context = {
       name: email,
@@ -51,12 +50,11 @@ export class MailOptionsBuilder {
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + confirmationCode;
     const fullURL = domainName + path + parameter;
-    const subject = 'Registration by confirmation code';
+    const subject = 'Welcome to Our Community! Confirm Your Email Registration';
     const template = 'index';
     const text = 'Welcome';
     const html = `
-      <h1 style="color: dimgrey">Click on the link below to confirm your email address.</h1>
-      <div><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}> Push link to confirm email.</a></div>`;
+      <h1 style="color: dimgrey">Your registration is almost complete!</h1><p>We're excited to have you on board. To access your account, please confirm your email address by clicking the link below.</p><p><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}>Confirm your email now</a></p>`;
 
     const context = {
       name: email,
