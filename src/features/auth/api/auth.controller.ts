@@ -42,7 +42,7 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 
-@SkipThrottle()
+// @SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -189,16 +189,16 @@ export class AuthController {
     return true;
   }
 
-  // @SkipThrottle()
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // @Get('confirm-registration')
-  // async confirmRegistrationByCodeFromQuery(@Query() query: any) {
-  //   const queryData = await this.parseQueriesService.getQueriesData(query);
-  //
-  //   return await this.commandBus.execute(
-  //     new ConfirmUserByCodeCommand(queryData.code),
-  //   );
-  // }
+  @SkipThrottle()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Get('confirm-registration')
+  async confirmRegistrationByCodeFromQuery(@Query() query: any) {
+    const queryData = await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(
+      new ConfirmUserByCodeCommand(queryData.code),
+    );
+  }
 
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
