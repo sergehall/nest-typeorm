@@ -49,10 +49,6 @@ export const userNotHavePermissionForPost = {
     'Leaving posts for this user is not allowed, and accessing the blog is restricted.',
   params: 'blogId',
 };
-export const emailNotExistsOrIsConfirmed = {
-  message: 'The email does not exist or the user is already confirmed.',
-  field: 'email',
-};
 export const cannotBlockOwnBlog = {
   message: 'You cannot block your own blog.',
   field: 'id',
