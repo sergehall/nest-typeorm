@@ -12,7 +12,6 @@ export class CodeExistsValidator implements ValidatorConstraintInterface {
   constructor(private readonly usersRawSqlRepository: UsersRawSqlRepository) {}
 
   async validate(value: string): Promise<boolean> {
-    console.log(value, 'value CodeExistsValidator');
     return await this.usersRawSqlRepository.findUserByConfirmationCode(value);
   }
 
