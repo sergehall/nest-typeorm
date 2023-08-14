@@ -23,6 +23,7 @@ export class LoginEmailExistsValidator implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments): string {
+    console.log(`User with '${args.value}' already exists.`);
     return `User with '${args.value}' already exists.`;
   }
 }
