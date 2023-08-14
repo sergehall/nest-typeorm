@@ -217,11 +217,9 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async confirmUserByConfirmCode(
-    confirmationCode: string,
-    isConfirmed: boolean,
-    isConfirmedDate: string,
-  ): Promise<boolean> {
+  async isConfirmedUserByCode(confirmationCode: string): Promise<boolean> {
+    const isConfirmed = true;
+    const isConfirmedDate = new Date().toISOString();
     try {
       const user = await this.db.query(
         `

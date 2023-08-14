@@ -54,7 +54,9 @@ export class MailOptionsBuilder {
     const template = 'index';
     const text = 'Welcome';
     const html = `
-      <h1 style="color: dimgrey">Your registration is almost complete!</h1><p>We're excited to have you on board. To access your account, please confirm your email address by clicking the link below.</p><p><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}>Confirm your email now</a></p>`;
+      <h1 style="color: dimgrey">Your registration is almost complete!</h1>
+      <p>We're excited to have you on board. To access your account, please confirm your email address by clicking the link below.</p>
+      <p><a style="font-size: 20px; text-decoration-line: underline" href=${fullURL}>Confirm your email now</a></p>`;
 
     const context = {
       name: email,

@@ -17,6 +17,7 @@ import { LoginEmailExistsValidator } from '../../common/validators/login-email-e
 import { RecoveryCodeExistsValidator } from '../../common/validators/recovery-code-exists.validator';
 import { KeyResolver } from '../../common/query/key-resolver';
 import { EmailNotExistValidator } from '../../common/validators/email-not-exist.validator';
+import { CodeExistsValidator } from '../../common/validators/code-exists.validator';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -24,10 +25,11 @@ const usersUseCases = [
   RemoveUserByIdUseCase,
 ];
 
-const usersRules = [
+const usersValidators = [
   RecoveryCodeExistsValidator,
   LoginEmailExistsValidator,
   EmailNotExistValidator,
+  CodeExistsValidator,
 ];
 
 @Module({
@@ -43,7 +45,7 @@ const usersRules = [
     EncryptConfig,
     KeyResolver,
     ExpirationDateCalculator,
-    ...usersRules,
+    ...usersValidators,
     ...usersUseCases,
   ],
   exports: [UsersService],
