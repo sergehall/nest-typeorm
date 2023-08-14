@@ -200,11 +200,9 @@ export class UsersRawSqlRepository {
         "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
         "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
         FROM public."Users"
-        WHERE "confirmationCode" = $1 
-        AND (
-          ("isConfirmed" = false AND "expirationDate" > $2)
-          OR "isConfirmed" = true
-        )
+        WHERE "confirmationCode" = $1  
+        AND "isConfirmed" = false 
+        AND "expirationDate" > $2
         `;
 
       const users = await this.db.query(`

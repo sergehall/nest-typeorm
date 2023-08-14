@@ -17,6 +17,6 @@ export class CodeExistsValidator implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `User with code: ${args.value} doesn't exist`;
+    return `User with code: ${args.value} doesn't exist or already confirmed.`;
   }
 }
