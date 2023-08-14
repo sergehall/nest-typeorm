@@ -18,7 +18,7 @@ export class SendConfirmationCodesUseCase
     protected sentCodeLogRepository: SentCodeLogRepository,
   ) {}
 
-  async execute(command: SendConfirmationCodesCommand): Promise<void> {
+  async execute(command: SendConfirmationCodesCommand): Promise<boolean> {
     const { email, confirmationCode } = command;
 
     const mailOptions: ConfirmationCodeEmailOptions =
@@ -30,5 +30,6 @@ export class SendConfirmationCodesUseCase
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 
     await this.sentCodeLogRepository.addTime(email);
+    return true;
   }
 }

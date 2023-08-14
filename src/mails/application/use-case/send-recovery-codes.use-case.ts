@@ -18,7 +18,7 @@ export class SendRecoveryCodesUseCase
     protected sentCodeLogRepository: SentCodeLogRepository,
   ) {}
 
-  async execute(command: SendRecoveryCodesCommand): Promise<void> {
+  async execute(command: SendRecoveryCodesCommand): Promise<boolean> {
     const { email, recoveryCode } = command;
 
     const mailOptions: ConfirmationCodeEmailOptions =
@@ -30,5 +30,6 @@ export class SendRecoveryCodesUseCase
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 
     await this.sentCodeLogRepository.addTime(email);
+    return true;
   }
 }

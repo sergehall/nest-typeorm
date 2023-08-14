@@ -242,7 +242,7 @@ export class UsersRawSqlRepository {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<TablesUsersWithIdEntity[]> {
+  ): Promise<boolean> {
     try {
       const updateUser = await this.db.query(
         `
@@ -253,7 +253,7 @@ export class UsersRawSqlRepository {
       `,
         [email, confirmationCode, expirationDate],
       );
-      return updateUser[0];
+      return updateUser[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -285,9 +285,7 @@ export class UsersRawSqlRepository {
     try {
       return await this.db.query(
         `
-        SELECT "userId", "login", "email", "passwordHash", "createdAt", "orgId",
-         "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
-         "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent", "isBanned"
         FROM public."Users"
         WHERE "login" = $1 OR "email" = $2
       `,

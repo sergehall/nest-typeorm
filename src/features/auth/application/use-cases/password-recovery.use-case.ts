@@ -13,23 +13,20 @@ export class PasswordRecoveryUseCase
   implements ICommandHandler<PasswordRecoveryCommand>
 {
   constructor(
-    protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected expirationDateCalculator: ExpirationDateCalculator,
-    protected mailsService: MailsService,
+    private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly expirationDateCalculator: ExpirationDateCalculator,
+    private readonly mailsService: MailsService,
   ) {}
   async execute(command: PasswordRecoveryCommand): Promise<boolean> {
     const { email } = command;
 
     const recoveryCode = uuid4().toString();
 
-    // Return the expirationDate in ISO format for user registration.
     const expirationDate = await this.expirationDateCalculator.createExpDate(
       0,
       1,
       0,
     );
-
-    await this.mailsService.sendRecoveryCode(email, recoveryCode);
 
     await this.usersRawSqlRepository.updateCodeAndExpirationByEmail(
       email,
@@ -37,6 +34,6 @@ export class PasswordRecoveryUseCase
       expirationDate,
     );
 
-    return true;
+    return await this.mailsService.sendRecoveryCode(email, recoveryCode);
   }
 }
