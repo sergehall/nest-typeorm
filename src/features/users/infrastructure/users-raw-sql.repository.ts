@@ -10,9 +10,9 @@ import { TablesUsersEntity } from '../entities/tables-users.entity';
 import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
-import { KeyResolver } from '../../../common/query/key-resolver';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -22,7 +22,7 @@ export class UsersRawSqlRepository {
   ) {}
 
   async saFindUsers(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
@@ -95,7 +95,7 @@ export class UsersRawSqlRepository {
   }
 
   async findUsers(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<TablesUsersWithIdEntity[]> {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
@@ -290,7 +290,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async totalCountUsersForSa(queryData: ParseQueriesType): Promise<number> {
+  async totalCountUsersForSa(queryData: ParseQueriesDto): Promise<number> {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;
@@ -310,7 +310,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async totalCountUsers(queryData: ParseQueriesType): Promise<number> {
+  async totalCountUsers(queryData: ParseQueriesDto): Promise<number> {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
       const searchLoginTerm = queryData.searchLoginTerm;

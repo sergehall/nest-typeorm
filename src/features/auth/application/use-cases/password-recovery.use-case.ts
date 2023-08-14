@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import * as uuid4 from 'uuid4';
 import { MailsService } from '../../../../mails/application/mails.service';
-import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 
 export class PasswordRecoveryCommand {
   constructor(public email: string) {}

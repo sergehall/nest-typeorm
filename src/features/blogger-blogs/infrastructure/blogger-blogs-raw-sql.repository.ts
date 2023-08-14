@@ -7,11 +7,11 @@ import {
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
-import { KeyResolver } from '../../../common/query/key-resolver';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -61,7 +61,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async findBlogsCurrentUser(
     currentUserDto: CurrentUserDto,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
@@ -102,7 +102,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async openFindBlogs(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<ReturnBloggerBlogsEntity[]> {
     try {
       const blogOwnerBanStatus = false;
@@ -145,7 +145,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saOpenCountBlogs(queryData: ParseQueriesType): Promise<number> {
+  async saOpenCountBlogs(queryData: ParseQueriesDto): Promise<number> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const searchNameTerm = queryData.searchNameTerm;
@@ -166,7 +166,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saTotalCountBlogs(queryData: ParseQueriesType): Promise<number> {
+  async saTotalCountBlogs(queryData: ParseQueriesDto): Promise<number> {
     try {
       const searchNameTerm = queryData.searchNameTerm;
 
@@ -185,7 +185,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async saFindBlogs(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {
       const searchNameTerm = queryData.searchNameTerm;
@@ -212,7 +212,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async totalCountBlogsByUserId(
     blogOwnerId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<number> {
     try {
       const blogOwnerBanStatus = false;

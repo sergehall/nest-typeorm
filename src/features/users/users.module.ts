@@ -10,11 +10,11 @@ import { CreateUserUseCase } from './application/use-cases/create-user.use-case'
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
 import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
-import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
-import { KeyResolver } from '../../common/query/key-resolver';
+import { KeyResolver } from '../../common/helpers/key-resolver';
 import { EmailNotExistValidator } from '../../common/validators/email-not-exist.validator';
 import { CodeExistsValidator } from '../../common/validators/code-exists.validator';
 

@@ -16,7 +16,6 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BloggerBlogsService } from '../application/blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateBloggerBlogCommand } from '../application/use-cases/create-blogger-blog.use-case';
 import { UpdateBlogByIdCommand } from '../application/use-cases/update-blog-byId.use-case';
@@ -35,12 +34,13 @@ import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-all-banned-users-for-blog.use.case';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
 import { BanUnbanBlogForUserCommand } from '../application/use-cases/ban-unban-user-for-blog.use-case';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -56,10 +56,10 @@ export class BloggerBlogsController {
   async findBlogsCurrentUser(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    const queryData: ParseQueriesType =
+    const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.bBloggerService.findBlogsCurrentUser(
@@ -72,7 +72,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtAuthGuard)
   async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesType =
+    const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
@@ -115,9 +115,9 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesType =
+    const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.postsService.findPostsByBlogId(
@@ -147,9 +147,9 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: IdParams,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesType =
+    const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(

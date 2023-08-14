@@ -32,13 +32,13 @@ import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-withBlogId.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { FindCommentsByPostIdCommand } from '../../comments/application/use-cases/find-comments-by-post-id.use-case';
 import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
 import { FindPostByIdCommand } from '../application/use-cases/find-post-by-id.use-case';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -54,7 +54,7 @@ export class PostsController {
   async openFindPosts(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(
@@ -86,9 +86,9 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData: ParseQueriesType =
+    const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(

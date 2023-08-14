@@ -16,7 +16,7 @@ import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-ra
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
@@ -27,7 +27,7 @@ import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
-import { KeyResolver } from '../../common/query/key-resolver';
+import { KeyResolver } from '../../common/helpers/key-resolver';
 
 const saUseCases = [
   CreateUserUseCase,

@@ -28,9 +28,8 @@ import { IdParams } from '../../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { IdUserIdParams } from '../../../common/query/params/idUserId.params';
+import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
 import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -38,6 +37,7 @@ import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entit
 import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @SkipThrottle()
 @Controller('sa')
@@ -54,7 +54,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saFindUsers(@Query() query: any): Promise<PaginationTypes> {
+  async saFindUsers(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return this.usersService.saFindUsers(queryData);
@@ -67,7 +67,7 @@ export class SaController {
   async saFindBlogs(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.bloggerBlogsService.saFindBlogs(queryData);

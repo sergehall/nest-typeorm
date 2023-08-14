@@ -7,15 +7,15 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { PaginationTypes } from '../../../../common/pagination/types/pagination.types';
 import { ReturnBannedUsersForBlogEntity } from '../../entities/return-banned-users-for-blog.entity';
 import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
+import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class FindAllBannedUsersForBlogCommand {
   constructor(
     public blogId: string,
-    public queryData: ParseQueriesType,
+    public queryData: ParseQueriesDto,
     public currentUser: CurrentUserDto,
   ) {}
 }
@@ -33,7 +33,7 @@ export class FindAllBannedUsersForBlogUseCase
   ) {}
   async execute(
     command: FindAllBannedUsersForBlogCommand,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const { blogId, queryData, currentUser } = command;
 
     // Check if the blog exists

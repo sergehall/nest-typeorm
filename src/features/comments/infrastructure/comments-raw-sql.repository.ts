@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';
-import { KeyResolver } from '../../../common/query/key-resolver';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -96,7 +96,7 @@ export class CommentsRawSqlRepository {
 
   async findAllNotBannedCommentsAndCountLikesDislikes(
     commentatorInfoUserId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {
@@ -166,7 +166,7 @@ export class CommentsRawSqlRepository {
 
   async findCommentByCommentatorIdAndCountOfLikesDislikesComments2(
     commentatorInfoUserId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {
@@ -241,7 +241,7 @@ export class CommentsRawSqlRepository {
 
   async findCommentsByPostIdAndCountOfLikesDislikes(
     postId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {

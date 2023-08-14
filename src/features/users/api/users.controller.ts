@@ -28,12 +28,12 @@ import { UpdateUserCommand } from '../application/use-cases/update-user.use-case
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/currentUser.dto';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { ReturnUserDto } from '../dto/return-user.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @SkipThrottle()
 @Controller('users')
@@ -48,8 +48,8 @@ export class UsersController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUsers(@Query() query: any): Promise<PaginationTypes> {
-    const queryData: ParseQueriesType = await this.parseQueries.getQueriesData(
+  async findUsers(@Query() query: any): Promise<PaginatedResultDto> {
+    const queryData: ParseQueriesDto = await this.parseQueries.getQueriesData(
       query,
     );
 

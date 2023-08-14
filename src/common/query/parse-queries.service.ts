@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { SortDirectionType } from './types/sort-direction.types';
-import { BanConditionType } from './types/ban-condition.types';
-import { ParseQueriesType } from './types/parse-query.types';
+import {
+  BanCondition,
+  ParseQueriesDto,
+  SortDirection,
+} from './dto/parse-queries.dto';
 
 @Injectable()
 export class ParseQueriesService {
@@ -59,16 +61,16 @@ export class ParseQueriesService {
     return searchTitle && searchTitle.length !== 0 ? `%${searchTitle}%` : '%';
   }
 
-  private async parseSortDirection(query: any): Promise<SortDirectionType> {
+  private async parseSortDirection(query: any): Promise<SortDirection> {
     const querySortDirection = query?.sortDirection;
     return ['ascending', 'ASCENDING', 'asc', 'ASC', -1].includes(
       querySortDirection,
     )
-      ? 'ASC'
-      : 'DESC';
+      ? SortDirection.ASC
+      : SortDirection.DESC;
   }
 
-  private async parseBanStatus(query: any): Promise<BanConditionType> {
+  private async parseBanStatus(query: any): Promise<BanCondition> {
     const queryBanStatus = query.banStatus?.toString();
 
     if (queryBanStatus === 'banned') {
@@ -80,7 +82,7 @@ export class ParseQueriesService {
     }
   }
 
-  async getQueriesData(query: any): Promise<ParseQueriesType> {
+  async getQueriesData(query: any): Promise<ParseQueriesDto> {
     return {
       queryPagination: {
         pageNumber: await this.parsePageNumber(query),
