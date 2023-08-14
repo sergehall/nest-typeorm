@@ -16,6 +16,7 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
 import { RecoveryCodeExistsValidator } from '../../common/validators/recovery-code-exists.validator';
 import { KeyResolver } from '../../common/query/key-resolver';
+import { EmailNotExistValidator } from '../../common/validators/email-not-exist.validator';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -23,7 +24,11 @@ const usersUseCases = [
   RemoveUserByIdUseCase,
 ];
 
-const usersRules = [RecoveryCodeExistsValidator, LoginEmailExistsValidator];
+const usersRules = [
+  RecoveryCodeExistsValidator,
+  LoginEmailExistsValidator,
+  EmailNotExistValidator,
+];
 
 @Module({
   imports: [CaslModule, CqrsModule],
