@@ -14,7 +14,6 @@ import { ExpirationDateCalculator } from '../../common/calculator/expiration-dat
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
-import { RecoveryCodeExistsValidator } from '../../common/validators/recovery-code-exists.validator';
 import { KeyResolver } from '../../common/query/key-resolver';
 import { EmailNotExistValidator } from '../../common/validators/email-not-exist.validator';
 import { CodeExistsValidator } from '../../common/validators/code-exists.validator';
@@ -26,7 +25,6 @@ const usersUseCases = [
 ];
 
 const usersValidators = [
-  RecoveryCodeExistsValidator,
   LoginEmailExistsValidator,
   EmailNotExistValidator,
   CodeExistsValidator,
