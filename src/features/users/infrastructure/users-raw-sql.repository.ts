@@ -208,7 +208,7 @@ export class UsersRawSqlRepository {
         `;
 
       const user = await this.db.query(query, [confirmationCode, currentTime]);
-
+      console.log(user, 'findUserByConfirmationCode', !!user[0], '!!user[0]');
       return !!user[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
