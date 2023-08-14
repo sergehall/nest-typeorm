@@ -7,13 +7,19 @@ import { SendConfirmationCodesCommand } from './use-case/send-confirmation-codes
 export class MailsService {
   constructor(protected commandBus: CommandBus) {}
 
-  async sendConfirmationCode(email: string, confirmationCode: string) {
+  async sendConfirmationCode(
+    email: string,
+    confirmationCode: string,
+  ): Promise<boolean> {
     return await this.commandBus.execute(
       new SendConfirmationCodesCommand(email, confirmationCode),
     );
   }
 
-  async sendRecoveryCode(email: string, recoveryCode: string) {
+  async sendRecoveryCode(
+    email: string,
+    recoveryCode: string,
+  ): Promise<boolean> {
     return await this.commandBus.execute(
       new SendRecoveryCodesCommand(email, recoveryCode),
     );
