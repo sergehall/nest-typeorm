@@ -482,10 +482,10 @@ export class BloggerBlogsRawSqlRepository {
       });
       if (isBanned) {
         // Successful User Ban Message
-        console.log(`User ${userId} Ban Successful 🚫✅. For blog ${blogId}.`);
+        console.log(`User ${userId} Ban 🚫. For blog ${blogId}.`);
       } else {
         // Successful User unBan Message
-        console.log(`User ${userId} Unban for blog ${blogId}. 🔓✅`);
+        console.log(`User ${userId} Unban 🚪 for blog ${blogId}.`);
       }
       return true;
     } catch (error) {
@@ -557,15 +557,13 @@ export class BloggerBlogsRawSqlRepository {
       });
       if (isBanned) {
         console.log(
-          `Blog Locked 🚫🔒
-          The blog with ID ${blogId} has been locked for the user. 
+          `Blog Locked 🔒. The blog with ID ${blogId} has been locked for the user. 
           Access to the blog and its content has been restricted as per the 
           defined policies or circumstances. Thank you for your understanding.`,
         );
       } else {
         // Successful Blog Unlock Message
-        console.log(`Blog Unlocked Successful🚪🔓
-        The blog with ID ${blogId} has been successfully unlocked. 
+        console.log(`Blog Unlocked 🚪. The blog with ID ${blogId} has been successfully unlocked. 
         Users can now access the blog and its content without any restrictions. 
         Thank you for your attention to ensuring a positive user experience.`);
       }
