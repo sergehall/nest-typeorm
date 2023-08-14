@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, MaxLength, Validate } from 'class-validator';
-import { RecoveryCodeExistsValidator } from '../../../common/validators/recovery-code-exists.validator';
+import { CodeExistsValidator } from '../../../common/validators/code-exists.validator';
 
 export class NewPasswordRecoveryDto {
   @IsNotEmpty()
@@ -11,6 +11,6 @@ export class NewPasswordRecoveryDto {
   @MaxLength(100, {
     message: 'Incorrect recoveryCode length! Must be max 100 ch.',
   })
-  @Validate(RecoveryCodeExistsValidator)
+  @Validate(CodeExistsValidator)
   recoveryCode: string;
 }

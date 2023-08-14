@@ -190,9 +190,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async findUserByConfirmationCode(
-    confirmationCode: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
+  async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
     try {
       const currentTime = new Date().toISOString();
 
@@ -211,7 +209,7 @@ export class UsersRawSqlRepository {
 
       const user = await this.db.query(query, [confirmationCode, currentTime]);
 
-      return user[0] || null;
+      return !!user[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
