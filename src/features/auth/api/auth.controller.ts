@@ -42,7 +42,7 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 
-// @SkipThrottle()
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
