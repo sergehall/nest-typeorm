@@ -28,9 +28,6 @@ import { RemovePostByIdOldCommand } from '../application/use-cases/remove-post-b
 import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../../common/query/params/postId.params';
 import { IdParams } from '../../../common/query/params/id.params';
-import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
-import { UpdatePostWithBlogIdDto } from '../dto/update-post-withBlogId.dto';
-import { CreatePostWithBlogIdDto } from '../dto/create-post-withBlogId.dto';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -39,6 +36,9 @@ import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
 import { FindPostByIdCommand } from '../application/use-cases/find-post-by-id.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
+import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
+import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 
 @SkipThrottle()
 @Controller('posts')

@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { SortDirection } from '../../../common/query/dto/parse-queries.dto';
+import { SortDirection } from '../../query/dto/parse-queries.dto';
 
 export class PagingParamsDto {
   @IsString()
