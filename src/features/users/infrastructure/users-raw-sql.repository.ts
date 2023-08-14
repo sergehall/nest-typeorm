@@ -207,7 +207,17 @@ export class UsersRawSqlRepository {
         )
         `;
 
+      const users = await this.db.query(`
+        SELECT 
+        "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
+        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        FROM public."Users"
+    
+        `);
       const user = await this.db.query(query, [confirmationCode, currentTime]);
+      console.log(users, 'users');
+      console.log(confirmationCode, 'confirmationCode');
       console.log(user, 'findUserByConfirmationCode', !!user[0], '!!user[0]');
       return !!user[0];
     } catch (error) {
