@@ -20,7 +20,7 @@ import {
   ParseQueriesDto,
   SortDirection,
 } from '../../../common/query/dto/parse-queries.dto';
-import { PagingParamsDto } from '../dto/paging-params.dto';
+import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 
 export class PostsRawSqlRepository {
   constructor(
