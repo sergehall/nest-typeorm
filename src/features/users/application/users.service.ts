@@ -1,15 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRawSqlRepository } from '../infrastructure/users-raw-sql.repository';
 import { ReturnUsersBanInfoEntity } from '../../sa/entities/return-users-banInfo.entity';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @Injectable()
 export class UsersService {
   constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
 
-  async saFindUsers(queryData: ParseQueriesType): Promise<PaginationTypes> {
+  async saFindUsers(queryData: ParseQueriesDto): Promise<PaginatedResultDto> {
     const arrUsers = await this.usersRawSqlRepository.saFindUsers(queryData);
 
     const transformedArrUsers = await this.transformedArrUsersForSa(arrUsers);
@@ -30,7 +30,7 @@ export class UsersService {
     };
   }
 
-  async findUsers(queryData: ParseQueriesType): Promise<PaginationTypes> {
+  async findUsers(queryData: ParseQueriesDto): Promise<PaginatedResultDto> {
     const users = await this.usersRawSqlRepository.findUsers(queryData);
 
     const totalCount = await this.usersRawSqlRepository.totalCountUsers(

@@ -4,7 +4,7 @@ import { SecurityDevicesRawSqlRepository } from '../features/security-devices/in
 import { CqrsModule } from '@nestjs/cqrs';
 import { BlacklistJwtRawSqlRepository } from '../features/auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { KeyResolver } from '../common/query/key-resolver';
+import { KeyResolver } from '../common/helpers/key-resolver';
 
 @Module({
   imports: [CqrsModule],

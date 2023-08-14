@@ -5,18 +5,30 @@ import { ReturnBannedUsersForBlogEntity } from '../../../features/blogger-blogs/
 import { ReturnUsersBanInfoEntity } from '../../../features/sa/entities/return-users-banInfo.entity';
 import { ReturnCommentsEntity } from '../../../features/comments/entities/return-comments.entity';
 import { ReturnPostsEntity } from '../../../features/posts/entities/return-posts-entity.entity';
+import { IsArray, IsNumber, IsObject } from 'class-validator';
 
-export type PaginationTypes = {
+export class PaginatedResultDto {
+  @IsNumber()
   pagesCount: number;
+
+  @IsNumber()
   page: number;
+
+  @IsNumber()
   pageSize: number;
+
+  @IsNumber()
   totalCount: number;
-  items:
-    | TablesUsersEntity[]
-    | TableBloggerBlogsRawSqlEntity[]
-    | ReturnCommentsEntity[]
-    | ReturnPostsEntity[]
-    | ReturnBloggerBlogsEntity[]
-    | ReturnUsersBanInfoEntity[]
-    | ReturnBannedUsersForBlogEntity[];
-};
+
+  @IsArray()
+  @IsObject({ each: true })
+  items: (
+    | TablesUsersEntity
+    | TableBloggerBlogsRawSqlEntity
+    | ReturnCommentsEntity
+    | ReturnPostsEntity
+    | ReturnBloggerBlogsEntity
+    | ReturnUsersBanInfoEntity
+    | ReturnBannedUsersForBlogEntity
+  )[];
+}

@@ -23,7 +23,7 @@ import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/applicati
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { BanUnbanBlogForUserUseCase } from './application/use-cases/ban-unban-user-for-blog.use-case';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/old/sa-change-ban-status-blogs-by-blog-id.use-case';
-import { KeyResolver } from '../../common/query/key-resolver';
+import { KeyResolver } from '../../common/helpers/key-resolver';
 
 const bloggersBlogUseCases = [
   BanUnbanBlogForUserUseCase,

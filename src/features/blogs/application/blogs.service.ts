@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { PostsService } from '../../posts/application/posts.service';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @Injectable()
 export class BlogsService {
@@ -17,15 +17,15 @@ export class BlogsService {
     return await this.bloggerBlogsService.openFindBlogById(blogId);
   }
 
-  async openFindBlogs(queryData: ParseQueriesType): Promise<PaginationTypes> {
+  async openFindBlogs(queryData: ParseQueriesDto): Promise<PaginatedResultDto> {
     return await this.bloggerBlogsService.openFindBlogs(queryData);
   }
 
   async openFindPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     return await this.postsService.openFindPostsByBlogId(
       params,
       queryData,

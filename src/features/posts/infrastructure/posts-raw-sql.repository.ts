@@ -7,17 +7,20 @@ import {
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import { PagingParamsDto } from '../dto/paging-params.dto';
 import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-posts.entity';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
-import { KeyResolver } from '../../../common/query/key-resolver';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import {
+  ParseQueriesDto,
+  SortDirection,
+} from '../../../common/query/dto/parse-queries.dto';
+import { PagingParamsDto } from '../dto/paging-params.dto';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -25,7 +28,7 @@ export class PostsRawSqlRepository {
     protected keyResolver: KeyResolver,
   ) {}
   async findPostsAndTotalCountPosts(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsCountPostsEntity> {
     try {
@@ -62,12 +65,14 @@ export class PostsRawSqlRepository {
   }
 
   private async getPagingParams(
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
-    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-    const direction = queryData.queryPagination.sortDirection;
-    const limit = queryData.queryPagination.pageSize;
-    const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+    const sortBy: string = await this.getSortBy(
+      queryData.queryPagination.sortBy,
+    );
+    const direction: SortDirection = queryData.queryPagination.sortDirection;
+    const limit: number = queryData.queryPagination.pageSize;
+    const offset: number = (queryData.queryPagination.pageNumber - 1) * limit;
 
     return { sortBy, direction, limit, offset };
   }
@@ -253,7 +258,7 @@ export class PostsRawSqlRepository {
 
   async findPostByPostIdWithLikes(
     postId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity | null> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
@@ -307,7 +312,7 @@ export class PostsRawSqlRepository {
 
   async findPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<TablesPostsEntity[]> {
     const postOwnerIsBanned = false;
     const banInfoBanStatus = false;

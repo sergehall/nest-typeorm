@@ -48,7 +48,7 @@ function setupGlobalPipes(app: INestApplication): void {
 
     // Validation pipe to automatically validate incoming request payloads.
     new ValidationPipe({
-      // Enable automatic transformation of incoming payload data to matching types.
+      // Enable automatic transformation of incoming payload data to matching dto.
       transform: true,
 
       // Continue validating all properties, even if some validations fail.

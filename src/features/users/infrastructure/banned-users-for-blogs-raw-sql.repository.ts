@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
-import { KeyResolver } from '../../../common/query/key-resolver';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 export class BannedUsersForBlogsRawSqlRepository {
   constructor(
@@ -84,7 +84,7 @@ export class BannedUsersForBlogsRawSqlRepository {
 
   async findBannedUsers(
     blogId: string,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
   ): Promise<BannedUsersForBlogsEntity[]> {
     try {
       const searchLoginTerm = queryData.searchLoginTerm;

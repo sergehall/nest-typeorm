@@ -9,10 +9,8 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../infrastructure/like-status-posts-raw-sql.repository';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
-import { PaginationTypes } from '../../../common/pagination/types/pagination.types';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { userNotHavePermission } from '../../../common/filters/custom-errors-messages';
-import { ParseQueriesType } from '../../../common/query/types/parse-query.types';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   NewestLikes,
@@ -20,6 +18,8 @@ import {
 } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BloggerBlogsRawSqlRepository } from '../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @Injectable()
 export class PostsService {
@@ -32,9 +32,9 @@ export class PostsService {
 
   async openFindPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const { pageSize, pageNumber } = queryData.queryPagination;
 
     const posts: TablesPostsEntity[] =
@@ -68,9 +68,9 @@ export class PostsService {
 
   async findPostsByBlogId(
     params: BlogIdParams,
-    queryData: ParseQueriesType,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const posts: TablesPostsEntity[] | null =
       await this.postsRawSqlRepository.findPostsByBlogId(params, queryData);
     if (!posts || posts.length === 0) {

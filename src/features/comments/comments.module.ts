@@ -26,7 +26,7 @@ import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/ban
 import { FindCommentByIdUseCase } from './application/use-cases/find-comment-by-id';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { FindCommentsByPostIdUseCase } from './application/use-cases/find-comments-by-post-id.use-case';
-import { KeyResolver } from '../../common/query/key-resolver';
+import { KeyResolver } from '../../common/helpers/key-resolver';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,

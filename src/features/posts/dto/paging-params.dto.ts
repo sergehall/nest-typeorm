@@ -1,12 +1,11 @@
-import { SortDirectionType } from '../../../common/query/types/sort-direction.types';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { SortDirection } from '../../../common/query/dto/parse-queries.dto';
 
 export class PagingParamsDto {
   @IsString()
   sortBy: string;
-  @IsNotEmpty()
-  @IsString()
-  direction: SortDirectionType;
+  @IsEnum(SortDirection)
+  direction: SortDirection;
   @IsNumber()
   limit: number;
   @IsNumber()

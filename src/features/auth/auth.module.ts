@@ -24,14 +24,14 @@ import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
-import { ExpirationDateCalculator } from '../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { MailsService } from '../../mails/application/mails.service';
-import { KeyResolver } from '../../common/query/key-resolver';
+import { KeyResolver } from '../../common/helpers/key-resolver';
 
 const authUseCases = [
   CreateUserUseCase,

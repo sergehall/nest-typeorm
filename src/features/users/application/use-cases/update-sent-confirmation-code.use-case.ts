@@ -1,7 +1,7 @@
 import * as uuid4 from 'uuid4';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
-import { ExpirationDateCalculator } from '../../../../common/calculator/expiration-date-calculator';
+import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { MailsService } from '../../../../mails/application/mails.service';
 
 export class UpdateSentConfirmationCodeCommand {

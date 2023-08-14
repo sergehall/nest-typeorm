@@ -1,12 +1,13 @@
-import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { ReturnPostsCountPostsEntity } from '../../entities/return-posts-count-posts.entity';
+import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class FindPostsCommand {
   constructor(
-    public queryData: ParseQueriesType,
+    public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
@@ -17,7 +18,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     private readonly postsRawSqlRepository: PostsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindPostsCommand) {
+  async execute(command: FindPostsCommand): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

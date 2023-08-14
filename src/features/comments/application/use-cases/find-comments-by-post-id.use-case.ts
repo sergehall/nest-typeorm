@@ -2,16 +2,16 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
-import { ParseQueriesType } from '../../../../common/query/types/parse-query.types';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
-import { PaginationTypes } from '../../../../common/pagination/types/pagination.types';
 import { CommentsCountLikesDislikesEntity } from '../../entities/comments-count-likes-dislikes.entity';
+import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class FindCommentsByPostIdCommand {
   constructor(
     public postId: string,
-    public queryData: ParseQueriesType,
+    public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
@@ -27,7 +27,7 @@ export class FindCommentsByPostIdUseCase
   ) {}
   async execute(
     command: FindCommentsByPostIdCommand,
-  ): Promise<PaginationTypes> {
+  ): Promise<PaginatedResultDto> {
     const { postId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
