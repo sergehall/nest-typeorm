@@ -10,7 +10,7 @@ export class PostExistValidationPipe implements PipeTransform {
     const post: TablesPostsEntity | null =
       await this.postsRawSqlRepository.getPostById(value);
     if (!post) {
-      throw new NotFoundException(`Post with id ${value} not found`);
+      throw new NotFoundException(`Post with id: ${value} not found`);
     }
     return value;
   }

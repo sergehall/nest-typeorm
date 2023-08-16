@@ -2,7 +2,6 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
-import { NotFoundException } from '@nestjs/common';
 
 export class FindPostByIdCommand {
   constructor(
@@ -24,13 +23,9 @@ export class FindPostByIdUseCase
   ): Promise<ReturnPostsEntity | null> {
     const { postId, currentUserDto } = command;
 
-    const post: ReturnPostsEntity | null =
-      await this.postsRawSqlRepository.findPostByPostIdWithLikes(
-        postId,
-        currentUserDto,
-      );
-    if (!post) throw new NotFoundException('Not found post.');
-
-    return post;
+    return await this.postsRawSqlRepository.findPostByPostIdWithLikes(
+      postId,
+      currentUserDto,
+    );
   }
 }
