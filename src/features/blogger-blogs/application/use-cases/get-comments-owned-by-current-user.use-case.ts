@@ -27,11 +27,9 @@ export class GetCommentsOwnedByCurrentUserUseCase
   ): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
-    const { id } = currentUserDto;
 
     const comments: CommentsCountLikesDislikesEntity[] =
-      await this.commentsRawSqlRepository.findAllNotBannedCommentsAndCountLikesDislikes(
-        id,
+      await this.commentsRawSqlRepository.findCommentsOwnedByCurrentUserAndCountLikesDislikes(
         queryData,
         currentUserDto,
       );

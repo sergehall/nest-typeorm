@@ -26,7 +26,7 @@ export class FindCommentByIdUseCase
     const { commentId, currentUserDto } = command;
 
     const comment: CommentsCountLikesDislikesEntity | null =
-      await this.commentsRawSqlRepository.findCommentByIdAndCountOfLikesDislikesComments(
+      await this.commentsRawSqlRepository.findCommentByIdAndCountOfLikesDislikesComment(
         commentId,
         currentUserDto,
       );
