@@ -27,8 +27,10 @@ import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-b
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { SearchBlogsForSaUseCase } from './application/use-cases/search-blogs-for-sa.use-case';
 
 const saUseCases = [
+  SearchBlogsForSaUseCase,
   CreateUserUseCase,
   SaChangeRoleUseCase,
   SaRemoveUserByUserIdUseCase,

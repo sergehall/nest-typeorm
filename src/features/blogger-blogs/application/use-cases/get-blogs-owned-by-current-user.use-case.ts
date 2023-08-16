@@ -5,22 +5,24 @@ import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blog
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 
-export class SearchUserBlogsCommand {
+export class GetBlogsOwnedByCurrentUserCommand {
   constructor(
     public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(SearchUserBlogsCommand)
-export class SearchUserBlogsUseCase
-  implements ICommandHandler<SearchUserBlogsCommand>
+@CommandHandler(GetBlogsOwnedByCurrentUserCommand)
+export class GetBlogsOwnedByCurrentUserUseCase
+  implements ICommandHandler<GetBlogsOwnedByCurrentUserCommand>
 {
   constructor(
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: SearchUserBlogsCommand): Promise<PaginatedResultDto> {
+  async execute(
+    command: GetBlogsOwnedByCurrentUserCommand,
+  ): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 

@@ -36,11 +36,11 @@ import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entit
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { SearchUserCommentsCommand } from '../application/use-cases/search-user-comments.use-case';
-import { SearchUserBlogsCommand } from '../application/use-cases/search-user-blogs.use-case';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
+import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
+import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -51,7 +51,7 @@ export class BloggerBlogsController {
   ) {}
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
-  async searchUserBlogs(
+  async getBlogsOwnedByCurrentUser(
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
@@ -61,19 +61,22 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchUserBlogsCommand(queryData, currentUserDto),
+      new GetBlogsOwnedByCurrentUserCommand(queryData, currentUserDto),
     );
   }
 
   @Get('blogs/comments')
   @UseGuards(JwtAuthGuard)
-  async searchUserComments(@Request() req: any, @Query() query: any) {
+  async getCommentsOwnedByCurrentUser(
+    @Request() req: any,
+    @Query() query: any,
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchUserCommentsCommand(queryData, currentUserDto),
+      new GetCommentsOwnedByCurrentUserCommand(queryData, currentUserDto),
     );
   }
 
