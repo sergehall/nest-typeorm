@@ -1,9 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
-import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
-import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -11,105 +8,9 @@ export class BloggerBlogsService {
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
 
-  async openFindBlogs(queryData: ParseQueriesDto): Promise<PaginatedResultDto> {
-    const { pageNumber, pageSize } = queryData.queryPagination;
-
-    const blogs: ReturnBloggerBlogsEntity[] =
-      await this.bloggerBlogsRawSqlRepository.openSearchBlogs(queryData);
-
-    if (blogs.length === 0) {
-      return {
-        pagesCount: 0,
-        page: pageNumber,
-        pageSize: pageSize,
-        totalCount: 0,
-        items: [],
-      };
-    }
-
-    const totalCount = await this.bloggerBlogsRawSqlRepository.openCountBlogs(
-      queryData,
-    );
-    const pagesCount = Math.ceil(totalCount / pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: blogs,
-    };
-  }
-
-  async openFindBlogById(blogId: string): Promise<ReturnBloggerBlogsEntity> {
-    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
-
-    if (!blog) {
-      throw new NotFoundException('Blog not found');
-    }
-
-    return {
-      id: blog.id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership,
-    };
-  }
-
   async findBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     return await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
-  }
-
-  async saFindBlogs(queryData: ParseQueriesDto): Promise<PaginatedResultDto> {
-    const { pageNumber, pageSize } = queryData.queryPagination;
-
-    const blogs: TableBloggerBlogsRawSqlEntity[] =
-      await this.bloggerBlogsRawSqlRepository.saFindBlogs(queryData);
-
-    if (blogs.length === 0) {
-      return {
-        pagesCount: 0,
-        page: pageNumber,
-        pageSize: pageSize,
-        totalCount: 0,
-        items: [],
-      };
-    }
-
-    const transformedArrBlogs = blogs.map(
-      (blog: TableBloggerBlogsRawSqlEntity) => ({
-        id: blog.id,
-        name: blog.name,
-        description: blog.description,
-        websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
-        isMembership: blog.isMembership,
-        blogOwnerInfo: {
-          userId: blog.blogOwnerId,
-          userLogin: blog.blogOwnerLogin,
-        },
-        banInfo: {
-          isBanned: blog.banInfoIsBanned,
-          banDate: blog.banInfoBanDate,
-        },
-      }),
-    );
-
-    const totalCount =
-      await this.bloggerBlogsRawSqlRepository.saTotalCountBlogs(queryData);
-
-    const pagesCount = Math.ceil(totalCount / pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: transformedArrBlogs,
-    };
   }
 }

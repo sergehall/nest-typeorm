@@ -38,6 +38,7 @@ import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blo
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { SearchBlogsForSaCommand } from '../application/use-cases/search-blogs-for-sa.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -64,13 +65,14 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saFindBlogs(
+  async searchBlogsForSa(
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
-
-    return await this.bloggerBlogsService.saFindBlogs(queryData);
+    return await this.commandBus.execute(
+      new SearchBlogsForSaCommand(queryData),
+    );
   }
 
   @Post('users')

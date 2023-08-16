@@ -184,7 +184,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saFindBlogs(
+  async searchBlogsForSa(
     queryData: ParseQueriesDto,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
     try {

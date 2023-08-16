@@ -19,15 +19,15 @@ import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/applicati
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/old/sa-change-ban-status-blogs-by-blog-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-import { SearchUserCommentsUseCase } from './application/use-cases/search-user-comments.use-case';
-import { SearchUserBlogsUseCase } from './application/use-cases/search-user-blogs.use-case';
 import { SearchPostsInBlogUseCase } from '../posts/application/use-cases/search-posts-in-blog.use-case';
 import { SearchBannedUsersInBlogUseCase } from './application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessUseCase } from './application/use-cases/manage-blog-access.use-case';
+import { GetBlogsOwnedByCurrentUserUseCase } from './application/use-cases/get-blogs-owned-by-current-user.use-case';
+import { GetCommentsOwnedByCurrentUserUseCase } from './application/use-cases/get-comments-owned-by-current-user.use-case';
 
 const bloggersBlogUseCases = [
-  SearchUserBlogsUseCase,
-  SearchUserCommentsUseCase,
+  GetBlogsOwnedByCurrentUserUseCase,
+  GetCommentsOwnedByCurrentUserUseCase,
   SearchBannedUsersInBlogUseCase,
   SearchPostsInBlogUseCase,
   ManageBlogAccessUseCase,

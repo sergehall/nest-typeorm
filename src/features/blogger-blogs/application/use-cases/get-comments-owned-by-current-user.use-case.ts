@@ -7,23 +7,23 @@ import { CommentsCountLikesDislikesEntity } from '../../../comments/entities/com
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
-export class SearchUserCommentsCommand {
+export class GetCommentsOwnedByCurrentUserCommand {
   constructor(
     public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(SearchUserCommentsCommand)
-export class SearchUserCommentsUseCase
-  implements ICommandHandler<SearchUserCommentsCommand>
+@CommandHandler(GetCommentsOwnedByCurrentUserCommand)
+export class GetCommentsOwnedByCurrentUserUseCase
+  implements ICommandHandler<GetCommentsOwnedByCurrentUserCommand>
 {
   constructor(
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   async execute(
-    command: SearchUserCommentsCommand,
+    command: GetCommentsOwnedByCurrentUserCommand,
   ): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
