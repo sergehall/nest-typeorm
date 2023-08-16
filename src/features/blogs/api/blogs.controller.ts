@@ -19,6 +19,7 @@ import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-res
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { CommandBus } from '@nestjs/cqrs';
+import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -31,11 +32,11 @@ export class BlogsController {
 
   @Get()
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindBlogs(@Query() query: any): Promise<PaginatedResultDto> {
+  async searchBlogs(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
-    return await this.blogsService.openFindBlogs(queryData);
+    return await this.commandBus.execute(new SearchBlogsCommand(queryData));
   }
 
   @Get(':id')

@@ -27,27 +27,25 @@ import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.p
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
-import { PostsService } from '../../posts/application/posts.service';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
-import { FindAllBannedUsersForBlogCommand } from '../application/use-cases/find-all-banned-users-for-blog.use.case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
-import { BanUnbanBlogForUserCommand } from '../application/use-cases/ban-unban-user-for-blog.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchUserCommentsCommand } from '../application/use-cases/search-user-comments.use-case';
 import { SearchUserBlogsCommand } from '../application/use-cases/search-user-blogs.use-case';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
+import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
+import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(
-    protected postsService: PostsService,
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
@@ -150,11 +148,7 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new FindAllBannedUsersForBlogCommand(
-        params.id,
-        queryData,
-        currentUserDto,
-      ),
+      new SearchBannedUsersInBlogCommand(params.id, queryData, currentUserDto),
     );
   }
 
@@ -176,7 +170,7 @@ export class BloggerBlogsController {
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async banUnbanBlogForUse(
+  async manageBlogAccess(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updateBanUserDto: UpdateBanUserDto,
@@ -184,11 +178,7 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new BanUnbanBlogForUserCommand(
-        params.id,
-        updateBanUserDto,
-        currentUserDto,
-      ),
+      new ManageBlogAccessCommand(params.id, updateBanUserDto, currentUserDto),
     );
   }
 

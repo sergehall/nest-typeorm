@@ -15,7 +15,7 @@ export class BloggerBlogsService {
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const blogs: ReturnBloggerBlogsEntity[] =
-      await this.bloggerBlogsRawSqlRepository.openFindBlogs(queryData);
+      await this.bloggerBlogsRawSqlRepository.openSearchBlogs(queryData);
 
     if (blogs.length === 0) {
       return {
@@ -27,7 +27,7 @@ export class BloggerBlogsService {
       };
     }
 
-    const totalCount = await this.bloggerBlogsRawSqlRepository.saOpenCountBlogs(
+    const totalCount = await this.bloggerBlogsRawSqlRepository.openCountBlogs(
       queryData,
     );
     const pagesCount = Math.ceil(totalCount / pageSize);
@@ -57,6 +57,7 @@ export class BloggerBlogsService {
       isMembership: blog.isMembership,
     };
   }
+
   async findBlogById(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
