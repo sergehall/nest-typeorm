@@ -39,6 +39,7 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
+import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
 
 @SkipThrottle()
 @Controller('posts')
@@ -68,16 +69,15 @@ export class PostsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openFindPostByPostId(
     @Request() req: any,
-    @Query() query: any,
-    @Param() params: IdParams,
+    @Param('id', PostExistValidationPipe) id: string,
   ) {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new FindPostByIdCommand(params.id, queryData, currentUserDto),
+      new FindPostByIdCommand(id, currentUserDto),
     );
   }
+
   @Get(':postId/comments')
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)

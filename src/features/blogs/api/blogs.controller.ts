@@ -16,10 +16,10 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
+import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -54,14 +54,13 @@ export class BlogsController {
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
-    const params = { blogId: blogId };
     const currentUserDto: CurrentUserDto | null = req.user;
 
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(params, queryData, currentUserDto),
+      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 }

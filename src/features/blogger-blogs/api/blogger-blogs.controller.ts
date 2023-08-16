@@ -41,6 +41,7 @@ import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
 import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
+import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -113,7 +114,7 @@ export class BloggerBlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async searchPostsInBlog(
     @Request() req: any,
-    @Param() params: BlogIdParams,
+    @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
@@ -121,7 +122,7 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(params, queryData, currentUserDto),
+      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 
@@ -202,7 +203,7 @@ export class BloggerBlogsController {
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async removeBlogById(@Request() req: any, @Param() params: IdParams) {
+  async deleteBlogById(@Request() req: any, @Param() params: IdParams) {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

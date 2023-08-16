@@ -1,9 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
@@ -288,62 +285,6 @@ export class BloggerBlogsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusBlogsDependencyIsBannedByUserId(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      const result = await this.db.query(
-        `
-      UPDATE public."BloggerBlogs"
-      SET "dependencyIsBanned" = $2
-      WHERE "blogOwnerId" = $1
-      `,
-        [userId, isBanned],
-      );
-
-      return result[1] !== 0;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusBlogsByBlogId(
-    blogId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      const isBannedDate = new Date().toISOString();
-
-      const updateBanStatusBlog = await this.db.query(
-        `
-      UPDATE public."BloggerBlogs"
-      SET "banInfoIsBanned" = $2, "banInfoBanDate" = $3
-      WHERE "id" = $1
-      `,
-        [blogId, isBanned, isBannedDate],
-      );
-      return updateBanStatusBlog[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeBlogsByBlogId(blogId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."BloggerBlogs"
-        WHERE "id" = $1
-          `,
-        [blogId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
     }
   }
 

@@ -12,7 +12,6 @@ import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-posts.entity';
-import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -53,12 +52,54 @@ export class PostsRawSqlRepository {
         currentUserDto,
       );
 
-      const countPosts = postsWithLikes[0].countPosts;
       return {
         posts,
-        countPosts: countPosts,
+        countPosts: postsWithLikes[0].countPosts,
       };
     } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findPostsAndTotalCountPostsForBlog(
+    blogId: string,
+    queryData: ParseQueriesDto,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnPostsCountPostsEntity> {
+    try {
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+
+      const pagingParams: PagingParamsDto = await this.getPagingParams(
+        queryData,
+      );
+
+      const postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[] =
+        await this.getPostsWithLikesForBlog(
+          blogId,
+          bannedFlags,
+          pagingParams,
+          currentUserDto,
+        );
+
+      if (postsWithLikes.length === 0) {
+        return {
+          posts: [],
+          countPosts: 0,
+        };
+      }
+
+      const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
+        postsWithLikes,
+        currentUserDto,
+      );
+
+      return {
+        posts,
+        countPosts: postsWithLikes[0].countPosts,
+      };
+    } catch (error) {
+      console.log('-------');
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
@@ -85,7 +126,8 @@ export class PostsRawSqlRepository {
       isBanned: false,
     };
   }
-  private async getPostWithLikes(
+
+  private async getPostWithLikesByPostId(
     postId: string,
     bannedFlags: BannedFlagsDto,
     currentUserDto: CurrentUserDto | null,
@@ -157,6 +199,103 @@ export class PostsRawSqlRepository {
       pwl."likeStatus"
     FROM PostsWithLikes pwl
   `;
+
+    try {
+      return await this.db.query(query, parameters);
+    } catch (error) {
+      console.log(error.message, '+++++');
+
+      if (error.message.includes('invalid input syntax for type uuid:')) {
+        throw new NotFoundException('Not found post.');
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  private async getPostsWithLikesForBlog(
+    blogId: string,
+    bannedFlags: BannedFlagsDto,
+    pagingParams: PagingParamsDto,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PostsCountPostsLikesDislikesStatusEntity[]> {
+    const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
+    const { sortBy, direction, limit, offset } = pagingParams;
+    const countLastLikes = 3;
+    const likeStatus = 'Like';
+
+    const parameters = [
+      dependencyIsBanned,
+      banInfoIsBanned,
+      isBanned,
+      countLastLikes,
+      likeStatus,
+      currentUserDto?.id,
+      limit,
+      offset,
+      blogId,
+    ];
+
+    const query = `
+      WITH LastThreeLikes AS (
+        SELECT
+          "postId", "userId", "likeStatus", "addedAt", "login",
+          ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC) AS rn
+        FROM public."LikeStatusPosts"
+        WHERE "isBanned" = $3 AND "likeStatus" = $5 AND "blogId" = $9
+        ),
+        PostsWithLikes AS (
+          SELECT
+            p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName",
+            p."createdAt", p."postOwnerId", p."dependencyIsBanned", p."banInfoIsBanned",
+            p."banInfoBanDate", p."banInfoBanReason",
+            COALESCE(CAST(l."userId" AS text), '0') AS "userId",
+            COALESCE(l."likeStatus", 'None') AS "likeStatus",
+            COALESCE(l."addedAt" ) AS "addedAt",
+            COALESCE(l.login ) AS "login",
+            COALESCE(lsc_myStatus."likeStatus", 'None') AS "myStatus",
+            COALESCE(lsc_like."likesCount", 0) AS "likesCount",
+            COALESCE(lsc_dislike."dislikesCount", 0) AS "dislikesCount"
+          FROM public."Posts" p
+          LEFT JOIN LastThreeLikes l ON p.id = l."postId" AND l.rn <= $4
+          LEFT JOIN (
+            SELECT "postId", COUNT(*) AS "likesCount"
+            FROM public."LikeStatusPosts"
+            WHERE "likeStatus" = 'Like' AND "isBanned" = $3 AND "blogId" = $9
+            GROUP BY "postId"
+          ) lsc_like ON p.id = lsc_like."postId"
+          LEFT JOIN (
+            SELECT "postId", COUNT(*) AS "dislikesCount"
+            FROM public."LikeStatusPosts"
+            WHERE "likeStatus" = 'Dislike' AND "isBanned" = $3 AND "blogId" = $9
+            GROUP BY "postId"
+          ) lsc_dislike ON p.id = lsc_dislike."postId"
+          LEFT JOIN (
+            SELECT "postId", "likeStatus"
+            FROM public."LikeStatusPosts"
+            WHERE "userId" = $6 AND "isBanned" = $3
+          ) lsc_myStatus ON p.id = lsc_myStatus."postId"
+          WHERE p."dependencyIsBanned" = $1 AND p."banInfoIsBanned" = $2 AND "blogId" = $9
+          ORDER BY "${sortBy}" ${direction}
+          LIMIT $7 OFFSET $8
+        ),TotalPosts AS (
+          SELECT COUNT(*) AS "countPosts"
+          FROM public."Posts"
+          WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2 AND "blogId" = $9
+        )
+        SELECT
+          pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
+          pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
+          pwl."likesCount"::integer,
+          pwl."dislikesCount"::integer,
+          pwl."myStatus",
+          pwl."userId", 
+          pwl."addedAt",
+          pwl."login",
+          pwl."likeStatus",
+          tp."countPosts"::integer
+        FROM PostsWithLikes pwl, TotalPosts tp
+        `;
 
     try {
       return await this.db.query(query, parameters);
@@ -258,14 +397,17 @@ export class PostsRawSqlRepository {
 
   async findPostByPostIdWithLikes(
     postId: string,
-    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity | null> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
     try {
       const postWithLikes: PostCountLikesDislikesStatusEntity[] =
-        await this.getPostWithLikes(postId, bannedFlags, currentUserDto);
+        await this.getPostWithLikesByPostId(
+          postId,
+          bannedFlags,
+          currentUserDto,
+        );
 
       if (postWithLikes && postWithLikes.length < 0) {
         return null;
@@ -279,10 +421,10 @@ export class PostsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       if (error.message.includes('invalid input syntax for type uuid:')) {
-        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
         throw new NotFoundException('Not found post.');
+      } else {
+        throw new InternalServerErrorException(error.message);
       }
-      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -418,24 +560,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async openTotalCountPosts(): Promise<number> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Posts"
-        WHERE "dependencyIsBanned" = $1 AND "banInfoIsBanned" = $2
-      `,
-        [postOwnerIsBanned, banInfoBanStatus],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
@@ -507,21 +631,6 @@ export class PostsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removePostsByBlogId(blogId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."Posts"
-        WHERE "blogId" = $1
-          `,
-        [blogId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
     }
   }
 
