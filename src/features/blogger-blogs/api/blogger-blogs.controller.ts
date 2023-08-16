@@ -25,7 +25,6 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { IdParams } from '../../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
-import { FindAllNotBannedCommentsCommand } from '../application/use-cases/find-all-not-banned-comments.use-case';
 import { UpdateBanUserDto } from '../dto/update-ban-user.dto';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
@@ -41,6 +40,8 @@ import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.enti
 import { BanUnbanBlogForUserCommand } from '../application/use-cases/ban-unban-user-for-blog.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { SearchUserCommentsCommand } from '../application/use-cases/search-user-comments.use-case';
+import { SearchUserBlogsCommand } from '../application/use-cases/search-user-blogs.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -53,7 +54,7 @@ export class BloggerBlogsController {
   ) {}
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
-  async findBlogsCurrentUser(
+  async searchUserBlogs(
     @Request() req: any,
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
@@ -62,21 +63,20 @@ export class BloggerBlogsController {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
-    return await this.bBloggerService.findBlogsCurrentUser(
-      currentUserDto,
-      queryData,
+    return await this.commandBus.execute(
+      new SearchUserBlogsCommand(queryData, currentUserDto),
     );
   }
 
   @Get('blogs/comments')
   @UseGuards(JwtAuthGuard)
-  async findCommentsCurrentUser(@Request() req: any, @Query() query: any) {
+  async searchUserComments(@Request() req: any, @Query() query: any) {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new FindAllNotBannedCommentsCommand(queryData, currentUserDto),
+      new SearchUserCommentsCommand(queryData, currentUserDto),
     );
   }
 

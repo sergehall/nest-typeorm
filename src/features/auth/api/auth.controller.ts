@@ -72,7 +72,7 @@ export class AuthController {
     await this.commandBus.execute(
       new CreateDeviceCommand(payload, ip, userAgent),
     );
-    // res.cookie('refreshToken', signedToken.refreshToken);
+
     res.cookie('refreshToken', signedToken.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -146,7 +146,7 @@ export class AuthController {
     await this.commandBus.execute(
       new CreateDeviceCommand(newPayload, ip, userAgent),
     );
-    // res.cookie('refreshToken', newRefreshToken.refreshToken);
+
     res.cookie('refreshToken', newRefreshToken.refreshToken, {
       httpOnly: true,
       secure: true,

@@ -7,23 +7,23 @@ import { CommentsCountLikesDislikesEntity } from '../../../comments/entities/com
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
-export class FindAllNotBannedCommentsCommand {
+export class SearchUserCommentsCommand {
   constructor(
     public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(FindAllNotBannedCommentsCommand)
-export class FindAllNotBannedCommentsUseCase
-  implements ICommandHandler<FindAllNotBannedCommentsCommand>
+@CommandHandler(SearchUserCommentsCommand)
+export class SearchUserCommentsUseCase
+  implements ICommandHandler<SearchUserCommentsCommand>
 {
   constructor(
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
   async execute(
-    command: FindAllNotBannedCommentsCommand,
+    command: SearchUserCommentsCommand,
   ): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
@@ -38,8 +38,8 @@ export class FindAllNotBannedCommentsUseCase
     if (comments.length === 0) {
       return {
         pagesCount: 0,
-        page: 1,
-        pageSize: 10,
+        page: pageNumber,
+        pageSize: pageSize,
         totalCount: 0,
         items: [],
       };

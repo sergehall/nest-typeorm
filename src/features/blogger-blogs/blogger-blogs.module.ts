@@ -7,7 +7,6 @@ import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
-import { FindAllNotBannedCommentsUseCase } from './application/use-cases/find-all-not-banned-comments.use-case';
 import { BanUserForBlogUseCase } from './application/use-cases/old/ban-user-for-blog.use-case';
 import { AddBannedUserToBanListUseCase } from '../sa/application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { ChangeBanStatusOwnerBlogUseCase } from './application/use-cases/old/change-ban-status-owner-blog.use-case';
@@ -24,13 +23,16 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { BanUnbanBlogForUserUseCase } from './application/use-cases/ban-unban-user-for-blog.use-case';
 import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cases/old/sa-change-ban-status-blogs-by-blog-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { SearchUserCommentsUseCase } from './application/use-cases/search-user-comments.use-case';
+import { SearchUserBlogsUseCase } from './application/use-cases/search-user-blogs.use-case';
 
 const bloggersBlogUseCases = [
   BanUnbanBlogForUserUseCase,
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   RemoveBlogByIdUseCase,
-  FindAllNotBannedCommentsUseCase,
+  SearchUserCommentsUseCase,
+  SearchUserBlogsUseCase,
   BanUserForBlogUseCase,
   AddBannedUserToBanListUseCase,
   ChangeBanStatusOwnerBlogUseCase,
