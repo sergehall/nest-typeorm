@@ -14,32 +14,34 @@ import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastruct
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 
-export class RemovePostByPostIdCommand {
+export class DeletePostByPostIdAndBlogIdCommand {
   constructor(
     public params: BlogIdPostIdParams,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(RemovePostByPostIdCommand)
-export class RemovePostByPostIdUseCase
-  implements ICommandHandler<RemovePostByPostIdCommand>
+@CommandHandler(DeletePostByPostIdAndBlogIdCommand)
+export class DeletePostByPostIdAndBlogIdUseCase
+  implements ICommandHandler<DeletePostByPostIdAndBlogIdCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly postsRepository: PostsRawSqlRepository,
   ) {}
-  async execute(command: RemovePostByPostIdCommand): Promise<boolean> {
+  async execute(command: DeletePostByPostIdAndBlogIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
 
     const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
-    if (!blog) throw new NotFoundException('Not found blog.');
+    if (!blog)
+      throw new NotFoundException(`Blog with id: ${params.blogId} not found`);
 
     const postToRemove: TablesPostsEntity | null =
       await this.postsRepository.getPostById(params.postId);
-    if (!postToRemove) throw new NotFoundException('Not found post.');
+    if (!postToRemove)
+      throw new NotFoundException(`Post with id: ${params.postId} not found`);
 
     await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
 

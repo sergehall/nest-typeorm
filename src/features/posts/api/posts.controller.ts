@@ -24,7 +24,6 @@ import { CreateCommentCommand } from '../../comments/application/use-cases/creat
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CreatePostCommand } from '../application/use-cases/create-post.use-case';
-import { RemovePostByIdOldCommand } from '../application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../../common/query/params/postId.params';
 import { IdParams } from '../../../common/query/params/id.params';
@@ -40,6 +39,7 @@ import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
+import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -152,7 +152,7 @@ export class PostsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new RemovePostByIdOldCommand(params, currentUserDto),
+      new DeletePostByIdCommand(params, currentUserDto),
     );
   }
 

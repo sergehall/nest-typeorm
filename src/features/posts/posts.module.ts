@@ -9,9 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BloggerBlogsService } from '../blogger-blogs/application/blogger-blogs.service';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RemovePostByPostIdUseCase } from './application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
-import { RemovePostByIdOldUseCase } from './application/use-cases/remove-post-byId-old.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
@@ -30,17 +28,20 @@ import { FindPostsUseCase } from './application/use-cases/find-posts.use-case';
 import { FindPostByIdUseCase } from './application/use-cases/find-post-by-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 
+import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
+import { DeletePostByPostIdAndBlogIdUseCase } from './application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
+
 const postsUseCases = [
   FindPostsUseCase,
   FindPostByIdUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
-  RemovePostByPostIdUseCase,
-  RemovePostByIdOldUseCase,
   ChangeBanStatusPostsUseCase,
   ChangeLikeStatusPostUseCase,
   ChangeBanStatusPostsByBlogIdUseCase,
   ChangeBanStatusLikesPostForBannedUserUseCase,
+  DeletePostByPostIdAndBlogIdUseCase,
+  DeletePostByIdUseCase,
 ];
 
 @Module({

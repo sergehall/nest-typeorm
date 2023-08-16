@@ -19,7 +19,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateBloggerBlogCommand } from '../application/use-cases/create-blogger-blog.use-case';
 import { UpdateBlogByIdCommand } from '../application/use-cases/update-blog-byId.use-case';
 import { DeleteBlogByBlogIdCommand } from '../application/use-cases/delete-blog-by-blog-id.use-case';
-import { RemovePostByPostIdCommand } from '../../posts/application/use-cases/remove-post-byPostId.use-case';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { IdParams } from '../../../common/query/params/id.params';
@@ -42,6 +41,7 @@ import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-ac
 import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
 import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
+import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -196,7 +196,7 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new RemovePostByPostIdCommand(params, currentUserDto),
+      new DeletePostByPostIdAndBlogIdCommand(params, currentUserDto),
     );
   }
 
