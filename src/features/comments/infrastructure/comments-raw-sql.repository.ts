@@ -19,85 +19,34 @@ export class CommentsRawSqlRepository {
     @InjectDataSource() private readonly db: DataSource,
     protected keyResolver: KeyResolver,
   ) {}
-
-  async createComment(
-    tablesCommentsRawSqlEntity: TablesCommentsEntity,
-  ): Promise<TablesCommentsEntity[]> {
+  async findCommentByCommentId(
+    commentId: string,
+  ): Promise<TablesCommentsEntity | null> {
     try {
-      return await this.db.query(
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { commentatorInfoIsBanned, banInfoIsBanned } = bannedFlags;
+
+      const comment = await this.db.query(
         `
-        INSERT INTO public."Comments"(
-          "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId",
-          "postInfoBlogName", "postInfoBlogOwnerId", 
-          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
-          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-          RETURNING *
+        SELECT "id", "content", "createdAt", 
+        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
+        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+        FROM public."Comments"
+        WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
           `,
-        [
-          tablesCommentsRawSqlEntity.id,
-          tablesCommentsRawSqlEntity.content,
-          tablesCommentsRawSqlEntity.createdAt,
-          tablesCommentsRawSqlEntity.postInfoPostId,
-          tablesCommentsRawSqlEntity.postInfoTitle,
-          tablesCommentsRawSqlEntity.postInfoBlogId,
-          tablesCommentsRawSqlEntity.postInfoBlogName,
-          tablesCommentsRawSqlEntity.postInfoBlogOwnerId,
-          tablesCommentsRawSqlEntity.commentatorInfoUserId,
-          tablesCommentsRawSqlEntity.commentatorInfoUserLogin,
-          tablesCommentsRawSqlEntity.commentatorInfoIsBanned,
-          tablesCommentsRawSqlEntity.banInfoIsBanned,
-          tablesCommentsRawSqlEntity.banInfoBanDate,
-          tablesCommentsRawSqlEntity.banInfoBanReason,
-        ],
+        [commentId, commentatorInfoIsBanned, banInfoIsBanned],
       );
+      return comment[0];
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      return null;
     }
   }
 
-  async updateComment(
-    commentId: string,
-    updateCommentDto: UpdateCommentDto,
-  ): Promise<boolean> {
-    try {
-      const updateUser = await this.db.query(
-        `
-      UPDATE public."Comments"
-      SET  "content" = $2
-      WHERE "id" = $1`,
-        [commentId, updateCommentDto.content],
-      );
-      return updateUser[1] === 1;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusCommentatorsByUserId(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      const updateComments = await this.db.query(
-        `
-      UPDATE public."Comments"
-      SET "commentatorInfoIsBanned" = $2
-      WHERE "commentatorInfoUserId" = $1 OR "postInfoBlogOwnerId" = $1
-      `,
-        [userId, isBanned],
-      );
-      return !!updateComments[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findAllNotBannedCommentsAndCountLikesDislikes(
-    commentatorInfoUserId: string,
+  async findCommentsOwnedByCurrentUserAndCountLikesDislikes(
     queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
+    currentUserDto: CurrentUserDto,
   ): Promise<CommentsCountLikesDislikesEntity[]> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
@@ -149,84 +98,9 @@ export class CommentsRawSqlRepository {
       LIMIT $5 OFFSET $6`;
 
       const parameters = [
-        currentUserDto?.id,
+        currentUserDto.id,
         commentatorInfoIsBanned,
         banInfoIsBanned,
-        isBanned,
-        limit,
-        offset,
-      ];
-
-      return await this.db.query(query, parameters);
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findCommentByCommentatorIdAndCountOfLikesDislikesComments2(
-    commentatorInfoUserId: string,
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<CommentsCountLikesDislikesEntity[]> {
-    try {
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-      const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
-        bannedFlags;
-      const { pageNumber, pageSize, sortDirection } = queryData.queryPagination;
-
-      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = sortDirection;
-      const limit = pageSize;
-      const offset = (pageNumber - 1) * limit;
-
-      const query = `
-      SELECT
-        c."id", c."content", c."createdAt", c."postInfoPostId", c."postInfoTitle",
-        c."postInfoBlogId", c."postInfoBlogName", c."postInfoBlogOwnerId",
-        c."commentatorInfoUserId", c."commentatorInfoUserLogin", c."commentatorInfoIsBanned",
-        c."banInfoIsBanned", c."banInfoBanDate", c."banInfoBanReason",
-        CAST(
-        (
-          SELECT COUNT(*)
-          FROM public."Comments"
-          WHERE "commentatorInfoUserId" = $1
-          AND "commentatorInfoIsBanned" = $2
-          AND "banInfoIsBanned" = $3
-          ) AS integer
-        ) AS "countComments",
-        COALESCE(lsc_like."countLikes"::integer, 0) AS "countLikes",
-        COALESCE(lsc_dislike."countDislikes"::integer, 0) AS "countDislikes",
-        COALESCE(lsc_user."likeStatus", 'None') AS "likeStatus"
-      FROM public."Comments" c
-      LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "countLikes"
-        FROM public."LikeStatusComments"
-        WHERE "likeStatus" = 'Like' AND "isBanned" = $5
-        GROUP BY "commentId"
-      ) lsc_like ON c."id" = lsc_like."commentId"
-      LEFT JOIN (
-        SELECT "commentId", COUNT(*) AS "countDislikes"
-        FROM public."LikeStatusComments"
-        WHERE "likeStatus" = 'Dislike' AND "isBanned" = $5
-        GROUP BY "commentId"
-      ) lsc_dislike ON c."id" = lsc_dislike."commentId"
-      LEFT JOIN (
-        SELECT "commentId", "likeStatus"
-        FROM public."LikeStatusComments"
-        WHERE "userId" = $4 AND "isBanned" = $5
-      ) lsc_user ON c."id" = lsc_user."commentId"
-      WHERE c."commentatorInfoUserId" = $1
-        AND c."commentatorInfoIsBanned" = $2
-        AND c."banInfoIsBanned" = $3
-      ORDER BY "${sortBy}" ${direction}
-      LIMIT $6 OFFSET $7`;
-
-      const parameters = [
-        commentatorInfoUserId,
-        commentatorInfoIsBanned,
-        banInfoIsBanned,
-        currentUserDto?.id,
         isBanned,
         limit,
         offset,
@@ -315,7 +189,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentByIdAndCountOfLikesDislikesComments(
+  async findCommentByIdAndCountOfLikesDislikesComment(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsCountLikesDislikesEntity | null> {
@@ -374,28 +248,77 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async findCommentByCommentId(
-    commentId: string,
-  ): Promise<TablesCommentsEntity | null> {
+  async createComment(
+    tablesCommentsRawSqlEntity: TablesCommentsEntity,
+  ): Promise<TablesCommentsEntity[]> {
     try {
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-      const { commentatorInfoIsBanned, banInfoIsBanned } = bannedFlags;
-
-      const comment = await this.db.query(
+      return await this.db.query(
         `
-        SELECT "id", "content", "createdAt", 
-        "postInfoPostId", "postInfoTitle", "postInfoBlogId", "postInfoBlogName", "postInfoBlogOwnerId", 
-        "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
-        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-        FROM public."Comments"
-        WHERE "id" = $1 AND "commentatorInfoIsBanned" = $2 AND "banInfoIsBanned" = $3
+        INSERT INTO public."Comments"(
+          "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId",
+          "postInfoBlogName", "postInfoBlogOwnerId", 
+          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+          "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          RETURNING *
           `,
-        [commentId, commentatorInfoIsBanned, banInfoIsBanned],
+        [
+          tablesCommentsRawSqlEntity.id,
+          tablesCommentsRawSqlEntity.content,
+          tablesCommentsRawSqlEntity.createdAt,
+          tablesCommentsRawSqlEntity.postInfoPostId,
+          tablesCommentsRawSqlEntity.postInfoTitle,
+          tablesCommentsRawSqlEntity.postInfoBlogId,
+          tablesCommentsRawSqlEntity.postInfoBlogName,
+          tablesCommentsRawSqlEntity.postInfoBlogOwnerId,
+          tablesCommentsRawSqlEntity.commentatorInfoUserId,
+          tablesCommentsRawSqlEntity.commentatorInfoUserLogin,
+          tablesCommentsRawSqlEntity.commentatorInfoIsBanned,
+          tablesCommentsRawSqlEntity.banInfoIsBanned,
+          tablesCommentsRawSqlEntity.banInfoBanDate,
+          tablesCommentsRawSqlEntity.banInfoBanReason,
+        ],
       );
-      return comment[0];
     } catch (error) {
       console.log(error.message);
-      return null;
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateComment(
+    commentId: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<boolean> {
+    try {
+      const updateUser = await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET  "content" = $2
+      WHERE "id" = $1`,
+        [commentId, updateCommentDto.content],
+      );
+      return updateUser[1] === 1;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusCommentatorsByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updateComments = await this.db.query(
+        `
+      UPDATE public."Comments"
+      SET "commentatorInfoIsBanned" = $2
+      WHERE "commentatorInfoUserId" = $1 OR "postInfoBlogOwnerId" = $1
+      `,
+        [userId, isBanned],
+      );
+      return !!updateComments[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 
