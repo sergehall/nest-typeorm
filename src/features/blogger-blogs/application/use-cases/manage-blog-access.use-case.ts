@@ -18,7 +18,7 @@ import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-wit
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
 import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 
-export class BanUnbanBlogForUserCommand {
+export class ManageBlogAccessCommand {
   constructor(
     public userId: string,
     public updateBanUserDto: UpdateBanUserDto,
@@ -26,9 +26,9 @@ export class BanUnbanBlogForUserCommand {
   ) {}
 }
 
-@CommandHandler(BanUnbanBlogForUserCommand)
-export class BanUnbanBlogForUserUseCase
-  implements ICommandHandler<BanUnbanBlogForUserCommand>
+@CommandHandler(ManageBlogAccessCommand)
+export class ManageBlogAccessUseCase
+  implements ICommandHandler<ManageBlogAccessCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
@@ -37,7 +37,7 @@ export class BanUnbanBlogForUserUseCase
   ) {}
 
   // This method is executed when the BanUserForBlogCommand is dispatched to this handler.
-  async execute(command: BanUnbanBlogForUserCommand): Promise<boolean> {
+  async execute(command: ManageBlogAccessCommand): Promise<boolean> {
     const { userId, updateBanUserDto, currentUserDto } = command;
 
     if (userId === currentUserDto.id) {

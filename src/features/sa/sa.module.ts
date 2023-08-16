@@ -21,7 +21,6 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
-import { SaBanUserByUserIdUseCase } from './application/use-cases/old/sa-ban-user-by-user-id.use-case';
 import { SaBanBlogByBlogIUseCase } from './application/use-cases/old/sa-ban-blog-by-blog-id.use-case';
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
@@ -36,7 +35,6 @@ const saUseCases = [
   SaBanUnbanBlogUseCase,
   SaBanUnbanUserUseCase,
   AddBannedUserToBanListUseCase,
-  SaBanUserByUserIdUseCase,
   SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserByIdUseCase,
   SaBindBlogWithUserUseCase,

@@ -12,7 +12,7 @@ import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
-export class FindAllBannedUsersForBlogCommand {
+export class SearchBannedUsersInBlogCommand {
   constructor(
     public blogId: string,
     public queryData: ParseQueriesDto,
@@ -20,9 +20,9 @@ export class FindAllBannedUsersForBlogCommand {
   ) {}
 }
 
-@CommandHandler(FindAllBannedUsersForBlogCommand)
-export class FindAllBannedUsersForBlogUseCase
-  implements ICommandHandler<FindAllBannedUsersForBlogCommand>
+@CommandHandler(SearchBannedUsersInBlogCommand)
+export class SearchBannedUsersInBlogUseCase
+  implements ICommandHandler<SearchBannedUsersInBlogCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
@@ -32,7 +32,7 @@ export class FindAllBannedUsersForBlogUseCase
     protected commandBus: CommandBus,
   ) {}
   async execute(
-    command: FindAllBannedUsersForBlogCommand,
+    command: SearchBannedUsersInBlogCommand,
   ): Promise<PaginatedResultDto> {
     const { blogId, queryData, currentUser } = command;
 

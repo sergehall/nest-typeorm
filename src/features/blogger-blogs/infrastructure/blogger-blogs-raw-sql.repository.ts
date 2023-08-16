@@ -101,7 +101,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async openFindBlogs(
+  async openSearchBlogs(
     queryData: ParseQueriesDto,
   ): Promise<ReturnBloggerBlogsEntity[]> {
     try {
@@ -112,14 +112,6 @@ export class BloggerBlogsRawSqlRepository {
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-
-      const parameters = [
-        blogOwnerBanStatus,
-        banInfoBanStatus,
-        searchNameTerm,
-        limit,
-        offset,
-      ];
 
       const query = `
         WITH FilteredBlogs AS (
@@ -138,6 +130,14 @@ export class BloggerBlogsRawSqlRepository {
         LIMIT $4 OFFSET $5
       `;
 
+      const parameters = [
+        blogOwnerBanStatus,
+        banInfoBanStatus,
+        searchNameTerm,
+        limit,
+        offset,
+      ];
+
       return await this.db.query(query, parameters);
     } catch (error) {
       console.log(error.message);
@@ -145,7 +145,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saOpenCountBlogs(queryData: ParseQueriesDto): Promise<number> {
+  async openCountBlogs(queryData: ParseQueriesDto): Promise<number> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const searchNameTerm = queryData.searchNameTerm;

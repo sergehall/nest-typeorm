@@ -14,6 +14,9 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { SearchBlogsUseCase } from './application/use-cases/search-blogs.use-case';
+
+const blogsUseCases = [SearchBlogsUseCase];
 
 @Module({
   imports: [CaslModule, CqrsModule],
@@ -31,6 +34,7 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
+    ...blogsUseCases,
   ],
 })
 export class BlogsModule {}
