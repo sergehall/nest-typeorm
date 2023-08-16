@@ -8,7 +8,6 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
-import { SecurityDevicesService } from '../application/security-devices.service';
 import { CookiesJwtVerificationGuard } from '../../auth/guards/cookies-jwt.verification.guard';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { RemoveDevicesExceptCurrentCommand } from '../application/use-cases/remove-devices-except-current.use-case';
@@ -24,7 +23,6 @@ import { SearchDevicesCommand } from '../application/use-cases/search-devices.us
 @Controller('security')
 export class SecurityDevicesController {
   constructor(
-    private readonly securityDevicesService: SecurityDevicesService,
     private readonly decodeTokenService: DecodeTokenService,
     private commandBus: CommandBus,
   ) {}
