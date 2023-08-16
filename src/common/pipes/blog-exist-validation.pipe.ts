@@ -12,7 +12,7 @@ export class BlogExistValidationPipe implements PipeTransform {
     const blog: TableBloggerBlogsRawSqlEntity | null =
       await this.bloggerBlogsRawSqlRepository.findBlogById(value);
     if (!blog) {
-      throw new NotFoundException(`Blog with id ${value} not found`);
+      throw new NotFoundException(`Blog with id: ${value} not found`);
     }
     return value;
   }

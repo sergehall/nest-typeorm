@@ -21,7 +21,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
 
     if (!blog) {
-      throw new NotFoundException('Blog not found');
+      throw new NotFoundException(`Blog with id: ${blogId} not found`);
     }
 
     return {

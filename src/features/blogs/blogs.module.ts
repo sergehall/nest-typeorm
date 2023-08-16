@@ -15,8 +15,9 @@ import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-j
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsUseCase } from './application/use-cases/search-blogs.use-case';
+import { GetBlogByIdUseCase } from './application/use-cases/get-blog-by-id.use-case';
 
-const blogsUseCases = [SearchBlogsUseCase];
+const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
 @Module({
   imports: [CaslModule, CqrsModule],
