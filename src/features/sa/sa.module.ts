@@ -20,8 +20,6 @@ import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-c
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
-import { AddBannedUserToBanListUseCase } from './application/use-cases/old/add-banned-user-to-ban-list.use-case';
-import { SaBanBlogByBlogIUseCase } from './application/use-cases/old/sa-ban-blog-by-blog-id.use-case';
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
@@ -36,8 +34,6 @@ const saUseCases = [
   SaRemoveUserByUserIdUseCase,
   SaBanUnbanBlogUseCase,
   SaBanUnbanUserUseCase,
-  AddBannedUserToBanListUseCase,
-  SaBanBlogByBlogIUseCase,
   SaBindBlogWithUserByIdUseCase,
   SaBindBlogWithUserUseCase,
 ];

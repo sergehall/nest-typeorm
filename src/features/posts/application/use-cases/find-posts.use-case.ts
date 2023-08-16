@@ -36,10 +36,12 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
         page: pageNumber,
         pageSize: pageSize,
         totalCount: pageNumber - 1,
-        items: [],
+        items: postsAndNumberOfPosts.posts,
       };
     }
+
     const pagesCount: number = Math.ceil(totalCount / pageSize);
+
     return {
       pagesCount: pagesCount,
       page: pageNumber,
