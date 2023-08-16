@@ -99,7 +99,6 @@ export class PostsRawSqlRepository {
         countPosts: postsWithLikes[0].countPosts,
       };
     } catch (error) {
-      console.log('-------');
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
@@ -203,13 +202,7 @@ export class PostsRawSqlRepository {
     try {
       return await this.db.query(query, parameters);
     } catch (error) {
-      console.log(error.message, '+++++');
-
-      if (error.message.includes('invalid input syntax for type uuid:')) {
-        throw new NotFoundException('Not found post.');
-      } else {
-        throw new InternalServerErrorException(error.message);
-      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -398,7 +391,7 @@ export class PostsRawSqlRepository {
   async findPostByPostIdWithLikes(
     postId: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity | null> {
+  ): Promise<ReturnPostsEntity> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
     try {
@@ -409,10 +402,6 @@ export class PostsRawSqlRepository {
           currentUserDto,
         );
 
-      if (postWithLikes && postWithLikes.length < 0) {
-        return null;
-      }
-
       const post: ReturnPostsEntity[] = await this.processPostWithLikes(
         postWithLikes,
       );
@@ -420,11 +409,7 @@ export class PostsRawSqlRepository {
       return post[0];
     } catch (error) {
       console.log(error.message);
-      if (error.message.includes('invalid input syntax for type uuid:')) {
-        throw new NotFoundException('Not found post.');
-      } else {
-        throw new InternalServerErrorException(error.message);
-      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
