@@ -149,6 +149,167 @@ export class PostsRawSqlRepository {
     }
   }
 
+  async createPost(
+    postsRawSqlEntity: TablesPostsEntity,
+  ): Promise<TablesPostsEntity> {
+    try {
+      const insertNewPost = await this.db.query(
+        `
+        INSERT INTO public."Posts"
+            (
+             "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
+             "postOwnerId", "dependencyIsBanned",
+             "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          RETURNING "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
+          `,
+        [
+          postsRawSqlEntity.id,
+          postsRawSqlEntity.title,
+          postsRawSqlEntity.shortDescription,
+          postsRawSqlEntity.content,
+          postsRawSqlEntity.blogId,
+          postsRawSqlEntity.blogName,
+          postsRawSqlEntity.createdAt,
+          postsRawSqlEntity.postOwnerId,
+          postsRawSqlEntity.dependencyIsBanned,
+          postsRawSqlEntity.banInfoIsBanned,
+          postsRawSqlEntity.banInfoBanDate,
+          postsRawSqlEntity.banInfoBanReason,
+        ],
+      );
+      return insertNewPost[0];
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updatePostByPostId(
+    postId: string,
+    updatePostDto: UpdatePostDto,
+  ): Promise<boolean> {
+    try {
+      const updatePost = await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET  "title" = $2, "shortDescription" = $3, "content" = $4
+      WHERE "id" = $1`,
+        [
+          postId,
+          updatePostDto.title,
+          updatePostDto.shortDescription,
+          updatePostDto.content,
+        ],
+      );
+      return updatePost[1] === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostByUserId(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      const updatePosts = await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "postOwnerId" = $1`,
+        [userId, isBanned],
+      );
+      return !!updatePosts[0];
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async changeBanStatusPostsByBlogId(
+    blogId: string,
+    isBanned: boolean,
+  ): Promise<boolean> {
+    try {
+      return await this.db.query(
+        `
+      UPDATE public."Posts"
+      SET "dependencyIsBanned" = $2
+      WHERE "blogId" = $1
+      `,
+        [blogId, isBanned],
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async deletePostByPostId(postId: string): Promise<boolean> {
+    try {
+      await this.db.transaction(async (client) => {
+        await client.query(
+          `
+        DELETE FROM public."LikeStatusPosts"
+        WHERE "postId" = $1
+        `,
+          [postId],
+        );
+
+        await client.query(
+          `
+        DELETE FROM public."Comments"
+        WHERE "postInfoPostId" = $1
+        `,
+          [postId],
+        );
+
+        const result = await client.query(
+          `
+        DELETE FROM public."Posts"
+        WHERE "id" = $1
+        RETURNING "id"
+        `,
+          [postId],
+        );
+        if (result[0][0].id) {
+          console.log(`Post with ID ${result[0][0].id} deleted.`);
+        }
+      });
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      [
+        'title',
+        'shortDescription',
+        'content',
+        'blogName',
+        'dependencyIsBanned',
+        'banInfoIsBanned',
+        'banInfoBanDate',
+        'banInfoBanReason',
+      ],
+      'createdAt',
+    );
+  }
+
+  private async getBannedFlags(): Promise<BannedFlagsDto> {
+    return {
+      commentatorInfoIsBanned: false,
+      dependencyIsBanned: false,
+      banInfoIsBanned: false,
+      isBanned: false,
+    };
+  }
+
   private async getPagingParams(
     queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
@@ -160,15 +321,6 @@ export class PostsRawSqlRepository {
     const offset: number = (queryData.queryPagination.pageNumber - 1) * limit;
 
     return { sortBy, direction, limit, offset };
-  }
-
-  private async getBannedFlags(): Promise<BannedFlagsDto> {
-    return {
-      commentatorInfoIsBanned: false,
-      dependencyIsBanned: false,
-      banInfoIsBanned: false,
-      isBanned: false,
-    };
   }
 
   private async getPostWithLikesByPostId(
@@ -430,158 +582,6 @@ export class PostsRawSqlRepository {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  async createPost(
-    postsRawSqlEntity: TablesPostsEntity,
-  ): Promise<TablesPostsEntity> {
-    try {
-      const insertNewPost = await this.db.query(
-        `
-        INSERT INTO public."Posts"
-            (
-             "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
-             "postOwnerId", "dependencyIsBanned",
-             "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          RETURNING "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
-          `,
-        [
-          postsRawSqlEntity.id,
-          postsRawSqlEntity.title,
-          postsRawSqlEntity.shortDescription,
-          postsRawSqlEntity.content,
-          postsRawSqlEntity.blogId,
-          postsRawSqlEntity.blogName,
-          postsRawSqlEntity.createdAt,
-          postsRawSqlEntity.postOwnerId,
-          postsRawSqlEntity.dependencyIsBanned,
-          postsRawSqlEntity.banInfoIsBanned,
-          postsRawSqlEntity.banInfoBanDate,
-          postsRawSqlEntity.banInfoBanReason,
-        ],
-      );
-      return insertNewPost[0];
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async updatePostByPostId(
-    postId: string,
-    updatePostDto: UpdatePostDto,
-  ): Promise<boolean> {
-    try {
-      const updatePost = await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET  "title" = $2, "shortDescription" = $3, "content" = $4
-      WHERE "id" = $1`,
-        [
-          postId,
-          updatePostDto.title,
-          updatePostDto.shortDescription,
-          updatePostDto.content,
-        ],
-      );
-      return updatePost[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusPostByUserId(
-    userId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      const updatePosts = await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET "dependencyIsBanned" = $2
-      WHERE "postOwnerId" = $1`,
-        [userId, isBanned],
-      );
-      return !!updatePosts[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeBanStatusPostsByBlogId(
-    blogId: string,
-    isBanned: boolean,
-  ): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-      UPDATE public."Posts"
-      SET "dependencyIsBanned" = $2
-      WHERE "blogId" = $1
-      `,
-        [blogId, isBanned],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async deletePostByPostId(postId: string): Promise<boolean> {
-    try {
-      await this.db.transaction(async (client) => {
-        await client.query(
-          `
-        DELETE FROM public."LikeStatusPosts"
-        WHERE "postId" = $1
-        `,
-          [postId],
-        );
-
-        await client.query(
-          `
-        DELETE FROM public."Comments"
-        WHERE "postInfoPostId" = $1
-        `,
-          [postId],
-        );
-
-        const result = await client.query(
-          `
-        DELETE FROM public."Posts"
-        WHERE "id" = $1
-        RETURNING "id"
-        `,
-          [postId],
-        );
-        if (result[0][0].id) {
-          console.log(`Post with ID ${result[0][0].id} deleted.`);
-        }
-      });
-      return true;
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async getSortBy(sortBy: string): Promise<string> {
-    return await this.keyResolver.resolveKey(
-      sortBy,
-      [
-        'title',
-        'shortDescription',
-        'content',
-        'blogName',
-        'dependencyIsBanned',
-        'banInfoIsBanned',
-        'banInfoBanDate',
-        'banInfoBanReason',
-      ],
-      'createdAt',
-    );
   }
 
   private async processPostsWithLikes(
