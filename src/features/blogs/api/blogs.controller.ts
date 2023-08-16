@@ -6,7 +6,6 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { BlogsService } from '../application/blogs.service';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
@@ -20,13 +19,13 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
+import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
   constructor(
     protected commandBus: CommandBus,
-    protected blogsService: BlogsService,
     protected parseQueriesService: ParseQueriesService,
   ) {}
 
@@ -41,16 +40,16 @@ export class BlogsController {
 
   @Get(':id')
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindBlogById(
+  async openGetBlogById(
     @Param('id', BlogExistValidationPipe) blogId: string,
   ): Promise<ReturnBloggerBlogsEntity> {
-    return await this.blogsService.openFindBlogById(blogId);
+    return await this.commandBus.execute(new GetBlogByIdCommand(blogId));
   }
 
   @Get(':blogId/posts')
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindPostsByBlogId(
+  async openSearchPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
