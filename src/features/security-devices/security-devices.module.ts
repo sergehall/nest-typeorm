@@ -16,8 +16,10 @@ import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-by-deviceId.use-case';
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-except-current.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { SearchDevicesUseCase } from './application/use-cases/search-devices.use-case';
 
 const securityDevicesCases = [
+  SearchDevicesUseCase,
   CreateDeviceUseCase,
   RemoveDevicesAfterLogoutUseCase,
   RemoveDevicesBannedUserUseCase,

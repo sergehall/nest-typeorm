@@ -18,6 +18,7 @@ import { DeviceIdParams } from '../../../common/query/params/deviceId.params';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { SearchDevicesCommand } from '../application/use-cases/search-devices.use-case';
 
 @SkipThrottle()
 @Controller('security')
@@ -36,7 +37,9 @@ export class SecurityDevicesController {
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(req.cookies.refreshToken);
 
-    return this.securityDevicesService.findDevices(currentPayload);
+    return await this.commandBus.execute(
+      new SearchDevicesCommand(currentPayload),
+    );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
