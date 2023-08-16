@@ -6,7 +6,6 @@ import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger-blog.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
-import { RemoveBlogByIdUseCase } from './application/use-cases/remove-blog-byId.use-case';
 import { AddBannedUserToBanListUseCase } from '../sa/application/use-cases/old/add-banned-user-to-ban-list.use-case';
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
@@ -24,6 +23,7 @@ import { SearchBannedUsersInBlogUseCase } from './application/use-cases/search-b
 import { ManageBlogAccessUseCase } from './application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserUseCase } from './application/use-cases/get-blogs-owned-by-current-user.use-case';
 import { GetCommentsOwnedByCurrentUserUseCase } from './application/use-cases/get-comments-owned-by-current-user.use-case';
+import { DeleteBlogByBlogIdUseCase } from './application/use-cases/delete-blog-by-blog-id.use-case';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -33,10 +33,10 @@ const bloggersBlogUseCases = [
   ManageBlogAccessUseCase,
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
-  RemoveBlogByIdUseCase,
   AddBannedUserToBanListUseCase,
   SaChangeBanStatusBlogsByBlogIdUseCase,
   ChangeBanStatusLikesPostForBannedUserUseCase,
+  DeleteBlogByBlogIdUseCase,
 ];
 
 @Module({

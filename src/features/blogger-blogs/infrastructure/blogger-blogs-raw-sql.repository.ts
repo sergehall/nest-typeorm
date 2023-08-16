@@ -347,6 +347,64 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
+  async deleteBlogByBlogId(blogId: string): Promise<boolean> {
+    try {
+      await this.db.transaction(async (client) => {
+        await client.query(
+          `
+          DELETE FROM public."LikeStatusComments"
+          WHERE "blogId" = $1
+          `,
+          [blogId],
+        );
+
+        await client.query(
+          `
+          DELETE FROM public."LikeStatusPosts"
+          WHERE "blogId" = $1
+          `,
+          [blogId],
+        );
+
+        await client.query(
+          `
+          DELETE FROM public."Comments"
+          WHERE "postInfoBlogId" = $1
+          `,
+          [blogId],
+        );
+
+        await client.query(
+          `
+          DELETE FROM public."Posts"
+          WHERE "blogId" = $1
+          `,
+          [blogId],
+        );
+
+        await client.query(
+          `
+          DELETE FROM public."BannedUsersForBlogs"
+          WHERE "blogId" = $1
+          `,
+          [blogId],
+        );
+
+        await client.query(
+          `
+          DELETE FROM public."BloggerBlogs"
+          WHERE "id" = $1
+          `,
+          [blogId],
+        );
+      });
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      return false;
+    }
+  }
+
   async findBlogByBlogId(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
