@@ -7,7 +7,6 @@ import {
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';
@@ -241,8 +240,7 @@ export class CommentsRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       if (error.message.includes('invalid input syntax for type uuid:')) {
-        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
-        throw new NotFoundException('Not found comment.');
+        return null;
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -377,7 +375,7 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async removeCommentsByPostId(postId: string): Promise<boolean> {
+  async deleteCommentsByPostId(postId: string): Promise<boolean> {
     try {
       return await this.db.query(
         `

@@ -172,7 +172,7 @@ export class LikeStatusPostsRawSqlRepository {
     }
   }
 
-  async removeLikesPostByPostId(postId: string): Promise<boolean> {
+  async deleteLikesPostByPostId(postId: string): Promise<boolean> {
     try {
       return await this.db.query(
         `

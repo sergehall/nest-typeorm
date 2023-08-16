@@ -1,9 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -532,20 +529,41 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async removePostByPostId(postId: string): Promise<boolean> {
+  async deletePostByPostId(postId: string): Promise<boolean> {
     try {
-      const isDeleted = await this.db.query(
-        `
+      await this.db.transaction(async (client) => {
+        await client.query(
+          `
+        DELETE FROM public."LikeStatusPosts"
+        WHERE "postId" = $1
+        `,
+          [postId],
+        );
+
+        await client.query(
+          `
+        DELETE FROM public."Comments"
+        WHERE "postInfoPostId" = $1
+        `,
+          [postId],
+        );
+
+        const result = await client.query(
+          `
         DELETE FROM public."Posts"
         WHERE "id" = $1
         RETURNING "id"
-          `,
-        [postId],
-      );
-      return isDeleted[1] === 1;
+        `,
+          [postId],
+        );
+        if (result[0][0].id) {
+          console.log(`Post with ID ${result[0][0].id} deleted.`);
+        }
+      });
+      return true;
     } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
