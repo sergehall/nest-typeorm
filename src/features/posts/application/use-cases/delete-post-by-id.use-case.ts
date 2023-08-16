@@ -7,21 +7,19 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { IdParams } from '../../../../common/query/params/id.params';
 
-export class RemovePostByIdOldCommand {
+export class DeletePostByIdCommand {
   constructor(public params: IdParams, public currentUserDto: CurrentUserDto) {}
 }
 
-@CommandHandler(RemovePostByIdOldCommand)
-export class RemovePostByIdOldUseCase
-  implements ICommandHandler<RemovePostByIdOldCommand>
+@CommandHandler(DeletePostByIdCommand)
+export class DeletePostByIdUseCase
+  implements ICommandHandler<DeletePostByIdCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
-  async execute(
-    command: RemovePostByIdOldCommand,
-  ): Promise<boolean | undefined> {
+  async execute(command: DeletePostByIdCommand): Promise<boolean | undefined> {
     const { params, currentUserDto } = command;
     const { id } = params;
     const postToDelete = await this.postsRawSqlRepository.getPostById(
