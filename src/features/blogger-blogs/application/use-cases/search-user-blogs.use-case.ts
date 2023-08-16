@@ -25,7 +25,7 @@ export class SearchUserBlogsUseCase
     const { pageSize, pageNumber } = queryData.queryPagination;
 
     const blogs: TableBloggerBlogsRawSqlEntity[] =
-      await this.bloggerBlogsRawSqlRepository.findBlogsCurrentUser(
+      await this.bloggerBlogsRawSqlRepository.searchUserBlogs(
         currentUserDto,
         queryData,
       );
@@ -41,7 +41,7 @@ export class SearchUserBlogsUseCase
     }
 
     const totalCount =
-      await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
+      await this.bloggerBlogsRawSqlRepository.totalCountUserBlogs(
         currentUserDto.id,
         queryData,
       );

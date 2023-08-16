@@ -59,7 +59,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async findBlogsCurrentUser(
+  async searchUserBlogs(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesDto,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
@@ -210,7 +210,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async totalCountBlogsByUserId(
+  async totalCountUserBlogs(
     blogOwnerId: string,
     queryData: ParseQueriesDto,
   ): Promise<number> {

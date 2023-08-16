@@ -13,7 +13,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { BloggerBlogsService } from '../application/blogger-blogs.service';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -42,12 +41,12 @@ import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-res
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchUserCommentsCommand } from '../application/use-cases/search-user-comments.use-case';
 import { SearchUserBlogsCommand } from '../application/use-cases/search-user-blogs.use-case';
+import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(
-    protected bBloggerService: BloggerBlogsService,
     protected postsService: PostsService,
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
@@ -111,7 +110,7 @@ export class BloggerBlogsController {
   @Get('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findPostsByBlogId(
+  async searchPostsInBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Query() query: any,
@@ -120,16 +119,14 @@ export class BloggerBlogsController {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
-    return await this.postsService.findPostsByBlogId(
-      params,
-      queryData,
-      currentUserDto,
+    return await this.commandBus.execute(
+      new SearchPostsInBlogCommand(params, queryData, currentUserDto),
     );
   }
 
   @Post('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
-  async createPostByBlogId(
+  async createPostInBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Body() createPostDto: CreatePostDto,
@@ -143,7 +140,7 @@ export class BloggerBlogsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users/blog/:id')
-  async findBannedUsersForBlog(
+  async searchBannedUsersInBlog(
     @Request() req: any,
     @Param() params: IdParams,
     @Query() query: any,
