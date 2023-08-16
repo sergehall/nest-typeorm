@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
-import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
@@ -26,6 +25,55 @@ export class PostsRawSqlRepository {
     @InjectDataSource() private readonly db: DataSource,
     protected keyResolver: KeyResolver,
   ) {}
+  async getPostById(postId: string): Promise<TablesPostsEntity | null> {
+    try {
+      const dependencyIsBanned = false;
+      const banInfoIsBanned = false;
+      const post = await this.db.query(
+        `
+      SELECT "id", "title", "shortDescription", "content",
+      "blogId", "blogName", "createdAt",
+      "postOwnerId", "dependencyIsBanned",
+      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
+      FROM public."Posts"
+      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
+      `,
+        [postId, dependencyIsBanned, banInfoIsBanned],
+      );
+      // Return the first blog if found, if not found actuate catch (error)
+      return post[0];
+    } catch (error) {
+      console.log(error.message);
+      // If an error occurs, return null instead of throwing an exception
+      return null;
+    }
+  }
+
+  async findPostByPostIdWithLikes(
+    postId: string,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnPostsEntity> {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+
+    try {
+      const postWithLikes: PostCountLikesDislikesStatusEntity[] =
+        await this.getPostWithLikesByPostId(
+          postId,
+          bannedFlags,
+          currentUserDto,
+        );
+
+      const post: ReturnPostsEntity[] = await this.processPostWithLikes(
+        postWithLikes,
+      );
+
+      return post[0];
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async findPostsAndTotalCountPosts(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
@@ -289,7 +337,6 @@ export class PostsRawSqlRepository {
           tp."countPosts"::integer
         FROM PostsWithLikes pwl, TotalPosts tp
         `;
-
     try {
       return await this.db.query(query, parameters);
     } catch (error) {
@@ -388,103 +435,6 @@ export class PostsRawSqlRepository {
     }
   }
 
-  async findPostByPostIdWithLikes(
-    postId: string,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-
-    try {
-      const postWithLikes: PostCountLikesDislikesStatusEntity[] =
-        await this.getPostWithLikesByPostId(
-          postId,
-          bannedFlags,
-          currentUserDto,
-        );
-
-      const post: ReturnPostsEntity[] = await this.processPostWithLikes(
-        postWithLikes,
-      );
-
-      return post[0];
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async getPostById(postId: string): Promise<TablesPostsEntity | null> {
-    try {
-      const dependencyIsBanned = false;
-      const banInfoIsBanned = false;
-      const post = await this.db.query(
-        `
-      SELECT "id", "title", "shortDescription", "content",
-      "blogId", "blogName", "createdAt",
-      "postOwnerId", "dependencyIsBanned",
-      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-      FROM public."Posts"
-      WHERE "id" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
-      `,
-        [postId, dependencyIsBanned, banInfoIsBanned],
-      );
-      // Return the first blog if found, if not found actuate catch (error)
-      return post[0];
-    } catch (error) {
-      console.log(error.message);
-      // If an error occurs, return null instead of throwing an exception
-      return null;
-    }
-  }
-
-  async findPostsByBlogId(
-    params: BlogIdParams,
-    queryData: ParseQueriesDto,
-  ): Promise<TablesPostsEntity[]> {
-    const postOwnerIsBanned = false;
-    const banInfoBanStatus = false;
-    const { blogId } = params;
-    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-    const limit = queryData.queryPagination.pageSize;
-    const direction = queryData.queryPagination.sortDirection;
-    const offset =
-      (queryData.queryPagination.pageNumber - 1) *
-      queryData.queryPagination.pageSize;
-
-    try {
-      const parameters = [
-        blogId,
-        postOwnerIsBanned,
-        banInfoBanStatus,
-        limit,
-        offset,
-      ];
-
-      const query = `
-       SELECT "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
-       "postOwnerId", "dependencyIsBanned",
-       "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason"
-        FROM public."Posts"
-        LEFT JOIN (
-            SELECT 1 AS empty
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM public."Posts"
-                WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
-            )
-        ) AS empty_check ON empty_check.empty = 1
-        WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $4 OFFSET $5
-        `;
-
-      return await this.db.query(query, parameters);
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async createPost(
     postsRawSqlEntity: TablesPostsEntity,
   ): Promise<TablesPostsEntity> {
@@ -541,24 +491,6 @@ export class PostsRawSqlRepository {
       return updatePost[1] === 1;
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountPostsByBlogId(params: BlogIdParams): Promise<number> {
-    const dependencyIsBanned = false;
-    const banInfoIsBanned = false;
-    try {
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Posts"
-        WHERE "blogId" = $1 AND "dependencyIsBanned" = $2 AND "banInfoIsBanned" = $3
-      `,
-        [params.blogId, dependencyIsBanned, banInfoIsBanned],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
