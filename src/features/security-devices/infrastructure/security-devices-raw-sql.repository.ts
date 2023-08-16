@@ -4,6 +4,8 @@ import { SessionDevicesEntity } from '../entities/security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
+import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
+import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -163,6 +165,48 @@ export class SecurityDevicesRawSqlRepository {
         [userId],
       );
       return removeCurrentDevices[0] != null;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saBindUserAndBlog(
+    userForBind: TablesUsersWithIdEntity,
+    blogForBind: TableBloggerBlogsRawSqlEntity,
+  ): Promise<boolean> {
+    const blogId = blogForBind.id;
+    const userId = userForBind.id;
+    const login = userForBind.login;
+
+    try {
+      await this.db.transaction(async (client) => {
+        await client.query(
+          `
+          UPDATE public."Comments"
+          SET "postInfoBlogOwnerId" = $2
+          WHERE "postInfoBlogId" = $1
+          `,
+          [blogId, userId],
+        );
+        await client.query(
+          `
+          UPDATE public."Posts"
+          SET "postOwnerId" = $2
+          WHERE "blogId" = $1
+          `,
+          [blogId, userId],
+        );
+        await client.query(
+          `
+          UPDATE public."BloggerBlogs"
+          SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
+          WHERE "id" = $1
+          `,
+          [blogId, userId, login],
+        );
+      });
+      return true;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);

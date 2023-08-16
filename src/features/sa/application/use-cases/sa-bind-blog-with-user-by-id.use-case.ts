@@ -4,17 +4,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import {
-  ForbiddenException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
-import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
+import { SecurityDevicesRawSqlRepository } from '../../../security-devices/infrastructure/security-devices-raw-sql.repository';
 
 export class SaBindBlogWithUserByIdCommand {
   constructor(
@@ -31,46 +26,22 @@ export class SaBindBlogWithUserByIdUseCase
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    private readonly postsRawSqlRepository: PostsRawSqlRepository,
-    private readonly commentsRawSqlRepository: CommentsRawSqlRepository,
+    private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
   async execute(command: SaBindBlogWithUserByIdCommand): Promise<boolean> {
     const { id, userId } = command.params;
     const { currentUserDto } = command;
 
-    const blogForBan = await this.getBlogForBind(id);
+    const blogForBind = await this.getBlogForBind(id);
 
     const userForBind = await this.getUserForBind(userId);
 
     await this.checkUserPermission(currentUserDto, userId);
 
-    return await this.executeBindUserAndBlogCommands(userForBind, blogForBan);
-  }
-
-  private async executeBindUserAndBlogCommands(
-    userForBind: TablesUsersWithIdEntity,
-    blogForBind: TableBloggerBlogsRawSqlEntity,
-  ): Promise<boolean> {
-    try {
-      await Promise.all([
-        this.commentsRawSqlRepository.changeIntoCommentsBlogOwner(
-          blogForBind.id,
-          userForBind.id,
-        ),
-        this.postsRawSqlRepository.changeIntoPostsBlogOwner(
-          blogForBind.id,
-          userForBind.id,
-        ),
-        this.bloggerBlogsRawSqlRepository.changeIntoBlogBlogOwner(
-          blogForBind.id,
-          userForBind,
-        ),
-      ]);
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
+    return await this.securityDevicesRawSqlRepository.saBindUserAndBlog(
+      userForBind,
+      blogForBind,
+    );
   }
 
   private async checkUserPermission(

@@ -163,24 +163,6 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async saTotalCountBlogs(queryData: ParseQueriesDto): Promise<number> {
-    try {
-      const searchNameTerm = queryData.searchNameTerm;
-
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."BloggerBlogs"
-        WHERE "name" ILIKE $1
-      `,
-        [searchNameTerm],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async searchBlogsForSa(
     queryData: ParseQueriesDto,
   ): Promise<TableBloggerBlogsRawSqlEntity[]> {
@@ -226,6 +208,24 @@ export class BloggerBlogsRawSqlRepository {
         AND "name" ILIKE $4
       `,
         [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId, searchNameTerm],
+      );
+      return Number(countBlogs[0].count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async totalCountBlogsForSa(queryData: ParseQueriesDto): Promise<number> {
+    try {
+      const searchNameTerm = queryData.searchNameTerm;
+
+      const countBlogs = await this.db.query(
+        `
+        SELECT count(*)
+        FROM public."BloggerBlogs"
+        WHERE "name" ILIKE $1
+      `,
+        [searchNameTerm],
       );
       return Number(countBlogs[0].count);
     } catch (error) {
@@ -397,28 +397,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async changeIntoBlogBlogOwner(
-    blogId: string,
-    userForBind: TablesUsersWithIdEntity,
-  ): Promise<boolean> {
-    const { id, login } = userForBind;
-
-    try {
-      return await this.db.query(
-        `
-        UPDATE public."BloggerBlogs"
-        SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
-        WHERE "id" = $1
-        `,
-        [blogId, id, login],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async banUnbanBlogForUser(
+  async manageBlogAccess(
     bannedUserForBlogEntity: BannedUsersForBlogsEntity,
   ): Promise<boolean> {
     const { id, login, userId, blogId, isBanned, banDate, banReason } =
