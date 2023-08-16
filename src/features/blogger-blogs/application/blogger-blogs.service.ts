@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
@@ -110,34 +109,6 @@ export class BloggerBlogsService {
       pageSize: pageSize,
       totalCount: totalCount,
       items: transformedArrBlogs,
-    };
-  }
-
-  async findBlogsCurrentUser(
-    currentUserDto: CurrentUserDto,
-    queryData: ParseQueriesDto,
-  ): Promise<PaginatedResultDto> {
-    const { pageSize, pageNumber } = queryData.queryPagination;
-
-    const blogs: TableBloggerBlogsRawSqlEntity[] =
-      await this.bloggerBlogsRawSqlRepository.findBlogsCurrentUser(
-        currentUserDto,
-        queryData,
-      );
-
-    const totalCount: number =
-      await this.bloggerBlogsRawSqlRepository.totalCountBlogsByUserId(
-        currentUserDto.id,
-        queryData,
-      );
-
-    const pagesCount: number = Math.ceil(totalCount / pageSize);
-    return {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: blogs,
     };
   }
 }

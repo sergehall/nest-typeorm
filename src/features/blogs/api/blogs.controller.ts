@@ -17,11 +17,14 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
   constructor(
+    protected commandBus: CommandBus,
     protected blogsService: BlogsService,
     protected parseQueriesService: ParseQueriesService,
   ) {}
@@ -57,10 +60,8 @@ export class BlogsController {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
-    return await this.blogsService.openFindPostsByBlogId(
-      params,
-      queryData,
-      currentUserDto,
+    return await this.commandBus.execute(
+      new SearchPostsInBlogCommand(params, queryData, currentUserDto),
     );
   }
 }

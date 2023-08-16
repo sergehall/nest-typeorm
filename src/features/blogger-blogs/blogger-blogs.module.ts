@@ -25,6 +25,7 @@ import { SaChangeBanStatusBlogsByBlogIdUseCase } from '../sa/application/use-cas
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchUserCommentsUseCase } from './application/use-cases/search-user-comments.use-case';
 import { SearchUserBlogsUseCase } from './application/use-cases/search-user-blogs.use-case';
+import { SearchPostsInBlogUseCase } from '../posts/application/use-cases/search-posts-in-blog.use-case';
 
 const bloggersBlogUseCases = [
   BanUnbanBlogForUserUseCase,
@@ -39,6 +40,7 @@ const bloggersBlogUseCases = [
   FindAllBannedUsersForBlogUseCase,
   SaChangeBanStatusBlogsByBlogIdUseCase,
   ChangeBanStatusLikesPostForBannedUserUseCase,
+  SearchPostsInBlogUseCase,
 ];
 
 @Module({
