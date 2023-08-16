@@ -152,7 +152,7 @@ export class PostsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new RemovePostByIdOldCommand(params.id, currentUserDto),
+      new RemovePostByIdOldCommand(params, currentUserDto),
     );
   }
 

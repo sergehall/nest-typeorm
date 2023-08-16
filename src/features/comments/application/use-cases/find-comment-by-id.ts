@@ -30,7 +30,9 @@ export class FindCommentByIdUseCase
         commentId,
         currentUserDto,
       );
-    if (!comment) throw new NotFoundException('Not found comment.');
+
+    if (!comment)
+      throw new NotFoundException(`Comment with id: ${commentId} not found.`);
 
     return {
       id: comment.id,

@@ -12,9 +12,6 @@ import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postI
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from '../../../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
-import { CommentsRawSqlRepository } from '../../../comments/infrastructure/comments-raw-sql.repository';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 
 export class RemovePostByPostIdCommand {
@@ -31,9 +28,6 @@ export class RemovePostByPostIdUseCase
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    private readonly likeStatusCommentsRepo: LikeStatusCommentsRawSqlRepository,
-    private readonly likeStatusPostRepository: LikeStatusPostsRawSqlRepository,
-    private readonly commentsRepository: CommentsRawSqlRepository,
     private readonly postsRepository: PostsRawSqlRepository,
   ) {}
   async execute(command: RemovePostByPostIdCommand): Promise<boolean> {
@@ -49,9 +43,7 @@ export class RemovePostByPostIdUseCase
 
     await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
 
-    await this.executeRemovePostByPostIdCommands(postToRemove.id);
-
-    return true;
+    return await this.postsRepository.deletePostByPostId(postToRemove.id);
   }
 
   private async checkUserPermission(
@@ -71,19 +63,6 @@ export class RemovePostByPostIdUseCase
           'You do not have permission to delete a post. ' + error.message,
         );
       }
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async executeRemovePostByPostIdCommands(
-    postId: string,
-  ): Promise<boolean> {
-    try {
-      await this.likeStatusPostRepository.removeLikesPostByPostId(postId);
-      await this.commentsRepository.removeCommentsByPostId(postId);
-      return await this.postsRepository.removePostByPostId(postId);
-    } catch (error) {
-      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
