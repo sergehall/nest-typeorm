@@ -60,7 +60,7 @@ export class ManageBlogAccessUseCase
     const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
       this.createBannedUserEntity(userForBan, updateBanUserDto);
 
-    return await this.bloggerBlogsRawSqlRepository.banUnbanBlogForUser(
+    return await this.bloggerBlogsRawSqlRepository.manageBlogAccess(
       bannedUserForBlogEntity,
     );
   }

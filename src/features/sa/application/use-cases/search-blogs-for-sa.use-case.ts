@@ -49,8 +49,9 @@ export class SearchBlogsForSaUseCase
         },
       }),
     );
+
     const totalCount =
-      await this.bloggerBlogsRawSqlRepository.saTotalCountBlogs(queryData);
+      await this.bloggerBlogsRawSqlRepository.totalCountBlogsForSa(queryData);
 
     const pagesCount = Math.ceil(totalCount / pageSize);
 
