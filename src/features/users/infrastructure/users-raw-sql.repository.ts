@@ -52,6 +52,26 @@ export class UsersRawSqlRepository {
     }
   }
 
+  async saFindUserByUserId(
+    userId: string,
+  ): Promise<TablesUsersWithIdEntity | null> {
+    try {
+      const user = await this.db.query(
+        `
+      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
+      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      FROM public."Users"
+      WHERE "userId" = $1`,
+        [userId],
+      );
+      return user[0];
+    } catch (error) {
+      console.log(error.message);
+      return null;
+    }
+  }
+
   async findUserByUserId(
     userId: string,
   ): Promise<TablesUsersWithIdEntity | null> {
@@ -66,26 +86,6 @@ export class UsersRawSqlRepository {
         WHERE "userId" = $1 AND "isBanned" = $2
       `,
         [userId, isBanned],
-      );
-      return user[0];
-    } catch (error) {
-      console.log(error.message);
-      return null;
-    }
-  }
-
-  async saFindUserByUserId(
-    userId: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
-    try {
-      const user = await this.db.query(
-        `
-      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-      FROM public."Users"
-      WHERE "userId" = $1`,
-        [userId],
       );
       return user[0];
     } catch (error) {
@@ -345,24 +345,6 @@ export class UsersRawSqlRepository {
         [userId, roles],
       );
       return updateUserRole[0][0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async banUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
-    try {
-      const { isBanned, banReason, banDate } = banInfo;
-
-      const updateUser = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET  "isBanned" = $2, "banDate" = $3, "banReason" = $4
-      WHERE "userId" = $1
-      `,
-        [userId, isBanned, banDate, banReason],
-      );
-      return updateUser[1] === 1;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

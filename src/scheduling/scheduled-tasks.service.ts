@@ -12,14 +12,14 @@ export class ScheduledTasksService {
     await this.dataCleanupService.removeInvalidJWTFromBlackList();
   }
 
-  //  every 30 min
-  @Cron('*/30 * * * *')
+  // every 5th hour
+  @Cron('0 */5 * * *')
   async removeUserWithExpirationDate() {
     await this.dataCleanupService.removeDataUsersWithExpiredDate();
   }
 
-  // every 30 min
-  @Cron('*/30 * * * *')
+  // every 1 hour
+  @Cron('0 */1 * * *')
   async removeDevicesWithExpiredDate() {
     await this.dataCleanupService.removeDevicesWithExpiredDate();
   }
