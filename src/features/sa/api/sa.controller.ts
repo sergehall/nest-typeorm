@@ -14,13 +14,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
-import { SaService } from '../application/sa.service';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/application/users.service';
 import { Action } from '../../../ability/roles/action.enum';
-import { BloggerBlogsService } from '../../blogger-blogs/application/blogger-blogs.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user.use-case';
@@ -44,10 +42,8 @@ import { SearchBlogsForSaCommand } from '../application/use-cases/search-blogs-f
 @Controller('sa')
 export class SaController {
   constructor(
-    private saService: SaService,
     private parseQueriesService: ParseQueriesService,
     private usersService: UsersService,
-    private bloggerBlogsService: BloggerBlogsService,
     private commandBus: CommandBus,
   ) {}
 

@@ -203,7 +203,10 @@ export class BloggerBlogsController {
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async deleteBlogById(@Request() req: any, @Param() params: IdParams) {
+  async deleteBlogById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

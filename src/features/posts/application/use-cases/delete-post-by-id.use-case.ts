@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -19,7 +23,7 @@ export class DeletePostByIdUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsRawSqlRepository: PostsRawSqlRepository,
   ) {}
-  async execute(command: DeletePostByIdCommand): Promise<boolean | undefined> {
+  async execute(command: DeletePostByIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
     const { id } = params;
     const postToDelete = await this.postsRawSqlRepository.getPostById(
@@ -44,6 +48,7 @@ export class DeletePostByIdUseCase
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);
       }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

@@ -40,6 +40,8 @@ import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
+import { ReturnCommentsEntity } from '../../comments/entities/return-comments.entity';
+import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
 
 @SkipThrottle()
 @Controller('posts')
@@ -70,7 +72,7 @@ export class PostsController {
   async openFindPostByPostId(
     @Request() req: any,
     @Param('id', PostExistValidationPipe) id: string,
-  ) {
+  ): Promise<ReturnPostsEntity> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
     return await this.commandBus.execute(
@@ -103,7 +105,7 @@ export class PostsController {
   async createPost(
     @Request() req: any,
     @Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto,
-  ) {
+  ): Promise<ReturnPostsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
     const { blogId, ...createPostDto } = createPostWithBlogIdDto;
 
@@ -118,7 +120,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Body() createCommentDto: CreateCommentDto,
-  ) {
+  ): Promise<ReturnCommentsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
@@ -132,7 +134,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updatePostWithBlogIdDto: UpdatePostWithBlogIdDto,
-  ) {
+  ): Promise<boolean> {
     const currentUserDto = req.user;
     const { blogId, ...updatePostDto } = updatePostWithBlogIdDto;
     const idBlogId: BlogIdPostIdParams = {
@@ -148,7 +150,10 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Delete(':id')
-  async removePost(@Request() req: any, @Param() params: IdParams) {
+  async removePost(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
