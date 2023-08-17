@@ -590,11 +590,12 @@ export class PostsRawSqlRepository {
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
-    postsWithLikes.forEach((row: PostsCountPostsLikesDislikesStatusEntity) => {
+    return postsWithLikes.reduce<ReturnPostsEntity[]>((result, row) => {
       const postId = row.id;
 
-      if (!postWithLikes[postId]) {
-        postWithLikes[postId] = {
+      let postEntity = postWithLikes[postId];
+      if (!postEntity) {
+        postEntity = {
           id: row.id,
           title: row.title,
           shortDescription: row.shortDescription,
@@ -605,27 +606,24 @@ export class PostsRawSqlRepository {
           extendedLikesInfo: {
             likesCount: row.likesCount,
             dislikesCount: row.dislikesCount,
-            myStatus: LikeStatusEnums.NONE,
+            myStatus: currentUserDto ? row.myStatus : LikeStatusEnums.NONE,
             newestLikes: [],
           },
         };
-      }
-
-      if (currentUserDto) {
-        postWithLikes[postId].extendedLikesInfo.myStatus = row.myStatus;
+        postWithLikes[postId] = postEntity;
+        result.push(postEntity);
       }
 
       if (row.likeStatus === LikeStatusEnums.LIKE) {
-        const likeStatus = {
+        postEntity.extendedLikesInfo.newestLikes.push({
           addedAt: row.addedAt,
           userId: row.userId,
           login: row.login,
-        };
-        postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
+        });
       }
-    });
 
-    return Object.values(postWithLikes);
+      return result;
+    }, []);
   }
 
   private async processPostWithLikes(
@@ -633,11 +631,12 @@ export class PostsRawSqlRepository {
   ): Promise<ReturnPostsEntity[]> {
     const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
 
-    post.forEach((row: PostCountLikesDislikesStatusEntity) => {
+    return post.reduce<ReturnPostsEntity[]>((result, row) => {
       const postId = row.id;
 
-      if (!postWithLikes[postId]) {
-        postWithLikes[postId] = {
+      let postEntity = postWithLikes[postId];
+      if (!postEntity) {
+        postEntity = {
           id: row.id,
           title: row.title,
           shortDescription: row.shortDescription,
@@ -652,18 +651,19 @@ export class PostsRawSqlRepository {
             newestLikes: [],
           },
         };
+        postWithLikes[postId] = postEntity;
+        result.push(postEntity);
       }
 
       if (row.likeStatus === LikeStatusEnums.LIKE) {
-        const likeStatus = {
+        postEntity.extendedLikesInfo.newestLikes.push({
           addedAt: row.addedAt,
           login: row.login,
           userId: row.userId,
-        };
-        postWithLikes[postId].extendedLikesInfo.newestLikes.push(likeStatus);
+        });
       }
-    });
 
-    return Object.values(postWithLikes);
+      return result;
+    }, []);
   }
 }

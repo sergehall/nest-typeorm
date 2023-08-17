@@ -375,21 +375,6 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  async deleteCommentsByPostId(postId: string): Promise<boolean> {
-    try {
-      return await this.db.query(
-        `
-        DELETE FROM public."Comments"
-        WHERE "postInfoPostId" = $1
-          `,
-        [postId],
-      );
-    } catch (error) {
-      console.log(error.message);
-      throw new NotFoundException(error.message);
-    }
-  }
-
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
