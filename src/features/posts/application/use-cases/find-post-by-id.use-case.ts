@@ -18,9 +18,7 @@ export class FindPostByIdUseCase
     private readonly postsRawSqlRepository: PostsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
-  async execute(
-    command: FindPostByIdCommand,
-  ): Promise<ReturnPostsEntity | null> {
+  async execute(command: FindPostByIdCommand): Promise<ReturnPostsEntity> {
     const { postId, currentUserDto } = command;
 
     return await this.postsRawSqlRepository.findPostByPostIdWithLikes(
