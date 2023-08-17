@@ -256,19 +256,19 @@ export class UsersRawSqlRepository {
   async updateUserPasswordHashByRecoveryCode(
     recoveryCode: string,
     newPasswordHash: string,
-  ): Promise<TablesUsersWithIdEntity[]> {
+  ): Promise<boolean> {
     try {
       const updateUserPassword = await this.db.query(
         `
       UPDATE public."Users"
       SET  "passwordHash" = $2
       WHERE "confirmationCode" = $1
-      RETURNING *
       `,
         [recoveryCode, newPasswordHash],
       );
-      return updateUserPassword[0];
+      return updateUserPassword[1] === 1;
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

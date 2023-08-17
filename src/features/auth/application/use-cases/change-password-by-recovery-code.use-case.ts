@@ -1,9 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import * as bcrypt from 'bcrypt';
-import { ConfigType } from '../../../../config/configuration';
-import { ConfigService } from '@nestjs/config';
 import { NewPasswordRecoveryDto } from '../../dto/new-password-recovery.dto';
+import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 
 export class ChangePasswordByRecoveryCodeCommand {
   constructor(public newPasswordRecoveryDto: NewPasswordRecoveryDto) {}
@@ -15,24 +13,18 @@ export class ChangePasswordByRecoveryCodeUseCase
 {
   constructor(
     protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected configService: ConfigService<ConfigType, true>,
+    protected encryptConfig: EncryptConfig,
   ) {}
   async execute(
     command: ChangePasswordByRecoveryCodeCommand,
   ): Promise<boolean> {
-    const SALT_FACTOR = this.configService.get('bcrypt', {
-      infer: true,
-    }).SALT_FACTOR;
-
     const { newPassword, recoveryCode } = command.newPasswordRecoveryDto;
 
-    const passwordHash = await bcrypt.hash(newPassword, SALT_FACTOR);
+    const passwordHash = await this.encryptConfig.getPasswordHash(newPassword);
 
-    const isPasswordUpdated =
-      await this.usersRawSqlRepository.updateUserPasswordHashByRecoveryCode(
-        recoveryCode,
-        passwordHash,
-      );
-    return isPasswordUpdated.length !== 0;
+    return await this.usersRawSqlRepository.updateUserPasswordHashByRecoveryCode(
+      recoveryCode,
+      passwordHash,
+    );
   }
 }
