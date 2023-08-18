@@ -41,7 +41,7 @@ import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.
 import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
 import { ReturnCommentsEntity } from '../../comments/entities/return-comments.entity';
-import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
+import { ReturnPostsEntity } from '../entities/return-posts.entity';
 
 @SkipThrottle()
 @Controller('posts')

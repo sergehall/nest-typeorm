@@ -7,17 +7,14 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import * as uuid4 from 'uuid4';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../../dto/create-post.dto';
-import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
-import { ExtendedLikesInfo, PostsViewDto } from '../../view-dto/posts-view.dto';
-import { ReturnPostsEntityDto } from '../../dto/return-posts-entity.dto';
+import { ReturnPostsEntity } from '../../entities/return-posts.entity';
 
 export class CreatePostCommand {
   constructor(
@@ -35,7 +32,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand): Promise<PostsViewDto> {
+  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
     const { blogId, currentUserDto, createPostDto } = command;
 
     const blog: TableBloggerBlogsRawSqlEntity | null =
@@ -46,50 +43,11 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    // User has the permission, proceed with creating the post
-    const tablesPostEntity: TablesPostsEntity = await this.getTablesPostsEntity(
+    return await this.postsRawSqlRepository.createPost(
       blog,
       createPostDto,
       currentUserDto,
     );
-
-    const newPost = await this.postsRawSqlRepository.createPost(
-      tablesPostEntity,
-    );
-
-    // addExtendedLikesInfoToPosts and return the new post view
-    return await this.addExtendedLikesInfoToPosts(newPost);
-  }
-
-  private async getTablesPostsEntity(
-    blog: TableBloggerBlogsRawSqlEntity,
-    createPostDto: CreatePostDto,
-    currentUserDto: CurrentUserDto,
-  ): Promise<TablesPostsEntity> {
-    return {
-      id: uuid4().toString(),
-      title: createPostDto.title,
-      shortDescription: createPostDto.shortDescription,
-      content: createPostDto.content,
-      blogId: blog.id,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-      postOwnerId: currentUserDto.id,
-      dependencyIsBanned: false,
-      banInfoIsBanned: false,
-      banInfoBanDate: null,
-      banInfoBanReason: null,
-    };
-  }
-
-  private async addExtendedLikesInfoToPosts(
-    newPost: ReturnPostsEntityDto,
-  ): Promise<PostsViewDto> {
-    const extendedLikesInfo = new ExtendedLikesInfo();
-    return {
-      ...newPost, // Spread properties of newPost
-      extendedLikesInfo, // Add extendedLikesInfo property
-    };
   }
 
   private async checkUserPermission(

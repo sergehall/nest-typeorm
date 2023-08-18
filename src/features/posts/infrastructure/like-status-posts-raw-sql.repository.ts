@@ -4,7 +4,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { TablesLikeStatusPostsEntity } from '../entities/tables-like-status-posts.entity';
 import { TablesLikeStatusCommentsEntity } from '../../comments/entities/tables-like-status-comments.entity';
 import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
-import { NewestLikes } from '../entities/return-posts-entity.entity';
+import { NewestLikes } from '../entities/return-posts.entity';
 
 export class LikeStatusPostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}

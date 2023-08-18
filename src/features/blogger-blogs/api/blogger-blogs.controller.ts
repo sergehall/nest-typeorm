@@ -31,7 +31,7 @@ import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
+import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';

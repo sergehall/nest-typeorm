@@ -2,7 +2,7 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { ReturnPostsCountPostsEntity } from '../../entities/return-posts-count-posts.entity';
+import { ReturnPostsCountPostsDto } from '../../entities/return-posts-count-posts.entity';
 
 export class SearchPostsInBlogCommand {
   constructor(
@@ -20,7 +20,7 @@ export class SearchPostsInBlogUseCase
     const { blogId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndNumberOfPosts: ReturnPostsCountPostsEntity =
+    const postsAndNumberOfPosts: ReturnPostsCountPostsDto =
       await this.postsRawSqlRepository.findPostsAndTotalCountPostsForBlog(
         blogId,
         queryData,
