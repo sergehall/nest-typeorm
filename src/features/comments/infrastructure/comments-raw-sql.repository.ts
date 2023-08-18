@@ -536,7 +536,9 @@ export class CommentsRawSqlRepository {
     };
     const likesInfo = new LikesInfo();
     return {
-      ...post,
+      id: post.id,
+      content: post.content,
+      createdAt: post.createdAt,
       commentatorInfo,
       likesInfo,
     };
