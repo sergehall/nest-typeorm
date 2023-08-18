@@ -122,7 +122,9 @@ export class CommentsRawSqlRepository {
       }
 
       const countComments: number = result[0].countComments;
-      const transformedComments = await this.transformedComments(result);
+      const transformedComments = await this.transformedCommentsForCurrentUser(
+        result,
+      );
 
       return {
         comments: transformedComments,
@@ -216,7 +218,7 @@ export class CommentsRawSqlRepository {
       }
 
       const transformedComments: ReturnCommentsEntity[] =
-        await this.transformedCommentsForPost(result);
+        await this.transformedComments(result);
 
       return {
         comments: transformedComments,
@@ -329,7 +331,7 @@ export class CommentsRawSqlRepository {
         query,
         parameters,
       );
-      return await this.transformedAndAddLikesInfoToCommentsEntity(result);
+      return await this.transformedComment(result);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -428,56 +430,6 @@ export class CommentsRawSqlRepository {
     }
   }
 
-  private async transformedComments(
-    comments: CommentsCountLikesDislikesEntity[],
-  ): Promise<ReturnCommentsWithPostInfoEntity[]> {
-    return comments.map(
-      (
-        comment: CommentsCountLikesDislikesEntity,
-      ): ReturnCommentsWithPostInfoEntity => ({
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentatorInfoUserId,
-          userLogin: comment.commentatorInfoUserLogin,
-        },
-        likesInfo: {
-          likesCount: comment.countLikes,
-          dislikesCount: comment.countDislikes,
-          myStatus: comment.likeStatus,
-        },
-        postInfo: {
-          id: comment.postInfoPostId,
-          title: comment.postInfoTitle,
-          blogId: comment.postInfoBlogId,
-          blogName: comment.postInfoBlogName,
-        },
-      }),
-    );
-  }
-
-  private async transformedCommentsForPost(
-    comments: CommentsCountLikesDislikesEntity[],
-  ): Promise<ReturnCommentsEntity[]> {
-    return comments.map(
-      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentatorInfoUserId,
-          userLogin: comment.commentatorInfoUserLogin,
-        },
-        likesInfo: {
-          likesCount: comment.countLikes,
-          dislikesCount: comment.countDislikes,
-          myStatus: comment.likeStatus,
-        },
-      }),
-    );
-  }
-
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
@@ -526,7 +478,57 @@ export class CommentsRawSqlRepository {
     };
   }
 
-  private async transformedAndAddLikesInfoToCommentsEntity(
+  private async transformedCommentsForCurrentUser(
+    comments: CommentsCountLikesDislikesEntity[],
+  ): Promise<ReturnCommentsWithPostInfoEntity[]> {
+    return comments.map(
+      (
+        comment: CommentsCountLikesDislikesEntity,
+      ): ReturnCommentsWithPostInfoEntity => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentatorInfoUserId,
+          userLogin: comment.commentatorInfoUserLogin,
+        },
+        likesInfo: {
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
+          myStatus: comment.likeStatus,
+        },
+        postInfo: {
+          id: comment.postInfoPostId,
+          title: comment.postInfoTitle,
+          blogId: comment.postInfoBlogId,
+          blogName: comment.postInfoBlogName,
+        },
+      }),
+    );
+  }
+
+  private async transformedComments(
+    comments: CommentsCountLikesDislikesEntity[],
+  ): Promise<ReturnCommentsEntity[]> {
+    return comments.map(
+      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentatorInfoUserId,
+          userLogin: comment.commentatorInfoUserLogin,
+        },
+        likesInfo: {
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
+          myStatus: comment.likeStatus,
+        },
+      }),
+    );
+  }
+
+  private async transformedComment(
     newPost: PartialTablesCommentsEntity[],
   ): Promise<ReturnCommentsEntity> {
     const post = newPost[0];
