@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
-import { ReturnBloggerBlogsDto } from '../../dto/return-blogger-blogs.dto';
+import { ReturnBloggerBlogsEntity } from '../../entities/return-blogger-blogs.entity';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -30,7 +30,7 @@ export class CreateBloggerBlogUseCase
   ) {}
   async execute(
     command: CreateBloggerBlogCommand,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<ReturnBloggerBlogsEntity> {
     this.checkPermission(command.currentUser);
 
     const blogsEntity = this.createBlogsEntity(

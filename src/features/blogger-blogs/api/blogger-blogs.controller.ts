@@ -41,7 +41,7 @@ import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-
 import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
-import { ReturnBloggerBlogsDto } from '../dto/return-blogger-blogs.dto';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -86,7 +86,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<ReturnBloggerBlogsEntity> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

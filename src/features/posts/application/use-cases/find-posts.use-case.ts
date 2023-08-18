@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { ReturnPostsCountPostsDto } from '../../entities/return-posts-count-posts.entity';
+import { PostsCountPostsDto } from '../../dto/posts-count-posts.dto';
 
 export class FindPostsCommand {
   constructor(
@@ -22,7 +22,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndNumberOfPosts: ReturnPostsCountPostsDto =
+    const postsAndNumberOfPosts: PostsCountPostsDto =
       await this.postsRawSqlRepository.findPostsAndTotalCountPosts(
         queryData,
         currentUserDto,

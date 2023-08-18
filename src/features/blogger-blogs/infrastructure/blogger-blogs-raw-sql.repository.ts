@@ -4,12 +4,13 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { ReturnBloggerBlogsDto } from '../dto/return-blogger-blogs.dto';
+import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { ReturnBlogDto } from '../dto/return-blog.dto';
+import { ReturnBloggerBlogsCountBlogsEntity } from '../entities/return-blogger-blogs-count-blogs.entity';
+import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -57,10 +58,10 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async searchUserBlogs(
+  async searchUserBlogsAndCountBlogs(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesDto,
-  ): Promise<ReturnBlogDto[]> {
+  ): Promise<BlogsCountBlogsDto> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const { id } = currentUserDto;
@@ -71,16 +72,22 @@ export class BloggerBlogsRawSqlRepository {
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
     const query = `
-        SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+    WITH filtered_blogs AS (
+      SELECT
+          "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
+          CAST(count(*) OVER() AS INTEGER) AS "countBlogs"
         FROM public."BloggerBlogs"
         WHERE "dependencyIsBanned" = $1
         AND "banInfoIsBanned" = $2
         AND "blogOwnerId" = $3
         AND "name" ILIKE $4
-        ORDER BY "${sortBy}" COLLATE "C" ${direction}
-        LIMIT $5
-        OFFSET $6
-        `;
+      )
+      SELECT *
+      FROM filtered_blogs
+      ORDER BY "${sortBy}" COLLATE "C" ${direction}
+      LIMIT $5
+      OFFSET $6;
+    `;
 
     const params = [
       blogOwnerBanStatus,
@@ -92,16 +99,60 @@ export class BloggerBlogsRawSqlRepository {
     ];
 
     try {
-      return await this.db.query(query, params);
+      const result = await this.db.query(query, params);
+
+      return await this.transformedBlogsTotalCount(result);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
 
+  // async searchUserBlogs(
+  //   currentUserDto: CurrentUserDto,
+  //   queryData: ParseQueriesDto,
+  // ): Promise<ReturnBlogDto[]> {
+  //   const blogOwnerBanStatus = false;
+  //   const banInfoBanStatus = false;
+  //   const { id } = currentUserDto;
+  //   const searchNameTerm = queryData.searchNameTerm;
+  //   const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+  //   const direction = queryData.queryPagination.sortDirection;
+  //   const limit = queryData.queryPagination.pageSize;
+  //   const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+  //
+  //   const query = `
+  //       SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+  //       FROM public."BloggerBlogs"
+  //       WHERE "dependencyIsBanned" = $1
+  //       AND "banInfoIsBanned" = $2
+  //       AND "blogOwnerId" = $3
+  //       AND "name" ILIKE $4
+  //       ORDER BY "${sortBy}" COLLATE "C" ${direction}
+  //       LIMIT $5
+  //       OFFSET $6
+  //       `;
+  //
+  //   const params = [
+  //     blogOwnerBanStatus,
+  //     banInfoBanStatus,
+  //     id,
+  //     searchNameTerm,
+  //     limit,
+  //     offset,
+  //   ];
+  //
+  //   try {
+  //     return await this.db.query(query, params);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
+
   async openSearchBlogs(
     queryData: ParseQueriesDto,
-  ): Promise<ReturnBloggerBlogsDto[]> {
+  ): Promise<ReturnBloggerBlogsEntity[]> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -190,32 +241,6 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async totalCountUserBlogs(
-    blogOwnerId: string,
-    queryData: ParseQueriesDto,
-  ): Promise<number> {
-    try {
-      const blogOwnerBanStatus = false;
-      const banInfoBanStatus = false;
-      const searchNameTerm = queryData.searchNameTerm;
-
-      const countBlogs = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."BloggerBlogs"
-        WHERE "dependencyIsBanned" = $1
-        AND "banInfoIsBanned" = $2
-        AND "blogOwnerId" = $3
-        AND "name" ILIKE $4
-      `,
-        [blogOwnerBanStatus, banInfoBanStatus, blogOwnerId, searchNameTerm],
-      );
-      return Number(countBlogs[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async totalCountBlogsForSa(queryData: ParseQueriesDto): Promise<number> {
     try {
       const searchNameTerm = queryData.searchNameTerm;
@@ -258,7 +283,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async createBlogs(
     bloggerBlogsRawSqlEntity: TableBloggerBlogsRawSqlEntity,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<ReturnBloggerBlogsEntity> {
     try {
       const createNewBlog = await this.db.query(
         `
@@ -624,5 +649,21 @@ export class BloggerBlogsRawSqlRepository {
       ],
       'createdAt',
     );
+  }
+
+  private async transformedBlogsTotalCount(
+    blogsArr: ReturnBloggerBlogsCountBlogsEntity[],
+  ): Promise<BlogsCountBlogsDto> {
+    const blogs = blogsArr.map((row: ReturnBloggerBlogsCountBlogsEntity) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      websiteUrl: row.websiteUrl,
+      createdAt: row.createdAt,
+      isMembership: row.isMembership,
+    }));
+    const countBlogs = blogsArr.length > 0 ? blogsArr[0].countBlogs : 0;
+
+    return { blogs, countBlogs };
   }
 }

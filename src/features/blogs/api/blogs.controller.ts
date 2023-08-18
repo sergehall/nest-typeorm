@@ -20,7 +20,7 @@ import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-ca
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
-import { ReturnBloggerBlogsDto } from '../../blogger-blogs/dto/return-blogger-blogs.dto';
+import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -43,7 +43,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openGetBlogById(
     @Param() params: IdParams,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<ReturnBloggerBlogsEntity> {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
