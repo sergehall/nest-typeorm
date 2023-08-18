@@ -111,48 +111,6 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  // async searchUserBlogs(
-  //   currentUserDto: CurrentUserDto,
-  //   queryData: ParseQueriesDto,
-  // ): Promise<ReturnBlogDto[]> {
-  //   const blogOwnerBanStatus = false;
-  //   const banInfoBanStatus = false;
-  //   const { id } = currentUserDto;
-  //   const searchNameTerm = queryData.searchNameTerm;
-  //   const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-  //   const direction = queryData.queryPagination.sortDirection;
-  //   const limit = queryData.queryPagination.pageSize;
-  //   const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-  //
-  //   const query = `
-  //       SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
-  //       FROM public."BloggerBlogs"
-  //       WHERE "dependencyIsBanned" = $1
-  //       AND "banInfoIsBanned" = $2
-  //       AND "blogOwnerId" = $3
-  //       AND "name" ILIKE $4
-  //       ORDER BY "${sortBy}" COLLATE "C" ${direction}
-  //       LIMIT $5
-  //       OFFSET $6
-  //       `;
-  //
-  //   const params = [
-  //     blogOwnerBanStatus,
-  //     banInfoBanStatus,
-  //     id,
-  //     searchNameTerm,
-  //     limit,
-  //     offset,
-  //   ];
-  //
-  //   try {
-  //     return await this.db.query(query, params);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
-
   async openSearchBlogs(
     queryData: ParseQueriesDto,
   ): Promise<ReturnBloggerBlogsEntity[]> {
@@ -500,10 +458,14 @@ export class BloggerBlogsRawSqlRepository {
       });
       if (isBanned) {
         // Successful User Ban Message
-        console.log(`User ${userId} Ban 🚫. For blog ${blogId}.`);
+        console.log(
+          `User ${userId} has been blocked from accessing Blog ${blogId}. 🚫`,
+        );
       } else {
         // Successful User unBan Message
-        console.log(`User ${userId} Unban 🚪 for blog ${blogId}.`);
+        console.log(
+          `User with ID ${userId} has been unbanned for the blog with ID ${blogId}🚪`,
+        );
       }
       return true;
     } catch (error) {

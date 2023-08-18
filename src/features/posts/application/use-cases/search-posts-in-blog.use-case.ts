@@ -29,7 +29,7 @@ export class SearchPostsInBlogUseCase
 
     const totalCount = postsAndNumberOfPosts.countPosts;
 
-    if (totalCount === 0) {
+    if (postsAndNumberOfPosts.countPosts === 0) {
       return {
         pagesCount: pageNumber,
         page: pageNumber,

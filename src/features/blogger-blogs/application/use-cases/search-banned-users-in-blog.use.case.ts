@@ -7,10 +7,9 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { ReturnBannedUsersForBlogEntity } from '../../entities/return-banned-users-for-blog.entity';
-import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { BannedUsersCountBannedUsersDto } from '../../dto/banned-users-count-banned-users.dto';
 
 export class SearchBannedUsersInBlogCommand {
   constructor(
@@ -25,7 +24,7 @@ export class SearchBannedUsersInBlogUseCase
   implements ICommandHandler<SearchBannedUsersInBlogCommand>
 {
   constructor(
-    private readonly caslAbilityFactory: CaslAbilityFactory,
+    protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRawSqlRepository: UsersRawSqlRepository,
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
@@ -35,40 +34,33 @@ export class SearchBannedUsersInBlogUseCase
     command: SearchBannedUsersInBlogCommand,
   ): Promise<PaginatedResultDto> {
     const { blogId, queryData, currentUser } = command;
+    const { pageNumber, pageSize } = queryData.queryPagination;
 
     // Check if the blog exists
-    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(
-      command.blogId,
-    );
+    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
     if (!blog) throw new NotFoundException('Not found blog.');
 
     // Check user's permission to ban the user
     await this.checkUserPermission(currentUser.id, blog.blogOwnerId);
 
     // Find all banned users for the blog
-    const bannedUsers: BannedUsersForBlogsEntity[] =
+    const bannedUsersAndCount: BannedUsersCountBannedUsersDto =
       await this.bannedUsersForBlogsRawSqlRepository.findBannedUsers(
         blogId,
         queryData,
       );
 
-    // Transform the banned user data into return format
-    const transformedBannedUsers: ReturnBannedUsersForBlogEntity[] =
-      bannedUsers.map((user: BannedUsersForBlogsEntity) => ({
-        id: user.userId,
-        login: user.login,
-        banInfo: {
-          isBanned: user.isBanned,
-          banDate: user.banDate,
-          banReason: user.banReason,
-        },
-      }));
-
     // Get the total count of banned users for pagination purposes
-    const totalCount =
-      await this.bannedUsersForBlogsRawSqlRepository.countBannedUsersForBlog(
-        blogId,
-      );
+    const totalCount = bannedUsersAndCount.countBannedUsers;
+    if (totalCount === 0) {
+      return {
+        pagesCount: 0,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
 
     // Calculate the number of pages for pagination
     const pagesCount = Math.ceil(
@@ -81,7 +73,7 @@ export class SearchBannedUsersInBlogUseCase
       page: queryData.queryPagination.pageNumber,
       pageSize: queryData.queryPagination.pageSize,
       totalCount: totalCount,
-      items: transformedBannedUsers,
+      items: bannedUsersAndCount.bannedUsers,
     };
   }
 
