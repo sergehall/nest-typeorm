@@ -114,12 +114,16 @@ export class CommentsRawSqlRepository {
         limit,
         offset,
       ];
+
       const result = await this.db.query(query, parameters);
+
       if (result.length === 0) {
         return { comments: [], countComments: 0 };
       }
+
       const countComments: number = result[0].countComments;
       const transformedComments = await this.transformedComments(result);
+
       return {
         comments: transformedComments,
         countComments: countComments,
