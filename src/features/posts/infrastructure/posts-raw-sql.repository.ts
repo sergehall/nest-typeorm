@@ -166,6 +166,7 @@ export class PostsRawSqlRepository {
       createPostDto,
       currentUserDto,
     );
+
     const query = `
         INSERT INTO public."Posts"
             (
@@ -175,6 +176,7 @@ export class PostsRawSqlRepository {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           RETURNING "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
           `;
+
     const parameters = [
       postEntity.id,
       postEntity.title,
@@ -189,6 +191,7 @@ export class PostsRawSqlRepository {
       postEntity.banInfoBanDate,
       postEntity.banInfoBanReason,
     ];
+
     try {
       const insertPost: PartialPostsEntity[] = await this.db.query(
         query,
