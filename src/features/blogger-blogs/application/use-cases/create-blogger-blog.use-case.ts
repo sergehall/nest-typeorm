@@ -1,4 +1,3 @@
-import * as uuid4 from 'uuid4';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CreateBloggerBlogsDto } from '../../dto/create-blogger-blogs.dto';
@@ -10,7 +9,6 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBloggerBlogsEntity } from '../../entities/return-blogger-blogs.entity';
 
 export class CreateBloggerBlogCommand {
@@ -31,37 +29,17 @@ export class CreateBloggerBlogUseCase
   async execute(
     command: CreateBloggerBlogCommand,
   ): Promise<ReturnBloggerBlogsEntity> {
-    this.checkPermission(command.currentUser);
+    const { createBloggerBlogsDto, currentUser } = command;
+    await this.checkPermission(command.currentUser);
 
-    const blogsEntity = this.createBlogsEntity(
-      command.createBloggerBlogsDto,
-      command.currentUser,
+    return await this.bloggerBlogsRawSqlRepository.createBlogs(
+      createBloggerBlogsDto,
+      currentUser,
     );
-
-    return await this.bloggerBlogsRawSqlRepository.createBlogs(blogsEntity);
   }
 
-  private createBlogsEntity(
-    dto: CreateBloggerBlogsDto,
-    currentUser: CurrentUserDto,
-  ): TableBloggerBlogsRawSqlEntity {
-    const { id, login, isBanned } = currentUser;
-
-    return {
-      ...dto,
-      id: uuid4(),
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-      blogOwnerId: id,
-      blogOwnerLogin: login,
-      dependencyIsBanned: isBanned,
-      banInfoIsBanned: false,
-      banInfoBanDate: null,
-      banInfoBanReason: null,
-    };
-  }
-
-  private checkPermission(currentUserDto: CurrentUserDto): void {
+  private async checkPermission(currentUserDto: CurrentUserDto): Promise<void> {
+    // In the future, you can add a checkPermission
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(

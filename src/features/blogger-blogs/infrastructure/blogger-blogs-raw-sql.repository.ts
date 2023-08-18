@@ -11,6 +11,8 @@ import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ReturnBloggerBlogsCountBlogsEntity } from '../entities/return-blogger-blogs-count-blogs.entity';
 import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
+import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
+import * as uuid4 from 'uuid4';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -282,39 +284,93 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async createBlogs(
-    bloggerBlogsRawSqlEntity: TableBloggerBlogsRawSqlEntity,
+    createBloggerBlogsDto: CreateBloggerBlogsDto,
+    currentUser: CurrentUserDto,
   ): Promise<ReturnBloggerBlogsEntity> {
+    const blogsEntity = await this.createTablesBlogsEntity(
+      createBloggerBlogsDto,
+      currentUser,
+    );
+
+    const query = `
+    INSERT INTO public."BloggerBlogs"(
+    "id", "createdAt", "isMembership", 
+    "blogOwnerId", "blogOwnerLogin", "dependencyIsBanned", 
+    "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
+    "name",  "description", "websiteUrl")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING "id", "name", "description", "websiteUrl", "createdAt", "isMembership";
+  `;
+
+    const parameters = [
+      blogsEntity.id,
+      blogsEntity.createdAt,
+      blogsEntity.isMembership,
+      blogsEntity.blogOwnerId,
+      blogsEntity.blogOwnerLogin,
+      blogsEntity.dependencyIsBanned,
+      blogsEntity.banInfoIsBanned,
+      blogsEntity.banInfoBanDate,
+      blogsEntity.banInfoBanReason,
+      blogsEntity.name,
+      blogsEntity.description,
+      blogsEntity.websiteUrl,
+    ];
+
     try {
-      const createNewBlog = await this.db.query(
-        `
-        INSERT INTO public."BloggerBlogs"(
-        "id", "createdAt", "isMembership", 
-        "blogOwnerId", "blogOwnerLogin", "dependencyIsBanned", 
-        "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
-        "name",  "description", "websiteUrl")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          RETURNING "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
-        [
-          bloggerBlogsRawSqlEntity.id,
-          bloggerBlogsRawSqlEntity.createdAt,
-          bloggerBlogsRawSqlEntity.isMembership,
-          bloggerBlogsRawSqlEntity.blogOwnerId,
-          bloggerBlogsRawSqlEntity.blogOwnerLogin,
-          bloggerBlogsRawSqlEntity.dependencyIsBanned,
-          bloggerBlogsRawSqlEntity.banInfoIsBanned,
-          bloggerBlogsRawSqlEntity.banInfoBanDate,
-          bloggerBlogsRawSqlEntity.banInfoBanReason,
-          bloggerBlogsRawSqlEntity.name,
-          bloggerBlogsRawSqlEntity.description,
-          bloggerBlogsRawSqlEntity.websiteUrl,
-        ],
-      );
+      const createNewBlog = await this.db.query(query, parameters);
       return createNewBlog[0];
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  // async createBlogs(
+  //   createBloggerBlogsDto: CreateBloggerBlogsDto,
+  //   currentUser: CurrentUserDto,
+  // ): Promise<ReturnBloggerBlogsEntity> {
+  //
+  // }
+  //     const blogsEntity = await this.createTablesBlogsEntity(
+  //       createBloggerBlogsDto,
+  //       currentUser,
+  //     );
+  //
+  //     const query = `
+  //         INSERT INTO public."BloggerBlogs"(
+  //         "id", "createdAt", "isMembership",
+  //         "blogOwnerId", "blogOwnerLogin", "dependencyIsBanned",
+  //         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason",
+  //         "name",  "description", "websiteUrl")
+  //           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+  //           RETURNING "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+  //           `;
+  //
+  //     const parameters = [
+  //       blogsEntity.id,
+  //       blogsEntity.createdAt,
+  //       blogsEntity.isMembership,
+  //       blogsEntity.blogOwnerId,
+  //       blogsEntity.blogOwnerLogin,
+  //       blogsEntity.dependencyIsBanned,
+  //       blogsEntity.banInfoIsBanned,
+  //       blogsEntity.banInfoBanDate,
+  //       blogsEntity.banInfoBanReason,
+  //       blogsEntity.name,
+  //       blogsEntity.description,
+  //       blogsEntity.websiteUrl,
+  //     ]
+  //   try {
+  //     const createNewBlog = await this.db.query(
+  //       `
+  //       INSERT INTO public."BloggerBlogs"(query,parameters);
+  //     return createNewBlog[0];
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async deleteBlogByBlogId(blogId: string): Promise<boolean> {
     try {
@@ -665,5 +721,25 @@ export class BloggerBlogsRawSqlRepository {
     const countBlogs = blogsArr.length > 0 ? blogsArr[0].countBlogs : 0;
 
     return { blogs, countBlogs };
+  }
+
+  private async createTablesBlogsEntity(
+    dto: CreateBloggerBlogsDto,
+    currentUser: CurrentUserDto,
+  ): Promise<TableBloggerBlogsRawSqlEntity> {
+    const { id, login, isBanned } = currentUser;
+
+    return {
+      ...dto,
+      id: uuid4(),
+      createdAt: new Date().toISOString(),
+      isMembership: false,
+      blogOwnerId: id,
+      blogOwnerLogin: login,
+      dependencyIsBanned: isBanned,
+      banInfoIsBanned: false,
+      banInfoBanDate: null,
+      banInfoBanReason: null,
+    };
   }
 }
