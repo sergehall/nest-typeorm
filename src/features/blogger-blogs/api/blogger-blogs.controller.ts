@@ -31,7 +31,6 @@ import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts-entity.entity';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -42,6 +41,7 @@ import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-
 import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
+import { ReturnBloggerBlogsDto } from '../dto/return-blogger-blogs.dto';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -86,7 +86,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBloggerBlogsDto,
-  ): Promise<ReturnBloggerBlogsEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

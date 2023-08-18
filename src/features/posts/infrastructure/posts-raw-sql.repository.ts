@@ -16,6 +16,7 @@ import {
   SortDirection,
 } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
+import { ReturnPostsEntityDto } from '../dto/return-posts-entity.dto';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -151,7 +152,7 @@ export class PostsRawSqlRepository {
 
   async createPost(
     postsRawSqlEntity: TablesPostsEntity,
-  ): Promise<TablesPostsEntity> {
+  ): Promise<ReturnPostsEntityDto> {
     try {
       const insertNewPost = await this.db.query(
         `

@@ -32,22 +32,24 @@ export class UpdateBlogByIdUseCase
       throw new NotFoundException('Blog not found');
     }
 
-    const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToUpdate.blogOwnerId,
-    });
-    this.checkUpdatePermission(ability, command.currentUser);
+    await this.checkUpdatePermission(blogToUpdate, command.currentUser);
 
     const updatedBlog: TableBloggerBlogsRawSqlEntity = {
       ...blogToUpdate,
       ...command.updateBlogDto,
     };
+
     return await this.bloggerBlogsRawSqlRepository.updatedBlogById(updatedBlog);
   }
 
-  private checkUpdatePermission(
-    ability: any,
+  private async checkUpdatePermission(
+    blogToUpdate: TableBloggerBlogsRawSqlEntity,
     currentUser: CurrentUserDto,
-  ): void {
+  ): Promise<void> {
+    const ability = this.caslAbilityFactory.createForUserId({
+      id: blogToUpdate.blogOwnerId,
+    });
+
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: currentUser.id,

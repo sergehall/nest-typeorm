@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
 
-export class ReturnBloggerBlogsEntity {
+export class ReturnBloggerBlogsDto {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 15 ch.',
