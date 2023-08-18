@@ -16,8 +16,8 @@ import { CreatePostDto } from '../../dto/create-post.dto';
 import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
-import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
-import { LikeStatusEnums } from '../../../../config/db/mongo/enums/like-status.enums';
+import { ExtendedLikesInfo, PostsViewDto } from '../../view-dto/posts-view.dto';
+import { ReturnPostsEntityDto } from '../../dto/return-posts-entity.dto';
 
 export class CreatePostCommand {
   constructor(
@@ -35,7 +35,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
+  async execute(command: CreatePostCommand): Promise<PostsViewDto> {
     const { blogId, currentUserDto, createPostDto } = command;
 
     const blog: TableBloggerBlogsRawSqlEntity | null =
@@ -47,31 +47,18 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     await this.checkUserPermission(blog, currentUserDto);
 
     // User has the permission, proceed with creating the post
-    const newPost: TablesPostsEntity = await this.getTablesPostsEntity(
+    const tablesPostEntity: TablesPostsEntity = await this.getTablesPostsEntity(
       blog,
       createPostDto,
       currentUserDto,
     );
 
-    // Create and return the new post
-    const createdNewPost: TablesPostsEntity =
-      await this.postsRawSqlRepository.createPost(newPost);
+    const newPost = await this.postsRawSqlRepository.createPost(
+      tablesPostEntity,
+    );
 
-    return {
-      id: createdNewPost.id,
-      title: createdNewPost.title,
-      shortDescription: createdNewPost.shortDescription,
-      content: createdNewPost.content,
-      blogId: createdNewPost.blogId,
-      blogName: createdNewPost.blogName,
-      createdAt: createdNewPost.createdAt,
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: LikeStatusEnums.NONE,
-        newestLikes: [],
-      },
-    };
+    // addExtendedLikesInfoToPosts and return the new post view
+    return await this.addExtendedLikesInfoToPosts(newPost);
   }
 
   private async getTablesPostsEntity(
@@ -95,6 +82,16 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     };
   }
 
+  private async addExtendedLikesInfoToPosts(
+    newPost: ReturnPostsEntityDto,
+  ): Promise<PostsViewDto> {
+    const extendedLikesInfo = new ExtendedLikesInfo();
+    return {
+      ...newPost, // Spread properties of newPost
+      extendedLikesInfo, // Add extendedLikesInfo property
+    };
+  }
+
   private async checkUserPermission(
     blog: TableBloggerBlogsRawSqlEntity,
     currentUserDto: CurrentUserDto,
@@ -105,14 +102,16 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         currentUserDto.id,
         blog.id,
       );
-    // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForPost);
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({
       id: currentUserDto.id,
     });
+
+    // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
+    if (userIsBannedForBlog)
+      throw new ForbiddenException(userNotHavePermissionForPost);
+
     try {
       // Check the user's ability to create a post in this blog
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {

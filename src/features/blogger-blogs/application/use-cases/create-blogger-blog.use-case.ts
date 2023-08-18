@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
-import { ReturnBloggerBlogsEntity } from '../../entities/return-blogger-blogs.entity';
+import { ReturnBloggerBlogsDto } from '../../dto/return-blogger-blogs.dto';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -30,7 +30,7 @@ export class CreateBloggerBlogUseCase
   ) {}
   async execute(
     command: CreateBloggerBlogCommand,
-  ): Promise<ReturnBloggerBlogsEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     this.checkPermission(command.currentUser);
 
     const blogsEntity = this.createBlogsEntity(
@@ -38,11 +38,7 @@ export class CreateBloggerBlogUseCase
       command.currentUser,
     );
 
-    const newBlog = await this.bloggerBlogsRawSqlRepository.createBlogs(
-      blogsEntity,
-    );
-
-    return await this.getBlogResponse(newBlog);
+    return await this.bloggerBlogsRawSqlRepository.createBlogs(blogsEntity);
   }
 
   private createBlogsEntity(
@@ -78,12 +74,5 @@ export class CreateBloggerBlogUseCase
       }
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  private async getBlogResponse(
-    blog: TableBloggerBlogsRawSqlEntity,
-  ): Promise<ReturnBloggerBlogsEntity> {
-    const { id, name, description, websiteUrl, createdAt, isMembership } = blog;
-    return { id, name, description, websiteUrl, createdAt, isMembership };
   }
 }

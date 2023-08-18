@@ -4,7 +4,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
+import { ReturnBloggerBlogsDto } from '../dto/return-blogger-blogs.dto';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -101,7 +101,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async openSearchBlogs(
     queryData: ParseQueriesDto,
-  ): Promise<ReturnBloggerBlogsEntity[]> {
+  ): Promise<ReturnBloggerBlogsDto[]> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -245,18 +245,20 @@ export class BloggerBlogsRawSqlRepository {
       UPDATE public."BloggerBlogs"
       SET  "name" = $2, "description" = $3, "websiteUrl" = $4
       WHERE "id" = $1
-      RETURNING *`,
+      RETURNING "id"
+      `,
         [id, name, description, websiteUrl],
       );
       return updatedBlogById[1] === 1;
     } catch (error) {
+      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
 
   async createBlogs(
     bloggerBlogsRawSqlEntity: TableBloggerBlogsRawSqlEntity,
-  ): Promise<TableBloggerBlogsRawSqlEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     try {
       const createNewBlog = await this.db.query(
         `
@@ -266,7 +268,7 @@ export class BloggerBlogsRawSqlRepository {
         "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
         "name",  "description", "websiteUrl")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          returning "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
+          RETURNING "id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
         [
           bloggerBlogsRawSqlEntity.id,
           bloggerBlogsRawSqlEntity.createdAt,

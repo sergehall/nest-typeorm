@@ -10,7 +10,6 @@ import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ReturnBloggerBlogsEntity } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
@@ -21,6 +20,7 @@ import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-ca
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
+import { ReturnBloggerBlogsDto } from '../../blogger-blogs/dto/return-blogger-blogs.dto';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -43,7 +43,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openGetBlogById(
     @Param() params: IdParams,
-  ): Promise<ReturnBloggerBlogsEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
