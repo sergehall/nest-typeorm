@@ -12,7 +12,7 @@ export class UpdateBlogByIdCommand {
   constructor(
     public id: string,
     public updateBlogDto: UpdateBBlogsDto,
-    public currentUser: CurrentUserDto,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 @CommandHandler(UpdateBlogByIdCommand)
@@ -25,21 +25,20 @@ export class UpdateBlogByIdUseCase
   ) {}
 
   async execute(command: UpdateBlogByIdCommand): Promise<boolean> {
+    const { id, updateBlogDto, currentUserDto } = command;
     const blogToUpdate = await this.bloggerBlogsRawSqlRepository.findBlogById(
-      command.id,
+      id,
     );
     if (!blogToUpdate) {
       throw new NotFoundException('Blog not found');
     }
 
-    await this.checkUpdatePermission(blogToUpdate, command.currentUser);
+    await this.checkUpdatePermission(blogToUpdate, currentUserDto);
 
-    const updatedBlog: TableBloggerBlogsRawSqlEntity = {
-      ...blogToUpdate,
-      ...command.updateBlogDto,
-    };
-
-    return await this.bloggerBlogsRawSqlRepository.updatedBlogById(updatedBlog);
+    return await this.bloggerBlogsRawSqlRepository.updatedBlogById(
+      id,
+      updateBlogDto,
+    );
   }
 
   private async checkUpdatePermission(
