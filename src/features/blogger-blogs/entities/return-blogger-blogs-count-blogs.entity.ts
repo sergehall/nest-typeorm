@@ -1,6 +1,12 @@
-import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  Length,
+  Matches,
+} from 'class-validator';
 
-export class ReturnBlogDto {
+export class ReturnBloggerBlogsCountBlogsEntity {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 15 ch.',
@@ -35,4 +41,7 @@ export class ReturnBlogDto {
   @IsNotEmpty()
   @IsBoolean()
   isMembership: boolean;
+  @IsNotEmpty()
+  @IsNumber()
+  countBlogs: number;
 }

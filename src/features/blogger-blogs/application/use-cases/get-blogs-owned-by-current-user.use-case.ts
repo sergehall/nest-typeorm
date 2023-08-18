@@ -3,7 +3,7 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { ReturnBlogDto } from '../../dto/return-blog.dto';
+import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';
 
 export class GetBlogsOwnedByCurrentUserCommand {
   constructor(
@@ -26,13 +26,13 @@ export class GetBlogsOwnedByCurrentUserUseCase
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogs: ReturnBlogDto[] =
-      await this.bloggerBlogsRawSqlRepository.searchUserBlogs(
+    const blogsAndCountBlogs: BlogsCountBlogsDto =
+      await this.bloggerBlogsRawSqlRepository.searchUserBlogsAndCountBlogs(
         currentUserDto,
         queryData,
       );
 
-    if (blogs.length === 0) {
+    if (blogsAndCountBlogs.countBlogs === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -42,11 +42,7 @@ export class GetBlogsOwnedByCurrentUserUseCase
       };
     }
 
-    const totalCount =
-      await this.bloggerBlogsRawSqlRepository.totalCountUserBlogs(
-        currentUserDto.id,
-        queryData,
-      );
+    const totalCount = blogsAndCountBlogs.countBlogs;
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
     return {
@@ -54,7 +50,7 @@ export class GetBlogsOwnedByCurrentUserUseCase
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: blogs,
+      items: blogsAndCountBlogs.blogs,
     };
   }
 }

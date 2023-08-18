@@ -10,7 +10,7 @@ import {
 } from '../entities/return-posts.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import { ReturnPostsCountPostsDto } from '../entities/return-posts-count-posts.entity';
+import { PostsCountPostsDto } from '../dto/posts-count-posts.dto';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -81,7 +81,7 @@ export class PostsRawSqlRepository {
   async findPostsAndTotalCountPosts(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsCountPostsDto> {
+  ): Promise<PostsCountPostsDto> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
@@ -118,7 +118,7 @@ export class PostsRawSqlRepository {
     blogId: string,
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsCountPostsDto> {
+  ): Promise<PostsCountPostsDto> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
