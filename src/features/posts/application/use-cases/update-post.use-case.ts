@@ -49,7 +49,7 @@ export class UpdatePostByPostIdUseCase
       throw new NotFoundException('Not found post.');
     }
 
-    this.checkUserPermission(blog.blogOwnerId, currentUserDto);
+    await this.checkUserPermission(blog.blogOwnerId, currentUserDto);
 
     return await this.postsRawSqlRepository.updatePostByPostId(
       params.postId,
@@ -57,7 +57,7 @@ export class UpdatePostByPostIdUseCase
     );
   }
 
-  private checkUserPermission(
+  private async checkUserPermission(
     blogOwnerId: string,
     currentUserDto: CurrentUserDto,
   ) {

@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ReturnPostsEntity } from '../../entities/return-posts-entity.entity';
+import { ReturnPostsEntity } from '../../entities/return-posts.entity';
 
 export class FindPostByIdCommand {
   constructor(

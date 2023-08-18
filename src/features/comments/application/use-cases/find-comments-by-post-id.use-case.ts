@@ -3,10 +3,9 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
-import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
-import { CommentsCountLikesDislikesEntity } from '../../entities/comments-count-likes-dislikes.entity';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { ReturnCommentsCountCommentsDto } from '../../dto/return-comments-count-comments.dto';
 
 export class FindCommentsByPostIdCommand {
   constructor(
@@ -34,14 +33,16 @@ export class FindCommentsByPostIdUseCase
     const post = await this.postsRawSqlRepository.getPostById(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
-    const comments =
+    const commentsAndCountComments: ReturnCommentsCountCommentsDto =
       await this.commentsRawSqlRepository.findCommentsByPostIdAndCountOfLikesDislikes(
         postId,
         queryData,
         currentUserDto,
       );
 
-    if (comments.length === 0) {
+    const { comments, countComments } = commentsAndCountComments;
+
+    if (countComments === 0) {
       return {
         pagesCount: pageNumber,
         page: pageNumber,
@@ -51,42 +52,16 @@ export class FindCommentsByPostIdUseCase
       };
     }
 
-    const transformedComments: ReturnCommentsEntity[] =
-      await this.transformedComments(comments);
-
-    const totalCountComments: number = comments[0].countComments;
-
     const pagesCount = Math.ceil(
-      totalCountComments / queryData.queryPagination.pageSize,
+      countComments / queryData.queryPagination.pageSize,
     );
 
     return {
       pagesCount: pagesCount,
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: totalCountComments,
-      items: transformedComments,
+      totalCount: countComments,
+      items: comments,
     };
-  }
-
-  private async transformedComments(
-    comments: CommentsCountLikesDislikesEntity[],
-  ): Promise<ReturnCommentsEntity[]> {
-    return comments.map(
-      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentatorInfoUserId,
-          userLogin: comment.commentatorInfoUserLogin,
-        },
-        likesInfo: {
-          likesCount: comment.countLikes,
-          dislikesCount: comment.countDislikes,
-          myStatus: comment.likeStatus,
-        },
-      }),
-    );
   }
 }

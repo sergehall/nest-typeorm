@@ -1,9 +1,9 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { ReturnPostsCountPostsEntity } from '../../entities/return-posts-count-posts.entity';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { ReturnPostsCountPostsDto } from '../../entities/return-posts-count-posts.entity';
 
 export class FindPostsCommand {
   constructor(
@@ -22,23 +22,22 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndNumberOfPosts: ReturnPostsCountPostsEntity =
+    const postsAndNumberOfPosts: ReturnPostsCountPostsDto =
       await this.postsRawSqlRepository.findPostsAndTotalCountPosts(
         queryData,
         currentUserDto,
       );
 
-    const totalCount = postsAndNumberOfPosts.countPosts;
-
-    if (totalCount === 0) {
+    if (postsAndNumberOfPosts.posts.length === 0) {
       return {
-        pagesCount: pageNumber,
+        pagesCount: 0,
         page: pageNumber,
         pageSize: pageSize,
-        totalCount: pageNumber - 1,
+        totalCount: 0,
         items: postsAndNumberOfPosts.posts,
       };
     }
+    const totalCount = postsAndNumberOfPosts.countPosts;
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 

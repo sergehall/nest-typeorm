@@ -4,10 +4,13 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { ReturnPostsEntity } from '../entities/return-posts-entity.entity';
+import {
+  ExtendedLikesInfo,
+  ReturnPostsEntity,
+} from '../entities/return-posts.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import { ReturnPostsCountPostsEntity } from '../entities/return-posts-count-posts.entity';
+import { ReturnPostsCountPostsDto } from '../entities/return-posts-count-posts.entity';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -16,7 +19,10 @@ import {
   SortDirection,
 } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
-import { ReturnPostsEntityDto } from '../dto/return-posts-entity.dto';
+import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { CreatePostDto } from '../dto/create-post.dto';
+import * as uuid4 from 'uuid4';
+import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -75,7 +81,7 @@ export class PostsRawSqlRepository {
   async findPostsAndTotalCountPosts(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsCountPostsEntity> {
+  ): Promise<ReturnPostsCountPostsDto> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
@@ -112,7 +118,7 @@ export class PostsRawSqlRepository {
     blogId: string,
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsCountPostsEntity> {
+  ): Promise<ReturnPostsCountPostsDto> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
@@ -151,11 +157,16 @@ export class PostsRawSqlRepository {
   }
 
   async createPost(
-    postsRawSqlEntity: TablesPostsEntity,
-  ): Promise<ReturnPostsEntityDto> {
-    try {
-      const insertNewPost = await this.db.query(
-        `
+    blog: TableBloggerBlogsRawSqlEntity,
+    createPostDto: CreatePostDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ReturnPostsEntity> {
+    const postEntity: TablesPostsEntity = await this.getTablesPostsEntity(
+      blog,
+      createPostDto,
+      currentUserDto,
+    );
+    const query = `
         INSERT INTO public."Posts"
             (
              "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt",
@@ -163,23 +174,28 @@ export class PostsRawSqlRepository {
              "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
           RETURNING "id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"
-          `,
-        [
-          postsRawSqlEntity.id,
-          postsRawSqlEntity.title,
-          postsRawSqlEntity.shortDescription,
-          postsRawSqlEntity.content,
-          postsRawSqlEntity.blogId,
-          postsRawSqlEntity.blogName,
-          postsRawSqlEntity.createdAt,
-          postsRawSqlEntity.postOwnerId,
-          postsRawSqlEntity.dependencyIsBanned,
-          postsRawSqlEntity.banInfoIsBanned,
-          postsRawSqlEntity.banInfoBanDate,
-          postsRawSqlEntity.banInfoBanReason,
-        ],
+          `;
+    const parameters = [
+      postEntity.id,
+      postEntity.title,
+      postEntity.shortDescription,
+      postEntity.content,
+      postEntity.blogId,
+      postEntity.blogName,
+      postEntity.createdAt,
+      postEntity.postOwnerId,
+      postEntity.dependencyIsBanned,
+      postEntity.banInfoIsBanned,
+      postEntity.banInfoBanDate,
+      postEntity.banInfoBanReason,
+    ];
+    try {
+      const insertPost: PartialPostsEntity[] = await this.db.query(
+        query,
+        parameters,
       );
-      return insertNewPost[0];
+
+      return await this.addExtendedLikesInfoToPostsEntity(insertPost[0]);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -666,5 +682,36 @@ export class PostsRawSqlRepository {
 
       return result;
     }, []);
+  }
+
+  private async getTablesPostsEntity(
+    blog: TableBloggerBlogsRawSqlEntity,
+    createPostDto: CreatePostDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<TablesPostsEntity> {
+    return {
+      id: uuid4().toString(),
+      title: createPostDto.title,
+      shortDescription: createPostDto.shortDescription,
+      content: createPostDto.content,
+      blogId: blog.id,
+      blogName: blog.name,
+      createdAt: new Date().toISOString(),
+      postOwnerId: currentUserDto.id,
+      dependencyIsBanned: false,
+      banInfoIsBanned: false,
+      banInfoBanDate: null,
+      banInfoBanReason: null,
+    };
+  }
+
+  private async addExtendedLikesInfoToPostsEntity(
+    newPost: PartialPostsEntity,
+  ): Promise<ReturnPostsEntity> {
+    const extendedLikesInfo = new ExtendedLikesInfo();
+    return {
+      ...newPost, // Spread properties of newPost
+      extendedLikesInfo, // Add extendedLikesInfo property
+    };
   }
 }

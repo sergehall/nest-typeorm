@@ -26,15 +26,15 @@ class CommentatorInfo {
 export class LikesInfo {
   @IsNotEmpty()
   @IsNumber()
-  likesCount: number;
+  likesCount = 0; // Set default value
   @IsNotEmpty()
   @IsNumber()
-  dislikesCount: number;
+  dislikesCount = 0; // Set default value
   @IsNotEmpty()
   @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  myStatus: LikeStatusEnums;
+  myStatus: LikeStatusEnums = LikeStatusEnums.NONE; // Set default value
 }
 
 export class ReturnCommentsEntity {

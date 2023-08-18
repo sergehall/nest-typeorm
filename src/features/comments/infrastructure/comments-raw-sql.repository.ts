@@ -14,6 +14,14 @@ import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ReturnCommentsWithPostInfoEntity } from '../entities/return-comments-with-post-info.entity';
 import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
+import {
+  LikesInfo,
+  ReturnCommentsEntity,
+} from '../entities/return-comments.entity';
+import { TablesPostsEntity } from '../../posts/entities/tables-posts-entity';
+import * as uuid4 from 'uuid4';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import { PartialTablesCommentsEntity } from '../entities/partialTablesComments.entity';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -126,7 +134,7 @@ export class CommentsRawSqlRepository {
     postId: string,
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<CommentsCountLikesDislikesEntity[]> {
+  ): Promise<ReturnCommentsCountCommentsDto> {
     try {
       const { pageSize, pageNumber, sortBy, sortDirection } =
         queryData.queryPagination;
@@ -191,7 +199,25 @@ export class CommentsRawSqlRepository {
         offset,
       ];
 
-      return await this.db.query(query, parameters);
+      const result: CommentsCountLikesDislikesEntity[] = await this.db.query(
+        query,
+        parameters,
+      );
+
+      if (result.length === 0) {
+        return {
+          comments: [],
+          countComments: 0,
+        };
+      }
+
+      const transformedComments: ReturnCommentsEntity[] =
+        await this.transformedCommentsForPost(result);
+
+      return {
+        comments: transformedComments,
+        countComments: result[0].countComments,
+      };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -257,36 +283,49 @@ export class CommentsRawSqlRepository {
   }
 
   async createComment(
-    tablesCommentsRawSqlEntity: TablesCommentsEntity,
-  ): Promise<TablesCommentsEntity[]> {
+    post: TablesPostsEntity,
+    createCommentDto: CreateCommentDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ReturnCommentsEntity> {
     try {
-      return await this.db.query(
-        `
+      const commentEntity = await this.getTablesCommentsEntity(
+        post,
+        createCommentDto,
+        currentUserDto,
+      );
+
+      const query = `
         INSERT INTO public."Comments"(
           "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId",
           "postInfoBlogName", "postInfoBlogOwnerId", 
           "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-          RETURNING *
-          `,
-        [
-          tablesCommentsRawSqlEntity.id,
-          tablesCommentsRawSqlEntity.content,
-          tablesCommentsRawSqlEntity.createdAt,
-          tablesCommentsRawSqlEntity.postInfoPostId,
-          tablesCommentsRawSqlEntity.postInfoTitle,
-          tablesCommentsRawSqlEntity.postInfoBlogId,
-          tablesCommentsRawSqlEntity.postInfoBlogName,
-          tablesCommentsRawSqlEntity.postInfoBlogOwnerId,
-          tablesCommentsRawSqlEntity.commentatorInfoUserId,
-          tablesCommentsRawSqlEntity.commentatorInfoUserLogin,
-          tablesCommentsRawSqlEntity.commentatorInfoIsBanned,
-          tablesCommentsRawSqlEntity.banInfoIsBanned,
-          tablesCommentsRawSqlEntity.banInfoBanDate,
-          tablesCommentsRawSqlEntity.banInfoBanReason,
-        ],
+          RETURNING "id", "content", "createdAt", "commentatorInfoUserId", "commentatorInfoUserLogin"
+          `;
+
+      const parameters = [
+        commentEntity.id,
+        commentEntity.content,
+        commentEntity.createdAt,
+        commentEntity.postInfoPostId,
+        commentEntity.postInfoTitle,
+        commentEntity.postInfoBlogId,
+        commentEntity.postInfoBlogName,
+        commentEntity.postInfoBlogOwnerId,
+        commentEntity.commentatorInfoUserId,
+        commentEntity.commentatorInfoUserLogin,
+        commentEntity.commentatorInfoIsBanned,
+        commentEntity.banInfoIsBanned,
+        commentEntity.banInfoBanDate,
+        commentEntity.banInfoBanReason,
+      ];
+
+      const result: PartialTablesCommentsEntity[] = await this.db.query(
+        query,
+        parameters,
       );
+      return await this.transformedAndAddLikesInfoToCommentsEntity(result);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -414,6 +453,27 @@ export class CommentsRawSqlRepository {
     );
   }
 
+  private async transformedCommentsForPost(
+    comments: CommentsCountLikesDislikesEntity[],
+  ): Promise<ReturnCommentsEntity[]> {
+    return comments.map(
+      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentatorInfoUserId,
+          userLogin: comment.commentatorInfoUserLogin,
+        },
+        likesInfo: {
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
+          myStatus: comment.likeStatus,
+        },
+      }),
+    );
+  }
+
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
@@ -437,5 +497,44 @@ export class CommentsRawSqlRepository {
       ],
       'createdAt',
     );
+  }
+
+  private async getTablesCommentsEntity(
+    post: TablesPostsEntity,
+    createCommentDto: CreateCommentDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<TablesCommentsEntity> {
+    return {
+      id: uuid4().toString(),
+      content: createCommentDto.content,
+      createdAt: new Date().toISOString(),
+      postInfoPostId: post.id,
+      postInfoTitle: post.title,
+      postInfoBlogId: post.blogId,
+      postInfoBlogName: post.blogName,
+      postInfoBlogOwnerId: post.postOwnerId,
+      commentatorInfoUserId: currentUserDto.id,
+      commentatorInfoUserLogin: currentUserDto.login,
+      commentatorInfoIsBanned: false,
+      banInfoIsBanned: false,
+      banInfoBanDate: null,
+      banInfoBanReason: null,
+    };
+  }
+
+  private async transformedAndAddLikesInfoToCommentsEntity(
+    newPost: PartialTablesCommentsEntity[],
+  ): Promise<ReturnCommentsEntity> {
+    const post = newPost[0];
+    const commentatorInfo = {
+      userId: post.commentatorInfoUserId,
+      userLogin: post.commentatorInfoUserLogin,
+    };
+    const likesInfo = new LikesInfo();
+    return {
+      ...post,
+      commentatorInfo,
+      likesInfo,
+    };
   }
 }
