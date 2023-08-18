@@ -32,16 +32,16 @@ export class DeletePostByPostIdAndBlogIdUseCase
   ) {}
   async execute(command: DeletePostByPostIdAndBlogIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
+    const { blogId, postId } = params;
 
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
-    if (!blog)
-      throw new NotFoundException(`Blog with id: ${params.blogId} not found`);
+      await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+    if (!blog) throw new NotFoundException(`Blog with id: ${blogId} not found`);
 
     const postToRemove: TablesPostsEntity | null =
-      await this.postsRepository.getPostById(params.postId);
+      await this.postsRepository.getPostById(postId);
     if (!postToRemove)
-      throw new NotFoundException(`Post with id: ${params.postId} not found`);
+      throw new NotFoundException(`Post with id: ${postId} not found`);
 
     await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
 
