@@ -1,9 +1,9 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
+import { ReturnBlogDto } from '../../dto/return-blog.dto';
 
 export class GetBlogsOwnedByCurrentUserCommand {
   constructor(
@@ -26,7 +26,7 @@ export class GetBlogsOwnedByCurrentUserUseCase
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogs: TableBloggerBlogsRawSqlEntity[] =
+    const blogs: ReturnBlogDto[] =
       await this.bloggerBlogsRawSqlRepository.searchUserBlogs(
         currentUserDto,
         queryData,

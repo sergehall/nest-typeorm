@@ -479,7 +479,7 @@ export class PostsRawSqlRepository {
           pwl."likesCount"::integer,
           pwl."dislikesCount"::integer,
           pwl."myStatus",
-          pwl."userId", 
+          pwl."userId",
           pwl."addedAt",
           pwl."login",
           pwl."likeStatus",

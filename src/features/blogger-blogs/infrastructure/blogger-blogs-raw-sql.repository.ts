@@ -9,6 +9,7 @@ import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { ReturnBlogDto } from '../dto/return-blog.dto';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -59,7 +60,7 @@ export class BloggerBlogsRawSqlRepository {
   async searchUserBlogs(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesDto,
-  ): Promise<TableBloggerBlogsRawSqlEntity[]> {
+  ): Promise<ReturnBlogDto[]> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
     const { id } = currentUserDto;

@@ -12,6 +12,8 @@ import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { CommentsCountLikesDislikesEntity } from '../entities/comments-count-likes-dislikes.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { ReturnCommentsWithPostInfoEntity } from '../entities/return-comments-with-post-info.entity';
+import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
 
 export class CommentsRawSqlRepository {
   constructor(
@@ -46,7 +48,7 @@ export class CommentsRawSqlRepository {
   async findCommentsOwnedByCurrentUserAndCountLikesDislikes(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<CommentsCountLikesDislikesEntity[]> {
+  ): Promise<ReturnCommentsCountCommentsDto> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { commentatorInfoIsBanned, banInfoIsBanned, isBanned } =
@@ -104,8 +106,16 @@ export class CommentsRawSqlRepository {
         limit,
         offset,
       ];
-
-      return await this.db.query(query, parameters);
+      const result = await this.db.query(query, parameters);
+      if (result.length === 0) {
+        return { comments: [], countComments: 0 };
+      }
+      const countComments: number = result[0].countComments;
+      const transformedComments = await this.transformedComments(result);
+      return {
+        comments: transformedComments,
+        countComments: countComments,
+      };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -373,6 +383,35 @@ export class CommentsRawSqlRepository {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async transformedComments(
+    comments: CommentsCountLikesDislikesEntity[],
+  ): Promise<ReturnCommentsWithPostInfoEntity[]> {
+    return comments.map(
+      (
+        comment: CommentsCountLikesDislikesEntity,
+      ): ReturnCommentsWithPostInfoEntity => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentatorInfoUserId,
+          userLogin: comment.commentatorInfoUserLogin,
+        },
+        likesInfo: {
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
+          myStatus: comment.likeStatus,
+        },
+        postInfo: {
+          id: comment.postInfoPostId,
+          title: comment.postInfoTitle,
+          blogId: comment.postInfoBlogId,
+          blogName: comment.postInfoBlogName,
+        },
+      }),
+    );
   }
 
   private async getBannedFlags(): Promise<BannedFlagsDto> {
