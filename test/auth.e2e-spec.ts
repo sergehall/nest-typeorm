@@ -1,32 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { AppModule } from '../src/app.module';
-import { createApp } from '../src/createApp';
+
+import { getAppServerModuleFixtureCleanDb } from './utilities/get-app-server-module-fixture-clean-db';
 
 describe('AuthController (e2e)', () => {
-  let mongoMemoryServer: MongoMemoryServer;
   let app: INestApplication;
   let server: any;
-
   beforeAll(async () => {
-    mongoMemoryServer = await MongoMemoryServer.create();
-    // const mongoUri = mongoMemoryServer.getUri();
-    process.env['ATLAS_URI'] = mongoMemoryServer.getUri();
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app = createApp(app);
-    await app.init();
-    server = app.getHttpServer();
+    const appServerModuleFixture = await getAppServerModuleFixtureCleanDb();
+    app = appServerModuleFixture.app;
+    server = appServerModuleFixture.server;
   });
 
   afterAll(async () => {
     await app.close();
-    await mongoMemoryServer.stop();
   });
 
   describe('Registration => (POST) /auth/registration', () => {
