@@ -1,10 +1,10 @@
-import { TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import * as crypto from 'crypto';
 import { isUUID } from 'class-validator';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
-import { getAppServerModuleFixtureCleanDb } from './utilities/get-app-server-module-fixture-clean-db';
+import { getTestAppOptions } from './utilities/get-test-app-options-db';
+import { SaDto } from './utilities/sa.dto';
 
 const generateRandomString = (size: number): string => {
   return crypto.randomBytes(size).toString('base64').slice(0, size);
@@ -12,25 +12,16 @@ const generateRandomString = (size: number): string => {
 
 describe('SaController (e2e)', () => {
   let app: INestApplication;
-  let moduleFixture: TestingModule;
   let server: any;
 
-  const sa = {
-    login: 'admin',
-    password: 'qwerty',
-  };
-
   beforeAll(async () => {
-    const appServerModuleFixture = await getAppServerModuleFixtureCleanDb();
-    app = appServerModuleFixture.app;
-    server = appServerModuleFixture.server;
-    moduleFixture = appServerModuleFixture.moduleFixture;
+    const testAppOptions = await getTestAppOptions();
+    app = testAppOptions.app;
+    server = testAppOptions.server;
   });
 
   afterAll(async () => {
-    await server.close();
     await app.close();
-    await moduleFixture.close();
   });
 
   describe('Create User by SA => POST => /sa/users', () => {
@@ -73,7 +64,7 @@ describe('SaController (e2e)', () => {
 
       const firstResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send({});
 
       expect(firstResponse.status).toBe(400);
@@ -87,7 +78,7 @@ describe('SaController (e2e)', () => {
 
       const secondResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(secondCreateUserDto);
 
       expect(secondResponse.status).toBe(400);
@@ -100,7 +91,7 @@ describe('SaController (e2e)', () => {
 
       const thirdResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(thirdCreateUserDto);
 
       expect(thirdResponse.status).toBe(400);
@@ -110,7 +101,7 @@ describe('SaController (e2e)', () => {
     it('should crate new user with 201 status code', async () => {
       const usersCountBeforeCreate = await request(server)
         .get(url)
-        .auth(sa.login, sa.password);
+        .auth(SaDto.login, SaDto.password);
 
       expect(usersCountBeforeCreate.status).toBe(200);
       expect(usersCountBeforeCreate.body.items).toHaveLength(0);
@@ -123,7 +114,7 @@ describe('SaController (e2e)', () => {
 
       const createUserResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(inputData);
 
       expect(createUserResponse.status).toBe(201);
@@ -143,7 +134,7 @@ describe('SaController (e2e)', () => {
 
       const usersCountAfterCreate = await request(server)
         .get(url)
-        .auth(sa.login, sa.password);
+        .auth(SaDto.login, SaDto.password);
 
       expect(usersCountAfterCreate.status).toBe(200);
       expect(usersCountAfterCreate.body.items).toHaveLength(1);
@@ -161,7 +152,7 @@ describe('SaController (e2e)', () => {
 
       const createUserResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(existingUser);
 
       expect(createUserResponse.status).toBe(201);
@@ -175,7 +166,7 @@ describe('SaController (e2e)', () => {
 
       const duplicateResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(duplicateUser);
 
       // Check that the response status is 400 (Bad Request) due to duplicate login/email
@@ -206,7 +197,7 @@ describe('SaController (e2e)', () => {
       // Create a new user
       const createUserResponse = await request(server)
         .post(url)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(createUserDto);
 
       expect(createUserResponse.status).toBe(201);

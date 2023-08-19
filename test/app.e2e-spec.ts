@@ -1,16 +1,16 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppServerModuleFixtureCleanDb } from './utilities/get-app-server-module-fixture-clean-db';
+import { getTestAppOptions } from './utilities/get-test-app-options-db';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    const appServerModuleFixture = await getAppServerModuleFixtureCleanDb();
-    app = appServerModuleFixture.app;
+    const testAppOptions = await getTestAppOptions();
+    app = testAppOptions.app;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 
