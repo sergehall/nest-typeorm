@@ -4,6 +4,7 @@ import { getAppServerModuleFixtureCleanDb } from './utilities/get-app-server-mod
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+
   beforeAll(async () => {
     const appServerModuleFixture = await getAppServerModuleFixtureCleanDb();
     app = appServerModuleFixture.app;

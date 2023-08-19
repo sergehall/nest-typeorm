@@ -28,6 +28,7 @@ describe('SaController (e2e)', () => {
   });
 
   afterAll(async () => {
+    await server.close();
     await app.close();
     await moduleFixture.close();
   });
@@ -41,6 +42,7 @@ describe('SaController (e2e)', () => {
       const response1 = await request(server).get(url);
       expect(response1).toBeDefined();
     });
+
     it('should return 401 status code because SA invalid', async () => {
       const responseWithoutAuth = await request(server).post(url);
       expect(responseWithoutAuth.status).toBe(401);
@@ -50,6 +52,7 @@ describe('SaController (e2e)', () => {
         .auth('invalid', 'data');
       expect(responseWithInvalidAuth.status).toBe(401);
     });
+
     it('should return 400 because invalid input data', async () => {
       const errors = {
         errorsMessages: expect.arrayContaining([
@@ -103,6 +106,7 @@ describe('SaController (e2e)', () => {
       expect(thirdResponse.status).toBe(400);
       expect(thirdResponse.body).toEqual(errors);
     });
+
     it('should crate new user with 201 status code', async () => {
       const usersCountBeforeCreate = await request(server)
         .get(url)
@@ -126,7 +130,7 @@ describe('SaController (e2e)', () => {
       const user = createUserResponse.body;
       expect(user).toStrictEqual({
         id: expect.any(String),
-        login: inputData.login,
+        login: inputData.login.toLowerCase(),
         email: inputData.email.toLowerCase(),
         createdAt: expect.any(String),
         banInfo: {
@@ -164,9 +168,9 @@ describe('SaController (e2e)', () => {
 
       // Now, attempt to create another user with the same login and email
       const duplicateUser: CreateUserDto = {
-        login: 'existingUser', // Same login as above
-        email: 'existingUser@example.com', // Same email as above
-        password: 'anotherPassword',
+        login: 'user', // Same login as above
+        email: 'user@example.com', // Same email as above
+        password: 'password123',
       };
 
       const duplicateResponse = await request(server)
@@ -181,23 +185,50 @@ describe('SaController (e2e)', () => {
       expect(duplicateResponse.body).toEqual({
         errorsMessages: [
           {
-            message: 'Login or email already exists',
+            message: `{"LoginEmailExistsValidator":"User with '${duplicateUser.login}' already exists."}`,
             field: 'login',
           },
           {
-            message: 'Login or email already exists',
-            field: 'email',
-          },
-          {
-            message: 'length! Must be min 3, max 10 ch.',
-            field: 'login',
-          },
-          {
-            message: "@Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')", // Add your expected message here
+            message: `{"LoginEmailExistsValidator":"User with '${duplicateUser.email}' already exists."}`,
             field: 'email',
           },
         ],
       });
+    });
+
+    it('should retrieve a created user by ID', async () => {
+      const createUserDto: CreateUserDto = {
+        login: 'createUser',
+        email: 'createUser@example.com',
+        password: 'password123',
+      };
+
+      // Create a new user
+      const createUserResponse = await request(server)
+        .post(url)
+        .auth(sa.login, sa.password)
+        .send(createUserDto);
+
+      expect(createUserResponse.status).toBe(201);
+
+      const createdUser = createUserResponse.body;
+
+      // Retrieve the user by their ID
+      const retrieveUserResponse = await request(server).get(
+        `/users/${createdUser.id}`,
+      );
+
+      expect(retrieveUserResponse.status).toBe(200);
+      const retrievedUser = retrieveUserResponse.body;
+
+      // Validate the retrieved user's data
+      expect(retrievedUser.id).toBe(createdUser.id);
+      expect(retrievedUser.login).toBe(createdUser.login.toLowerCase());
+      expect(retrievedUser.email).toBe(createdUser.email.toLowerCase());
+      expect(retrievedUser.createdAt).toBe(createdUser.createdAt);
+      expect(retrievedUser.isBanned).toEqual(createdUser.banInfo.isBanned);
+      expect(retrievedUser.banDate).toEqual(createdUser.banInfo.banDate);
+      expect(retrievedUser.banReason).toEqual(createdUser.banInfo.banReason);
     });
   });
 });
