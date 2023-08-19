@@ -1,26 +1,21 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppServerModuleFixtureCleanDb } from './utilities/get-app-server-module-fixture-clean-db';
+import { getTestAppOptions } from './utilities/get-test-app-options-db';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
+import { SaDto } from './utilities/sa.dto';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
-
   const saCreateUserUrl = '/sa/users';
-  const sa = {
-    login: 'admin',
-    password: 'qwerty',
-  };
 
   beforeAll(async () => {
-    const appServerModuleFixture = await getAppServerModuleFixtureCleanDb();
-    app = appServerModuleFixture.app;
-    server = appServerModuleFixture.server;
+    const testAppOptions = await getTestAppOptions();
+    app = testAppOptions.app;
+    server = testAppOptions.server;
   });
 
   afterAll(async () => {
-    await server.close();
     await app.close();
   });
 
@@ -32,7 +27,7 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  describe('(POST) /auth/login', () => {
+  describe('Login => (POST) /auth/login', () => {
     it('should return a accessToken object', async () => {
       const createUserDto: CreateUserDto = {
         login: 'createUser',
@@ -43,7 +38,7 @@ describe('AuthController (e2e)', () => {
       // Create a new user
       const createUserResponse = await request(server)
         .post(saCreateUserUrl)
-        .auth(sa.login, sa.password)
+        .auth(SaDto.login, SaDto.password)
         .send(createUserDto);
 
       expect(createUserResponse.status).toBe(201);

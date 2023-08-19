@@ -10,7 +10,7 @@ import Configuration from '../../src/config/configuration';
 const ownerNameDb =
   Configuration.getConfiguration().db.pg.authConfig.PG_HEROKU_USER_NAME;
 
-export const getAppServerModuleFixtureCleanDb = async () => {
+export const getTestAppOptions = async () => {
   let app: INestApplication;
 
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -42,5 +42,5 @@ export const getAppServerModuleFixtureCleanDb = async () => {
     SELECT truncate_tables('${ownerNameDb}');
     `);
 
-  return { app, server, moduleFixture };
+  return { app, server, moduleFixture, dataSours };
 };
