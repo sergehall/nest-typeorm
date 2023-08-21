@@ -5,10 +5,10 @@ import {
   MatchConditions,
   PureAbility,
 } from '@casl/ability';
-import { RolesEnums } from './enums/roles.enums';
 import { Action } from './roles/action.enum';
 import { IdDto } from './dto/id.dto';
 import { CurrentUserDto } from '../features/users/dto/currentUser.dto';
+import { UserRolesEnums } from './enums/user-roles.enums';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;
 const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
@@ -17,7 +17,7 @@ const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
 export class CaslAbilityFactory {
   createSaUser(currentUser: CurrentUserDto) {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility);
-    if (currentUser.roles === RolesEnums.SA) {
+    if (currentUser.roles === UserRolesEnums.SA) {
       can(Action.MANAGE, 'all');
       cannot(
         Action.CREATE,

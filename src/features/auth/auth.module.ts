@@ -32,6 +32,9 @@ import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-b
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { MailsService } from '../../mails/application/mails.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from '../users/entities/users.entity';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -51,7 +54,13 @@ const authUseCases = [
 ];
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([Users]),
+    UsersModule,
+    PassportModule,
+    JwtModule,
+    CqrsModule,
+  ],
   controllers: [AuthController],
   providers: [
     LocalStrategy,
@@ -62,6 +71,7 @@ const authUseCases = [
     EncryptConfig,
     MailsService,
     KeyResolver,
+    UsersRepo,
     DecodeTokenService,
     UsersRawSqlRepository,
     SecurityDevicesService,

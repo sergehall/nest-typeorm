@@ -20,7 +20,6 @@ import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/application/users.service';
 import { Action } from '../../../ability/roles/action.enum';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
@@ -28,7 +27,6 @@ import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
 import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
-import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
@@ -37,6 +35,8 @@ import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-use
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { SearchBlogsForSaCommand } from '../application/use-cases/search-blogs-for-sa.use-case';
+import { Users } from '../../users/entities/users.entity';
+import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -86,16 +86,16 @@ export class SaController {
       userAgent: userAgent,
     };
 
-    const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
+    const newUser: Users = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 
-    const saUser: TablesUsersWithIdEntity = await this.commandBus.execute(
-      new ChangeRoleCommand(newUser),
+    const saUser: Users = await this.commandBus.execute(
+      new ChangeRoleCommand(newUser.userId),
     );
 
     return {
-      id: saUser.id,
+      id: saUser.userId,
       login: saUser.login,
       email: saUser.email,
       createdAt: saUser.createdAt,

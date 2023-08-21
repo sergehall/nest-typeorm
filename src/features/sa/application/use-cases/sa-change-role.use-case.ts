@@ -1,22 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { TablesUsersEntity } from '../../../users/entities/tables-users.entity';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
-import { RolesEnums } from '../../../../ability/enums/roles.enums';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
+import { Users } from '../../../users/entities/users.entity';
 
 export class ChangeRoleCommand {
-  constructor(public newUser: TablesUsersWithIdEntity) {}
+  constructor(public userId: string) {}
 }
 
 @CommandHandler(ChangeRoleCommand)
 export class SaChangeRoleUseCase implements ICommandHandler<ChangeRoleCommand> {
-  constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
-  async execute(command: ChangeRoleCommand): Promise<TablesUsersEntity> {
-    command.newUser.roles = RolesEnums.SA;
-
-    return await this.usersRawSqlRepository.changeRole(
-      command.newUser.id,
-      command.newUser.roles,
-    );
+  constructor(protected usersRepo: UsersRepo) {}
+  async execute(command: ChangeRoleCommand): Promise<Users | null> {
+    return await this.usersRepo.updateUserRole(command.userId);
   }
 }

@@ -26,6 +26,9 @@ import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog
 import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsForSaUseCase } from './application/use-cases/search-blogs-for-sa.use-case';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from '../users/entities/users.entity';
 
 const saUseCases = [
   SearchBlogsForSaUseCase,
@@ -39,7 +42,7 @@ const saUseCases = [
 ];
 
 @Module({
-  imports: [CaslModule, CqrsModule],
+  imports: [TypeOrmModule.forFeature([Users]), CaslModule, CqrsModule],
   controllers: [SaController],
   providers: [
     ParseQueriesService,
@@ -48,6 +51,7 @@ const saUseCases = [
     BloggerBlogsService,
     EncryptConfig,
     KeyResolver,
+    UsersRepo,
     SentCodeLogRepository,
     PostsRawSqlRepository,
     UsersRawSqlRepository,
