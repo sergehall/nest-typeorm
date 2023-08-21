@@ -10,7 +10,7 @@ const generateRandomString = (size: number): string => {
   return crypto.randomBytes(size).toString('base64').slice(0, size);
 };
 
-describe('SaController (e2e)', () => {
+describe('Sa Controller (e2e)', () => {
   let app: INestApplication;
   let server: any;
 
