@@ -4,7 +4,7 @@ import { getTestAppOptions } from './utilities/get-test-app-options-db';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
 import { SaDto } from './utilities/sa.dto';
 
-describe('AuthController (e2e)', () => {
+describe('Auth Controller (e2e)', () => {
   let app: INestApplication;
   let server: any;
   const saCreateUserUrl = '/sa/users';

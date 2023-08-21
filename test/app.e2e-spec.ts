@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { getTestAppOptions } from './utilities/get-test-app-options-db';
 
-describe('AppController (e2e)', () => {
+describe('App Controller (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
