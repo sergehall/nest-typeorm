@@ -7,12 +7,12 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager } from 'typeorm';
 import { TablesUsersEntity } from '../entities/tables-users.entity';
-import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -332,7 +332,7 @@ export class UsersRawSqlRepository {
 
   async changeRole(
     userId: string,
-    roles: RolesEnums,
+    roles: UserRolesEnums[],
   ): Promise<TablesUsersEntity> {
     try {
       const updateUserRole = await this.db.query(

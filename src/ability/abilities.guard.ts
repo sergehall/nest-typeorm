@@ -8,7 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from './casl-ability.factory';
 import { CHECK_ABILITY, RequiredRule } from './abilities.decorator';
 import { ForbiddenError } from '@casl/ability';
-import { RolesEnums } from './enums/roles.enums';
+import { UserRolesEnums } from './enums/user-roles.enums';
 
 @Injectable()
 export class AbilitiesGuard implements CanActivate {
@@ -24,7 +24,7 @@ export class AbilitiesGuard implements CanActivate {
     );
     let { currentUser } = context.switchToHttp().getRequest();
     if (!currentUser) {
-      currentUser = { roles: RolesEnums.USER };
+      currentUser = { roles: UserRolesEnums.USER };
     }
     const ability = this.caslAbilityFactory.createSaUser(currentUser);
     try {

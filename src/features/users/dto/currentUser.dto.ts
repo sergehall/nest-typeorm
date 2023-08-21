@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
-import { RolesEnums } from '../../../ability/enums/roles.enums';
 import { OrgIdEnums } from '../enums/org-id.enums';
+import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 export class CurrentUserDto {
   @IsNotEmpty()
@@ -20,7 +20,7 @@ export class CurrentUserDto {
   @IsNotEmpty()
   orgId: OrgIdEnums;
   @IsNotEmpty()
-  roles: RolesEnums;
+  roles: UserRolesEnums;
   @IsNotEmpty()
   @IsBoolean()
   isBanned: boolean;

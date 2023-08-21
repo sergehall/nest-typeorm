@@ -20,6 +20,7 @@ export class TestingRawSqlRepository {
       'Posts',
       'BloggerBlogs',
       'Users',
+      'users',
     ];
 
     try {
@@ -29,7 +30,9 @@ export class TestingRawSqlRepository {
       }
     } catch (error) {
       console.error(error.message);
-      throw new InternalServerErrorException('Failed to remove data.');
+      throw new InternalServerErrorException(
+        'Failed to remove data.' + error.message,
+      );
     }
   }
 }

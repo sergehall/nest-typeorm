@@ -6,7 +6,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { OrgIdEnums } from '../enums/org-id.enums';
-import { RolesEnums } from '../../../ability/enums/roles.enums';
+import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 export class TablesUsersEntity {
   @IsNotEmpty()
@@ -36,7 +36,7 @@ export class TablesUsersEntity {
   @IsNotEmpty()
   orgId: OrgIdEnums;
   @IsNotEmpty()
-  roles: RolesEnums;
+  roles: UserRolesEnums[];
   @IsNotEmpty()
   @IsBoolean({
     message: 'Incorrect isBanned length! Must be boolean.',

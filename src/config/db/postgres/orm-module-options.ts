@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { PostgresConfig } from './postgres.config';
+import { Users } from '../../../features/users/entities/users.entity';
 
 @Injectable()
 export class OrmModuleOptions
@@ -22,7 +23,7 @@ export class OrmModuleOptions
       password,
       database,
       ssl: { rejectUnauthorized: false },
-      entities: [],
+      entities: [Users],
       synchronize: true,
       logging: false,
     };
