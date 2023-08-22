@@ -4,13 +4,13 @@ import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 @Entity()
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
 export class UsersEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { unique: true })
   userId: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   login: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email: string;
 
   @Column({ nullable: false })
@@ -36,7 +36,7 @@ export class UsersEntity {
   @Column({ type: 'character varying', nullable: true })
   banReason: string | null = null;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   confirmationCode: string;
 
   @Column({ nullable: false })

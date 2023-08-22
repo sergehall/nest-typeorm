@@ -12,15 +12,13 @@ export class TestingRawSqlRepository {
       'SecurityDevices',
       'BannedUsersForBlogs',
       'BlacklistJwt',
-      'EmailsConfirmationCodes',
-      'EmailsRecoveryCodes',
       'LikeStatusComments',
       'LikeStatusPosts',
       'Comments',
       'Posts',
       'BloggerBlogs',
       'Users',
-      'users',
+      'users_entity',
     ];
 
     try {
