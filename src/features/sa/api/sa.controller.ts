@@ -93,7 +93,6 @@ export class SaController {
     const saUser: UsersEntity = await this.commandBus.execute(
       new ChangeRoleCommand(newUser.userId),
     );
-
     return {
       id: saUser.userId,
       login: saUser.login,

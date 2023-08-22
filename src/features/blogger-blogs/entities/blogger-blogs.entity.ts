@@ -6,13 +6,15 @@ import {
   JoinColumn,
   OneToMany,
   ManyToOne,
+  Unique,
 } from 'typeorm';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 
 @Entity('BloggerBlogs')
+@Unique(['id'])
 export class BloggerBlogsEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { unique: true })
   id: string;
 
   @CreateDateColumn({ type: 'varchar', length: 50, nullable: false })

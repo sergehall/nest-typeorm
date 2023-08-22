@@ -14,7 +14,7 @@ export class SecurityDevicesEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('uuid', { nullable: false })
+  @Column('uuid', { nullable: false, unique: true })
   deviceId: string;
 
   @Column({

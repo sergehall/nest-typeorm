@@ -1,10 +1,18 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 
 @Entity('Comments')
+@Unique(['id'])
 export class CommentsEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { unique: true })
   id: string;
 
   @Column({
