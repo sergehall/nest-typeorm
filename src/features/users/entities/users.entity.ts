@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { Entity, Column, Unique, PrimaryColumn } from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 @Entity()
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
-export class Users {
-  @PrimaryGeneratedColumn('uuid')
+export class UsersEntity {
+  @PrimaryColumn('uuid')
   userId: string;
 
   @Column({ nullable: false })

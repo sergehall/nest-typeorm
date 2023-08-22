@@ -1,7 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from '../entities/users.entity';
+import { UsersEntity } from '../entities/users.entity';
 import { Repository, UpdateResult } from 'typeorm';
-import { UserType } from '../types/users.type';
 import {
   HttpException,
   HttpStatus,
@@ -11,11 +10,11 @@ import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 export class UsersRepo {
   constructor(
-    @InjectRepository(Users)
-    private readonly usersRepository: Repository<Users>,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
   ) {}
 
-  async createUser(newUser: UserType): Promise<Users> {
+  async createUser(newUser: UsersEntity): Promise<UsersEntity> {
     try {
       return await this.usersRepository.save(newUser);
     } catch (error) {
@@ -41,7 +40,7 @@ export class UsersRepo {
     }
   }
 
-  async updateUserRole(userId: string): Promise<Users | null> {
+  async updateUserRole(userId: string): Promise<UsersEntity | null> {
     const newRoles = [UserRolesEnums.SA];
 
     try {

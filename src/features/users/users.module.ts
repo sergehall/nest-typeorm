@@ -19,7 +19,7 @@ import { EmailNotExistValidator } from '../../common/validators/email-not-exist.
 import { CodeExistsValidator } from '../../common/validators/code-exists.validator';
 import { UsersRepo } from './infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './entities/users.entity';
+import { UsersEntity } from './entities/users.entity';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -34,7 +34,7 @@ const usersValidators = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), CaslModule, CqrsModule],
+  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
   controllers: [UsersController],
   providers: [
     ParseQueriesService,

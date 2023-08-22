@@ -34,7 +34,7 @@ import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity'
 import { ReturnUserDto } from '../dto/return-user.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
-import { Users } from '../entities/users.entity';
+import { UsersEntity } from '../entities/users.entity';
 
 @SkipThrottle()
 @Controller('users')
@@ -80,7 +80,7 @@ export class UsersController {
       userAgent: req.get('user-agent') || 'None',
     };
 
-    const newUser: Users = await this.commandBus.execute(
+    const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 
