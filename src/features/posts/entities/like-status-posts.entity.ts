@@ -4,10 +4,10 @@ import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.e
 
 @Entity('LikeStatusPosts')
 export class LikeStatusPostsEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { nullable: false })
   userId: string;
 
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { nullable: false })
   postId: string;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId)
@@ -18,16 +18,31 @@ export class LikeStatusPostsEntity {
   @JoinColumn({ name: 'blogId' })
   blog: BloggerBlogsEntity;
 
-  @Column()
+  @Column({ default: false })
   isBanned: boolean;
 
-  @Column({ type: 'varchar', length: 10, collation: 'pg_catalog."default"' })
+  @Column({
+    type: 'varchar',
+    length: 10,
+    collation: 'pg_catalog."default"',
+    nullable: false,
+  })
   login: string;
 
-  @Column({ type: 'varchar', length: 7, collation: 'pg_catalog."default"' })
+  @Column({
+    type: 'varchar',
+    length: 7,
+    collation: 'pg_catalog."default"',
+    nullable: false,
+  })
   likeStatus: string;
 
-  @Column({ type: 'varchar', length: 30, collation: 'pg_catalog."default"' })
+  @Column({
+    type: 'varchar',
+    length: 30,
+    collation: 'pg_catalog."default"',
+    nullable: false,
+  })
   addedAt: string;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId)
