@@ -1,5 +1,5 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
-import { SessionDevicesEntity } from '../../entities/security-device.entity';
+import { TablesSessionDevicesEntity } from '../../entities/tables-security-device.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 
@@ -19,7 +19,7 @@ export class CreateDeviceUseCase
     private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
   ) {}
   async execute(command: CreateDeviceCommand): Promise<boolean> {
-    const newDevices: SessionDevicesEntity = {
+    const newDevices: TablesSessionDevicesEntity = {
       userId: command.newPayload.userId,
       ip: command.clientIp,
       title: command.userAgent,

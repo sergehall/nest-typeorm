@@ -1,6 +1,6 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { SessionDevicesEntity } from '../entities/security-device.entity';
+import { TablesSessionDevicesEntity } from '../entities/tables-security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
@@ -11,7 +11,7 @@ export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async createOrUpdateDevice(
-    newDevices: SessionDevicesEntity,
+    newDevices: TablesSessionDevicesEntity,
   ): Promise<boolean> {
     try {
       const createOrUpdateDevice = await this.db.query(
@@ -105,7 +105,7 @@ export class SecurityDevicesRawSqlRepository {
 
   async findDeviceByDeviceId(
     deviceId: string,
-  ): Promise<SessionDevicesEntity[]> {
+  ): Promise<TablesSessionDevicesEntity[]> {
     try {
       const currentTime = new Date().toISOString();
 
