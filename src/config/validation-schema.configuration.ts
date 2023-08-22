@@ -44,7 +44,7 @@ export const validationSchemaConfiguration = Joi.object({
   THROTTLE_LIMIT: Joi.number().required(),
   PORT: Joi.number().default(5000),
   PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
-  PG_HOST_HEROKU: Joi.string().min(41).max(41).required(),
+  PG_HOST_HEROKU: Joi.string().min(40).max(40).required(),
   DATABASE_URL: Joi.string().min(10).max(170).required(),
   PG_HEROKU_USER_NAME: Joi.string()
     .min(2)
