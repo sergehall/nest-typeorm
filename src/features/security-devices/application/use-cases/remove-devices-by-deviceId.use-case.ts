@@ -2,7 +2,7 @@ import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
-import { SessionDevicesEntity } from '../../entities/security-device.entity';
+import { TablesSessionDevicesEntity } from '../../entities/tables-security-device.entity';
 import { forbiddenDeleteDevice } from '../../../../common/filters/custom-errors-messages';
 
 export class RemoveDevicesByDeviceIdCommand {
@@ -19,7 +19,7 @@ export class RemoveDevicesByDeviceIdUseCase
 
   async execute(command: RemoveDevicesByDeviceIdCommand): Promise<boolean> {
     const { deviceId, currentPayload } = command;
-    const device: SessionDevicesEntity[] =
+    const device: TablesSessionDevicesEntity[] =
       await this.securityDevicesRawSqlRepository.findDeviceByDeviceId(deviceId);
 
     if (device.length === 0) {
