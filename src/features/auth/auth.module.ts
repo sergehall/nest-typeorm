@@ -34,7 +34,7 @@ import { MailsService } from '../../mails/application/mails.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from '../users/entities/users.entity';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const authUseCases = [
   CreateUserUseCase,
@@ -55,7 +55,7 @@ const authUseCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([UsersEntity]),
     UsersModule,
     PassportModule,
     JwtModule,

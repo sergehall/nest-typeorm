@@ -7,8 +7,7 @@ import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UserRolesEnums } from '../../../../ability/enums/user-roles.enums';
 import { UsersRepo } from '../../infrastructure/users-repo';
-import { UserType } from '../../types/users.type';
-import { Users } from '../../entities/users.entity';
+import { UsersEntity } from '../../entities/users.entity';
 import * as uuid4 from 'uuid4';
 
 export class CreateUserCommand {
@@ -27,7 +26,7 @@ export class CreateUserUseCase
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
   ) {}
-  async execute(command: CreateUserCommand): Promise<Users> {
+  async execute(command: CreateUserCommand): Promise<UsersEntity> {
     const { login, email, password } = command.createUserDto;
     const { ip, userAgent } = command.registrationData;
 
@@ -43,7 +42,8 @@ export class CreateUserUseCase
 
     // Prepare the user object with the necessary properties
 
-    const newUser: UserType = {
+    const newUser: UsersEntity = {
+      userId: uuid4().toString(),
       login: login.toLowerCase(),
       email: email.toLowerCase(),
       passwordHash: passwordHash,
