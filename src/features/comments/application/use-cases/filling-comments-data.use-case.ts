@@ -40,7 +40,7 @@ export class FillingCommentsDataUseCase
           const currentComment =
             await this.likeStatusCommentsRawSqlRepository.findOne(
               commentId,
-              currentUserDto.id,
+              currentUserDto.userId,
               isBanned,
             );
           ownLikeStatus = currentComment[0]?.likeStatus || LikeStatusEnums.NONE;

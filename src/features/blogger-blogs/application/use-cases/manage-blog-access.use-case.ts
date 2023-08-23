@@ -40,7 +40,7 @@ export class ManageBlogAccessUseCase
   async execute(command: ManageBlogAccessCommand): Promise<boolean> {
     const { userId, updateBanUserDto, currentUserDto } = command;
 
-    if (userId === currentUserDto.id) {
+    if (userId === currentUserDto.userId) {
       throw new HttpException(
         { message: cannotBlockYourself },
         HttpStatus.BAD_REQUEST,
@@ -91,7 +91,7 @@ export class ManageBlogAccessUseCase
   ): BannedUsersForBlogsEntity {
     return {
       id: uuid4().toString(),
-      userId: userToBan.id,
+      userId: userToBan.userId,
       blogId: updateBanUserDto.blogId,
       login: userToBan.login,
       isBanned: updateBanUserDto.isBanned,
@@ -109,7 +109,7 @@ export class ManageBlogAccessUseCase
     try {
       // Throws a ForbiddenError if the current user doesn't have the permission to perform the action.
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: currentUserDto.id,
+        id: currentUserDto.userId,
       });
     } catch (error) {
       throw new ForbiddenException(

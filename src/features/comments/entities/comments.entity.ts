@@ -7,7 +7,7 @@ import {
   Unique,
 } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { Users } from '../../users/entities/users.entity';
 
 @Entity('Comments')
 @Unique(['id'])
@@ -55,13 +55,13 @@ export class CommentsEntity {
   })
   postInfoBlogName: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'postInfoBlogOwnerId' })
-  blogOwner: UsersEntity;
+  blogOwner: Users;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'commentatorInfoUserId' })
-  commentator: UsersEntity;
+  commentator: Users;
 
   @Column({
     type: 'varchar',

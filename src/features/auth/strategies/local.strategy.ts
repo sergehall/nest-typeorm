@@ -3,13 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
-import { TablesUsersEntity } from '../../users/entities/tables-users.entity';
+
 import {
   invalidLoginOrEmailLengthError,
   passwordInvalid,
   validatePasswordFailed,
 } from '../../../common/filters/custom-errors-messages';
 import { CustomErrorsMessagesType } from '../../../common/filters/types/custom-errors-messages.types';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -22,7 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(
     loginOrEmail: string,
     password: string,
-  ): Promise<TablesUsersEntity | null> {
+  ): Promise<CurrentUserDto | null> {
     const messages: CustomErrorsMessagesType[] = [];
 
     this.validateLength(
@@ -53,8 +54,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    return user;
+
+    return {
+      userId: user.userId,
+      login: user.login,
+      email: user.email,
+      orgId: user.orgId,
+      roles: user.roles,
+      isBanned: user.isBanned,
+    };
   }
+
   private validateLength(
     value: string,
     min: number,

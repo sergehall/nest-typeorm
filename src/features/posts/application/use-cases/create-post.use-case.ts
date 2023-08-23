@@ -57,13 +57,13 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     // Check if the user is banned from posting in this blog
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        currentUserDto.id,
+        currentUserDto.userId,
         blog.id,
       );
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({
-      id: currentUserDto.id,
+      id: currentUserDto.userId,
     });
 
     // User is banned from posting in this blog, throw a ForbiddenException with a custom error message

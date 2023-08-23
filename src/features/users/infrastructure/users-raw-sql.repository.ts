@@ -175,7 +175,7 @@ export class UsersRawSqlRepository {
       const insertNewUser = await this.db.query(query, parameters);
 
       // Because I delegated the creation of the user ID to the database itself.
-      return { id: insertNewUser[0].id, ...tablesUsersEntity };
+      return { userId: insertNewUser[0].userId, ...tablesUsersEntity };
     } catch (error) {
       if (
         error.message.includes('duplicate key value violates unique constraint')
@@ -477,7 +477,7 @@ export class UsersRawSqlRepository {
 
         await Promise.all(
           allUsersWithExpiredDate.map((user) =>
-            this.deleteUserData(user.id, client),
+            this.deleteUserData(user.userId, client),
           ),
         );
       });

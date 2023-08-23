@@ -41,7 +41,7 @@ export class SearchBannedUsersInBlogUseCase
     if (!blog) throw new NotFoundException('Not found blog.');
 
     // Check user's permission to ban the user
-    await this.checkUserPermission(currentUser.id, blog.blogOwnerId);
+    await this.checkUserPermission(currentUser.userId, blog.blogOwnerId);
 
     // Find all banned users for the blog
     const bannedUsersAndCount: BannedUsersCountBannedUsersDto =

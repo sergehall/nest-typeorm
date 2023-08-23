@@ -57,7 +57,7 @@ export class DeletePostByPostIdAndBlogIdUseCase
     });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: currentUserDto.id,
+        id: currentUserDto.userId,
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {

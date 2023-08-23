@@ -1,33 +1,33 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../../users/application/users.service';
 import { PayloadDto } from '../dto/payload.dto';
 import { JwtConfig } from '../../../config/jwt/jwt-config';
+import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { UsersRepo } from '../../users/infrastructure/users-repo';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly usersRepo: UsersRepo,
     private readonly jwtConfig: JwtConfig,
   ) {
     super(JwtStrategy.getJwtOptions(jwtConfig));
   }
 
-  async validate(payload: PayloadDto) {
-    const user = await this.usersService.findUserByUserId(payload.userId);
+  async validate(payload: PayloadDto): Promise<CurrentUserDto | null> {
+    const user = await this.usersRepo.findUserById(payload.userId);
     if (user && !user.isBanned) {
       return {
-        id: user.id,
+        userId: user.userId,
         login: user.login,
         email: user.email,
         orgId: user.orgId,
         roles: user.roles,
         isBanned: user.isBanned,
-        payloadExp: new Date(payload.exp * 1000).toISOString(),
       };
     }
-    return false;
+    return null;
   }
 
   protected static getJwtOptions(jwtConfig: JwtConfig) {

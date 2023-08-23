@@ -9,7 +9,7 @@ import {
   Unique,
 } from 'typeorm';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { Users } from '../../users/entities/users.entity';
 
 @Entity('BloggerBlogs')
 @Unique(['id'])
@@ -23,9 +23,9 @@ export class BloggerBlogsEntity {
   @Column({ nullable: false, default: false })
   isMembership: boolean;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'blogOwnerId' })
-  blogOwner: UsersEntity;
+  blogOwner: Users;
 
   @Column({ nullable: false, default: false })
   dependencyIsBanned: boolean;

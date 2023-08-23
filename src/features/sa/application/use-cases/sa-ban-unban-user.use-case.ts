@@ -36,7 +36,7 @@ export class SaBanUnbanUserUseCase
     const { currentUserDto } = command;
     const { id } = command;
 
-    if (id === currentUserDto.id) {
+    if (id === currentUserDto.userId) {
       throw new HttpException(
         { message: cannotBlockYourself },
         HttpStatus.BAD_REQUEST,
@@ -57,7 +57,7 @@ export class SaBanUnbanUserUseCase
     };
 
     return await this.usersRawSqlRepository.saBanUnbanUser(
-      userToBan.id,
+      userToBan.userId,
       banInfo,
     );
   }
@@ -69,7 +69,7 @@ export class SaBanUnbanUserUseCase
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: userToBan.id,
+        id: userToBan.userId,
       });
     } catch (error) {
       throw new ForbiddenException(

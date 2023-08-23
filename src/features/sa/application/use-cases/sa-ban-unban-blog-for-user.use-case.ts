@@ -34,7 +34,7 @@ export class SaBanUnbanBlogUseCase
 
     const blogForBan = await this.saGetBlogForBan(blogId);
 
-    if (blogForBan.blogOwnerId === currentUserDto.id) {
+    if (blogForBan.blogOwnerId === currentUserDto.userId) {
       throw new HttpException(
         { message: cannotBlockOwnBlog },
         HttpStatus.BAD_REQUEST,

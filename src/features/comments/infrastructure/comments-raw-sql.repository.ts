@@ -107,7 +107,7 @@ export class CommentsRawSqlRepository {
       LIMIT $5 OFFSET $6`;
 
       const parameters = [
-        currentUserDto.id,
+        currentUserDto.userId,
         commentatorInfoIsBanned,
         banInfoIsBanned,
         isBanned,
@@ -199,7 +199,7 @@ export class CommentsRawSqlRepository {
         postId,
         commentatorInfoIsBanned,
         banInfoIsBanned,
-        currentUserDto?.id,
+        currentUserDto?.userId,
         isBanned,
         limit,
         offset,
@@ -270,7 +270,7 @@ export class CommentsRawSqlRepository {
 
       const parameters = [
         commentId,
-        currentUserDto?.id,
+        currentUserDto?.userId,
         isBanned,
         commentatorInfoIsBanned,
         banInfoIsBanned,
@@ -469,7 +469,7 @@ export class CommentsRawSqlRepository {
       postInfoBlogId: post.blogId,
       postInfoBlogName: post.blogName,
       postInfoBlogOwnerId: post.postOwnerId,
-      commentatorInfoUserId: currentUserDto.id,
+      commentatorInfoUserId: currentUserDto.userId,
       commentatorInfoUserLogin: currentUserDto.login,
       commentatorInfoIsBanned: false,
       banInfoIsBanned: false,

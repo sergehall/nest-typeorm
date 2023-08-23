@@ -35,13 +35,12 @@ export class NoneStatusGuard implements CanActivate {
         request.user =
           user && !user.isBanned
             ? {
-                id: user.id,
+                id: user.userId,
                 login: user.login,
                 email: user.email,
                 orgId: user.orgId,
                 roles: user.roles,
                 isBanned: user.isBanned,
-                payloadExp: new Date(payload.exp * 1000).toISOString(),
               }
             : null;
         return true;

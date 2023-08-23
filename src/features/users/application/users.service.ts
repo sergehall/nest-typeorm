@@ -62,7 +62,7 @@ export class UsersService {
     usersArr: TablesUsersWithIdEntity[],
   ): Promise<ReturnUsersBanInfoEntity[]> {
     return usersArr.map((user: TablesUsersWithIdEntity) => ({
-      id: user.id,
+      id: user.userId,
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,

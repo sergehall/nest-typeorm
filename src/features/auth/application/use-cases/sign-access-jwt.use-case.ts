@@ -22,7 +22,7 @@ export class SignAccessJwtUseCase
     const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
 
     const payloadData = {
-      userId: currentUserDto.id,
+      userId: currentUserDto.userId,
       email: currentUserDto.email,
       deviceId: uuid4().toString(),
     };

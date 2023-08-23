@@ -358,7 +358,7 @@ export class PostsRawSqlRepository {
       isBanned,
       countLastLikes,
       likeStatus,
-      currentUserDto?.id,
+      currentUserDto?.userId,
       postId,
     ];
 
@@ -440,7 +440,7 @@ export class PostsRawSqlRepository {
       isBanned,
       countLastLikes,
       likeStatus,
-      currentUserDto?.id,
+      currentUserDto?.userId,
       limit,
       offset,
       blogId,
@@ -530,7 +530,7 @@ export class PostsRawSqlRepository {
       isBanned,
       countLastLikes,
       likeStatus,
-      currentUserDto?.id,
+      currentUserDto?.userId,
       limit,
       offset,
     ];
@@ -700,7 +700,7 @@ export class PostsRawSqlRepository {
       blogId: blog.id,
       blogName: blog.name,
       createdAt: new Date().toISOString(),
-      postOwnerId: currentUserDto.id,
+      postOwnerId: currentUserDto.userId,
       dependencyIsBanned: false,
       banInfoIsBanned: false,
       banInfoBanDate: null,

@@ -30,7 +30,7 @@ export class CreateCommentUseCase
     const post = await this.postsRawSqlRepository.getPostById(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
-    await this.checkUserPermission(currentUserDto.id, post.blogId);
+    await this.checkUserPermission(currentUserDto.userId, post.blogId);
 
     return await this.commentsRawSqlRepository.createComment(
       post,

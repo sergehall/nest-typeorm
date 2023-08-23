@@ -52,7 +52,7 @@ export class UpdateCommentUseCase
     currentUserDto: CurrentUserDto,
     commentatorId: string,
   ) {
-    const userIdDto: IdDto = { id: currentUserDto.id };
+    const userIdDto: IdDto = { id: currentUserDto.userId };
     const ability = this.caslAbilityFactory.createForUserId(userIdDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {

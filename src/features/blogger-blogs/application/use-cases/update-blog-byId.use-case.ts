@@ -51,7 +51,7 @@ export class UpdateBlogByIdUseCase
 
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
-        id: currentUser.id,
+        id: currentUser.userId,
       });
     } catch (error) {
       throw new ForbiddenException(

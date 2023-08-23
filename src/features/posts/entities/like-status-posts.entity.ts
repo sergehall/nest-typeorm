@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { Users } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 
 @Entity('LikeStatusPosts')
@@ -10,9 +10,9 @@ export class LikeStatusPostsEntity {
   @PrimaryColumn('uuid', { nullable: false })
   postId: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
+  user: Users;
 
   @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id)
   @JoinColumn({ name: 'blogId' })
@@ -45,9 +45,9 @@ export class LikeStatusPostsEntity {
   })
   addedAt: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'postOwnerId' })
-  postOwner: UsersEntity;
+  postOwner: Users;
 
   // You might have other decorators and properties here based on your use case
 

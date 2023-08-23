@@ -67,7 +67,7 @@ export class BloggerBlogsRawSqlRepository {
   ): Promise<BlogsCountBlogsDto> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
-    const { id } = currentUserDto;
+    const { userId } = currentUserDto;
     const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
@@ -95,7 +95,7 @@ export class BloggerBlogsRawSqlRepository {
     const params = [
       blogOwnerBanStatus,
       banInfoBanStatus,
-      id,
+      userId,
       searchNameTerm,
       limit,
       offset,
@@ -570,7 +570,7 @@ export class BloggerBlogsRawSqlRepository {
         SET "postInfoBlogOwnerId" = $2
         WHERE "postInfoBlogId" = $1
         `,
-          [blogForBind.id, userForBind.id],
+          [blogForBind.id, userForBind.userId],
         );
 
         // Update Posts table
@@ -580,7 +580,7 @@ export class BloggerBlogsRawSqlRepository {
         SET "postOwnerId" = $2
         WHERE "blogId" = $1
         `,
-          [blogForBind.id, userForBind.id],
+          [blogForBind.id, userForBind.userId],
         );
 
         // Update BloggerBlogs table
@@ -590,17 +590,17 @@ export class BloggerBlogsRawSqlRepository {
         SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
         WHERE "id" = $1
         `,
-          [blogForBind.id, userForBind.id, userForBind.login],
+          [blogForBind.id, userForBind.userId, userForBind.login],
         );
       });
 
       console.log(
-        `"🔗 Blog ${blogForBind.id} has been successfully bound with user ${userForBind.id}. 🔗"`,
+        `"🔗 Blog ${blogForBind.id} has been successfully bound with user ${userForBind.userId}. 🔗"`,
       );
       return true;
     } catch (error) {
       console.error(
-        `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.id}:`,
+        `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.userId}:`,
         error,
       );
       return false;
@@ -645,14 +645,14 @@ export class BloggerBlogsRawSqlRepository {
     dto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<TableBloggerBlogsRawSqlEntity> {
-    const { id, login, isBanned } = currentUser;
+    const { userId, login, isBanned } = currentUser;
 
     return {
       ...dto,
       id: uuid4(),
       createdAt: new Date().toISOString(),
       isMembership: false,
-      blogOwnerId: id,
+      blogOwnerId: userId,
       blogOwnerLogin: login,
       dependencyIsBanned: isBanned,
       banInfoIsBanned: false,

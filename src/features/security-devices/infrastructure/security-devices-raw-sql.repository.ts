@@ -10,26 +10,26 @@ import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/tabl
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async createOrUpdateDevice(
+  async createNewDevice(
     newDevices: TablesSessionDevicesEntity,
   ): Promise<boolean> {
     try {
       const createOrUpdateDevice = await this.db.query(
         `
       INSERT INTO public."SecurityDevices"
-      ("userId",
-       "deviceId",
-       "ip",
-       "title",
-       "lastActiveDate",
-       "expirationDate"
+      ("id",
+      "userId", 
+      "deviceId",
+      "ip",
+      "title",
+      "lastActiveDate",
+      "expirationDate"
        )
-      VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT ( "userId", "deviceId" )
-      DO UPDATE SET "userId" = $1, "deviceId" = $2, "ip" = $3, "title" = $4, "lastActiveDate" = $5, "expirationDate" = $6
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING "userId"
       `,
         [
+          newDevices.id,
           newDevices.userId,
           newDevices.deviceId,
           newDevices.ip,
@@ -176,7 +176,7 @@ export class SecurityDevicesRawSqlRepository {
     blogForBind: TableBloggerBlogsRawSqlEntity,
   ): Promise<boolean> {
     const blogId = blogForBind.id;
-    const userId = userForBind.id;
+    const userId = userForBind.userId;
     const login = userForBind.login;
 
     try {
