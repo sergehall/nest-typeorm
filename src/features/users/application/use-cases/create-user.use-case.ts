@@ -2,14 +2,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { RegDataDto } from '../../dto/reg-data.dto';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
-import { OrgIdEnums } from '../../enums/org-id.enums';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
-import { UserRolesEnums } from '../../../../ability/enums/user-roles.enums';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
-import * as uuid4 from 'uuid4';
-import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
+import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
 
 export class CreateUserCommand {
   constructor(
@@ -40,28 +37,15 @@ export class CreateUserUseCase
       2,
       0,
     );
-
-    // Prepare the user object with the necessary properties
-    const newUser: TablesUsersWithIdEntity = {
-      userId: uuid4().toString(),
-      login: login.toLowerCase(),
-      email: email.toLowerCase(),
-      passwordHash: passwordHash,
-      createdAt: new Date().toISOString(),
-      orgId: OrgIdEnums.IT_INCUBATOR,
-      roles: [UserRolesEnums.USER],
-      isBanned: false,
-      banDate: null,
-      banReason: null,
-      confirmationCode: uuid4().toString(),
-      expirationDate: expirationDate,
-      isConfirmed: false,
-      isConfirmedDate: null,
-      ip: ip,
-      userAgent: userAgent,
+    const dataForCreateUserDto: DataForCreateUserDto = {
+      login,
+      email,
+      passwordHash,
+      expirationDate,
+      ip,
+      userAgent,
     };
 
-    // return await this.usersRawSqlRepository.createUser(newUser);
-    return await this.usersRepo.createUser(newUser);
+    return await this.usersRepo.createUser(dataForCreateUserDto);
   }
 }

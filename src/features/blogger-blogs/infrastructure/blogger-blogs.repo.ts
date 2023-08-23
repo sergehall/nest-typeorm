@@ -17,7 +17,7 @@ export class BloggerBlogsRepo {
     createBloggerBlogsDto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
-    const blogEntity: BloggerBlogsEntity = await this.createTablesBlogsEntity(
+    const blogEntity: BloggerBlogsEntity = await this.createBlogsEntity(
       createBloggerBlogsDto,
       currentUser,
     );
@@ -43,7 +43,7 @@ export class BloggerBlogsRepo {
     }
   }
 
-  private async createTablesBlogsEntity(
+  private async createBlogsEntity(
     dto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {

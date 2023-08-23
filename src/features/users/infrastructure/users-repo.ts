@@ -8,7 +8,8 @@ import {
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { UsersEntity } from '../entities/users.entity';
-import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
+import * as uuid4 from 'uuid4';
+import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 
 export class UsersRepo {
   constructor(
@@ -41,9 +42,12 @@ export class UsersRepo {
     }
   }
 
-  async createUser(newUser: TablesUsersWithIdEntity): Promise<UsersEntity> {
+  async createUser(
+    dataForCreateUserDto: DataForCreateUserDto,
+  ): Promise<UsersEntity> {
     try {
-      return await this.usersRepository.save(newUser);
+      const newUserEntity = await this.createUserEntity(dataForCreateUserDto);
+      return await this.usersRepository.save(newUserEntity);
     } catch (error) {
       if (
         error.message.includes('duplicate key value violates unique constraint')
@@ -92,5 +96,24 @@ export class UsersRepo {
   private extractValueFromMessage(message: string) {
     const match = /\(([^)]+)\)/.exec(message);
     return match ? match[1] : 'null';
+  }
+
+  private async createUserEntity(
+    dto: DataForCreateUserDto,
+  ): Promise<UsersEntity> {
+    const { login, email, passwordHash, expirationDate, ip, userAgent } = dto;
+
+    const user = new UsersEntity();
+    user.userId = uuid4();
+    user.login = login.toLowerCase();
+    user.email = email.toLowerCase();
+    user.passwordHash = passwordHash;
+    user.createdAt = new Date().toISOString();
+    user.confirmationCode = uuid4();
+    user.expirationDate = expirationDate;
+    user.ip = ip;
+    user.userAgent = userAgent;
+
+    return user;
   }
 }
