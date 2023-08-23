@@ -39,7 +39,7 @@ export class ChangeLikeStatusCommentUseCase
 
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        currentUserDto.id,
+        currentUserDto.userId,
         findComment.postInfoBlogId,
       );
 
@@ -50,7 +50,7 @@ export class ChangeLikeStatusCommentUseCase
       commentId: commentId,
       blogId: findComment.postInfoBlogId,
       commentOwnerId: findComment.commentatorInfoUserId,
-      userId: currentUserDto.id,
+      userId: currentUserDto.userId,
       isBanned: currentUserDto.isBanned,
       likeStatus: likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),

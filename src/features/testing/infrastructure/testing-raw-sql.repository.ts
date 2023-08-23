@@ -18,7 +18,7 @@ export class TestingRawSqlRepository {
       'Posts',
       'BloggerBlogs',
       'Users',
-      'users_entity',
+      'users',
     ];
 
     try {

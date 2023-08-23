@@ -7,7 +7,7 @@ import {
   Unique,
 } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { Users } from '../../users/entities/users.entity';
 
 @Entity('Posts')
 @Unique(['id'])
@@ -59,9 +59,9 @@ export class PostsEntity {
   })
   createdAt: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.userId)
   @JoinColumn({ name: 'postOwnerId' })
-  postOwner: UsersEntity;
+  postOwner: Users;
 
   @Column({ default: false })
   dependencyIsBanned: boolean;

@@ -33,7 +33,7 @@ export class DeletePostByIdUseCase
       throw new NotFoundException(`Post with id: ${id} not found.`);
     }
     const ability = this.caslAbilityFactory.createForUserId({
-      id: currentUserDto.id,
+      id: currentUserDto.userId,
     });
     try {
       // ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
@@ -41,7 +41,7 @@ export class DeletePostByIdUseCase
       // });
       // The old conditions, then it was not necessary to check the owner post
       ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
-        id: currentUserDto.id,
+        id: currentUserDto.userId,
       });
       return await this.postsRawSqlRepository.deletePostByPostId(id);
     } catch (error) {

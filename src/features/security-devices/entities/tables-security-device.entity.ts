@@ -5,6 +5,11 @@ export class TablesSessionDevicesEntity {
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 100 ch.',
   })
+  id: string;
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId! Must be max 100 ch.',
+  })
   userId: string;
   @IsNotEmpty()
   @Length(0, 20, {

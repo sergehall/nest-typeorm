@@ -1,56 +1,43 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Unique,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+import { Users } from '../../users/entities/users.entity';
 
 @Entity('SecurityDevices')
-@Unique(['userId', 'deviceId'])
-export class SecurityDevicesEntity {
-  @PrimaryGeneratedColumn('uuid')
+export class SecurityDevices {
+  @PrimaryColumn('uuid', { unique: true })
   id: string;
 
-  @Column('uuid', { nullable: false, unique: true })
+  @Column('uuid', { nullable: false })
   deviceId: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 20,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   ip: string;
 
   @Column({
-    type: 'varchar',
-    collation: 'pg_catalog."default"',
+    type: 'character varying',
+    length: 50,
     nullable: false,
   })
   title: string;
 
   @Column({
-    type: 'varchar',
-    collation: 'pg_catalog."default"',
+    type: 'character varying',
+    length: 50,
     nullable: false,
   })
   lastActiveDate: string;
 
   @Column({
-    type: 'varchar',
-    collation: 'pg_catalog."default"',
+    type: 'character varying',
+    length: 50,
     nullable: false,
   })
   expirationDate: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => Users, (user) => user.securityDevices)
   @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
-
-  // You might have other decorators and properties here based on your use case
-
-  // Constraints are generally managed in migrations
+  user: Users;
 }

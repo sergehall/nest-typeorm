@@ -25,9 +25,11 @@ export class SaRemoveUserByUserIdUseCase
     );
     if (!userToRemove) throw new NotFoundException('Not found user.');
 
-    this.checkUserPermission(currentUserDto, userToRemove.id);
+    this.checkUserPermission(currentUserDto, userToRemove.userId);
 
-    await this.usersRawSqlRepository.removeUserDataByUserId(userToRemove.id);
+    await this.usersRawSqlRepository.removeUserDataByUserId(
+      userToRemove.userId,
+    );
     return true;
   }
 

@@ -60,11 +60,13 @@ export class AuthController {
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
     const currentUserDto: CurrentUserDto = req.user;
+
     const userAgent = req.get('user-agent') || 'None';
 
     const signedToken = await this.commandBus.execute(
       new SignRefreshJwtCommand(currentUserDto),
     );
+
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       signedToken.refreshToken,
     );

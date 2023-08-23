@@ -1,7 +1,9 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
-import { TablesSessionDevicesEntity } from '../../entities/tables-security-device.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
+import * as uuid4 from 'uuid4';
+import { SecurityDevicesRepo } from '../../infrastructure/security-devices.repo';
+import { Users } from '../../../users/entities/users.entity';
+import { SecurityDevices } from '../../entities/session-devices.entity';
 
 export class CreateDeviceCommand {
   constructor(
@@ -15,20 +17,23 @@ export class CreateDeviceCommand {
 export class CreateDeviceUseCase
   implements ICommandHandler<CreateDeviceCommand>
 {
-  constructor(
-    private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
-  ) {}
+  constructor(private readonly securityDevicesRepo: SecurityDevicesRepo) {}
   async execute(command: CreateDeviceCommand): Promise<boolean> {
-    const newDevices: TablesSessionDevicesEntity = {
-      userId: command.newPayload.userId,
-      ip: command.clientIp,
-      title: command.userAgent,
-      lastActiveDate: new Date(command.newPayload.iat * 1000).toISOString(),
-      expirationDate: new Date(command.newPayload.exp * 1000).toISOString(),
-      deviceId: command.newPayload.deviceId,
+    const { newPayload, clientIp, userAgent } = command;
+
+    const user = new Users();
+    user.userId = newPayload.userId;
+
+    const newDevices: SecurityDevices = {
+      id: uuid4().toString(),
+      deviceId: newPayload.deviceId,
+      ip: clientIp,
+      title: userAgent,
+      lastActiveDate: new Date(newPayload.iat * 1000).toISOString(),
+      expirationDate: new Date(newPayload.exp * 1000).toISOString(),
+      user: user,
     };
-    return await this.securityDevicesRawSqlRepository.createOrUpdateDevice(
-      newDevices,
-    );
+    await this.securityDevicesRepo.createNewDevice(newDevices);
+    return true;
   }
 }

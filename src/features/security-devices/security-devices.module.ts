@@ -17,6 +17,11 @@ import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-d
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-except-current.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchDevicesUseCase } from './application/use-cases/search-devices.use-case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { Users } from '../users/entities/users.entity';
+import { SecurityDevices } from './entities/session-devices.entity';
+import { SecurityDevicesRepo } from './infrastructure/security-devices.repo';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
@@ -28,10 +33,11 @@ const securityDevicesCases = [
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [TypeOrmModule.forFeature([SecurityDevices, Users]), CqrsModule],
   controllers: [SecurityDevicesController],
   providers: [
     JwtService,
+    UsersRepo,
     UsersRawSqlRepository,
     JwtConfig,
     CaslAbilityFactory,
@@ -39,6 +45,7 @@ const securityDevicesCases = [
     KeyResolver,
     DecodeTokenService,
     SecurityDevicesService,
+    SecurityDevicesRepo,
     SecurityDevicesRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     ...securityDevicesCases,

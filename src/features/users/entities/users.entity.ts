@@ -1,13 +1,20 @@
-import { Entity, Column, Unique, PrimaryColumn } from 'typeorm';
+import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
+import { OrgIdEnums } from '../enums/org-id.enums';
+import { SecurityDevices } from '../../security-devices/entities/session-devices.entity';
 
 @Entity()
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
-export class UsersEntity {
+export class Users {
   @PrimaryColumn('uuid', { unique: true })
   userId: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({
+    type: 'character varying',
+    length: 10,
+    nullable: false,
+    unique: true,
+  })
   login: string;
 
   @Column({ nullable: false, unique: true })
@@ -19,8 +26,13 @@ export class UsersEntity {
   @Column({ nullable: false })
   createdAt: string;
 
-  @Column({ nullable: false })
-  orgId: string;
+  @Column({
+    type: 'enum',
+    enum: OrgIdEnums,
+    default: OrgIdEnums.IT_INCUBATOR,
+    nullable: false,
+  })
+  orgId: OrgIdEnums;
 
   @Column({
     type: 'enum',
@@ -56,4 +68,7 @@ export class UsersEntity {
 
   @Column({ default: false })
   isBanned: boolean;
+
+  @OneToMany(() => SecurityDevices, (securityDevice) => securityDevice.user)
+  securityDevices: SecurityDevices[];
 }

@@ -119,7 +119,7 @@ export class LikeStatusPostsRawSqlRepository {
       blogId: post.blogId,
       postOwnerId: post.postOwnerId,
       postId: post.id,
-      userId: currentUserDto.id,
+      userId: currentUserDto.userId,
       login: currentUserDto.login,
       isBanned: currentUserDto.isBanned,
       likeStatus: likeStatusDto.likeStatus,

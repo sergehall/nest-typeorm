@@ -17,7 +17,7 @@ const lambdaMatcher = (matchConditions: MatchConditions) => matchConditions;
 export class CaslAbilityFactory {
   createSaUser(currentUser: CurrentUserDto) {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility);
-    if (currentUser.roles === UserRolesEnums.SA) {
+    if (currentUser.roles.includes(UserRolesEnums.SA)) {
       can(Action.MANAGE, 'all');
       cannot(
         Action.CREATE,
@@ -27,8 +27,8 @@ export class CaslAbilityFactory {
     } else {
       can(Action.READ, 'all');
       can(Action.CREATE, 'all');
-      can(Action.UPDATE, 'all', ({ id }) => id === currentUser.id);
-      can(Action.DELETE, 'all', ({ id }) => id === currentUser.id);
+      can(Action.UPDATE, 'all', ({ id }) => id === currentUser.userId);
+      can(Action.DELETE, 'all', ({ id }) => id === currentUser.userId);
       cannot(Action.CREATE, 'all', ({ isBanned }) => isBanned === true);
       cannot(Action.UPDATE, 'all', ({ orgId }) => orgId !== currentUser.orgId);
       cannot(Action.CREATE, 'all', ({ orgId }) => orgId !== currentUser.orgId);

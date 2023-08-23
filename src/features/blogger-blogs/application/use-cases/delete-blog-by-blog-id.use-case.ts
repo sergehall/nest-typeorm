@@ -36,7 +36,7 @@ export class DeleteBlogByBlogIdUseCase
     currentUserDto: CurrentUserDto,
     blogOwnerId: string,
   ) {
-    const userIdDto: IdDto = { id: currentUserDto.id };
+    const userIdDto: IdDto = { id: currentUserDto.userId };
     const ability = this.caslAbilityFactory.createForUserId(userIdDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {

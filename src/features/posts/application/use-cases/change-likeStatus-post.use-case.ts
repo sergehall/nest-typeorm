@@ -49,7 +49,7 @@ export class ChangeLikeStatusPostUseCase
   ) {
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        currentUserDto.id,
+        currentUserDto.userId,
         post.blogId,
       );
     if (userIsBannedForBlog)

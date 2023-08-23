@@ -1,20 +1,45 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersEntity } from '../entities/users.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import {
   HttpException,
   HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
+import { Users } from '../entities/users.entity';
+import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 
 export class UsersRepo {
   constructor(
-    @InjectRepository(UsersEntity)
-    private readonly usersRepository: Repository<UsersEntity>,
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
   ) {}
 
-  async createUser(newUser: UsersEntity): Promise<UsersEntity> {
+  async findUserById(userId: string): Promise<Users> {
+    const user = await this.usersRepository.findBy({ userId: userId });
+
+    if (!user[0]) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return user[0];
+  }
+
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: [{ email: loginOrEmail }, { login: loginOrEmail }],
+      });
+
+      return user ? user : null;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async createUser(newUser: TablesUsersWithIdEntity): Promise<Users> {
     try {
       return await this.usersRepository.save(newUser);
     } catch (error) {
@@ -40,7 +65,7 @@ export class UsersRepo {
     }
   }
 
-  async updateUserRole(userId: string): Promise<UsersEntity | null> {
+  async updateUserRole(userId: string): Promise<Users | null> {
     const newRoles = [UserRolesEnums.SA];
 
     try {

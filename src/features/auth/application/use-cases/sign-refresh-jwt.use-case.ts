@@ -21,7 +21,7 @@ export class SignRefreshJwtUseCase
     const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
 
     const payloadData = {
-      userId: currentUserDto.id,
+      userId: currentUserDto.userId,
       email: currentUserDto.email,
       deviceId: uuid4().toString(),
     };
