@@ -1,8 +1,11 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { PostgresConfig } from './postgres.config';
-import { Users } from '../../../features/users/entities/users.entity';
-import { SecurityDevices } from '../../../features/security-devices/entities/session-devices.entity';
+import { UsersEntity } from '../../../features/users/entities/users.entity';
+import { SecurityDevicesEntity } from '../../../features/security-devices/entities/session-devices.entity';
+import { BloggerBlogsEntity } from '../../../features/blogger-blogs/entities/blogger-blogs.entity';
+import { CommentsEntity } from '../../../features/comments/entities/comments.entity';
+import { PostsEntity } from '../../../features/posts/entities/posts.entity';
 
 @Injectable()
 export class OrmModuleOptions
@@ -24,7 +27,13 @@ export class OrmModuleOptions
       password,
       database,
       ssl: { rejectUnauthorized: false },
-      entities: [Users, SecurityDevices],
+      entities: [
+        UsersEntity,
+        SecurityDevicesEntity,
+        BloggerBlogsEntity,
+        CommentsEntity,
+        PostsEntity,
+      ],
       synchronize: true,
       logging: false,
     };

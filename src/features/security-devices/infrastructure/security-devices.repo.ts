@@ -1,21 +1,21 @@
 import { InsertResult, Repository } from 'typeorm';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SecurityDevices } from '../entities/session-devices.entity';
+import { SecurityDevicesEntity } from '../entities/session-devices.entity';
 
 @Injectable()
 export class SecurityDevicesRepo {
   constructor(
-    @InjectRepository(SecurityDevices)
-    private readonly securityDevicesRepository: Repository<SecurityDevices>,
+    @InjectRepository(SecurityDevicesEntity)
+    private readonly securityDevicesRepository: Repository<SecurityDevicesEntity>,
   ) {}
 
-  async createNewDevice(newDevice: SecurityDevices): Promise<boolean> {
+  async createDevice(newDevice: SecurityDevicesEntity): Promise<boolean> {
     try {
       const queryBuilder = this.securityDevicesRepository
         .createQueryBuilder()
         .insert()
-        .into(SecurityDevices)
+        .into(SecurityDevicesEntity)
         .values(newDevice)
         .returning(`"userId"`);
 

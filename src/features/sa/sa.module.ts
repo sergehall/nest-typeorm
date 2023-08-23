@@ -28,7 +28,7 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsForSaUseCase } from './application/use-cases/search-blogs-for-sa.use-case';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from '../users/entities/users.entity';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const saUseCases = [
   SearchBlogsForSaUseCase,
@@ -42,7 +42,7 @@ const saUseCases = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), CaslModule, CqrsModule],
+  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
   controllers: [SaController],
   providers: [
     ParseQueriesService,

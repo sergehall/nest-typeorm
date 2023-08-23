@@ -35,7 +35,7 @@ import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-use
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { SearchBlogsForSaCommand } from '../application/use-cases/search-blogs-for-sa.use-case';
-import { Users } from '../../users/entities/users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 
 @SkipThrottle()
@@ -86,11 +86,11 @@ export class SaController {
       userAgent: userAgent,
     };
 
-    const newUser: Users = await this.commandBus.execute(
+    const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 
-    const saUser: Users = await this.commandBus.execute(
+    const saUser: UsersEntity = await this.commandBus.execute(
       new ChangeRoleCommand(newUser.userId),
     );
     return {

@@ -7,16 +7,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
-import { Users } from '../entities/users.entity';
+import { UsersEntity } from '../entities/users.entity';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 
 export class UsersRepo {
   constructor(
-    @InjectRepository(Users)
-    private readonly usersRepository: Repository<Users>,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
   ) {}
 
-  async findUserById(userId: string): Promise<Users> {
+  async findUserById(userId: string): Promise<UsersEntity> {
     const user = await this.usersRepository.findBy({ userId: userId });
 
     if (!user[0]) {
@@ -26,7 +26,9 @@ export class UsersRepo {
     return user[0];
   }
 
-  async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UsersEntity | null> {
     try {
       const user = await this.usersRepository.findOne({
         where: [{ email: loginOrEmail }, { login: loginOrEmail }],
@@ -39,7 +41,7 @@ export class UsersRepo {
     }
   }
 
-  async createUser(newUser: TablesUsersWithIdEntity): Promise<Users> {
+  async createUser(newUser: TablesUsersWithIdEntity): Promise<UsersEntity> {
     try {
       return await this.usersRepository.save(newUser);
     } catch (error) {
@@ -65,7 +67,7 @@ export class UsersRepo {
     }
   }
 
-  async updateUserRole(userId: string): Promise<Users | null> {
+  async updateUserRole(userId: string): Promise<UsersEntity | null> {
     const newRoles = [UserRolesEnums.SA];
 
     try {

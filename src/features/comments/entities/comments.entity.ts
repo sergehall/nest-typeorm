@@ -7,7 +7,8 @@ import {
   Unique,
 } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { Users } from '../../users/entities/users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { PostsEntity } from '../../posts/entities/posts.entity';
 
 @Entity('Comments')
 @Unique(['id'])
@@ -31,10 +32,6 @@ export class CommentsEntity {
   })
   createdAt: string;
 
-  // @ManyToOne(() => PostsEntity, (post) => post.comments)
-  // @JoinColumn({ name: 'postInfoPostId' })
-  // post: PostsEntity;
-
   @Column({
     type: 'varchar',
     length: 30,
@@ -54,14 +51,6 @@ export class CommentsEntity {
     nullable: true,
   })
   postInfoBlogName: string;
-
-  @ManyToOne(() => Users, (user) => user.userId)
-  @JoinColumn({ name: 'postInfoBlogOwnerId' })
-  blogOwner: Users;
-
-  @ManyToOne(() => Users, (user) => user.userId)
-  @JoinColumn({ name: 'commentatorInfoUserId' })
-  commentator: Users;
 
   @Column({
     type: 'varchar',
@@ -93,7 +82,15 @@ export class CommentsEntity {
   })
   banInfoBanReason: string;
 
-  // You might have other decorators and properties here based on your use case
+  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @JoinColumn({ name: 'postInfoBlogOwnerId' })
+  blogOwner: UsersEntity;
 
-  // Constraints are generally managed in migrations
+  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @JoinColumn({ name: 'commentatorInfoUserId' })
+  commentator: UsersEntity;
+
+  @ManyToOne(() => PostsEntity, (post) => post.post)
+  @JoinColumn({ name: 'postInfoPostId' })
+  post: PostsEntity;
 }

@@ -5,9 +5,11 @@ import {
   JoinColumn,
   PrimaryColumn,
   Unique,
+  OneToMany,
 } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { Users } from '../../users/entities/users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { CommentsEntity } from '../../comments/entities/comments.entity';
 
 @Entity('Posts')
 @Unique(['id'])
@@ -16,25 +18,22 @@ export class PostsEntity {
   id: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 30,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   title: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 100,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   shortDescription: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 1000,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   content: string;
@@ -44,24 +43,18 @@ export class PostsEntity {
   blog: BloggerBlogsEntity;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 15,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   blogName: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 50,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   createdAt: string;
-
-  @ManyToOne(() => Users, (user) => user.userId)
-  @JoinColumn({ name: 'postOwnerId' })
-  postOwner: Users;
 
   @Column({ default: false })
   dependencyIsBanned: boolean;
@@ -70,22 +63,24 @@ export class PostsEntity {
   banInfoIsBanned: boolean;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 50,
-    collation: 'pg_catalog."default"',
     nullable: true,
   })
   banInfoBanDate: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 300,
-    collation: 'pg_catalog."default"',
     nullable: true,
   })
   banInfoBanReason: string;
 
-  // You might have other decorators and properties here based on your use case
+  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @JoinColumn({ name: 'postOwnerId' })
+  postOwner: UsersEntity;
 
-  // Constraints are generally managed in migrations
+  @OneToMany(() => CommentsEntity, (comment) => comment.post)
+  @JoinColumn({ name: 'postInfoPostId' })
+  post: CommentsEntity[];
 }
