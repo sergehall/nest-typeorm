@@ -10,6 +10,7 @@ import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { UsersEntity } from '../entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
+import { OrgIdEnums } from '../enums/org-id.enums';
 
 export class UsersRepo {
   constructor(
@@ -109,8 +110,14 @@ export class UsersRepo {
     user.email = email.toLowerCase();
     user.passwordHash = passwordHash;
     user.createdAt = new Date().toISOString();
+    user.orgId = OrgIdEnums.IT_INCUBATOR;
+    user.roles = [UserRolesEnums.USER];
+    user.isBanned = false;
+    user.banDate = null;
+    user.banReason = null;
     user.confirmationCode = uuid4();
     user.expirationDate = expirationDate;
+    user.isConfirmed = false;
     user.ip = ip;
     user.userAgent = userAgent;
 
