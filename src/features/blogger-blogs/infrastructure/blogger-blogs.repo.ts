@@ -48,22 +48,25 @@ export class BloggerBlogsRepo {
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
     const { userId, login, isBanned } = currentUser;
+    const { name, description, websiteUrl } = dto;
 
     const user = new UsersEntity();
     user.userId = userId;
 
-    return {
-      ...dto,
-      id: uuid4(),
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-      blogOwnerLogin: login,
-      dependencyIsBanned: isBanned,
-      banInfoIsBanned: false,
-      banInfoBanDate: null,
-      banInfoBanReason: null,
-      blogOwnerId: user,
-      comments: [],
-    };
+    const newBlog = new BloggerBlogsEntity();
+    newBlog.id = uuid4();
+    newBlog.name = name;
+    newBlog.description = description;
+    newBlog.websiteUrl = websiteUrl;
+    newBlog.createdAt = new Date().toISOString();
+    newBlog.isMembership = false;
+    newBlog.blogOwnerLogin = login;
+    newBlog.dependencyIsBanned = isBanned;
+    newBlog.banInfoIsBanned = false;
+    newBlog.banInfoBanDate = null;
+    newBlog.banInfoBanReason = null;
+    newBlog.blogOwnerId = user;
+
+    return newBlog;
   }
 }
