@@ -5,7 +5,7 @@ import { ReturnUsersBanInfoEntity } from '../../../features/sa/entities/return-u
 import { ReturnCommentsEntity } from '../../../features/comments/entities/return-comments.entity';
 import { ReturnPostsEntity } from '../../../features/posts/entities/return-posts.entity';
 import { IsArray, IsNumber, IsObject } from 'class-validator';
-import { ReturnBloggerBlogsEntity } from '../../../features/blogger-blogs/entities/return-blogger-blogs.entity';
+import { ReturnBloggerBlogsDto } from '../../../features/blogger-blogs/entities/return-blogger-blogs.entity';
 
 export class PaginatedResultDto {
   @IsNumber()
@@ -27,7 +27,7 @@ export class PaginatedResultDto {
     | TableBloggerBlogsRawSqlEntity
     | ReturnCommentsEntity
     | ReturnPostsEntity
-    | ReturnBloggerBlogsEntity
+    | ReturnBloggerBlogsDto
     | ReturnUsersBanInfoEntity
     | ReturnBannedUsersForBlogEntity
   )[];

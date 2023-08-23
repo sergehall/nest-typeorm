@@ -2,8 +2,8 @@ import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
 import { SecurityDevicesRepo } from '../../infrastructure/security-devices.repo';
-import { Users } from '../../../users/entities/users.entity';
-import { SecurityDevices } from '../../entities/session-devices.entity';
+import { UsersEntity } from '../../../users/entities/users.entity';
+import { SecurityDevicesEntity } from '../../entities/session-devices.entity';
 
 export class CreateDeviceCommand {
   constructor(
@@ -21,10 +21,10 @@ export class CreateDeviceUseCase
   async execute(command: CreateDeviceCommand): Promise<boolean> {
     const { newPayload, clientIp, userAgent } = command;
 
-    const user = new Users();
+    const user = new UsersEntity();
     user.userId = newPayload.userId;
 
-    const newDevices: SecurityDevices = {
+    const newDevices: SecurityDevicesEntity = {
       id: uuid4().toString(),
       deviceId: newPayload.deviceId,
       ip: clientIp,
@@ -33,7 +33,7 @@ export class CreateDeviceUseCase
       expirationDate: new Date(newPayload.exp * 1000).toISOString(),
       user: user,
     };
-    await this.securityDevicesRepo.createNewDevice(newDevices);
+    await this.securityDevicesRepo.createDevice(newDevices);
     return true;
   }
 }

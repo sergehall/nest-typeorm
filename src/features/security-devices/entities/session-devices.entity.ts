@@ -1,8 +1,8 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
-import { Users } from '../../users/entities/users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @Entity('SecurityDevices')
-export class SecurityDevices {
+export class SecurityDevicesEntity {
   @PrimaryColumn('uuid', { unique: true })
   id: string;
 
@@ -37,7 +37,7 @@ export class SecurityDevices {
   })
   expirationDate: string;
 
-  @ManyToOne(() => Users, (user) => user.securityDevices)
+  @ManyToOne(() => UsersEntity, (user) => user.securityDevices)
   @JoinColumn({ name: 'userId' })
-  user: Users;
+  user: UsersEntity;
 }

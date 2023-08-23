@@ -8,8 +8,8 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { ReturnBloggerBlogsEntity } from '../../entities/return-blogger-blogs.entity';
+import { ReturnBloggerBlogsDto } from '../../entities/return-blogger-blogs.entity';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -24,15 +24,14 @@ export class CreateBloggerBlogUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(
     command: CreateBloggerBlogCommand,
-  ): Promise<ReturnBloggerBlogsEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     const { createBloggerBlogsDto, currentUser } = command;
     await this.checkPermission(command.currentUser);
-
-    return await this.bloggerBlogsRawSqlRepository.createBlogs(
+    return await this.bloggerBlogsRepo.createBlogs(
       createBloggerBlogsDto,
       currentUser,
     );

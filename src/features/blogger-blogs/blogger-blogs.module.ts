@@ -22,6 +22,9 @@ import { ManageBlogAccessUseCase } from './application/use-cases/manage-blog-acc
 import { GetBlogsOwnedByCurrentUserUseCase } from './application/use-cases/get-blogs-owned-by-current-user.use-case';
 import { GetCommentsOwnedByCurrentUserUseCase } from './application/use-cases/get-comments-owned-by-current-user.use-case';
 import { DeleteBlogByBlogIdUseCase } from './application/use-cases/delete-blog-by-blog-id.use-case';
+import { BloggerBlogsRepo } from './infrastructure/blogger-blogs.repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BloggerBlogsEntity } from './entities/blogger-blogs.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -36,7 +39,7 @@ const bloggersBlogUseCases = [
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [TypeOrmModule.forFeature([BloggerBlogsEntity]), CqrsModule],
   controllers: [BloggerBlogsController],
   providers: [
     CaslAbilityFactory,
@@ -45,6 +48,7 @@ const bloggersBlogUseCases = [
     PostsService,
     KeyResolver,
     UsersRawSqlRepository,
+    BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,

@@ -4,7 +4,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { ReturnBloggerBlogsEntity } from '../entities/return-blogger-blogs.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -14,6 +13,7 @@ import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
 import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import * as uuid4 from 'uuid4';
 import { UpdateBBlogsDto } from '../dto/update-blogger-blogs.dto';
+import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(
@@ -113,7 +113,7 @@ export class BloggerBlogsRawSqlRepository {
 
   async openSearchBlogs(
     queryData: ParseQueriesDto,
-  ): Promise<ReturnBloggerBlogsEntity[]> {
+  ): Promise<ReturnBloggerBlogsDto[]> {
     try {
       const blogOwnerBanStatus = false;
       const banInfoBanStatus = false;
@@ -246,7 +246,7 @@ export class BloggerBlogsRawSqlRepository {
   async createBlogs(
     createBloggerBlogsDto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
-  ): Promise<ReturnBloggerBlogsEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     const blogsEntity = await this.createTablesBlogsEntity(
       createBloggerBlogsDto,
       currentUser,

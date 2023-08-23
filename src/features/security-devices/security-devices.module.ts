@@ -19,9 +19,9 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchDevicesUseCase } from './application/use-cases/search-devices.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepo } from '../users/infrastructure/users-repo';
-import { Users } from '../users/entities/users.entity';
-import { SecurityDevices } from './entities/session-devices.entity';
 import { SecurityDevicesRepo } from './infrastructure/security-devices.repo';
+import { UsersEntity } from '../users/entities/users.entity';
+import { SecurityDevicesEntity } from './entities/session-devices.entity';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
@@ -33,7 +33,10 @@ const securityDevicesCases = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SecurityDevices, Users]), CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([SecurityDevicesEntity, UsersEntity]),
+    CqrsModule,
+  ],
   controllers: [SecurityDevicesController],
   providers: [
     JwtService,

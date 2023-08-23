@@ -1,11 +1,11 @@
 import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { OrgIdEnums } from '../enums/org-id.enums';
-import { SecurityDevices } from '../../security-devices/entities/session-devices.entity';
+import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
 
-@Entity()
+@Entity('users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
-export class Users {
+export class UsersEntity {
   @PrimaryColumn('uuid', { unique: true })
   userId: string;
 
@@ -69,6 +69,9 @@ export class Users {
   @Column({ default: false })
   isBanned: boolean;
 
-  @OneToMany(() => SecurityDevices, (securityDevice) => securityDevice.user)
-  securityDevices: SecurityDevices[];
+  @OneToMany(
+    () => SecurityDevicesEntity,
+    (securityDevice) => securityDevice.user,
+  )
+  securityDevices: SecurityDevicesEntity[];
 }

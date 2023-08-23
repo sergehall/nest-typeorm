@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
-import { Users } from '../../../users/entities/users.entity';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class ValidatePasswordCommand {
   constructor(public loginOrEmail: string, public password: string) {}
@@ -12,7 +12,7 @@ export class ValidatePasswordUseCase
   implements ICommandHandler<ValidatePasswordCommand>
 {
   constructor(protected usersRepo: UsersRepo) {}
-  async execute(command: ValidatePasswordCommand): Promise<Users | null> {
+  async execute(command: ValidatePasswordCommand): Promise<UsersEntity | null> {
     const { loginOrEmail, password } = command;
     const user = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
     const isValidPassword =
