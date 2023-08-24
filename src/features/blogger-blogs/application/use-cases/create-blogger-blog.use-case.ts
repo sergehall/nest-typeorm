@@ -30,7 +30,9 @@ export class CreateBloggerBlogUseCase
     command: CreateBloggerBlogCommand,
   ): Promise<ReturnBloggerBlogsDto> {
     const { createBloggerBlogsDto, currentUser } = command;
+
     await this.checkPermission(command.currentUser);
+
     return await this.bloggerBlogsRepo.createBlogs(
       createBloggerBlogsDto,
       currentUser,

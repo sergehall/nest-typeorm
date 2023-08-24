@@ -1,47 +1,45 @@
-import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+  Entity,
+  Column,
+  Unique,
+  Check,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn,
+} from 'typeorm';
+import { BloggerBlogsEntity } from './blogger-blogs.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
 
+@Entity('BannedUsersForBlogs')
+@Unique(['blogId', 'userId', 'isBanned'])
+@Check(`"isBanned" = true`)
 export class BannedUsersForBlogsEntity {
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect id! Must be max 100 ch.',
-  })
+  @PrimaryColumn('uuid')
   id: string;
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect blogId! Must be max 100 ch.',
-  })
-  blogId: string;
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect userId! Must be max 100 ch.',
-  })
-  userId: string;
-  @IsNotEmpty()
-  @Length(3, 10, {
-    message: 'Incorrect login length! Must be min 3, max 10 ch.',
-  })
-  @Matches('^[a-zA-Z0-9_-]*$')
+
+  @Column({ type: 'character varying', length: 100, nullable: false })
   login: string;
-  @IsNotEmpty()
-  @Length(20, 300, {
-    message: 'Incorrect banReason length! Must be min 20 max 300 ch.',
-  })
-  @IsNotEmpty()
-  @IsBoolean({
-    message: 'Incorrect isBanned length! Must be boolean.',
-  })
+
+  @Column({ type: 'boolean', nullable: false })
   isBanned: boolean;
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect banDate length! Must be max 100 ch.',
-  })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
-  banDate: string;
-  @IsNotEmpty()
-  @Length(20, 300, {
-    message: 'Incorrect banReason length! Must be min 20 max 300 ch.',
-  })
-  banReason: string;
+
+  @Column({ type: 'character varying', length: 50, nullable: true })
+  banDate: string | null;
+
+  @Column({ type: 'character varying', length: 300, nullable: true })
+  banReason: string | null;
+
+  @Column({ type: 'uuid', nullable: false, unique: true })
+  blogId: string;
+
+  @Column({ type: 'uuid', nullable: false, unique: true })
+  userId: string;
+
+  // @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.bannedUsers)
+  // @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
+  // blog: BloggerBlogsEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
+  user: UsersEntity;
 }

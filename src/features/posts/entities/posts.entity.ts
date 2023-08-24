@@ -38,17 +38,6 @@ export class PostsEntity {
   })
   content: string;
 
-  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id)
-  @JoinColumn({ name: 'blogId' })
-  blog: BloggerBlogsEntity;
-
-  @Column({
-    type: 'character varying',
-    length: 15,
-    nullable: false,
-  })
-  blogName: string;
-
   @Column({
     type: 'character varying',
     length: 50,
@@ -62,19 +51,28 @@ export class PostsEntity {
   @Column({ default: false })
   banInfoIsBanned: boolean;
 
-  @Column({
-    type: 'character varying',
-    length: 50,
-    nullable: true,
-  })
-  banInfoBanDate: string;
+  @Column({ type: 'character varying', nullable: true })
+  banInfoBanDate: string | null = null;
+
+  @Column({ type: 'character varying', nullable: true })
+  banInfoBanReason: string | null = null;
+
+  @Column('uuid')
+  blogId: string;
 
   @Column({
     type: 'character varying',
-    length: 300,
-    nullable: true,
+    length: 15,
+    nullable: false,
   })
-  banInfoBanReason: string;
+  blogName: string;
+
+  // @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.posts)
+  // @JoinColumn([
+  //   { name: 'blogId', referencedColumnName: 'id' },
+  //   { name: 'blogName', referencedColumnName: 'name' },
+  // ])
+  // blogOwner: BloggerBlogsEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId)
   @JoinColumn({ name: 'postOwnerId' })
@@ -82,5 +80,5 @@ export class PostsEntity {
 
   @OneToMany(() => CommentsEntity, (comment) => comment.post)
   @JoinColumn({ name: 'postInfoPostId' })
-  post: CommentsEntity[];
+  comments: CommentsEntity[];
 }

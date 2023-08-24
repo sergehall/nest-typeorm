@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
-import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../blogger-blogs/entities/table-banned-users-for-blogs.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesCommentsEntity } from '../entities/tables-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
@@ -393,7 +393,7 @@ export class CommentsRawSqlRepository {
   }
 
   async changeBanStatusCommentsByUserIdBlogId(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+    bannedUserForBlogEntity: TableBannedUsersForBlogsEntity,
   ): Promise<boolean> {
     const { userId, blogId, isBanned, banDate, banReason } =
       bannedUserForBlogEntity;

@@ -30,6 +30,11 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 
 import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
 import { DeletePostByPostIdAndBlogIdUseCase } from './application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
+import { PostsRepo } from './infrastructure/posts-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PostsEntity } from './entities/posts.entity';
+import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -45,7 +50,11 @@ const postsUseCases = [
 ];
 
 @Module({
-  imports: [CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([PostsEntity, BloggerBlogsEntity]),
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [PostsController],
   providers: [
     JwtConfig,
@@ -59,7 +68,9 @@ const postsUseCases = [
     BloggerBlogsService,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,
+    PostsRepo,
     PostsRawSqlRepository,
+    BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
