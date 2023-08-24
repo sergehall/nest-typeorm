@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/table-banned-users-for-blogs.entity';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class ChangeBanStatusCommentsByUserIdBlogIdCommand {
-  constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
+  constructor(public bannedUserForBlogEntity: TableBannedUsersForBlogsEntity) {}
 }
 
 @CommandHandler(ChangeBanStatusCommentsByUserIdBlogIdCommand)

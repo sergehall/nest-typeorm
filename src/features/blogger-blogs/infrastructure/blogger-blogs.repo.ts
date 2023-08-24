@@ -13,6 +13,22 @@ export class BloggerBlogsRepo {
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
   ) {}
 
+  async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const dependencyIsBanned = false;
+    const banInfoIsBanned = false;
+    const blog = await this.bloggerBlogsRepository.findBy({
+      id: blogId,
+      dependencyIsBanned,
+      banInfoIsBanned,
+    });
+
+    if (!blog[0]) {
+      return null;
+    }
+
+    return blog[0];
+  }
+
   async createBlogs(
     createBloggerBlogsDto: CreateBloggerBlogsDto,
     currentUser: CurrentUserDto,
@@ -52,6 +68,7 @@ export class BloggerBlogsRepo {
 
     const user = new UsersEntity();
     user.userId = userId;
+    user.login = login;
 
     const newBlog = new BloggerBlogsEntity();
     newBlog.id = uuid4();
@@ -60,12 +77,11 @@ export class BloggerBlogsRepo {
     newBlog.websiteUrl = websiteUrl;
     newBlog.createdAt = new Date().toISOString();
     newBlog.isMembership = false;
-    newBlog.blogOwnerLogin = login;
     newBlog.dependencyIsBanned = isBanned;
     newBlog.banInfoIsBanned = false;
     newBlog.banInfoBanDate = null;
     newBlog.banInfoBanReason = null;
-    newBlog.blogOwnerId = user;
+    newBlog.blogOwner = user;
 
     return newBlog;
   }

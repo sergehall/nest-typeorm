@@ -6,6 +6,7 @@ import { SecurityDevicesEntity } from '../../../features/security-devices/entiti
 import { BloggerBlogsEntity } from '../../../features/blogger-blogs/entities/blogger-blogs.entity';
 import { CommentsEntity } from '../../../features/comments/entities/comments.entity';
 import { PostsEntity } from '../../../features/posts/entities/posts.entity';
+import { BannedUsersForBlogsEntity } from '../../../features/blogger-blogs/entities/banned-users-for-blogs.entity';
 
 @Injectable()
 export class OrmModuleOptions
@@ -30,9 +31,10 @@ export class OrmModuleOptions
       entities: [
         UsersEntity,
         SecurityDevicesEntity,
-        BloggerBlogsEntity,
         CommentsEntity,
+        BloggerBlogsEntity,
         PostsEntity,
+        BannedUsersForBlogsEntity,
       ],
       synchronize: true,
       logging: false,

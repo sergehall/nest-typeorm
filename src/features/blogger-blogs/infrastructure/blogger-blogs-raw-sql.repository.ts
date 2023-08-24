@@ -5,7 +5,7 @@ import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-r
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
-import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../entities/table-banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ReturnBloggerBlogsCountBlogsEntity } from '../entities/return-blogger-blogs-count-blogs.entity';
@@ -396,7 +396,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async manageBlogAccess(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+    bannedUserForBlogEntity: TableBannedUsersForBlogsEntity,
   ): Promise<boolean> {
     const { id, login, userId, blogId, isBanned, banDate, banReason } =
       bannedUserForBlogEntity;

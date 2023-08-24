@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../../blogger-blogs/entities/table-banned-users-for-blogs.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 
 // Command class representing the action to change the ban status for a user's posts on a particular blog
 export class ChangeBanStatusLikesPostsForBannedUserCommand {
-  constructor(public bannedUserForBlogEntity: BannedUsersForBlogsEntity) {}
+  constructor(public bannedUserForBlogEntity: TableBannedUsersForBlogsEntity) {}
 }
 
 // Command handler class that implements the ICommandHandler for ChangeBanStatusPostsByUserIdBlogIdCommand

@@ -12,7 +12,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { BannedUsersForBlogsEntity } from '../../entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../entities/table-banned-users-for-blogs.entity';
 import * as uuid4 from 'uuid4';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
@@ -56,8 +56,8 @@ export class ManageBlogAccessUseCase
     // Check if the current user has permission to perform the ban action.
     await this.checkUserPermission(blogForBan.blogOwnerId, currentUserDto);
 
-    // Create a BannedUsersForBlogsEntity object that represents the ban entity.
-    const bannedUserForBlogEntity: BannedUsersForBlogsEntity =
+    // Create a TableBannedUsersForBlogsEntity object that represents the ban entity.
+    const bannedUserForBlogEntity: TableBannedUsersForBlogsEntity =
       this.createBannedUserEntity(userForBan, updateBanUserDto);
 
     return await this.bloggerBlogsRawSqlRepository.manageBlogAccess(
@@ -84,11 +84,11 @@ export class ManageBlogAccessUseCase
     return blogForBan;
   }
 
-  // Creates a new instance of BannedUsersForBlogsEntity using the user and DTO information.
+  // Creates a new instance of TableBannedUsersForBlogsEntity using the user and DTO information.
   private createBannedUserEntity(
     userToBan: TablesUsersWithIdEntity,
     updateBanUserDto: UpdateBanUserDto,
-  ): BannedUsersForBlogsEntity {
+  ): TableBannedUsersForBlogsEntity {
     return {
       id: uuid4().toString(),
       userId: userToBan.userId,

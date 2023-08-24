@@ -47,6 +47,10 @@ export class TableBloggerBlogsRawSqlEntity {
   })
   @Matches('^[a-zA-Z0-9_-]*$')
   blogOwnerLogin: string;
+  @IsNotEmpty()
+  @IsBoolean({
+    message: 'Incorrect dependencyIsBanned length! Must be boolean.',
+  })
   dependencyIsBanned: boolean;
   @IsNotEmpty()
   @IsBoolean({

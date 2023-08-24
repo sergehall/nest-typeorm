@@ -15,6 +15,10 @@ import { CreatePostDto } from '../../dto/create-post.dto';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
 import { ReturnPostsEntity } from '../../entities/return-posts.entity';
+import { PostsRepo } from '../../infrastructure/posts-repo';
+import { PostsEntity } from '../../entities/posts.entity';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 
 export class CreatePostCommand {
   constructor(
@@ -28,22 +32,22 @@ export class CreatePostCommand {
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly postsRawSqlRepository: PostsRawSqlRepository,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly postsRepo: PostsRepo,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
+  async execute(command: CreatePostCommand): Promise<PostsEntity> {
     const { blogId, currentUserDto, createPostDto } = command;
 
-    const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    return await this.postsRawSqlRepository.createPost(
+    return await this.postsRepo.createPosts(
       blog,
       createPostDto,
       currentUserDto,
@@ -51,7 +55,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   }
 
   private async checkUserPermission(
-    blog: TableBloggerBlogsRawSqlEntity,
+    blog: BloggerBlogsEntity,
     currentUserDto: CurrentUserDto,
   ) {
     // Check if the user is banned from posting in this blog

@@ -4,7 +4,7 @@ import { LikeStatusDto } from '../../comments/dto/like-status.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { InternalServerErrorException } from '@nestjs/common';
-import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../blogger-blogs/entities/table-banned-users-for-blogs.entity';
 
 export class LikeStatusPostsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
@@ -54,7 +54,7 @@ export class LikeStatusPostsRawSqlRepository {
   }
 
   async changeBanStatusLikesPostsByUserIdBlogId(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+    bannedUserForBlogEntity: TableBannedUsersForBlogsEntity,
   ): Promise<boolean> {
     const { userId, blogId, isBanned } = bannedUserForBlogEntity;
     try {

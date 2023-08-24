@@ -1,7 +1,6 @@
 import {
   Entity,
   Column,
-  CreateDateColumn,
   PrimaryColumn,
   JoinColumn,
   OneToMany,
@@ -10,14 +9,17 @@ import {
 } from 'typeorm';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { PostsEntity } from '../../posts/entities/posts.entity';
+import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 
 @Entity('BloggerBlogs')
 @Unique(['id'])
+@Unique(['blogOwnerLogin', 'blogOwnerId'])
 export class BloggerBlogsEntity {
-  @PrimaryColumn('uuid', { unique: true })
+  @PrimaryColumn('uuid')
   id: string;
 
-  @CreateDateColumn({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'character varying', length: 50, nullable: false })
   createdAt: string;
 
   @Column({ nullable: false, default: false })
@@ -44,14 +46,29 @@ export class BloggerBlogsEntity {
   @Column({ type: 'character varying', length: 100, nullable: false })
   websiteUrl: string;
 
-  @Column({ type: 'character varying', length: 20, nullable: false })
+  @Column('uuid')
+  blogOwnerId: string;
+
+  @Column({
+    type: 'character varying',
+    length: 10,
+    nullable: false,
+  })
   blogOwnerLogin: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
-  @JoinColumn({ name: 'blogOwnerId' })
-  blogOwnerId: UsersEntity;
+  @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs)
+  @JoinColumn([
+    { name: 'blogOwnerId', referencedColumnName: 'userId' },
+    { name: 'blogOwnerLogin', referencedColumnName: 'login' },
+  ])
+  blogOwner: UsersEntity;
 
-  @OneToMany(() => CommentsEntity, (comment) => comment.id)
-  @JoinColumn({ name: 'Comments' })
-  comments: CommentsEntity[];
+  // @OneToMany(() => BannedUsersForBlogsEntity, (bannedUsers) => bannedUsers.blog)
+  // bannedUsers: BannedUsersForBlogsEntity[];
+  //
+  // @OneToMany(() => PostsEntity, (posts) => posts.blogOwner)
+  // posts: PostsEntity[];
+  //
+  // @OneToMany(() => CommentsEntity, (comments) => comments.blog)
+  // comments: CommentsEntity[];
 }

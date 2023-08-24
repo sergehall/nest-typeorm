@@ -1,7 +1,7 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
-import { BannedUsersForBlogsEntity } from '../../blogger-blogs/entities/banned-users-for-blogs.entity';
+import { TableBannedUsersForBlogsEntity } from '../../blogger-blogs/entities/table-banned-users-for-blogs.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ReturnBannedUsersForBlogEntity } from '../../blogger-blogs/entities/return-banned-users-for-blog.entity';
@@ -14,7 +14,7 @@ export class BannedUsersForBlogsRawSqlRepository {
     protected keyResolver: KeyResolver,
   ) {}
   async addBannedOrDeleteUnBannedUser(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
+    bannedUserForBlogEntity: TableBannedUsersForBlogsEntity,
   ): Promise<boolean> {
     const { id, login, userId, blogId, isBanned, banDate, banReason } =
       bannedUserForBlogEntity;
@@ -65,7 +65,7 @@ export class BannedUsersForBlogsRawSqlRepository {
 
   async userIsBanned(userId: string, blogId: string): Promise<boolean> {
     try {
-      const bannedUser: BannedUsersForBlogsEntity[] = await this.db.query(
+      const bannedUser: TableBannedUsersForBlogsEntity[] = await this.db.query(
         `
       SELECT "id", "login", "isBanned", "banDate", "banReason", "blogId", "userId"
       FROM public."BannedUsersForBlogs"
