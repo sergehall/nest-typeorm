@@ -41,6 +41,7 @@ import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @SkipThrottle()
 @Controller('auth')
@@ -96,12 +97,12 @@ export class AuthController {
       userAgent: req.get('user-agent') || 'None',
     };
 
-    const newUser = await this.commandBus.execute(
+    const newUser: UsersEntity = await this.commandBus.execute(
       new RegistrationUserCommand(loginDto, registrationData),
     );
 
     return {
-      id: newUser.id,
+      id: newUser.userId,
       login: newUser.login,
       email: newUser.email,
     };

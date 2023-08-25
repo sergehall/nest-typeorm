@@ -7,7 +7,7 @@ import { PostsEntity } from '../../posts/entities/posts.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
-import { SentCodesLogEntity } from '../../../mails/infrastructure/sent-codes-log.entity';
+import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 
 @Entity('Users')
 @Unique(['email'])
@@ -105,6 +105,9 @@ export class UsersEntity {
   )
   ratedCommentUser: LikeStatusCommentsEntity[];
 
-  @OneToMany(() => SentCodesLogEntity, (sentCodesLog) => sentCodesLog.sentCodes)
+  @OneToMany(
+    () => SentCodesLogEntity,
+    (sentCodesLog) => sentCodesLog.sentForUser,
+  )
   sentCodeLogs: SentCodesLogEntity[];
 }

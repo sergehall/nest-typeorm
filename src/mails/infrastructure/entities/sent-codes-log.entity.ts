@@ -5,7 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { UsersEntity } from '../../features/users/entities/users.entity';
+import { UsersEntity } from '../../../features/users/entities/users.entity';
 
 @Entity('SentCodeLog')
 export class SentCodesLogEntity {
@@ -21,5 +21,5 @@ export class SentCodesLogEntity {
 
   @ManyToOne(() => UsersEntity, (user) => user.email, { nullable: false })
   @JoinColumn({ name: 'email', referencedColumnName: 'email' })
-  sentCodes: UsersEntity;
+  sentForUser: UsersEntity;
 }

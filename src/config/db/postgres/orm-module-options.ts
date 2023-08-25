@@ -10,7 +10,7 @@ import { BannedUsersForBlogsEntity } from '../../../features/blogger-blogs/entit
 import { LikeStatusPostsEntity } from '../../../features/posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../../features/comments/entities/like-status-comments.entity';
 import { BlacklistJwtEntity } from '../../../features/auth/entities/blacklist-jwt.entity';
-import { SentCodesLogEntity } from '../../../mails/infrastructure/sent-codes-log.entity';
+import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 
 @Injectable()
 export class OrmModuleOptions
