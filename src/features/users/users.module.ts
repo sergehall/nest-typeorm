@@ -15,7 +15,7 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-import { EmailNotExistValidator } from '../../common/validators/email-not-exist.validator';
+import { EmailAndLoginNotExistValidator } from '../../common/validators/email-and-login-not-exist.validator';
 import { CodeExistsValidator } from '../../common/validators/code-exists.validator';
 import { UsersRepo } from './infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -29,7 +29,7 @@ const usersUseCases = [
 
 const usersValidators = [
   LoginEmailExistsValidator,
-  EmailNotExistValidator,
+  EmailAndLoginNotExistValidator,
   CodeExistsValidator,
 ];
 

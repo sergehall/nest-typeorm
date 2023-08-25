@@ -14,12 +14,9 @@ export class MailsService {
     );
   }
 
-  async sendRecoveryCode(
-    email: string,
-    recoveryCode: string,
-  ): Promise<boolean> {
+  async sendRecoveryCode(updatedUser: UsersEntity): Promise<boolean> {
     return await this.commandBus.execute(
-      new SendRecoveryCodesCommand(email, recoveryCode),
+      new SendRecoveryCodesCommand(updatedUser),
     );
   }
 }

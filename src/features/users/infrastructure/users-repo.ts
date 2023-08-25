@@ -72,6 +72,26 @@ export class UsersRepo {
     }
   }
 
+  async updateCodeAndExpirationByEmail(
+    email: string,
+    confirmationCode: string,
+    expirationDate: string,
+  ): Promise<UsersEntity> {
+    try {
+      const userToUpdate = await this.usersRepository.findOneBy({ email });
+      if (userToUpdate) {
+        userToUpdate.confirmationCode = confirmationCode;
+        userToUpdate.expirationDate = expirationDate;
+        return await this.usersRepository.save(userToUpdate);
+      }
+
+      throw new NotFoundException(`User with email: ${email} not found`);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async updateUserRole(userId: string): Promise<UsersEntity | null> {
     const newRoles = [UserRolesEnums.SA];
 

@@ -236,7 +236,7 @@ export class UsersRawSqlRepository {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<boolean> {
+  ): Promise<TablesUsersWithIdEntity> {
     try {
       const updateUser = await this.db.query(
         `
@@ -247,7 +247,7 @@ export class UsersRawSqlRepository {
       `,
         [email, confirmationCode, expirationDate],
       );
-      return updateUser[1] === 1;
+      return updateUser[0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
