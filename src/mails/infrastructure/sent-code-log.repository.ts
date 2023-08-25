@@ -2,11 +2,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
-import { UsersEntity } from '../../features/users/entities/users.entity';
+import { TablesUsersWithIdEntity } from '../../features/users/entities/tables-user-with-id.entity';
 
 export class SentCodeLogRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addTime(user: UsersEntity): Promise<boolean> {
+  async addTime(user: TablesUsersWithIdEntity): Promise<boolean> {
     const id = uuid4().toString();
     const currentTime = new Date().toISOString();
 

@@ -1,8 +1,9 @@
 import * as uuid4 from 'uuid4';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { MailsService } from '../../../../mails/application/mails.service';
+import { UsersRepo } from '../../infrastructure/users-repo';
+import { UsersEntity } from '../../entities/users.entity';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -13,7 +14,7 @@ export class UpdateSentConfirmationCodeUseCase
 {
   constructor(
     private readonly mailsService: MailsService,
-    private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly usersRepo: UsersRepo,
     private readonly expirationDateCalculator: ExpirationDateCalculator,
   ) {}
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
@@ -27,15 +28,13 @@ export class UpdateSentConfirmationCodeUseCase
       0,
     );
 
-    await this.usersRawSqlRepository.updateCodeAndExpirationByEmail(
-      email,
-      confirmationCode,
-      expirationDate,
-    );
+    const updatedUser: UsersEntity =
+      await this.usersRepo.updateCodeAndExpirationByEmail(
+        email,
+        confirmationCode,
+        expirationDate,
+      );
 
-    return await this.mailsService.sendConfirmationCode(
-      email,
-      confirmationCode,
-    );
+    return await this.mailsService.sendConfirmationCode(updatedUser);
   }
 }

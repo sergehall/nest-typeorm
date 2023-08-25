@@ -10,6 +10,9 @@ import { SendConfirmationCodesUseCase } from './application/use-case/send-confir
 import { SendRecoveryCodesUseCase } from './application/use-case/send-recovery-codes.use-case';
 import { SentCodeLogRepository } from './infrastructure/sent-code-log.repository';
 import { MailOptionsBuilder } from './mail-options/mail-options-builder';
+import { SentCodeLogRepo } from './infrastructure/sent-code-log.repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SentCodesLogEntity } from './infrastructure/entities/sent-codes-log.entity';
 
 const mailsUseCases = [
   EmailSendingUseCase,
@@ -19,6 +22,7 @@ const mailsUseCases = [
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([SentCodesLogEntity]),
     CqrsModule,
     MailerModule.forRootAsync({
       useClass: MailerOptionsService, // Use the custom service for Mailer options
@@ -29,6 +33,7 @@ const mailsUseCases = [
     PostgresConfig,
     MailsService,
     MailOptionsBuilder,
+    SentCodeLogRepo,
     SentCodeLogRepository,
     ...mailsUseCases,
   ],

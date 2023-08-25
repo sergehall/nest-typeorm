@@ -13,7 +13,7 @@ export class SentCodesLogEntity {
   id: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 50,
     nullable: false,
   })
