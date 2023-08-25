@@ -14,7 +14,7 @@ import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 
 @Entity('BloggerBlogs')
 @Unique(['id'])
-@Unique(['blogOwnerLogin', 'blogOwnerId'])
+@Unique(['id', 'name'])
 export class BloggerBlogsEntity {
   @PrimaryColumn('uuid')
   id: string;
@@ -46,29 +46,21 @@ export class BloggerBlogsEntity {
   @Column({ type: 'character varying', length: 100, nullable: false })
   websiteUrl: string;
 
-  @Column('uuid')
-  blogOwnerId: string;
-
-  @Column({
-    type: 'character varying',
-    length: 10,
+  @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs, {
     nullable: false,
   })
-  blogOwnerLogin: string;
-
-  @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs)
   @JoinColumn([
     { name: 'blogOwnerId', referencedColumnName: 'userId' },
     { name: 'blogOwnerLogin', referencedColumnName: 'login' },
   ])
   blogOwner: UsersEntity;
 
-  // @OneToMany(() => BannedUsersForBlogsEntity, (bannedUsers) => bannedUsers.blog)
-  // bannedUsers: BannedUsersForBlogsEntity[];
-  //
-  // @OneToMany(() => PostsEntity, (posts) => posts.blogOwner)
-  // posts: PostsEntity[];
-  //
-  // @OneToMany(() => CommentsEntity, (comments) => comments.blog)
-  // comments: CommentsEntity[];
+  @OneToMany(() => BannedUsersForBlogsEntity, (bannedUsers) => bannedUsers.blog)
+  bannedUsers: BannedUsersForBlogsEntity[];
+
+  @OneToMany(() => PostsEntity, (posts) => posts.blog)
+  posts: PostsEntity[];
+
+  @OneToMany(() => CommentsEntity, (comments) => comments.blog)
+  comments: CommentsEntity[];
 }

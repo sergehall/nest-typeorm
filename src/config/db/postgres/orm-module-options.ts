@@ -7,6 +7,10 @@ import { BloggerBlogsEntity } from '../../../features/blogger-blogs/entities/blo
 import { CommentsEntity } from '../../../features/comments/entities/comments.entity';
 import { PostsEntity } from '../../../features/posts/entities/posts.entity';
 import { BannedUsersForBlogsEntity } from '../../../features/blogger-blogs/entities/banned-users-for-blogs.entity';
+import { LikeStatusPostsEntity } from '../../../features/posts/entities/like-status-posts.entity';
+import { LikeStatusCommentsEntity } from '../../../features/comments/entities/like-status-comments.entity';
+import { BlacklistJwtEntity } from '../../../features/auth/entities/blacklist-jwt.entity';
+import { SentCodesLogEntity } from '../../../mails/infrastructure/sent-codes-log.entity';
 
 @Injectable()
 export class OrmModuleOptions
@@ -35,6 +39,10 @@ export class OrmModuleOptions
         BloggerBlogsEntity,
         PostsEntity,
         BannedUsersForBlogsEntity,
+        LikeStatusPostsEntity,
+        LikeStatusCommentsEntity,
+        BlacklistJwtEntity,
+        SentCodesLogEntity,
       ],
       synchronize: true,
       logging: false,

@@ -7,19 +7,19 @@ export class ScheduledTasksService {
   constructor(protected dataCleanupService: DataCleanupService) {}
 
   // every 30 min
-  @Cron('*/30 * * * *')
+  // @Cron('*/30 * * * *')
   async removeInvalidJWTFromBlackList() {
     await this.dataCleanupService.removeInvalidJWTFromBlackList();
   }
 
   // every 5th hour
-  @Cron('0 */5 * * *')
+  // @Cron('0 */5 * * *')
   async removeUserWithExpirationDate() {
     await this.dataCleanupService.removeDataUsersWithExpiredDate();
   }
 
   // every 1 hour
-  @Cron('0 */1 * * *')
+  // @Cron('0 */1 * * *')
   async removeDevicesWithExpiredDate() {
     await this.dataCleanupService.removeDevicesWithExpiredDate();
   }

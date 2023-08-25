@@ -1,27 +1,18 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 
 @Entity('LikeStatusComments')
 export class LikeStatusCommentsEntity {
-  @PrimaryColumn('uuid', { nullable: false })
-  commentId: string;
-
-  @PrimaryColumn('uuid', { nullable: false })
-  userId: string;
-
-  @ManyToOne(() => CommentsEntity, (comment) => comment.id)
-  @JoinColumn({ name: 'commentId' })
-  comment: CommentsEntity;
-
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
-
-  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id)
-  @JoinColumn({ name: 'blogId' })
-  blog: BloggerBlogsEntity;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: false })
   isBanned: boolean;
@@ -29,7 +20,6 @@ export class LikeStatusCommentsEntity {
   @Column({
     type: 'varchar',
     length: 7,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   likeStatus: string;
@@ -37,16 +27,25 @@ export class LikeStatusCommentsEntity {
   @Column({
     type: 'varchar',
     length: 50,
-    collation: 'pg_catalog."default"',
     nullable: false,
   })
   createdAt: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => CommentsEntity, (comment) => comment.id, { nullable: false })
+  @JoinColumn({ name: 'commentId' })
+  comment: CommentsEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.ratedCommentUser, {
+    nullable: false,
+  })
+  @JoinColumn([{ name: 'userId' }, { name: 'login' }, { name: 'isBanned' }])
+  ratedCommentUser: UsersEntity;
+
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, { nullable: false })
+  @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
+  blog: BloggerBlogsEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
   @JoinColumn({ name: 'commentOwnerId' })
   commentOwner: UsersEntity;
-
-  // You might have other decorators and properties here based on your use case
-
-  // Constraints are generally managed in migrations
 }

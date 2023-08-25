@@ -7,6 +7,11 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
+import {
+  ExtendedLikesInfo,
+  ReturnPostsEntity,
+} from '../entities/return-posts.entity';
 
 export class PostsRepo {
   constructor(
@@ -18,7 +23,7 @@ export class PostsRepo {
     blog: BloggerBlogsEntity,
     createPostDto: CreatePostDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<PostsEntity> {
+  ): Promise<ReturnPostsEntity> {
     const postEntity: PostsEntity = await this.creatPostsEntity(
       blog,
       createPostDto,
@@ -37,7 +42,7 @@ export class PostsRepo {
 
       const result: InsertResult = await queryBuilder.execute();
 
-      return result.raw[0];
+      return await this.addExtendedLikesInfoToPostsEntity(result.raw[0]);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
@@ -66,7 +71,19 @@ export class PostsRepo {
     postEntity.banInfoIsBanned = false;
     postEntity.banInfoBanDate = null;
     postEntity.banInfoBanReason = null;
+    postEntity.blog = blog;
+    postEntity.postOwner = user;
 
     return postEntity;
+  }
+
+  private async addExtendedLikesInfoToPostsEntity(
+    newPost: PartialPostsEntity,
+  ): Promise<ReturnPostsEntity> {
+    const extendedLikesInfo = new ExtendedLikesInfo();
+    return {
+      ...newPost, // Spread properties of newPost
+      extendedLikesInfo, // Add extendedLikesInfo property
+    };
   }
 }

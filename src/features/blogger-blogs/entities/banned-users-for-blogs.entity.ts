@@ -35,11 +35,13 @@ export class BannedUsersForBlogsEntity {
   @Column({ type: 'uuid', nullable: false, unique: true })
   userId: string;
 
-  // @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.bannedUsers)
-  // @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
-  // blog: BloggerBlogsEntity;
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.bannedUsers, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
+  blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
+  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UsersEntity;
 }
