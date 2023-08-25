@@ -5,22 +5,28 @@ import { SecurityDevicesEntity } from '../../security-devices/entities/session-d
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
+import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
+import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
+import { SentCodesLogEntity } from '../../../mails/infrastructure/sent-codes-log.entity';
 
 @Entity('Users')
+@Unique(['email'])
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
 @Unique(['userId', 'login'])
+@Unique(['userId', 'login', 'isBanned'])
 export class UsersEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { unique: true })
   userId: string;
 
   @Column({
     type: 'character varying',
     length: 10,
     nullable: false,
+    unique: true,
   })
   login: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email: string;
 
   @Column({ nullable: false })
@@ -51,7 +57,7 @@ export class UsersEntity {
   @Column({ type: 'character varying', nullable: true, default: null })
   banReason: string | null = null;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   confirmationCode: string;
 
   @Column({ nullable: false })
@@ -81,9 +87,24 @@ export class UsersEntity {
   @OneToMany(() => BloggerBlogsEntity, (bloggerBlogs) => bloggerBlogs.blogOwner)
   bloggerBlogs: BloggerBlogsEntity[];
 
-  // @OneToMany(() => PostsEntity, (posts) => posts.postOwner)
-  // posts: PostsEntity[];
-  //
-  // @OneToMany(() => CommentsEntity, (comments) => comments.blogOwner)
-  // comments: CommentsEntity[];
+  @OneToMany(() => PostsEntity, (posts) => posts.postOwner)
+  posts: PostsEntity[];
+
+  @OneToMany(() => CommentsEntity, (comments) => comments.commentator)
+  comments: CommentsEntity[];
+
+  @OneToMany(
+    () => LikeStatusPostsEntity,
+    (LikeStatusPosts) => LikeStatusPosts.ratedPostUser,
+  )
+  ratedPostUser: LikeStatusPostsEntity[];
+
+  @OneToMany(
+    () => LikeStatusCommentsEntity,
+    (LikeStatusComments) => LikeStatusComments.ratedCommentUser,
+  )
+  ratedCommentUser: LikeStatusCommentsEntity[];
+
+  @OneToMany(() => SentCodesLogEntity, (sentCodesLog) => sentCodesLog.sentCodes)
+  sentCodeLogs: SentCodesLogEntity[];
 }

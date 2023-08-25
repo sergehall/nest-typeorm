@@ -37,7 +37,9 @@ export class SecurityDevicesEntity {
   })
   expirationDate: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.securityDevices)
+  @ManyToOne(() => UsersEntity, (user) => user.securityDevices, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'userId' })
   user: UsersEntity;
 }

@@ -16,17 +16,18 @@ export class BloggerBlogsRepo {
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
-    const blog = await this.bloggerBlogsRepository.findBy({
-      id: blogId,
-      dependencyIsBanned,
-      banInfoIsBanned,
-    });
 
-    if (!blog[0]) {
-      return null;
-    }
+    const blog = await this.bloggerBlogsRepository
+      .createQueryBuilder('blog') // Start building a query
+      .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
+      .where('blog.id = :blogId', { blogId })
+      .andWhere('blog.dependencyIsBanned = :dependencyIsBanned', {
+        dependencyIsBanned,
+      })
+      .andWhere('blog.banInfoIsBanned = :banInfoIsBanned', { banInfoIsBanned })
+      .getOne(); // Execute the query and get a single result
 
-    return blog[0];
+    return blog || null; // Return the retrieved blog with its associated blogOwner
   }
 
   async createBlogs(

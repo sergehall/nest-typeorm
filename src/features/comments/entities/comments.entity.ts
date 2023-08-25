@@ -19,89 +19,16 @@ export class CommentsEntity {
   @Column({
     type: 'character varying',
     length: 300,
-    nullable: true,
+    nullable: false,
   })
   content: string;
 
   @Column({
     type: 'character varying',
     length: 50,
-    nullable: true,
+    nullable: false,
   })
   createdAt: string;
-
-  @Column({
-    type: 'uuid',
-    nullable: true,
-  })
-  postInfoPostId: string;
-
-  @ManyToOne(() => PostsEntity, (post) => post.comments)
-  @JoinColumn({ name: 'postInfoPostId' })
-  post: PostsEntity;
-
-  @Column({
-    type: 'character varying',
-    length: 30,
-    nullable: true,
-  })
-  postInfoTitle: string;
-
-  @Column({
-    type: 'uuid',
-    nullable: true,
-  })
-  postInfoBlogId: string;
-
-  @Column({
-    type: 'character varying',
-    length: 15,
-    nullable: true,
-  })
-  postInfoBlogName: string;
-
-  // @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.posts)
-  // @JoinColumn({ name: 'postInfoBlogId', referencedColumnName: 'id' }) // Foreign key column
-  // @JoinColumn({ name: 'postInfoBlogName', referencedColumnName: 'name' }) // Foreign key column
-  // blog: BloggerBlogsEntity;
-
-  @Column({
-    type: 'uuid',
-    nullable: true,
-  })
-  postInfoBlogOwnerId: string;
-
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
-  @JoinColumn({ name: 'postInfoBlogOwnerId' })
-  blogOwner: UsersEntity;
-
-  @Column({
-    type: 'uuid',
-    nullable: true,
-  })
-  commentatorInfoUserId: string;
-
-  @Column({
-    type: 'character varying',
-    length: 10,
-    nullable: true,
-  })
-  commentatorInfoUserLogin: string;
-
-  @Column({ default: false })
-  commentatorInfoIsBanned: boolean;
-
-  // @ManyToOne(() => UsersEntity, (user) => user.comments)
-  // @JoinColumn({ name: 'commentatorInfoUserId', referencedColumnName: 'userId' }) // Foreign key column
-  // @JoinColumn({
-  //   name: 'commentatorInfoUserLogin',
-  //   referencedColumnName: 'login',
-  // }) // Foreign key column
-  // @JoinColumn({
-  //   name: 'commentatorInfoIsBanned',
-  //   referencedColumnName: 'isBanned',
-  // }) // Foreign key column
-  // commentator: UsersEntity;
 
   @Column({ default: false })
   banInfoIsBanned: boolean;
@@ -119,4 +46,35 @@ export class CommentsEntity {
     nullable: true,
   })
   banInfoBanReason: string;
+
+  @ManyToOne(() => PostsEntity, (post) => post.comments, { nullable: false })
+  @JoinColumn([
+    { name: 'postInfoPostId', referencedColumnName: 'id' },
+    { name: 'postInfoTitle', referencedColumnName: 'title' },
+  ])
+  post: PostsEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
+  @JoinColumn({ name: 'postInfoBlogOwnerId' })
+  blogOwner: UsersEntity;
+
+  @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.comments, {
+    nullable: false,
+  })
+  @JoinColumn([
+    { name: 'postInfoBlogId', referencedColumnName: 'id' },
+    { name: 'postInfoBlogName', referencedColumnName: 'name' },
+  ])
+  blog: BloggerBlogsEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.comments, { nullable: false })
+  @JoinColumn([
+    { name: 'commentatorInfoUserId', referencedColumnName: 'userId' },
+    { name: 'commentatorInfoUserLogin', referencedColumnName: 'login' },
+    {
+      name: 'commentatorInfoIsBanned',
+      referencedColumnName: 'isBanned',
+    },
+  ])
+  commentator: UsersEntity;
 }

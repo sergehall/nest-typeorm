@@ -8,17 +8,13 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../../dto/create-post.dto';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
-import { ReturnPostsEntity } from '../../entities/return-posts.entity';
 import { PostsRepo } from '../../infrastructure/posts-repo';
-import { PostsEntity } from '../../entities/posts.entity';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { ReturnPostsEntity } from '../../entities/return-posts.entity';
 
 export class CreatePostCommand {
   constructor(
@@ -36,7 +32,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand): Promise<PostsEntity> {
+  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
     const { blogId, currentUserDto, createPostDto } = command;
 
     const blog: BloggerBlogsEntity | null =
@@ -77,7 +73,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     try {
       // Check the user's ability to create a post in this blog
       ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, {
-        id: blog.blogOwnerId,
+        id: blog.blogOwner.userId,
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {

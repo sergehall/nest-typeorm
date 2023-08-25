@@ -1,25 +1,18 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { PostsEntity } from './posts.entity';
 
 @Entity('LikeStatusPosts')
 export class LikeStatusPostsEntity {
-  @PrimaryColumn('uuid', { nullable: false })
-  userId: string;
-
-  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id)
-  @JoinColumn({ name: 'blogId' })
-  blog: BloggerBlogsEntity;
-
-  @Column({ default: false })
-  isBanned: boolean;
-
-  @Column({
-    type: 'character varying',
-    length: 10,
-    nullable: false,
-  })
-  login: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({
     type: 'character varying',
@@ -35,14 +28,21 @@ export class LikeStatusPostsEntity {
   })
   addedAt: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
-  @JoinColumn({ name: 'postOwnerId' })
+  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
+  @JoinColumn({ name: 'postOwnerId', referencedColumnName: 'userId' })
   postOwner: UsersEntity;
 
-  @PrimaryColumn('uuid', { nullable: false })
-  postId: string;
+  @ManyToOne(() => UsersEntity, (user) => user.ratedPostUser, {
+    nullable: false,
+  })
+  @JoinColumn([{ name: 'userId' }, { name: 'login' }, { name: 'isBanned' }])
+  ratedPostUser: UsersEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, { nullable: false })
+  @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
+  blog: BloggerBlogsEntity;
+
+  @ManyToOne(() => PostsEntity, (post) => post.id, { nullable: false })
+  @JoinColumn({ name: 'postId', referencedColumnName: 'id' })
+  post: PostsEntity;
 }
