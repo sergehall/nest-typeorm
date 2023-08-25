@@ -2,8 +2,8 @@ import { CreateUserDto } from '../../../users/dto/create-user.dto';
 import { RegDataDto } from '../../../users/dto/reg-data.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { MailsService } from '../../../../mails/application/mails.service';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class RegistrationUserCommand {
   constructor(
@@ -20,18 +20,15 @@ export class RegistrationUserUseCase
     protected mailsService: MailsService,
     protected commandBus: CommandBus,
   ) {}
-  async execute(
-    command: RegistrationUserCommand,
-  ): Promise<TablesUsersWithIdEntity> {
+  async execute(command: RegistrationUserCommand): Promise<UsersEntity> {
     const { createUserDto, registrationData } = command;
+    const {} = registrationData;
 
-    const newUser: TablesUsersWithIdEntity = await this.commandBus.execute(
+    const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto, registrationData),
     );
 
-    const { email, confirmationCode } = newUser;
-
-    await this.mailsService.sendConfirmationCode(email, confirmationCode);
+    await this.mailsService.sendConfirmationCode(newUser);
 
     return newUser;
   }

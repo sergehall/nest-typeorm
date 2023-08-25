@@ -2,10 +2,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as uuid4 from 'uuid4';
+import { UsersEntity } from '../../features/users/entities/users.entity';
 
 export class SentCodeLogRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addTime(email: string): Promise<boolean> {
+  async addTime(user: UsersEntity): Promise<boolean> {
     const id = uuid4().toString();
     const currentTime = new Date().toISOString();
 
@@ -15,7 +16,7 @@ export class SentCodeLogRepository {
         VALUES ($1, $2, $3)
         RETURNING "id";
       `;
-      const result = await this.db.query(query, [id, email, currentTime]);
+      const result = await this.db.query(query, [id, user.email, currentTime]);
 
       return result[0];
     } catch (error) {

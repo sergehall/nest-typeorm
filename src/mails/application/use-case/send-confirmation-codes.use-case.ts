@@ -3,9 +3,10 @@ import { EmailSendingCommand } from './email-sending-use-case';
 import { SentCodeLogRepository } from '../../infrastructure/sent-code-log.repository';
 import { ConfirmationCodeEmailOptions } from '../dto/confirmation-code-email-options';
 import { MailOptionsBuilder } from '../../mail-options/mail-options-builder';
+import { UsersEntity } from '../../../features/users/entities/users.entity';
 
 export class SendConfirmationCodesCommand {
-  constructor(public email: string, public confirmationCode: string) {}
+  constructor(public user: UsersEntity) {}
 }
 
 @CommandHandler(SendConfirmationCodesCommand)
@@ -19,17 +20,17 @@ export class SendConfirmationCodesUseCase
   ) {}
 
   async execute(command: SendConfirmationCodesCommand): Promise<boolean> {
-    const { email, confirmationCode } = command;
+    const { user } = command;
 
     const mailOptions: ConfirmationCodeEmailOptions =
       await this.mailOptionsBuilder.buildOptionsForConfirmationCode(
-        email,
-        confirmationCode,
+        user.email,
+        user.confirmationCode,
       );
 
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 
-    await this.sentCodeLogRepository.addTime(email);
+    await this.sentCodeLogRepository.addTime(user);
     return true;
   }
 }
