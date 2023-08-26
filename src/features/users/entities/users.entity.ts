@@ -1,4 +1,11 @@
-import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Unique,
+  PrimaryColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
@@ -8,6 +15,7 @@ import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
+import { BannedUserForBlogEntity } from './banned-user-for-blog.entity';
 
 @Entity('Users')
 @Unique(['email'])
@@ -110,4 +118,11 @@ export class UsersEntity {
     (sentCodesLog) => sentCodesLog.sentForUser,
   )
   sentCodeLogs: SentCodesLogEntity[];
+
+  @OneToMany(
+    () => BannedUserForBlogEntity,
+    (bannedBlog) => bannedBlog.bannedUserForBlog,
+  )
+  @JoinColumn({ name: 'bannedBlogForUser', referencedColumnName: 'id' })
+  bannedBlogForUser: BannedUserForBlogEntity[];
 }
