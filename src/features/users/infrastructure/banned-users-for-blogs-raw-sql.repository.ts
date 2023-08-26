@@ -21,7 +21,7 @@ export class BannedUsersForBlogsRawSqlRepository {
 
     if (isBanned) {
       const insertOrUpdateQuery = `
-      INSERT INTO public."BannedUsersForBlogs"
+      INSERT INTO public."BannedUserForBlog"
       ("id", "login", "isBanned", "banDate", "banReason", "blogId", "userId")
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT ("blogId", "userId", "isBanned")
@@ -47,7 +47,7 @@ export class BannedUsersForBlogsRawSqlRepository {
       }
     } else {
       const deleteQuery = `
-      DELETE FROM public."BannedUsersForBlogs"
+      DELETE FROM public."BannedUserForBlog"
       WHERE "blogId" = $1 AND "userId" = $2
       RETURNING "id";
     `;
@@ -68,7 +68,7 @@ export class BannedUsersForBlogsRawSqlRepository {
       const bannedUser: TableBannedUsersForBlogsEntity[] = await this.db.query(
         `
       SELECT "id", "login", "isBanned", "banDate", "banReason", "blogId", "userId"
-      FROM public."BannedUsersForBlogs"
+      FROM public."BannedUserForBlog"
       WHERE "userId" = $1 AND "blogId" = $2
       `,
         [userId, blogId],
@@ -96,7 +96,7 @@ export class BannedUsersForBlogsRawSqlRepository {
       const query = `
         WITH banned_users_cte AS (
           SELECT "id", "blogId", "userId", "login", "isBanned", "banDate", "banReason"
-          FROM public."BannedUsersForBlogs"
+          FROM public."BannedUserForBlog"
           WHERE "blogId" = $1 AND "login" ILIKE $2
           ORDER BY "${sortBy}" ${direction}
           LIMIT $3 OFFSET $4

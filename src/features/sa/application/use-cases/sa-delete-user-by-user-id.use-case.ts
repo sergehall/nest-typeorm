@@ -6,18 +6,18 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
-export class SaRemoveUserByUserIdCommand {
+export class SaDeleteUserByUserIddCommand {
   constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
 }
-@CommandHandler(SaRemoveUserByUserIdCommand)
-export class SaRemoveUserByUserIdUseCase
-  implements ICommandHandler<SaRemoveUserByUserIdCommand>
+@CommandHandler(SaDeleteUserByUserIddCommand)
+export class SaDeleteUserByUserIdUseCase
+  implements ICommandHandler<SaDeleteUserByUserIddCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRepo: UsersRepo,
   ) {}
-  async execute(command: SaRemoveUserByUserIdCommand): Promise<boolean> {
+  async execute(command: SaDeleteUserByUserIddCommand): Promise<boolean> {
     const { userId, currentUserDto } = command;
 
     const userToRemove = await this.usersRepo.findUserById(userId);
@@ -27,7 +27,7 @@ export class SaRemoveUserByUserIdUseCase
 
     this.checkUserPermission(currentUserDto, userToRemove.userId);
 
-    await this.usersRepo.removeUserDataByUserId(userToRemove.userId);
+    await this.usersRepo.deleteUserDataByUserId(userToRemove.userId);
     return true;
   }
 

@@ -13,6 +13,13 @@ import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
+import { BannedUserForBlogEntity } from '../entities/banned-user-for-blog.entity';
+import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
+import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
+import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
+import { CommentsEntity } from '../../comments/entities/comments.entity';
+import { PostsEntity } from '../../posts/entities/posts.entity';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 
 export class UsersRepo {
   constructor(
@@ -165,7 +172,7 @@ export class UsersRepo {
     }
   }
 
-  async removeUserDataByUserId(userId: string): Promise<void> {
+  async deleteUserDataByUserId(userId: string): Promise<void> {
     try {
       await this.usersRepository.manager.transaction(
         async (transactionalEntityManager) => {
@@ -173,10 +180,7 @@ export class UsersRepo {
         },
       );
     } catch (error) {
-      console.error(`Error while removing data for users: ${error.message}`);
-      throw new InternalServerErrorException(
-        `Error while removing data for users`,
-      );
+      this.handleUserDataRemovalError(error);
     }
   }
 
@@ -185,47 +189,120 @@ export class UsersRepo {
     client: EntityManager,
   ): Promise<void> {
     try {
-      const securityDevices = await client
-        .createQueryBuilder(SecurityDevicesEntity, 'securityDevice')
-        .where('securityDevice.user.userId = :userId', { userId })
-        .getMany();
-      const securityDeviceIds = securityDevices.map((device) => device.id);
+      const deleteUserDataArray = await this.getDeleteDataArray(userId, client);
 
-      console.log(securityDeviceIds, 'securityDeviceIds');
-
-      await Promise.all([
-        client.delete('SecurityDevices', securityDeviceIds),
-        client.delete('BannedUsersForBlogs', {
-          'securityDevice.user.userId': userId,
+      await Promise.all(
+        deleteUserDataArray.map(async (userData) => {
+          for (const [entityName, entityIds] of Object.entries(userData)) {
+            await this.deleteEntityData(entityName, entityIds, client);
+          }
         }),
-        client.query(
-          `
-          DELETE FROM "SentCodeLog" 
-          WHERE "email" IN (
-            SELECT "email" FROM "Users" WHERE "userId" = $1
-          )
-          `,
-          [userId],
-        ),
-        client.delete('LikeStatusComments', [
-          { userId },
-          { commentOwnerId: userId },
-        ]),
-        client.delete('LikeStatusPosts', [{ userId }, { postOwnerId: userId }]),
-      ]);
+      );
+      await this.deleteEntityData('Users', [{ userId }], client);
+    } catch (error) {
+      this.handleUserDataRemovalError(error, userId);
+    }
+  }
 
-      await client.delete('Comments', { commentatorInfoUserId: userId });
-      await client.delete('Posts', { postOwnerId: userId });
-      await client.delete('BloggerBlogs', { blogOwnerId: userId });
-      await client.delete('Users', { userId });
+  private async getDeleteDataArray(
+    userId: string,
+    client: EntityManager,
+  ): Promise<Array<{ [key: string]: string[] }>> {
+    const entityMappings = [
+      {
+        Entity: SecurityDevicesEntity,
+        Key: 'SecurityDevices',
+        JoinColumn: 'user',
+      },
+      {
+        Entity: BannedUserForBlogEntity,
+        Key: 'BannedUserForBlog',
+        JoinColumn: 'bannedUserForBlog',
+      },
+      {
+        Entity: SentCodesLogEntity,
+        Key: 'SentCodeLog',
+        JoinColumn: 'sentForUser',
+      },
+      {
+        Entity: LikeStatusCommentsEntity,
+        Key: 'LikeStatusComments',
+        JoinColumn: 'commentOwner',
+      },
+      {
+        Entity: LikeStatusPostsEntity,
+        Key: 'LikeStatusPosts',
+        JoinColumn: 'postOwner',
+      },
+      { Entity: CommentsEntity, Key: 'Comments', JoinColumn: 'commentator' },
+      { Entity: PostsEntity, Key: 'Posts', JoinColumn: 'postOwner' },
+      {
+        Entity: BloggerBlogsEntity,
+        Key: 'BloggerBlogs',
+        JoinColumn: 'blogOwner',
+      },
+    ];
+
+    const deleteDataArray: Array<{ [key: string]: string[] }> = [];
+
+    for (const mapping of entityMappings) {
+      const entityIds = await this.getEntityIdsByUserId(
+        userId,
+        client,
+        mapping,
+      );
+      if (entityIds.length > 0) {
+        const keyValuePair = {
+          [mapping.Key]: entityIds.map((entity) => entity.id),
+        };
+        deleteDataArray.push(keyValuePair);
+      }
+    }
+
+    return deleteDataArray;
+  }
+
+  private async getEntityIdsByUserId(
+    userId: string,
+    client: EntityManager,
+    mapping: any,
+  ): Promise<any[]> {
+    return await client
+      .createQueryBuilder(mapping.Entity, 'entity')
+      .select('entity.id')
+      .innerJoin(`entity.${mapping.JoinColumn}`, 'associatedEntity')
+      .where(`associatedEntity.userId = :userId`, { userId })
+      .getMany();
+  }
+
+  private async deleteEntityData(
+    entityName: string,
+    entityIds: any[],
+    client: EntityManager,
+  ): Promise<void> {
+    try {
+      await client.delete(entityName, entityIds);
+      console.log(
+        `Data deleted for entity: ${entityName}, ids: ${JSON.stringify(
+          entityIds,
+        )}`,
+      );
     } catch (error) {
       console.error(
-        `Error while removing data for user ${userId}: ${error.message}`,
-      );
-      throw new InternalServerErrorException(
-        `Error while removing data for user ${userId}`,
+        `Error while deleting data for entity: ${entityName}, ids: ${JSON.stringify(
+          entityIds,
+        )}`,
+        error,
       );
     }
+  }
+
+  private handleUserDataRemovalError(error: any, userId?: string): void {
+    const errorMessage = userId
+      ? `Error while removing data for user ${userId}`
+      : `Error while removing user data`;
+    console.error(errorMessage, error);
+    throw new InternalServerErrorException(errorMessage);
   }
 
   private extractValueFromMessage(message: string) {
