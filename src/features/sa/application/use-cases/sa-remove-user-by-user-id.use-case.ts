@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class SaRemoveUserByUserIdCommand {
   constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
@@ -15,21 +15,19 @@ export class SaRemoveUserByUserIdUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly usersRepo: UsersRepo,
   ) {}
   async execute(command: SaRemoveUserByUserIdCommand): Promise<boolean> {
     const { userId, currentUserDto } = command;
 
-    const userToRemove = await this.usersRawSqlRepository.saFindUserByUserId(
-      userId,
-    );
-    if (!userToRemove) throw new NotFoundException('Not found user.');
+    const userToRemove = await this.usersRepo.findUserById(userId);
+
+    if (!userToRemove)
+      throw new NotFoundException(`User with ID ${userId} not found`);
 
     this.checkUserPermission(currentUserDto, userToRemove.userId);
 
-    await this.usersRawSqlRepository.removeUserDataByUserId(
-      userToRemove.userId,
-    );
+    await this.usersRepo.removeUserDataByUserId(userToRemove.userId);
     return true;
   }
 

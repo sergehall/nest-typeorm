@@ -11,8 +11,6 @@ import { BanInfoDto } from '../dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
 import { loginOrEmailAlreadyExists } from '../../../common/filters/custom-errors-messages';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
 @Injectable()
 export class UsersRawSqlRepository {
@@ -20,35 +18,6 @@ export class UsersRawSqlRepository {
     @InjectDataSource() private readonly db: DataSource,
     protected keyResolver: KeyResolver,
   ) {}
-
-  async saFindUsers(
-    queryData: ParseQueriesDto,
-  ): Promise<TablesUsersWithIdEntity[]> {
-    try {
-      const searchEmailTerm = queryData.searchEmailTerm;
-      const searchLoginTerm = queryData.searchLoginTerm;
-      const banCondition = queryData.banStatus;
-      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-
-      return await this.db.query(
-        `
-        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
-        FROM public."Users"
-        WHERE ("email" LIKE $1 OR "login" LIKE $2) AND "isBanned" in (${banCondition})
-        ORDER BY "${sortBy}" ${direction}
-        LIMIT $3 OFFSET $4
-      `,
-        [searchEmailTerm, searchLoginTerm, limit, offset],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
 
   async saFindUserByUserId(
     userId: string,
@@ -89,53 +58,6 @@ export class UsersRawSqlRepository {
     } catch (error) {
       console.log(error.message);
       return null;
-    }
-  }
-
-  async findUsers(
-    queryData: ParseQueriesDto,
-  ): Promise<TablesUsersWithIdEntity[]> {
-    try {
-      const searchEmailTerm = queryData.searchEmailTerm;
-      const searchLoginTerm = queryData.searchLoginTerm;
-      const banCondition = queryData.banStatus;
-      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-
-      return await this.db.query(
-        `
-      SELECT "userId" as "id", "login", "email", "createdAt"
-      FROM public."Users"
-      WHERE "email" LIKE $1 OR "login" LIKE $2 AND "isBanned" in (${banCondition})
-      ORDER BY "${sortBy}" ${direction}
-      LIMIT $3 OFFSET $4
-    `,
-        [searchEmailTerm, searchLoginTerm, limit, offset],
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
-    try {
-      const user = await this.db.query(
-        `
-        SELECT "userId" as "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
-        "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed",
-         "isConfirmedDate", "ip", "userAgent"
-        FROM public."Users"
-        WHERE "email" = $1 OR "login" = $1
-      `,
-        [loginOrEmail],
-      );
-      return user[0] ? user[0] : null;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -230,27 +152,6 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async updateCodeAndExpirationByEmail(
-    email: string,
-    confirmationCode: string,
-    expirationDate: string,
-  ): Promise<TablesUsersWithIdEntity> {
-    try {
-      const updateUser = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET "confirmationCode" = $2, "expirationDate" = $3
-      WHERE "email" = $1
-      RETURNING *
-      `,
-        [email, confirmationCode, expirationDate],
-      );
-      return updateUser[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async updateUserPasswordHashByRecoveryCode(
     recoveryCode: string,
     newPasswordHash: string,
@@ -283,66 +184,6 @@ export class UsersRawSqlRepository {
       `,
         [key.toLocaleLowerCase(), key.toLocaleLowerCase()],
       );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountUsersForSa(queryData: ParseQueriesDto): Promise<number> {
-    try {
-      const searchEmailTerm = queryData.searchEmailTerm;
-      const searchLoginTerm = queryData.searchLoginTerm;
-      const banCondition = queryData.banStatus;
-
-      const totalCount = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Users"
-        WHERE ("email" like $1 OR "login" like $2) AND "isBanned" in (${banCondition})
-      `,
-        [searchEmailTerm, searchLoginTerm],
-      );
-      return Number(totalCount[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async totalCountUsers(queryData: ParseQueriesDto): Promise<number> {
-    try {
-      const searchEmailTerm = queryData.searchEmailTerm;
-      const searchLoginTerm = queryData.searchLoginTerm;
-      const banCondition = queryData.banStatus;
-
-      const totalCount = await this.db.query(
-        `
-        SELECT count(*)
-        FROM public."Users"
-        WHERE "email" like $1 OR "login" like $2 AND "isBanned" in (${banCondition})
-        `,
-        [searchEmailTerm, searchLoginTerm],
-      );
-      return Number(totalCount[0].count);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async changeRole(
-    userId: string,
-    roles: UserRolesEnums[],
-  ): Promise<TablesUsersEntity> {
-    try {
-      const updateUserRole = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET  "roles" = $2
-      WHERE "userId" = $1
-      RETURNING "userId" AS "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
-      `,
-        [userId, roles],
-      );
-      return updateUserRole[0][0];
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

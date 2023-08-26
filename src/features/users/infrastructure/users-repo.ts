@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { EntityManager, Repository, UpdateResult } from 'typeorm';
 import {
   HttpException,
   HttpStatus,
@@ -12,6 +12,7 @@ import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
 
 export class UsersRepo {
   constructor(
@@ -58,8 +59,8 @@ export class UsersRepo {
         .createQueryBuilder('user')
         .select('COUNT(user.userId)', 'count')
         .where('user.email LIKE :email OR user.login LIKE :login', {
-          email: `%${searchEmailTerm}%`,
-          login: `%${searchLoginTerm}%`,
+          email: searchEmailTerm,
+          login: searchLoginTerm,
         })
         .andWhere('user.isBanned IN (:...banCondition)', { banCondition })
         .getRawOne();
@@ -163,6 +164,70 @@ export class UsersRepo {
       throw new Error(`Error updating user role: ${error.message}`);
     }
   }
+
+  async removeUserDataByUserId(userId: string): Promise<void> {
+    try {
+      await this.usersRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          await this.deleteUserData(userId, transactionalEntityManager);
+        },
+      );
+    } catch (error) {
+      console.error(`Error while removing data for users: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Error while removing data for users`,
+      );
+    }
+  }
+
+  private async deleteUserData(
+    userId: string,
+    client: EntityManager,
+  ): Promise<void> {
+    try {
+      const securityDevices = await client
+        .createQueryBuilder(SecurityDevicesEntity, 'securityDevice')
+        .where('securityDevice.user.userId = :userId', { userId })
+        .getMany();
+      const securityDeviceIds = securityDevices.map((device) => device.id);
+
+      console.log(securityDeviceIds, 'securityDeviceIds');
+
+      await Promise.all([
+        client.delete('SecurityDevices', securityDeviceIds),
+        client.delete('BannedUsersForBlogs', {
+          'securityDevice.user.userId': userId,
+        }),
+        client.query(
+          `
+          DELETE FROM "SentCodeLog" 
+          WHERE "email" IN (
+            SELECT "email" FROM "Users" WHERE "userId" = $1
+          )
+          `,
+          [userId],
+        ),
+        client.delete('LikeStatusComments', [
+          { userId },
+          { commentOwnerId: userId },
+        ]),
+        client.delete('LikeStatusPosts', [{ userId }, { postOwnerId: userId }]),
+      ]);
+
+      await client.delete('Comments', { commentatorInfoUserId: userId });
+      await client.delete('Posts', { postOwnerId: userId });
+      await client.delete('BloggerBlogs', { blogOwnerId: userId });
+      await client.delete('Users', { userId });
+    } catch (error) {
+      console.error(
+        `Error while removing data for user ${userId}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        `Error while removing data for user ${userId}`,
+      );
+    }
+  }
+
   private extractValueFromMessage(message: string) {
     const match = /\(([^)]+)\)/.exec(message);
     return match ? match[1] : 'null';
