@@ -25,13 +25,15 @@ import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-b
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-import { SearchBlogsForSaUseCase } from './application/use-cases/search-blogs-for-sa.use-case';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
+import { SaFindUsersUseCase } from './application/use-cases/sa-find-users.use-case';
+import { SaFindBlogsCommand } from './application/use-cases/sa-find-blogs.use-case';
 
 const saUseCases = [
-  SearchBlogsForSaUseCase,
+  SaFindBlogsCommand,
+  SaFindUsersUseCase,
   CreateUserUseCase,
   SaChangeRoleUseCase,
   SaRemoveUserByUserIdUseCase,

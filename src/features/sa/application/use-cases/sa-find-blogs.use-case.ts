@@ -3,18 +3,16 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
-export class SearchBlogsForSaCommand {
+export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
 }
 
-@CommandHandler(SearchBlogsForSaCommand)
-export class SearchBlogsForSaUseCase
-  implements ICommandHandler<SearchBlogsForSaCommand>
-{
+@CommandHandler(SaFindBlogsCommand)
+export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
   constructor(
     protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
-  async execute(command: SearchBlogsForSaCommand) {
+  async execute(command: SaFindBlogsCommand) {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

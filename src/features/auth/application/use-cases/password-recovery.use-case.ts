@@ -4,6 +4,7 @@ import { MailsService } from '../../../../mails/application/mails.service';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
+import { NotFoundException } from '@nestjs/common';
 
 export class PasswordRecoveryCommand {
   constructor(public email: string) {}
@@ -25,16 +26,20 @@ export class PasswordRecoveryUseCase
 
     const expirationDate = await this.expirationDateCalculator.createExpDate(
       0,
-      1,
+      2,
       0,
     );
 
-    const updatedUser: UsersEntity =
+    const updatedUser: UsersEntity | null =
       await this.usersRepo.updateCodeAndExpirationByEmail(
         email,
         recoveryCode,
         expirationDate,
       );
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with email: ${email} not found`);
+    }
 
     return await this.mailsService.sendRecoveryCode(updatedUser);
   }

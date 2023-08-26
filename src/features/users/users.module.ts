@@ -20,11 +20,15 @@ import { CodeExistsValidator } from '../../common/validators/code-exists.validat
 import { UsersRepo } from './infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from './entities/users.entity';
+import { FindUsersUseCase } from './application/use-cases/find-users.use-case';
+import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
 
 const usersUseCases = [
   CreateUserUseCase,
   UpdateUserUseCase,
   RemoveUserByIdUseCase,
+  FindUsersUseCase,
+  FindUserByIdUseCase,
 ];
 
 const usersValidators = [

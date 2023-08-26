@@ -35,6 +35,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsEntity } from './entities/posts.entity';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -51,7 +53,7 @@ const postsUseCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostsEntity, BloggerBlogsEntity]),
+    TypeOrmModule.forFeature([UsersEntity, PostsEntity, BloggerBlogsEntity]),
     CaslModule,
     CqrsModule,
   ],
@@ -66,6 +68,7 @@ const postsUseCases = [
     UsersService,
     ParseQueriesService,
     BloggerBlogsService,
+    UsersRepo,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRepo,

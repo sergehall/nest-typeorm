@@ -1,16 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UsersService } from '../../users/application/users.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt.use-case';
 import { BlacklistJwtRawSqlRepository } from '../infrastructure/blacklist-jwt-raw-sql.repository';
 import { PayloadDto } from '../dto/payload.dto';
-import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
+import { UsersRepo } from '../../users/infrastructure/users-repo';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
   constructor(
     protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
-    protected usersService: UsersService,
+    protected usersRepo: UsersRepo,
     protected commandBus: CommandBus,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,8 +28,7 @@ export class NoneStatusGuard implements CanActivate {
         );
 
       if (!jwtExistInBlackList && payload) {
-        const user: TablesUsersWithIdEntity | null =
-          await this.usersService.findUserByUserId(payload.userId);
+        const user = await this.usersRepo.findUserById(payload.userId);
 
         request.user =
           user && !user.isBanned

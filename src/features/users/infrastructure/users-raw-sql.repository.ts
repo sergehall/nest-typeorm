@@ -31,9 +31,7 @@ export class UsersRawSqlRepository {
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
       return await this.db.query(
         `

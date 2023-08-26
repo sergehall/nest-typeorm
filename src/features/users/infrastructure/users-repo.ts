@@ -4,28 +4,75 @@ import {
   HttpException,
   HttpStatus,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { UsersEntity } from '../entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import { OrgIdEnums } from '../enums/org-id.enums';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
 
 export class UsersRepo {
   constructor(
+    private readonly keyResolver: KeyResolver,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
   ) {}
+  async findUsers(queryData: ParseQueriesDto): Promise<UsersEntity[]> {
+    try {
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset =
+        (queryData.queryPagination.pageNumber - 1) *
+        queryData.queryPagination.pageSize;
 
-  async findUserById(userId: string): Promise<UsersEntity> {
-    const user = await this.usersRepository.findBy({ userId: userId });
-
-    if (!user[0]) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      return await this.usersRepository
+        .createQueryBuilder('user')
+        .select('*')
+        .where('user.email LIKE :email OR user.login LIKE :login', {
+          email: searchEmailTerm,
+          login: searchLoginTerm,
+        })
+        .andWhere('user.isBanned IN (:...banCondition)', { banCondition })
+        .orderBy(`user.${sortBy}`, direction)
+        .limit(limit)
+        .offset(offset)
+        .getRawMany();
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
+  }
 
-    return user[0];
+  async totalCountUsers(queryData: ParseQueriesDto): Promise<number> {
+    try {
+      const searchEmailTerm = queryData.searchEmailTerm;
+      const searchLoginTerm = queryData.searchLoginTerm;
+      const banCondition = queryData.banStatus;
+
+      const totalCount = await this.usersRepository
+        .createQueryBuilder('user')
+        .select('COUNT(user.userId)', 'count')
+        .where('user.email LIKE :email OR user.login LIKE :login', {
+          email: `%${searchEmailTerm}%`,
+          login: `%${searchLoginTerm}%`,
+        })
+        .andWhere('user.isBanned IN (:...banCondition)', { banCondition })
+        .getRawOne();
+
+      return Number(totalCount.count);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findUserById(userId: string): Promise<UsersEntity | null> {
+    const user = await this.usersRepository.findBy({ userId: userId });
+    return user[0] ? user[0] : null;
   }
 
   async findUserByLoginOrEmail(
@@ -76,16 +123,18 @@ export class UsersRepo {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<UsersEntity> {
+  ): Promise<UsersEntity | null> {
     try {
       const userToUpdate = await this.usersRepository.findOneBy({ email });
-      if (userToUpdate) {
-        userToUpdate.confirmationCode = confirmationCode;
-        userToUpdate.expirationDate = expirationDate;
-        return await this.usersRepository.save(userToUpdate);
+
+      if (!userToUpdate) {
+        return null;
       }
 
-      throw new NotFoundException(`User with email: ${email} not found`);
+      userToUpdate.confirmationCode = confirmationCode;
+      userToUpdate.expirationDate = expirationDate;
+
+      return await this.usersRepository.save(userToUpdate);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -142,5 +191,27 @@ export class UsersRepo {
     user.userAgent = userAgent;
 
     return user;
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      [
+        'userId',
+        'login',
+        'email',
+        'orgId',
+        'roles',
+        'isBanned',
+        'banDate',
+        'banReason',
+        'expirationDate',
+        'isConfirmed',
+        'isConfirmedDate',
+        'ip',
+        'userAgent',
+      ],
+      'createdAt',
+    );
   }
 }
