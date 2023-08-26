@@ -25,7 +25,7 @@ import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
-import { SaRemoveUserByUserIdCommand } from '../application/use-cases/sa-remove-user-by-user-id.use-case';
+import { SaDeleteUserByUserIddCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
@@ -112,7 +112,7 @@ export class SaController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new SaRemoveUserByUserIdCommand(params.id, currentUserDto),
+      new SaDeleteUserByUserIddCommand(params.id, currentUserDto),
     );
   }
 

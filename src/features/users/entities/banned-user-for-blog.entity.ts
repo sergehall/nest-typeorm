@@ -9,7 +9,7 @@ import {
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from './users.entity';
 
-@Entity('BannedUsersForBlogs')
+@Entity('BannedUserForBlog')
 @Unique(['id'])
 export class BannedUserForBlogEntity {
   @PrimaryColumn({ nullable: false, unique: true })

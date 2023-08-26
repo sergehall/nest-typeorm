@@ -10,7 +10,7 @@ import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
-import { SaRemoveUserByUserIdUseCase } from './application/use-cases/sa-remove-user-by-user-id.use-case';
+import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
 import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
@@ -36,7 +36,7 @@ const saUseCases = [
   SaFindUsersUseCase,
   CreateUserUseCase,
   SaChangeRoleUseCase,
-  SaRemoveUserByUserIdUseCase,
+  SaDeleteUserByUserIdUseCase,
   SaBanUnbanBlogUseCase,
   SaBanUnbanUserUseCase,
   SaBindBlogWithUserByIdUseCase,

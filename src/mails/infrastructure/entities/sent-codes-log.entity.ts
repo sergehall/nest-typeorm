@@ -19,7 +19,10 @@ export class SentCodesLogEntity {
   })
   sentCodeTime: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.email, { nullable: false })
-  @JoinColumn({ name: 'email', referencedColumnName: 'email' })
+  @ManyToOne(() => UsersEntity, (user) => user, { nullable: false })
+  @JoinColumn([
+    { name: 'email', referencedColumnName: 'email' },
+    { name: 'userId', referencedColumnName: 'userId' },
+  ])
   sentForUser: UsersEntity;
 }

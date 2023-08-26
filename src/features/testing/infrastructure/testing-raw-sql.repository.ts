@@ -10,7 +10,7 @@ export class TestingRawSqlRepository {
     const tablesToDelete = [
       'SentCodeLog',
       'SecurityDevices',
-      'BannedUsersForBlogs',
+      'BannedUserForBlog',
       'BlacklistJwt',
       'LikeStatusComments',
       'LikeStatusPosts',

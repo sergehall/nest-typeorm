@@ -18,9 +18,9 @@ import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-
 import { BannedUserForBlogEntity } from './banned-user-for-blog.entity';
 
 @Entity('Users')
-@Unique(['email'])
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
 @Unique(['userId', 'login'])
+@Unique(['userId', 'email'])
 @Unique(['userId', 'login', 'isBanned'])
 export class UsersEntity {
   @PrimaryColumn('uuid', { unique: true })

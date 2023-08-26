@@ -40,6 +40,6 @@ export class SecurityDevicesEntity {
   @ManyToOne(() => UsersEntity, (user) => user.securityDevices, {
     nullable: false,
   })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UsersEntity;
 }
