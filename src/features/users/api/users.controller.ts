@@ -13,7 +13,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from '../application/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { Action } from '../../../ability/roles/action.enum';
@@ -35,12 +34,13 @@ import { ReturnUserDto } from '../dto/return-user.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { UsersEntity } from '../entities/users.entity';
+import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
+import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
 
 @SkipThrottle()
 @Controller('users')
 export class UsersController {
   constructor(
-    protected usersService: UsersService,
     protected commandBus: CommandBus,
     protected parseQueries: ParseQueriesService,
   ) {}
@@ -54,7 +54,7 @@ export class UsersController {
       query,
     );
 
-    return this.usersService.findUsers(queryData);
+    return await this.commandBus.execute(new FindUsersCommand(queryData));
   }
 
   @Get(':id')
@@ -63,7 +63,7 @@ export class UsersController {
   async findUserByUserId(
     @Param() params: IdParams,
   ): Promise<TablesUsersWithIdEntity> {
-    return await this.usersService.findUserByUserId(params.id);
+    return await this.commandBus.execute(new FindUserByICommand(params.id));
   }
 
   @Post()

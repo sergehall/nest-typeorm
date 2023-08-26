@@ -27,6 +27,9 @@ import { FindCommentByIdUseCase } from './application/use-cases/find-comment-by-
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { FindCommentsByPostIdUseCase } from './application/use-cases/find-comments-by-post-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
@@ -42,7 +45,7 @@ const commentsUseCases = [
 ];
 
 @Module({
-  imports: [CaslModule, CqrsModule],
+  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
   controllers: [CommentsController],
   providers: [
     CommentsService,
@@ -52,6 +55,7 @@ const commentsUseCases = [
     AuthService,
     UsersService,
     KeyResolver,
+    UsersRepo,
     UsersRawSqlRepository,
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,

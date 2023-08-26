@@ -16,11 +16,14 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsUseCase } from './application/use-cases/search-blogs.use-case';
 import { GetBlogByIdUseCase } from './application/use-cases/get-blog-by-id.use-case';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
 @Module({
-  imports: [CaslModule, CqrsModule],
+  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
   controllers: [BlogsController],
   providers: [
     AuthService,
@@ -30,6 +33,7 @@ const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
     PostsService,
     KeyResolver,
     BloggerBlogsService,
+    UsersRepo,
     UsersRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,

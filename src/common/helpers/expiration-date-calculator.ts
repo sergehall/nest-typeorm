@@ -17,13 +17,8 @@ export class ExpirationDateCalculator {
     const totalTimeInMilliseconds: number =
       daysInMilliseconds + hoursInMilliseconds + minutesInMilliseconds;
 
-    // Get the current date and time
-    const currentDate: Date = new Date();
-
     // Calculate the future date by adding the total time
-    const futureDate: Date = new Date(
-      currentDate.getTime() + totalTimeInMilliseconds,
-    );
+    const futureDate: Date = new Date(Date.now() + totalTimeInMilliseconds);
 
     // Return the future date in ISO format
     return futureDate.toISOString();

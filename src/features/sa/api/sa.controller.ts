@@ -17,7 +17,6 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
-import { UsersService } from '../../users/application/users.service';
 import { Action } from '../../../ability/roles/action.enum';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../users/application/use-cases/create-user.use-case';
@@ -34,16 +33,15 @@ import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blo
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
-import { SearchBlogsForSaCommand } from '../application/use-cases/search-blogs-for-sa.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
+import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 
 @SkipThrottle()
 @Controller('sa')
 export class SaController {
   constructor(
     private parseQueriesService: ParseQueriesService,
-    private usersService: UsersService,
     private commandBus: CommandBus,
   ) {}
 
@@ -54,7 +52,7 @@ export class SaController {
   async saFindUsers(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
-    return this.usersService.saFindUsers(queryData);
+    return await this.commandBus.execute(new SaFindUsersCommand(queryData));
   }
 
   @Get('blogs')
@@ -66,9 +64,7 @@ export class SaController {
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
-    return await this.commandBus.execute(
-      new SearchBlogsForSaCommand(queryData),
-    );
+    return await this.commandBus.execute(new SaFindUsersCommand(queryData));
   }
 
   @Post('users')

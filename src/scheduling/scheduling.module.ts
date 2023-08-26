@@ -19,9 +19,17 @@ import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 import { SentCodeLogRepository } from '../mails/infrastructure/sent-code-log.repository';
 import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
 import { KeyResolver } from '../common/helpers/key-resolver';
+import { UsersRepo } from '../features/users/infrastructure/users-repo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersEntity } from '../features/users/entities/users.entity';
 
 @Module({
-  imports: [MailsModule, CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([UsersEntity]),
+    MailsModule,
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [],
   providers: [
     MailerConfig,
@@ -31,6 +39,7 @@ import { KeyResolver } from '../common/helpers/key-resolver';
     UsersService,
     DataCleanupService,
     KeyResolver,
+    UsersRepo,
     UsersRawSqlRepository,
     CommentsRawSqlRepository,
     PostsRawSqlRepository,
