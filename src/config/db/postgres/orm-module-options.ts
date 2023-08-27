@@ -31,6 +31,7 @@ export class OrmModuleOptions
       username,
       password,
       database,
+      autoLoadEntities: true,
       ssl: { rejectUnauthorized: false },
       entities: [
         UsersEntity,

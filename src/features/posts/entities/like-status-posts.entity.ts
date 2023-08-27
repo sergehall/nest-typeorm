@@ -22,7 +22,7 @@ export class LikeStatusPostsEntity {
   likeStatus: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 30,
     nullable: false,
   })

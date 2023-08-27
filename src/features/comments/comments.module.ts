@@ -30,6 +30,8 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
+import { LikeStatusCommentsRepo } from './infrastructure/like-status-comments.repo';
+import { LikeStatusCommentsEntity } from './entities/like-status-comments.entity';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
@@ -45,7 +47,11 @@ const commentsUseCases = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([UsersEntity, LikeStatusCommentsEntity]),
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [CommentsController],
   providers: [
     CommentsService,
@@ -60,6 +66,7 @@ const commentsUseCases = [
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
+    LikeStatusCommentsRepo,
     LikeStatusCommentsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,

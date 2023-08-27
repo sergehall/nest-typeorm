@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { UsersEntity } from '../entities/users.entity';
@@ -20,6 +21,7 @@ import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.en
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { BanInfoDto } from '../dto/banInfo.dto';
 
 export class UsersRepo {
   constructor(
@@ -27,6 +29,7 @@ export class UsersRepo {
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
   ) {}
+
   async findUsers(queryData: ParseQueriesDto): Promise<UsersEntity[]> {
     try {
       const searchEmailTerm = queryData.searchEmailTerm;
@@ -79,8 +82,16 @@ export class UsersRepo {
   }
 
   async findUserById(userId: string): Promise<UsersEntity | null> {
-    const user = await this.usersRepository.findBy({ userId: userId });
-    return user[0] ? user[0] : null;
+    try {
+      const user = await this.usersRepository.findBy({ userId: userId });
+      return user[0] ? user[0] : null;
+    } catch (error) {
+      if (this.isInvalidUUIDError(error)) {
+        const userId = this.extractUserIdFromError(error);
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async findUserByLoginOrEmail(
@@ -94,6 +105,81 @@ export class UsersRepo {
       return user ? user : null;
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
+    const { isBanned, banReason, banDate } = banInfo;
+    try {
+      await this.usersRepository.manager.transaction(
+        async (transactionalEntityManager: EntityManager) => {
+          await transactionalEntityManager.update(
+            'LikeStatusComments',
+            { userId },
+            { isBanned: isBanned },
+          );
+
+          await transactionalEntityManager.update(
+            'LikeStatusPosts',
+            { userId: userId },
+            { isBanned: isBanned },
+          );
+          await transactionalEntityManager.update(
+            'Comments',
+            { postInfoBlogOwnerId: userId },
+            { commentatorInfoIsBanned: isBanned },
+          );
+          await transactionalEntityManager.update(
+            'Posts',
+            { postOwnerId: userId },
+            { dependencyIsBanned: isBanned },
+          );
+          await transactionalEntityManager.update(
+            'BloggerBlogs',
+            { blogOwnerId: userId },
+            { dependencyIsBanned: isBanned },
+          );
+          await transactionalEntityManager.delete('SecurityDevices', {
+            userId: userId,
+          });
+          await transactionalEntityManager.update(
+            'Users',
+            { userId: userId },
+            { isBanned, banDate, banReason },
+          );
+        },
+      );
+      // const entityManager = getManager(); // Replace with how you access your EntityManager
+      // const user = await entityManager
+      //   .getRepository(UsersEntity)
+      //   .createQueryBuilder('user')
+      //   .leftJoinAndSelect('user.comments', 'comments')
+      //   .leftJoinAndSelect('user.likeStatusComments', 'likeStatusComments')
+      //   .leftJoinAndSelect('user.posts', 'posts')
+      //   .leftJoinAndSelect('user.likeStatusPosts', 'likeStatusPosts')
+      //   .leftJoinAndSelect('user.bloggerBlogs', 'bloggerBlogs')
+      //   .leftJoinAndSelect('user.securityDevices', 'securityDevices')
+      //   .where('user.userId = :userId', { userId })
+      //   .getOne();
+
+      if (isBanned) {
+        console.log(`User Ban 🚫. The user with ID ${userId} has been successfully banned.
+          This action was taken due to "${banReason}".
+          Thank you for maintaining a safe environment for our community.`);
+      } else {
+        console.log(`User Unban 🔓. The user with ID ${userId} has been successfully unbanned. 
+        They can now access the platform and perform actions as usual. 
+        We appreciate your attention to ensuring a fair and inclusive community environment.`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`User Ban Error ❌❗ ${error.message}
+      We encountered an issue while attempting to ban the user with ID ${userId}.
+      Unfortunately, we couldn't complete the ban operation at this time. 
+      Please try again later or contact our support team for assistance.
+      We apologize for any inconvenience this may have caused.`);
+
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -355,5 +441,14 @@ export class UsersRepo {
       ],
       'createdAt',
     );
+  }
+
+  private isInvalidUUIDError(error: any): boolean {
+    return error.message.includes('invalid input syntax for type uuid');
+  }
+
+  private extractUserIdFromError(error: any): string | null {
+    const match = error.message.match(/"([^"]+)"/);
+    return match ? match[1] : null;
   }
 }
