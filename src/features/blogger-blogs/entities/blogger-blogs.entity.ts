@@ -17,7 +17,7 @@ import { BannedUserForBlogEntity } from '../../users/entities/banned-user-for-bl
 @Unique(['id'])
 @Unique(['id', 'name'])
 export class BloggerBlogsEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
   @Column({ type: 'character varying', length: 50, nullable: false })

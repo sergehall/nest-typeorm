@@ -23,7 +23,7 @@ import { BannedUserForBlogEntity } from './banned-user-for-blog.entity';
 @Unique(['userId', 'email'])
 @Unique(['userId', 'login', 'isBanned'])
 export class UsersEntity {
-  @PrimaryColumn('uuid', { unique: true })
+  @PrimaryColumn('uuid', { unique: true, nullable: false })
   userId: string;
 
   @Column({

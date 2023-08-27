@@ -14,10 +14,11 @@ import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-s
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class SaBanUnbanUserCommand {
   constructor(
-    public id: string,
+    public userId: string,
     public saBanUserDto: SaBanUserDto,
     public currentUserDto: CurrentUserDto,
   ) {}
@@ -30,13 +31,14 @@ export class SaBanUnbanUserUseCase
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRawSqlRepository: UsersRawSqlRepository,
+    protected usersRepo: UsersRepo,
   ) {}
 
   async execute(command: SaBanUnbanUserCommand): Promise<boolean> {
     const { currentUserDto } = command;
-    const { id } = command;
+    const { userId } = command;
 
-    if (id === currentUserDto.userId) {
+    if (userId === currentUserDto.userId) {
       throw new HttpException(
         { message: cannotBlockYourself },
         HttpStatus.BAD_REQUEST,
@@ -44,8 +46,9 @@ export class SaBanUnbanUserUseCase
     }
 
     const userToBan: TablesUsersWithIdEntity | null =
-      await this.usersRawSqlRepository.saFindUserByUserId(id);
-    if (!userToBan) throw new NotFoundException('Not found user.');
+      await this.usersRepo.findUserById(userId);
+    if (!userToBan)
+      throw new NotFoundException(`User with ID ${userId} not found`);
 
     await this.checkUserPermission(currentUserDto, userToBan);
 
@@ -56,10 +59,7 @@ export class SaBanUnbanUserUseCase
       banReason: isBanned ? banReason : null,
     };
 
-    return await this.usersRawSqlRepository.saBanUnbanUser(
-      userToBan.userId,
-      banInfo,
-    );
+    return await this.usersRepo.saBanUnbanUser(userToBan.userId, banInfo);
   }
 
   private async checkUserPermission(

@@ -1,51 +1,56 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 
 @Entity('LikeStatusComments')
 export class LikeStatusCommentsEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
-  @Column({ nullable: false })
-  isBanned: boolean;
-
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 7,
     nullable: false,
   })
   likeStatus: string;
 
   @Column({
-    type: 'varchar',
+    type: 'character varying',
     length: 50,
     nullable: false,
   })
   createdAt: string;
 
-  @ManyToOne(() => CommentsEntity, (comment) => comment.id, { nullable: false })
+  @ManyToOne(() => CommentsEntity, (comment) => comment.id, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'commentId' })
   comment: CommentsEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.ratedCommentUser, {
     nullable: false,
+    eager: true,
   })
-  @JoinColumn([{ name: 'userId' }, { name: 'login' }, { name: 'isBanned' }])
+  @JoinColumn([
+    { name: 'userId', referencedColumnName: 'userId' },
+    { name: 'login', referencedColumnName: 'login' },
+    { name: 'isBanned', referencedColumnName: 'isBanned' },
+  ])
   ratedCommentUser: UsersEntity;
 
-  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, { nullable: false })
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
-  @JoinColumn({ name: 'commentOwnerId' })
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'commentOwnerId', referencedColumnName: 'userId' })
   commentOwner: UsersEntity;
 }

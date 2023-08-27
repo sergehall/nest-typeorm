@@ -4,13 +4,16 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { TablesLikeStatusCommentsEntity } from '../../entities/tables-like-status-comments.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { UsersEntity } from '../../../users/entities/users.entity';
+import { CommentsEntity } from '../../entities/comments.entity';
+import { LikeStatusCommentsRepo } from '../../infrastructure/like-status-comments.repo';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(
@@ -28,6 +31,7 @@ export class ChangeLikeStatusCommentUseCase
     protected commentsRawSqlRepository: CommentsRawSqlRepository,
     protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+    protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
   async execute(command: ChangeLikeStatusCommentCommand): Promise<boolean> {
     const { commentId, likeStatusDto, currentUserDto } = command;
@@ -46,20 +50,24 @@ export class ChangeLikeStatusCommentUseCase
     if (userIsBannedForBlog)
       throw new ForbiddenException(userNotHavePermissionForBlog);
 
-    const likeStatusCommEntity: TablesLikeStatusCommentsEntity = {
-      commentId: commentId,
-      blogId: findComment.postInfoBlogId,
-      commentOwnerId: findComment.commentatorInfoUserId,
-      userId: currentUserDto.userId,
-      isBanned: currentUserDto.isBanned,
-      likeStatus: likeStatusDto.likeStatus,
-      createdAt: new Date().toISOString(),
-    };
+    const commentatorUserEntity = new UsersEntity();
+    commentatorUserEntity.userId = findComment.commentatorInfoUserId;
+
+    const blogEntity = new BloggerBlogsEntity();
+    blogEntity.id = findComment.postInfoBlogId;
+
+    const findCommentEntity = new CommentsEntity();
+    findCommentEntity.id = commentId;
+    findCommentEntity.commentator = commentatorUserEntity;
+    findCommentEntity.blog = blogEntity;
 
     try {
-      return await this.likeStatusCommentsRawSqlRepository.updateLikeStatusComment(
-        likeStatusCommEntity,
+      const result = await this.likeStatusCommentsRepo.updateLikeStatusComment(
+        likeStatusDto,
+        currentUserDto,
+        findCommentEntity,
       );
+      return result !== null;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
