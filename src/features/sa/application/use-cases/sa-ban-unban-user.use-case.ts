@@ -10,7 +10,6 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
@@ -30,7 +29,6 @@ export class SaBanUnbanUserUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
     protected usersRepo: UsersRepo,
   ) {}
 

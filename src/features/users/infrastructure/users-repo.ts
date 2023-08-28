@@ -78,7 +78,7 @@ export class UsersRepo {
       const user = await this.usersRepository.findBy({ userId });
       return user[0] ? user[0] : null;
     } catch (error) {
-      if (this.isInvalidUUIDError(error)) {
+      if (await this.isInvalidUUIDError(error)) {
         const userId = this.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
@@ -107,52 +107,43 @@ export class UsersRepo {
         async (transactionalEntityManager: EntityManager) => {
           await transactionalEntityManager.update(
             'LikeStatusComments',
-            { userId },
-            { isBanned: isBanned },
+            { ratedCommentUser: userId },
+            { isBanned },
           );
 
           await transactionalEntityManager.update(
             'LikeStatusPosts',
-            { userId: userId },
-            { isBanned: isBanned },
+            { ratedPostUser: userId },
+            { isBanned },
           );
-          await transactionalEntityManager.update(
-            'Comments',
-            { postInfoBlogOwnerId: userId },
-            { commentatorInfoIsBanned: isBanned },
-          );
-          await transactionalEntityManager.update(
-            'Posts',
-            { postOwnerId: userId },
-            { dependencyIsBanned: isBanned },
-          );
-          await transactionalEntityManager.update(
-            'BloggerBlogs',
-            { blogOwnerId: userId },
-            { dependencyIsBanned: isBanned },
-          );
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update('Comments')
+            .set({ dependencyIsBanned: isBanned })
+            .where('commentatorInfoUserId = :userId', { userId })
+            .execute();
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update('Posts')
+            .set({ dependencyIsBanned: isBanned })
+            .where('postOwner = :userId', { userId })
+            .execute();
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update('BloggerBlogs')
+            .set({ dependencyIsBanned: isBanned })
+            .where('blogOwnerId = :userId', { userId })
+            .execute();
           await transactionalEntityManager.delete('SecurityDevices', {
-            userId: userId,
+            user: userId,
           });
           await transactionalEntityManager.update(
             'Users',
-            { userId: userId },
+            { userId },
             { isBanned, banDate, banReason },
           );
         },
       );
-      // const entityManager = getManager(); // Replace with how you access your EntityManager
-      // const user = await entityManager
-      //   .getRepository(UsersEntity)
-      //   .createQueryBuilder('user')
-      //   .leftJoinAndSelect('user.comments', 'comments')
-      //   .leftJoinAndSelect('user.likeStatusComments', 'likeStatusComments')
-      //   .leftJoinAndSelect('user.posts', 'posts')
-      //   .leftJoinAndSelect('user.likeStatusPosts', 'likeStatusPosts')
-      //   .leftJoinAndSelect('user.bloggerBlogs', 'bloggerBlogs')
-      //   .leftJoinAndSelect('user.securityDevices', 'securityDevices')
-      //   .where('user.userId = :userId', { userId })
-      //   .getOne();
 
       if (isBanned) {
         console.log(`User Ban 🚫. The user with ID ${userId} has been successfully banned.
@@ -186,7 +177,9 @@ export class UsersRepo {
       if (
         error.message.includes('duplicate key value violates unique constraint')
       ) {
-        const extractedFieldName = this.extractValueFromMessage(error.detail);
+        const extractedFieldName = await this.extractValueFromMessage(
+          error.detail,
+        );
         const constraint = error.message.match(/"(.*?)"/)[1];
 
         const field = extractedFieldName || constraint;
@@ -302,140 +295,7 @@ export class UsersRepo {
     }
   }
 
-  // async deleteUserDataByUserId(userId: string): Promise<void> {
-  //   try {
-  //     await this.usersRepository.manager.transaction(
-  //       async (transactionalEntityManager) => {
-  //         await this.deleteUserData(userId, transactionalEntityManager);
-  //       },
-  //     );
-  //   } catch (error) {
-  //     this.handleUserDataRemovalError(error);
-  //   }
-  // }
-
-  // private async deleteUserData(
-  //   userId: string,
-  //   client: EntityManager,
-  // ): Promise<void> {
-  //   try {
-  //     const deleteUserDataArray = await this.getDeleteDataArray(userId, client);
-  //
-  //     await Promise.all(
-  //       deleteUserDataArray.map(async (userData) => {
-  //         for (const [entityName, entityIds] of Object.entries(userData)) {
-  //           await this.deleteEntityData(entityName, entityIds, client);
-  //         }
-  //       }),
-  //     );
-  //     await this.deleteEntityData('Users', [{ userId }], client);
-  //   } catch (error) {
-  //     this.handleUserDataRemovalError(error, userId);
-  //   }
-  // }
-
-  // private async getDeleteDataArray(
-  //   userId: string,
-  //   client: EntityManager,
-  // ): Promise<Array<{ [key: string]: string[] }>> {
-  //   const entityMappings = [
-  //     {
-  //       Entity: SecurityDevicesEntity,
-  //       Key: 'SecurityDevices',
-  //       JoinColumn: 'user',
-  //     },
-  //     {
-  //       Entity: BannedUsersForBlogsEntity,
-  //       Key: 'BannedUserForBlog',
-  //       JoinColumn: 'bannedUserForBlog',
-  //     },
-  //     {
-  //       Entity: SentCodesLogEntity,
-  //       Key: 'SentCodeLog',
-  //       JoinColumn: 'sentForUser',
-  //     },
-  //     {
-  //       Entity: LikeStatusCommentsEntity,
-  //       Key: 'LikeStatusComments',
-  //       JoinColumn: 'commentOwner',
-  //     },
-  //     {
-  //       Entity: LikeStatusPostsEntity,
-  //       Key: 'LikeStatusPosts',
-  //       JoinColumn: 'postOwner',
-  //     },
-  //     { Entity: CommentsEntity, Key: 'Comments', JoinColumn: 'commentator' },
-  //     { Entity: PostsEntity, Key: 'Posts', JoinColumn: 'postOwner' },
-  //     {
-  //       Entity: BloggerBlogsEntity,
-  //       Key: 'BloggerBlogs',
-  //       JoinColumn: 'blogOwner',
-  //     },
-  //   ];
-  //
-  //   const deleteDataArray: Array<{ [key: string]: string[] }> = [];
-  //
-  //   for (const mapping of entityMappings) {
-  //     const entityIds = await this.getEntityIdsByUserId(
-  //       userId,
-  //       client,
-  //       mapping,
-  //     );
-  //     if (entityIds.length > 0) {
-  //       const keyValuePair = {
-  //         [mapping.Key]: entityIds.map((entity) => entity.id),
-  //       };
-  //       deleteDataArray.push(keyValuePair);
-  //     }
-  //   }
-  //
-  //   return deleteDataArray;
-  // }
-
-  // private async getEntityIdsByUserId(
-  //   userId: string,
-  //   client: EntityManager,
-  //   mapping: any,
-  // ): Promise<any[]> {
-  //   return await client
-  //     .createQueryBuilder(mapping.Entity, 'entity')
-  //     .select('entity.id')
-  //     .innerJoin(`entity.${mapping.JoinColumn}`, 'associatedEntity')
-  //     .where(`associatedEntity.userId = :userId`, { userId })
-  //     .getMany();
-  // }
-  //
-  // private async deleteEntityData(
-  //   entityName: string,
-  //   entityIds: any[],
-  //   client: EntityManager,
-  // ): Promise<void> {
-  //   try {
-  //     await client.delete(entityName, entityIds);
-  //     console.log(
-  //       `Data deleted for entity: ${entityName}, ids: ${JSON.stringify(
-  //         entityIds,
-  //       )}`,
-  //     );
-  //   } catch (error) {
-  //     console.error(
-  //       `Error while deleting data for entity: ${entityName}, ids: ${JSON.stringify(
-  //         entityIds,
-  //       )}`,
-  //       error,
-  //     );
-  //   }
-  // }
-  //
-  // private handleUserDataRemovalError(error: any, userId?: string): void {
-  //   const errorMessage = userId
-  //     ? `Error while removing data for user ${userId}`
-  //     : `Error while removing user data`;
-  //   console.error(errorMessage, error);
-  //   throw new InternalServerErrorException(errorMessage);
-  // }
-
-  private extractValueFromMessage(message: string) {
+  private async extractValueFromMessage(message: string) {
     const match = /\(([^)]+)\)/.exec(message);
     return match ? match[1] : 'null';
   }
@@ -487,7 +347,7 @@ export class UsersRepo {
     );
   }
 
-  private isInvalidUUIDError(error: any): boolean {
+  private async isInvalidUUIDError(error: any): Promise<boolean> {
     return error.message.includes('invalid input syntax for type uuid');
   }
 

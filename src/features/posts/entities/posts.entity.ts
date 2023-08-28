@@ -49,7 +49,7 @@ export class PostsEntity {
   @Column({ default: false, nullable: false })
   dependencyIsBanned: boolean;
 
-  @Column({ nullable: false, default: true })
+  @Column({ nullable: false, default: false })
   isBanned: boolean;
 
   @Column({ default: false, nullable: false })
