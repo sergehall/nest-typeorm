@@ -100,6 +100,7 @@ export class UsersRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async saBanUnbanUser(userId: string, banInfo: BanInfoDto): Promise<boolean> {
     const { isBanned, banReason, banDate } = banInfo;
     try {
@@ -238,8 +239,8 @@ export class UsersRepo {
       // Fetch and return the updated user
       return await this.usersRepository.findOneBy({ userId: userId });
     } catch (error) {
-      // Handle errors (e.g., database errors)
-      throw new Error(`Error updating user role: ${error.message}`);
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 

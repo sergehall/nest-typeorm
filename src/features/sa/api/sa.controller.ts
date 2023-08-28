@@ -86,20 +86,7 @@ export class SaController {
       new CreateUserCommand(createUserDto, registrationData),
     );
 
-    const saUser: UsersEntity = await this.commandBus.execute(
-      new ChangeRoleCommand(newUser.userId),
-    );
-    return {
-      id: saUser.userId,
-      login: saUser.login,
-      email: saUser.email,
-      createdAt: saUser.createdAt,
-      banInfo: {
-        isBanned: saUser.isBanned,
-        banDate: saUser.banDate,
-        banReason: saUser.banReason,
-      },
-    };
+    return await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
   }
 
   @Delete('users/:id')
