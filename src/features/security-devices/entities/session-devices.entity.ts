@@ -18,7 +18,7 @@ export class SecurityDevicesEntity {
 
   @Column({
     type: 'character varying',
-    length: 50,
+    length: 300,
     nullable: false,
   })
   title: string;
