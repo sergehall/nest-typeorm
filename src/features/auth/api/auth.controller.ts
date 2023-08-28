@@ -34,14 +34,13 @@ import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
-import { ProfileDto } from '../dto/profile.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { UserIdEmailLoginDto } from '../dto/profile.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -97,15 +96,9 @@ export class AuthController {
       userAgent: req.get('user-agent') || 'None',
     };
 
-    const newUser: UsersEntity = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new RegistrationUserCommand(loginDto, registrationData),
     );
-
-    return {
-      id: newUser.userId,
-      login: newUser.login,
-      email: newUser.email,
-    };
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -226,12 +219,12 @@ export class AuthController {
   @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Request() req: any): ProfileDto {
-    const { email, login, id } = req.user;
+  async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {
+    const { userId, email, login } = req.user;
     return {
       email: email,
       login: login,
-      userId: id,
+      userId: userId,
     };
   }
 }
