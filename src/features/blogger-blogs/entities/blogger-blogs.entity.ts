@@ -26,11 +26,11 @@ export class BloggerBlogsEntity {
   @Column({ nullable: false, default: false })
   isMembership: boolean;
 
-  @Column({ nullable: false, default: true })
-  isBanned: boolean;
-
   @Column({ nullable: false, default: false })
   dependencyIsBanned: boolean;
+
+  @Column({ nullable: false, default: false })
+  isBanned: boolean;
 
   @Column({ nullable: false, default: false })
   banInfoIsBanned: boolean;

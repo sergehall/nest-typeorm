@@ -47,7 +47,10 @@ export class CommentsEntity {
   })
   banInfoBanReason: string;
 
-  @Column({ nullable: false, default: true })
+  @Column({ default: false, nullable: false })
+  dependencyIsBanned: boolean;
+
+  @Column({ nullable: false, default: false })
   isBanned: boolean;
 
   @ManyToOne(() => PostsEntity, (post) => post.comments, {
