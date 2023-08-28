@@ -4,6 +4,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { MailsService } from '../../../../mails/application/mails.service';
 import { UsersEntity } from '../../../users/entities/users.entity';
+import { UserIdEmailLoginDto } from '../../dto/profile.dto';
 
 export class RegistrationUserCommand {
   constructor(
@@ -20,7 +21,9 @@ export class RegistrationUserUseCase
     protected mailsService: MailsService,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: RegistrationUserCommand): Promise<UsersEntity> {
+  async execute(
+    command: RegistrationUserCommand,
+  ): Promise<UserIdEmailLoginDto> {
     const { createUserDto, registrationData } = command;
     const {} = registrationData;
 
@@ -30,6 +33,7 @@ export class RegistrationUserUseCase
 
     await this.mailsService.sendConfirmationCode(newUser);
 
-    return newUser;
+    const { userId, login, email } = newUser;
+    return { userId, login, email };
   }
 }
