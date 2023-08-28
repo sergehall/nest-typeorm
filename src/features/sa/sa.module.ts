@@ -6,7 +6,6 @@ import { SaController } from './api/sa.controller';
 import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
-import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
@@ -30,6 +29,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
 import { SaFindUsersUseCase } from './application/use-cases/sa-find-users.use-case';
 import { SaFindBlogsCommand } from './application/use-cases/sa-find-blogs.use-case';
+import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
 
 const saUseCases = [
   SaFindBlogsCommand,
