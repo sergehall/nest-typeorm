@@ -60,7 +60,7 @@ export class SaBanUnbanBlogUseCase
     currentUserDto: CurrentUserDto,
     blogOwnerId: string,
   ) {
-    const ability = await this.caslAbilityFactory.createSaUser(currentUserDto);
+    const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: blogOwnerId,

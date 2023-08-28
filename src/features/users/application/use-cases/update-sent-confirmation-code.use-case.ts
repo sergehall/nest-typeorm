@@ -4,7 +4,6 @@ import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-
 import { MailsService } from '../../../../mails/application/mails.service';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
-import { NotFoundException } from '@nestjs/common';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -37,7 +36,9 @@ export class UpdateSentConfirmationCodeUseCase
       );
 
     if (!updatedUser) {
-      throw new NotFoundException(`User with email: ${email} not found`);
+      throw new Error(
+        `Invalid update user confirmationCode: ${confirmationCode}`,
+      );
     }
 
     return await this.mailsService.sendConfirmationCode(updatedUser);

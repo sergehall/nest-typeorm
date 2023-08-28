@@ -23,7 +23,7 @@ export class EmailAndLoginNotExistValidator
       await this.usersRepo.findUserByLoginOrEmail(value);
 
     if (!user) {
-      return true; // Don't perform validation if value is not provided
+      return false;
     }
 
     return (
