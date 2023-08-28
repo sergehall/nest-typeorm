@@ -6,14 +6,13 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from '../../infrastructure/like-status-comments-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
-import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
-import { UsersEntity } from '../../../users/entities/users.entity';
 import { CommentsEntity } from '../../entities/comments.entity';
 import { LikeStatusCommentsRepo } from '../../infrastructure/like-status-comments.repo';
+import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
+import { CommentsRepo } from '../../infrastructure/comments.repo';
+import { LikeStatusCommentsEntity } from '../../entities/like-status-comments.entity';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(
@@ -28,49 +27,43 @@ export class ChangeLikeStatusCommentUseCase
   implements ICommandHandler<ChangeLikeStatusCommentCommand>
 {
   constructor(
-    protected commentsRawSqlRepository: CommentsRawSqlRepository,
-    protected likeStatusCommentsRawSqlRepository: LikeStatusCommentsRawSqlRepository,
+    protected caslAbilityFactory: CaslAbilityFactory,
+    protected commentsRepo: CommentsRepo,
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
     protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
-  async execute(command: ChangeLikeStatusCommentCommand): Promise<boolean> {
+  async execute(
+    command: ChangeLikeStatusCommentCommand,
+  ): Promise<LikeStatusCommentsEntity> {
     const { commentId, likeStatusDto, currentUserDto } = command;
-    const findComment =
-      await this.commentsRawSqlRepository.findCommentByCommentId(
-        command.commentId,
-      );
-    if (!findComment) throw new NotFoundException('Not found comment.');
 
-    const userIsBannedForBlog =
-      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        currentUserDto.userId,
-        findComment.postInfoBlogId,
-      );
+    const findComment: CommentsEntity | null =
+      await this.commentsRepo.findCommentById(commentId);
 
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForBlog);
+    if (!findComment)
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
-    const commentatorUserEntity = new UsersEntity();
-    commentatorUserEntity.userId = findComment.commentatorInfoUserId;
-
-    const blogEntity = new BloggerBlogsEntity();
-    blogEntity.id = findComment.postInfoBlogId;
-
-    const findCommentEntity = new CommentsEntity();
-    findCommentEntity.id = commentId;
-    findCommentEntity.commentator = commentatorUserEntity;
-    findCommentEntity.blog = blogEntity;
+    await this.checkUserPermission(currentUserDto.userId, findComment.blog.id);
 
     try {
-      const result = await this.likeStatusCommentsRepo.updateLikeStatusComment(
+      return await this.likeStatusCommentsRepo.updateLikeStatusComment(
         likeStatusDto,
         currentUserDto,
-        findCommentEntity,
+        findComment,
       );
-      return result !== null;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async checkUserPermission(userId: string, postInfoBlogId: string) {
+    const userIsBannedForBlog =
+      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
+        userId,
+        postInfoBlogId,
+      );
+    if (userIsBannedForBlog)
+      throw new ForbiddenException(userNotHavePermissionForBlog);
   }
 }

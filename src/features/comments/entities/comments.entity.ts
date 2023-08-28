@@ -47,19 +47,26 @@ export class CommentsEntity {
   })
   banInfoBanReason: string;
 
-  @ManyToOne(() => PostsEntity, (post) => post.comments, { nullable: false })
+  @ManyToOne(() => PostsEntity, (post) => post.comments, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn([
     { name: 'postInfoPostId', referencedColumnName: 'id' },
     { name: 'postInfoTitle', referencedColumnName: 'title' },
   ])
   post: PostsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'postInfoBlogOwnerId' })
   blogOwner: UsersEntity;
 
   @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.comments, {
     nullable: false,
+    eager: true,
   })
   @JoinColumn([
     { name: 'postInfoBlogId', referencedColumnName: 'id' },
@@ -67,7 +74,10 @@ export class CommentsEntity {
   ])
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.comments, { nullable: false })
+  @ManyToOne(() => UsersEntity, (user) => user.comments, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn([
     { name: 'commentatorInfoUserId', referencedColumnName: 'userId' },
     { name: 'commentatorInfoUserLogin', referencedColumnName: 'login' },

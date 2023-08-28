@@ -32,6 +32,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusCommentsRepo } from './infrastructure/like-status-comments.repo';
 import { LikeStatusCommentsEntity } from './entities/like-status-comments.entity';
+import { CommentsRepo } from './infrastructure/comments.repo';
+import { CommentsEntity } from './entities/comments.entity';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
@@ -48,7 +50,11 @@ const commentsUseCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, LikeStatusCommentsEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      CommentsEntity,
+      LikeStatusCommentsEntity,
+    ]),
     CaslModule,
     CqrsModule,
   ],
@@ -65,6 +71,7 @@ const commentsUseCases = [
     UsersRawSqlRepository,
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
+    CommentsRepo,
     CommentsRawSqlRepository,
     LikeStatusCommentsRepo,
     LikeStatusCommentsRawSqlRepository,

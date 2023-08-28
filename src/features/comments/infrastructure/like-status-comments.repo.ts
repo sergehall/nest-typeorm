@@ -40,10 +40,6 @@ export class LikeStatusCommentsRepo {
     currentUserDto: CurrentUserDto,
     findComment: CommentsEntity,
   ): Promise<LikeStatusCommentsEntity> {
-    console.log(likeStatusDto);
-    console.log(currentUserDto);
-    console.log(findComment);
-
     const blogEntity = new BloggerBlogsEntity();
     blogEntity.id = findComment.blog.id;
 

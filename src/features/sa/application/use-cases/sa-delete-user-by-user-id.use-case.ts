@@ -25,13 +25,16 @@ export class SaDeleteUserByUserIdUseCase
     if (!userToRemove)
       throw new NotFoundException(`User with ID ${userId} not found`);
 
-    this.checkUserPermission(currentUserDto, userToRemove.userId);
+    await this.checkUserPermission(currentUserDto, userToRemove.userId);
 
     await this.usersRepo.deleteUserDataByUserId(userToRemove.userId);
     return true;
   }
 
-  private checkUserPermission(currentUserDto: CurrentUserDto, userId: string) {
+  private async checkUserPermission(
+    currentUserDto: CurrentUserDto,
+    userId: string,
+  ) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {

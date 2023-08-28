@@ -27,6 +27,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';
 import { ReturnCommentsEntity } from '../entities/return-comments.entity';
+import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 
 @SkipThrottle()
 @Controller('comments')
@@ -87,7 +88,7 @@ export class CommentsController {
     @Request() req: any,
     @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ): Promise<boolean> {
+  ): Promise<LikeStatusCommentsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
