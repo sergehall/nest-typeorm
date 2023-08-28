@@ -13,14 +13,6 @@ import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
-import { BannedUserForBlogEntity } from '../entities/banned-user-for-blog.entity';
-import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
-import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
-import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
-import { CommentsEntity } from '../../comments/entities/comments.entity';
-import { PostsEntity } from '../../posts/entities/posts.entity';
-import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { BanInfoDto } from '../dto/banInfo.dto';
 
 export class UsersRepo {
@@ -83,7 +75,7 @@ export class UsersRepo {
 
   async findUserById(userId: string): Promise<UsersEntity | null> {
     try {
-      const user = await this.usersRepository.findBy({ userId: userId });
+      const user = await this.usersRepository.findBy({ userId });
       return user[0] ? user[0] : null;
     } catch (error) {
       if (this.isInvalidUUIDError(error)) {
@@ -266,130 +258,182 @@ export class UsersRepo {
         },
       );
     } catch (error) {
-      this.handleUserDataRemovalError(error);
+      console.error(`Error while removing data for users: ${error.message}`);
+      throw new Error(`Error while removing data for users`);
     }
   }
 
   private async deleteUserData(
     userId: string,
-    client: EntityManager,
+    entityManager: EntityManager,
   ): Promise<void> {
     try {
-      const deleteUserDataArray = await this.getDeleteDataArray(userId, client);
-
-      await Promise.all(
-        deleteUserDataArray.map(async (userData) => {
-          for (const [entityName, entityIds] of Object.entries(userData)) {
-            await this.deleteEntityData(entityName, entityIds, client);
-          }
+      await Promise.all([
+        entityManager.delete('SecurityDevices', { user: userId }),
+        entityManager.delete('BannedUsersForBlogs', {
+          bannedUserForBlogs: userId,
         }),
-      );
-      await this.deleteEntityData('Users', [{ userId }], client);
-    } catch (error) {
-      this.handleUserDataRemovalError(error, userId);
-    }
-  }
+        entityManager.delete('SentCodesLog', { sentForUser: userId }),
+        entityManager.delete('LikeStatusComments', {
+          ratedCommentUser: userId,
+        }),
+        entityManager.delete('LikeStatusPosts', { ratedPostUser: userId }),
+      ]);
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('Comments')
+        .where('commentatorInfoUserId = :userId', { userId })
+        .execute();
+      await entityManager.delete('Posts', { postOwner: userId });
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('BloggerBlogs')
+        .where('blogOwnerId = :userId', { userId })
+        .execute();
 
-  private async getDeleteDataArray(
-    userId: string,
-    client: EntityManager,
-  ): Promise<Array<{ [key: string]: string[] }>> {
-    const entityMappings = [
-      {
-        Entity: SecurityDevicesEntity,
-        Key: 'SecurityDevices',
-        JoinColumn: 'user',
-      },
-      {
-        Entity: BannedUserForBlogEntity,
-        Key: 'BannedUserForBlog',
-        JoinColumn: 'bannedUserForBlog',
-      },
-      {
-        Entity: SentCodesLogEntity,
-        Key: 'SentCodeLog',
-        JoinColumn: 'sentForUser',
-      },
-      {
-        Entity: LikeStatusCommentsEntity,
-        Key: 'LikeStatusComments',
-        JoinColumn: 'commentOwner',
-      },
-      {
-        Entity: LikeStatusPostsEntity,
-        Key: 'LikeStatusPosts',
-        JoinColumn: 'postOwner',
-      },
-      { Entity: CommentsEntity, Key: 'Comments', JoinColumn: 'commentator' },
-      { Entity: PostsEntity, Key: 'Posts', JoinColumn: 'postOwner' },
-      {
-        Entity: BloggerBlogsEntity,
-        Key: 'BloggerBlogs',
-        JoinColumn: 'blogOwner',
-      },
-    ];
-
-    const deleteDataArray: Array<{ [key: string]: string[] }> = [];
-
-    for (const mapping of entityMappings) {
-      const entityIds = await this.getEntityIdsByUserId(
-        userId,
-        client,
-        mapping,
-      );
-      if (entityIds.length > 0) {
-        const keyValuePair = {
-          [mapping.Key]: entityIds.map((entity) => entity.id),
-        };
-        deleteDataArray.push(keyValuePair);
-      }
-    }
-
-    return deleteDataArray;
-  }
-
-  private async getEntityIdsByUserId(
-    userId: string,
-    client: EntityManager,
-    mapping: any,
-  ): Promise<any[]> {
-    return await client
-      .createQueryBuilder(mapping.Entity, 'entity')
-      .select('entity.id')
-      .innerJoin(`entity.${mapping.JoinColumn}`, 'associatedEntity')
-      .where(`associatedEntity.userId = :userId`, { userId })
-      .getMany();
-  }
-
-  private async deleteEntityData(
-    entityName: string,
-    entityIds: any[],
-    client: EntityManager,
-  ): Promise<void> {
-    try {
-      await client.delete(entityName, entityIds);
-      console.log(
-        `Data deleted for entity: ${entityName}, ids: ${JSON.stringify(
-          entityIds,
-        )}`,
-      );
+      await entityManager.delete('Users', { userId });
     } catch (error) {
       console.error(
-        `Error while deleting data for entity: ${entityName}, ids: ${JSON.stringify(
-          entityIds,
-        )}`,
-        error,
+        `Error while removing data for user ${userId}: ${error.message}`,
       );
+      throw new Error(`Error while removing data for user ${userId}`);
     }
   }
 
-  private handleUserDataRemovalError(error: any, userId?: string): void {
-    const errorMessage = userId
-      ? `Error while removing data for user ${userId}`
-      : `Error while removing user data`;
-    console.error(errorMessage, error);
-    throw new InternalServerErrorException(errorMessage);
-  }
+  // async deleteUserDataByUserId(userId: string): Promise<void> {
+  //   try {
+  //     await this.usersRepository.manager.transaction(
+  //       async (transactionalEntityManager) => {
+  //         await this.deleteUserData(userId, transactionalEntityManager);
+  //       },
+  //     );
+  //   } catch (error) {
+  //     this.handleUserDataRemovalError(error);
+  //   }
+  // }
+
+  // private async deleteUserData(
+  //   userId: string,
+  //   client: EntityManager,
+  // ): Promise<void> {
+  //   try {
+  //     const deleteUserDataArray = await this.getDeleteDataArray(userId, client);
+  //
+  //     await Promise.all(
+  //       deleteUserDataArray.map(async (userData) => {
+  //         for (const [entityName, entityIds] of Object.entries(userData)) {
+  //           await this.deleteEntityData(entityName, entityIds, client);
+  //         }
+  //       }),
+  //     );
+  //     await this.deleteEntityData('Users', [{ userId }], client);
+  //   } catch (error) {
+  //     this.handleUserDataRemovalError(error, userId);
+  //   }
+  // }
+
+  // private async getDeleteDataArray(
+  //   userId: string,
+  //   client: EntityManager,
+  // ): Promise<Array<{ [key: string]: string[] }>> {
+  //   const entityMappings = [
+  //     {
+  //       Entity: SecurityDevicesEntity,
+  //       Key: 'SecurityDevices',
+  //       JoinColumn: 'user',
+  //     },
+  //     {
+  //       Entity: BannedUsersForBlogsEntity,
+  //       Key: 'BannedUserForBlog',
+  //       JoinColumn: 'bannedUserForBlog',
+  //     },
+  //     {
+  //       Entity: SentCodesLogEntity,
+  //       Key: 'SentCodeLog',
+  //       JoinColumn: 'sentForUser',
+  //     },
+  //     {
+  //       Entity: LikeStatusCommentsEntity,
+  //       Key: 'LikeStatusComments',
+  //       JoinColumn: 'commentOwner',
+  //     },
+  //     {
+  //       Entity: LikeStatusPostsEntity,
+  //       Key: 'LikeStatusPosts',
+  //       JoinColumn: 'postOwner',
+  //     },
+  //     { Entity: CommentsEntity, Key: 'Comments', JoinColumn: 'commentator' },
+  //     { Entity: PostsEntity, Key: 'Posts', JoinColumn: 'postOwner' },
+  //     {
+  //       Entity: BloggerBlogsEntity,
+  //       Key: 'BloggerBlogs',
+  //       JoinColumn: 'blogOwner',
+  //     },
+  //   ];
+  //
+  //   const deleteDataArray: Array<{ [key: string]: string[] }> = [];
+  //
+  //   for (const mapping of entityMappings) {
+  //     const entityIds = await this.getEntityIdsByUserId(
+  //       userId,
+  //       client,
+  //       mapping,
+  //     );
+  //     if (entityIds.length > 0) {
+  //       const keyValuePair = {
+  //         [mapping.Key]: entityIds.map((entity) => entity.id),
+  //       };
+  //       deleteDataArray.push(keyValuePair);
+  //     }
+  //   }
+  //
+  //   return deleteDataArray;
+  // }
+
+  // private async getEntityIdsByUserId(
+  //   userId: string,
+  //   client: EntityManager,
+  //   mapping: any,
+  // ): Promise<any[]> {
+  //   return await client
+  //     .createQueryBuilder(mapping.Entity, 'entity')
+  //     .select('entity.id')
+  //     .innerJoin(`entity.${mapping.JoinColumn}`, 'associatedEntity')
+  //     .where(`associatedEntity.userId = :userId`, { userId })
+  //     .getMany();
+  // }
+  //
+  // private async deleteEntityData(
+  //   entityName: string,
+  //   entityIds: any[],
+  //   client: EntityManager,
+  // ): Promise<void> {
+  //   try {
+  //     await client.delete(entityName, entityIds);
+  //     console.log(
+  //       `Data deleted for entity: ${entityName}, ids: ${JSON.stringify(
+  //         entityIds,
+  //       )}`,
+  //     );
+  //   } catch (error) {
+  //     console.error(
+  //       `Error while deleting data for entity: ${entityName}, ids: ${JSON.stringify(
+  //         entityIds,
+  //       )}`,
+  //       error,
+  //     );
+  //   }
+  // }
+  //
+  // private handleUserDataRemovalError(error: any, userId?: string): void {
+  //   const errorMessage = userId
+  //     ? `Error while removing data for user ${userId}`
+  //     : `Error while removing user data`;
+  //   console.error(errorMessage, error);
+  //   throw new InternalServerErrorException(errorMessage);
+  // }
 
   private extractValueFromMessage(message: string) {
     const match = /\(([^)]+)\)/.exec(message);

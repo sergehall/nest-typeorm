@@ -28,7 +28,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
       await this.usersRawSqlRepository.findUserByUserId(id);
 
     if (!userToUpdate) {
-      throw new NotFoundException('Not found user');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
 
     await this.checkUserPermission(userToUpdate, currentUserDto);

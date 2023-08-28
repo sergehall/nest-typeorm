@@ -58,6 +58,7 @@ export class LikeStatusCommentsRepo {
       id: uuid4().toString(),
       likeStatus: likeStatusDto.likeStatus,
       createdAt: new Date().toISOString(),
+      isBanned: false,
       comment: commentEntity,
       ratedCommentUser: ratedUserEntity,
       blog: blogEntity,

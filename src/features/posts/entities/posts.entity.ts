@@ -49,6 +49,9 @@ export class PostsEntity {
   @Column({ default: false, nullable: false })
   dependencyIsBanned: boolean;
 
+  @Column({ nullable: false, default: true })
+  isBanned: boolean;
+
   @Column({ default: false, nullable: false })
   banInfoIsBanned: boolean;
 
@@ -60,6 +63,7 @@ export class PostsEntity {
 
   @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.posts, {
     nullable: false,
+    eager: true,
   })
   @JoinColumn([
     { name: 'blogId', referencedColumnName: 'id' },
@@ -67,7 +71,10 @@ export class PostsEntity {
   ])
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'postOwnerId', referencedColumnName: 'userId' })
   postOwner: UsersEntity;
 

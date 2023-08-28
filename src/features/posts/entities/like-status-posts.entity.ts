@@ -28,21 +28,34 @@ export class LikeStatusPostsEntity {
   })
   addedAt: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, { nullable: false })
+  @Column({ default: false })
+  isBanned: boolean;
+
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'postOwnerId', referencedColumnName: 'userId' })
   postOwner: UsersEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.ratedPostUser, {
     nullable: false,
+    eager: true,
   })
-  @JoinColumn([{ name: 'userId' }, { name: 'login' }, { name: 'isBanned' }])
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   ratedPostUser: UsersEntity;
 
-  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, { nullable: false })
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => PostsEntity, (post) => post.id, { nullable: false })
+  @ManyToOne(() => PostsEntity, (post) => post.id, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'postId', referencedColumnName: 'id' })
   post: PostsEntity;
 }

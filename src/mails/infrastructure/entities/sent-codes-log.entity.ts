@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 
-@Entity('SentCodeLog')
+@Entity('SentCodesLog')
 export class SentCodesLogEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -19,10 +19,13 @@ export class SentCodesLogEntity {
   })
   sentCodeTime: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user, { nullable: false })
+  @ManyToOne(() => UsersEntity, (user) => user, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn([
-    { name: 'email', referencedColumnName: 'email' },
     { name: 'userId', referencedColumnName: 'userId' },
+    { name: 'email', referencedColumnName: 'email' },
   ])
   sentForUser: UsersEntity;
 }

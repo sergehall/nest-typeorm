@@ -304,7 +304,7 @@ export class CommentsRawSqlRepository {
         INSERT INTO public."Comments"(
           "id", "content", "createdAt", "postInfoPostId", "postInfoTitle", "postInfoBlogId",
           "postInfoBlogName", "postInfoBlogOwnerId", 
-          "commentatorInfoUserId", "commentatorInfoUserLogin", "commentatorInfoIsBanned", 
+          "commentatorInfoUserId", "commentatorInfoUserLogin", "isBanned", 
           "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason")
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
           RETURNING "id", "content", "createdAt", "commentatorInfoUserId", "commentatorInfoUserLogin"
@@ -321,7 +321,7 @@ export class CommentsRawSqlRepository {
         commentEntity.postInfoBlogOwnerId,
         commentEntity.commentatorInfoUserId,
         commentEntity.commentatorInfoUserLogin,
-        commentEntity.commentatorInfoIsBanned,
+        commentEntity.isBanned,
         commentEntity.banInfoIsBanned,
         commentEntity.banInfoBanDate,
         commentEntity.banInfoBanReason,
@@ -471,7 +471,7 @@ export class CommentsRawSqlRepository {
       postInfoBlogOwnerId: post.postOwnerId,
       commentatorInfoUserId: currentUserDto.userId,
       commentatorInfoUserLogin: currentUserDto.login,
-      commentatorInfoIsBanned: false,
+      isBanned: false,
       banInfoIsBanned: false,
       banInfoBanDate: null,
       banInfoBanReason: null,
