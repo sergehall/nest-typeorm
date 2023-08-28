@@ -30,22 +30,40 @@ export class UsersRepo {
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
       const direction = queryData.queryPagination.sortDirection;
       const limit = queryData.queryPagination.pageSize;
-      const offset =
-        (queryData.queryPagination.pageNumber - 1) *
-        queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      return await this.usersRepository
+      const query = this.usersRepository
         .createQueryBuilder('user')
-        .select('*')
-        .where('user.email LIKE :email OR user.login LIKE :login', {
+        .select([
+          'user.userId',
+          'user.login',
+          'user.email',
+          'user.passwordHash',
+          'user.createdAt',
+          'user.orgId',
+          'user.roles',
+          'user.isBanned',
+          'user.banDate',
+          'user.banReason',
+          'user.confirmationCode',
+          'user.expirationDate',
+          'user.isConfirmed',
+          'user.isConfirmedDate',
+          'user.ip',
+          'user.userAgent',
+        ])
+        .where('(user.email LIKE :email OR user.login LIKE :login)', {
           email: searchEmailTerm,
           login: searchLoginTerm,
         })
-        .andWhere('user.isBanned IN (:...banCondition)', { banCondition })
+        .andWhere('user.isBanned IN (:...banStatus)', {
+          banStatus: banCondition,
+        })
         .orderBy(`user.${sortBy}`, direction)
         .limit(limit)
-        .offset(offset)
-        .getRawMany();
+        .offset(offset);
+
+      return await query.getMany();
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -60,11 +78,13 @@ export class UsersRepo {
       const totalCount = await this.usersRepository
         .createQueryBuilder('user')
         .select('COUNT(user.userId)', 'count')
-        .where('user.email LIKE :email OR user.login LIKE :login', {
+        .where('(user.email LIKE :email OR user.login LIKE :login)', {
           email: searchEmailTerm,
           login: searchLoginTerm,
         })
-        .andWhere('user.isBanned IN (:...banCondition)', { banCondition })
+        .andWhere('user.isBanned IN (:...banStatus)', {
+          banStatus: banCondition,
+        })
         .getRawOne();
 
       return Number(totalCount.count);
