@@ -11,7 +11,7 @@ import {
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
-import { BannedUserForBlogEntity } from '../../users/entities/banned-user-for-blog.entity';
+import { BannedUsersForBlogsEntity } from '../../users/entities/banned-users-for-blogs.entity';
 
 @Entity('BloggerBlogs')
 @Unique(['id'])
@@ -25,6 +25,9 @@ export class BloggerBlogsEntity {
 
   @Column({ nullable: false, default: false })
   isMembership: boolean;
+
+  @Column({ nullable: false, default: true })
+  isBanned: boolean;
 
   @Column({ nullable: false, default: false })
   dependencyIsBanned: boolean;
@@ -49,6 +52,7 @@ export class BloggerBlogsEntity {
 
   @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs, {
     nullable: false,
+    eager: true,
   })
   @JoinColumn([
     { name: 'blogOwnerId', referencedColumnName: 'userId' },
@@ -56,9 +60,8 @@ export class BloggerBlogsEntity {
   ])
   blogOwner: UsersEntity;
 
-  @OneToOne(() => BannedUserForBlogEntity, (ban) => ban.bannedBlog)
-  @JoinColumn({ name: 'banId', referencedColumnName: 'id' })
-  bannedBlog: BannedUserForBlogEntity;
+  @OneToOne(() => BannedUsersForBlogsEntity, (ban) => ban.bannedBlog)
+  bannedBlog: BannedUsersForBlogsEntity;
 
   @OneToMany(() => PostsEntity, (posts) => posts.blog)
   posts: PostsEntity[];

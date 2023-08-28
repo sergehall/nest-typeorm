@@ -39,6 +39,7 @@ export class SecurityDevicesEntity {
 
   @ManyToOne(() => UsersEntity, (user) => user.securityDevices, {
     nullable: false,
+    eager: true,
   })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UsersEntity;

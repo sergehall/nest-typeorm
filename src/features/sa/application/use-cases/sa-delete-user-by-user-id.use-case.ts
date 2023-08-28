@@ -6,18 +6,18 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
-export class SaDeleteUserByUserIddCommand {
+export class SaDeleteUserByUserIdCommand {
   constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
 }
-@CommandHandler(SaDeleteUserByUserIddCommand)
+@CommandHandler(SaDeleteUserByUserIdCommand)
 export class SaDeleteUserByUserIdUseCase
-  implements ICommandHandler<SaDeleteUserByUserIddCommand>
+  implements ICommandHandler<SaDeleteUserByUserIdCommand>
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRepo: UsersRepo,
   ) {}
-  async execute(command: SaDeleteUserByUserIddCommand): Promise<boolean> {
+  async execute(command: SaDeleteUserByUserIdCommand): Promise<boolean> {
     const { userId, currentUserDto } = command;
 
     const userToRemove = await this.usersRepo.findUserById(userId);
@@ -37,12 +37,12 @@ export class SaDeleteUserByUserIdUseCase
   ) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
-      ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
+      ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, {
         id: userId,
       });
     } catch (error) {
       throw new ForbiddenException(
-        'You are not allowed to remove user. ' + error.message,
+        'You are not allowed to delete user. ' + error.message,
       );
     }
   }

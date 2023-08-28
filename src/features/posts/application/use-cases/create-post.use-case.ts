@@ -38,7 +38,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
-      throw new NotFoundException('Blog not found');
+      throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
 
     await this.checkUserPermission(blog, currentUserDto);

@@ -22,6 +22,9 @@ export class LikeStatusCommentsEntity {
   })
   createdAt: string;
 
+  @Column({ default: false })
+  isBanned: boolean;
+
   @ManyToOne(() => CommentsEntity, (comment) => comment.id, {
     nullable: false,
     eager: true,
@@ -33,11 +36,7 @@ export class LikeStatusCommentsEntity {
     nullable: false,
     eager: true,
   })
-  @JoinColumn([
-    { name: 'userId', referencedColumnName: 'userId' },
-    { name: 'login', referencedColumnName: 'login' },
-    { name: 'isBanned', referencedColumnName: 'isBanned' },
-  ])
+  @JoinColumn({ name: 'userId' })
   ratedCommentUser: UsersEntity;
 
   @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, {

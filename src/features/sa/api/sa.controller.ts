@@ -25,7 +25,6 @@ import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
-import { SaDeleteUserByUserIddCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
@@ -36,6 +35,7 @@ import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-res
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
+import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -105,14 +105,14 @@ export class SaController {
   @Delete('users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async removeUserById(
+  async deleteUserById(
     @Request() req: any,
     @Param() params: IdParams,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new SaDeleteUserByUserIddCommand(params.id, currentUserDto),
+      new SaDeleteUserByUserIdCommand(params.id, currentUserDto),
     );
   }
 

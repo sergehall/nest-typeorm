@@ -398,7 +398,7 @@ export class BloggerBlogsRawSqlRepository {
   async manageBlogAccess(
     bannedUserForBlogEntity: TableBannedUsersForBlogsEntity,
   ): Promise<boolean> {
-    const { id, login, userId, blogId, isBanned, banDate, banReason } =
+    const { id, userId, blogId, isBanned, banDate, banReason } =
       bannedUserForBlogEntity;
     try {
       await this.db.transaction(async (client) => {
@@ -436,13 +436,13 @@ export class BloggerBlogsRawSqlRepository {
           await client.query(
             `
           INSERT INTO public."BannedUsersForBlogs"
-          ("id", "login", "isBanned", "banDate", "banReason", "blogId", "userId")
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ("id", "isBanned", "banDate", "banReason", "blogId", "userId")
+          VALUES ($1, $2, $3, $4, $5, $6,)
           ON CONFLICT ("blogId", "userId", "isBanned")
           DO UPDATE SET "banDate" = $4, "banReason" = $5
           RETURNING "id";
         `,
-            [id, login, isBanned, banDate, banReason, blogId, userId],
+            [id, isBanned, banDate, banReason, blogId, userId],
           );
         } else {
           // Delete record from BannedUsersForBlogs table if unBan user

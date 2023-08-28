@@ -64,7 +64,7 @@ export class TablesCommentsEntity {
   @Matches('^[a-zA-Z0-9_-]*$')
   commentatorInfoUserLogin: string;
   @IsBoolean()
-  commentatorInfoIsBanned: boolean;
+  isBanned: boolean;
   @IsNotEmpty()
   @IsBoolean({
     message: 'Incorrect isBanned length! Must be boolean.',

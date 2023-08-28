@@ -47,6 +47,9 @@ export class CommentsEntity {
   })
   banInfoBanReason: string;
 
+  @Column({ nullable: false, default: true })
+  isBanned: boolean;
+
   @ManyToOne(() => PostsEntity, (post) => post.comments, {
     nullable: false,
     eager: true,
@@ -81,10 +84,6 @@ export class CommentsEntity {
   @JoinColumn([
     { name: 'commentatorInfoUserId', referencedColumnName: 'userId' },
     { name: 'commentatorInfoUserLogin', referencedColumnName: 'login' },
-    {
-      name: 'commentatorInfoIsBanned',
-      referencedColumnName: 'isBanned',
-    },
   ])
   commentator: UsersEntity;
 }
