@@ -11,7 +11,7 @@ export class SecurityDevicesEntity {
 
   @Column({
     type: 'character varying',
-    length: 20,
+    length: 50,
     nullable: false,
   })
   ip: string;
