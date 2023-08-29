@@ -37,6 +37,7 @@ export class BlacklistJwtRawSqlRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async JwtExistInBlackList(jwt: string): Promise<boolean> {
     try {
       const findJwt = await this.db.query(

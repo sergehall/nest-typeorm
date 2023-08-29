@@ -1,19 +1,19 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { BlacklistJwtRawSqlRepository } from '../features/auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../features/security-devices/infrastructure/security-devices-raw-sql.repository';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
+import { InvalidJwtRepo } from '../features/auth/infrastructure/invalid-jwt-repo';
 
 @Injectable()
 export class DataCleanupService {
   constructor(
+    private readonly invalidJwtRepo: InvalidJwtRepo,
     private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
-    private readonly blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
     private readonly usersRawSqlRepository: UsersRawSqlRepository,
   ) {}
 
-  async removeInvalidJWTFromBlackList(): Promise<void> {
+  async clearingExpiredJwtFromInvalidJwt(): Promise<void> {
     try {
-      return await this.blacklistJwtRawSqlRepository.clearingInvalidJWTFromBlackList();
+      return await this.invalidJwtRepo.clearingExpiredJwt();
     } catch (error) {
       console.error('Error while clearing invalid JWT tokens:', error.message);
       throw new InternalServerErrorException(
