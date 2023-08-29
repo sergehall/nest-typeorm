@@ -15,14 +15,8 @@ export class DecodeTokenService {
         message: 'Invalid refreshToken, cannot be decoded.',
       });
     }
-    const { userId, email, deviceId, iat, exp, ...restPayload } = payload;
-    return {
-      userId,
-      email,
-      deviceId,
-      iat,
-      exp,
-      ...restPayload, // Include any other properties from the decoded payload
-    };
+
+    const { userId, deviceId, iat, exp } = payload;
+    return { userId, deviceId, iat, exp };
   }
 }

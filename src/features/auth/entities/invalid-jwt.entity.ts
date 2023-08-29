@@ -9,7 +9,7 @@ export class InvalidJwtEntity {
     type: 'character varying',
     nullable: false,
   })
-  refreshToken: string;
+  hashedRefreshToken: string;
 
   @Column({
     type: 'character varying',

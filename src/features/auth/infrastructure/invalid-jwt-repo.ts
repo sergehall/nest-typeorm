@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InvalidJwtEntity } from '../entities/invalid-jwt.entity';
 import { InvalidJwtDto } from '../dto/invalid-jwt.dto';
 import { InternalServerErrorException } from '@nestjs/common';
+import * as crypto from 'crypto';
 
 export class InvalidJwtRepo {
   constructor(
@@ -11,10 +12,11 @@ export class InvalidJwtRepo {
   ) {}
 
   async addJwt(jwtBlacklistDto: InvalidJwtDto): Promise<boolean> {
+    const { refreshToken, expirationDate } = jwtBlacklistDto;
     try {
       const invalidJwtEntity = this.invalidJwtRepository.create({
-        refreshToken: jwtBlacklistDto.refreshToken,
-        expirationDate: jwtBlacklistDto.expirationDate,
+        hashedRefreshToken: await this.hashRefreshToken(refreshToken),
+        expirationDate: expirationDate,
       });
 
       const result = await this.invalidJwtRepository.save(invalidJwtEntity);
@@ -29,12 +31,17 @@ export class InvalidJwtRepo {
     try {
       const findJwt = await this.invalidJwtRepository.findOne({
         where: {
-          refreshToken: jwt,
+          hashedRefreshToken: await this.hashRefreshToken(jwt),
         },
       });
       return !!findJwt;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  // Hash the refresh token before saving
+  private async hashRefreshToken(refreshToken: string): Promise<string> {
+    return crypto.createHash('sha256').update(refreshToken).digest('hex');
   }
 }
