@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { RegDataDto } from '../../dto/reg-data.dto';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
@@ -9,10 +8,7 @@ import { UsersEntity } from '../../entities/users.entity';
 import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
 
 export class CreateUserCommand {
-  constructor(
-    public createUserDto: CreateUserDto,
-    public registrationData: RegDataDto,
-  ) {}
+  constructor(public createUserDto: CreateUserDto) {}
 }
 
 @CommandHandler(CreateUserCommand)
@@ -26,7 +22,6 @@ export class CreateUserUseCase
   ) {}
   async execute(command: CreateUserCommand): Promise<UsersEntity> {
     const { login, email, password } = command.createUserDto;
-    const { ip, userAgent } = command.registrationData;
 
     // Hash the user's password
     const passwordHash = await this.encryptConfig.getPasswordHash(password);
@@ -42,8 +37,6 @@ export class CreateUserUseCase
       email,
       passwordHash,
       expirationDate,
-      ip,
-      userAgent,
     };
 
     return await this.usersRepo.createUser(dataForCreateUserDto);

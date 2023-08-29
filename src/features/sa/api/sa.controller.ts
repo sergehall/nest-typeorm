@@ -7,7 +7,6 @@ import {
   Delete,
   UseGuards,
   Request,
-  Ip,
   Query,
   HttpCode,
   HttpStatus,
@@ -59,10 +58,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchBlogsForSa(
-    @Request() req: any,
-    @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  async searchBlogsForSa(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(new SaFindUsersCommand(queryData));
   }
@@ -72,18 +68,10 @@ export class SaController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
-    @Request() req: any,
     @Body() createUserDto: CreateUserDto,
-    @Ip() ip: string,
   ): Promise<ReturnUsersBanInfoEntity> {
-    const userAgent = req.get('user-agent') || 'None';
-    const registrationData = {
-      ip: ip,
-      userAgent: userAgent,
-    };
-
     const newUser: UsersEntity = await this.commandBus.execute(
-      new CreateUserCommand(createUserDto, registrationData),
+      new CreateUserCommand(createUserDto),
     );
 
     return await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));

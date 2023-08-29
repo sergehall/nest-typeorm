@@ -1,11 +1,11 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
+import { InvalidJwtDto } from '../dto/invalid-jwt.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class BlacklistJwtRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-  async addJwt(jwtBlacklistDto: JwtBlacklistDto): Promise<boolean> {
+  async addJwt(jwtBlacklistDto: InvalidJwtDto): Promise<boolean> {
     try {
       const result = await this.db.query(
         `
@@ -20,6 +20,7 @@ export class BlacklistJwtRawSqlRepository {
       return false;
     }
   }
+
   async clearingInvalidJWTFromBlackList(): Promise<void> {
     try {
       const currentTime = new Date().toISOString();
@@ -31,9 +32,9 @@ export class BlacklistJwtRawSqlRepository {
       `,
         [currentTime],
       );
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async JwtExistInBlackList(jwt: string): Promise<boolean> {

@@ -70,12 +70,6 @@ export class UsersEntity {
   @Column({ type: 'character varying', nullable: true, default: null })
   isConfirmedDate: string | null = null;
 
-  @Column({ nullable: false })
-  ip: string;
-
-  @Column({ nullable: false })
-  userAgent: string;
-
   @Column({ default: false })
   isBanned: boolean;
 

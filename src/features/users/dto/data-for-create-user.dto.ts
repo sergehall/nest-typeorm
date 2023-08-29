@@ -1,4 +1,4 @@
-import { IsNotEmpty, Length, Matches, MaxLength } from 'class-validator';
+import { IsNotEmpty, Length, Matches } from 'class-validator';
 
 export class DataForCreateUserDto {
   @IsNotEmpty()
@@ -24,12 +24,4 @@ export class DataForCreateUserDto {
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
   expirationDate: string;
-
-  @IsNotEmpty()
-  @MaxLength(20)
-  ip: string;
-
-  @IsNotEmpty()
-  @MaxLength(50)
-  userAgent: string;
 }

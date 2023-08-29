@@ -1,20 +1,24 @@
-import { JwtBlacklistDto } from '../../dto/jwt-blacklist.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlacklistJwtRawSqlRepository } from '../../infrastructure/blacklist-jwt-raw-sql.repository';
+import { PayloadDto } from '../../dto/payload.dto';
+import { InvalidJwtDto } from '../../dto/invalid-jwt.dto';
+import { InvalidJwtRepo } from '../../infrastructure/invalid-jwt-repo';
 
-export class AddRefreshTokenToBlacklistCommand {
-  constructor(public refreshTokenToBlackList: JwtBlacklistDto) {}
+export class AddInvalidJwtToBlacklistCommand {
+  constructor(public refreshToken: string, public currentPayload: PayloadDto) {}
 }
-@CommandHandler(AddRefreshTokenToBlacklistCommand)
-export class AddRefreshTokenToBlacklistUseCase
-  implements ICommandHandler<AddRefreshTokenToBlacklistCommand>
+@CommandHandler(AddInvalidJwtToBlacklistCommand)
+export class AddInvalidJwtToBlacklistUseCase
+  implements ICommandHandler<AddInvalidJwtToBlacklistCommand>
 {
-  constructor(
-    private blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
-  ) {}
-  async execute(command: AddRefreshTokenToBlacklistCommand): Promise<boolean> {
-    return await this.blacklistJwtRawSqlRepository.addJwt(
-      command.refreshTokenToBlackList,
-    );
+  constructor(private invalidJwtRepo: InvalidJwtRepo) {}
+  async execute(command: AddInvalidJwtToBlacklistCommand): Promise<boolean> {
+    const { refreshToken, currentPayload } = command;
+
+    const refreshTokenToBlackList: InvalidJwtDto = {
+      refreshToken: refreshToken,
+      expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
+    };
+
+    return await this.invalidJwtRepo.addJwt(refreshTokenToBlackList);
   }
 }

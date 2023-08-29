@@ -11,7 +11,7 @@ export class TestingRawSqlRepository {
       'SentCodesLog',
       'BannedUsersForBlogs',
       'SecurityDevices',
-      'BlacklistJwt',
+      'InvalidJwt',
       'LikeStatusComments',
       'LikeStatusPosts',
       'Comments',

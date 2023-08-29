@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Ip,
   Param,
   Post,
   Put,
@@ -21,7 +20,6 @@ import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegDataDto } from '../dto/reg-data.dto';
 import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
@@ -71,19 +69,12 @@ export class UsersController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async createUser(
-    @Request() req: any,
     @Body() createUserDto: CreateUserDto,
-    @Ip() ip: string,
   ): Promise<ReturnUserDto> {
-    const registrationData: RegDataDto = {
-      ip: ip,
-      userAgent: req.get('user-agent') || 'None',
-    };
-
+    console.log('createUser---');
     const newUser: UsersEntity = await this.commandBus.execute(
-      new CreateUserCommand(createUserDto, registrationData),
+      new CreateUserCommand(createUserDto),
     );
-
     return {
       id: newUser.userId,
       login: newUser.login,

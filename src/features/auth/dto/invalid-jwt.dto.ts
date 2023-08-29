@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class JwtBlacklistDto {
+export class InvalidJwtDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 100, {
