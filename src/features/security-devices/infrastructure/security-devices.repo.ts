@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SecurityDevicesEntity } from '../entities/session-devices.entity';
@@ -62,6 +62,18 @@ export class SecurityDevicesRepo {
       throw new InternalServerErrorException(
         'An error occurred while creating a new device.',
       );
+    }
+  }
+
+  async clearingExpiredDevices(): Promise<void> {
+    try {
+      const currentTime = new Date().toISOString();
+      await this.securityDevicesRepository.delete({
+        expirationDate: LessThan(currentTime),
+      });
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 

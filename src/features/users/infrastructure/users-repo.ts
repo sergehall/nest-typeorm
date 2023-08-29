@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository, UpdateResult } from 'typeorm';
+import { EntityManager, LessThan, Repository, UpdateResult } from 'typeorm';
 import {
   HttpException,
   HttpStatus,
@@ -296,6 +296,35 @@ export class UsersRepo {
     } catch (error) {
       console.error(`Error while removing data for users: ${error.message}`);
       throw new Error(`Error while removing data for users`);
+    }
+  }
+
+  async clearingExpiredUsersData(): Promise<void> {
+    try {
+      await this.usersRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          const isConfirmed = false;
+          const currentTime = new Date().toISOString();
+
+          const allUsersWithExpiredDate = await this.usersRepository.find({
+            select: ['userId'],
+            where: {
+              isConfirmed,
+              expirationDate: LessThan(currentTime),
+            },
+          });
+          await Promise.all(
+            allUsersWithExpiredDate.map((user) =>
+              this.deleteUserData(user.userId, transactionalEntityManager),
+            ),
+          );
+        },
+      );
+    } catch (error) {
+      console.error(`Error while removing data for users: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Error while removing data for users`,
+      );
     }
   }
 

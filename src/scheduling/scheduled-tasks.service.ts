@@ -8,19 +8,19 @@ export class ScheduledTasksService {
 
   // every 45 min
   @Cron('*/1 * * * *')
-  async clearingExpiredJwtFromInvalidJwt() {
-    await this.dataCleanupService.clearingExpiredJwtFromInvalidJwt();
+  async clearingExpiredJwt() {
+    await this.dataCleanupService.clearingExpiredJwt();
   }
 
-  // every 5th hour
-  // @Cron('0 */5 * * *')
-  async removeUserWithExpirationDate() {
-    await this.dataCleanupService.removeDataUsersWithExpiredDate();
+  // every 4th hour
+  @Cron('0 */4 * * *')
+  async clearingExpiredUsersData() {
+    await this.dataCleanupService.clearingExpiredUsersData();
   }
 
   // every 1 hour
-  // @Cron('0 */1 * * *')
-  async removeDevicesWithExpiredDate() {
-    await this.dataCleanupService.removeDevicesWithExpiredDate();
+  @Cron('0 */1 * * *')
+  async clearingExpiredDevices() {
+    await this.dataCleanupService.clearingExpiredDevices();
   }
 }

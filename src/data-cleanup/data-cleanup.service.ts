@@ -1,17 +1,17 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { SecurityDevicesRawSqlRepository } from '../features/security-devices/infrastructure/security-devices-raw-sql.repository';
-import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
 import { InvalidJwtRepo } from '../features/auth/infrastructure/invalid-jwt-repo';
+import { SecurityDevicesRepo } from '../features/security-devices/infrastructure/security-devices.repo';
+import { UsersRepo } from '../features/users/infrastructure/users-repo';
 
 @Injectable()
 export class DataCleanupService {
   constructor(
     private readonly invalidJwtRepo: InvalidJwtRepo,
-    private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
-    private readonly usersRawSqlRepository: UsersRawSqlRepository,
+    private readonly securityDevicesRepo: SecurityDevicesRepo,
+    private readonly usersRepo: UsersRepo,
   ) {}
 
-  async clearingExpiredJwtFromInvalidJwt(): Promise<void> {
+  async clearingExpiredJwt(): Promise<void> {
     try {
       return await this.invalidJwtRepo.clearingExpiredJwt();
     } catch (error) {
@@ -22,9 +22,9 @@ export class DataCleanupService {
     }
   }
 
-  async removeDataUsersWithExpiredDate(): Promise<void> {
+  async clearingExpiredUsersData(): Promise<void> {
     try {
-      return await this.usersRawSqlRepository.removeUsersData();
+      return await this.usersRepo.clearingExpiredUsersData();
     } catch (error) {
       console.error('Error while removing expired user data:', error.message);
       throw new InternalServerErrorException(
@@ -33,9 +33,9 @@ export class DataCleanupService {
     }
   }
 
-  async removeDevicesWithExpiredDate(): Promise<void> {
+  async clearingExpiredDevices(): Promise<void> {
     try {
-      return await this.securityDevicesRawSqlRepository.clearingDevicesWithExpiredDate();
+      return await this.securityDevicesRepo.clearingExpiredDevices();
     } catch (error) {
       console.error(
         'Error while clearing devices with expired date:',
