@@ -107,12 +107,12 @@ export class AuthController {
     const refreshToken = req.cookies.refreshToken;
     const userAgent = req.get('user-agent');
 
-    const updatedJwtPayload: UpdatedJwtAndPayloadDto =
+    const updatedJwtAndPayload: UpdatedJwtAndPayloadDto =
       await this.commandBus.execute(
         new RefreshJwtCommand(refreshToken, ip, userAgent),
       );
 
-    const { updatedJwt, updatedPayload } = updatedJwtPayload;
+    const { updatedJwt, updatedPayload } = updatedJwtAndPayload;
 
     res.cookie('refreshToken', updatedJwt, {
       httpOnly: true,
@@ -150,7 +150,9 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
-  async confirmRegistrationByCodeFromQuery(@Query() query: any) {
+  async confirmRegistrationByCodeFromQuery(
+    @Query() query: any,
+  ): Promise<boolean> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
