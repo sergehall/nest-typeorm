@@ -33,6 +33,38 @@ export class SecurityDevicesRepo {
     }
   }
 
+  async updateDevice(
+    updatedPayload: PayloadDto,
+    clientIp: string,
+    userAgent: string,
+  ): Promise<SecurityDevicesEntity | null> {
+    try {
+      const sessionToUpdate = await this.securityDevicesRepository.findOneBy({
+        deviceId: updatedPayload.deviceId,
+      });
+
+      if (!sessionToUpdate) {
+        return null;
+      }
+
+      sessionToUpdate.ip = clientIp;
+      sessionToUpdate.title = userAgent;
+      sessionToUpdate.lastActiveDate = new Date(
+        updatedPayload.iat * 1000,
+      ).toISOString();
+      sessionToUpdate.expirationDate = new Date(
+        updatedPayload.exp * 1000,
+      ).toISOString();
+
+      return await this.securityDevicesRepository.save(sessionToUpdate);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating a new device.',
+      );
+    }
+  }
+
   private async createSecurityDevice(
     newPayload: PayloadDto,
     clientIp: string,

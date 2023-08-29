@@ -23,7 +23,6 @@ export class SignAccessJwtUseCase
 
     const payloadData = {
       userId: currentUserDto.userId,
-      email: currentUserDto.email,
       deviceId: uuid4().toString(),
     };
 

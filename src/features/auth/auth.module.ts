@@ -34,15 +34,15 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
-import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
 import { InvalidJwtRepo } from './infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from './entities/invalid-jwt.entity';
 import { AddInvalidJwtToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
+import { RefreshJwtUseCase } from './application/use-cases/refresh-jwt.use-case';
 
 const authUseCases = [
   CreateUserUseCase,
   AddInvalidJwtToBlacklistUseCase,
-  RefreshTokenUseCase,
+  RefreshJwtUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,

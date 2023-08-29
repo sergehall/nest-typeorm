@@ -37,8 +37,9 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { UserIdEmailLoginDto } from '../dto/profile.dto';
-import { RefreshTokenCommand } from '../application/use-cases/refresh-token.use-case';
 import { AddInvalidJwtToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
+import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case';
+import { UpdatedJwtAndPayloadDto } from '../dto/updated-jwt-and-payload.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -107,41 +108,18 @@ export class AuthController {
     const refreshToken = req.cookies.refreshToken;
     const userAgent = req.get('user-agent');
 
-    const updatedJwt = await this.commandBus.execute(
-      new RefreshTokenCommand(refreshToken, ip, userAgent),
-    );
+    const updatedJwtPayload: UpdatedJwtAndPayloadDto =
+      await this.commandBus.execute(
+        new RefreshJwtCommand(refreshToken, ip, userAgent),
+      );
 
-    // const currentPayload: PayloadDto =
-    //   await this.decodeTokenService.toExtractPayload(refreshToken);
-    //
-    // const refreshTokenToBlackList = {
-    //   refreshToken: refreshToken,
-    //   expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
-    // };
-    //
-    // await this.commandBus.execute(
-    //   new AddRefreshTokenToBlacklistCommand(refreshTokenToBlackList),
-    // );
-    //
-    // const newRefreshToken = await this.commandBus.execute(
-    //   new UpdateRefreshJwtCommand(currentPayload),
-    // );
-    // const newPayload: PayloadDto =
-    //   await this.decodeTokenService.toExtractPayload(
-    //     newRefreshToken.refreshToken,
-    //   );
-    //
-    // await this.commandBus.execute(
-    //   new CreateDeviceCommand(newPayload, ip, userAgent),
-    // );
+    const { updatedJwt, updatedPayload } = updatedJwtPayload;
 
-    const updatedPayload: PayloadDto =
-      await this.decodeTokenService.toExtractPayload(updatedJwt);
-
-    res.cookie('refreshToken', updatedJwt.refreshToken, {
+    res.cookie('refreshToken', updatedJwt, {
       httpOnly: true,
       secure: true,
     });
+
     return await this.commandBus.execute(
       new UpdateAccessJwtCommand(updatedPayload),
     );

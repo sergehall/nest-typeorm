@@ -22,7 +22,6 @@ export class SignRefreshJwtUseCase
 
     const payloadData = {
       userId: currentUserDto.userId,
-      email: currentUserDto.email,
       deviceId: uuid4().toString(),
     };
 

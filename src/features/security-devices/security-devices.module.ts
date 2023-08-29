@@ -22,10 +22,14 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { SecurityDevicesRepo } from './infrastructure/security-devices.repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { SecurityDevicesEntity } from './entities/session-devices.entity';
+import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
+import { UpdateDeviceUseCase } from './application/use-cases/update-device.use-case';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
   CreateDeviceUseCase,
+  UpdateDeviceUseCase,
   RemoveDevicesAfterLogoutUseCase,
   RemoveDevicesBannedUserUseCase,
   RemoveDevicesByDeviceIdUseCase,
@@ -34,7 +38,11 @@ const securityDevicesCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SecurityDevicesEntity, UsersEntity]),
+    TypeOrmModule.forFeature([
+      SecurityDevicesEntity,
+      UsersEntity,
+      InvalidJwtEntity,
+    ]),
     CqrsModule,
   ],
   controllers: [SecurityDevicesController],
@@ -50,6 +58,7 @@ const securityDevicesCases = [
     SecurityDevicesService,
     SecurityDevicesRepo,
     SecurityDevicesRawSqlRepository,
+    InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
     ...securityDevicesCases,
   ],
