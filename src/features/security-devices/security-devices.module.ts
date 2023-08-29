@@ -8,7 +8,6 @@ import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RemoveDevicesBannedUserUseCase } from './application/use-cases/remove-devices-banned-user.use-case';
 import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
-import { RemoveDevicesAfterLogoutUseCase } from './application/use-cases/remove-devices-after-logout.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
@@ -25,12 +24,13 @@ import { SecurityDevicesEntity } from './entities/session-devices.entity';
 import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { UpdateDeviceUseCase } from './application/use-cases/update-device.use-case';
+import { DeleteDevicesAfterLogoutUseCase } from './application/use-cases/delete-devices-after-logout.use-case';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
   CreateDeviceUseCase,
   UpdateDeviceUseCase,
-  RemoveDevicesAfterLogoutUseCase,
+  DeleteDevicesAfterLogoutUseCase,
   RemoveDevicesBannedUserUseCase,
   RemoveDevicesByDeviceIdUseCase,
   RemoveDevicesExceptCurrentUseCase,

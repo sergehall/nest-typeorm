@@ -24,7 +24,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
-import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/application/use-cases/remove-devices-after-logout.use-case';
 import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { SignRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
@@ -37,9 +36,9 @@ import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/ch
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { UserIdEmailLoginDto } from '../dto/profile.dto';
-import { AddInvalidJwtToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case';
 import { UpdatedJwtAndPayloadDto } from '../dto/updated-jwt-and-payload.dto';
+import { LogoutCommand } from '../application/use-cases/logout.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -142,15 +141,8 @@ export class AuthController {
   ): Promise<boolean> {
     const refreshToken = req.cookies.refreshToken;
 
-    const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
-      refreshToken,
-    );
+    await this.commandBus.execute(new LogoutCommand(refreshToken));
 
-    await this.commandBus.execute(
-      new AddInvalidJwtToBlacklistCommand(refreshToken, payload),
-    );
-
-    await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
     return true;
   }

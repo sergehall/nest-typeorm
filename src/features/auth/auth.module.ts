@@ -38,11 +38,13 @@ import { InvalidJwtRepo } from './infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from './entities/invalid-jwt.entity';
 import { AddInvalidJwtToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { RefreshJwtUseCase } from './application/use-cases/refresh-jwt.use-case';
+import { LogoutUseCase } from './application/use-cases/logout.use-case';
 
 const authUseCases = [
   CreateUserUseCase,
   AddInvalidJwtToBlacklistUseCase,
   RefreshJwtUseCase,
+  LogoutUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,

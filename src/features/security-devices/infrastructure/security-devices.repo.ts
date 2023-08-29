@@ -77,6 +77,25 @@ export class SecurityDevicesRepo {
     }
   }
 
+  async deleteDeviceOnLogout(payload: PayloadDto): Promise<boolean> {
+    const { userId, deviceId } = payload;
+
+    try {
+      const deleteDevice = await this.securityDevicesRepository.delete({
+        deviceId: deviceId,
+        user: { userId },
+      });
+      if (deleteDevice && deleteDevice.affected) {
+        return deleteDevice.affected > 0;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async createSecurityDevice(
     newPayload: PayloadDto,
     clientIp: string,
