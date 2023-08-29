@@ -19,10 +19,8 @@ import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
 import { PayloadDto } from '../dto/payload.dto';
-import { JwtBlacklistDto } from '../dto/jwt-blacklist.dto';
 import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegDataDto } from '../../users/dto/reg-data.dto';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
@@ -30,17 +28,17 @@ import { RemoveDevicesAfterLogoutCommand } from '../../security-devices/applicat
 import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { SignRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
-import { UpdateRefreshJwtCommand } from '../application/use-cases/update-refresh-jwt.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
-import { AddRefreshTokenToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { UserIdEmailLoginDto } from '../dto/profile.dto';
+import { RefreshTokenCommand } from '../application/use-cases/refresh-token.use-case';
+import { AddInvalidJwtToBlacklistCommand } from '../application/use-cases/add-refresh-token-to-blacklist.use-case';
 
 @SkipThrottle()
 @Controller('auth')
@@ -86,19 +84,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
-  async registration(
-    @Request() req: any,
-    @Body() loginDto: LoginDto,
-    @Ip() ip: string,
-  ) {
-    const registrationData: RegDataDto = {
-      ip: ip,
-      userAgent: req.get('user-agent') || 'None',
-    };
-
-    return await this.commandBus.execute(
-      new RegistrationUserCommand(loginDto, registrationData),
-    );
+  async registration(@Body() loginDto: LoginDto) {
+    return await this.commandBus.execute(new RegistrationUserCommand(loginDto));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -118,37 +105,45 @@ export class AuthController {
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
     const refreshToken = req.cookies.refreshToken;
-
-    const currentPayload: PayloadDto =
-      await this.decodeTokenService.toExtractPayload(refreshToken);
-
-    const refreshTokenToBlackList = {
-      refreshToken: refreshToken,
-      expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
-    };
-
-    await this.commandBus.execute(
-      new AddRefreshTokenToBlacklistCommand(refreshTokenToBlackList),
-    );
-
-    const newRefreshToken = await this.commandBus.execute(
-      new UpdateRefreshJwtCommand(currentPayload),
-    );
-    const newPayload: PayloadDto =
-      await this.decodeTokenService.toExtractPayload(
-        newRefreshToken.refreshToken,
-      );
     const userAgent = req.get('user-agent');
-    await this.commandBus.execute(
-      new CreateDeviceCommand(newPayload, ip, userAgent),
+
+    const updatedJwt = await this.commandBus.execute(
+      new RefreshTokenCommand(refreshToken, ip, userAgent),
     );
 
-    res.cookie('refreshToken', newRefreshToken.refreshToken, {
+    // const currentPayload: PayloadDto =
+    //   await this.decodeTokenService.toExtractPayload(refreshToken);
+    //
+    // const refreshTokenToBlackList = {
+    //   refreshToken: refreshToken,
+    //   expirationDate: new Date(currentPayload.exp * 1000).toISOString(),
+    // };
+    //
+    // await this.commandBus.execute(
+    //   new AddRefreshTokenToBlacklistCommand(refreshTokenToBlackList),
+    // );
+    //
+    // const newRefreshToken = await this.commandBus.execute(
+    //   new UpdateRefreshJwtCommand(currentPayload),
+    // );
+    // const newPayload: PayloadDto =
+    //   await this.decodeTokenService.toExtractPayload(
+    //     newRefreshToken.refreshToken,
+    //   );
+    //
+    // await this.commandBus.execute(
+    //   new CreateDeviceCommand(newPayload, ip, userAgent),
+    // );
+
+    const updatedPayload: PayloadDto =
+      await this.decodeTokenService.toExtractPayload(updatedJwt);
+
+    res.cookie('refreshToken', updatedJwt.refreshToken, {
       httpOnly: true,
       secure: true,
     });
     return await this.commandBus.execute(
-      new UpdateAccessJwtCommand(currentPayload),
+      new UpdateAccessJwtCommand(updatedPayload),
     );
   }
 
@@ -173,13 +168,10 @@ export class AuthController {
       refreshToken,
     );
 
-    const currentJwt: JwtBlacklistDto = {
-      refreshToken: refreshToken,
-      expirationDate: new Date(payload.exp * 1000).toISOString(),
-    };
     await this.commandBus.execute(
-      new AddRefreshTokenToBlacklistCommand(currentJwt),
+      new AddInvalidJwtToBlacklistCommand(refreshToken, payload),
     );
+
     await this.commandBus.execute(new RemoveDevicesAfterLogoutCommand(payload));
     res.clearCookie('refreshToken');
     return true;

@@ -4,22 +4,20 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { UsersRawSqlRepository } from '../../features/users/infrastructure/users-raw-sql.repository';
-import { TablesUsersWithIdEntity } from '../../features/users/entities/tables-user-with-id.entity';
+import { UsersRepo } from '../../features/users/infrastructure/users-repo';
 
 @ValidatorConstraint({ name: 'LoginEmailExistsValidator', async: true })
 @Injectable()
 export class LoginEmailExistsValidator implements ValidatorConstraintInterface {
-  constructor(private readonly usersRawSqlRepository: UsersRawSqlRepository) {}
+  constructor(protected usersRepo: UsersRepo) {}
 
   async validate(value: any, args: ValidationArguments): Promise<boolean> {
     if (!value) {
       return true; // Don't perform validation if value is not provided
     }
 
-    const user: TablesUsersWithIdEntity[] =
-      await this.usersRawSqlRepository.loginOrEmailAlreadyExist(value);
-    return user.length === 0;
+    const user = await this.usersRepo.loginOrEmailAlreadyExist(value);
+    return !user;
   }
 
   defaultMessage(args: ValidationArguments): string {

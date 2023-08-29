@@ -8,7 +8,7 @@ import { CommentsEntity } from '../../../features/comments/entities/comments.ent
 import { PostsEntity } from '../../../features/posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../../../features/posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../../features/comments/entities/like-status-comments.entity';
-import { BlacklistJwtEntity } from '../../../features/auth/entities/blacklist-jwt.entity';
+import { InvalidJwtEntity } from '../../../features/auth/entities/invalid-jwt.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from '../../../features/users/entities/banned-users-for-blogs.entity';
 
@@ -42,7 +42,7 @@ export class OrmModuleOptions
         BannedUsersForBlogsEntity,
         LikeStatusPostsEntity,
         LikeStatusCommentsEntity,
-        BlacklistJwtEntity,
+        InvalidJwtEntity,
         SentCodesLogEntity,
       ],
       synchronize: true,

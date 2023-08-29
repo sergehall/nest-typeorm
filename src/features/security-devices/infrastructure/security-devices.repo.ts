@@ -40,9 +40,7 @@ export class SecurityDevicesRepo {
   ): Promise<SecurityDevicesEntity> {
     const user = new UsersEntity();
     user.userId = newPayload.userId;
-    console.log(newPayload, 'newPayload');
-    console.log(clientIp, 'clientIp');
-    console.log(userAgent, 'userAgent');
+
     const newDevice: SecurityDevicesEntity = new SecurityDevicesEntity();
     newDevice.id = uuid4();
     newDevice.deviceId = newPayload.deviceId;

@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  Length,
-  Matches,
-  MaxLength,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 
@@ -77,10 +71,4 @@ export class TablesUsersEntity {
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
   isConfirmedDate: string | null;
-  @IsNotEmpty()
-  @MaxLength(20)
-  ip: string;
-  @IsNotEmpty()
-  @MaxLength(50)
-  userAgent: string;
 }

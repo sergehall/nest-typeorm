@@ -27,7 +27,7 @@ export class UsersRawSqlRepository {
         `
       SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
       "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-      "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+      "expirationDate", "isConfirmed", "isConfirmedDate"
       FROM public."Users"
       WHERE "userId" = $1`,
         [userId],
@@ -48,7 +48,7 @@ export class UsersRawSqlRepository {
         `
         SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
         "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        "expirationDate", "isConfirmed", "isConfirmedDate"
         FROM public."Users"
         WHERE "userId" = $1 AND "isBanned" = $2
       `,
@@ -69,8 +69,8 @@ export class UsersRawSqlRepository {
         INSERT INTO public."Users" 
         ( "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
           "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", 
-          "isConfirmed", "isConfirmedDate", "ip", "userAgent")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+          "isConfirmed", "isConfirmedDate")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
           RETURNING "userId" AS "id"
           `;
 
@@ -88,8 +88,6 @@ export class UsersRawSqlRepository {
         tablesUsersEntity.expirationDate,
         tablesUsersEntity.isConfirmed,
         tablesUsersEntity.isConfirmedDate,
-        tablesUsersEntity.ip,
-        tablesUsersEntity.userAgent,
       ];
 
       const insertNewUser = await this.db.query(query, parameters);
@@ -118,7 +116,7 @@ export class UsersRawSqlRepository {
         SELECT 
         "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
         "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
-        "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent"
+        "expirationDate", "isConfirmed", "isConfirmedDate"
         FROM public."Users"
         WHERE "confirmationCode" = $1  
         AND "isConfirmed" = false 
@@ -178,7 +176,7 @@ export class UsersRawSqlRepository {
     try {
       return await this.db.query(
         `
-        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", "orgId", "roles", "banDate", "banReason", "confirmationCode", "expirationDate", "isConfirmed", "isConfirmedDate", "ip", "userAgent", "isBanned"
+        SELECT "login", "email"
         FROM public."Users"
         WHERE "login" = $1 OR "email" = $2
       `,
@@ -419,8 +417,6 @@ export class UsersRawSqlRepository {
         'expirationDate',
         'isConfirmed',
         'isConfirmedDate',
-        'ip',
-        'userAgent',
       ],
       'createdAt',
     );

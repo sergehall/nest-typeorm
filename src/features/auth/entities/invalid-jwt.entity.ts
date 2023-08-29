@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('BlacklistJwt')
-export class BlacklistJwtEntity {
+@Entity('InvalidJwt')
+export class InvalidJwtEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -9,7 +9,7 @@ export class BlacklistJwtEntity {
     type: 'character varying',
     nullable: false,
   })
-  jwt: string;
+  refreshToken: string;
 
   @Column({
     type: 'character varying',

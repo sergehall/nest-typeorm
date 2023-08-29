@@ -49,8 +49,6 @@ export class UsersRepo {
           'user.expirationDate',
           'user.isConfirmed',
           'user.isConfirmedDate',
-          'user.ip',
-          'user.userAgent',
         ])
         .where('(user.email LIKE :email OR user.login LIKE :login)', {
           email: searchEmailTerm,
@@ -117,6 +115,28 @@ export class UsersRepo {
       return user ? user : null;
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async loginOrEmailAlreadyExist(key: string): Promise<string | null> {
+    try {
+      const keyLowerCase = key.toLowerCase();
+      const result = await this.usersRepository
+        .createQueryBuilder('user')
+        .select(['user.login AS login', 'user.email AS email'])
+        .where('LOWER(user.login) = :key OR LOWER(user.email) = :key', {
+          key: keyLowerCase,
+        })
+        .getRawOne();
+
+      if (result) {
+        // Determine which field was found and return it
+        return result.login ? result.login : result.email;
+      } else {
+        return null;
+      }
+    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -192,7 +212,9 @@ export class UsersRepo {
     dataForCreateUserDto: DataForCreateUserDto,
   ): Promise<UsersEntity> {
     try {
-      const newUserEntity = await this.createUserEntity(dataForCreateUserDto);
+      const newUserEntity: UsersEntity = await this.createUserEntity(
+        dataForCreateUserDto,
+      );
       return await this.usersRepository.save(newUserEntity);
     } catch (error) {
       if (
@@ -324,7 +346,7 @@ export class UsersRepo {
   private async createUserEntity(
     dto: DataForCreateUserDto,
   ): Promise<UsersEntity> {
-    const { login, email, passwordHash, expirationDate, ip, userAgent } = dto;
+    const { login, email, passwordHash, expirationDate } = dto;
 
     const user = new UsersEntity();
     user.userId = uuid4();
@@ -340,8 +362,6 @@ export class UsersRepo {
     user.confirmationCode = uuid4();
     user.expirationDate = expirationDate;
     user.isConfirmed = false;
-    user.ip = ip;
-    user.userAgent = userAgent;
 
     return user;
   }
@@ -361,8 +381,6 @@ export class UsersRepo {
         'expirationDate',
         'isConfirmed',
         'isConfirmedDate',
-        'ip',
-        'userAgent',
       ],
       'createdAt',
     );

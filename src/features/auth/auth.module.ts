@@ -27,7 +27,6 @@ import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/cha
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
-import { AddRefreshTokenToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { MailsService } from '../../mails/application/mails.service';
@@ -35,10 +34,15 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
+import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
+import { InvalidJwtRepo } from './infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from './entities/invalid-jwt.entity';
+import { AddInvalidJwtToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 
 const authUseCases = [
   CreateUserUseCase,
-  AddRefreshTokenToBlacklistUseCase,
+  AddInvalidJwtToBlacklistUseCase,
+  RefreshTokenUseCase,
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,
@@ -55,7 +59,7 @@ const authUseCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity]),
+    TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
     UsersModule,
     PassportModule,
     JwtModule,
@@ -76,6 +80,7 @@ const authUseCases = [
     UsersRawSqlRepository,
     SecurityDevicesService,
     ExpirationDateCalculator,
+    InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     ...authUseCases,
