@@ -296,7 +296,7 @@ export class UsersRawSqlRepository {
     }
   }
 
-  async removeUsersData(): Promise<void> {
+  async clearingExpiredUsersData(): Promise<void> {
     try {
       await this.db.transaction(async (client) => {
         const isConfirmed = false;

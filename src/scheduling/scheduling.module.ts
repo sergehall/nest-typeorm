@@ -5,7 +5,6 @@ import { UsersService } from '../features/users/application/users.service';
 import { CaslModule } from '../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { SecurityDevicesRawSqlRepository } from '../features/security-devices/infrastructure/security-devices-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../features/posts/infrastructure/like-status-posts-raw-sql.repository';
 import { LikeStatusCommentsRawSqlRepository } from '../features/comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../features/comments/infrastructure/comments-raw-sql.repository';
@@ -23,10 +22,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../features/users/entities/users.entity';
 import { InvalidJwtRepo } from '../features/auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
+import { SecurityDevicesEntity } from '../features/security-devices/entities/session-devices.entity';
+import { SecurityDevicesRepo } from '../features/security-devices/infrastructure/security-devices.repo';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      InvalidJwtEntity,
+      SecurityDevicesEntity,
+    ]),
     MailsModule,
     CaslModule,
     CqrsModule,
@@ -47,7 +52,7 @@ import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
     BloggerBlogsRawSqlRepository,
     InvalidJwtRepo,
     LikeStatusPostsRawSqlRepository,
-    SecurityDevicesRawSqlRepository,
+    SecurityDevicesRepo,
     LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
     SentCodeLogRepository,
