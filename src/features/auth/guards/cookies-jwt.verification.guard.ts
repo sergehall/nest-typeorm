@@ -20,13 +20,16 @@ export class CookiesJwtVerificationGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies?.['refreshToken'];
 
-    const jwtExistInBlackList = await this.invalidJwtRepo.JwtExistInBlackList(
-      refreshToken,
-    );
-
-    if (refreshToken && !jwtExistInBlackList) {
-      await this.commandBus.execute(new ValidRefreshJwtCommand(refreshToken));
-      return true;
+    if (refreshToken) {
+      const jwtExistInBlackList = await this.invalidJwtRepo.JwtExistInBlackList(
+        refreshToken,
+      );
+      if (!jwtExistInBlackList) {
+        const validRefreshJwt = await this.commandBus.execute(
+          new ValidRefreshJwtCommand(refreshToken),
+        );
+        return validRefreshJwt !== null;
+      }
     }
     throw new HttpException(
       { message: [jwtCookiesIncorrect] },
