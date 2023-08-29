@@ -40,7 +40,7 @@ import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case
 import { UpdatedJwtAndPayloadDto } from '../dto/updated-jwt-and-payload.dto';
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
 
-@SkipThrottle()
+// @SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -96,6 +96,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle()
   @HttpCode(HttpStatus.OK)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('refresh-token')
