@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { InvalidJwtEntity } from '../entities/invalid-jwt.entity';
 import { InvalidJwtDto } from '../dto/invalid-jwt.dto';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -36,6 +36,18 @@ export class InvalidJwtRepo {
       });
       return !!findJwt;
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async clearingExpiredJwt(): Promise<void> {
+    try {
+      const currentTime = new Date().toISOString();
+      await this.invalidJwtRepository.delete({
+        expirationDate: LessThan(currentTime),
+      });
+    } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }

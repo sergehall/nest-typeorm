@@ -6,10 +6,10 @@ import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 export class ScheduledTasksService {
   constructor(protected dataCleanupService: DataCleanupService) {}
 
-  // every 30 min
-  // @Cron('*/30 * * * *')
-  async removeInvalidJWTFromBlackList() {
-    await this.dataCleanupService.removeInvalidJWTFromBlackList();
+  // every 45 min
+  @Cron('*/1 * * * *')
+  async clearingExpiredJwtFromInvalidJwt() {
+    await this.dataCleanupService.clearingExpiredJwtFromInvalidJwt();
   }
 
   // every 5th hour
