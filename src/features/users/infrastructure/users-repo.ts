@@ -97,7 +97,7 @@ export class UsersRepo {
       return user[0] ? user[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
-        const userId = this.extractUserIdFromError(error);
+        const userId = await this.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -313,6 +313,7 @@ export class UsersRepo {
               expirationDate: LessThan(currentTime),
             },
           });
+          console.log(allUsersWithExpiredDate, 'allUsersWithExpiredDate');
           await Promise.all(
             allUsersWithExpiredDate.map((user) =>
               this.deleteUserData(user.userId, transactionalEntityManager),
@@ -419,7 +420,7 @@ export class UsersRepo {
     return error.message.includes('invalid input syntax for type uuid');
   }
 
-  private extractUserIdFromError(error: any): string | null {
+  private async extractUserIdFromError(error: any): Promise<string | null> {
     const match = error.message.match(/"([^"]+)"/);
     return match ? match[1] : null;
   }
