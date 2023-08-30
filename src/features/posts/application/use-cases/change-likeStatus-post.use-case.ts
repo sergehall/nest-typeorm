@@ -38,7 +38,7 @@ export class ChangeLikeStatusPostUseCase
 
     await this.checkUserPermission(post, currentUserDto);
 
-    return await this.likeStatusPostsRepo.updateLikeStatusPosts(
+    return await this.likeStatusPostsRepo.updateOrCreateLikeStatusPosts(
       post,
       likeStatusDto,
       currentUserDto,

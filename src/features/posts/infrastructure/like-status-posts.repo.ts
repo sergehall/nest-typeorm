@@ -14,17 +14,31 @@ export class LikeStatusPostsRepo {
     @InjectRepository(LikeStatusPostsEntity)
     private readonly likeStatusPostsRepository: Repository<LikeStatusPostsEntity>,
   ) {}
-  async updateLikeStatusPosts(
+  async updateOrCreateLikeStatusPosts(
     post: PostsEntity,
     likeStatusDto: LikeStatusDto,
     currentUserDto: CurrentUserDto,
   ): Promise<LikeStatusPostsEntity> {
     try {
-      const likeStatusPostEntity = await this.likeStatusPostsEntity(
-        post,
-        likeStatusDto,
-        currentUserDto,
-      );
+      let likeStatusPostEntity: LikeStatusPostsEntity | null =
+        await this.likeStatusPostsRepository.findOne({
+          where: {
+            post: { id: post.id },
+            ratedPostUser: { userId: currentUserDto.userId },
+          },
+        });
+
+      if (likeStatusPostEntity) {
+        likeStatusPostEntity.likeStatus = likeStatusDto.likeStatus;
+        likeStatusPostEntity.addedAt = new Date().toISOString();
+      } else {
+        likeStatusPostEntity = await this.likeStatusPostsEntity(
+          post,
+          likeStatusDto,
+          currentUserDto,
+        );
+      }
+
       return await this.likeStatusPostsRepository.save(likeStatusPostEntity);
     } catch (error) {
       console.log(error.message);

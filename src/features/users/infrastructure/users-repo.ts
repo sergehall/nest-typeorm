@@ -279,7 +279,7 @@ export class UsersRepo {
       }
 
       // Fetch and return the updated user
-      return await this.usersRepository.findOneBy({ userId: userId });
+      return await this.usersRepository.findOneBy({ userId });
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
