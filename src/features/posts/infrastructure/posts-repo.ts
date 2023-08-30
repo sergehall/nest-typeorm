@@ -24,7 +24,6 @@ import {
 } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { PostsCountPostsDto } from '../dto/posts-count-posts.dto';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class PostsRepo {
@@ -92,7 +91,7 @@ export class PostsRepo {
     const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
     const numberLastLikes = 3;
-    const likeStatus = 'Like';
+    const likeStatus = LikeStatusEnums.LIKE;
 
     // Query posts with pagination conditions
     const [posts, totalPosts] = await this.postsRepository.findAndCount({
@@ -146,189 +145,6 @@ export class PostsRepo {
     };
   }
 
-  async findPostsAndTotalCountPostsForBlog(
-    blogId: string,
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsCountPostsDto> {
-    try {
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-
-      const pagingParams: PagingParamsDto = await this.getPagingParams(
-        queryData,
-      );
-
-      const postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[] =
-        await this.getPostsWithLikesForBlog(
-          blogId,
-          bannedFlags,
-          pagingParams,
-          currentUserDto,
-        );
-
-      if (postsWithLikes.length === 0) {
-        return {
-          posts: [],
-          countPosts: 0,
-        };
-      }
-
-      const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
-        postsWithLikes,
-        currentUserDto,
-      );
-
-      return {
-        posts,
-        countPosts: postsWithLikes[0].countPosts,
-      };
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async getPostsWithLikesForBlog(
-    blogId: string,
-    bannedFlags: BannedFlagsDto,
-    pagingParams: PagingParamsDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsCountPostsLikesDislikesStatusEntity[]> {
-    const { dependencyIsBanned, banInfoIsBanned, isBanned } = bannedFlags;
-    const { sortBy, direction, limit, offset } = pagingParams;
-    const countLastLikes = 3;
-    const likeStatus = 'Like';
-
-    const lastThreeLikesSubQuery = this.likePostsRepository
-      .createQueryBuilder('LikeStatusPosts')
-      .select(['postId', 'userId', 'likeStatus', 'addedAt', 'login'])
-      .addSelect(
-        'ROW_NUMBER() OVER (PARTITION BY "postId" ORDER BY "addedAt" DESC)',
-        'rn',
-      )
-      .where('"isBanned" = :isBanned', { isBanned })
-      .andWhere('"likeStatus" = :likeStatus', { likeStatus })
-      .andWhere('"blogId" = :blogId', { blogId })
-      .andWhere('rn <= :countLastLikes', { countLastLikes })
-      .getQuery();
-
-    const postsWithLikesQuery = this.postsRepository
-      .createQueryBuilder('Posts')
-      .select([
-        'p.id',
-        'p.title',
-        'p.shortDescription',
-        'p.content',
-        'p.blogId',
-        'p.blogName',
-        'p.createdAt',
-        'p.postOwnerId',
-        'p.dependencyIsBanned',
-        'p.banInfoIsBanned',
-        'p.banInfoBanDate',
-        'p.banInfoBanReason',
-        `COALESCE(CAST(l."userId" AS text), '0')`,
-        'userId',
-        `COALESCE(l."likeStatus", 'None')`,
-        'likeStatus',
-        `COALESCE(l."addedAt")`,
-        'addedAt',
-        `COALESCE(l.login)`,
-        'login',
-        `COALESCE(lsc_myStatus."likeStatus", 'None')`,
-        'myStatus',
-        `COALESCE(lsc_like."likesCount", 0)`,
-        'likesCount',
-        `COALESCE(lsc_dislike."dislikesCount", 0)`,
-        'dislikesCount',
-      ])
-      .leftJoin(`(${lastThreeLikesSubQuery})`, 'l', 'Posts.id = l."postId"')
-      .leftJoin(
-        (q) =>
-          q
-            .select(['"postId"', 'COUNT(*) AS "likesCount"'])
-            .from(LikeStatusPostsEntity, 'LikeStatusPosts')
-            .where('"likeStatus" = :likeStatus', { likeStatus })
-            .andWhere('"isBanned" = :isBanned', { isBanned })
-            .andWhere('"blogId" = :blogId', { blogId })
-            .groupBy('"postId"'),
-        'lsc_like',
-        'Posts.id = lsc_like."postId"',
-      )
-      .leftJoin(
-        (q) =>
-          q
-            .select(['"postId"', 'COUNT(*) AS "dislikesCount"'])
-            .from(LikeStatusPostsEntity, 'LikeStatusPosts')
-            .where('"likeStatus" = :dislikeStatus', {
-              dislikeStatus: 'Dislike',
-            })
-            .andWhere('"isBanned" = :isBanned', { isBanned })
-            .andWhere('"blogId" = :blogId', { blogId })
-            .groupBy('"postId"'),
-        'lsc_dislike',
-        'Posts.id = lsc_dislike."postId"',
-      )
-      .leftJoin(
-        (q) =>
-          q
-            .select(['"postId"', '"likeStatus"'])
-            .from(LikeStatusPostsEntity, 'LikeStatusPosts')
-            .where('"userId" = :userId', { userId: currentUserDto?.userId })
-            .andWhere('"isBanned" = :isBanned', { isBanned }),
-        'lsc_myStatus',
-        'Posts.id = lsc_myStatus."postId"',
-      )
-      .where('Posts."dependencyIsBanned" = :dependencyIsBanned', {
-        dependencyIsBanned,
-      })
-      .andWhere('Posts."banInfoIsBanned" = :banInfoIsBanned', {
-        banInfoIsBanned,
-      })
-      .andWhere('"blogId" = :blogId', { blogId })
-      .orderBy(`"Posts"."${sortBy}"`, direction)
-      .limit(limit)
-      .offset(offset)
-      .getQuery();
-
-    const totalPostsQuery = this.postsRepository
-      .createQueryBuilder('Posts')
-      .select('COUNT(*)', 'countPosts')
-      .where('Posts."dependencyIsBanned" = :dependencyIsBanned', {
-        dependencyIsBanned,
-      })
-      .andWhere('Posts."banInfoIsBanned" = :banInfoIsBanned', {
-        banInfoIsBanned,
-      })
-      .andWhere('"blogId" = :blogId', { blogId })
-      .getQuery();
-
-    const query = `
-      WITH LastThreeLikes AS (${lastThreeLikesSubQuery}),
-      PostsWithLikes AS (${postsWithLikesQuery}),
-      TotalPosts AS (${totalPostsQuery})
-      SELECT
-        pwl."id", pwl."title", pwl."shortDescription", pwl."content", pwl."blogId", pwl."blogName", pwl."createdAt",
-        pwl."postOwnerId", pwl."dependencyIsBanned", pwl."banInfoIsBanned", pwl."banInfoBanDate", pwl."banInfoBanReason",
-        pwl."likesCount"::integer,
-        pwl."dislikesCount"::integer,
-        pwl."myStatus",
-        pwl."userId",
-        pwl."addedAt",
-        pwl."login",
-        pwl."likeStatus",
-        tp."countPosts"::integer
-      FROM PostsWithLikes pwl, TotalPosts tp
-    `;
-
-    try {
-      return await this.postsRepository.query(query);
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   private async creatPostsEntity(
     blog: BloggerBlogsEntity,
     createPostDto: CreatePostDto,
@@ -354,6 +170,7 @@ export class PostsRepo {
 
     return postEntity;
   }
+
   private async processPostsWithLikes(
     postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[],
     currentUserDto: CurrentUserDto | null,

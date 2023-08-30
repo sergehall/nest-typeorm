@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 @Entity('LikeStatusComments')
 export class LikeStatusCommentsEntity {
@@ -9,11 +10,12 @@ export class LikeStatusCommentsEntity {
   id: string;
 
   @Column({
-    type: 'character varying',
-    length: 7,
+    type: 'enum',
+    enum: LikeStatusEnums,
+    default: LikeStatusEnums.NONE,
     nullable: false,
   })
-  likeStatus: string;
+  likeStatus: LikeStatusEnums;
 
   @Column({
     type: 'character varying',
