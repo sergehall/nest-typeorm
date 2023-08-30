@@ -18,17 +18,12 @@ import { LoginDto } from '../dto/login.dto';
 import { EmailDto } from '../dto/email.dto';
 import { CodeDto } from '../dto/code.dto';
 import { Response } from 'express';
-import { PayloadDto } from '../dto/payload.dto';
 import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { CreateDeviceCommand } from '../../security-devices/application/use-cases/create-device.use-case';
-import { SignAccessJwtUseCommand } from '../application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
-import { SignRefreshJwtCommand } from '../application/use-cases/sign-refresh-jwt.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
-import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
@@ -39,14 +34,14 @@ import { UserIdEmailLoginDto } from '../dto/profile.dto';
 import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case';
 import { UpdatedJwtAndPayloadDto } from '../dto/updated-jwt-and-payload.dto';
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
+import { LoginCommand } from '../application/use-cases/login.use-case';
 
-// @SkipThrottle()
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
     protected commandBus: CommandBus,
     protected parseQueriesService: ParseQueriesService,
-    protected decodeTokenService: DecodeTokenService,
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -59,32 +54,16 @@ export class AuthController {
   ): Promise<AccessTokenDto> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    const userAgent = req.get('user-agent') || 'None';
+    const userAgent = req.get('user-agent');
 
-    const signedToken = await this.commandBus.execute(
-      new SignRefreshJwtCommand(currentUserDto),
-    );
-
-    const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
-      signedToken.refreshToken,
-    );
-
-    await this.commandBus.execute(
-      new CreateDeviceCommand(payload, ip, userAgent),
-    );
-
-    res.cookie('refreshToken', signedToken.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
     return await this.commandBus.execute(
-      new SignAccessJwtUseCommand(currentUserDto),
+      new LoginCommand(currentUserDto, ip, userAgent, res),
     );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
-  async registration(@Body() loginDto: LoginDto) {
+  async registration(@Body() loginDto: LoginDto): Promise<UserIdEmailLoginDto> {
     return await this.commandBus.execute(new RegistrationUserCommand(loginDto));
   }
 
@@ -96,7 +75,6 @@ export class AuthController {
     );
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.OK)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('refresh-token')

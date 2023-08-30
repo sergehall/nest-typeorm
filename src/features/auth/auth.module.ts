@@ -39,10 +39,11 @@ import { InvalidJwtEntity } from './entities/invalid-jwt.entity';
 import { AddInvalidJwtToBlacklistUseCase } from './application/use-cases/add-refresh-token-to-blacklist.use-case';
 import { RefreshJwtUseCase } from './application/use-cases/refresh-jwt.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
+import { LoginUseCase } from './application/use-cases/login.use-case';
 
 const authUseCases = [
+  LoginUseCase,
   CreateUserUseCase,
-  AddInvalidJwtToBlacklistUseCase,
   RefreshJwtUseCase,
   LogoutUseCase,
   RegistrationUserUseCase,
@@ -56,6 +57,7 @@ const authUseCases = [
   ValidAccessJwtUseCase,
   ValidRefreshJwtUseCase,
   PasswordRecoveryUseCase,
+  AddInvalidJwtToBlacklistUseCase,
   ChangePasswordByRecoveryCodeUseCase,
 ];
 
