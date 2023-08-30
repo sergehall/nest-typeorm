@@ -5,13 +5,16 @@ import { DecodeTokenService } from '../../../../config/jwt/decode.service/decode
 import { AddInvalidJwtToBlacklistCommand } from './add-refresh-token-to-blacklist.use-case';
 import { UpdateDeviceCommand } from '../../../security-devices/application/use-cases/update-device.use-case';
 import { RefreshTokenDto } from '../../dto/refresh-token.dto';
-import { UpdatedJwtAndPayloadDto } from '../../dto/updated-jwt-and-payload.dto';
+import { Response } from 'express';
+import { UpdateAccessJwtCommand } from './update-access-jwt.use-case';
+import { AccessTokenDto } from '../../dto/access-token.dto';
 
 export class RefreshJwtCommand {
   constructor(
-    public refreshToken: string,
+    public refreshTokenDto: RefreshTokenDto,
     public ip: string,
     public userAgent: string,
+    public res: Response,
   ) {}
 }
 
@@ -22,19 +25,32 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: RefreshJwtCommand): Promise<UpdatedJwtAndPayloadDto> {
-    const { refreshToken, ip, userAgent } = command;
+  async execute(command: RefreshJwtCommand): Promise<AccessTokenDto> {
+    const { refreshTokenDto, ip, userAgent, res } = command;
+    const { refreshToken } = refreshTokenDto;
 
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(refreshToken);
 
-    await this.commandBus.execute(
-      new AddInvalidJwtToBlacklistCommand(refreshToken, currentPayload),
-    );
+    const currentTimestamp = new Date().toISOString();
+    const expirationTimestamp = new Date(
+      currentPayload.exp * 1000,
+    ).toISOString();
+
+    if (expirationTimestamp > currentTimestamp) {
+      await this.commandBus.execute(
+        new AddInvalidJwtToBlacklistCommand(refreshToken, currentPayload),
+      );
+    }
 
     const updatedJwt: RefreshTokenDto = await this.commandBus.execute(
       new UpdateRefreshJwtCommand(currentPayload),
     );
+
+    res.cookie('refreshToken', updatedJwt, {
+      httpOnly: true,
+      secure: true,
+    });
 
     const updatedPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(updatedJwt.refreshToken);
@@ -43,9 +59,8 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
       new UpdateDeviceCommand(updatedPayload, ip, userAgent),
     );
 
-    return {
-      updatedJwt: updatedJwt.refreshToken,
-      updatedPayload: updatedPayload,
-    };
+    return await this.commandBus.execute(
+      new UpdateAccessJwtCommand(updatedPayload),
+    );
   }
 }

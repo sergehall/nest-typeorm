@@ -11,7 +11,6 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
-import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsUseCase } from './application/use-cases/search-blogs.use-case';
@@ -19,11 +18,17 @@ import { GetBlogByIdUseCase } from './application/use-cases/get-blog-by-id.use-c
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
+import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [BlogsController],
   providers: [
     AuthService,
@@ -38,7 +43,7 @@ const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
-    BlacklistJwtRawSqlRepository,
+    InvalidJwtRepo,
     ...blogsUseCases,
   ],
 })

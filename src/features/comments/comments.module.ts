@@ -34,6 +34,8 @@ import { LikeStatusCommentsRepo } from './infrastructure/like-status-comments.re
 import { LikeStatusCommentsEntity } from './entities/like-status-comments.entity';
 import { CommentsRepo } from './infrastructure/comments.repo';
 import { CommentsEntity } from './entities/comments.entity';
+import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
@@ -54,6 +56,7 @@ const commentsUseCases = [
       UsersEntity,
       CommentsEntity,
       LikeStatusCommentsEntity,
+      InvalidJwtEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -77,6 +80,7 @@ const commentsUseCases = [
     LikeStatusCommentsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
+    InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
     ...commentsUseCases,
   ],

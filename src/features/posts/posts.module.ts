@@ -37,6 +37,8 @@ import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
+import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -53,7 +55,12 @@ const postsUseCases = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, PostsEntity, BloggerBlogsEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      PostsEntity,
+      BloggerBlogsEntity,
+      InvalidJwtEntity,
+    ]),
     CaslModule,
     CqrsModule,
   ],
@@ -77,6 +84,7 @@ const postsUseCases = [
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
+    InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
     ...postsUseCases,
