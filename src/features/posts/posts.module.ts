@@ -39,6 +39,8 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
+import { LikeStatusPostsEntity } from './entities/like-status-posts.entity';
+import { LikeStatusPostsRepo } from './infrastructure/like-status-posts.repo';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -60,6 +62,7 @@ const postsUseCases = [
       PostsEntity,
       BloggerBlogsEntity,
       InvalidJwtEntity,
+      LikeStatusPostsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -82,6 +85,7 @@ const postsUseCases = [
     PostsRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
+    LikeStatusPostsRepo,
     LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,

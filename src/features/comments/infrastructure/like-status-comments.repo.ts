@@ -20,14 +20,14 @@ export class LikeStatusCommentsRepo {
     findComment: CommentsEntity,
   ): Promise<LikeStatusCommentsEntity> {
     try {
-      const LikeStatusCommentsEntity =
+      const likeStatusCommentsEntity =
         await this.createLikeStatusCommentsEntity(
           likeStatusDto,
           currentUserDto,
           findComment,
         );
       return await this.likeStatusCommentRepository.save(
-        LikeStatusCommentsEntity,
+        likeStatusCommentsEntity,
       );
     } catch (error) {
       console.log(error.message);

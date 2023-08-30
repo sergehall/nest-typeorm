@@ -25,6 +25,9 @@ import { DeleteBlogByBlogIdUseCase } from './application/use-cases/delete-blog-b
 import { BloggerBlogsRepo } from './infrastructure/blogger-blogs.repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BloggerBlogsEntity } from './entities/blogger-blogs.entity';
+import { PostsRepo } from '../posts/infrastructure/posts-repo';
+import { PostsEntity } from '../posts/entities/posts.entity';
+import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -39,7 +42,14 @@ const bloggersBlogUseCases = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BloggerBlogsEntity]), CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      PostsEntity,
+      BloggerBlogsEntity,
+      LikeStatusPostsEntity,
+    ]),
+    CqrsModule,
+  ],
   controllers: [BloggerBlogsController],
   providers: [
     CaslAbilityFactory,
@@ -51,6 +61,7 @@ const bloggersBlogUseCases = [
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     CommentsRawSqlRepository,
+    PostsRepo,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,

@@ -2,12 +2,13 @@ import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../../infrastructure/like-status-posts-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { TablesPostsEntity } from '../../entities/tables-posts-entity';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
+import { PostsRepo } from '../../infrastructure/posts-repo';
+import { PostsEntity } from '../../entities/posts.entity';
+import { LikeStatusPostsRepo } from '../../infrastructure/like-status-posts.repo';
+import { LikeStatusPostsEntity } from '../../entities/like-status-posts.entity';
 
 export class ChangeLikeStatusPostCommand {
   constructor(
@@ -23,20 +24,21 @@ export class ChangeLikeStatusPostUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected likeStatusPostsRawSqlRepository: LikeStatusPostsRawSqlRepository,
+    protected likeStatusPostsRepo: LikeStatusPostsRepo,
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
-    protected postsRawSqlRepository: PostsRawSqlRepository,
+    protected postsRepo: PostsRepo,
   ) {}
-  async execute(command: ChangeLikeStatusPostCommand): Promise<boolean> {
+  async execute(
+    command: ChangeLikeStatusPostCommand,
+  ): Promise<LikeStatusPostsEntity> {
     const { postId, likeStatusDto, currentUserDto } = command;
 
-    const post: TablesPostsEntity | null =
-      await this.postsRawSqlRepository.getPostById(postId);
+    const post: PostsEntity | null = await this.postsRepo.findPostById(postId);
     if (!post) throw new NotFoundException('Not found post.');
 
     await this.checkUserPermission(post, currentUserDto);
 
-    return await this.likeStatusPostsRawSqlRepository.updateLikeStatusPosts(
+    return await this.likeStatusPostsRepo.updateLikeStatusPosts(
       post,
       likeStatusDto,
       currentUserDto,
@@ -44,13 +46,13 @@ export class ChangeLikeStatusPostUseCase
   }
 
   private async checkUserPermission(
-    post: TablesPostsEntity,
+    post: PostsEntity,
     currentUserDto: CurrentUserDto,
   ) {
     const userIsBannedForBlog =
       await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
         currentUserDto.userId,
-        post.blogId,
+        post.blog.id,
       );
     if (userIsBannedForBlog)
       throw new ForbiddenException(userNotHavePermissionForBlog);
