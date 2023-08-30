@@ -22,7 +22,6 @@ import { CookiesJwtVerificationGuard } from '../guards/cookies-jwt.verification.
 import { CommandBus } from '@nestjs/cqrs';
 import { RegistrationUserCommand } from '../application/use-cases/registration-user.use-case';
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { UpdateAccessJwtCommand } from '../application/use-cases/update-access-jwt.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -32,7 +31,6 @@ import { PasswordRecoveryCommand } from '../application/use-cases/password-recov
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { UserIdEmailLoginDto } from '../dto/profile.dto';
 import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case';
-import { UpdatedJwtAndPayloadDto } from '../dto/updated-jwt-and-payload.dto';
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
 import { LoginCommand } from '../application/use-cases/login.use-case';
 
@@ -83,23 +81,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AccessTokenDto> {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshTokenDto = req.cookies.refreshToken;
+
     const userAgent = req.get('user-agent');
 
-    const updatedJwtAndPayload: UpdatedJwtAndPayloadDto =
-      await this.commandBus.execute(
-        new RefreshJwtCommand(refreshToken, ip, userAgent),
-      );
-
-    const { updatedJwt, updatedPayload } = updatedJwtAndPayload;
-
-    res.cookie('refreshToken', updatedJwt, {
-      httpOnly: true,
-      secure: true,
-    });
-
     return await this.commandBus.execute(
-      new UpdateAccessJwtCommand(updatedPayload),
+      new RefreshJwtCommand(refreshTokenDto, ip, userAgent, res),
     );
   }
 

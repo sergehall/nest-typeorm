@@ -1,14 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt.use-case';
-import { BlacklistJwtRawSqlRepository } from '../infrastructure/blacklist-jwt-raw-sql.repository';
 import { PayloadDto } from '../dto/payload.dto';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
+import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
   constructor(
-    protected blacklistJwtRawSqlRepository: BlacklistJwtRawSqlRepository,
+    protected invalidJwtRepo: InvalidJwtRepo,
     protected usersRepo: UsersRepo,
     protected commandBus: CommandBus,
   ) {}
@@ -23,9 +23,7 @@ export class NoneStatusGuard implements CanActivate {
       );
 
       const jwtExistInBlackList: boolean =
-        await this.blacklistJwtRawSqlRepository.JwtExistInBlackList(
-          accessToken,
-        );
+        await this.invalidJwtRepo.JwtExistInBlackList(accessToken);
 
       if (!jwtExistInBlackList && payload) {
         const user = await this.usersRepo.findUserById(payload.userId);
