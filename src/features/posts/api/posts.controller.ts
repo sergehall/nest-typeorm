@@ -42,6 +42,7 @@ import { PostExistValidationPipe } from '../../../common/pipes/post-exist-valida
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
 import { ReturnCommentsEntity } from '../../comments/entities/return-comments.entity';
 import { ReturnPostsEntity } from '../entities/return-posts.entity';
+import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 
 @SkipThrottle()
 @Controller('posts')
@@ -168,7 +169,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ): Promise<boolean> {
+  ): Promise<LikeStatusPostsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

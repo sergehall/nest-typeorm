@@ -52,14 +52,11 @@ export class PostsEntity {
   @Column({ nullable: false, default: false })
   isBanned: boolean;
 
-  @Column({ default: false, nullable: false })
-  banInfoIsBanned: boolean;
+  @Column({ type: 'character varying', nullable: true })
+  banDate: string | null = null;
 
   @Column({ type: 'character varying', nullable: true })
-  banInfoBanDate: string | null = null;
-
-  @Column({ type: 'character varying', nullable: true })
-  banInfoBanReason: string | null = null;
+  banReason: string | null = null;
 
   @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.posts, {
     nullable: false,
