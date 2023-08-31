@@ -1,6 +1,6 @@
 import { ReturnPostsEntity } from '../entities/return-posts.entity';
 
-export class PostsCountPostsDto {
+export class PostsAndCountDto {
   posts: ReturnPostsEntity[];
   countPosts: number;
 }
