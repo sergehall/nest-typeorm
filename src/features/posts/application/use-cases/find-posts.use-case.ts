@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { PostsCountPostsDto } from '../../dto/posts-count-posts.dto';
+import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 
 export class FindPostsCommand {
   constructor(
@@ -22,22 +22,22 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndNumberOfPosts: PostsCountPostsDto =
+    const postsAndCount: PostsAndCountDto =
       await this.postsRawSqlRepository.findPostsAndTotalCountPosts(
         queryData,
         currentUserDto,
       );
 
-    if (postsAndNumberOfPosts.posts.length === 0) {
+    if (postsAndCount.posts.length === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
         pageSize: pageSize,
         totalCount: 0,
-        items: postsAndNumberOfPosts.posts,
+        items: postsAndCount.posts,
       };
     }
-    const totalCount = postsAndNumberOfPosts.countPosts;
+    const totalCount = postsAndCount.countPosts;
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 
@@ -46,7 +46,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: postsAndNumberOfPosts.posts,
+      items: postsAndCount.posts,
     };
   }
 }

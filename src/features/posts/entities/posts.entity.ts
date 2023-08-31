@@ -76,6 +76,5 @@ export class PostsEntity {
   postOwner: UsersEntity;
 
   @OneToMany(() => CommentsEntity, (comment) => comment.post)
-  @JoinColumn({ name: 'postInfoPostId' })
   comments: CommentsEntity[];
 }
