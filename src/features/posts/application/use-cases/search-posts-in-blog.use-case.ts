@@ -1,7 +1,6 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 
@@ -16,22 +15,13 @@ export class SearchPostsInBlogCommand {
 export class SearchPostsInBlogUseCase
   implements ICommandHandler<SearchPostsInBlogCommand>
 {
-  constructor(
-    protected postsRawSqlRepository: PostsRawSqlRepository,
-    protected postsRepo: PostsRepo,
-  ) {}
+  constructor(protected postsRepo: PostsRepo) {}
   async execute(command: SearchPostsInBlogCommand) {
     const { blogId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    // const postsAndNumberOfPosts: PostsAndCountDto =
-    //   await this.postsRepo.getPostsAndLikesWithPagination(
-    //     blogId,
-    //     queryData,
-    //     currentUserDto,
-    //   );
     const postsAndNumberOfPosts: PostsAndCountDto =
-      await this.postsRepo.getPostsAndLikesWithPagination2(
+      await this.postsRepo.getPostsWithLikesAndPagination(
         blogId,
         queryData,
         currentUserDto,

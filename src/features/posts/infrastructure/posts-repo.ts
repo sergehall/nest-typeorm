@@ -25,10 +25,6 @@ import {
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
-import {
-  PostsLastThreeLikesMyStatusCountLikesDislikesDto,
-  PostsLastThreeLikesMyStatusCountLikesDislikesDto2,
-} from '../dto/posts-last-three-likes-my-status-count-likes-dislikes.dto';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 
 export class PostsRepo {
@@ -85,20 +81,22 @@ export class PostsRepo {
     }
   }
 
-  async getPostsAndLikesWithPagination(
+  async getPostsWithLikesAndPagination(
     blogId: string,
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
+    // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
 
+    // Retrieve paging parameters
     const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
+
     const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
     const numberLastLikes = 3;
-    const likeStatus = LikeStatusEnums.LIKE;
 
-    // Query posts with pagination conditions
+    // Query posts and countPosts with pagination conditions
     const [posts, countPosts] = await this.postsRepository.findAndCount({
       where: {
         dependencyIsBanned,
@@ -110,246 +108,86 @@ export class PostsRepo {
       skip: offset,
     });
 
-    // Fetch last three likes for each post
-    const postsWithLikesAndStatus: PostsLastThreeLikesMyStatusCountLikesDislikesDto[] =
-      await Promise.all(
-        posts.map(
-          async (
-            post: PostsEntity,
-          ): Promise<PostsLastThreeLikesMyStatusCountLikesDislikesDto> => {
-            let myStatus = LikeStatusEnums.NONE;
-            if (currentUserDto) {
-              const status: LikeStatusPostsEntity | null =
-                await this.likePostsRepository.findOne({
-                  where: {
-                    post: { id: post.id },
-                    ratedPostUser: { userId: currentUserDto.userId },
-                  },
-                });
-              if (status) {
-                myStatus = status.likeStatus;
-              }
-            }
-
-            const lastLikes: LikeStatusPostsEntity[] =
-              await this.likePostsRepository.find({
-                where: {
-                  post: { id: post.id },
-                  likeStatus: likeStatus,
-                },
-                order: { addedAt: 'DESC' },
-                take: numberLastLikes,
-              });
-
-            const likesCount: number = await this.likePostsRepository.count({
-              where: {
-                post: { id: post.id },
-                likeStatus: LikeStatusEnums.LIKE, // Assuming 'Like' is the status for likes
-              },
-            });
-
-            const dislikesCount: number = await this.likePostsRepository.count({
-              where: {
-                post: { id: post.id },
-                likeStatus: LikeStatusEnums.DISLIKE, // Assuming 'Dislike' is the status for dislikes
-              },
-            });
-
-            return {
-              post,
-              lastLikes,
-              myStatus,
-              likesCount,
-              dislikesCount,
-            };
-          },
-        ),
-      );
-
-    const processedPosts: ReturnPostsEntity[] =
-      await this.processPostsWithLikes(postsWithLikesAndStatus, currentUserDto);
-    return {
-      posts: processedPosts,
-      countPosts,
-    };
-  }
-
-  async getPostsAndLikesWithPagination2(
-    blogId: string,
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsAndCountDto> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-    const { sortBy, direction, limit, offset } = pagingParams;
-    const numberLastLikes = 3;
-    // const likeStatus = LikeStatusEnums.LIKE;
-
-    // Query posts with pagination conditions
-    const [posts, countPosts] = await this.postsRepository.findAndCount({
-      where: {
-        dependencyIsBanned,
-        isBanned,
-        blog: { id: blogId },
-      },
-      order: { [sortBy]: direction },
-      take: limit,
-      skip: offset,
-    });
-
+    // Extract post IDs
     const postIds = posts.map((post) => post.id);
 
-    const postData = await this.likePostsRepository
-      .createQueryBuilder('likePost')
-      .leftJoinAndSelect('likePost.post', 'post')
-      .leftJoinAndSelect('likePost.ratedPostUser', 'ratedPostUser')
-      .where('likePost.post.id IN (:...postIds)', { postIds })
-      .orderBy('likePost.addedAt', 'DESC')
-      .take(numberLastLikes) // Limit the number of retrieved likes per post
-      .getMany();
+    if (postIds.length === 0) {
+      return {
+        posts: [],
+        countPosts: 0,
+      };
+    }
 
-    const postsWithLikesAndStatus: PostsLastThreeLikesMyStatusCountLikesDislikesDto2[] =
-      posts.map(
-        (
-          post: PostsEntity,
-        ): PostsLastThreeLikesMyStatusCountLikesDislikesDto2 => {
-          const filteredData: LikeStatusPostsEntity[] = postData.filter(
+    // Query like status data for the posts
+    const likeStatusPostsData: LikeStatusPostsEntity[] =
+      await this.likePostsRepository
+        .createQueryBuilder('likeStatusPosts')
+        .leftJoinAndSelect('likeStatusPosts.post', 'post')
+        .leftJoinAndSelect('likeStatusPosts.ratedPostUser', 'ratedPostUser')
+        .where('likeStatusPosts.post.id IN (:...postIds)', { postIds })
+        .orderBy('likeStatusPosts.addedAt', 'DESC')
+        .take(numberLastLikes) // Limit the number of retrieved likes per post
+        .getMany();
+
+    // Process posts and associated like data
+    const postsWithData: ReturnPostsEntity[] = posts.map(
+      (post: PostsEntity): ReturnPostsEntity => {
+        const filteredData: LikeStatusPostsEntity[] =
+          likeStatusPostsData.filter(
             (item: LikeStatusPostsEntity) => item.post.id === post.id,
           );
 
-          const lastLikes: NewestLikes[] = filteredData.map(
-            (item: LikeStatusPostsEntity): NewestLikes => ({
-              addedAt: item.addedAt,
-              userId: item.ratedPostUser.userId,
-              login: item.ratedPostUser.login,
-            }),
-          );
+        // Create an array of last likes for the post
+        const lastLikes: NewestLikes[] = filteredData.map(
+          (item: LikeStatusPostsEntity): NewestLikes => ({
+            addedAt: item.addedAt,
+            userId: item.ratedPostUser.userId,
+            login: item.ratedPostUser.login,
+          }),
+        );
 
-          const likesCount = filteredData.filter(
-            (item) => item.likeStatus === LikeStatusEnums.LIKE,
-          ).length;
+        // Count likes and dislikes
+        const likesCount = filteredData.filter(
+          (item: LikeStatusPostsEntity) =>
+            item.likeStatus === LikeStatusEnums.LIKE,
+        ).length;
+        const dislikesCount = filteredData.filter(
+          (item: LikeStatusPostsEntity) =>
+            item.likeStatus === LikeStatusEnums.DISLIKE,
+        ).length;
 
-          const dislikesCount = filteredData.filter(
-            (item) => item.likeStatus === LikeStatusEnums.DISLIKE,
-          ).length;
+        // Determine the user's status for the post
+        let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
+        if (
+          currentUserDto &&
+          filteredData[0] &&
+          currentUserDto.userId === filteredData[0].ratedPostUser.userId
+        ) {
+          myStatus = filteredData[0].likeStatus;
+        }
+        // Construct the posts data with extended likes information
+        return {
+          id: post.id,
+          title: post.title,
+          shortDescription: post.shortDescription,
+          content: post.content,
+          blogId: post.blog.id,
+          blogName: post.blog.name,
+          createdAt: post.createdAt,
+          extendedLikesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: myStatus,
+            newestLikes: lastLikes,
+          },
+        };
+      },
+    );
 
-          let myStatus = LikeStatusEnums.NONE;
-          if (
-            currentUserDto &&
-            filteredData[0] &&
-            currentUserDto.userId === filteredData[0].ratedPostUser.userId
-          ) {
-            myStatus = filteredData[0].likeStatus;
-          }
-
-          return {
-            post,
-            lastLikes,
-            myStatus,
-            likesCount,
-            dislikesCount,
-          };
-        },
-      );
-
-    const processedPosts: ReturnPostsEntity[] =
-      await this.processPostsWithLikes2(postsWithLikesAndStatus);
     return {
-      posts: processedPosts,
+      posts: postsWithData,
       countPosts,
     };
-  }
-
-  private async processPostsWithLikes2(
-    postsWithLikes: PostsLastThreeLikesMyStatusCountLikesDislikesDto2[],
-  ): Promise<ReturnPostsEntity[]> {
-    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-
-    return postsWithLikes.reduce<ReturnPostsEntity[]>(
-      (
-        result: ReturnPostsEntity[],
-        row: PostsLastThreeLikesMyStatusCountLikesDislikesDto2,
-      ) => {
-        const post = row.post;
-        const postId = row.post.id;
-
-        let postEntity = postWithLikes[postId];
-        if (!postEntity) {
-          postEntity = {
-            id: post.id,
-            title: post.title,
-            shortDescription: post.shortDescription,
-            content: post.content,
-            blogId: post.blog.id,
-            blogName: post.blog.name,
-            createdAt: post.createdAt,
-            extendedLikesInfo: {
-              likesCount: row.likesCount,
-              dislikesCount: row.dislikesCount,
-              myStatus: row.myStatus,
-              newestLikes: row.lastLikes,
-            },
-          };
-          postWithLikes[postId] = postEntity;
-          result.push(postEntity);
-        }
-        return result;
-      },
-      [],
-    );
-  }
-
-  private async processPostsWithLikes(
-    postsWithLikes: PostsLastThreeLikesMyStatusCountLikesDislikesDto[],
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity[]> {
-    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-
-    return postsWithLikes.reduce<ReturnPostsEntity[]>(
-      (
-        result: ReturnPostsEntity[],
-        row: PostsLastThreeLikesMyStatusCountLikesDislikesDto,
-      ) => {
-        const post = row.post;
-        const postId = row.post.id;
-        const likesCount = row.likesCount;
-        const dislikesCount = row.dislikesCount;
-        const myStatus = currentUserDto ? row.myStatus : LikeStatusEnums.NONE;
-        let postEntity = postWithLikes[postId];
-        if (!postEntity) {
-          const transformLikes = (
-            likes: LikeStatusPostsEntity[],
-          ): { addedAt: string; userId: string; login: string }[] => {
-            return likes.map((l: LikeStatusPostsEntity) => ({
-              addedAt: l.addedAt,
-              userId: l.ratedPostUser.userId,
-              login: l.ratedPostUser.login,
-            }));
-          };
-          postEntity = {
-            id: post.id,
-            title: post.title,
-            shortDescription: post.shortDescription,
-            content: post.content,
-            blogId: post.blog.id,
-            blogName: post.blog.name,
-            createdAt: post.createdAt,
-            extendedLikesInfo: {
-              likesCount: likesCount,
-              dislikesCount: dislikesCount,
-              myStatus: myStatus,
-              newestLikes: transformLikes(row.lastLikes),
-            },
-          };
-          postWithLikes[postId] = postEntity;
-          result.push(postEntity);
-        }
-        return result;
-      },
-      [],
-    );
   }
 
   private async creatPostsEntity(
