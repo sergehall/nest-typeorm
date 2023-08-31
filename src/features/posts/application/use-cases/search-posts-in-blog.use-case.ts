@@ -24,8 +24,14 @@ export class SearchPostsInBlogUseCase
     const { blogId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
+    // const postsAndNumberOfPosts: PostsAndCountDto =
+    //   await this.postsRepo.getPostsAndLikesWithPagination(
+    //     blogId,
+    //     queryData,
+    //     currentUserDto,
+    //   );
     const postsAndNumberOfPosts: PostsAndCountDto =
-      await this.postsRepo.getPostsAndLikesWithPagination(
+      await this.postsRepo.getPostsAndLikesWithPagination2(
         blogId,
         queryData,
         currentUserDto,

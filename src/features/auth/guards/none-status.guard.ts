@@ -31,7 +31,7 @@ export class NoneStatusGuard implements CanActivate {
         request.user =
           user && !user.isBanned
             ? {
-                id: user.userId,
+                userId: user.userId,
                 login: user.login,
                 email: user.email,
                 orgId: user.orgId,
