@@ -200,7 +200,64 @@ export class PostsRepo {
       take: limit,
       skip: offset,
     });
-    console.log(posts, 'posts------------');
+
+    if (posts.length === 0) {
+      return {
+        posts: [],
+        countPosts: 0,
+      };
+    }
+
+    // Extract post IDs
+    const postIds = posts.map((post) => post.id);
+
+    const postsWithLikes: ReturnPostsEntity[] =
+      await this.postsLikesAggregation(
+        postIds,
+        posts,
+        numberLastLikes,
+        currentUserDto,
+      );
+
+    return {
+      posts: postsWithLikes,
+      countPosts,
+    };
+  }
+
+  async searchPosts(
+    queryData: ParseQueriesDto,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<PostsAndCountDto> {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
+    // Retrieve paging parameters
+    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
+    const { sortBy, direction, limit, offset } = pagingParams;
+
+    const numberLastLikes = await this.numberLastLikes();
+
+    const query = this.postsRepository
+      .createQueryBuilder('post')
+      .where('post.dependencyIsBanned = :dependencyIsBanned', {
+        dependencyIsBanned,
+      })
+      .andWhere('post.isBanned = :isBanned', { isBanned })
+      .innerJoinAndSelect('post.blog', 'blog')
+      .innerJoinAndSelect('post.postOwner', 'postOwner');
+
+    if (sortBy === 'blogName') {
+      query.orderBy('blog.name', direction);
+    } else {
+      query.orderBy('post.createdAt', direction);
+    }
+
+    // Count the total number of posts that match the criteria
+    const countPosts = await query.getCount();
+
+    const posts = await query.skip(offset).take(limit).getMany();
+
     if (posts.length === 0) {
       return {
         posts: [],
@@ -276,6 +333,7 @@ export class PostsRepo {
       ) {
         myStatus = filteredData[0].likeStatus;
       }
+
       // Construct the posts data with extended likes information
       return {
         id: post.id,
