@@ -21,7 +21,7 @@ export class SearchPostsInBlogUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const postsAndNumberOfPosts: PostsAndCountDto =
-      await this.postsRepo.getPostsWithLikesAndPagination(
+      await this.postsRepo.getPostsInBlogWithPagination(
         blogId,
         queryData,
         currentUserDto,
