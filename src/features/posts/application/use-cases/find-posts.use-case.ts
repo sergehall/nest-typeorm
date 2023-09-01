@@ -21,7 +21,10 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
   async execute(command: FindPostsCommand): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
-
+    console.log('--------------------------------');
+    console.log(queryData, 'queryData');
+    console.log(currentUserDto, 'currentUserDto');
+    console.log('--------------------------------');
     const postsAndCount: PostsAndCountDto =
       await this.postsRepo.getPostsWithPagination(queryData, currentUserDto);
 
