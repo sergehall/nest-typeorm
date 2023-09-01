@@ -200,7 +200,7 @@ export class PostsRepo {
       take: limit,
       skip: offset,
     });
-
+    console.log(posts, 'posts------------');
     if (posts.length === 0) {
       return {
         posts: [],
@@ -276,7 +276,6 @@ export class PostsRepo {
       ) {
         myStatus = filteredData[0].likeStatus;
       }
-      console.log(post, 'post------------');
       // Construct the posts data with extended likes information
       return {
         id: post.id,
