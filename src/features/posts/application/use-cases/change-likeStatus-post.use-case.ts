@@ -33,8 +33,9 @@ export class ChangeLikeStatusPostUseCase
   ): Promise<LikeStatusPostsEntity> {
     const { postId, likeStatusDto, currentUserDto } = command;
 
-    const post: PostsEntity | null = await this.postsRepo.findPostById(postId);
-    if (!post) throw new NotFoundException('Not found post.');
+    const post: PostsEntity | null =
+      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkUserPermission(post, currentUserDto);
 

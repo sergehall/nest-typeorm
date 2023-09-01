@@ -36,10 +36,55 @@ export class PostsRepo {
     private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
   ) {}
 
-  async findPostById(id: string): Promise<PostsEntity | null> {
+  async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
     try {
-      const post = await this.postsRepository.findBy({ id });
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { dependencyIsBanned, isBanned } = bannedFlags;
+
+      const post = await this.postsRepository.findBy({
+        id,
+        dependencyIsBanned,
+        isBanned,
+      });
       return post[0] ? post[0] : null;
+    } catch (error) {
+      if (await this.isInvalidUUIDError(error)) {
+        const userId = await this.extractUserIdFromError(error);
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getPostByIdWithLikes(
+    id: string,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnPostsEntity[] | null> {
+    // Retrieve banned flags
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+    const numberLastLikes = await this.numberLastLikes();
+
+    try {
+      const post: PostsEntity[] = await this.postsRepository.findBy({
+        id,
+        dependencyIsBanned,
+        isBanned,
+      });
+
+      if (post.length === 0) {
+        return null;
+      }
+
+      // Extract post IDs
+      const postIds: string[] = post.map((p) => p.id);
+
+      return await this.postsLikesAggregation(
+        postIds,
+        post,
+        numberLastLikes,
+        currentUserDto,
+      );
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
         const userId = await this.extractUserIdFromError(error);
@@ -94,7 +139,7 @@ export class PostsRepo {
 
     const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
-    const numberLastLikes = 3;
+    const numberLastLikes = await this.numberLastLikes();
 
     // Query posts and countPosts with pagination conditions
     const [posts, countPosts] = await this.postsRepository.findAndCount({
@@ -108,17 +153,17 @@ export class PostsRepo {
       skip: offset,
     });
 
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
-
-    if (postIds.length === 0) {
+    if (posts.length === 0) {
       return {
         posts: [],
         countPosts: 0,
       };
     }
 
-    const postWithLikes = await this.postsLikesAggregation(
+    // Extract post IDs
+    const postIds = posts.map((post) => post.id);
+
+    const postsWithLikes = await this.postsLikesAggregation(
       postIds,
       posts,
       numberLastLikes,
@@ -126,7 +171,7 @@ export class PostsRepo {
     );
 
     return {
-      posts: postWithLikes,
+      posts: postsWithLikes,
       countPosts,
     };
   }
@@ -143,7 +188,7 @@ export class PostsRepo {
 
     const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
-    const numberLastLikes = 3;
+    const numberLastLikes = await this.numberLastLikes();
 
     // Query posts and countPosts with pagination conditions
     const [posts, countPosts] = await this.postsRepository.findAndCount({
@@ -156,25 +201,26 @@ export class PostsRepo {
       skip: offset,
     });
 
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
-
-    if (postIds.length === 0) {
+    if (posts.length === 0) {
       return {
         posts: [],
         countPosts: 0,
       };
     }
 
-    const postWithLikes: ReturnPostsEntity[] = await this.postsLikesAggregation(
-      postIds,
-      posts,
-      numberLastLikes,
-      currentUserDto,
-    );
+    // Extract post IDs
+    const postIds = posts.map((post) => post.id);
+
+    const postsWithLikes: ReturnPostsEntity[] =
+      await this.postsLikesAggregation(
+        postIds,
+        posts,
+        numberLastLikes,
+        currentUserDto,
+      );
 
     return {
-      posts: postWithLikes,
+      posts: postsWithLikes,
       countPosts,
     };
   }
@@ -284,6 +330,7 @@ export class PostsRepo {
       extendedLikesInfo, // Add extendedLikesInfo property
     };
   }
+
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
@@ -321,6 +368,10 @@ export class PostsRepo {
       ],
       'createdAt',
     );
+  }
+
+  private async numberLastLikes(): Promise<number> {
+    return 3;
   }
 
   private async isInvalidUUIDError(error: any): Promise<boolean> {
