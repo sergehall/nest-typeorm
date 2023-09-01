@@ -182,12 +182,12 @@ export class PostsRepo {
   ): Promise<PostsAndCountDto> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Retrieve paging parameters
     const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-
-    const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
+
     const numberLastLikes = await this.numberLastLikes();
 
     // Query posts and countPosts with pagination conditions
@@ -276,6 +276,7 @@ export class PostsRepo {
       ) {
         myStatus = filteredData[0].likeStatus;
       }
+      console.log(post, 'post------------');
       // Construct the posts data with extended likes information
       return {
         id: post.id,

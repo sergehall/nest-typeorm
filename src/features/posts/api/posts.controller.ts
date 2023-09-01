@@ -60,7 +60,8 @@ export class PostsController {
     @Query() query: any,
   ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData = await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(
       new FindPostsCommand(queryData, currentUserDto),
     );
