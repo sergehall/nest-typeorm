@@ -313,7 +313,6 @@ export class UsersRepo {
               expirationDate: LessThan(currentTime),
             },
           });
-          console.log(allUsersWithExpiredDate, 'allUsersWithExpiredDate');
           await Promise.all(
             allUsersWithExpiredDate.map((user) =>
               this.deleteUserData(user.userId, transactionalEntityManager),
