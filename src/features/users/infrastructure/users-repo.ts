@@ -94,6 +94,7 @@ export class UsersRepo {
   async findUserById(userId: string): Promise<UsersEntity | null> {
     try {
       const user = await this.usersRepository.findBy({ userId });
+
       return user[0] ? user[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
