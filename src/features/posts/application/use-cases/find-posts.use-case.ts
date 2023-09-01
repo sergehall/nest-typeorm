@@ -1,9 +1,9 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
+import { PostsRepo } from '../../infrastructure/posts-repo';
 
 export class FindPostsCommand {
   constructor(
@@ -15,7 +15,7 @@ export class FindPostsCommand {
 @CommandHandler(FindPostsCommand)
 export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
   constructor(
-    private readonly postsRawSqlRepository: PostsRawSqlRepository,
+    protected postsRepo: PostsRepo,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: FindPostsCommand): Promise<PaginatedResultDto> {
@@ -23,10 +23,7 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const postsAndCount: PostsAndCountDto =
-      await this.postsRawSqlRepository.findPostsAndTotalCountPosts(
-        queryData,
-        currentUserDto,
-      );
+      await this.postsRepo.getPostsWithPagination(queryData, currentUserDto);
 
     if (postsAndCount.posts.length === 0) {
       return {
