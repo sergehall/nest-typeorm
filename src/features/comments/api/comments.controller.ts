@@ -43,6 +43,7 @@ export class CommentsController {
     @Param() params: IdParams,
   ): Promise<ReturnCommentsEntity> {
     const currentUserDto: CurrentUserDto = req.user;
+
     return await this.commandBus.execute(
       new FindCommentByIdCommand(params.id, currentUserDto),
     );
