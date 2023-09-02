@@ -36,6 +36,9 @@ import { CommentsRepo } from './infrastructure/comments.repo';
 import { CommentsEntity } from './entities/comments.entity';
 import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
+import { PostsRepo } from '../posts/infrastructure/posts-repo';
+import { PostsEntity } from '../posts/entities/posts.entity';
+import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
@@ -54,7 +57,9 @@ const commentsUseCases = [
   imports: [
     TypeOrmModule.forFeature([
       UsersEntity,
+      PostsEntity,
       CommentsEntity,
+      LikeStatusPostsEntity,
       LikeStatusCommentsEntity,
       InvalidJwtEntity,
     ]),
@@ -72,6 +77,7 @@ const commentsUseCases = [
     KeyResolver,
     UsersRepo,
     UsersRawSqlRepository,
+    PostsRepo,
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     CommentsRepo,

@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { ReturnCommentsCountCommentsDto } from '../../dto/return-comments-count-comments.dto';
+import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 
 export class FindCommentsByPostIdCommand {
   constructor(
@@ -20,7 +20,7 @@ export class FindCommentsByPostIdUseCase
   implements ICommandHandler<FindCommentsByPostIdCommand>
 {
   constructor(
-    private readonly postsRawSqlRepository: PostsRawSqlRepository,
+    private readonly postsRepo: PostsRepo,
     private readonly commentsRawSqlRepository: CommentsRawSqlRepository,
     protected commandBus: CommandBus,
   ) {}
@@ -30,8 +30,8 @@ export class FindCommentsByPostIdUseCase
     const { postId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const post = await this.postsRawSqlRepository.getPostById(postId);
-    if (!post) throw new NotFoundException('Not found post.');
+    const post = await this.postsRepo.getPostByIdWithoutLikes(postId);
+    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     const commentsAndCountComments: ReturnCommentsCountCommentsDto =
       await this.commentsRawSqlRepository.findCommentsByPostIdAndCountOfLikesDislikes(
