@@ -176,7 +176,7 @@ export class PostsRepo {
     };
   }
 
-  async getPostsWithPagination(
+  async getPostsWithPagination2(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
@@ -225,7 +225,7 @@ export class PostsRepo {
     };
   }
 
-  async searchPosts(
+  async getPostsWithPaginationAndCount(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
@@ -237,6 +237,7 @@ export class PostsRepo {
     const { sortBy, direction, limit, offset } = pagingParams;
 
     const numberLastLikes = await this.numberLastLikes();
+    const orderByField = await this.getOrderField(sortBy);
 
     const query = this.postsRepository
       .createQueryBuilder('post')
@@ -247,11 +248,7 @@ export class PostsRepo {
       .innerJoinAndSelect('post.blog', 'blog')
       .innerJoinAndSelect('post.postOwner', 'postOwner');
 
-    if (sortBy === 'blogName') {
-      query.orderBy('blog.name', direction);
-    } else {
-      query.orderBy('post.createdAt', direction);
-    }
+    query.orderBy(orderByField, direction);
 
     // Count the total number of posts that match the criteria
     const countPosts = await query.getCount();
@@ -280,6 +277,44 @@ export class PostsRepo {
       posts: postsWithLikes,
       countPosts,
     };
+  }
+
+  private async getOrderField(field: string): Promise<string> {
+    let orderByString;
+
+    switch (field) {
+      case 'blogName':
+        orderByString = 'blog.name';
+        break;
+      case 'title':
+        orderByString = 'post.title';
+        break;
+      case 'shortDescription':
+        orderByString = 'post.shortDescription ';
+        break;
+      case 'content':
+        orderByString = 'post.content';
+        break;
+      case 'dependencyIsBanned':
+        orderByString = 'post.dependencyIsBanned';
+        break;
+      case 'isBanned':
+        orderByString = 'post.isBanned';
+        break;
+      case 'banDate':
+        orderByString = 'post.banDate';
+        break;
+      case 'banReason':
+        orderByString = 'post.banReason';
+        break;
+      case 'createdAt':
+        orderByString = 'post.createdAt';
+        break;
+      default:
+        throw new Error('Invalid field');
+    }
+
+    return orderByString;
   }
 
   private async postsLikesAggregation(
@@ -401,12 +436,14 @@ export class PostsRepo {
   private async getPagingParams(
     queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
+    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
+
     const sortBy: string = await this.getSortBy(
       queryData.queryPagination.sortBy,
     );
-    const direction: SortDirection = queryData.queryPagination.sortDirection;
-    const limit: number = queryData.queryPagination.pageSize;
-    const offset: number = (queryData.queryPagination.pageNumber - 1) * limit;
+    const direction: SortDirection = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
 
     return { sortBy, direction, limit, offset };
   }
@@ -420,9 +457,9 @@ export class PostsRepo {
         'content',
         'blogName',
         'dependencyIsBanned',
-        'banInfoIsBanned',
-        'banInfoBanDate',
-        'banInfoBanReason',
+        'isBanned',
+        'banDate',
+        'banReason',
       ],
       'createdAt',
     );
