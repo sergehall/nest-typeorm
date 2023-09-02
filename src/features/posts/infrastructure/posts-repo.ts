@@ -79,11 +79,7 @@ export class PostsRepo {
         return null;
       }
 
-      // Extract post IDs
-      const postIds: string[] = post.map((p) => p.id);
-
       return await this.postsLikesAggregation(
-        postIds,
         post,
         numberLastLikes,
         currentUserDto,
@@ -173,12 +169,8 @@ export class PostsRepo {
 
     const posts = await query.skip(offset).take(limit).getMany();
 
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
-
     // Retrieve posts with information about likes
     const postsWithLikes = await this.postsLikesAggregation(
-      postIds,
       posts,
       numberLastLikes,
       currentUserDto,
@@ -228,16 +220,8 @@ export class PostsRepo {
       };
     }
 
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
-
     const postsWithLikes: ReturnPostsEntity[] =
-      await this.postsLikesAggregation(
-        postIds,
-        posts,
-        numberLastLikes,
-        currentUserDto,
-      );
+      await this.postsLikesAggregation(posts, numberLastLikes, currentUserDto);
 
     return {
       posts: postsWithLikes,
@@ -312,11 +296,13 @@ export class PostsRepo {
   }
 
   private async postsLikesAggregation(
-    postIds: string[],
     posts: PostsEntity[],
     numberLastLikes: number,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
+    // Extract post IDs
+    const postIds = posts.map((post) => post.id);
+
     // Query like status data for the posts
     const likeStatusPostsData: LikeStatusPostsEntity[] =
       await this.likePostsRepository

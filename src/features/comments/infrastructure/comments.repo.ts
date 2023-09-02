@@ -39,7 +39,14 @@ export class CommentsRepo {
 
   async findCommentById(id: string): Promise<CommentsEntity | null> {
     try {
-      const comment = await this.commentsRepository.findBy({ id });
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { dependencyIsBanned, isBanned } = bannedFlags;
+
+      const comment = await this.commentsRepository.findBy({
+        id,
+        dependencyIsBanned,
+        isBanned,
+      });
       return comment[0] ? comment[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
@@ -69,11 +76,8 @@ export class CommentsRepo {
         return null;
       }
 
-      // Extract post IDs
-      const commentIds: string[] = comment.map((p) => p.id);
-
       const result: ReturnCommentWithLikesInfoDto[] =
-        await this.commentLikesAggregation(commentIds, comment, currentUserDto);
+        await this.commentLikesAggregation(comment, currentUserDto);
 
       return result[0];
     } catch (error) {
@@ -84,14 +88,17 @@ export class CommentsRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   private async commentLikesAggregation(
-    commentIds: string[],
     comments: CommentsEntity[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnCommentWithLikesInfoDto[]> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { isBanned } = bannedFlags;
+
+    // Extract post IDs
+    const commentIds: string[] = comments.map((p) => p.id);
 
     // Query like status data for the posts
     const likeStatusCommentsData: LikeStatusCommentsEntity[] =
@@ -185,15 +192,6 @@ export class CommentsRepo {
     }
   }
 
-  private async isInvalidUUIDError(error: any): Promise<boolean> {
-    return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async extractUserIdFromError(error: any): Promise<string | null> {
-    const match = error.message.match(/"([^"]+)"/);
-    return match ? match[1] : null;
-  }
-
   private async creatCommentEntity(
     post: PostsEntity,
     createCommentDto: CreateCommentDto,
@@ -216,9 +214,9 @@ export class CommentsRepo {
     commentsEntity.id = uuid4().toString();
     commentsEntity.content = content;
     commentsEntity.createdAt = new Date().toISOString();
-    commentsEntity.banInfoIsBanned = false;
-    commentsEntity.banInfoBanDate = null;
-    commentsEntity.banInfoBanReason = null;
+    commentsEntity.isBanned = false;
+    commentsEntity.banDate = null;
+    commentsEntity.banReason = null;
     commentsEntity.dependencyIsBanned = false;
     commentsEntity.isBanned = false;
     commentsEntity.blog = blog;
@@ -284,5 +282,14 @@ export class CommentsRepo {
       ],
       'createdAt',
     );
+  }
+
+  private async isInvalidUUIDError(error: any): Promise<boolean> {
+    return error.message.includes('invalid input syntax for type uuid');
+  }
+
+  private async extractUserIdFromError(error: any): Promise<string | null> {
+    const match = error.message.match(/"([^"]+)"/);
+    return match ? match[1] : null;
   }
 }
