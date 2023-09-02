@@ -126,6 +126,14 @@ export class PostsRepo {
     }
   }
 
+  /**
+   * Retrieves paginated posts within a specific blog and includes information about likes for each post.
+   *
+   * @param blogId - The unique identifier of the blog for which to retrieve posts.
+   * @param queryData - Query parameters for pagination and sorting.
+   * @param currentUserDto - Information about the current user (optional).
+   * @returns A Promise containing an object with paginated posts and the total count of posts.
+   */
   async getPostsInBlogWithPagination(
     blogId: string,
     queryData: ParseQueriesDto,
@@ -133,36 +141,39 @@ export class PostsRepo {
   ): Promise<PostsAndCountDto> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Retrieve paging parameters
     const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-
-    const { dependencyIsBanned, isBanned } = bannedFlags;
     const { sortBy, direction, limit, offset } = pagingParams;
+
+    // Retrieve the number of last likes
     const numberLastLikes = await this.numberLastLikes();
 
-    // Query posts and countPosts with pagination conditions
-    const [posts, countPosts] = await this.postsRepository.findAndCount({
-      where: {
-        dependencyIsBanned,
-        isBanned,
-        blog: { id: blogId },
-      },
-      order: { [sortBy]: direction },
-      take: limit,
-      skip: offset,
-    });
+    // Retrieve the order field for sorting
+    const orderByField = await this.getOrderField(sortBy);
 
-    if (posts.length === 0) {
-      return {
-        posts: [],
-        countPosts: 0,
-      };
-    }
+    // Query posts and countPosts with pagination conditions
+    const query = this.postsRepository
+      .createQueryBuilder('post')
+      .where('post.dependencyIsBanned = :dependencyIsBanned', {
+        dependencyIsBanned,
+      })
+      .andWhere('post.isBanned = :isBanned', { isBanned })
+      .innerJoinAndSelect('post.blog', 'blog')
+      .innerJoinAndSelect('post.postOwner', 'postOwner')
+      .andWhere('blog.id = :blogId', { blogId });
+
+    query.orderBy(orderByField, direction);
+
+    const countPosts = await query.getCount();
+
+    const posts = await query.skip(offset).take(limit).getMany();
 
     // Extract post IDs
     const postIds = posts.map((post) => post.id);
 
+    // Retrieve posts with information about likes
     const postsWithLikes = await this.postsLikesAggregation(
       postIds,
       posts,
@@ -176,7 +187,7 @@ export class PostsRepo {
     };
   }
 
-  async getPostsWithPagination2(
+  async getPostsWithPaginationAndCount(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
@@ -190,53 +201,6 @@ export class PostsRepo {
 
     const numberLastLikes = await this.numberLastLikes();
 
-    // Query posts and countPosts with pagination conditions
-    const [posts, countPosts] = await this.postsRepository.findAndCount({
-      where: {
-        dependencyIsBanned,
-        isBanned,
-      },
-      order: { [sortBy]: direction },
-      take: limit,
-      skip: offset,
-    });
-
-    if (posts.length === 0) {
-      return {
-        posts: [],
-        countPosts: 0,
-      };
-    }
-
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
-
-    const postsWithLikes: ReturnPostsEntity[] =
-      await this.postsLikesAggregation(
-        postIds,
-        posts,
-        numberLastLikes,
-        currentUserDto,
-      );
-
-    return {
-      posts: postsWithLikes,
-      countPosts,
-    };
-  }
-
-  async getPostsWithPaginationAndCount(
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsAndCountDto> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { sortBy, direction, limit, offset } = pagingParams;
-
-    const numberLastLikes = await this.numberLastLikes();
     const orderByField = await this.getOrderField(sortBy);
 
     const query = this.postsRepository
@@ -250,7 +214,6 @@ export class PostsRepo {
 
     query.orderBy(orderByField, direction);
 
-    // Count the total number of posts that match the criteria
     const countPosts = await query.getCount();
 
     const posts = await query.skip(offset).take(limit).getMany();
@@ -311,7 +274,7 @@ export class PostsRepo {
         orderByString = 'post.createdAt';
         break;
       default:
-        throw new Error('Invalid field');
+        throw new Error('Invalid field in getOrderField(field: string)');
     }
 
     return orderByString;
