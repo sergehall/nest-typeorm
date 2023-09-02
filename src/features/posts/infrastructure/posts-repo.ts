@@ -26,6 +26,7 @@ import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
+import { CommentsEntity } from '../../comments/entities/comments.entity';
 
 export class PostsRepo {
   constructor(
@@ -34,6 +35,8 @@ export class PostsRepo {
     private readonly postsRepository: Repository<PostsEntity>,
     @InjectRepository(LikeStatusPostsEntity)
     private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
+    @InjectRepository(CommentsEntity)
+    private readonly commentsRepository: Repository<CommentsEntity>,
   ) {}
 
   async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
@@ -240,6 +243,34 @@ export class PostsRepo {
       posts: postsWithLikes,
       countPosts,
     };
+  }
+
+  async deletePostByPostId(postId: string): Promise<boolean> {
+    return this.postsRepository.manager.transaction(async (manager) => {
+      try {
+        // Delete likes associated with the post
+        await manager.delete(LikeStatusPostsEntity, { post: { id: postId } });
+
+        // Delete comments associated with the post
+        await manager.delete(LikeStatusPostsEntity, {
+          post: { id: postId },
+        });
+
+        // Delete the post itself
+        const deleteResult = await manager.delete(PostsEntity, postId);
+
+        if (deleteResult.affected && deleteResult.affected > 0) {
+          console.log(`Post with ID ${postId} deleted.`);
+          return true;
+        } else {
+          console.log(`No post found with ID ${postId}.`);
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        throw new InternalServerErrorException(error.message);
+      }
+    });
   }
 
   private async getOrderField(field: string): Promise<string> {

@@ -41,6 +41,7 @@ import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { LikeStatusPostsEntity } from './entities/like-status-posts.entity';
 import { LikeStatusPostsRepo } from './infrastructure/like-status-posts.repo';
+import { CommentsEntity } from '../comments/entities/comments.entity';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -59,8 +60,9 @@ const postsUseCases = [
   imports: [
     TypeOrmModule.forFeature([
       UsersEntity,
-      PostsEntity,
       BloggerBlogsEntity,
+      PostsEntity,
+      CommentsEntity,
       InvalidJwtEntity,
       LikeStatusPostsEntity,
     ]),

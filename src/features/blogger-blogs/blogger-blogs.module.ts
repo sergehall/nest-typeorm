@@ -28,6 +28,7 @@ import { BloggerBlogsEntity } from './entities/blogger-blogs.entity';
 import { PostsRepo } from '../posts/infrastructure/posts-repo';
 import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
+import { CommentsEntity } from '../comments/entities/comments.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -45,6 +46,7 @@ const bloggersBlogUseCases = [
   imports: [
     TypeOrmModule.forFeature([
       PostsEntity,
+      CommentsEntity,
       BloggerBlogsEntity,
       LikeStatusPostsEntity,
     ]),
