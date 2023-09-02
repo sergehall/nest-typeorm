@@ -38,14 +38,14 @@ export class CommentsEntity {
     length: 50,
     nullable: true,
   })
-  banInfoBanDate: string;
+  banInfoBanDate: string | null = null;
 
   @Column({
     type: 'character varying',
     length: 300,
     nullable: true,
   })
-  banInfoBanReason: string;
+  banInfoBanReason: string | null = null;
 
   @Column({ default: false, nullable: false })
   dependencyIsBanned: boolean;
