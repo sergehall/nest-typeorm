@@ -331,7 +331,7 @@ export class CommentsRawSqlRepository {
         query,
         parameters,
       );
-      return await this.transformedComment(result);
+      return await this.addLikesInfoAndTransformedComment(result);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -528,19 +528,19 @@ export class CommentsRawSqlRepository {
     );
   }
 
-  private async transformedComment(
-    newPost: PartialTablesCommentsEntity[],
+  private async addLikesInfoAndTransformedComment(
+    newComment: PartialTablesCommentsEntity[],
   ): Promise<ReturnCommentsEntity> {
-    const post = newPost[0];
+    const comment = newComment[0];
     const commentatorInfo = {
-      userId: post.commentatorInfoUserId,
-      userLogin: post.commentatorInfoUserLogin,
+      userId: comment.commentatorInfoUserId,
+      userLogin: comment.commentatorInfoUserLogin,
     };
     const likesInfo = new LikesInfo();
     return {
-      id: post.id,
-      content: post.content,
-      createdAt: post.createdAt,
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
       commentatorInfo,
       likesInfo,
     };
