@@ -442,6 +442,10 @@ export class PostsRepo {
     return { sortBy, direction, limit, offset };
   }
 
+  private async numberLastLikes(): Promise<number> {
+    return 3;
+  }
+
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
@@ -457,10 +461,6 @@ export class PostsRepo {
       ],
       'createdAt',
     );
-  }
-
-  private async numberLastLikes(): Promise<number> {
-    return 3;
   }
 
   private async isInvalidUUIDError(error: any): Promise<boolean> {
