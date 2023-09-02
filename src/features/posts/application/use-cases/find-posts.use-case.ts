@@ -22,10 +22,11 @@ export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const postsAndCount: PostsAndCountDto = await this.postsRepo.searchPosts(
-      queryData,
-      currentUserDto,
-    );
+    const postsAndCount: PostsAndCountDto =
+      await this.postsRepo.getPostsWithPaginationAndCount(
+        queryData,
+        currentUserDto,
+      );
 
     if (postsAndCount.posts.length === 0) {
       return {
