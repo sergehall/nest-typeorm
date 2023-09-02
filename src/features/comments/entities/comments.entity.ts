@@ -30,25 +30,14 @@ export class CommentsEntity {
   })
   createdAt: string;
 
-  @Column({ default: false })
-  banInfoIsBanned: boolean;
-
-  @Column({
-    type: 'character varying',
-    length: 50,
-    nullable: true,
-  })
-  banInfoBanDate: string | null = null;
-
-  @Column({
-    type: 'character varying',
-    length: 300,
-    nullable: true,
-  })
-  banInfoBanReason: string | null = null;
-
   @Column({ default: false, nullable: false })
   dependencyIsBanned: boolean;
+
+  @Column({ type: 'character varying', nullable: true })
+  banDate: string | null = null;
+
+  @Column({ type: 'character varying', nullable: true })
+  banReason: string | null = null;
 
   @Column({ nullable: false, default: false })
   isBanned: boolean;
