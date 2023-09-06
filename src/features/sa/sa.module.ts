@@ -33,6 +33,7 @@ import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-
 import { SaCreateBlogUseCase } from './application/use-cases/sa-create-blog.use-case';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
+import { SaCreateSuperAdmin } from './application/use-cases/sa-create-super-admin.use-case';
 
 const saUseCases = [
   SaFindBlogsCommand,
@@ -55,6 +56,7 @@ const saUseCases = [
   ],
   controllers: [SaController],
   providers: [
+    SaCreateSuperAdmin,
     ParseQueriesService,
     SaService,
     UsersService,

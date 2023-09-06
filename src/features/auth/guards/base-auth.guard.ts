@@ -7,14 +7,25 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { SaConfig } from '../../../config/sa/sa-config';
-import { userSuperAdmin } from '../../sa/dto/super-admin.dto';
 import {
   loginOrPassInvalid,
   noAuthHeadersError,
 } from '../../../common/filters/custom-errors-messages';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../../../config/configuration';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { SaCreateSuperAdmin } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
 
 @Injectable()
 export class BaseAuthGuard extends SaConfig implements CanActivate {
+  private readonly saCreateSuperAdmin: SaCreateSuperAdmin; // Declare a private property to store the CommandBus instance
+  constructor(
+    saCreateSuperAdmin: SaCreateSuperAdmin,
+    configService: ConfigService<ConfigType, true>,
+  ) {
+    super(configService);
+    this.saCreateSuperAdmin = saCreateSuperAdmin; // Store the CommandBus instance
+  }
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const basicAuth = await this.getBasicAuth('BASIC_AUTH');
@@ -31,7 +42,16 @@ export class BaseAuthGuard extends SaConfig implements CanActivate {
           HttpStatus.UNAUTHORIZED,
         );
       }
-      request.user = userSuperAdmin;
+      const sa: UsersEntity = await this.saCreateSuperAdmin.create();
+
+      request.user = {
+        userId: sa.userId,
+        login: sa.login,
+        email: sa.email,
+        orgId: sa.orgId,
+        roles: sa.roles,
+        isBanned: sa.isBanned,
+      };
       return true;
     }
   }

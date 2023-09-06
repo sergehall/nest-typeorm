@@ -22,6 +22,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from './entities/users.entity';
 import { FindUsersUseCase } from './application/use-cases/find-users.use-case';
 import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
+import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -42,6 +43,7 @@ const usersValidators = [
   controllers: [UsersController],
   providers: [
     ParseQueriesService,
+    SaCreateSuperAdmin,
     UsersService,
     JwtConfig,
     UsersRawSqlRepository,

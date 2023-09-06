@@ -245,34 +245,25 @@ export class UsersRepo {
   async createSaUser(
     dataForCreateUserDto: DataForCreateUserDto,
   ): Promise<UsersEntity> {
-    try {
-      const newUserEntity: UsersEntity = await this.createSaUserEntity(
-        dataForCreateUserDto,
-      );
-      return await this.usersRepository.save(newUserEntity);
-    } catch (error) {
-      if (
-        error.message.includes('duplicate key value violates unique constraint')
-      ) {
-        const extractedFieldName = await this.extractValueFromMessage(
-          error.detail,
-        );
-        const constraint = error.message.match(/"(.*?)"/)[1];
+    const { login, email } = dataForCreateUserDto;
 
-        const field = extractedFieldName || constraint;
+    // Check if a user with the same login or email already exists
+    const existingUser = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.login = :login OR user.email = :email', { login, email })
+      .getOne();
 
-        throw new HttpException(
-          {
-            message: {
-              message: error.message,
-              field: field,
-            },
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      throw new InternalServerErrorException(error.message);
+    if (existingUser) {
+      // User with the same login or email already exists, do nothing
+      return existingUser;
     }
+
+    // If no existing user found, create a new user
+    const newSaUserEntity: UsersEntity = await this.createSaUserEntity(
+      dataForCreateUserDto,
+    );
+
+    return await this.usersRepository.save(newSaUserEntity);
   }
 
   async updateCodeAndExpirationByEmail(
