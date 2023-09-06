@@ -39,6 +39,7 @@ import { CreateBlogsDto } from '../../blogger-blogs/dto/create-blogs.dto';
 import { SaCreateBlogCommand } from '../application/use-cases/sa-create-blog.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { SaUpdateBlogByIdCommand } from '../application/use-cases/sa-update-blog-by-id.use-case';
+import { SaDeleteBlogByBlogIdCommand } from '../application/use-cases/sa-delete-blog-by-id.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -122,6 +123,20 @@ export class SaController {
 
     return await this.commandBus.execute(
       new SaDeleteUserByUserIdCommand(params.id, currentUserDto),
+    );
+  }
+
+  @Delete('blog/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saDeleteBlogById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaDeleteBlogByBlogIdCommand(params.id, currentUserDto),
     );
   }
 
