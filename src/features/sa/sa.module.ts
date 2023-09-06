@@ -34,7 +34,7 @@ import { SaCreateBlogUseCase } from './application/use-cases/sa-create-blog.use-
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 import { SaCreateSuperAdmin } from './application/use-cases/sa-create-super-admin.use-case';
-import { SaGetBlogByIdUseCase } from './application/use-cases/sa-get-blog-by-id.use-case';
+import { SaUpdateBlogByIdUseCase } from './application/use-cases/sa-update-blog-by-id.use-case';
 
 const saUseCases = [
   SaFindBlogsCommand,
@@ -47,7 +47,7 @@ const saUseCases = [
   SaBindBlogWithUserByIdUseCase,
   SaBindBlogWithUserUseCase,
   SaCreateBlogUseCase,
-  SaGetBlogByIdUseCase,
+  SaUpdateBlogByIdUseCase,
 ];
 
 @Module({

@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { InternalServerErrorException } from '@nestjs/common';
-import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
+import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
@@ -31,7 +31,7 @@ export class BloggerBlogsRepo {
   }
 
   async createBlogs(
-    createBloggerBlogsDto: CreateBloggerBlogsDto,
+    createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
     const blogEntity: BloggerBlogsEntity = await this.createBlogsEntity(
@@ -60,8 +60,28 @@ export class BloggerBlogsRepo {
     }
   }
 
+  async updateBlogById(
+    id: string,
+    updateBlogDto: CreateBlogsDto,
+  ): Promise<boolean> {
+    try {
+      const { name, description, websiteUrl } = updateBlogDto;
+
+      const result = await this.bloggerBlogsRepository.update(id, {
+        name,
+        description,
+        websiteUrl,
+      });
+
+      return result.affected === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async createBlogsEntity(
-    dto: CreateBloggerBlogsDto,
+    dto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
     const { userId, login, isBanned } = currentUser;

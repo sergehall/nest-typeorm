@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { CreateBloggerBlogsDto } from '../../dto/create-blogger-blogs.dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
@@ -10,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { ReturnBloggerBlogsDto } from '../../entities/return-blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { CreateBlogsDto } from '../../dto/create-blogs.dto';
 
 export class CreateBloggerBlogCommand {
   constructor(
-    public createBloggerBlogsDto: CreateBloggerBlogsDto,
+    public createBloggerBlogsDto: CreateBlogsDto,
     public currentUser: CurrentUserDto,
   ) {}
 }
