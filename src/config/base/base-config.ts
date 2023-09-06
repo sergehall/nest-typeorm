@@ -160,6 +160,25 @@ export class BaseConfig {
   }
 
   /**
+   * Retrieves the 'SALT_FACTOR' from the 'bcrypt' configuration property and uses it to generate a salt for hashing the provided `password`.
+   * @returns {Promise<string>} A Promise containing the hashed password.
+   */
+  protected async getSaValueHash(): Promise<string> {
+    const basicAuth = this.configService.get('basicAuth', {
+      infer: true,
+    }).BASIC_AUTH;
+    const decodedPassword = Buffer.from(basicAuth, 'base64')
+      .toString('utf8')
+      .split(':')[1];
+    const SALT_FACTOR = this.configService.get('bcrypt', {
+      infer: true,
+    }).SALT_FACTOR;
+    const salt = await bcrypt.genSalt(SALT_FACTOR);
+    console.log(decodedPassword, 'decodedPassword');
+    return bcrypt.hash(decodedPassword, salt);
+  }
+
+  /**
    * Retrieves a specific key from the 'mail' configuration property and returns its value as a Promise of a string.
    * @param {MailerTypes} key - The key of the 'mail' configuration property to retrieve.
    * @returns {Promise<string>} The value of the specified key from the 'mail' configuration property.

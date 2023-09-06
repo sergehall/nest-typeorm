@@ -30,6 +30,9 @@ import { UsersEntity } from '../users/entities/users.entity';
 import { SaFindUsersUseCase } from './application/use-cases/sa-find-users.use-case';
 import { SaFindBlogsCommand } from './application/use-cases/sa-find-blogs.use-case';
 import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
+import { SaCreateBlogUseCase } from './application/use-cases/sa-create-blog.use-case';
+import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 
 const saUseCases = [
   SaFindBlogsCommand,
@@ -41,10 +44,15 @@ const saUseCases = [
   SaBanUnbanUserUseCase,
   SaBindBlogWithUserByIdUseCase,
   SaBindBlogWithUserUseCase,
+  SaCreateBlogUseCase,
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([UsersEntity, BloggerBlogsEntity]),
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [SaController],
   providers: [
     ParseQueriesService,
@@ -59,6 +67,7 @@ const saUseCases = [
     UsersRawSqlRepository,
     ExpirationDateCalculator,
     CommentsRawSqlRepository,
+    BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
