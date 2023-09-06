@@ -35,6 +35,8 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
+import { CreateBloggerBlogsDto } from '../../blogger-blogs/dto/create-blogger-blogs.dto';
+import { SaCreateBlogCommand } from '../application/use-cases/sa-create-blog.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -75,6 +77,21 @@ export class SaController {
     );
 
     return await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
+  }
+
+  @Post('blogs')
+  @UseGuards(BaseAuthGuard)
+  @UseGuards(AbilitiesGuard)
+  @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
+  async saCreateBlog(
+    @Request() req: any,
+    @Body() createBBlogsDto: CreateBloggerBlogsDto,
+  ): Promise<ReturnUsersBanInfoEntity> {
+    const currentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaCreateBlogCommand(createBBlogsDto, currentUserDto),
+    );
   }
 
   @Delete('users/:id')

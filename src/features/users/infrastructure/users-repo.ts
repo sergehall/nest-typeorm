@@ -242,6 +242,39 @@ export class UsersRepo {
     }
   }
 
+  async createSaUser(
+    dataForCreateUserDto: DataForCreateUserDto,
+  ): Promise<UsersEntity> {
+    try {
+      const newUserEntity: UsersEntity = await this.createSaUserEntity(
+        dataForCreateUserDto,
+      );
+      return await this.usersRepository.save(newUserEntity);
+    } catch (error) {
+      if (
+        error.message.includes('duplicate key value violates unique constraint')
+      ) {
+        const extractedFieldName = await this.extractValueFromMessage(
+          error.detail,
+        );
+        const constraint = error.message.match(/"(.*?)"/)[1];
+
+        const field = extractedFieldName || constraint;
+
+        throw new HttpException(
+          {
+            message: {
+              message: error.message,
+              field: field,
+            },
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async updateCodeAndExpirationByEmail(
     email: string,
     confirmationCode: string,
@@ -393,6 +426,14 @@ export class UsersRepo {
     user.expirationDate = expirationDate;
     user.isConfirmed = false;
 
+    return user;
+  }
+
+  private async createSaUserEntity(
+    dto: DataForCreateUserDto,
+  ): Promise<UsersEntity> {
+    const user = await this.createUserEntity(dto);
+    user.roles = [UserRolesEnums.USER, UserRolesEnums.SA];
     return user;
   }
 
