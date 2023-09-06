@@ -10,7 +10,7 @@ import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ReturnBloggerBlogsCountBlogsEntity } from '../entities/return-blogger-blogs-count-blogs.entity';
 import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
-import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
+import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import * as uuid4 from 'uuid4';
 import { UpdateBBlogsDto } from '../dto/update-blogger-blogs.dto';
 import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
@@ -244,7 +244,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async createBlogs(
-    createBloggerBlogsDto: CreateBloggerBlogsDto,
+    createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<ReturnBloggerBlogsDto> {
     const blogsEntity = await this.createTablesBlogsEntity(
@@ -642,7 +642,7 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   private async createTablesBlogsEntity(
-    dto: CreateBloggerBlogsDto,
+    dto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<TableBloggerBlogsRawSqlEntity> {
     const { userId, login, isBanned } = currentUser;

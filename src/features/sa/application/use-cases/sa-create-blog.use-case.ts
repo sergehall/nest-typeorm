@@ -7,13 +7,13 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateBloggerBlogsDto } from '../../../blogger-blogs/dto/create-blogger-blogs.dto';
+import { CreateBlogsDto } from '../../../blogger-blogs/dto/create-blogs.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { ReturnBloggerBlogsDto } from '../../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 export class SaCreateBlogCommand {
   constructor(
-    public createBlogsDto: CreateBloggerBlogsDto,
+    public createBlogsDto: CreateBlogsDto,
     public currentUser: CurrentUserDto,
   ) {}
 }

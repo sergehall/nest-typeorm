@@ -13,7 +13,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CreateBloggerBlogsDto } from '../dto/create-blogger-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateBloggerBlogCommand } from '../application/use-cases/create-blogger-blog.use-case';
@@ -42,6 +41,7 @@ import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/g
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
 import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
+import { CreateBlogsDto } from '../dto/create-blogs.dto';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -85,7 +85,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtAuthGuard)
   async createBlog(
     @Request() req: any,
-    @Body() createBBlogsDto: CreateBloggerBlogsDto,
+    @Body() createBBlogsDto: CreateBlogsDto,
   ): Promise<ReturnBloggerBlogsDto> {
     const currentUserDto = req.user;
 
@@ -100,7 +100,7 @@ export class BloggerBlogsController {
   async updateBlogById(
     @Request() req: any,
     @Param() params: IdParams,
-    @Body() updateBlogDto: CreateBloggerBlogsDto,
+    @Body() updateBlogDto: CreateBlogsDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 

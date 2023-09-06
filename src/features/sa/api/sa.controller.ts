@@ -35,10 +35,10 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
-import { CreateBloggerBlogsDto } from '../../blogger-blogs/dto/create-blogger-blogs.dto';
+import { CreateBlogsDto } from '../../blogger-blogs/dto/create-blogs.dto';
 import { SaCreateBlogCommand } from '../application/use-cases/sa-create-blog.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
-import { SaGetBlogByIdCommand } from '../application/use-cases/sa-get-blog-by-id.use-case';
+import { SaUpdateBlogByIdCommand } from '../application/use-cases/sa-update-blog-by-id.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -67,14 +67,19 @@ export class SaController {
     return await this.commandBus.execute(new SaFindUsersCommand(queryData));
   }
 
-  @Get('blogs/:id')
+  @Put('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  @UseGuards(AbilitiesGuard)
-  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async getBlogById(
+  async saUpdateBlogById(
+    @Request() req: any,
     @Param('id', BlogExistValidationPipe) id: string,
+    @Body() updateBlogDto: CreateBlogsDto,
   ): Promise<boolean> {
-    return await this.commandBus.execute(new SaGetBlogByIdCommand(id));
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaUpdateBlogByIdCommand(id, updateBlogDto, currentUserDto),
+    );
   }
 
   @Post('users')
@@ -97,12 +102,12 @@ export class SaController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateBlog(
     @Request() req: any,
-    @Body() createBBlogsDto: CreateBloggerBlogsDto,
+    @Body() createBlogsDto: CreateBlogsDto,
   ): Promise<ReturnUsersBanInfoEntity> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new SaCreateBlogCommand(createBBlogsDto, currentUserDto),
+      new SaCreateBlogCommand(createBlogsDto, currentUserDto),
     );
   }
 

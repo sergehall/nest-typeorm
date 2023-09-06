@@ -30,7 +30,7 @@ export class UpdateBlogByIdUseCase
       id,
     );
     if (!blogToUpdate) {
-      throw new NotFoundException('Blog not found');
+      throw new NotFoundException(`Blog with id: ${id} not found`);
     }
 
     await this.checkUpdatePermission(blogToUpdate, currentUserDto);
