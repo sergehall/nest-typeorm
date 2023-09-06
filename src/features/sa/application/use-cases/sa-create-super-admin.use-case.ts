@@ -1,9 +1,9 @@
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
-import { UsersEntity } from '../../../users/entities/users.entity';
 import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dto';
 import { Injectable } from '@nestjs/common';
+import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 
 @Injectable()
 export class SaCreateSuperAdmin {
@@ -12,7 +12,7 @@ export class SaCreateSuperAdmin {
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
   ) {}
-  async create(): Promise<UsersEntity> {
+  async create(): Promise<CurrentUserDto> {
     const login = 'admin';
     const email = 'admin@gmail.com';
 
@@ -33,6 +33,14 @@ export class SaCreateSuperAdmin {
       expirationDate,
     };
 
-    return await this.usersRepo.createSaUser(dataForCreateUserDto);
+    const sa = await this.usersRepo.createSaUser(dataForCreateUserDto);
+    return {
+      userId: sa.userId,
+      login: sa.login,
+      email: sa.email,
+      orgId: sa.orgId,
+      roles: sa.roles,
+      isBanned: sa.isBanned,
+    };
   }
 }

@@ -1,16 +1,14 @@
 import { Injectable, PipeTransform, NotFoundException } from '@nestjs/common';
-import { BloggerBlogsRawSqlRepository } from '../../features/blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { BloggerBlogsRepo } from '../../features/blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../features/blogger-blogs/entities/blogger-blogs.entity';
 
 @Injectable()
 export class BlogExistValidationPipe implements PipeTransform {
-  constructor(
-    private bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-  ) {}
+  constructor(private bloggerBlogsRepo: BloggerBlogsRepo) {}
 
   async transform(value: string): Promise<string> {
-    const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(value);
+    const blog: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(value);
     if (!blog) {
       throw new NotFoundException(`Blog with id: ${value} not found`);
     }

@@ -37,6 +37,8 @@ import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-c
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 import { CreateBloggerBlogsDto } from '../../blogger-blogs/dto/create-blogger-blogs.dto';
 import { SaCreateBlogCommand } from '../application/use-cases/sa-create-blog.use-case';
+import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
+import { SaGetBlogByIdCommand } from '../application/use-cases/sa-get-blog-by-id.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -63,6 +65,16 @@ export class SaController {
   async searchBlogsForSa(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(new SaFindUsersCommand(queryData));
+  }
+
+  @Get('blogs/:id')
+  @UseGuards(BaseAuthGuard)
+  @UseGuards(AbilitiesGuard)
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  async getBlogById(
+    @Param('id', BlogExistValidationPipe) id: string,
+  ): Promise<boolean> {
+    return await this.commandBus.execute(new SaGetBlogByIdCommand(id));
   }
 
   @Post('users')

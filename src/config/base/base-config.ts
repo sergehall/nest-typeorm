@@ -174,7 +174,7 @@ export class BaseConfig {
       infer: true,
     }).SALT_FACTOR;
     const salt = await bcrypt.genSalt(SALT_FACTOR);
-    console.log(decodedPassword, 'decodedPassword');
+
     return bcrypt.hash(decodedPassword, salt);
   }
 
