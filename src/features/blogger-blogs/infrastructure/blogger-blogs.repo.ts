@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { EntityManager, InsertResult, Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
@@ -105,5 +105,54 @@ export class BloggerBlogsRepo {
     newBlog.blogOwner = user;
 
     return newBlog;
+  }
+
+  async saDeleteBlogDataById(id: string): Promise<boolean> {
+    try {
+      await this.bloggerBlogsRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          await this.deleteBlogData(id, transactionalEntityManager);
+        },
+      );
+      return true;
+    } catch (error) {
+      console.error(`Error while removing data for blog: ${error.message}`);
+      throw new Error(`Error while removing data for blog`);
+    }
+  }
+
+  private async deleteBlogData(
+    id: string,
+    entityManager: EntityManager,
+  ): Promise<void> {
+    try {
+      await Promise.all([
+        entityManager.delete('BannedUsersForBlogs', {
+          bannedBlog: id,
+        }),
+        entityManager.delete('LikeStatusComments', {
+          blog: id,
+        }),
+        entityManager.delete('LikeStatusPosts', { blog: id }),
+      ]);
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('Comments')
+        .where('postInfoBlogId = :id', { id })
+        .execute();
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('Posts')
+        .where('blogId = :id', { id })
+        .execute();
+      await entityManager.delete('BloggerBlogs', { id });
+    } catch (error) {
+      console.error(
+        `Error while removing data for user ${id}: ${error.message}`,
+      );
+      throw new Error(`Error while removing data for user ${id}`);
+    }
   }
 }
