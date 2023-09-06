@@ -42,6 +42,9 @@ import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { LikeStatusPostsEntity } from './entities/like-status-posts.entity';
 import { LikeStatusPostsRepo } from './infrastructure/like-status-posts.repo';
 import { CommentsEntity } from '../comments/entities/comments.entity';
+import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
+import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
+import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -71,6 +74,9 @@ const postsUseCases = [
   ],
   controllers: [PostsController],
   providers: [
+    SaCreateSuperAdmin,
+    ExpirationDateCalculator,
+    EncryptConfig,
     JwtConfig,
     AuthService,
     JwtService,
