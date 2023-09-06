@@ -20,12 +20,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
 import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
+import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      InvalidJwtEntity,
+      BloggerBlogsEntity,
+    ]),
     CaslModule,
     CqrsModule,
   ],
@@ -40,6 +46,7 @@ const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
     BloggerBlogsService,
     UsersRepo,
     UsersRawSqlRepository,
+    BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,
     LikeStatusPostsRawSqlRepository,

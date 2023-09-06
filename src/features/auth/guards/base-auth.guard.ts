@@ -13,7 +13,6 @@ import {
 } from '../../../common/filters/custom-errors-messages';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../../config/configuration';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { SaCreateSuperAdmin } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
 
 @Injectable()
@@ -42,16 +41,8 @@ export class BaseAuthGuard extends SaConfig implements CanActivate {
           HttpStatus.UNAUTHORIZED,
         );
       }
-      const sa: UsersEntity = await this.saCreateSuperAdmin.create();
 
-      request.user = {
-        userId: sa.userId,
-        login: sa.login,
-        email: sa.email,
-        orgId: sa.orgId,
-        roles: sa.roles,
-        isBanned: sa.isBanned,
-      };
+      request.user = await this.saCreateSuperAdmin.create();
       return true;
     }
   }
