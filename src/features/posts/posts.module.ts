@@ -45,7 +45,6 @@ import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
-import { PostExistValidator } from '../../common/validators/post-exist.validator';
 
 const postsUseCases = [
   FindPostsUseCase,
@@ -59,8 +58,6 @@ const postsUseCases = [
   DeletePostByPostIdAndBlogIdUseCase,
   DeletePostByIdUseCase,
 ];
-
-const validators = [PostExistValidator];
 
 @Module({
   imports: [
@@ -102,7 +99,6 @@ const validators = [PostExistValidator];
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
     LikeStatusCommentsRawSqlRepository,
-    ...validators,
     ...postsUseCases,
   ],
 })

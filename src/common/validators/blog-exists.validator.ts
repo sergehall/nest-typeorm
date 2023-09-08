@@ -3,7 +3,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../features/blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../features/blogger-blogs/entities/blogger-blogs.entity';
 
@@ -16,7 +16,6 @@ export class BlogExistsValidator implements ValidatorConstraintInterface {
     try {
       const blog: BloggerBlogsEntity | null =
         await this.bloggerBlogsRepo.findBlogById(value);
-      if (!blog) throw new NotFoundException(`Blog with ID ${value} not found`);
       return !!blog; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
       return false;

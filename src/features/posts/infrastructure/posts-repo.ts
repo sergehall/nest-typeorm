@@ -45,13 +45,13 @@ export class PostsRepo {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;
-
+      console.log('++++1+++++');
       const post = await this.postsRepository.findBy({
         id,
         dependencyIsBanned,
         isBanned,
       });
-
+      console.log('++++++2+++');
       return post[0] ? post[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
