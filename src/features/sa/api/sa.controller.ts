@@ -44,6 +44,8 @@ import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -156,6 +158,23 @@ export class SaController {
 
     return await this.commandBus.execute(
       new SaBanUnbanBlogCommand(params.id, saBanBlogDto, currentUserDto),
+    );
+  }
+
+  @Get('blogs/:blogId/posts')
+  @UseGuards(BaseAuthGuard)
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  async saSearchPostsInBlog(
+    @Request() req: any,
+    @Param('blogId', BlogExistValidationPipe) blogId: string,
+    @Query() query: any,
+  ): Promise<PaginatedResultDto> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(
+      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 
