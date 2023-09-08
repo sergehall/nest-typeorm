@@ -46,12 +46,14 @@ import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { PostExistValidator } from '../../common/validators/post-exist.validator';
+import { UpdatePostsByPostIdUseCase } from './application/use-cases/update-posts.use-case';
 
 const postsUseCases = [
   FindPostsUseCase,
   FindPostByIdUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
+  UpdatePostsByPostIdUseCase,
   ChangeBanStatusPostsUseCase,
   ChangeLikeStatusPostUseCase,
   ChangeBanStatusPostsByBlogIdUseCase,

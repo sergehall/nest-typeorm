@@ -47,8 +47,8 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
-import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { SaBlogIdPostIdParams } from '../../../common/query/params/sa-blog-id-post-id.params';
+import { UpdatePostsByPostIdCommand } from '../../posts/application/use-cases/update-posts.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -77,33 +77,20 @@ export class SaController {
     return await this.commandBus.execute(new SaFindUsersCommand(queryData));
   }
 
-  @Put('blogs/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @Get('blogs/:blogId/posts')
   @UseGuards(BaseAuthGuard)
-  async saUpdateBlogById(
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  async saSearchPostsInBlog(
     @Request() req: any,
-    @Param('id', BlogExistValidationPipe) id: string,
-    @Body() updateBlogDto: CreateBlogsDto,
-  ): Promise<boolean> {
+    @Param('blogId', BlogExistValidationPipe) blogId: string,
+    @Query() query: any,
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SaUpdateBlogByIdCommand(id, updateBlogDto, currentUserDto),
-    );
-  }
-
-  @Put('blogs/:blogId/posts/:postId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async saUpdatePostByPostId(
-    @Request() req: any,
-    @Param() params: SaBlogIdPostIdParams,
-    @Body() updatePostDto: UpdatePostDto,
-  ): Promise<boolean> {
-    const currentUserDto: CurrentUserDto = req.user;
-
-    return await this.commandBus.execute(
-      new UpdatePostByPostIdCommand(params, updatePostDto, currentUserDto),
+      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 
@@ -136,34 +123,6 @@ export class SaController {
     );
   }
 
-  @Delete('users/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async deleteUserById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
-    const currentUserDto: CurrentUserDto = req.user;
-
-    return await this.commandBus.execute(
-      new SaDeleteUserByUserIdCommand(params.id, currentUserDto),
-    );
-  }
-
-  @Delete('blogs/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
-  async saDeleteBlogById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
-    const currentUserDto: CurrentUserDto = req.user;
-
-    return await this.commandBus.execute(
-      new SaDeleteBlogByBlogIdCommand(params.id, currentUserDto),
-    );
-  }
-
   @Put('blogs/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
@@ -179,23 +138,6 @@ export class SaController {
     );
   }
 
-  @Get('blogs/:blogId/posts')
-  @UseGuards(BaseAuthGuard)
-  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saSearchPostsInBlog(
-    @Request() req: any,
-    @Param('blogId', BlogExistValidationPipe) blogId: string,
-    @Query() query: any,
-  ): Promise<PaginatedResultDto> {
-    const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
-
-    return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
-    );
-  }
-
   @Post('blogs/:blogId/posts')
   @UseGuards(BaseAuthGuard)
   async saCreatePostInBlog(
@@ -207,6 +149,36 @@ export class SaController {
 
     return await this.commandBus.execute(
       new CreatePostCommand(params.blogId, createPostDto, currentUserDto),
+    );
+  }
+
+  @Put('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saUpdateBlogById(
+    @Request() req: any,
+    @Param('id', BlogExistValidationPipe) id: string,
+    @Body() updateBlogDto: CreateBlogsDto,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaUpdateBlogByIdCommand(id, updateBlogDto, currentUserDto),
+    );
+  }
+
+  @Put('blogs/:blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saUpdatePostByPostId(
+    @Request() req: any,
+    @Param() params: SaBlogIdPostIdParams,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new UpdatePostsByPostIdCommand(params, updatePostDto, currentUserDto),
     );
   }
 
@@ -250,6 +222,34 @@ export class SaController {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
       new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
+    );
+  }
+
+  @Delete('users/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async deleteUserById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaDeleteUserByUserIdCommand(params.id, currentUserDto),
+    );
+  }
+
+  @Delete('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saDeleteBlogById(
+    @Request() req: any,
+    @Param() params: IdParams,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaDeleteBlogByBlogIdCommand(params.id, currentUserDto),
     );
   }
 }

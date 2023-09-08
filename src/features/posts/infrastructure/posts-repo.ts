@@ -27,6 +27,7 @@ import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
+import { UpdatePostDto } from '../dto/update-post.dto';
 
 export class PostsRepo {
   constructor(
@@ -41,7 +42,6 @@ export class PostsRepo {
 
   async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
     try {
-      console.log('+++++++++');
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;
 
@@ -50,7 +50,7 @@ export class PostsRepo {
         dependencyIsBanned,
         isBanned,
       });
-      console.log(post, 'post2');
+
       return post[0] ? post[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
@@ -257,6 +257,26 @@ export class PostsRepo {
         throw new InternalServerErrorException(error.message);
       }
     });
+  }
+
+  async updatePostByPostId(
+    postId: string,
+    updatePostDto: UpdatePostDto,
+  ): Promise<boolean> {
+    try {
+      const { title, shortDescription, content } = updatePostDto;
+
+      const result = await this.postsRepository.update(postId, {
+        title,
+        shortDescription,
+        content,
+      });
+
+      return result.affected === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   private async getOrderField(field: string): Promise<string> {
