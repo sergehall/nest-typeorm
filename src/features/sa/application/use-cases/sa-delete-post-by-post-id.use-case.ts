@@ -1,15 +1,18 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRawSqlRepository } from '../../../posts/infrastructure/posts-raw-sql.repository';
-import { SaBlogIdPostIdParams } from '../../../../common/query/params/sa-blog-id-post-id.params';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { PostsEntity } from '../../../posts/entities/posts.entity';
+import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
 
 export class SaDeletePostByPostIdCommand {
   constructor(
-    public params: SaBlogIdPostIdParams,
+    public params: BlogIdPostIdParams,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
@@ -20,15 +23,24 @@ export class SaDeletePostByPostIdUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly postsRepository: PostsRawSqlRepository,
+    private readonly postsRepo: PostsRepo,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(command: SaDeletePostByPostIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
-    const { postId } = params;
+    const { blogId, postId } = params;
+
+    const blog: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
+    if (!blog) throw new NotFoundException(`Blog with ID ${blogId} not found`);
+
+    const post: PostsEntity | null =
+      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkSaPermission(currentUserDto);
 
-    return await this.postsRepository.deletePostByPostId(postId);
+    return await this.postsRepo.deletePostByPostId(postId);
   }
 
   private async checkSaPermission(currentUser: CurrentUserDto): Promise<void> {

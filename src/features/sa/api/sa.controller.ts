@@ -47,9 +47,9 @@ import { CreatePostCommand } from '../../posts/application/use-cases/create-post
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
-import { SaBlogIdPostIdParams } from '../../../common/query/params/sa-blog-id-post-id.params';
 import { SaUpdatePostsByPostIdCommand } from '../application/use-cases/sa-update-post.use-case';
 import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-post-by-post-id.use-case';
+import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 
 @SkipThrottle()
 @Controller('sa')
@@ -173,7 +173,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   async saUpdatePostByPostId(
     @Request() req: any,
-    @Param() params: SaBlogIdPostIdParams,
+    @Param() params: BlogIdPostIdParams,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
@@ -231,7 +231,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   async saDeletePostByPostId(
     @Request() req: any,
-    @Param() params: SaBlogIdPostIdParams,
+    @Param() params: BlogIdPostIdParams,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 

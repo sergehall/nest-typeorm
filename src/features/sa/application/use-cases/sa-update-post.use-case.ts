@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -6,11 +6,14 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { UpdatePostDto } from '../../../posts/dto/update-post.dto';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
-import { SaBlogIdPostIdParams } from '../../../../common/query/params/sa-blog-id-post-id.params';
+import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { PostsEntity } from '../../../posts/entities/posts.entity';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 
 export class SaUpdatePostsByPostIdCommand {
   constructor(
-    public params: SaBlogIdPostIdParams,
+    public params: BlogIdPostIdParams,
     public updatePostDto: UpdatePostDto,
     public currentUserDto: CurrentUserDto,
   ) {}
@@ -21,13 +24,22 @@ export class SaUpdatePostsByPostIdUseCase
   implements ICommandHandler<SaUpdatePostsByPostIdCommand>
 {
   constructor(
-    protected postsRepo: PostsRepo,
-    protected caslAbilityFactory: CaslAbilityFactory,
+    private readonly postsRepo: PostsRepo,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
   async execute(command: SaUpdatePostsByPostIdCommand): Promise<boolean> {
     const { params, updatePostDto, currentUserDto } = command;
-    const { postId } = params;
+    const { blogId, postId } = params;
+
+    const blog: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
+    if (!blog) throw new NotFoundException(`Blog with ID ${blogId} not found`);
+
+    const post: PostsEntity | null =
+      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkSaPermission(currentUserDto);
 
