@@ -199,7 +199,7 @@ export class CommentsRepo {
       try {
         // Delete likes comments associated with the post
         await manager.delete(LikeStatusCommentsEntity, {
-          post: { id: commentId },
+          comment: { id: commentId },
         });
 
         // Delete the comment itself
