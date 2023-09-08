@@ -31,7 +31,6 @@ import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blo
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
@@ -50,6 +49,7 @@ import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SaUpdatePostsByPostIdCommand } from '../application/use-cases/sa-update-post.use-case';
 import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-post-by-post-id.use-case';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
+import { ReturnUserDto } from '../../users/dto/return-user.dto';
 
 @SkipThrottle()
 @Controller('sa')
@@ -101,12 +101,12 @@ export class SaController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<ReturnUsersBanInfoEntity> {
-    const newUser: UsersEntity = await this.commandBus.execute(
+  ): Promise<ReturnUserDto> {
+    const newUser: ReturnUserDto = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
-
-    return await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
+    await this.commandBus.execute(new ChangeRoleCommand(newUser.id));
+    return newUser;
   }
 
   @Post('blogs')
