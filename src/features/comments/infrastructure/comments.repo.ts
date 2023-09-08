@@ -27,6 +27,7 @@ import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dt
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
 
 export class CommentsRepo {
   constructor(
@@ -197,7 +198,7 @@ export class CommentsRepo {
   async deleteCommentById(commentId: string): Promise<boolean> {
     return this.commentsRepository.manager.transaction(async (manager) => {
       try {
-        // Delete likes comments associated with the post
+        // Delete likes comments associated with the comment
         await manager.delete(LikeStatusCommentsEntity, {
           comment: { id: commentId },
         });
@@ -220,6 +221,23 @@ export class CommentsRepo {
       }
     });
   }
+
+  async updateComment(
+    commentId: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<boolean> {
+    try {
+      const updateResult = await this.commentsRepository.update(
+        { id: commentId },
+        { content: updateCommentDto.content },
+      );
+
+      return updateResult.affected === 1;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async creatCommentEntity(
     post: PostsEntity,
     createCommentDto: CreateCommentDto,
