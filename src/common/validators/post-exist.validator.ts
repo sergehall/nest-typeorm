@@ -3,7 +3,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostsRepo } from '../../features/posts/infrastructure/posts-repo';
 import { PostsEntity } from '../../features/posts/entities/posts.entity';
 
@@ -18,7 +18,7 @@ export class PostExistValidator implements ValidatorConstraintInterface {
         await this.postsRepo.getPostByIdWithoutLikes(value);
       return !!post; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
-      return false;
+      throw new NotFoundException(`Post with ID ${value} not found`);
     }
   }
 
