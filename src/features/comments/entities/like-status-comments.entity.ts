@@ -3,6 +3,7 @@ import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
+import { PostsEntity } from '../../posts/entities/posts.entity';
 
 @Entity('LikeStatusComments')
 export class LikeStatusCommentsEntity {
@@ -47,6 +48,13 @@ export class LikeStatusCommentsEntity {
   })
   @JoinColumn({ name: 'blogId', referencedColumnName: 'id' })
   blog: BloggerBlogsEntity;
+
+  @ManyToOne(() => PostsEntity, (post) => post.id, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'postId', referencedColumnName: 'id' })
+  post: PostsEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId, {
     nullable: false,

@@ -10,6 +10,7 @@ import {
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
+import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 
 @Entity('Posts')
 @Unique(['id'])
@@ -77,4 +78,7 @@ export class PostsEntity {
 
   @OneToMany(() => CommentsEntity, (comment) => comment.post)
   comments: CommentsEntity[];
+
+  @OneToMany(() => LikeStatusCommentsEntity, (LikeStatus) => LikeStatus.post)
+  likeStatusComments: LikeStatusCommentsEntity[];
 }

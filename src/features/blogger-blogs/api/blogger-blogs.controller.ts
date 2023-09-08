@@ -189,7 +189,7 @@ export class BloggerBlogsController {
   @Delete('blogs/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async removePostByPostId(
+  async deletePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
   ): Promise<boolean> {

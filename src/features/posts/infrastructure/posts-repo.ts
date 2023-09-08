@@ -28,6 +28,7 @@ import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enum
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 
 export class PostsRepo {
   constructor(
@@ -234,13 +235,21 @@ export class PostsRepo {
   async deletePostByPostId(postId: string): Promise<boolean> {
     return this.postsRepository.manager.transaction(async (manager) => {
       try {
-        // Delete likes associated with the post
+        // Delete likes posts associated with the post
         await manager.delete(LikeStatusPostsEntity, { post: { id: postId } });
 
-        // Delete comments associated with the post
-        await manager.delete(LikeStatusPostsEntity, {
+        // Delete likes comments associated with the post
+        await manager.delete(LikeStatusCommentsEntity, {
           post: { id: postId },
         });
+
+        // Delete comments associated with the post
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from('Comments')
+          .where('postInfoPostId = :id', { id: postId })
+          .execute();
 
         // Delete the post itself
         const deleteResult = await manager.delete(PostsEntity, postId);
