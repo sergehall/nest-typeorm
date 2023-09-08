@@ -16,9 +16,10 @@ export class PostExistValidator implements ValidatorConstraintInterface {
     try {
       const post: PostsEntity | null =
         await this.postsRepo.getPostByIdWithoutLikes(value);
+      if (!post) throw new NotFoundException(`Post with ID ${value} not found`);
       return !!post; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
-      throw new NotFoundException(`Post with ID ${value} not found`);
+      return false;
     }
   }
 

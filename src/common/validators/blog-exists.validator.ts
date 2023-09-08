@@ -16,9 +16,10 @@ export class BlogExistsValidator implements ValidatorConstraintInterface {
     try {
       const blog: BloggerBlogsEntity | null =
         await this.bloggerBlogsRepo.findBlogById(value);
+      if (!blog) throw new NotFoundException(`Blog with ID ${value} not found`);
       return !!blog; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
-      throw new NotFoundException(`Blog with ID ${value} not found`);
+      return false;
     }
   }
 
