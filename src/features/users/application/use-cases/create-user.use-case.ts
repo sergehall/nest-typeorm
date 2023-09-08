@@ -4,8 +4,8 @@ import { RegistrationUserCommand } from '../../../auth/application/use-cases/reg
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UsersRepo } from '../../infrastructure/users-repo';
-import { UsersEntity } from '../../entities/users.entity';
 import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
+import { ReturnUserDto } from '../../dto/return-user.dto';
 
 export class CreateUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -20,7 +20,7 @@ export class CreateUserUseCase
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
   ) {}
-  async execute(command: CreateUserCommand): Promise<UsersEntity> {
+  async execute(command: CreateUserCommand): Promise<ReturnUserDto> {
     const { login, email, password } = command.createUserDto;
 
     // Hash the user's password
@@ -39,6 +39,13 @@ export class CreateUserUseCase
       expirationDate,
     };
 
-    return await this.usersRepo.createUser(dataForCreateUserDto);
+    const newUser = await this.usersRepo.createUser(dataForCreateUserDto);
+
+    return {
+      id: newUser.userId,
+      login: newUser.login,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    };
   }
 }
