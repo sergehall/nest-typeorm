@@ -126,7 +126,7 @@ export class SaController {
     );
   }
 
-  @Delete('blog/:id')
+  @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   async saDeleteBlogById(
