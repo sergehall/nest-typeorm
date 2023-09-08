@@ -46,9 +46,9 @@ import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
-import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
+import { SaBlogIdPostIdParams } from '../../../common/query/params/sa-blog-id-post-id.params';
 
 @SkipThrottle()
 @Controller('sa')
@@ -97,7 +97,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   async saUpdatePostByPostId(
     @Request() req: any,
-    @Param() params: BlogIdPostIdParams,
+    @Param() params: SaBlogIdPostIdParams,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
