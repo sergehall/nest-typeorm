@@ -8,6 +8,7 @@ import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.e
 import * as uuid4 from 'uuid4';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { InternalServerErrorException } from '@nestjs/common';
+import { PostsEntity } from '../../posts/entities/posts.entity';
 
 export class LikeStatusCommentsRepo {
   constructor(
@@ -43,6 +44,9 @@ export class LikeStatusCommentsRepo {
     const blogEntity = new BloggerBlogsEntity();
     blogEntity.id = findComment.blog.id;
 
+    const postEntity = new PostsEntity();
+    postEntity.id = findComment.post.id;
+
     const ownerUserEntity = new UsersEntity();
     ownerUserEntity.userId = findComment.commentator.userId;
 
@@ -62,6 +66,7 @@ export class LikeStatusCommentsRepo {
       comment: commentEntity,
       ratedCommentUser: ratedUserEntity,
       blog: blogEntity,
+      post: postEntity,
       commentOwner: ownerUserEntity,
     };
   }

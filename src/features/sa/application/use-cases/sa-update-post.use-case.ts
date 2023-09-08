@@ -4,39 +4,37 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
-import { UpdatePostDto } from '../../dto/update-post.dto';
-import { PostsRepo } from '../../infrastructure/posts-repo';
+import { UpdatePostDto } from '../../../posts/dto/update-post.dto';
+import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
+import { SaBlogIdPostIdParams } from '../../../../common/query/params/sa-blog-id-post-id.params';
 
-export class UpdatePostsByPostIdCommand {
+export class SaUpdatePostsByPostIdCommand {
   constructor(
-    public params: BlogIdPostIdParams,
+    public params: SaBlogIdPostIdParams,
     public updatePostDto: UpdatePostDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(UpdatePostsByPostIdCommand)
-export class UpdatePostsByPostIdUseCase
-  implements ICommandHandler<UpdatePostsByPostIdCommand>
+@CommandHandler(SaUpdatePostsByPostIdCommand)
+export class SaUpdatePostsByPostIdUseCase
+  implements ICommandHandler<SaUpdatePostsByPostIdCommand>
 {
   constructor(
     protected postsRepo: PostsRepo,
     protected caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
-  async execute(command: UpdatePostsByPostIdCommand): Promise<boolean> {
+  async execute(command: SaUpdatePostsByPostIdCommand): Promise<boolean> {
     const { params, updatePostDto, currentUserDto } = command;
     const { postId } = params;
 
-    await this.checkUpdatePermission(currentUserDto);
+    await this.checkSaPermission(currentUserDto);
 
     return await this.postsRepo.updatePostByPostId(postId, updatePostDto);
   }
 
-  private async checkUpdatePermission(
-    currentUser: CurrentUserDto,
-  ): Promise<void> {
+  private async checkSaPermission(currentUser: CurrentUserDto): Promise<void> {
     const ability = this.caslAbilityFactory.createSaUser(currentUser);
 
     try {

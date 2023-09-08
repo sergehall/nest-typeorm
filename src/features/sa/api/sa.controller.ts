@@ -48,7 +48,8 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SaBlogIdPostIdParams } from '../../../common/query/params/sa-blog-id-post-id.params';
-import { UpdatePostsByPostIdCommand } from '../../posts/application/use-cases/update-posts.use-case';
+import { SaUpdatePostsByPostIdCommand } from '../application/use-cases/sa-update-post.use-case';
+import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-post-by-post-id.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -178,7 +179,7 @@ export class SaController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new UpdatePostsByPostIdCommand(params, updatePostDto, currentUserDto),
+      new SaUpdatePostsByPostIdCommand(params, updatePostDto, currentUserDto),
     );
   }
 
@@ -222,6 +223,20 @@ export class SaController {
     const currentUserDto = req.user;
     return await this.commandBus.execute(
       new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
+    );
+  }
+
+  @Delete('blogs/:blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
+  async saDeletePostByPostId(
+    @Request() req: any,
+    @Param() params: SaBlogIdPostIdParams,
+  ): Promise<boolean> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaDeletePostByPostIdCommand(params, currentUserDto),
     );
   }
 

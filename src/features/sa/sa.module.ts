@@ -36,6 +36,12 @@ import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.enti
 import { SaCreateSuperAdmin } from './application/use-cases/sa-create-super-admin.use-case';
 import { SaUpdateBlogByIdUseCase } from './application/use-cases/sa-update-blog-by-id.use-case';
 import { SaDeleteBlogByBlogIdUseCase } from './application/use-cases/sa-delete-blog-by-id.use-case';
+import { SaUpdatePostsByPostIdUseCase } from './application/use-cases/sa-update-post.use-case';
+import { PostsRepo } from '../posts/infrastructure/posts-repo';
+import { PostsEntity } from '../posts/entities/posts.entity';
+import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
+import { CommentsEntity } from '../comments/entities/comments.entity';
+import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-post-by-post-id.use-case';
 
 const saUseCases = [
   SaFindBlogsCommand,
@@ -50,11 +56,19 @@ const saUseCases = [
   SaCreateBlogUseCase,
   SaUpdateBlogByIdUseCase,
   SaDeleteBlogByBlogIdUseCase,
+  SaUpdatePostsByPostIdUseCase,
+  SaDeletePostByPostIdUseCase,
 ];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, BloggerBlogsEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      BloggerBlogsEntity,
+      PostsEntity,
+      LikeStatusPostsEntity,
+      CommentsEntity,
+    ]),
     CaslModule,
     CqrsModule,
   ],
@@ -69,6 +83,7 @@ const saUseCases = [
     KeyResolver,
     UsersRepo,
     SentCodeLogRepository,
+    PostsRepo,
     PostsRawSqlRepository,
     UsersRawSqlRepository,
     ExpirationDateCalculator,
