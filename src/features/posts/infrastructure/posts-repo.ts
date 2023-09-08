@@ -41,6 +41,7 @@ export class PostsRepo {
 
   async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
     try {
+      console.log('+++++++++');
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;
 
@@ -49,6 +50,7 @@ export class PostsRepo {
         dependencyIsBanned,
         isBanned,
       });
+      console.log(post, 'post2');
       return post[0] ? post[0] : null;
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
