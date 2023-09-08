@@ -11,7 +11,6 @@ import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-b
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
-import { RemoveCommentUseCase } from './application/use-cases/remove-comment.use-case';
 import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
 import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
@@ -39,13 +38,14 @@ import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { PostsRepo } from '../posts/infrastructure/posts-repo';
 import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
+import { DeleteCommentUseCase } from './application/use-cases/delete-comment.use-case';
 
 const commentsUseCases = [
   FindCommentsByPostIdUseCase,
   FindCommentByIdUseCase,
   CreateCommentUseCase,
   UpdateCommentUseCase,
-  RemoveCommentUseCase,
+  DeleteCommentUseCase,
   ChangeBanStatusCommentsUseCase,
   ChangeLikeStatusCommentUseCase,
   FillingCommentsDataUseCase,
