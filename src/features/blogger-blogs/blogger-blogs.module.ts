@@ -29,6 +29,7 @@ import { PostsRepo } from '../posts/infrastructure/posts-repo';
 import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 import { CommentsEntity } from '../comments/entities/comments.entity';
+import { BlogExistsValidator } from '../../common/validators/blog-exists.validator';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -41,6 +42,8 @@ const bloggersBlogUseCases = [
   ChangeBanStatusLikesPostForBannedUserUseCase,
   DeleteBlogByBlogIdUseCase,
 ];
+
+const validators = [BlogExistsValidator];
 
 @Module({
   imports: [
@@ -69,6 +72,7 @@ const bloggersBlogUseCases = [
     LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
     ...bloggersBlogUseCases,
+    ...validators,
   ],
 })
 export class BloggerBlogsModule {}

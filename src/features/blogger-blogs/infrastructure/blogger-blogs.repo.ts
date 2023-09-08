@@ -16,7 +16,7 @@ export class BloggerBlogsRepo {
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
-
+    console.log('-------');
     const blog = await this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship

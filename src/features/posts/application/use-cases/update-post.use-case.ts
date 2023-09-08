@@ -35,18 +35,19 @@ export class UpdatePostByPostIdUseCase
 
   async execute(command: UpdatePostByPostIdCommand): Promise<boolean> {
     const { params, updatePostDto, currentUserDto } = command;
+    const { blogId, postId } = params;
     const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(params.blogId);
+      await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
 
     if (!blog) {
-      throw new NotFoundException('Not found blog.');
+      throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
 
     const post: TablesPostsEntity | null =
-      await this.postsRawSqlRepository.getPostById(params.postId);
+      await this.postsRawSqlRepository.getPostById(postId);
 
     if (!post) {
-      throw new NotFoundException('Not found post.');
+      throw new NotFoundException(`Blog with ID ${postId} not found`);
     }
 
     await this.checkUserPermission(blog.blogOwnerId, currentUserDto);

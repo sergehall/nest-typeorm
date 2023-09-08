@@ -1,14 +1,12 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, Validate } from 'class-validator';
+import { BlogExistsValidator } from '../../validators/blog-exists.validator';
+import { PostExistValidator } from '../../validators/post-exist.validator';
 
 export class BlogIdPostIdParams {
   @IsNotEmpty()
-  @Length(1, 100, {
-    message: 'Incorrect blogId length! Must be max 100 ch.',
-  })
+  @Validate(BlogExistsValidator)
   blogId: string;
   @IsNotEmpty()
-  @Length(1, 100, {
-    message: 'Incorrect postId length! Must be max 100 ch.',
-  })
+  @Validate(PostExistValidator)
   postId: string;
 }
