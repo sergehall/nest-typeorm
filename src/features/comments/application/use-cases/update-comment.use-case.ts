@@ -9,8 +9,8 @@ import {
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { IdDto } from '../../../../ability/dto/id.dto';
+import { CommentsRepo } from '../../infrastructure/comments.repo';
 
 export class UpdateCommentCommand {
   constructor(
@@ -26,22 +26,21 @@ export class UpdateCommentUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected commentsRawSqlRepository: CommentsRawSqlRepository,
+    protected commentsRepo: CommentsRepo,
   ) {}
   async execute(command: UpdateCommentCommand): Promise<boolean> {
     const { commentId, updateCommentDto, currentUserDto } = command;
 
-    const findComment =
-      await this.commentsRawSqlRepository.findCommentByCommentId(commentId);
-    if (!findComment) throw new NotFoundException('Not found comment.');
+    const findComment = await this.commentsRepo.findCommentByIdWithoutLikes(
+      commentId,
+    );
+    if (!findComment)
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
-    this.checkUserPermission(currentUserDto, findComment.commentatorInfoUserId);
+    this.checkUserPermission(currentUserDto, findComment.commentator.userId);
 
     try {
-      return await this.commentsRawSqlRepository.updateComment(
-        commentId,
-        updateCommentDto,
-      );
+      return await this.commentsRepo.updateComment(commentId, updateCommentDto);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
