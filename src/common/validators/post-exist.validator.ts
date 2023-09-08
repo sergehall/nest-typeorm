@@ -14,11 +14,8 @@ export class PostExistValidator implements ValidatorConstraintInterface {
 
   async validate(value: string): Promise<boolean> {
     try {
-      console.log(value, 'value');
-      console.log(value, 'value2');
       const post: PostsEntity | null =
         await this.postsRepo.getPostByIdWithoutLikes(value);
-      console.log(post, 'post');
       return !!post; // Convert the blog to a boolean value (true if not null, false if null)
     } catch (error) {
       return false;
