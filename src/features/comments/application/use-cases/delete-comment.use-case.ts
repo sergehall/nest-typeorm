@@ -8,37 +8,40 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { CommentsRawSqlRepository } from '../../infrastructure/comments-raw-sql.repository';
 import { IdDto } from '../../../../ability/dto/id.dto';
+import { CommentsRepo } from '../../infrastructure/comments.repo';
 
-export class RemoveCommentCommand {
+export class DeleteCommentCommand {
   constructor(
     public commentId: string,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(RemoveCommentCommand)
-export class RemoveCommentUseCase
-  implements ICommandHandler<RemoveCommentCommand>
+@CommandHandler(DeleteCommentCommand)
+export class DeleteCommentUseCase
+  implements ICommandHandler<DeleteCommentCommand>
 {
   constructor(
-    protected commentsRawSqlRepository: CommentsRawSqlRepository,
+    protected commentsRepo: CommentsRepo,
     protected caslAbilityFactory: CaslAbilityFactory,
   ) {}
-  async execute(command: RemoveCommentCommand): Promise<boolean> {
+  async execute(command: DeleteCommentCommand): Promise<boolean> {
     const { commentId, currentUserDto } = command;
 
-    const findComment =
-      await this.commentsRawSqlRepository.findCommentByCommentId(commentId);
-    if (!findComment) throw new NotFoundException('Not found comment.');
+    const commentToDelete = await this.commentsRepo.findCommentByIdWithoutLikes(
+      commentId,
+    );
+    if (!commentToDelete)
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
-    this.checkUserPermission(currentUserDto, findComment.commentatorInfoUserId);
+    this.checkUserPermission(
+      currentUserDto,
+      commentToDelete.commentator.userId,
+    );
 
     try {
-      return this.commentsRawSqlRepository.removeCommentByCommentId(
-        command.commentId,
-      );
+      return this.commentsRepo.deleteCommentById(command.commentId);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

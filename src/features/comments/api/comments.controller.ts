@@ -20,7 +20,7 @@ import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { ChangeLikeStatusCommentCommand } from '../application/use-cases/change-likeStatus-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
-import { RemoveCommentCommand } from '../application/use-cases/remove-comment.use-case';
+import { DeleteCommentCommand } from '../application/use-cases/delete-comment.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -71,14 +71,14 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':commentId')
-  async removeComment(
+  async deleteComment(
     @Request() req: any,
     @Param() params: CommentIdParams,
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new RemoveCommentCommand(params.commentId, currentUserDto),
+      new DeleteCommentCommand(params.commentId, currentUserDto),
     );
   }
 

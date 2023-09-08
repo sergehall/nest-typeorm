@@ -424,7 +424,7 @@ export class UsersRepo {
     dto: DataForCreateUserDto,
   ): Promise<UsersEntity> {
     const user = await this.createUserEntity(dto);
-    user.roles = [UserRolesEnums.USER, UserRolesEnums.SA];
+    user.roles = [UserRolesEnums.SA];
     return user;
   }
 

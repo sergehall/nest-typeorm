@@ -37,7 +37,9 @@ export class CommentsRepo {
     private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
   ) {}
 
-  async findCommentById(id: string): Promise<CommentsEntity | null> {
+  async findCommentByIdWithoutLikes(
+    id: string,
+  ): Promise<CommentsEntity | null> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;
@@ -192,6 +194,32 @@ export class CommentsRepo {
     }
   }
 
+  async deleteCommentById(commentId: string): Promise<boolean> {
+    return this.commentsRepository.manager.transaction(async (manager) => {
+      try {
+        // Delete likes comments associated with the post
+        await manager.delete(LikeStatusCommentsEntity, {
+          post: { id: commentId },
+        });
+
+        // Delete the comment itself
+        const deleteResult = await manager.delete(CommentsEntity, {
+          id: commentId,
+        });
+
+        if (deleteResult.affected && deleteResult.affected > 0) {
+          console.log(`Comment with ID ${commentId} deleted.`);
+          return true;
+        } else {
+          console.log(`No comment found with ID ${commentId}.`);
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        throw new InternalServerErrorException(error.message);
+      }
+    });
+  }
   private async creatCommentEntity(
     post: PostsEntity,
     createCommentDto: CreateCommentDto,
