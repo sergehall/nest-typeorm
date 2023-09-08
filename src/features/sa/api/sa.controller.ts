@@ -40,6 +40,10 @@ import { SaCreateBlogCommand } from '../application/use-cases/sa-create-blog.use
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { SaUpdateBlogByIdCommand } from '../application/use-cases/sa-update-blog-by-id.use-case';
 import { SaDeleteBlogByBlogIdCommand } from '../application/use-cases/sa-delete-blog-by-id.use-case';
+import { BlogIdParams } from '../../../common/query/params/blogId.params';
+import { CreatePostDto } from '../../posts/dto/create-post.dto';
+import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
+import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -149,8 +153,23 @@ export class SaController {
     @Body() saBanBlogDto: SaBanBlogDto,
   ): Promise<boolean> {
     const currentUserDto = req.user;
+
     return await this.commandBus.execute(
       new SaBanUnbanBlogCommand(params.id, saBanBlogDto, currentUserDto),
+    );
+  }
+
+  @Post('blogs/:blogId/posts')
+  @UseGuards(BaseAuthGuard)
+  async saCreatePostInBlog(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+    @Body() createPostDto: CreatePostDto,
+  ): Promise<ReturnPostsEntity> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new CreatePostCommand(params.blogId, createPostDto, currentUserDto),
     );
   }
 
@@ -163,6 +182,7 @@ export class SaController {
     @Body() updateSaBanDto: SaBanUserDto,
   ): Promise<boolean> {
     const currentUserDto = req.user;
+
     return await this.commandBus.execute(
       new SaBanUnbanUserCommand(params.id, updateSaBanDto, currentUserDto),
     );
