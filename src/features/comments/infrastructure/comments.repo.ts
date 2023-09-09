@@ -28,6 +28,8 @@ import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enum
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
+import { LikeStatusCommentsRepo } from './like-status-comments.repo';
 
 export class CommentsRepo {
   constructor(
@@ -36,6 +38,7 @@ export class CommentsRepo {
     private readonly commentsRepository: Repository<CommentsEntity>,
     @InjectRepository(LikeStatusCommentsEntity)
     private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
+    protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
 
   async findCommentByIdWithoutLikes(
@@ -299,6 +302,134 @@ export class CommentsRepo {
     };
   }
 
+  async getCommentLikesDislikesAndStatusByPostId(
+    postId: string,
+    queryData: ParseQueriesDto,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnCommentsCountCommentsDto> {
+    try {
+      // Retrieve banned flags
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { dependencyIsBanned, isBanned } = bannedFlags;
+
+      // Retrieve paging parameters
+      const pagingParams: PagingParamsDto = await this.getPagingParams(
+        queryData,
+      );
+      const { sortBy, direction, limit, offset } = pagingParams;
+
+      const numberLastLikes = await this.numberLastLikes();
+
+      // Retrieve the order field for sorting
+      const orderByField = await this.getOrderField(sortBy);
+
+      // Query comments and countPosts with pagination conditions
+      const queryBuilder = this.commentsRepository
+        .createQueryBuilder('comment')
+        .where({ dependencyIsBanned })
+        .andWhere({ isBanned })
+        .innerJoinAndSelect('comment.post', 'post')
+        .innerJoinAndSelect('comment.commentator', 'commentator')
+        .andWhere('post.id = :postInfoPostId', { postInfoPostId: postId });
+
+      queryBuilder.orderBy(orderByField, direction);
+
+      const countComment = await queryBuilder.getCount();
+
+      const comments = await queryBuilder.skip(offset).take(limit).getMany();
+
+      if (comments.length === 0) {
+        return {
+          comments: [],
+          countComments: countComment,
+        };
+      }
+
+      // Retrieve comments with information about likes
+      const commentsWithLikes = await this.commentsLikesAggregation(
+        comments,
+        numberLastLikes,
+        currentUserDto,
+      );
+
+      return {
+        comments: commentsWithLikes,
+        countComments: countComment,
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async commentsLikesAggregation(
+    comments: CommentsEntity[],
+    numberLastLikes: number,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnCommentsEntity[]> {
+    // Extract post IDs
+    const postIds = comments.map((comment) => comment.post.id);
+
+    // Query like status data for the posts
+    const likeStatusCommentsData: LikeStatusCommentsEntity[] =
+      await this.likeCommentRepository
+        .createQueryBuilder('likeStatusComments')
+        .leftJoinAndSelect('likeStatusComments.post', 'post')
+        .leftJoinAndSelect('likeStatusComments.comment', 'comment')
+        .leftJoinAndSelect(
+          'likeStatusComments.ratedCommentUser',
+          'ratedCommentUser',
+        )
+        .where('likeStatusComments.post.id IN (:...postIds)', { postIds })
+        .orderBy('likeStatusComments.addedAt', 'DESC')
+        .take(numberLastLikes) // Limit the number of retrieved likes per post
+        .getMany();
+
+    // Process comments and associated like data
+    return comments.map((comment: CommentsEntity): ReturnCommentsEntity => {
+      const filteredData: LikeStatusCommentsEntity[] =
+        likeStatusCommentsData.filter(
+          (item: LikeStatusCommentsEntity) => item.comment.id === comment.id,
+        );
+
+      // Count likes and dislikes
+      const likesCount = filteredData.filter(
+        (item: LikeStatusCommentsEntity) =>
+          item.likeStatus === LikeStatusEnums.LIKE,
+      ).length;
+      const dislikesCount = filteredData.filter(
+        (item: LikeStatusCommentsEntity) =>
+          item.likeStatus === LikeStatusEnums.DISLIKE,
+      ).length;
+
+      // Determine the user's status for the post
+      let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
+      if (
+        currentUserDto &&
+        filteredData[0] &&
+        currentUserDto.userId === filteredData[0].ratedCommentUser.userId
+      ) {
+        myStatus = filteredData[0].likeStatus;
+      }
+
+      // Construct the comments data with extended likes information
+      return {
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentator.userId,
+          userLogin: comment.commentator.login,
+        },
+        likesInfo: {
+          likesCount: likesCount,
+          dislikesCount: dislikesCount,
+          myStatus: myStatus,
+        },
+      };
+    });
+  }
+
   private async getPagingParams(
     queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
@@ -322,16 +453,57 @@ export class CommentsRepo {
         'postInfoTitle',
         'postInfoBlogName',
         'commentatorInfoUserLogin',
-        'commentatorInfoIsBanned',
-        'banInfoIsBanned',
-        'banInfoBanDate',
+        'isBanned',
+        'dependencyIsBanned',
+        'banDate',
       ],
       'createdAt',
     );
   }
 
+  private async getOrderField(field: string): Promise<string> {
+    let orderByString;
+    try {
+      switch (field) {
+        case 'postInfoTitle':
+          orderByString = 'comment.post.postInfoTitle';
+          break;
+        case 'postInfoBlogName':
+          orderByString = 'comment.blog.postInfoBlogName';
+          break;
+        case 'commentatorInfoUserLogin':
+          orderByString = 'commentator.commentatorInfoUserLogin ';
+          break;
+        case 'isBanned':
+          orderByString = 'comment.isBanned';
+          break;
+        case 'dependencyIsBanned':
+          orderByString = 'comment.dependencyIsBanned';
+          break;
+        case 'banDate':
+          orderByString = 'comment.banDate';
+          break;
+        case 'banReason':
+          orderByString = 'comment.banReason';
+          break;
+        default:
+          orderByString = 'comment.createdAt';
+      }
+      return orderByString;
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(
+        'Invalid field in getOrderField(field: string)' + error.message,
+      );
+    }
+  }
+
   private async isInvalidUUIDError(error: any): Promise<boolean> {
     return error.message.includes('invalid input syntax for type uuid');
+  }
+
+  private async numberLastLikes(): Promise<number> {
+    return 3;
   }
 
   private async extractUserIdFromError(error: any): Promise<string | null> {

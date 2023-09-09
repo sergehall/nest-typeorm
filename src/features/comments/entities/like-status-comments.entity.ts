@@ -23,7 +23,7 @@ export class LikeStatusCommentsEntity {
     length: 50,
     nullable: false,
   })
-  createdAt: string;
+  addedAt: string;
 
   @Column({ default: false })
   isBanned: boolean;
@@ -32,7 +32,7 @@ export class LikeStatusCommentsEntity {
     nullable: false,
     eager: true,
   })
-  @JoinColumn({ name: 'commentId' })
+  @JoinColumn({ name: 'commentId', referencedColumnName: 'id' })
   comment: CommentsEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.ratedCommentUser, {
