@@ -230,6 +230,27 @@ export class CommentsRawSqlRepository {
     }
   }
 
+  private async transformedComments(
+    comments: CommentsCountLikesDislikesEntity[],
+  ): Promise<ReturnCommentsEntity[]> {
+    return comments.map(
+      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentatorInfoUserId,
+          userLogin: comment.commentatorInfoUserLogin,
+        },
+        likesInfo: {
+          likesCount: comment.countLikes,
+          dislikesCount: comment.countDislikes,
+          myStatus: comment.likeStatus,
+        },
+      }),
+    );
+  }
+
   async findCommentByIdAndCountOfLikesDislikesComment(
     commentId: string,
     currentUserDto: CurrentUserDto | null,
@@ -502,27 +523,6 @@ export class CommentsRawSqlRepository {
           title: comment.postInfoTitle,
           blogId: comment.postInfoBlogId,
           blogName: comment.postInfoBlogName,
-        },
-      }),
-    );
-  }
-
-  private async transformedComments(
-    comments: CommentsCountLikesDislikesEntity[],
-  ): Promise<ReturnCommentsEntity[]> {
-    return comments.map(
-      (comment: CommentsCountLikesDislikesEntity): ReturnCommentsEntity => ({
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentatorInfoUserId,
-          userLogin: comment.commentatorInfoUserLogin,
-        },
-        likesInfo: {
-          likesCount: comment.countLikes,
-          dislikesCount: comment.countDislikes,
-          myStatus: comment.likeStatus,
         },
       }),
     );

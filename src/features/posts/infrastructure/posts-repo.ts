@@ -290,40 +290,41 @@ export class PostsRepo {
 
   private async getOrderField(field: string): Promise<string> {
     let orderByString;
+    try {
+      switch (field) {
+        case 'blogName':
+          orderByString = 'blog.name';
+          break;
+        case 'title':
+          orderByString = 'post.title';
+          break;
+        case 'shortDescription':
+          orderByString = 'post.shortDescription ';
+          break;
+        case 'content':
+          orderByString = 'post.content';
+          break;
+        case 'dependencyIsBanned':
+          orderByString = 'post.dependencyIsBanned';
+          break;
+        case 'isBanned':
+          orderByString = 'post.isBanned';
+          break;
+        case 'banDate':
+          orderByString = 'post.banDate';
+          break;
+        case 'banReason':
+          orderByString = 'post.banReason';
+          break;
+        default:
+          orderByString = 'post.createdAt';
+      }
 
-    switch (field) {
-      case 'blogName':
-        orderByString = 'blog.name';
-        break;
-      case 'title':
-        orderByString = 'post.title';
-        break;
-      case 'shortDescription':
-        orderByString = 'post.shortDescription ';
-        break;
-      case 'content':
-        orderByString = 'post.content';
-        break;
-      case 'dependencyIsBanned':
-        orderByString = 'post.dependencyIsBanned';
-        break;
-      case 'isBanned':
-        orderByString = 'post.isBanned';
-        break;
-      case 'banDate':
-        orderByString = 'post.banDate';
-        break;
-      case 'banReason':
-        orderByString = 'post.banReason';
-        break;
-      case 'createdAt':
-        orderByString = 'post.createdAt';
-        break;
-      default:
-        throw new Error('Invalid field in getOrderField(field: string)');
+      return orderByString;
+    } catch (error) {
+      console.log(error.message);
+      throw new Error('Invalid field in getOrderField(field: string)');
     }
-
-    return orderByString;
   }
 
   private async postsLikesAggregation(

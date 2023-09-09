@@ -9,6 +9,7 @@ import * as uuid4 from 'uuid4';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { PostsEntity } from '../../posts/entities/posts.entity';
+import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 export class LikeStatusCommentsRepo {
   constructor(
@@ -61,7 +62,7 @@ export class LikeStatusCommentsRepo {
     return {
       id: uuid4().toString(),
       likeStatus: likeStatusDto.likeStatus,
-      createdAt: new Date().toISOString(),
+      addedAt: new Date().toISOString(),
       isBanned: false,
       comment: commentEntity,
       ratedCommentUser: ratedUserEntity,
@@ -69,5 +70,46 @@ export class LikeStatusCommentsRepo {
       post: postEntity,
       commentOwner: ownerUserEntity,
     };
+  }
+
+  async getLikesDislikesAndStatusByPostIdForComment(
+    postId: string, // Add postId as a parameter
+    userId: string,
+  ): Promise<{ likes: number; dislikes: number; status: string }> {
+    try {
+      const likes = await this.likeStatusCommentRepository.count({
+        where: {
+          likeStatus: LikeStatusEnums.LIKE,
+          post: { id: postId },
+        },
+      });
+
+      const dislikes = await this.likeStatusCommentRepository.count({
+        where: {
+          likeStatus: LikeStatusEnums.DISLIKE,
+          post: { id: postId },
+        },
+      });
+
+      const userLikeStatus = await this.likeStatusCommentRepository.findOne({
+        where: {
+          ratedCommentUser: { userId },
+          post: { id: postId },
+        },
+      });
+
+      const status = userLikeStatus
+        ? userLikeStatus.likeStatus
+        : LikeStatusEnums.NONE;
+
+      return {
+        likes,
+        dislikes,
+        status,
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
