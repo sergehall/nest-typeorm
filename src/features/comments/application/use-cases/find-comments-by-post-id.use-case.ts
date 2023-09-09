@@ -34,7 +34,7 @@ export class FindCommentsByPostIdUseCase
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     const commentsAndCountComments: ReturnCommentsCountCommentsDto =
-      await this.commentsRepo.getCommentLikesDislikesAndStatusByPostId(
+      await this.commentsRepo.getCommentsWithLikesByPostId(
         postId,
         queryData,
         currentUserDto,

@@ -29,7 +29,6 @@ import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entit
 import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
-import { LikeStatusCommentsRepo } from './like-status-comments.repo';
 
 export class CommentsRepo {
   constructor(
@@ -38,7 +37,6 @@ export class CommentsRepo {
     private readonly commentsRepository: Repository<CommentsEntity>,
     @InjectRepository(LikeStatusCommentsEntity)
     private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
-    protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
 
   async findCommentByIdWithoutLikes(
@@ -63,7 +61,7 @@ export class CommentsRepo {
     }
   }
 
-  async getCommentByIdWithLikes(
+  async getCommentWithLikesById(
     id: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnCommentWithLikesInfoDto | null> {
@@ -82,8 +80,14 @@ export class CommentsRepo {
         return null;
       }
 
+      const numberLastLikes = await this.numberLastLikes();
+
       const result: ReturnCommentWithLikesInfoDto[] =
-        await this.commentLikesAggregation(comment, currentUserDto);
+        await this.commentsLikesAggregation(
+          comment,
+          numberLastLikes,
+          currentUserDto,
+        );
 
       return result[0];
     } catch (error) {
@@ -95,75 +99,64 @@ export class CommentsRepo {
     }
   }
 
-  private async commentLikesAggregation(
-    comments: CommentsEntity[],
+  async getCommentsWithLikesByPostId(
+    postId: string,
+    queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentWithLikesInfoDto[]> {
-    // Retrieve banned flags
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { isBanned } = bannedFlags;
+  ): Promise<ReturnCommentsCountCommentsDto> {
+    try {
+      // Retrieve banned flags
+      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+      const { dependencyIsBanned, isBanned } = bannedFlags;
 
-    // Extract post IDs
-    const commentIds: string[] = comments.map((p) => p.id);
+      // Retrieve paging parameters
+      const pagingParams: PagingParamsDto = await this.getPagingParams(
+        queryData,
+      );
+      const { sortBy, direction, limit, offset } = pagingParams;
 
-    // Query like status data for the posts
-    const likeStatusCommentsData: LikeStatusCommentsEntity[] =
-      await this.likeCommentRepository
-        .createQueryBuilder('likeStatusComments')
-        .leftJoinAndSelect('likeStatusComments.comment', 'comment')
-        .leftJoinAndSelect(
-          'likeStatusComments.ratedCommentUser',
-          'ratedCommentUser',
-        )
-        .where('likeStatusComments.comment.id IN (:...commentIds)', {
-          commentIds,
-        })
-        .andWhere('likeStatusComments.isBanned = :isBanned', { isBanned })
-        .orderBy('likeStatusComments.createdAt', 'DESC')
-        .getMany();
+      const numberLastLikes = await this.numberLastLikes();
 
-    // Process posts and associated like data
-    return comments.map((comment: CommentsEntity) => {
-      const filteredData: LikeStatusCommentsEntity[] =
-        likeStatusCommentsData.filter(
-          (item: LikeStatusCommentsEntity) => item.comment.id === comment.id,
-        );
+      // Retrieve the order field for sorting
+      const orderByField = await this.getOrderField(sortBy);
 
-      // Count likes and dislikes
-      const likesCount = filteredData.filter(
-        (item: LikeStatusCommentsEntity) =>
-          item.likeStatus === LikeStatusEnums.LIKE,
-      ).length;
-      const dislikesCount = filteredData.filter(
-        (item: LikeStatusCommentsEntity) =>
-          item.likeStatus === LikeStatusEnums.DISLIKE,
-      ).length;
+      // Query comments and countPosts with pagination conditions
+      const queryBuilder = this.commentsRepository
+        .createQueryBuilder('comment')
+        .where({ dependencyIsBanned })
+        .andWhere({ isBanned })
+        .innerJoinAndSelect('comment.post', 'post')
+        .innerJoinAndSelect('comment.commentator', 'commentator')
+        .andWhere('post.id = :postInfoPostId', { postInfoPostId: postId });
 
-      // Determine the user's status for the post
-      let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
-      if (
-        currentUserDto &&
-        filteredData[0] &&
-        currentUserDto.userId === filteredData[0].ratedCommentUser.userId
-      ) {
-        myStatus = filteredData[0].likeStatus;
+      queryBuilder.orderBy(orderByField, direction);
+
+      const countComment = await queryBuilder.getCount();
+
+      const comments = await queryBuilder.skip(offset).take(limit).getMany();
+
+      if (comments.length === 0) {
+        return {
+          comments: [],
+          countComments: countComment,
+        };
       }
 
+      // Retrieve comments with information about likes
+      const commentsWithLikes = await this.commentsLikesAggregation(
+        comments,
+        numberLastLikes,
+        currentUserDto,
+      );
+
       return {
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentator.userId,
-          userLogin: comment.commentator.login,
-        },
-        likesInfo: {
-          likesCount: likesCount,
-          dislikesCount: dislikesCount,
-          myStatus: myStatus,
-        },
+        comments: commentsWithLikes,
+        countComments: countComment,
       };
-    });
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async createComments(
@@ -300,66 +293,6 @@ export class CommentsRepo {
       banInfoIsBanned: false,
       isBanned: false,
     };
-  }
-
-  async getCommentLikesDislikesAndStatusByPostId(
-    postId: string,
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentsCountCommentsDto> {
-    try {
-      // Retrieve banned flags
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-      const { dependencyIsBanned, isBanned } = bannedFlags;
-
-      // Retrieve paging parameters
-      const pagingParams: PagingParamsDto = await this.getPagingParams(
-        queryData,
-      );
-      const { sortBy, direction, limit, offset } = pagingParams;
-
-      const numberLastLikes = await this.numberLastLikes();
-
-      // Retrieve the order field for sorting
-      const orderByField = await this.getOrderField(sortBy);
-
-      // Query comments and countPosts with pagination conditions
-      const queryBuilder = this.commentsRepository
-        .createQueryBuilder('comment')
-        .where({ dependencyIsBanned })
-        .andWhere({ isBanned })
-        .innerJoinAndSelect('comment.post', 'post')
-        .innerJoinAndSelect('comment.commentator', 'commentator')
-        .andWhere('post.id = :postInfoPostId', { postInfoPostId: postId });
-
-      queryBuilder.orderBy(orderByField, direction);
-
-      const countComment = await queryBuilder.getCount();
-
-      const comments = await queryBuilder.skip(offset).take(limit).getMany();
-
-      if (comments.length === 0) {
-        return {
-          comments: [],
-          countComments: countComment,
-        };
-      }
-
-      // Retrieve comments with information about likes
-      const commentsWithLikes = await this.commentsLikesAggregation(
-        comments,
-        numberLastLikes,
-        currentUserDto,
-      );
-
-      return {
-        comments: commentsWithLikes,
-        countComments: countComment,
-      };
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
   }
 
   private async commentsLikesAggregation(
