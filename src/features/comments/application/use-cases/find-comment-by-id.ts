@@ -26,7 +26,7 @@ export class FindCommentByIdUseCase
     const { commentId, currentUserDto } = command;
 
     const comment: ReturnCommentWithLikesInfoDto | null =
-      await this.commentsRepo.getCommentByIdWithLikes(
+      await this.commentsRepo.getCommentWithLikesById(
         commentId,
         currentUserDto,
       );
