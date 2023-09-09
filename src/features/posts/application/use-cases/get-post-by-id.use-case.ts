@@ -4,22 +4,20 @@ import { PostsRepo } from '../../infrastructure/posts-repo';
 import { NotFoundException } from '@nestjs/common';
 import { ReturnPostsEntity } from '../../entities/return-posts.entity';
 
-export class FindPostByIdCommand {
+export class GetPostByIdCommand {
   constructor(
     public postId: string,
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
 
-@CommandHandler(FindPostByIdCommand)
-export class FindPostByIdUseCase
-  implements ICommandHandler<FindPostByIdCommand>
-{
+@CommandHandler(GetPostByIdCommand)
+export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
   constructor(
     private readonly postsRepo: PostsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindPostByIdCommand): Promise<ReturnPostsEntity> {
+  async execute(command: GetPostByIdCommand): Promise<ReturnPostsEntity> {
     const { postId, currentUserDto } = command;
 
     const post: ReturnPostsEntity[] | null =

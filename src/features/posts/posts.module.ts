@@ -25,9 +25,7 @@ import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-bans
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { FindPostsUseCase } from './application/use-cases/find-posts.use-case';
-import { FindPostByIdUseCase } from './application/use-cases/find-post-by-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-
 import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
 import { DeletePostByPostIdAndBlogIdUseCase } from './application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
 import { PostsRepo } from './infrastructure/posts-repo';
@@ -45,10 +43,11 @@ import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
+import { GetPostByIdUseCase } from './application/use-cases/get-post-by-id.use-case';
 
 const postsUseCases = [
   FindPostsUseCase,
-  FindPostByIdUseCase,
+  GetPostByIdUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
   ChangeBanStatusPostsUseCase,

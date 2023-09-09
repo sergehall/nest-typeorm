@@ -30,9 +30,7 @@ import { IdParams } from '../../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { FindCommentsByPostIdCommand } from '../../comments/application/use-cases/find-comments-by-post-id.use-case';
 import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
-import { FindPostByIdCommand } from '../application/use-cases/find-post-by-id.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
@@ -43,6 +41,8 @@ import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-i
 import { ReturnCommentsEntity } from '../../comments/entities/return-comments.entity';
 import { ReturnPostsEntity } from '../entities/return-posts.entity';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
+import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
+import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -78,7 +78,7 @@ export class PostsController {
     const currentUserDto: CurrentUserDto | null = req.user;
 
     return await this.commandBus.execute(
-      new FindPostByIdCommand(id, currentUserDto),
+      new GetPostByIdCommand(id, currentUserDto),
     );
   }
 
@@ -86,7 +86,7 @@ export class PostsController {
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findCommentsByPostId(
+  async getCommentsByPostId(
     @Request() req: any,
     @Param() params: PostIdParams,
     @Query() query: any,
@@ -96,7 +96,7 @@ export class PostsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new FindCommentsByPostIdCommand(params.postId, queryData, currentUserDto),
+      new GetCommentsByPostIdCommand(params.postId, queryData, currentUserDto),
     );
   }
 

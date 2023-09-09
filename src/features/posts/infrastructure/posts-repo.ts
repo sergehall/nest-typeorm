@@ -352,14 +352,19 @@ export class PostsRepo {
         (item: LikeStatusPostsEntity) => item.post.id === post.id,
       );
 
-      // Create an array of last likes for the post
-      const lastLikes: NewestLikes[] = filteredData.map(
-        (item: LikeStatusPostsEntity): NewestLikes => ({
-          addedAt: item.addedAt,
-          userId: item.ratedPostUser.userId,
-          login: item.ratedPostUser.login,
-        }),
-      );
+      // Create an array of latest likes for the post
+      const lastLikes: NewestLikes[] = filteredData
+        .filter(
+          (item: LikeStatusPostsEntity) =>
+            item.likeStatus === LikeStatusEnums.LIKE,
+        )
+        .map(
+          (item: LikeStatusPostsEntity): NewestLikes => ({
+            addedAt: item.addedAt,
+            userId: item.ratedPostUser.userId,
+            login: item.ratedPostUser.login,
+          }),
+        );
 
       // Count likes and dislikes
       const likesCount = filteredData.filter(

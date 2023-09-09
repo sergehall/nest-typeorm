@@ -7,7 +7,7 @@ import { ReturnCommentsCountCommentsDto } from '../../dto/return-comments-count-
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 
-export class FindCommentsByPostIdCommand {
+export class GetCommentsByPostIdCommand {
   constructor(
     public postId: string,
     public queryData: ParseQueriesDto,
@@ -15,9 +15,9 @@ export class FindCommentsByPostIdCommand {
   ) {}
 }
 
-@CommandHandler(FindCommentsByPostIdCommand)
-export class FindCommentsByPostIdUseCase
-  implements ICommandHandler<FindCommentsByPostIdCommand>
+@CommandHandler(GetCommentsByPostIdCommand)
+export class GetCommentsByPostIdUseCase
+  implements ICommandHandler<GetCommentsByPostIdCommand>
 {
   constructor(
     private readonly postsRepo: PostsRepo,
@@ -25,7 +25,7 @@ export class FindCommentsByPostIdUseCase
     protected commandBus: CommandBus,
   ) {}
   async execute(
-    command: FindCommentsByPostIdCommand,
+    command: GetCommentsByPostIdCommand,
   ): Promise<PaginatedResultDto> {
     const { postId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
