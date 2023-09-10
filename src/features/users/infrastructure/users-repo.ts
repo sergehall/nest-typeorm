@@ -50,10 +50,14 @@ export class UsersRepo {
           'user.isConfirmed',
           'user.isConfirmedDate',
         ])
-        .where('(user.email LIKE :email OR user.login LIKE :login)', {
-          email: searchEmailTerm,
-          login: searchLoginTerm,
-        })
+        .where(
+          '(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin',
+          {
+            email: searchEmailTerm,
+            login: searchLoginTerm,
+            admin: 'admin',
+          },
+        )
         .andWhere('user.isBanned IN (:...banStatus)', {
           banStatus: banCondition,
         })
@@ -76,10 +80,14 @@ export class UsersRepo {
       const totalCount = await this.usersRepository
         .createQueryBuilder('user')
         .select('COUNT(user.userId)', 'count')
-        .where('(user.email LIKE :email OR user.login LIKE :login)', {
-          email: searchEmailTerm,
-          login: searchLoginTerm,
-        })
+        .where(
+          '(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin',
+          {
+            email: searchEmailTerm,
+            login: searchLoginTerm,
+            admin: 'admin',
+          },
+        )
         .andWhere('user.isBanned IN (:...banStatus)', {
           banStatus: banCondition,
         })
