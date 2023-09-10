@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { MailsService } from '../../../../mails/application/mails.service';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { UserIdEmailLoginDto } from '../../dto/profile.dto';
+import { ReturnUserDto } from '../../../users/dto/return-user.dto';
 
 export class RegistrationUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -17,9 +17,7 @@ export class RegistrationUserUseCase
     protected mailsService: MailsService,
     protected commandBus: CommandBus,
   ) {}
-  async execute(
-    command: RegistrationUserCommand,
-  ): Promise<UserIdEmailLoginDto> {
+  async execute(command: RegistrationUserCommand): Promise<ReturnUserDto> {
     const { createUserDto } = command;
 
     const newUser: UsersEntity = await this.commandBus.execute(
@@ -28,7 +26,11 @@ export class RegistrationUserUseCase
 
     await this.mailsService.sendConfirmationCode(newUser);
 
-    const { userId, login, email } = newUser;
-    return { userId, login, email };
+    return {
+      id: newUser.userId,
+      login: newUser.login,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    };
   }
 }
