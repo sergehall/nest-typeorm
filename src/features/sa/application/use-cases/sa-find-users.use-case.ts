@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { ReturnUsersBanInfoEntity } from '../../entities/return-users-banInfo.entity';
+import { ReturnUsersDto } from '../../dto/return-users.dto';
 
 export class SaFindUsersCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -35,17 +35,12 @@ export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
 
   private async transformedArrUsers(
     usersArr: UsersEntity[],
-  ): Promise<ReturnUsersBanInfoEntity[]> {
+  ): Promise<ReturnUsersDto[]> {
     return usersArr.map((user: UsersEntity) => ({
       id: user.userId,
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
-      banInfo: {
-        isBanned: user.isBanned,
-        banDate: user.banDate,
-        banReason: user.banReason,
-      },
     }));
   }
 }

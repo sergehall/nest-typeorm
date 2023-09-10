@@ -26,7 +26,6 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ReturnUsersBanInfoEntity } from '../entities/return-users-banInfo.entity';
 import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
@@ -50,6 +49,7 @@ import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ReturnUserDto } from '../../users/dto/return-user.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
+import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -116,7 +116,7 @@ export class SaController {
   async saCreateBlog(
     @Request() req: any,
     @Body() createBlogsDto: CreateBlogsDto,
-  ): Promise<ReturnUsersBanInfoEntity> {
+  ): Promise<ReturnBloggerBlogsDto> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(
