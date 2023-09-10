@@ -50,6 +50,7 @@ import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.p
 import { ReturnUserDto } from '../../users/dto/return-user.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @SkipThrottle()
 @Controller('sa')
@@ -102,11 +103,17 @@ export class SaController {
   async saCreateUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<ReturnUserDto> {
-    const newUser: ReturnUserDto = await this.commandBus.execute(
+    const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
-    await this.commandBus.execute(new ChangeRoleCommand(newUser.id));
-    return newUser;
+    await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
+
+    return {
+      id: newUser.userId,
+      login: newUser.login,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    };
   }
 
   @Post('blogs')
