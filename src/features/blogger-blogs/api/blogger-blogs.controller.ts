@@ -33,7 +33,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
@@ -42,6 +41,7 @@ import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-valida
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
 import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
+import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -112,7 +112,7 @@ export class BloggerBlogsController {
   @Get('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchPostsInBlog(
+  async getPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
@@ -122,7 +122,7 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
+      new GetPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 

@@ -191,6 +191,22 @@ export class CommentsRepo {
     }
   }
 
+  async updateComment(
+    commentId: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<boolean> {
+    try {
+      const updateResult = await this.commentsRepository.update(
+        { id: commentId },
+        { content: updateCommentDto.content },
+      );
+
+      return updateResult.affected === 1;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteCommentById(commentId: string): Promise<boolean> {
     return this.commentsRepository.manager.transaction(async (manager) => {
       try {
@@ -216,22 +232,6 @@ export class CommentsRepo {
         throw new InternalServerErrorException(error.message);
       }
     });
-  }
-
-  async updateComment(
-    commentId: string,
-    updateCommentDto: UpdateCommentDto,
-  ): Promise<boolean> {
-    try {
-      const updateResult = await this.commentsRepository.update(
-        { id: commentId },
-        { content: updateCommentDto.content },
-      );
-
-      return updateResult.affected === 1;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
   }
 
   private async creatCommentEntity(
