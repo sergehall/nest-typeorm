@@ -15,20 +15,34 @@ export class LikeStatusCommentsRepo {
     @InjectRepository(LikeStatusCommentsEntity)
     private readonly likeStatusCommentRepository: Repository<LikeStatusCommentsEntity>,
   ) {}
+
   async updateLikeStatusComment(
+    comment: CommentsEntity,
     likeStatusDto: LikeStatusDto,
     currentUserDto: CurrentUserDto,
-    findComment: CommentsEntity,
   ): Promise<LikeStatusCommentsEntity> {
     try {
-      const likeStatusCommentsEntity =
-        await this.createLikeStatusCommentsEntity(
+      let likeStatusCommentEntity: LikeStatusCommentsEntity | null =
+        await this.likeStatusCommentRepository.findOne({
+          where: {
+            comment: { id: comment.id },
+            ratedCommentUser: { userId: currentUserDto.userId },
+          },
+        });
+
+      if (likeStatusCommentEntity) {
+        likeStatusCommentEntity.likeStatus = likeStatusDto.likeStatus;
+        likeStatusCommentEntity.addedAt = new Date().toISOString();
+      } else {
+        likeStatusCommentEntity = await this.createLikeStatusCommentsEntity(
+          comment,
           likeStatusDto,
           currentUserDto,
-          findComment,
         );
+      }
+
       return await this.likeStatusCommentRepository.save(
-        likeStatusCommentsEntity,
+        likeStatusCommentEntity,
       );
     } catch (error) {
       console.log(error.message);
@@ -37,9 +51,9 @@ export class LikeStatusCommentsRepo {
   }
 
   private async createLikeStatusCommentsEntity(
+    findComment: CommentsEntity,
     likeStatusDto: LikeStatusDto,
     currentUserDto: CurrentUserDto,
-    findComment: CommentsEntity,
   ): Promise<LikeStatusCommentsEntity> {
     const blogEntity = new BloggerBlogsEntity();
     blogEntity.id = findComment.blog.id;
