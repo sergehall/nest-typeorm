@@ -13,7 +13,6 @@ import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enum
 
 @Entity('LikeStatusPosts')
 @Unique(['id'])
-@Unique(['post.id'])
 export class LikeStatusPostsEntity {
   @PrimaryColumn('uuid', { nullable: false, unique: true })
   id: string;

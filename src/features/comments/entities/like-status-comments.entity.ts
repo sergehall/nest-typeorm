@@ -14,7 +14,6 @@ import { PostsEntity } from '../../posts/entities/posts.entity';
 
 @Entity('LikeStatusComments')
 @Unique(['id'])
-@Unique(['comment.id'])
 export class LikeStatusCommentsEntity {
   @PrimaryColumn('uuid', { nullable: false, unique: true })
   id: string;
