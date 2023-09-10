@@ -12,9 +12,10 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
+import { CheckAbilities } from '../../../ability/abilities.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
-import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { LikeStatusDto } from '../dto/like-status.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
@@ -29,8 +30,6 @@ import { PostIdParams } from '../../../common/query/params/postId.params';
 import { IdParams } from '../../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { SkipThrottle } from '@nestjs/throttler';
-import { FindPostsCommand } from '../application/use-cases/find-posts.use-case';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
@@ -43,6 +42,7 @@ import { ReturnPostsEntity } from '../entities/return-posts.entity';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
 import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-case';
+import { GetPostsCommand } from '../application/use-cases/get-posts.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -63,7 +63,7 @@ export class PostsController {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(
-      new FindPostsCommand(queryData, currentUserDto),
+      new GetPostsCommand(queryData, currentUserDto),
     );
   }
 
@@ -71,7 +71,7 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindPostByPostId(
+  async openFindPostById(
     @Request() req: any,
     @Param('id', PostExistValidationPipe) id: string,
   ): Promise<ReturnPostsEntity> {

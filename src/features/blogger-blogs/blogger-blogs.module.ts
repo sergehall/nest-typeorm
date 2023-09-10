@@ -16,7 +16,6 @@ import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/l
 import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-import { SearchPostsInBlogUseCase } from '../posts/application/use-cases/search-posts-in-blog.use-case';
 import { SearchBannedUsersInBlogUseCase } from './application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessUseCase } from './application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserUseCase } from './application/use-cases/get-blogs-owned-by-current-user.use-case';
@@ -35,7 +34,6 @@ const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
   GetCommentsOwnedByCurrentUserUseCase,
   SearchBannedUsersInBlogUseCase,
-  SearchPostsInBlogUseCase,
   ManageBlogAccessUseCase,
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,

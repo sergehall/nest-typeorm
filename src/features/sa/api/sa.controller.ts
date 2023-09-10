@@ -44,12 +44,12 @@ import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SaUpdatePostsByPostIdCommand } from '../application/use-cases/sa-update-post.use-case';
 import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-post-by-post-id.use-case';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ReturnUserDto } from '../../users/dto/return-user.dto';
+import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -81,7 +81,7 @@ export class SaController {
   @Get('blogs/:blogId/posts')
   @UseGuards(BaseAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saSearchPostsInBlog(
+  async saGetPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
@@ -91,7 +91,7 @@ export class SaController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
+      new GetPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 

@@ -4,19 +4,19 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 
-export class SearchPostsInBlogCommand {
+export class GetPostsInBlogCommand {
   constructor(
     public blogId: string,
     public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
-@CommandHandler(SearchPostsInBlogCommand)
-export class SearchPostsInBlogUseCase
-  implements ICommandHandler<SearchPostsInBlogCommand>
+@CommandHandler(GetPostsInBlogCommand)
+export class GetPostsInBlogUseCase
+  implements ICommandHandler<GetPostsInBlogCommand>
 {
   constructor(protected postsRepo: PostsRepo) {}
-  async execute(command: SearchPostsInBlogCommand) {
+  async execute(command: GetPostsInBlogCommand) {
     const { blogId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

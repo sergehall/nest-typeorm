@@ -18,9 +18,9 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
-import { SearchPostsInBlogCommand } from '../../posts/application/use-cases/search-posts-in-blog.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
+import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -61,7 +61,7 @@ export class BlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new SearchPostsInBlogCommand(blogId, queryData, currentUserDto),
+      new GetPostsInBlogCommand(blogId, queryData, currentUserDto),
     );
   }
 }

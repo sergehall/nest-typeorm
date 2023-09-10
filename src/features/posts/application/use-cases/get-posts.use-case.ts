@@ -5,20 +5,20 @@ import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 
-export class FindPostsCommand {
+export class GetPostsCommand {
   constructor(
     public queryData: ParseQueriesDto,
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
 
-@CommandHandler(FindPostsCommand)
-export class FindPostsUseCase implements ICommandHandler<FindPostsCommand> {
+@CommandHandler(GetPostsCommand)
+export class GetPostsUseCase implements ICommandHandler<GetPostsCommand> {
   constructor(
     protected postsRepo: PostsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: FindPostsCommand): Promise<PaginatedResultDto> {
+  async execute(command: GetPostsCommand): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
