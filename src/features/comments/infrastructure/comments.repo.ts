@@ -25,10 +25,10 @@ import {
 } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
-import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
+import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 
 export class CommentsRepo {
   constructor(
@@ -80,14 +80,8 @@ export class CommentsRepo {
         return null;
       }
 
-      const numberLastLikes = await this.numberLastLikes();
-
       const result: ReturnCommentWithLikesInfoDto[] =
-        await this.commentsLikesAggregation(
-          comment,
-          numberLastLikes,
-          currentUserDto,
-        );
+        await this.commentsLikesAggregation(comment, currentUserDto);
 
       return result[0];
     } catch (error) {
@@ -114,8 +108,6 @@ export class CommentsRepo {
         queryData,
       );
       const { sortBy, direction, limit, offset } = pagingParams;
-
-      const numberLastLikes = await this.numberLastLikes();
 
       // Retrieve the order field for sorting
       const orderByField = await this.getOrderField(sortBy);
@@ -145,7 +137,6 @@ export class CommentsRepo {
       // Retrieve comments with information about likes
       const commentsWithLikes = await this.commentsLikesAggregation(
         comments,
-        numberLastLikes,
         currentUserDto,
       );
 
@@ -295,74 +286,6 @@ export class CommentsRepo {
     };
   }
 
-  private async commentsLikesAggregation(
-    comments: CommentsEntity[],
-    numberLastLikes: number,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentsEntity[]> {
-    // Extract post IDs
-    const postIds = comments.map((comment) => comment.post.id);
-
-    // Query like status data for the posts
-    const likeStatusCommentsData: LikeStatusCommentsEntity[] =
-      await this.likeCommentRepository
-        .createQueryBuilder('likeStatusComments')
-        .leftJoinAndSelect('likeStatusComments.post', 'post')
-        .leftJoinAndSelect('likeStatusComments.comment', 'comment')
-        .leftJoinAndSelect(
-          'likeStatusComments.ratedCommentUser',
-          'ratedCommentUser',
-        )
-        .where('likeStatusComments.post.id IN (:...postIds)', { postIds })
-        .orderBy('likeStatusComments.addedAt', 'DESC')
-        .take(numberLastLikes) // Limit the number of retrieved likes per post
-        .getMany();
-
-    // Process comments and associated like data
-    return comments.map((comment: CommentsEntity): ReturnCommentsEntity => {
-      const filteredData: LikeStatusCommentsEntity[] =
-        likeStatusCommentsData.filter(
-          (item: LikeStatusCommentsEntity) => item.comment.id === comment.id,
-        );
-
-      // Count likes and dislikes
-      const likesCount = filteredData.filter(
-        (item: LikeStatusCommentsEntity) =>
-          item.likeStatus === LikeStatusEnums.LIKE,
-      ).length;
-      const dislikesCount = filteredData.filter(
-        (item: LikeStatusCommentsEntity) =>
-          item.likeStatus === LikeStatusEnums.DISLIKE,
-      ).length;
-
-      // Determine the user's status for the post
-      let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
-      if (
-        currentUserDto &&
-        filteredData[0] &&
-        currentUserDto.userId === filteredData[0].ratedCommentUser.userId
-      ) {
-        myStatus = filteredData[0].likeStatus;
-      }
-
-      // Construct the comments data with extended likes information
-      return {
-        id: comment.id,
-        content: comment.content,
-        createdAt: comment.createdAt,
-        commentatorInfo: {
-          userId: comment.commentator.userId,
-          userLogin: comment.commentator.login,
-        },
-        likesInfo: {
-          likesCount: likesCount,
-          dislikesCount: dislikesCount,
-          myStatus: myStatus,
-        },
-      };
-    });
-  }
-
   private async getPagingParams(
     queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
@@ -376,6 +299,66 @@ export class CommentsRepo {
     const offset: number = (pageNumber - 1) * limit;
 
     return { sortBy, direction, limit, offset };
+  }
+
+  async commentsLikesAggregation(
+    comments: CommentsEntity[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<ReturnCommentsEntity[]> {
+    const result: ReturnCommentsEntity[] = [];
+
+    for (const comment of comments) {
+      const commentId = comment.id; // Get the comment ID
+
+      // Query like status data for the posts
+      const likeStatusCommentsData: LikeStatusCommentsEntity[] =
+        await this.likeCommentRepository
+          .createQueryBuilder('likeStatusComments')
+          .leftJoinAndSelect('likeStatusComments.comment', 'comment')
+          .leftJoinAndSelect(
+            'likeStatusComments.ratedCommentUser',
+            'ratedCommentUser',
+          )
+          .where('likeStatusComments.comment.id = :commentId', { commentId })
+          .orderBy('likeStatusComments.addedAt', 'DESC')
+          .getMany();
+
+      const likeCount = likeStatusCommentsData.filter(
+        (post) => post.likeStatus === LikeStatusEnums.LIKE,
+      ).length;
+      const dislikeCount = likeStatusCommentsData.filter(
+        (post) => post.likeStatus === LikeStatusEnums.DISLIKE,
+      ).length;
+
+      let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
+
+      if (currentUserDto) {
+        const myLikeStatusPost = likeStatusCommentsData.find(
+          (post) => post.ratedCommentUser.userId === currentUserDto.userId,
+        );
+
+        if (myLikeStatusPost) {
+          myStatus = myLikeStatusPost.likeStatus;
+        }
+      }
+
+      result.push({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentator.userId,
+          userLogin: comment.commentator.login,
+        },
+        likesInfo: {
+          likesCount: likeCount,
+          dislikesCount: dislikeCount,
+          myStatus: myStatus,
+        },
+      });
+    }
+
+    return result;
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
@@ -433,10 +416,6 @@ export class CommentsRepo {
 
   private async isInvalidUUIDError(error: any): Promise<boolean> {
     return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async numberLastLikes(): Promise<number> {
-    return 3;
   }
 
   private async extractUserIdFromError(error: any): Promise<string | null> {

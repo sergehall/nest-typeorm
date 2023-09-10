@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn,
+  Unique,
+} from 'typeorm';
 import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
@@ -6,8 +13,10 @@ import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enum
 import { PostsEntity } from '../../posts/entities/posts.entity';
 
 @Entity('LikeStatusComments')
+@Unique(['id'])
+@Unique(['comment.id'])
 export class LikeStatusCommentsEntity {
-  @PrimaryColumn('uuid', { nullable: false })
+  @PrimaryColumn('uuid', { nullable: false, unique: true })
   id: string;
 
   @Column({

@@ -47,9 +47,9 @@ export class ChangeLikeStatusCommentUseCase
 
     try {
       return await this.likeStatusCommentsRepo.updateLikeStatusComment(
+        findComment,
         likeStatusDto,
         currentUserDto,
-        findComment,
       );
     } catch (error) {
       console.log(error.message);

@@ -3,7 +3,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  PrimaryGeneratedColumn,
+  Unique,
+  PrimaryColumn,
 } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
@@ -11,8 +12,10 @@ import { PostsEntity } from './posts.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
 @Entity('LikeStatusPosts')
+@Unique(['id'])
+@Unique(['post.id'])
 export class LikeStatusPostsEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid', { nullable: false, unique: true })
   id: string;
 
   @Column({
