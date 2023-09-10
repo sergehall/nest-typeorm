@@ -38,7 +38,7 @@ export class ChangeLikeStatusCommentUseCase
     const { commentId, likeStatusDto, currentUserDto } = command;
 
     const findComment: CommentsEntity | null =
-      await this.commentsRepo.findCommentByIdWithoutLikes(commentId);
+      await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
 
     if (!findComment)
       throw new NotFoundException(`Comment with ID ${commentId} not found`);

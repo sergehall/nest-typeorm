@@ -39,9 +39,7 @@ export class CommentsRepo {
     private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
   ) {}
 
-  async findCommentByIdWithoutLikes(
-    id: string,
-  ): Promise<CommentsEntity | null> {
+  async getCommentByIdWithoutLikes(id: string): Promise<CommentsEntity | null> {
     try {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;

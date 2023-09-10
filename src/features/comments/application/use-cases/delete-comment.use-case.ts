@@ -29,7 +29,7 @@ export class DeleteCommentUseCase
   async execute(command: DeleteCommentCommand): Promise<boolean> {
     const { commentId, currentUserDto } = command;
 
-    const commentToDelete = await this.commentsRepo.findCommentByIdWithoutLikes(
+    const commentToDelete = await this.commentsRepo.getCommentByIdWithoutLikes(
       commentId,
     );
     if (!commentToDelete)
