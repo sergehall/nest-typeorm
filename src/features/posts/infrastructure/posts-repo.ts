@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { InsertResult, Repository, SelectQueryBuilder } from 'typeorm';
 import { PostsEntity } from '../entities/posts.entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
@@ -327,132 +327,91 @@ export class PostsRepo {
     }
   }
 
-  private async postsLikesAggregation(
+  async postsLikesAggregation(
     posts: PostsEntity[],
     numberLastLikes: number,
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnPostsEntity[]> {
-    // Extract post IDs
-    const postIds = posts.map((post) => post.id);
+    const result: ReturnPostsEntity[] = [];
 
-    // Query like status data for the posts
-    const lastLikesData: LikeStatusPostsEntity[] =
-      await this.likePostsRepository
-        .createQueryBuilder('likeStatusPosts')
+    for (const post of posts) {
+      const queryBuilder: SelectQueryBuilder<LikeStatusPostsEntity> =
+        this.likePostsRepository.createQueryBuilder('likeStatusPosts');
+
+      const postId = post.id; // Get the post ID
+
+      queryBuilder
+        .select([
+          'likeStatusPosts.id',
+          'likeStatusPosts.likeStatus',
+          'likeStatusPosts.addedAt',
+          'likeStatusPosts.isBanned',
+        ])
         .leftJoinAndSelect('likeStatusPosts.post', 'post')
         .leftJoinAndSelect('likeStatusPosts.ratedPostUser', 'ratedPostUser')
-        .where('likeStatusPosts.post.id IN (:...postIds)', { postIds })
-        .orderBy('likeStatusPosts.addedAt', 'DESC')
-        .take(numberLastLikes) // Limit the number of retrieved likes per post
-        .getMany();
+        .where('likeStatusPosts.post.id = :postId', { postId })
+        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned: false })
+        .orderBy('likeStatusPosts.addedAt', 'DESC');
 
-    // Process posts and associated like data asynchronously
-    const resultPromises = posts.map(
-      async (post: PostsEntity): Promise<ReturnPostsEntity> => {
-        const filteredData: LikeStatusPostsEntity[] = lastLikesData.filter(
-          (item: LikeStatusPostsEntity) => item.post.id === post.id,
+      const likeStatusPosts: LikeStatusPostsEntity[] =
+        await queryBuilder.getMany();
+
+      const likeCount = likeStatusPosts.filter(
+        (post) => post.likeStatus === LikeStatusEnums.LIKE,
+      ).length;
+      const dislikeCount = likeStatusPosts.filter(
+        (post) => post.likeStatus === LikeStatusEnums.DISLIKE,
+      ).length;
+
+      let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
+
+      if (currentUserDto) {
+        const myLikeStatusPost = likeStatusPosts.find(
+          (post) => post.ratedPostUser.userId === currentUserDto.userId,
         );
 
-        // Create an array of latest likes for the post
-        const lastLikes: NewestLikes[] = filteredData
-          .filter(
-            (item: LikeStatusPostsEntity) =>
-              item.likeStatus === LikeStatusEnums.LIKE,
-          )
-          .map(
-            (item: LikeStatusPostsEntity): NewestLikes => ({
+        if (myLikeStatusPost) {
+          myStatus = myLikeStatusPost.likeStatus;
+        }
+      }
+
+      const lastLikes: NewestLikes[] = likeStatusPosts.reduce(
+        (accumulator: NewestLikes[], item: LikeStatusPostsEntity) => {
+          if (accumulator.length === numberLastLikes) {
+            return accumulator; // Stop adding items once we have 3
+          }
+
+          if (item.likeStatus === LikeStatusEnums.LIKE) {
+            accumulator.push({
               addedAt: item.addedAt,
               userId: item.ratedPostUser.userId,
               login: item.ratedPostUser.login,
-            }),
-          );
+            });
+          }
 
-        // Count likes and dislikes asynchronously
-        const likeCounts = await this.getLikesCountsForPosts(post.id);
-        const dislikesCount = await this.getDislikeCountsForPosts(post.id);
+          return accumulator;
+        },
+        [],
+      );
 
-        // Determine the user's status for the post
-        let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
-        if (
-          currentUserDto &&
-          filteredData[0] &&
-          currentUserDto.userId === filteredData[0].ratedPostUser.userId
-        ) {
-          myStatus = filteredData[0].likeStatus;
-        }
-
-        // Construct the posts data with extended likes information
-        return {
-          id: post.id,
-          title: post.title,
-          shortDescription: post.shortDescription,
-          content: post.content,
-          blogId: post.blog.id,
-          blogName: post.blog.name,
-          createdAt: post.createdAt,
-          extendedLikesInfo: {
-            likesCount: likeCounts,
-            dislikesCount: dislikesCount,
-            myStatus: myStatus,
-            newestLikes: lastLikes,
-          },
-        };
-      },
-    );
-
-    // Wait for all promises to resolve and return the final result
-    return Promise.all(resultPromises);
-  }
-
-  // Method to get likes counts for posts
-  private async getLikesCountsForPosts(postId: string): Promise<number> {
-    try {
-      const likeCountsArray: { postId: string; likeCount: number }[] =
-        await this.likePostsRepository
-          .createQueryBuilder('likeStatusPosts')
-          .leftJoinAndSelect('likeStatusPosts.post', 'post')
-          .select([
-            'likeStatusPosts.post.id AS postId',
-            'COUNT(likeStatusPosts.id) AS "likeCount"',
-          ])
-          .where('likeStatusPosts.post.id = :postId', { postId })
-          .andWhere('likeStatusPosts.likeStatus = :likeStatus', {
-            likeStatus: LikeStatusEnums.LIKE,
-          })
-          .groupBy('likeStatusPosts.post.id')
-          .getRawMany();
-
-      return likeCountsArray.length > 0
-        ? likeCountsArray.map((result) => Number(result.likeCount))[0]
-        : 0;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
+      result.push({
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blog.id,
+        blogName: post.blog.name,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          likesCount: likeCount,
+          dislikesCount: dislikeCount,
+          myStatus: myStatus,
+          newestLikes: lastLikes,
+        },
+      });
     }
-  }
 
-  // Method to get dislike counts for posts
-  private async getDislikeCountsForPosts(postId: string): Promise<number> {
-    const dislikeCountsArray: {
-      postId: string;
-      dislikeCount: number;
-    }[] = await this.likePostsRepository
-      .createQueryBuilder('likeStatusPosts')
-      .leftJoinAndSelect('likeStatusPosts.post', 'post')
-      .select([
-        'likeStatusPosts.post.id AS postId',
-        'COUNT(likeStatusPosts.id) AS "dislikeCount"',
-      ])
-      .where('likeStatusPosts.post.id = :postId', { postId })
-      .andWhere('likeStatusPosts.likeStatus = :dislikeStatus', {
-        dislikeStatus: LikeStatusEnums.DISLIKE,
-      })
-      .groupBy('likeStatusPosts.post.id')
-      .getRawMany();
-
-    return dislikeCountsArray.length > 0
-      ? dislikeCountsArray.map((result) => Number(result.dislikeCount))[0]
-      : 0;
+    return result;
   }
 
   private async creatPostsEntity(
