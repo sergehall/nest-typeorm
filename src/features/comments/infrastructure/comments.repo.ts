@@ -1,6 +1,6 @@
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { InsertResult, Repository, SelectQueryBuilder } from 'typeorm';
 import { CommentsEntity } from '../entities/comments.entity';
 
 import {
@@ -29,7 +29,7 @@ import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
-import { CommentsLikesInfoDto } from '../dto/comment-likes-info.dto';
+import { LikesDislikesMyStatusInfoDto } from '../dto/likes-dislikes-my-status-info.dto';
 
 export class CommentsRepo {
   constructor(
@@ -137,10 +137,8 @@ export class CommentsRepo {
       }
 
       // Retrieve comments with information about likes
-      const commentsWithLikes = await this.commentsLikesAggregation(
-        comments,
-        currentUserDto,
-      );
+      const commentsWithLikes: ReturnCommentsEntity[] =
+        await this.commentsLikesAggregation(comments, currentUserDto);
 
       return {
         comments: commentsWithLikes,
@@ -309,27 +307,34 @@ export class CommentsRepo {
   ): Promise<ReturnCommentsEntity[]> {
     const commentIds = comments.map((comment) => comment.id);
 
-    const queryBuilder = this.likeCommentRepository
-      .createQueryBuilder('likeStatusComments')
-      .select([
-        'likeStatusComments.commentId AS "commentId"',
-        'COUNT(CASE WHEN likeStatusComments.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
-        'COUNT(CASE WHEN likeStatusComments.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
-        'MAX(CASE WHEN likeStatusComments.ratedCommentUser.userId = :userId THEN likeStatusComments.likeStatus ELSE NULL END) AS "myStatus"',
-      ])
-      .where('likeStatusComments.commentId IN (:...commentIds)', { commentIds })
-      .setParameters({
-        likeStatus: LikeStatusEnums.LIKE,
-        dislikeStatus: LikeStatusEnums.DISLIKE,
-        userId: currentUserDto?.userId,
-      })
-      .groupBy('likeStatusComments.commentId');
+    const queryBuilder: SelectQueryBuilder<LikeStatusCommentsEntity> =
+      this.likeCommentRepository
+        .createQueryBuilder('likeStatusComments')
+        .select([
+          'likeStatusComments.commentId AS "commentId"',
+          'COUNT(CASE WHEN likeStatusComments.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
+          'COUNT(CASE WHEN likeStatusComments.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
+          'MAX(CASE WHEN likeStatusComments.ratedCommentUser.userId = :userId THEN likeStatusComments.likeStatus ELSE NULL END) AS "myStatus"',
+        ])
+        .where('likeStatusComments.commentId IN (:...commentIds)', {
+          commentIds,
+        })
+        .andWhere('likeStatusComments.isBanned = :isBanned', {
+          isBanned: false,
+        })
+        .setParameters({
+          likeStatus: LikeStatusEnums.LIKE,
+          dislikeStatus: LikeStatusEnums.DISLIKE,
+          userId: currentUserDto?.userId,
+        })
+        .groupBy('likeStatusComments.commentId');
 
-    const results: CommentsLikesInfoDto[] = await queryBuilder.getRawMany();
+    const results: LikesDislikesMyStatusInfoDto[] =
+      await queryBuilder.getRawMany();
 
     return comments.map((comment: CommentsEntity): ReturnCommentsEntity => {
-      const likesInfo: CommentsLikesInfoDto | undefined = results.find(
-        (result: CommentsLikesInfoDto) => result.commentId === comment.id,
+      const likesInfo: LikesDislikesMyStatusInfoDto | undefined = results.find(
+        (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
       );
       return {
         id: comment.id,
@@ -347,66 +352,6 @@ export class CommentsRepo {
       };
     });
   }
-
-  // async commentsLikesAggregation(
-  //   comments: CommentsEntity[],
-  //   currentUserDto: CurrentUserDto | null,
-  // ): Promise<ReturnCommentsEntity[]> {
-  //   const result: ReturnCommentsEntity[] = [];
-  //
-  //   for (const comment of comments) {
-  //     const commentId = comment.id; // Get the comment ID
-  //
-  //     // Query like status data for the posts
-  //     const likeStatusCommentsData: LikeStatusCommentsEntity[] =
-  //       await this.likeCommentRepository
-  //         .createQueryBuilder('likeStatusComments')
-  //         .leftJoinAndSelect('likeStatusComments.comment', 'comment')
-  //         .leftJoinAndSelect(
-  //           'likeStatusComments.ratedCommentUser',
-  //           'ratedCommentUser',
-  //         )
-  //         .where('likeStatusComments.comment.id = :commentId', { commentId })
-  //         .orderBy('likeStatusComments.addedAt', 'DESC')
-  //         .getMany();
-  //
-  //     const likeCount = likeStatusCommentsData.filter(
-  //       (post) => post.likeStatus === LikeStatusEnums.LIKE,
-  //     ).length;
-  //     const dislikeCount = likeStatusCommentsData.filter(
-  //       (post) => post.likeStatus === LikeStatusEnums.DISLIKE,
-  //     ).length;
-  //
-  //     let myStatus: LikeStatusEnums = LikeStatusEnums.NONE;
-  //
-  //     if (currentUserDto) {
-  //       const myLikeStatusPost = likeStatusCommentsData.find(
-  //         (post) => post.ratedCommentUser.userId === currentUserDto.userId,
-  //       );
-  //
-  //       if (myLikeStatusPost) {
-  //         myStatus = myLikeStatusPost.likeStatus;
-  //       }
-  //     }
-  //
-  //     result.push({
-  //       id: comment.id,
-  //       content: comment.content,
-  //       createdAt: comment.createdAt,
-  //       commentatorInfo: {
-  //         userId: comment.commentator.userId,
-  //         userLogin: comment.commentator.login,
-  //       },
-  //       likesInfo: {
-  //         likesCount: likeCount,
-  //         dislikesCount: dislikeCount,
-  //         myStatus: myStatus,
-  //       },
-  //     });
-  //   }
-  //
-  //   return result;
-  // }
 
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
