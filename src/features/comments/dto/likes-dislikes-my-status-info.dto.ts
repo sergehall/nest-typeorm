@@ -1,7 +1,7 @@
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 
-export type CommentsLikesInfoDto = {
-  commentId: string;
+export type LikesDislikesMyStatusInfoDto = {
+  id: string;
   likesCount: string;
   dislikesCount: string;
   myStatus: LikeStatusEnums;
