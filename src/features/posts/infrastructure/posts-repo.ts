@@ -337,10 +337,10 @@ export class PostsRepo {
 
     const postIds = posts.map((post) => post.id);
 
-    const likesInfo: LikesDislikesMyStatusInfoDto[] =
+    const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
       await this.getLikesDislikesMyStatus(postIds, currentUserDto);
 
-    const lookupExtendedLikesInfo = await this.createLookupTable(likesInfo);
+    const lookupExtendedLikesInfo = await this.createLookupTable(likesInfoArr);
 
     for (const post of posts) {
       const postId = post.id; // Get the post ID
@@ -440,7 +440,7 @@ export class PostsRepo {
           'likeStatusPosts.postId AS "id"',
           'COUNT(CASE WHEN likeStatusPosts.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
           'COUNT(CASE WHEN likeStatusPosts.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
-          'MAX(CASE WHEN likeStatusPosts.ratedPostUser.userId = :userId THEN likeStatusPosts.likeStatus ELSE NULL END) AS "myStatus"',
+          'COALESCE(MAX(CASE WHEN likeStatusPosts.ratedPostUser.userId = :userId THEN likeStatusPosts.likeStatus ELSE NULL END), \'None\') AS "myStatus"',
         ])
         .where('likeStatusPosts.postId IN (:...postIds)', {
           postIds,
