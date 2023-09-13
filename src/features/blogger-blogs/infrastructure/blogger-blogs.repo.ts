@@ -139,7 +139,7 @@ export class BloggerBlogsRepo {
         .createQueryBuilder()
         .delete()
         .from('Comments')
-        .where('postInfoBlogId = :id', { id })
+        .where('blogId = :id', { id })
         .execute();
       await entityManager
         .createQueryBuilder()
