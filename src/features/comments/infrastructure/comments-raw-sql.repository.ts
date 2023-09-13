@@ -533,8 +533,8 @@ export class CommentsRawSqlRepository {
   ): Promise<ReturnCommentsEntity> {
     const comment = newComment[0];
     const commentatorInfo = {
-      userId: comment.commentatorInfoUserId,
-      userLogin: comment.commentatorInfoUserLogin,
+      userId: comment.commentatorId,
+      userLogin: comment.commentatorLogin,
     };
     const likesInfo = new LikesInfo();
     return {

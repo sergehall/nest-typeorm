@@ -28,11 +28,11 @@ export class PartialTablesCommentsEntity {
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 15 ch.',
   })
-  commentatorInfoUserId: string;
+  commentatorId: string;
   @IsNotEmpty()
   @Length(3, 10, {
     message: 'Incorrect login length! Must be min 3, max 10 ch.',
   })
   @Matches('^[a-zA-Z0-9_-]*$')
-  commentatorInfoUserLogin: string;
+  commentatorLogin: string;
 }

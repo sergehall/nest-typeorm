@@ -8,9 +8,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
-import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
@@ -90,9 +88,7 @@ const saUseCases = [
     CommentsRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
-    LikeStatusPostsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
-    LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
     ...saUseCases,
   ],

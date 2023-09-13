@@ -1,6 +1,6 @@
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { InsertResult, Repository, SelectQueryBuilder } from 'typeorm';
 import { CommentsEntity } from '../entities/comments.entity';
 
 import {
@@ -98,29 +98,59 @@ export class CommentsRepo {
     currentUserDto: CurrentUserDto | null,
   ): Promise<ReturnCommentsCountCommentsDto> {
     try {
-      // Retrieve banned flags
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-      const { dependencyIsBanned, isBanned } = bannedFlags;
+      const queryBuilder = await this.createCommentsQueryBuilder(
+        queryData,
+        'postId',
+        postId,
+      );
+      const countComment = await queryBuilder.getCount();
 
-      // Retrieve paging parameters
       const pagingParams: PagingParamsDto = await this.getPagingParams(
         queryData,
       );
-      const { sortBy, direction, limit, offset } = pagingParams;
+      const { limit, offset } = pagingParams;
 
-      // Retrieve the order field for sorting
-      const orderByField = await this.getOrderField(sortBy);
+      const comments: CommentsEntity[] = await queryBuilder
+        .skip(offset)
+        .take(limit)
+        .getMany();
 
-      // Query comments and countPosts with pagination conditions
-      const queryBuilder = this.commentsRepository
-        .createQueryBuilder('comment')
-        .where({ dependencyIsBanned })
-        .andWhere({ isBanned })
-        .innerJoinAndSelect('comment.post', 'post')
-        .innerJoinAndSelect('comment.commentator', 'commentator')
-        .andWhere('post.id = :postInfoPostId', { postInfoPostId: postId });
+      if (comments.length === 0) {
+        return {
+          comments: [],
+          countComments: countComment,
+        };
+      }
 
-      queryBuilder.orderBy(orderByField, direction);
+      // Retrieve comments with information about likes
+      const commentsWithLikes: ReturnCommentsEntity[] =
+        await this.commentsLikesAggregation(comments, currentUserDto);
+
+      return {
+        comments: commentsWithLikes,
+        countComments: countComment,
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getCommentsWithLikesByUserId(
+    queryData: ParseQueriesDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ReturnCommentsCountCommentsDto> {
+    try {
+      const pagingParams: PagingParamsDto = await this.getPagingParams(
+        queryData,
+      );
+      const { limit, offset } = pagingParams;
+
+      const queryBuilder = await this.createCommentsQueryBuilder(
+        queryData,
+        'commentatorId',
+        currentUserDto.userId,
+      );
 
       const countComment = await queryBuilder.getCount();
 
@@ -149,6 +179,42 @@ export class CommentsRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+  private async createCommentsQueryBuilder(
+    queryData: ParseQueriesDto,
+    keyword: 'commentatorId' | 'postId',
+    value: string,
+  ): Promise<SelectQueryBuilder<CommentsEntity>> {
+    // Retrieve banned flags
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
+    // Retrieve paging parameters
+    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
+    const { sortBy, direction } = pagingParams;
+
+    // Retrieve the order field for sorting
+    const orderByField = await this.getOrderField(sortBy);
+
+    const queryBuilder = this.commentsRepository
+      .createQueryBuilder('comment')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned })
+      .innerJoinAndSelect('comment.post', 'post')
+      .innerJoinAndSelect('comment.commentator', 'commentator');
+
+    if (keyword === 'commentatorId') {
+      queryBuilder.andWhere('commentator.userId = :commentatorId', {
+        commentatorInfoUserId: value,
+      });
+    } else if (keyword === 'postId') {
+      queryBuilder.andWhere('post.id = :postInfoPostId', {
+        postInfoPostId: value,
+      });
+    }
+    queryBuilder.orderBy(orderByField, direction);
+
+    return queryBuilder;
+  }
 
   async createComments(
     post: PostsEntity,
@@ -168,7 +234,7 @@ export class CommentsRepo {
         .into(CommentsEntity)
         .values(commentsEntity)
         .returning(
-          `"id", "content", "createdAt", "commentatorInfoUserId", "commentatorInfoUserLogin"`,
+          `"id", "content", "createdAt", "commentatorId", "commentatorLogin"`,
         );
 
       const result: InsertResult = await queryBuilder.execute();
@@ -264,8 +330,8 @@ export class CommentsRepo {
     comment: PartialTablesCommentsEntity,
   ): Promise<ReturnCommentsEntity> {
     const commentatorInfo = {
-      userId: comment.commentatorInfoUserId,
-      userLogin: comment.commentatorInfoUserLogin,
+      userId: comment.commentatorId,
+      userLogin: comment.commentatorLogin,
     };
     const likesInfo = new LikesInfo();
     return {
@@ -370,9 +436,9 @@ export class CommentsRepo {
       sortBy,
       [
         'content',
-        'postInfoTitle',
-        'postInfoBlogName',
-        'commentatorInfoUserLogin',
+        'postTitle',
+        'blogName',
+        'commentatorLogin',
         'isBanned',
         'dependencyIsBanned',
         'banDate',
@@ -385,14 +451,14 @@ export class CommentsRepo {
     let orderByString;
     try {
       switch (field) {
-        case 'postInfoTitle':
-          orderByString = 'comment.post.postInfoTitle';
+        case 'postTitle':
+          orderByString = 'comment.post.postTitle';
           break;
-        case 'postInfoBlogName':
-          orderByString = 'comment.blog.postInfoBlogName';
+        case 'blogName':
+          orderByString = 'comment.blog.blogName';
           break;
-        case 'commentatorInfoUserLogin':
-          orderByString = 'commentator.commentatorInfoUserLogin ';
+        case 'commentatorLogin':
+          orderByString = 'commentator.commentatorLogin ';
           break;
         case 'isBanned':
           orderByString = 'comment.isBanned';
