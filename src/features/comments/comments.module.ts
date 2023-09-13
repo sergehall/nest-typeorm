@@ -22,7 +22,6 @@ import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-st
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { FindCommentByIdUseCase } from './application/use-cases/find-comment-by-id';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
@@ -39,10 +38,11 @@ import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 import { DeleteCommentUseCase } from './application/use-cases/delete-comment.use-case';
 import { GetCommentsByPostIdUseCase } from './application/use-cases/get-comments-by-post-id.use-case';
+import { GetCommentByIdUseCase } from './application/use-cases/get-comment-by-id';
 
 const commentsUseCases = [
   GetCommentsByPostIdUseCase,
-  FindCommentByIdUseCase,
+  GetCommentByIdUseCase,
   CreateCommentUseCase,
   UpdateCommentUseCase,
   DeleteCommentUseCase,

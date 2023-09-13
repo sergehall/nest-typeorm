@@ -338,7 +338,7 @@ export class PostsRepo {
     const postIds = posts.map((post) => post.id);
 
     const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
-      await this.getLikesDislikesMyStatus(postIds, currentUserDto);
+      await this.getPostsLikesDislikesMyStatus(postIds, currentUserDto);
 
     const lookupExtendedLikesInfo = await this.createLookupTable(likesInfoArr);
 
@@ -429,7 +429,7 @@ export class PostsRepo {
     }
   }
 
-  private async getLikesDislikesMyStatus(
+  private async getPostsLikesDislikesMyStatus(
     postIds: string[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<LikesDislikesMyStatusInfoDto[]> {

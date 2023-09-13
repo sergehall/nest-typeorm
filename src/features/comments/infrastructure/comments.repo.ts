@@ -1,6 +1,6 @@
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository, SelectQueryBuilder } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import { CommentsEntity } from '../entities/comments.entity';
 
 import {
@@ -307,35 +307,15 @@ export class CommentsRepo {
   ): Promise<ReturnCommentsEntity[]> {
     const commentIds = comments.map((comment) => comment.id);
 
-    const queryBuilder: SelectQueryBuilder<LikeStatusCommentsEntity> =
-      this.likeCommentRepository
-        .createQueryBuilder('likeStatusComments')
-        .select([
-          'likeStatusComments.commentId AS "commentId"',
-          'COUNT(CASE WHEN likeStatusComments.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
-          'COUNT(CASE WHEN likeStatusComments.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
-          'MAX(CASE WHEN likeStatusComments.ratedCommentUser.userId = :userId THEN likeStatusComments.likeStatus ELSE NULL END) AS "myStatus"',
-        ])
-        .where('likeStatusComments.commentId IN (:...commentIds)', {
-          commentIds,
-        })
-        .andWhere('likeStatusComments.isBanned = :isBanned', {
-          isBanned: false,
-        })
-        .setParameters({
-          likeStatus: LikeStatusEnums.LIKE,
-          dislikeStatus: LikeStatusEnums.DISLIKE,
-          userId: currentUserDto?.userId,
-        })
-        .groupBy('likeStatusComments.commentId');
-
-    const results: LikesDislikesMyStatusInfoDto[] =
-      await queryBuilder.getRawMany();
+    const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
+      await this.getCommentsLikesDislikesMyStatus(commentIds, currentUserDto);
 
     return comments.map((comment: CommentsEntity): ReturnCommentsEntity => {
-      const likesInfo: LikesDislikesMyStatusInfoDto | undefined = results.find(
-        (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
-      );
+      const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
+        likesInfoArr.find(
+          (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
+        );
+
       return {
         id: comment.id,
         content: comment.content,
@@ -351,6 +331,38 @@ export class CommentsRepo {
         },
       };
     });
+  }
+
+  private async getCommentsLikesDislikesMyStatus(
+    commentIds: string[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<LikesDislikesMyStatusInfoDto[]> {
+    try {
+      return this.likeCommentRepository
+        .createQueryBuilder('likeStatusComments')
+        .select([
+          'likeStatusComments.commentId AS "id"',
+          'COUNT(CASE WHEN likeStatusComments.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
+          'COUNT(CASE WHEN likeStatusComments.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
+          'COALESCE(MAX(CASE WHEN likeStatusComments.ratedCommentUser.userId = :userId THEN likeStatusComments.likeStatus ELSE NULL END), \'None\') AS "myStatus"',
+        ])
+        .where('likeStatusComments.commentId IN (:...commentIds)', {
+          commentIds,
+        })
+        .andWhere('likeStatusComments.isBanned = :isBanned', {
+          isBanned: false,
+        })
+        .setParameters({
+          likeStatus: LikeStatusEnums.LIKE,
+          dislikeStatus: LikeStatusEnums.DISLIKE,
+          userId: currentUserDto?.userId,
+        })
+        .groupBy('likeStatusComments.commentId')
+        .getRawMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
