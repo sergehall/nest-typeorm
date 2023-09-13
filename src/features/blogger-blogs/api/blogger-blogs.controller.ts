@@ -36,12 +36,12 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
-import { GetCommentsOwnedByCurrentUserCommand } from '../application/use-cases/get-comments-owned-by-current-user.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
 import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
+import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -77,7 +77,7 @@ export class BloggerBlogsController {
       await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new GetCommentsOwnedByCurrentUserCommand(queryData, currentUserDto),
+      new GetCommentsByUserIdCommand(queryData, currentUserDto),
     );
   }
 

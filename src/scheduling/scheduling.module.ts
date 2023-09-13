@@ -5,8 +5,6 @@ import { UsersService } from '../features/users/application/users.service';
 import { CaslModule } from '../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../features/posts/infrastructure/like-status-posts-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from '../features/comments/infrastructure/like-status-comments-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../features/comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../features/posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../features/blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
@@ -51,9 +49,7 @@ import { SecurityDevicesRepo } from '../features/security-devices/infrastructure
     PostsRawSqlRepository,
     BloggerBlogsRawSqlRepository,
     InvalidJwtRepo,
-    LikeStatusPostsRawSqlRepository,
     SecurityDevicesRepo,
-    LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
     SentCodeLogRepository,
   ],

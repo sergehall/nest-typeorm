@@ -47,8 +47,8 @@ export class CommentsEntity {
     eager: true,
   })
   @JoinColumn([
-    { name: 'postInfoPostId', referencedColumnName: 'id' },
-    { name: 'postInfoTitle', referencedColumnName: 'title' },
+    { name: 'postId', referencedColumnName: 'id' },
+    { name: 'postTitle', referencedColumnName: 'title' },
   ])
   post: PostsEntity;
 
@@ -64,8 +64,8 @@ export class CommentsEntity {
     eager: true,
   })
   @JoinColumn([
-    { name: 'postInfoBlogId', referencedColumnName: 'id' },
-    { name: 'postInfoBlogName', referencedColumnName: 'name' },
+    { name: 'blogId', referencedColumnName: 'id' },
+    { name: 'blogName', referencedColumnName: 'name' },
   ])
   blog: BloggerBlogsEntity;
 
@@ -74,8 +74,8 @@ export class CommentsEntity {
     eager: true,
   })
   @JoinColumn([
-    { name: 'commentatorInfoUserId', referencedColumnName: 'userId' },
-    { name: 'commentatorInfoUserLogin', referencedColumnName: 'login' },
+    { name: 'commentatorId', referencedColumnName: 'userId' },
+    { name: 'commentatorLogin', referencedColumnName: 'login' },
   ])
   commentator: UsersEntity;
 }

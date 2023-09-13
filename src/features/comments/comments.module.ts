@@ -7,20 +7,14 @@ import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../config/jwt/jwt-config';
-import { ChangeBanStatusCommentsUseCase } from './application/use-cases/change-banStatus-comments.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
-import { FillingCommentsDataUseCase } from './application/use-cases/filling-comments-data.use-case';
-import { ChangeBanStatusCommentsByUserIdBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-userId-blogId.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from './infrastructure/comments-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from './infrastructure/like-status-comments-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { ChangeBanStatusCommentsByBlogIdUseCase } from './application/use-cases/change-banStatus-comments-by-blogId.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -39,18 +33,16 @@ import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entit
 import { DeleteCommentUseCase } from './application/use-cases/delete-comment.use-case';
 import { GetCommentsByPostIdUseCase } from './application/use-cases/get-comments-by-post-id.use-case';
 import { GetCommentByIdUseCase } from './application/use-cases/get-comment-by-id';
+import { GetCommentsByUserIdUseCase } from '../blogger-blogs/application/use-cases/get-comments-by-user-id.use-case';
 
 const commentsUseCases = [
+  GetCommentsByUserIdUseCase,
   GetCommentsByPostIdUseCase,
   GetCommentByIdUseCase,
   CreateCommentUseCase,
   UpdateCommentUseCase,
   DeleteCommentUseCase,
-  ChangeBanStatusCommentsUseCase,
   ChangeLikeStatusCommentUseCase,
-  FillingCommentsDataUseCase,
-  ChangeBanStatusCommentsByUserIdBlogIdUseCase,
-  ChangeBanStatusCommentsByBlogIdUseCase,
 ];
 
 @Module({
@@ -83,8 +75,6 @@ const commentsUseCases = [
     CommentsRepo,
     CommentsRawSqlRepository,
     LikeStatusCommentsRepo,
-    LikeStatusCommentsRawSqlRepository,
-    LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,

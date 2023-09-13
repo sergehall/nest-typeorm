@@ -9,17 +9,13 @@ import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from '../posts/infrastructure/like-status-posts-raw-sql.repository';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { ChangeBanStatusLikesPostForBannedUserUseCase } from '../posts/application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBannedUsersInBlogUseCase } from './application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessUseCase } from './application/use-cases/manage-blog-access.use-case';
 import { GetBlogsOwnedByCurrentUserUseCase } from './application/use-cases/get-blogs-owned-by-current-user.use-case';
-import { GetCommentsOwnedByCurrentUserUseCase } from './application/use-cases/get-comments-owned-by-current-user.use-case';
 import { DeleteBlogByBlogIdUseCase } from './application/use-cases/delete-blog-by-blog-id.use-case';
 import { BloggerBlogsRepo } from './infrastructure/blogger-blogs.repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -32,12 +28,10 @@ import { BlogExistsValidator } from '../../common/validators/blog-exists.validat
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
-  GetCommentsOwnedByCurrentUserUseCase,
   SearchBannedUsersInBlogUseCase,
   ManageBlogAccessUseCase,
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
-  ChangeBanStatusLikesPostForBannedUserUseCase,
   DeleteBlogByBlogIdUseCase,
 ];
 
@@ -66,8 +60,6 @@ const validators = [BlogExistsValidator];
     CommentsRawSqlRepository,
     PostsRepo,
     PostsRawSqlRepository,
-    LikeStatusPostsRawSqlRepository,
-    LikeStatusCommentsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
     ...bloggersBlogUseCases,
     ...validators,

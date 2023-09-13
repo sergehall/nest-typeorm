@@ -14,15 +14,10 @@ import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-like
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
-import { LikeStatusPostsRawSqlRepository } from './infrastructure/like-status-posts-raw-sql.repository';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
-import { LikeStatusCommentsRawSqlRepository } from '../comments/infrastructure/like-status-comments-raw-sql.repository';
-import { ChangeBanStatusPostsByBlogIdUseCase } from './application/use-cases/change-banstatus-posts-by-blogid.use-case';
-import { ChangeBanStatusPostsUseCase } from './application/use-cases/change-banstatus-posts.use-case';
-import { ChangeBanStatusLikesPostForBannedUserUseCase } from './application/use-cases/change-banstatus-posts-by-userid-blogid.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
@@ -52,10 +47,7 @@ const postsUseCases = [
   GetPostsInBlogUseCase,
   CreatePostUseCase,
   UpdatePostByPostIdUseCase,
-  ChangeBanStatusPostsUseCase,
   ChangeLikeStatusPostUseCase,
-  ChangeBanStatusPostsByBlogIdUseCase,
-  ChangeBanStatusLikesPostForBannedUserUseCase,
   DeletePostByPostIdAndBlogIdUseCase,
   DeletePostByIdUseCase,
 ];
@@ -95,11 +87,9 @@ const postsUseCases = [
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRepo,
-    LikeStatusPostsRawSqlRepository,
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
-    LikeStatusCommentsRawSqlRepository,
     ...postsUseCases,
   ],
 })
