@@ -56,7 +56,7 @@ export class CommentsEntity {
     nullable: false,
     eager: true,
   })
-  @JoinColumn({ name: 'postInfoBlogOwnerId' })
+  @JoinColumn({ name: 'blogOwnerId' })
   blogOwner: UsersEntity;
 
   @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.comments, {
