@@ -249,7 +249,7 @@ export class PostsRepo {
           .createQueryBuilder()
           .delete()
           .from('Comments')
-          .where('postInfoPostId = :id', { id: postId })
+          .where('postId = :id', { id: postId })
           .execute();
 
         // Delete the post itself
