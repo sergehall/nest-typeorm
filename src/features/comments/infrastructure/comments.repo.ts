@@ -204,11 +204,11 @@ export class CommentsRepo {
 
     if (keyword === 'commentatorId') {
       queryBuilder.andWhere('commentator.userId = :commentatorId', {
-        commentatorInfoUserId: value,
+        commentatorId: value,
       });
     } else if (keyword === 'postId') {
-      queryBuilder.andWhere('post.id = :postInfoPostId', {
-        postInfoPostId: value,
+      queryBuilder.andWhere('post.id = :postId', {
+        postId: value,
       });
     }
     queryBuilder.orderBy(orderByField, direction);
