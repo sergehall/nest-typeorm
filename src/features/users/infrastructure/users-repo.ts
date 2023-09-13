@@ -381,7 +381,7 @@ export class UsersRepo {
         .createQueryBuilder()
         .delete()
         .from('Comments')
-        .where('commentatorInfoUserId = :userId', { userId })
+        .where('commentatorId = :userId', { userId })
         .execute();
       await entityManager.delete('Posts', { postOwner: userId });
       await entityManager
