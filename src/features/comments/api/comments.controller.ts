@@ -25,9 +25,9 @@ import { IdParams } from '../../../common/query/params/id.params';
 import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import { FindCommentByIdCommand } from '../application/use-cases/find-comment-by-id';
 import { ReturnCommentsEntity } from '../entities/return-comments.entity';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
+import { GetCommentByIdCommand } from '../application/use-cases/get-comment-by-id';
 
 @SkipThrottle()
 @Controller('comments')
@@ -45,7 +45,7 @@ export class CommentsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new FindCommentByIdCommand(params.id, currentUserDto),
+      new GetCommentByIdCommand(params.id, currentUserDto),
     );
   }
 
