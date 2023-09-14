@@ -36,17 +36,18 @@ export class OrmModuleOptions
       entities: [
         UsersEntity,
         SecurityDevicesEntity,
-        CommentsEntity,
         BloggerBlogsEntity,
         PostsEntity,
+        CommentsEntity,
         BannedUsersForBlogsEntity,
         LikeStatusPostsEntity,
         LikeStatusCommentsEntity,
         InvalidJwtEntity,
         SentCodesLogEntity,
       ],
+      // entities: ['src/**/*.entity{.ts,.js}'],
       synchronize: true,
-      logging: false,
+      logging: true,
     };
   }
 }
