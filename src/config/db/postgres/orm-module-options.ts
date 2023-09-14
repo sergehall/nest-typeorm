@@ -46,8 +46,8 @@ export class OrmModuleOptions
         SentCodesLogEntity,
       ],
       // entities: ['src/**/*.entity{.ts,.js}'],
-      synchronize: true,
-      logging: true,
+      synchronize: false,
+      logging: false,
     };
   }
 }

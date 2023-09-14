@@ -9,12 +9,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   createApp(app); // Apply configurations using the createApp function
 
-  // // Run migrations separately if needed
-  // const migrationsApp = await NestFactory.createApplicationContext(
-  //   MigrationsModule,
-  // );
-  // await migrationsApp.init();
-
   const configService = app.get(ConfigService<ConfigType>);
   const port = configService.get<number>('PORT') || 5000;
 
