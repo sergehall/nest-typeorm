@@ -33,6 +33,7 @@ import { UserIdEmailLoginDto } from '../dto/profile.dto';
 import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case';
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
 import { LoginCommand } from '../application/use-cases/login.use-case';
+import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -105,7 +106,8 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
   ): Promise<boolean> {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshTokenDto: RefreshTokenDto = req.cookies.refreshToken;
+    const { refreshToken } = refreshTokenDto;
 
     await this.commandBus.execute(new LogoutCommand(refreshToken));
 

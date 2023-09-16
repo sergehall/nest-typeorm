@@ -18,6 +18,8 @@ export default new DataSource({
   username: process.env.PG_HEROKU_USER_NAME,
   password: process.env.PG_HEROKU_USER_PASSWORD,
   database: process.env.PG_HEROKU_NAME_DATABASE,
+  ssl: { rejectUnauthorized: false },
+  migrationsTableName: 'migrationsNest',
   entities: [
     UsersEntity,
     SecurityDevicesEntity,
@@ -30,5 +32,5 @@ export default new DataSource({
     InvalidJwtEntity,
     SentCodesLogEntity,
   ],
-  migrations: ['dist/db/migrations/*.js'], // Specify the path to your migrations
+  migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });
