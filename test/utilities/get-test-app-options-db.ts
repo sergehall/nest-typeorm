@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrmModuleOptions } from '../../src/config/db/postgres/orm-module-options';
 import { AppModule } from '../../src/app.module';
 import { createApp } from '../../src/create-app';
 import { DataSource } from 'typeorm';
 import Configuration from '../../src/config/configuration';
+import { AppTypeOrmModuleOptions } from '../../src/config/db/type-orm-options/app-type-orm-module.options';
 
 const ownerNameDb =
   Configuration.getConfiguration().db.pg.authConfig.PG_HEROKU_USER_NAME;
@@ -16,7 +16,7 @@ export const getTestAppOptions = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [
       TypeOrmModule.forRootAsync({
-        useClass: OrmModuleOptions,
+        useClass: AppTypeOrmModuleOptions,
       }),
       AppModule,
     ],

@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { PostgresConfig } from './postgres.config';
+import { PostgresConfig } from '../postgres/postgres.config';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { SecurityDevicesEntity } from '../../../features/security-devices/entities/session-devices.entity';
 import { BloggerBlogsEntity } from '../../../features/blogger-blogs/entities/blogger-blogs.entity';
@@ -13,7 +13,7 @@ import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-
 import { BannedUsersForBlogsEntity } from '../../../features/users/entities/banned-users-for-blogs.entity';
 
 @Injectable()
-export class OrmModuleOptions
+export class AppTypeOrmModuleOptions
   extends PostgresConfig
   implements TypeOrmOptionsFactory
 {
@@ -47,7 +47,7 @@ export class OrmModuleOptions
       ],
       // entities: ['src/**/*.entity{.ts,.js}'],
       synchronize: true,
-      logging: true,
+      logging: false,
     };
   }
 }
