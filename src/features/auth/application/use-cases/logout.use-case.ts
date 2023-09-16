@@ -17,7 +17,7 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
 
   async execute(command: LogoutCommand): Promise<boolean> {
     const { refreshToken } = command;
-
+    console.log(refreshToken);
     const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
       refreshToken,
     );
