@@ -18,10 +18,10 @@ export class InvalidJwtEntity {
   })
   expirationDate: string;
 
-  // @IsNotEmpty()
-  // @Length(3, 10, {
-  //   message: 'Incorrect login length! Must be min 3, max 10 ch.',
-  // })
-  // @Matches('^[a-zA-Z0-9_-]*$')
-  // login: string | null;
+  @IsNotEmpty()
+  @Length(3, 10, {
+    message: 'Incorrect login length! Must be min 3, max 10 ch.',
+  })
+  @Matches('^[a-zA-Z0-9_-]*$')
+  login: string | null;
 }

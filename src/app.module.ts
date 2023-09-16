@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import AppConfigModuleOptions from './config/app-module.configuration';
+// import AppConfigModuleOptions from './config/app-module.configuration';
 import { appProviders } from './app.providers';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,17 +18,17 @@ import { SaModule } from './features/sa/sa.module';
 import { BlogsModule } from './features/blogs/blogs.module';
 import { BloggerBlogsModule } from './features/blogger-blogs/blogger-blogs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { OrmModuleOptions } from './config/db/postgres/orm-module-options';
 import { ThrottlerOptions } from './config/throttle/throttler-options';
 import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
 import { DataCleanupModule } from './data-cleanup/data-cleanup.module';
+import { AppTypeOrmModuleOptions } from './config/db/type-orm-options/app-type-orm-module.options';
+import { CustomConfigModule } from './config/custom.config-module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(AppConfigModuleOptions),
+    CustomConfigModule,
     TypeOrmModule.forRootAsync({
-      useClass: OrmModuleOptions, // Use the OrmOptions class as the factory
+      useClass: AppTypeOrmModuleOptions, // Use the OrmOptions class as the factory
     }),
     ThrottlerModule.forRootAsync({
       useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
