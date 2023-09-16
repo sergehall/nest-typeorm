@@ -30,4 +30,5 @@ export default new DataSource({
     InvalidJwtEntity,
     SentCodesLogEntity,
   ],
+  migrations: ['dist/db/migrations/*.js'], // Specify the path to your migrations
 });
