@@ -23,6 +23,7 @@ import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
 import { DataCleanupModule } from './data-cleanup/data-cleanup.module';
 import { AppTypeOrmModuleOptions } from './config/db/type-orm-options/app-type-orm-module.options';
 import { CustomConfigModule } from './config/custom.config-module';
+import { QuizQuestionsModule } from './features/quiz-questions/quiz-questions.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CustomConfigModule } from './config/custom.config-module';
     SecurityDevicesModule,
     TestingModule,
     DataCleanupModule,
+    QuizQuestionsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],

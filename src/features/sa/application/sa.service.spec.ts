@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SaService } from './sa.service';
 import { AppModule } from '../../../app.module';
-import { createApp } from '../../../createApp';
 import { INestApplication } from '@nestjs/common';
+import { createApp } from '../../../create-app';
 
 describe('SaService', () => {
   let service: SaService;
