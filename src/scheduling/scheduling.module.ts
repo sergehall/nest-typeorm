@@ -5,9 +5,7 @@ import { UsersService } from '../features/users/application/users.service';
 import { CaslModule } from '../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { CommentsRawSqlRepository } from '../features/comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../features/posts/infrastructure/posts-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../features/blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../features/users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { MailerConfig } from '../config/mailer/mailer-config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
@@ -45,9 +43,7 @@ import { SecurityDevicesRepo } from '../features/security-devices/infrastructure
     KeyResolver,
     UsersRepo,
     UsersRawSqlRepository,
-    CommentsRawSqlRepository,
     PostsRawSqlRepository,
-    BloggerBlogsRawSqlRepository,
     InvalidJwtRepo,
     SecurityDevicesRepo,
     BannedUsersForBlogsRawSqlRepository,

@@ -7,7 +7,6 @@ import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
-import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
@@ -57,7 +56,6 @@ const validators = [BlogExistsValidator];
     UsersRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
-    CommentsRawSqlRepository,
     PostsRepo,
     PostsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,

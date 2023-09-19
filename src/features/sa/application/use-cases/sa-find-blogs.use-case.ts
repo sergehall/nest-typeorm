@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs.dto';
 
 export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -9,17 +10,15 @@ export class SaFindBlogsCommand {
 
 @CommandHandler(SaFindBlogsCommand)
 export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
-  constructor(
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-  ) {}
+  constructor(protected bloggerBlogsRepo: BloggerBlogsRepo) {}
   async execute(command: SaFindBlogsCommand) {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const blogs: TableBloggerBlogsRawSqlEntity[] =
-      await this.bloggerBlogsRawSqlRepository.searchBlogsForSa(queryData);
+    const blogsAndCount: BlogsCountBlogsDto =
+      await this.bloggerBlogsRepo.searchBlogsForSa(queryData);
 
-    if (blogs.length === 0) {
+    if (blogsAndCount.blogs.length === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -29,8 +28,8 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
       };
     }
 
-    const transformedArrBlogs = blogs.map(
-      (blog: TableBloggerBlogsRawSqlEntity) => ({
+    const transformedArrBlogs = blogsAndCount.blogs.map(
+      (blog: BloggerBlogsEntity) => ({
         id: blog.id,
         name: blog.name,
         description: blog.description,
@@ -38,8 +37,8 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
         createdAt: blog.createdAt,
         isMembership: blog.isMembership,
         blogOwnerInfo: {
-          userId: blog.blogOwnerId,
-          userLogin: blog.blogOwnerLogin,
+          userId: blog.blogOwner.userId,
+          userLogin: blog.blogOwner.login,
         },
         banInfo: {
           isBanned: blog.banInfoIsBanned,
@@ -48,8 +47,7 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
       }),
     );
 
-    const totalCount =
-      await this.bloggerBlogsRawSqlRepository.totalCountBlogsForSa(queryData);
+    const totalCount = blogsAndCount.countBlogs;
 
     const pagesCount = Math.ceil(totalCount / pageSize);
 

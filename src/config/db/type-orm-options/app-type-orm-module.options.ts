@@ -45,8 +45,7 @@ export class AppTypeOrmModuleOptions
         InvalidJwtEntity,
         SentCodesLogEntity,
       ],
-      // entities: ['src/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
       logging: false,
     };
   }

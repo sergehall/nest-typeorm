@@ -51,7 +51,6 @@ exec(command, (error, stdout, stderr) => {
     // Get the last created migration file
     const lastCreatedMigration = files[files.length - 1];
 
-    // const gitAddCommand = `git add ${files.join(' ')}`;
     const gitAddCommand = `git add ${lastCreatedMigration}`;
 
     exec(gitAddCommand, (addError) => {

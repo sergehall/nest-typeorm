@@ -6,7 +6,6 @@ import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RemoveDevicesBannedUserUseCase } from './application/use-cases/remove-devices-banned-user.use-case';
 import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
@@ -31,7 +30,6 @@ const securityDevicesCases = [
   CreateDeviceUseCase,
   UpdateDeviceUseCase,
   DeleteDevicesAfterLogoutUseCase,
-  RemoveDevicesBannedUserUseCase,
   RemoveDevicesByDeviceIdUseCase,
   RemoveDevicesExceptCurrentUseCase,
 ];
