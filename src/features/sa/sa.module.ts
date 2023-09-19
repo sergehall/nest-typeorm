@@ -7,9 +7,7 @@ import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
-import { CommentsRawSqlRepository } from '../comments/infrastructure/comments-raw-sql.repository';
 import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
@@ -40,6 +38,7 @@ import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-post-by-post-id.use-case';
+import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 
 const saUseCases = [
   SaFindBlogsCommand,
@@ -85,7 +84,6 @@ const saUseCases = [
     PostsRawSqlRepository,
     UsersRawSqlRepository,
     ExpirationDateCalculator,
-    CommentsRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     SecurityDevicesRawSqlRepository,

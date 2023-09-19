@@ -6,12 +6,69 @@ import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
 
 export class BloggerBlogsRepo {
   constructor(
     @InjectRepository(BloggerBlogsEntity)
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
+    protected keyResolver: KeyResolver,
   ) {}
+
+  async searchBlogsForSa(
+    queryData: ParseQueriesDto,
+  ): Promise<BlogsCountBlogsDto> {
+    try {
+      const searchNameTerm = queryData.searchNameTerm;
+      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+      const direction = queryData.queryPagination.sortDirection;
+      const limit = queryData.queryPagination.pageSize;
+      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
+      const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+
+      const queryBuilder = this.bloggerBlogsRepository
+        .createQueryBuilder('blog')
+        .select([
+          'blog.id',
+          'blog.name',
+          'blog.description',
+          'blog.websiteUrl',
+          'blog.createdAt',
+          'blog.isMembership',
+          'blog.blogOwnerId',
+          'blog.blogOwnerLogin',
+          'blog.banInfoIsBanned',
+          'blog.banInfoBanDate',
+        ])
+        .leftJoinAndSelect('blog.blogOwner', 'blogOwner')
+        .where('blog.name ILIKE :searchNameTerm', {
+          searchNameTerm: searchNameTerm,
+        })
+        .orderBy(`blog.${sortBy}`, direction, collate);
+
+      const blogs: BloggerBlogsEntity[] = await queryBuilder
+        .skip(offset)
+        .take(limit)
+        .getMany();
+
+      const countBlogs = await queryBuilder.getCount();
+
+      if (blogs.length === 0) {
+        return {
+          blogs: [],
+          countBlogs: countBlogs,
+        };
+      }
+
+      return { blogs: blogs, countBlogs: countBlogs };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
@@ -154,5 +211,23 @@ export class BloggerBlogsRepo {
       );
       throw new Error(`Error while removing data for user ${id}`);
     }
+  }
+
+  async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      [
+        'isMembership',
+        'blogLogin',
+        'dependencyIsBanned',
+        'banInfoIsBanned',
+        'banInfoBanDate',
+        'banInfoBanReason',
+        'name',
+        'description',
+        'websiteUrl',
+      ],
+      'createdAt',
+    );
   }
 }
