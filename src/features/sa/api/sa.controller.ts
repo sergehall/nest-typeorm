@@ -51,6 +51,7 @@ import { ReturnUserDto } from '../../users/dto/return-user.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-case';
 
 @SkipThrottle()
 @Controller('sa')
@@ -76,7 +77,7 @@ export class SaController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async searchBlogsForSa(@Query() query: any): Promise<PaginatedResultDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
-    return await this.commandBus.execute(new SaFindUsersCommand(queryData));
+    return await this.commandBus.execute(new SaFindBlogsCommand(queryData));
   }
 
   @Get('blogs/:blogId/posts')
