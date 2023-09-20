@@ -24,7 +24,7 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
 import { SaFindUsersUseCase } from './application/use-cases/sa-find-users.use-case';
-import { SaFindBlogsCommand } from './application/use-cases/sa-find-blogs.use-case';
+import { SaFindBlogsUseCase } from './application/use-cases/sa-find-blogs.use-case';
 import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-case';
 import { SaCreateBlogUseCase } from './application/use-cases/sa-create-blog.use-case';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
@@ -41,7 +41,7 @@ import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-p
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 
 const saUseCases = [
-  SaFindBlogsCommand,
+  SaFindBlogsUseCase,
   SaFindUsersUseCase,
   CreateUserUseCase,
   SaChangeRoleUseCase,

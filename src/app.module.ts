@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-// import AppConfigModuleOptions from './config/app-module.configuration';
 import { appProviders } from './app.providers';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
