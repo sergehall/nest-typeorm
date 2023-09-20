@@ -1,10 +1,14 @@
 {
   "name": "nest-typeorm",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "NestJS app by typeorm and postgresql DB. My first steps work with NodeJS, Express, NestJS, Swagger, MongoDB, PostgreSQL, Microservices, RabbitMQ, WebSocket, DevOps basics (docker + kubernetes + jenkins), SOLID, Hexagonal architecture, SAGA,front-end basics.",
   "author": "Serge Hall",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "19.x",
+    "yarn": "1.x"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
