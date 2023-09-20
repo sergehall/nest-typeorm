@@ -17,7 +17,6 @@ export class QuizQuestionsController {
 
   @Post()
   create(@Body() createQuizQuestionDto: CreateQuizQuestionDto) {
-    console.log('quiz-questions');
     return this.quizQuestionsService.create(createQuizQuestionDto);
   }
 
