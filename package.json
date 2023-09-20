@@ -5,6 +5,9 @@
   "author": "Serge Hall",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "npm": "10.x"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
