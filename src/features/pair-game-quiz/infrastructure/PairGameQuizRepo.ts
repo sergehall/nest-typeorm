@@ -13,6 +13,7 @@ export class PairGameQuizRepo {
   ) {}
 
   async createAndSaveQuestion(): Promise<boolean> {
+    // Example of created questions
     const dictionaryQuestions: DifficultyDictionary = {
       easy: [
         {
@@ -55,7 +56,7 @@ export class PairGameQuizRepo {
         // Loop through the questions and insert them into the database
         for (const question of questions) {
           const newQuestion = new QuestionsQuizEntity();
-          newQuestion.question = question.question;
+          newQuestion.questionText = question.question;
           newQuestion.hashAnswer = await this.hashAnswer(question.answer, 20);
           newQuestion.complexity = question.complexity;
           newQuestion.topic = question.topic;

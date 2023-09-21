@@ -1,7 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 import { ComplexityEnums } from '../enums/complexity.enums';
+import { PairGameQuizEntity } from './pair-game-quiz.entity';
 
 @Entity('QuestionsQuiz')
+@Unique(['id', 'questionText'])
 export class QuestionsQuizEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -11,7 +19,7 @@ export class QuestionsQuizEntity {
     length: 600,
     nullable: false,
   })
-  question: string;
+  questionText: string;
 
   @Column({
     type: 'character varying',
@@ -34,4 +42,8 @@ export class QuestionsQuizEntity {
     nullable: false,
   })
   topic: string;
+  @OneToMany(() => PairGameQuizEntity, (game) => game.questions, {
+    nullable: false,
+  })
+  game: PairGameQuizEntity;
 }

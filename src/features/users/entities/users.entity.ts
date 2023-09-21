@@ -9,6 +9,7 @@ import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.en
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
+import { PairGameQuizEntity } from '../../pair-game-quiz/entities/pair-game-quiz.entity';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
@@ -114,4 +115,10 @@ export class UsersEntity {
     (bannedBlogs) => bannedBlogs.bannedUserForBlogs,
   )
   bannedBlogsForUser: BannedUsersForBlogsEntity[];
+
+  @OneToMany(() => PairGameQuizEntity, (pair) => pair.firstPlayer)
+  firstPlayer: PairGameQuizEntity[];
+
+  @OneToMany(() => PairGameQuizEntity, (pair) => pair.secondPlayer)
+  secondPlayer: PairGameQuizEntity[];
 }
