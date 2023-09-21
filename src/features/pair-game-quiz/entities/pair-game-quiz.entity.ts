@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { GameChallengesEntity } from './game-challenges.entity';
+import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 
 @Entity('PairGameQuiz')
 export class PairGameQuizEntity {
@@ -36,10 +36,10 @@ export class PairGameQuizEntity {
   secondPlayer: UsersEntity | null;
 
   @OneToMany(
-    () => GameChallengesEntity,
-    (gameChallenge) => gameChallenge.question,
+    () => ChallengeQuestionsEntity,
+    (gameChallenge) => gameChallenge.id,
   )
-  questions: GameChallengesEntity[];
+  questions: ChallengeQuestionsEntity[];
 
   @Column({
     type: 'enum',

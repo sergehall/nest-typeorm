@@ -13,7 +13,7 @@ import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-
 import { BannedUsersForBlogsEntity } from '../../../features/users/entities/banned-users-for-blogs.entity';
 import { QuestionsQuizEntity } from '../../../features/pair-game-quiz/entities/questions-quiz.entity';
 import { PairGameQuizEntity } from '../../../features/pair-game-quiz/entities/pair-game-quiz.entity';
-import { GameChallengesEntity } from '../../../features/pair-game-quiz/entities/game-challenges.entity';
+import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 
 @Injectable()
 export class AppTypeOrmModuleOptions
@@ -49,7 +49,7 @@ export class AppTypeOrmModuleOptions
         SentCodesLogEntity,
         QuestionsQuizEntity,
         PairGameQuizEntity,
-        GameChallengesEntity,
+        ChallengeQuestionsEntity,
       ],
       synchronize: true,
       logging: false,
