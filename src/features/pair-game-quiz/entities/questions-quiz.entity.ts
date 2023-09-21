@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { ComplexityEnums } from '../enums/complexity.enums';
 import { PairGameQuizEntity } from './pair-game-quiz.entity';
-import { GameChallengesEntity } from './game-challenges.entity';
+import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 
 @Entity('QuestionsQuiz')
 @Unique(['id', 'questionText'])
@@ -48,8 +48,8 @@ export class QuestionsQuizEntity {
   pairGame: PairGameQuizEntity;
 
   @OneToMany(
-    () => GameChallengesEntity,
+    () => ChallengeQuestionsEntity,
     (gameChallenge) => gameChallenge.question,
   )
-  gameChallenge: GameChallengesEntity;
+  challengeQuestion: ChallengeQuestionsEntity[];
 }
