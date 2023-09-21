@@ -3,22 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
-import { QuizQuestionsService } from './quiz-questions.service';
-import { CreateQuizQuestionDto } from './dto/create-quiz-question.dto';
-import { UpdateQuizQuestionDto } from './dto/update-quiz-question.dto';
+import { QuizQuestionsService } from '../application/quiz-questions.service';
+import { CreateQuizQuestionDto } from '../dto/create-quiz-question.dto';
+import { UpdateQuizQuestionDto } from '../dto/update-quiz-question.dto';
 
 @Controller('quiz-questions')
 export class QuizQuestionsController {
   constructor(private readonly quizQuestionsService: QuizQuestionsService) {}
-
-  @Post()
-  create(@Body() createQuizQuestionDto: CreateQuizQuestionDto) {
-    return this.quizQuestionsService.create(createQuizQuestionDto);
-  }
 
   @Get()
   findAll() {
@@ -30,8 +25,21 @@ export class QuizQuestionsController {
     return this.quizQuestionsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
+  @Post()
+  create(@Body() createQuizQuestionDto: CreateQuizQuestionDto) {
+    return this.quizQuestionsService.create(createQuizQuestionDto);
+  }
+
+  @Put(':id')
+  updateById(
+    @Param('id') id: string,
+    @Body() updateQuizQuestionDto: UpdateQuizQuestionDto,
+  ) {
+    return this.quizQuestionsService.update(+id, updateQuizQuestionDto);
+  }
+
+  @Put(':id/publish')
+  updatePublish(
     @Param('id') id: string,
     @Body() updateQuizQuestionDto: UpdateQuizQuestionDto,
   ) {
@@ -39,7 +47,7 @@ export class QuizQuestionsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  deleteById(@Param('id') id: string) {
     return this.quizQuestionsService.remove(+id);
   }
 }
