@@ -1,10 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { dictionaryQuestions } from '../questions/dictionary-questions';
 import { ComplexityEnums } from '../enums/complexity.enums';
 import { InternalServerErrorException } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
 import * as crypto from 'crypto';
+import { DifficultyDictionary } from '../questions/types/difficulty-dictionary.type';
 
 export class PairGameQuizRepo {
   constructor(
@@ -13,6 +13,36 @@ export class PairGameQuizRepo {
   ) {}
 
   async createAndSaveQuestion(): Promise<boolean> {
+    const dictionaryQuestions: DifficultyDictionary = {
+      easy: [
+        {
+          id: '1',
+          question: 'What is RAM?',
+          answer: 'Memory',
+          topic: 'Computer science',
+          complexity: ComplexityEnums.EASY,
+        },
+      ],
+      medium: [
+        {
+          id: '1',
+          question: 'Explain OOP.',
+          answer: 'Object-Oriented Programming',
+          topic: 'Computer science',
+          complexity: ComplexityEnums.MEDIUM,
+        },
+      ],
+      difficult: [
+        {
+          id: '1',
+          question: 'Explain quantum computing.',
+          answer: 'Quantum Bits',
+          topic: 'Computer science',
+          complexity: ComplexityEnums.DIFFICULT,
+        },
+      ],
+    };
+
     try {
       // Loop through each complexity level (easy, medium, difficult)
       for (const complexity of [
