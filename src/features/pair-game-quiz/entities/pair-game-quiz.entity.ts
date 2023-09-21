@@ -4,10 +4,11 @@ import {
   Column,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { QuestionsQuizEntity } from './questions-quiz.entity';
+import { GameChallengesEntity } from './game-challenges.entity';
 
 @Entity('PairGameQuiz')
 export class PairGameQuizEntity {
@@ -34,16 +35,11 @@ export class PairGameQuizEntity {
   ])
   secondPlayer: UsersEntity | null;
 
-  // Define the relationship with QuestionsQuizEntity
-  @ManyToOne(() => QuestionsQuizEntity, (question) => question.game, {
-    cascade: true,
-    eager: true,
-  })
-  @JoinColumn([
-    { name: 'questionId', referencedColumnName: 'id' },
-    { name: 'body', referencedColumnName: 'questionText' },
-  ])
-  questions: QuestionsQuizEntity[];
+  @OneToMany(
+    () => GameChallengesEntity,
+    (gameChallenge) => gameChallenge.question,
+  )
+  questions: GameChallengesEntity[];
 
   @Column({
     type: 'enum',
