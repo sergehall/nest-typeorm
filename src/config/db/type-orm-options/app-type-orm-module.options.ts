@@ -11,6 +11,7 @@ import { LikeStatusCommentsEntity } from '../../../features/comments/entities/li
 import { InvalidJwtEntity } from '../../../features/auth/entities/invalid-jwt.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from '../../../features/users/entities/banned-users-for-blogs.entity';
+import { QuestionsQuizEntity } from '../../../features/pair-game-quiz/entities/questions-quiz.entity';
 
 @Injectable()
 export class AppTypeOrmModuleOptions
@@ -44,6 +45,7 @@ export class AppTypeOrmModuleOptions
         LikeStatusCommentsEntity,
         InvalidJwtEntity,
         SentCodesLogEntity,
+        QuestionsQuizEntity,
       ],
       synchronize: true,
       logging: false,

@@ -23,6 +23,7 @@ import { DataCleanupModule } from './data-cleanup/data-cleanup.module';
 import { AppTypeOrmModuleOptions } from './config/db/type-orm-options/app-type-orm-module.options';
 import { CustomConfigModule } from './config/custom.config-module';
 import { QuizQuestionsModule } from './features/quiz-questions/quiz-questions.module';
+import { PairGameQuizModule } from './features/pair-game-quiz/pair-game-quiz.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { QuizQuestionsModule } from './features/quiz-questions/quiz-questions.mo
     TestingModule,
     DataCleanupModule,
     QuizQuestionsModule,
+    PairGameQuizModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],
