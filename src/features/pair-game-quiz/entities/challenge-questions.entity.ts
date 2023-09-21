@@ -1,4 +1,10 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { QuestionsQuizEntity } from './questions-quiz.entity';
 import { PairGameQuizEntity } from './pair-game-quiz.entity';
 
@@ -20,4 +26,7 @@ export class ChallengeQuestionsEntity {
     { name: 'body', referencedColumnName: 'questionText' },
   ])
   question: QuestionsQuizEntity;
+
+  @Column({ type: 'character varying', length: 50, nullable: false })
+  createdAt: string;
 }
