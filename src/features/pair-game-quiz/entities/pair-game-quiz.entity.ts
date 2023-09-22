@@ -35,12 +35,6 @@ export class PairGameQuizEntity {
   ])
   secondPlayer: UsersEntity | null;
 
-  @OneToMany(
-    () => ChallengeQuestionsEntity,
-    (gameChallenge) => gameChallenge.id,
-  )
-  questions: ChallengeQuestionsEntity[];
-
   @Column({
     type: 'enum',
     enum: StatusGameEnum,
@@ -57,6 +51,12 @@ export class PairGameQuizEntity {
 
   @Column({ type: 'character varying', length: 50, nullable: true })
   finishGameDate: string | null;
+
+  @OneToMany(
+    () => ChallengeQuestionsEntity,
+    (challengeQuestion) => challengeQuestion.pairGameQuiz,
+  )
+  questions: ChallengeQuestionsEntity[];
 }
 
 // @Entity('PairGameQuiz)

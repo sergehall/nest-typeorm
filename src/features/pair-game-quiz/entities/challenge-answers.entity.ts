@@ -7,6 +7,8 @@ import {
 } from 'typeorm';
 import { QuestionsQuizEntity } from './questions-quiz.entity';
 import { PairGameQuizEntity } from './pair-game-quiz.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { AnswerStatusEnum } from '../enums/answer-status.enum';
 
 @Entity('ChallengeAnswers')
 export class ChallengeAnswersEntity {
@@ -15,6 +17,12 @@ export class ChallengeAnswersEntity {
 
   @Column({ type: 'character varying', length: 50, nullable: false })
   answer: string;
+
+  @Column({
+    type: 'enum',
+    enum: AnswerStatusEnum,
+  })
+  answerStatus: AnswerStatusEnum;
 
   @Column({ type: 'character varying', length: 50, nullable: false })
   addedAt: string;
@@ -43,4 +51,11 @@ export class ChallengeAnswersEntity {
     { name: 'body', referencedColumnName: 'questionText' },
   ])
   question: QuestionsQuizEntity;
+
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'answerOwnerId', referencedColumnName: 'userId' })
+  answerOwner: UsersEntity;
 }

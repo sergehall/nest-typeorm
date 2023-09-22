@@ -36,7 +36,7 @@ class PlayerProgressModel {
   answers: AnswerModel[];
 
   @ValidateNested()
-  player: PlayerModel;
+  player: PlayerModel | null;
 
   @IsString()
   score: number;

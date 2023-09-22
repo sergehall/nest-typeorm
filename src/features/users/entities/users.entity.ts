@@ -10,6 +10,7 @@ import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-co
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 import { PairGameQuizEntity } from '../../pair-game-quiz/entities/pair-game-quiz.entity';
+import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
@@ -121,4 +122,7 @@ export class UsersEntity {
 
   @OneToMany(() => PairGameQuizEntity, (pair) => pair.secondPlayer)
   secondPlayer: PairGameQuizEntity[];
+
+  @OneToMany(() => ChallengeAnswersEntity, (answer) => answer.answerOwner)
+  answerOwner: ChallengeAnswersEntity[];
 }

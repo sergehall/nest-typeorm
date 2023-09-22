@@ -8,6 +8,7 @@ import { StartGameUseCase } from './application/use-cases/start-game.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PairGameQuizEntity } from './entities/pair-game-quiz.entity';
 import { ChallengeQuestionsEntity } from './entities/challenge-questions.entity';
+import { ChallengeAnswersEntity } from './entities/challenge-answers.entity';
 
 const usersUseCases = [StartGameUseCase];
 
@@ -17,6 +18,7 @@ const usersUseCases = [StartGameUseCase];
       QuestionsQuizEntity,
       PairGameQuizEntity,
       ChallengeQuestionsEntity,
+      ChallengeAnswersEntity,
     ]),
     CqrsModule,
   ],
