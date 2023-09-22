@@ -30,6 +30,7 @@ export class GameQuizRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsDto> {
     try {
+      // make a search by PENDING and whatever you are playing the current game
       let pairGameQuizArr: PairGameQuizEntity[] =
         await this.pairGameQuizRepository.findBy({
           status: StatusGameEnum.PENDING,
@@ -41,6 +42,8 @@ export class GameQuizRepo {
         await this.pairGameQuizRepository.save(pairGameQuizArr[0]);
 
         await this.createChallengeQuestions(pairGameQuizArr[0].id);
+        const challengeQuestions: ChallengeQuestionsEntity[] = [];
+        return { pair: pairGameQuizArr[0], challengeQuestions };
       }
 
       const pairGameQuizId = pairGameQuizArr[0].id;
