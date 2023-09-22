@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePairGameQuizDto } from '../dto/create-pair-game-quiz.dto';
 import { UpdatePairGameQuizDto } from '../dto/update-pair-game-quiz.dto';
-import { PairGameQuizRepo } from '../infrastructure/PairGameQuizRepo';
+import { GameQuizRepo } from '../infrastructure/game-quiz-repo';
 
 @Injectable()
 export class PairGameQuizService {
-  constructor(protected pairGameQuizRepo: PairGameQuizRepo) {}
+  constructor(protected gameQuizRepo: GameQuizRepo) {}
   async createAndSaveQuestion(): Promise<boolean> {
-    return await this.pairGameQuizRepo.createAndSaveQuestion();
+    return await this.gameQuizRepo.createAndSaveQuestion();
   }
 
   async create(createPairGameQuizDto: CreatePairGameQuizDto) {
