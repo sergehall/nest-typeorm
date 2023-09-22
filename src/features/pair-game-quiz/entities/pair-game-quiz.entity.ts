@@ -49,14 +49,14 @@ export class PairGameQuizEntity {
   })
   status: StatusGameEnum;
 
-  @Column({ type: 'character varying', length: 50, nullable: false })
-  pairCreatedDate: string;
+  @Column({ type: 'character varying', length: 50, nullable: true })
+  pairCreatedDate: string | null;
 
-  @Column({ type: 'character varying', length: 50, nullable: false })
-  startGameDate: string;
+  @Column({ type: 'character varying', length: 50, nullable: true })
+  startGameDate: string | null;
 
-  @Column({ type: 'character varying', length: 50, nullable: false })
-  finishGameDate: string;
+  @Column({ type: 'character varying', length: 50, nullable: true })
+  finishGameDate: string | null;
 }
 
 // @Entity('PairGameQuiz)

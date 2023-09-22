@@ -14,6 +14,7 @@ import { BannedUsersForBlogsEntity } from '../../../features/users/entities/bann
 import { QuestionsQuizEntity } from '../../../features/pair-game-quiz/entities/questions-quiz.entity';
 import { PairGameQuizEntity } from '../../../features/pair-game-quiz/entities/pair-game-quiz.entity';
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
+import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
 
 @Injectable()
 export class AppTypeOrmModuleOptions
@@ -50,6 +51,7 @@ export class AppTypeOrmModuleOptions
         QuestionsQuizEntity,
         PairGameQuizEntity,
         ChallengeQuestionsEntity,
+        ChallengeAnswersEntity,
       ],
       synchronize: true,
       logging: false,

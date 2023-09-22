@@ -1,14 +1,23 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { QuestionsQuizEntity } from './questions-quiz.entity';
 import { PairGameQuizEntity } from './pair-game-quiz.entity';
 
-@Entity('ChallengeQuestions')
-export class ChallengeQuestionsEntity {
-  @PrimaryColumn('uuid')
+@Entity('ChallengeAnswers')
+export class ChallengeAnswersEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'character varying', length: 50, nullable: false })
-  createdAt: string;
+  answer: string;
+
+  @Column({ type: 'character varying', length: 50, nullable: false })
+  addedAt: string;
 
   @ManyToOne(
     () => PairGameQuizEntity,
