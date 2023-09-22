@@ -31,8 +31,8 @@ export class PairGameQuizController {
   @Post('connection')
   async startGame(@Request() req: any) {
     const currentUserDto: CurrentUserDto = req.user;
-    await this.commandBus.execute(new StartGameCommand(currentUserDto));
-    return '++++';
+
+    return await this.commandBus.execute(new StartGameCommand(currentUserDto));
   }
 
   @Post('my-current')
