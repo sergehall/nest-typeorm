@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
-import { GameModel } from '../../models/game.model';
+import { GameModel, PlayerModel, QuestionModel } from '../../models/game.model';
 import { PairQuestionsDto } from '../../dto/pair-questions.dto';
 import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
@@ -22,7 +22,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     await this.checkPermission(isExistPair);
 
     const pairAndQuestionsDto: PairQuestionsDto =
-      await this.gameQuizRepo.getOrCreatePairGame(currentUserDto);
+      await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
 
     return await this.mapPairGameQuizEntityToGameModel(pairAndQuestionsDto);
   }
@@ -33,16 +33,14 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     const { pair } = pairQuestionsDto;
     const { challengeQuestions } = pairQuestionsDto;
 
-    const secondPlayer = pair.secondPlayer?.userId
+    const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
       ? {
           id: pair.secondPlayer.userId,
           login: pair.secondPlayer.login,
         }
       : null;
 
-    // console.log(pair, 'pair');
-    // console.log(challengeQuestions, 'challengeQuestions');
-    const questions =
+    const questions: QuestionModel[] | [] =
       challengeQuestions.length > 0
         ? challengeQuestions.map((challengeQuestion) => ({
             id: challengeQuestion.id,

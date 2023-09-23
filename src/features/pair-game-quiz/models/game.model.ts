@@ -22,7 +22,7 @@ class AnswerModel {
   addedAt: Date;
 }
 
-class PlayerModel {
+export class PlayerModel {
   @IsString()
   id: string;
 
@@ -42,7 +42,7 @@ class PlayerProgressModel {
   score: number;
 }
 
-class QuestionModel {
+export class QuestionModel {
   @IsString()
   id: string;
 
