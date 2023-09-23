@@ -9,8 +9,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ChallengeQuestionsEntity } from './entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from './entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from './entities/pairs-game-quiz.entity';
+import { MapPairGame } from './common/map-pair-game-entity-to-game-model';
+import { MyCurrentGameUseCase } from './application/use-cases/my-current-game.use-case';
 
-const usersUseCases = [StartGameUseCase];
+const usersUseCases = [MyCurrentGameUseCase, StartGameUseCase];
 
 @Module({
   imports: [
@@ -23,6 +25,6 @@ const usersUseCases = [StartGameUseCase];
     CqrsModule,
   ],
   controllers: [PairGameQuizController],
-  providers: [PairGameQuizService, GameQuizRepo, ...usersUseCases],
+  providers: [PairGameQuizService, GameQuizRepo, MapPairGame, ...usersUseCases],
 })
 export class PairGameQuizModule {}

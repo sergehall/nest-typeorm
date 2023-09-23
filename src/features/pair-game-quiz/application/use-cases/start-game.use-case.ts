@@ -1,10 +1,11 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
-import { GameModel, PlayerModel, QuestionModel } from '../../models/game.model';
-import { PairQuestionsDto } from '../../dto/pair-questions.dto';
+import { GameModel } from '../../models/game.model';
+import { PairAndQuestionsDto } from '../../dto/pair-questions.dto';
 import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
+import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -12,7 +13,10 @@ export class StartGameCommand {
 
 @CommandHandler(StartGameCommand)
 export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
-  constructor(protected gameQuizRepo: GameQuizRepo) {}
+  constructor(
+    protected gameQuizRepo: GameQuizRepo,
+    protected mapPairGame: MapPairGame,
+  ) {}
   async execute(command: StartGameCommand): Promise<GameModel> {
     const { currentUserDto } = command;
 
@@ -21,54 +25,10 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
 
     await this.checkPermission(isExistPair);
 
-    const pairAndQuestionsDto: PairQuestionsDto =
+    const pairAndQuestions: PairAndQuestionsDto =
       await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
 
-    return await this.mapPairGameQuizEntityToGameModel(pairAndQuestionsDto);
-  }
-
-  private async mapPairGameQuizEntityToGameModel(
-    pairQuestionsDto: PairQuestionsDto,
-  ): Promise<GameModel> {
-    const { pair } = pairQuestionsDto;
-    const { challengeQuestions } = pairQuestionsDto;
-
-    const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
-      ? {
-          id: pair.secondPlayer.userId,
-          login: pair.secondPlayer.login,
-        }
-      : null;
-
-    const questions: QuestionModel[] | [] =
-      challengeQuestions.length > 0
-        ? challengeQuestions.map((challengeQuestion) => ({
-            id: challengeQuestion.id,
-            body: challengeQuestion.question.questionText,
-          }))
-        : [];
-
-    return {
-      id: pair.id,
-      firstPlayerProgress: {
-        answers: [],
-        player: {
-          id: pair.firstPlayer.userId,
-          login: pair.firstPlayer.login,
-        },
-        score: 0,
-      },
-      secondPlayerProgress: {
-        answers: [],
-        player: secondPlayer,
-        score: 0,
-      },
-      questions: questions,
-      status: pair.status,
-      pairCreatedDate: pair.pairCreatedDate || '',
-      startGameDate: pair.startGameDate || '',
-      finishGameDate: pair.finishGameDate || '',
-    };
+    return await this.mapPairGame.toGameModel(pairAndQuestions);
   }
 
   private async checkPermission(

@@ -8,12 +8,13 @@ import {
   Request,
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
-import { CreatePairGameQuizDto } from '../dto/create-pair-game-quiz.dto';
 import { UpdatePairGameQuizDto } from '../dto/update-pair-game-quiz.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { StartGameCommand } from '../application/use-cases/start-game.use-case';
+import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';
+import { GameModel } from '../models/game.model';
 
 @Controller('pair-game-quiz/pairs')
 export class PairGameQuizController {
@@ -28,18 +29,21 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('my-current')
+  async findUnfinishedGame(@Request() req: any): Promise<GameModel> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new MyCurrentGameCommand(currentUserDto),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('connection')
-  async startGame(@Request() req: any) {
+  async startGame(@Request() req: any): Promise<GameModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(new StartGameCommand(currentUserDto));
-  }
-
-  @Post('my-current')
-  async findUnfinishedGame(
-    @Body() createPairGameQuizDto: CreatePairGameQuizDto,
-  ) {
-    return await this.pairGameQuizService.create(createPairGameQuizDto);
   }
 
   @Get(':id')
