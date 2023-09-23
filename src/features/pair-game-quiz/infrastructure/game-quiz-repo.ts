@@ -10,7 +10,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
-import { PairQuestionsDto } from '../dto/pair-questions.dto';
+import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 
@@ -48,9 +48,44 @@ export class GameQuizRepo {
     }
   }
 
+  async getPairByUserId(
+    currentUserDto: CurrentUserDto,
+  ): Promise<PairAndQuestionsDto | null> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepository
+        .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+        .where('firstPlayer.userId = :userId', {
+          userId: currentUserDto.userId,
+        })
+        .orWhere('pairsGame.secondPlayerId = :userId', {
+          userId: currentUserDto.userId,
+        });
+
+      const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
+
+      if (!game) {
+        return null;
+      }
+
+      const countAnswers = await this.getCountAnswers(
+        game.id,
+        currentUserDto.userId,
+      );
+      const challengeQuestions: ChallengeQuestionsEntity[] =
+        await this.getChallengeQuestions(game.id, countAnswers);
+
+      return { pair: game, challengeQuestions };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async getPendingPairOrCreateNew(
     currentUserDto: CurrentUserDto,
-  ): Promise<PairQuestionsDto> {
+  ): Promise<PairAndQuestionsDto> {
     try {
       const pendingGame: PairsGameQuizEntity | null =
         await this.pairsGameQuizRepository.findOne({
@@ -89,13 +124,18 @@ export class GameQuizRepo {
     }
   }
 
-  private async getCountAnswers(id: string, userId: string): Promise<number> {
+  private async getCountAnswers(
+    pairGameQuizId: string,
+    userId: string,
+  ): Promise<number> {
     const queryBuilder = this.challengeAnswersRepository
       .createQueryBuilder('challengeAnswers')
       .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
       .leftJoinAndSelect('challengeAnswers.question', 'question')
       .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
-      .where('challengeAnswers.pairGameQuizId = :id', { id })
+      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+        pairGameQuizId,
+      })
       .andWhere('challengeAnswers.answerOwnerId = :userId', {
         userId,
       });
