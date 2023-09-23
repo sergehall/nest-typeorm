@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CaslModule } from '../../ability/casl.module';
 import { PairGameQuizService } from './application/pair-game-quiz.service';
 import { PairGameQuizController } from './api/pair-game-quiz.controller';
 import { GameQuizRepo } from './infrastructure/game-quiz-repo';
@@ -11,8 +12,13 @@ import { ChallengeAnswersEntity } from './entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from './entities/pairs-game-quiz.entity';
 import { MapPairGame } from './common/map-pair-game-entity-to-game-model';
 import { MyCurrentGameUseCase } from './application/use-cases/my-current-game.use-case';
+import { GetGameByIdUseCase } from './application/use-cases/get-game-by-id.use-case';
 
-const usersUseCases = [MyCurrentGameUseCase, StartGameUseCase];
+const usersUseCases = [
+  MyCurrentGameUseCase,
+  GetGameByIdUseCase,
+  StartGameUseCase,
+];
 
 @Module({
   imports: [
@@ -22,6 +28,7 @@ const usersUseCases = [MyCurrentGameUseCase, StartGameUseCase];
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
     ]),
+    CaslModule,
     CqrsModule,
   ],
   controllers: [PairGameQuizController],

@@ -1,7 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ComplexityEnums } from '../enums/complexity.enums';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
 import * as crypto from 'crypto';
 import { DifficultyDictionary } from '../questions/types/difficulty-dictionary.type';
@@ -26,7 +29,7 @@ export class GameQuizRepo {
     private readonly challengeAnswersRepository: Repository<ChallengeAnswersEntity>,
   ) {}
 
-  async isExistPair(userId: string): Promise<PairsGameQuizEntity | null> {
+  async getPairByUserId(userId: string): Promise<PairsGameQuizEntity | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepository
         .createQueryBuilder('pairsGame')
@@ -48,7 +51,50 @@ export class GameQuizRepo {
     }
   }
 
-  async getPairByUserId(
+  async getGameById(id: string): Promise<PairsGameQuizEntity | null> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepository
+        .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+        .andWhere('pairsGame.id = :id', {
+          id,
+        });
+
+      const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
+      return game ? game : null;
+    } catch (error) {
+      if (await this.isInvalidUUIDError(error)) {
+        const userId = await this.extractUserIdFromError(error);
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async addQuestionsToGame(
+    game: PairsGameQuizEntity,
+    currentUserDto: CurrentUserDto,
+  ): Promise<PairAndQuestionsDto> {
+    try {
+      const countAnswers = await this.getCountAnswers(
+        game.id,
+        currentUserDto.userId,
+      );
+      const challengeQuestions: ChallengeQuestionsEntity[] =
+        await this.getChallengeQuestions(game.id, countAnswers);
+
+      return { pair: game, challengeQuestions };
+    } catch (error) {
+      if (await this.isInvalidUUIDError(error)) {
+        const userId = await this.extractUserIdFromError(error);
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getPairAndQuestionsForUser(
     currentUserDto: CurrentUserDto,
   ): Promise<PairAndQuestionsDto | null> {
     try {
@@ -329,5 +375,14 @@ export class GameQuizRepo {
       console.error('Error inserting questions into the database:', error);
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async isInvalidUUIDError(error: any): Promise<boolean> {
+    return error.message.includes('invalid input syntax for type uuid');
+  }
+
+  private async extractUserIdFromError(error: any): Promise<string | null> {
+    const match = error.message.match(/"([^"]+)"/);
+    return match ? match[1] : null;
   }
 }

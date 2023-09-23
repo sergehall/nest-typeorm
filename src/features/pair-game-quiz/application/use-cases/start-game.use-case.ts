@@ -21,7 +21,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     const { currentUserDto } = command;
 
     const isExistPair: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.isExistPair(currentUserDto.userId);
+      await this.gameQuizRepo.getPairByUserId(currentUserDto.userId);
 
     await this.checkPermission(isExistPair);
 
