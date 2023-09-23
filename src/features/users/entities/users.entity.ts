@@ -9,7 +9,7 @@ import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.en
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
-import { PairGameQuizEntity } from '../../pair-game-quiz/entities/pair-game-quiz.entity';
+import { PairsGameQuizEntity } from '../../pair-game-quiz/entities/pairs-game-quiz.entity';
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
 
 @Entity('Users')
@@ -117,11 +117,11 @@ export class UsersEntity {
   )
   bannedBlogsForUser: BannedUsersForBlogsEntity[];
 
-  @OneToMany(() => PairGameQuizEntity, (pair) => pair.firstPlayer)
-  firstPlayer: PairGameQuizEntity[];
+  @OneToMany(() => PairsGameQuizEntity, (pair) => pair.firstPlayer)
+  firstPlayer: PairsGameQuizEntity[];
 
-  @OneToMany(() => PairGameQuizEntity, (pair) => pair.secondPlayer)
-  secondPlayer: PairGameQuizEntity[];
+  @OneToMany(() => PairsGameQuizEntity, (pair) => pair.secondPlayer)
+  secondPlayer: PairsGameQuizEntity[];
 
   @OneToMany(() => ChallengeAnswersEntity, (answer) => answer.answerOwner)
   answerOwner: ChallengeAnswersEntity[];

@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { QuestionsQuizEntity } from './entities/questions-quiz.entity';
 import { StartGameUseCase } from './application/use-cases/start-game.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
-import { PairGameQuizEntity } from './entities/pair-game-quiz.entity';
 import { ChallengeQuestionsEntity } from './entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from './entities/challenge-answers.entity';
+import { PairsGameQuizEntity } from './entities/pairs-game-quiz.entity';
 
 const usersUseCases = [StartGameUseCase];
 
@@ -16,7 +16,7 @@ const usersUseCases = [StartGameUseCase];
   imports: [
     TypeOrmModule.forFeature([
       QuestionsQuizEntity,
-      PairGameQuizEntity,
+      PairsGameQuizEntity,
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
     ]),

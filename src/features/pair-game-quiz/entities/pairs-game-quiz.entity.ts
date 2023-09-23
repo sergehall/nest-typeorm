@@ -10,8 +10,8 @@ import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 
-@Entity('PairGameQuiz')
-export class PairGameQuizEntity {
+@Entity('PairsGameQuiz')
+export class PairsGameQuizEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
