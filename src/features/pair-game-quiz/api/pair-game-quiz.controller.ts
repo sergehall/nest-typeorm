@@ -15,6 +15,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { StartGameCommand } from '../application/use-cases/start-game.use-case';
 import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';
 import { GameModel } from '../models/game.model';
+import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 
 @Controller('pair-game-quiz/pairs')
 export class PairGameQuizController {
@@ -46,9 +47,14 @@ export class PairGameQuizController {
     return await this.commandBus.execute(new StartGameCommand(currentUserDto));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findGameById(@Param('id') id: string) {
-    return await this.pairGameQuizService.findOne(+id);
+  async findGameById(@Request() req: any, @Param('id') id: string) {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new GetGameByIdCommand(id, currentUserDto),
+    );
   }
 
   @Post('my-current/answer')

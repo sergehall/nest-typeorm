@@ -24,7 +24,7 @@
     "revert-last-migrations": "typeorm-ts-node-esm migration:revert -d ./src/db/data-source.ts"
   },
   "dependencies": {
-    "@casl/ability": "^6.3.3",
+    "@casl/ability": "^6.5.0",
     "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "^9.0.0",
