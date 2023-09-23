@@ -1,10 +1,10 @@
-import { PairGameQuizEntity } from '../entities/pair-game-quiz.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { IsNotEmpty } from 'class-validator';
+import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 
 export class PairQuestionsDto {
   @IsNotEmpty()
-  pair: PairGameQuizEntity;
+  pair: PairsGameQuizEntity;
   @IsNotEmpty()
   challengeQuestions: ChallengeQuestionsEntity[];
 }

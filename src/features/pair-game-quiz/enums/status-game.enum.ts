@@ -1,5 +1,5 @@
 export enum StatusGameEnum {
-  PENDING = 'Pending',
+  PENDING = 'PendingSecondPlayer',
   COMPETING = 'Competing',
   CONCLUDED = 'Concluded',
 }

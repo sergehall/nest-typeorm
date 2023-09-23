@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { QuestionsQuizEntity } from './questions-quiz.entity';
-import { PairGameQuizEntity } from './pair-game-quiz.entity';
+import { PairsGameQuizEntity } from './pairs-game-quiz.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
 
@@ -28,7 +28,7 @@ export class ChallengeAnswersEntity {
   addedAt: string;
 
   @ManyToOne(
-    () => PairGameQuizEntity,
+    () => PairsGameQuizEntity,
     (pairGameQuiz) => pairGameQuiz.questions,
     {
       nullable: false,
@@ -36,7 +36,7 @@ export class ChallengeAnswersEntity {
     },
   )
   @JoinColumn({ name: 'pairGameQuizId', referencedColumnName: 'id' })
-  pairGameQuiz: PairGameQuizEntity;
+  pairGameQuiz: PairsGameQuizEntity;
 
   @ManyToOne(
     () => QuestionsQuizEntity,

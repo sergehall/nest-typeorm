@@ -3,6 +3,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameModel } from '../../models/game.model';
 import { PairQuestionsDto } from '../../dto/pair-questions.dto';
+import { ForbiddenException } from '@nestjs/common';
+import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -14,10 +16,15 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   async execute(command: StartGameCommand): Promise<GameModel> {
     const { currentUserDto } = command;
 
-    const pairQuestionsDto: PairQuestionsDto =
+    const isExistPair: PairsGameQuizEntity | null =
+      await this.gameQuizRepo.isExistPair(currentUserDto.userId);
+
+    await this.checkPermission(isExistPair);
+
+    const pairAndQuestionsDto: PairQuestionsDto =
       await this.gameQuizRepo.getOrCreatePairGame(currentUserDto);
 
-    return await this.mapPairGameQuizEntityToGameModel(pairQuestionsDto);
+    return await this.mapPairGameQuizEntityToGameModel(pairAndQuestionsDto);
   }
 
   private async mapPairGameQuizEntityToGameModel(
@@ -64,5 +71,15 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
       startGameDate: pair.startGameDate || '',
       finishGameDate: pair.finishGameDate || '',
     };
+  }
+
+  private async checkPermission(
+    isExistPair: PairsGameQuizEntity | null,
+  ): Promise<void> {
+    if (isExistPair) {
+      throw new ForbiddenException(
+        'The current player is already involved in an ongoing active game pairing.',
+      );
+    }
   }
 }
