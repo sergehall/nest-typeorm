@@ -48,7 +48,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getOrCreatePairGame(
+  async getPendingPairOrCreateNew(
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsDto> {
     try {
@@ -77,48 +77,12 @@ export class GameQuizRepo {
         currentUserDto,
       );
 
-      let challengeQuestions: ChallengeQuestionsEntity[] = [];
+      const countAnswers = 0;
 
-      let countAnswers = 0;
+      const challengeQuestions: ChallengeQuestionsEntity[] =
+        await this.getChallengeQuestions(createdGame.id, countAnswers);
 
-      if (createdGame.secondPlayer) {
-        countAnswers = await this.getCountAnswers(
-          pendingGame.id,
-          currentUserDto.userId,
-        );
-        challengeQuestions = await this.getChallengeQuestions(
-          pendingGame.id,
-          countAnswers,
-        );
-      }
       return { pair: createdGame, challengeQuestions };
-
-      // const pairGameQuizId = pendingGame.id;
-      // let pairGameQuiz = pendingGame;
-      //
-      // if (pairGameQuiz) {
-      //   // add Second Player and start game
-      //   pairGameQuiz = await this.addSecondPlayerAndStarGame(
-      //     pairGameQuiz,
-      //     currentUserDto,
-      //   );
-      // }
-      //
-      // let challengeQuestions: ChallengeQuestionsEntity[] = [];
-      //
-      // let countAnswers = 0;
-      //
-      // if (pairGameQuiz.secondPlayer) {
-      //   countAnswers = await this.getCountAnswers(
-      //     pairGameQuizId,
-      //     currentUserDto.userId,
-      //   );
-      //   challengeQuestions = await this.getChallengeQuestions(
-      //     pairGameQuizId,
-      //     countAnswers,
-      //   );
-      // }
-      // return { pair: pairGameQuiz, challengeQuestions };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
