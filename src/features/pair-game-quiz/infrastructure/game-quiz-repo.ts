@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { ComplexityEnums } from '../enums/complexity.enums';
 import {
   InternalServerErrorException,
@@ -490,6 +490,56 @@ export class GameQuizRepo {
     } catch (error) {
       console.error('Error inserting questions into the database:', error);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saDeleteQuestionById(id: string): Promise<boolean> {
+    try {
+      await this.questionsRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          await this.deleteQuestionsData(id, transactionalEntityManager);
+        },
+      );
+      return true;
+    } catch (error) {
+      console.error(
+        `Error while removing data for question id: ${error.message}`,
+      );
+      throw new Error(`Error while removing data for question id`);
+    }
+  }
+  private async deleteQuestionsData(
+    questionId: string,
+    entityManager: EntityManager,
+  ): Promise<void> {
+    try {
+      await Promise.all([
+        await entityManager
+          .createQueryBuilder()
+          .delete()
+          .from('ChallengeQuestions', 'challengeQuestions')
+          .where('questionId = :questionId', { questionId })
+          .execute(),
+        await entityManager
+          .createQueryBuilder()
+          .delete()
+          .from('ChallengeAnswers', 'challengeAnswers')
+          .where('questionId = :questionId', { questionId })
+          .execute(),
+      ]);
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('QuestionsQuiz', 'challengeAnswers')
+        .where('id = :questionId', { questionId })
+        .execute();
+    } catch (error) {
+      console.error(
+        `Error while removing data for question id ${questionId}: ${error.message}`,
+      );
+      throw new Error(
+        `Error while removing data for question id ${questionId}`,
+      );
     }
   }
 

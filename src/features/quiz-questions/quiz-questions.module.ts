@@ -19,11 +19,13 @@ import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaGetQuestionsUseCase } from './application/use-cases/sa-get-questions.use-case';
 import { TransformationService } from './common/transform-to-questions-model';
 import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-update-questions-and-answer.use-case';
+import { SaDeleteQuestionByIdUseCase } from './application/use-cases/sa-delete-question-by-id.use-case';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
   SaGetQuestionsUseCase,
   SaUpdateQuestionsAndAnswerUseCase,
+  SaDeleteQuestionByIdUseCase,
 ];
 
 @Module({
