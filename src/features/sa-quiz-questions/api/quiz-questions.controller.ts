@@ -42,8 +42,8 @@ export class QuizQuestionsController {
   }
 
   @Post()
-  @UseGuards(BaseAuthGuard)
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(BaseAuthGuard)
   async saCreateQuestion(
     @Body() createQuizQuestionDto: CreateQuizQuestionDto,
   ): Promise<QuestionsModel> {
@@ -55,7 +55,7 @@ export class QuizQuestionsController {
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
-  async saUpdateQuestions(
+  async saUpdateQuestionsAndAnswer(
     @Param() params: IdParams,
     @Body() updateQuizQuestionDto: UpdateQuizQuestionDto,
   ): Promise<boolean> {
@@ -78,6 +78,7 @@ export class QuizQuestionsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BaseAuthGuard)
   async deleteById(@Param() params: IdParams): Promise<boolean> {
     return await this.commandBus.execute(
       new SaDeleteQuestionByIdCommand(params.id),
