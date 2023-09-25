@@ -25,7 +25,7 @@ export class SaUpdateQuestionsAndAnswerUseCase
     if (!question)
       throw new NotFoundException(`Question with ID ${questionId} not found`);
 
-    return await this.gameQuizRepo.saUpdateQuestionAndAnswer(
+    return await this.gameQuizRepo.saUpdateQuestionAndAnswers(
       question,
       updateQuizQuestionDto,
     );

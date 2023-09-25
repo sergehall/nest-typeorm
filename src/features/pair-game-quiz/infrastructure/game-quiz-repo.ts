@@ -221,12 +221,12 @@ export class GameQuizRepo {
     }
   }
 
-  async saUpdateQuestionAndAnswer(
+  async saUpdateQuestionAndAnswers(
     question: QuestionsQuizEntity,
     updateQuizQuestionDto: UpdateQuizQuestionDto,
   ): Promise<boolean> {
     try {
-      const hashedAnswers = await this.stringToHash(
+      const hashedAnswers = await this.stringsToHashes(
         updateQuizQuestionDto.correctAnswers,
         20,
       );
@@ -252,7 +252,7 @@ export class GameQuizRepo {
       const question = createQuizQuestionDto.body;
       const correctAnswers = createQuizQuestionDto.correctAnswers;
 
-      const hashedAnswers = await this.stringToHash(correctAnswers, 20);
+      const hashedAnswers = await this.stringsToHashes(correctAnswers, 20);
 
       const newQuestion = new QuestionsQuizEntity();
       newQuestion.questionText = question;
@@ -492,7 +492,10 @@ export class GameQuizRepo {
 
         // Loop through the questions and insert them into the database
         for (const question of questions) {
-          const hashedAnswers = await this.stringToHash(question.answers, 20);
+          const hashedAnswers = await this.stringsToHashes(
+            question.answers,
+            20,
+          );
           const newQuestion = new QuestionsQuizEntity();
           newQuestion.questionText = question.question;
           newQuestion.hashedAnswers = hashedAnswers;
@@ -562,7 +565,7 @@ export class GameQuizRepo {
     }
   }
 
-  private async stringToHash(
+  private async stringsToHashes(
     answers: string[],
     hashLength: number,
   ): Promise<string[]> {
