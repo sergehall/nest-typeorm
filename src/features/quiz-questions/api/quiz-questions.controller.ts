@@ -7,13 +7,15 @@ import {
   Delete,
   Put,
   UseGuards,
-  Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { QuizQuestionsService } from '../application/quiz-questions.service';
 import { CreateQuizQuestionDto } from '../dto/create-quiz-question.dto';
 import { UpdateQuizQuestionDto } from '../dto/update-quiz-question.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
+import { SaCreateQuestionsAndAnswerCommand } from '../application/use-cases/sa-create-questions-and-answer.use-case';
 
 @Controller('sa/quiz/questions')
 export class QuizQuestionsController {
@@ -34,16 +36,11 @@ export class QuizQuestionsController {
 
   @Post()
   @UseGuards(BaseAuthGuard)
-  create(
-    @Request() req: any,
-    @Body() createQuizQuestionDto: CreateQuizQuestionDto,
-  ) {
-    const currentUserDto = req.user;
-    console.log(createQuizQuestionDto);
-    // return await this.commandBus.execute(
-    //   new SaCreateBlogCommand(createBlogsDto, currentUserDto),
-    // );
-    return this.quizQuestionsService.create(createQuizQuestionDto);
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createQuizQuestionDto: CreateQuizQuestionDto) {
+    return this.commandBus.execute(
+      new SaCreateQuestionsAndAnswerCommand(createQuizQuestionDto),
+    );
   }
 
   @Put(':id')

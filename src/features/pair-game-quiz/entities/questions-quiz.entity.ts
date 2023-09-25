@@ -29,6 +29,15 @@ export class QuestionsQuizEntity {
   })
   hashedAnswers: string[];
 
+  @Column({ default: false, nullable: false })
+  published: boolean;
+
+  @Column({ type: 'character varying', nullable: false })
+  createdAt: string;
+
+  @Column({ type: 'character varying', nullable: true, default: null })
+  updatedAt: string | null = null;
+
   @Column({
     type: 'enum',
     enum: ComplexityEnums,
@@ -41,6 +50,7 @@ export class QuestionsQuizEntity {
     type: 'character varying',
     length: 50,
     nullable: false,
+    default: 'Еhe topic is not defined',
   })
   topic: string;
 

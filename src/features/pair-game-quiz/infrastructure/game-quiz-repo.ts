@@ -16,6 +16,7 @@ import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { dictionaryQuestions } from '../questions/dictionary-questions';
+import { CreateQuizQuestionDto } from '../../quiz-questions/dto/create-quiz-question.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -312,18 +313,31 @@ export class GameQuizRepo {
     return randomQuestions.slice(0, numberQuestions);
   }
 
-  private async stringToHash(
-    answers: string[],
-    hashLength: number,
-  ): Promise<string[]> {
-    const hashedArray: string[] = [];
+  async saCreateQuestion(
+    createQuizQuestionDto: CreateQuizQuestionDto,
+  ): Promise<QuestionsQuizEntity> {
+    try {
+      const question = createQuizQuestionDto.body;
+      const correctAnswers = createQuizQuestionDto.correctAnswers;
 
-    for (const answer of answers) {
-      const hash = crypto.createHash('sha256').update(answer).digest('hex');
-      hashedArray.push(hash.substring(0, hashLength));
+      const hashedAnswers = await this.stringToHash(correctAnswers, 20);
+
+      const newQuestion = new QuestionsQuizEntity();
+      newQuestion.questionText = question;
+      newQuestion.hashedAnswers = hashedAnswers;
+      newQuestion.complexity = ComplexityEnums.EASY;
+      newQuestion.published = false;
+      newQuestion.createdAt = new Date().toISOString();
+
+      // Save the question to the database
+      await this.questionsRepository.save(newQuestion);
+      newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
+
+      return newQuestion;
+    } catch (error) {
+      console.error('Error inserting questions into the database:', error);
+      throw new InternalServerErrorException(error.message);
     }
-
-    return hashedArray;
   }
 
   async createAndSaveQuestion(): Promise<boolean> {
@@ -338,15 +352,14 @@ export class GameQuizRepo {
 
         // Loop through the questions and insert them into the database
         for (const question of questions) {
+          const hashedAnswers = await this.stringToHash(question.answers, 20);
           const newQuestion = new QuestionsQuizEntity();
           newQuestion.questionText = question.question;
-          newQuestion.hashedAnswers = await this.stringToHash(
-            question.answers,
-            20,
-          );
-
+          newQuestion.hashedAnswers = hashedAnswers;
           newQuestion.complexity = question.complexity;
           newQuestion.topic = question.topic;
+          newQuestion.published = false;
+          newQuestion.createdAt = new Date().toISOString();
 
           // Save the question to the database
           await this.questionsRepository.save(newQuestion);
@@ -359,6 +372,35 @@ export class GameQuizRepo {
     }
   }
 
+  private async stringToHash(
+    answers: string[],
+    hashLength: number,
+  ): Promise<string[]> {
+    const hashedArray: string[] = [];
+
+    for (const answer of answers) {
+      const hash = crypto.createHash('sha256').update(answer).digest('hex');
+      hashedArray.push(hash.substring(0, hashLength));
+    }
+
+    return hashedArray;
+  }
+
+  private async hashToString(
+    hash: string,
+    answers: string[],
+  ): Promise<string | null> {
+    for (const answer of answers) {
+      const computedHash = crypto
+        .createHash('sha256')
+        .update(answer)
+        .digest('hex');
+      if (computedHash.substring(0, hash.length) === hash) {
+        return answer;
+      }
+    }
+    return null; // Hash doesn't match any of the original strings
+  }
   private async isInvalidUUIDError(error: any): Promise<boolean> {
     return error.message.includes('invalid input syntax for type uuid');
   }
