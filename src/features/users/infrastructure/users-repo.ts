@@ -367,6 +367,12 @@ export class UsersRepo {
   ): Promise<void> {
     try {
       await Promise.all([
+        await entityManager
+          .createQueryBuilder()
+          .delete()
+          .from('ChallengeAnswers')
+          .where('answerOwnerId = :userId', { userId })
+          .execute(),
         entityManager.delete('SecurityDevices', { user: userId }),
         entityManager.delete('BannedUsersForBlogs', {
           bannedUserForBlogs: userId,
@@ -377,6 +383,13 @@ export class UsersRepo {
         }),
         entityManager.delete('LikeStatusPosts', { ratedPostUser: userId }),
       ]);
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('PairsGameQuiz')
+        .where('firstPlayerId = :userId', { userId })
+        .orWhere('secondPlayerId = :userId', { userId })
+        .execute();
       await entityManager
         .createQueryBuilder()
         .delete()

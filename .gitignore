@@ -38,5 +38,3 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dictionaryQuestions
-/src/features/pair-game-quiz/questions/dictionary-questions.ts

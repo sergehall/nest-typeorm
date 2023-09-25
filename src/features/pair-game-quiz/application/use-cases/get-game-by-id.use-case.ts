@@ -28,7 +28,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     const { id, currentUserDto } = command;
 
     const gameById: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getGameById(id);
+      await this.gameQuizRepo.getGameByPairId(id);
 
     if (!gameById) throw new NotFoundException(`Game with ID ${id} not found`);
 

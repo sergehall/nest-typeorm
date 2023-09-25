@@ -11,6 +11,7 @@ export class TestingRawSqlRepository {
       'ChallengeAnswers',
       'ChallengeQuestions',
       'PairsGameQuiz',
+      'QuestionsQuiz',
       'SentCodesLog',
       'BannedUsersForBlogs',
       'SecurityDevices',

@@ -20,10 +20,10 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   async execute(command: StartGameCommand): Promise<GameModel> {
     const { currentUserDto } = command;
 
-    const isExistPair: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getPairByUserId(currentUserDto.userId);
+    const game: PairsGameQuizEntity | null =
+      await this.gameQuizRepo.getGameByUserId(currentUserDto.userId);
 
-    await this.checkPermission(isExistPair);
+    await this.checkPermission(game);
 
     const pairAndQuestions: PairAndQuestionsDto =
       await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
@@ -32,9 +32,9 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   }
 
   private async checkPermission(
-    isExistPair: PairsGameQuizEntity | null,
+    game: PairsGameQuizEntity | null,
   ): Promise<void> {
-    if (isExistPair) {
+    if (game) {
       throw new ForbiddenException(
         'The current player is already involved in an ongoing active game pairing.',
       );

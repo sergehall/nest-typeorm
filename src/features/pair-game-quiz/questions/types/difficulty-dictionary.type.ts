@@ -3,7 +3,7 @@ import { ComplexityEnums } from '../../enums/complexity.enums';
 type Question = {
   id: string;
   question: string;
-  answer: string;
+  answers: string[];
   topic: string;
   complexity: ComplexityEnums;
 };

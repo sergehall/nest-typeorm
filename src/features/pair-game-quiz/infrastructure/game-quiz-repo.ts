@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
 import * as crypto from 'crypto';
-import { DifficultyDictionary } from '../questions/types/difficulty-dictionary.type';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
@@ -16,6 +15,7 @@ import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity
 import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
+import { dictionaryQuestions } from '../questions/dictionary-questions';
 
 export class GameQuizRepo {
   constructor(
@@ -29,7 +29,7 @@ export class GameQuizRepo {
     private readonly challengeAnswersRepository: Repository<ChallengeAnswersEntity>,
   ) {}
 
-  async getPairByUserId(userId: string): Promise<PairsGameQuizEntity | null> {
+  async getGameByUserId(userId: string): Promise<PairsGameQuizEntity | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepository
         .createQueryBuilder('pairsGame')
@@ -51,7 +51,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getGameById(id: string): Promise<PairsGameQuizEntity | null> {
+  async getGameByPairId(id: string): Promise<PairsGameQuizEntity | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepository
         .createQueryBuilder('pairsGame')
@@ -94,7 +94,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getPairAndQuestionsForUser(
+  async getGameAndQuestionsForUser(
     currentUserDto: CurrentUserDto,
   ): Promise<PairAndQuestionsDto | null> {
     try {
@@ -312,43 +312,21 @@ export class GameQuizRepo {
     return randomQuestions.slice(0, numberQuestions);
   }
 
-  private async hashAnswer(answer: string, length: number): Promise<string> {
-    const fullHash = crypto.createHash('sha256').update(answer).digest('hex');
-    return fullHash.substring(0, length);
+  private async stringToHash(
+    answers: string[],
+    hashLength: number,
+  ): Promise<string[]> {
+    const hashedArray: string[] = [];
+
+    for (const answer of answers) {
+      const hash = crypto.createHash('sha256').update(answer).digest('hex');
+      hashedArray.push(hash.substring(0, hashLength));
+    }
+
+    return hashedArray;
   }
 
   async createAndSaveQuestion(): Promise<boolean> {
-    // Example of created questions
-    const dictionaryQuestions: DifficultyDictionary = {
-      easy: [
-        {
-          id: '1',
-          question: 'What is RAM?',
-          answer: 'Memory',
-          topic: 'Computer science',
-          complexity: ComplexityEnums.EASY,
-        },
-      ],
-      medium: [
-        {
-          id: '1',
-          question: 'Explain OOP.',
-          answer: 'Object-Oriented Programming',
-          topic: 'Computer science',
-          complexity: ComplexityEnums.MEDIUM,
-        },
-      ],
-      difficult: [
-        {
-          id: '1',
-          question: 'Explain quantum computing.',
-          answer: 'Quantum Bits',
-          topic: 'Computer science',
-          complexity: ComplexityEnums.DIFFICULT,
-        },
-      ],
-    };
-
     try {
       // Loop through each complexity level (easy, medium, difficult)
       for (const complexity of [
@@ -362,7 +340,11 @@ export class GameQuizRepo {
         for (const question of questions) {
           const newQuestion = new QuestionsQuizEntity();
           newQuestion.questionText = question.question;
-          newQuestion.hashAnswer = await this.hashAnswer(question.answer, 20);
+          newQuestion.hashedAnswers = await this.stringToHash(
+            question.answers,
+            20,
+          );
+
           newQuestion.complexity = question.complexity;
           newQuestion.topic = question.topic;
 
