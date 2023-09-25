@@ -18,10 +18,12 @@ import { ChallengeAnswersEntity } from '../pair-game-quiz/entities/challenge-ans
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaGetQuestionsUseCase } from './application/use-cases/sa-get-questions.use-case';
 import { TransformationService } from './common/transform-to-questions-model';
+import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-update-questions-and-answer.use-case';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
   SaGetQuestionsUseCase,
+  SaUpdateQuestionsAndAnswerUseCase,
 ];
 
 @Module({
