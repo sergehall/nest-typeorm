@@ -1,11 +1,7 @@
 import { IsString, IsNumber, IsEnum } from 'class-validator';
-
-export type BanCondition = boolean[];
-
-export enum SortDirection {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
+import { PublishedStatusEnum } from '../enums/published-status.enum';
+import { SortDirectionEnum } from '../enums/sort-direction.enum';
+import { BanCondition } from '../types/ban-condition.type';
 
 export class QueryPagination {
   @IsNumber()
@@ -17,8 +13,8 @@ export class QueryPagination {
   @IsString()
   sortBy: string;
 
-  @IsEnum(SortDirection)
-  sortDirection: SortDirection;
+  @IsEnum(SortDirectionEnum)
+  sortDirection: SortDirectionEnum;
 }
 
 export class ParseQueriesDto {
@@ -46,8 +42,13 @@ export class ParseQueriesDto {
   @IsString()
   searchEmailTerm: string;
 
+  @IsString()
+  bodySearchTerm: string;
+
   @IsNumber()
   queryPagination: QueryPagination;
 
   banStatus: BanCondition;
+
+  publishedStatus: PublishedStatusEnum;
 }

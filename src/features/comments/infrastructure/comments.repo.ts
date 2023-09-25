@@ -19,10 +19,7 @@ import {
   ReturnCommentsEntity,
 } from '../entities/return-comments.entity';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
-import {
-  ParseQueriesDto,
-  SortDirection,
-} from '../../../common/query/dto/parse-queries.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
@@ -30,6 +27,7 @@ import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { LikesDislikesMyStatusInfoDto } from '../dto/likes-dislikes-my-status-info.dto';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class CommentsRepo {
   constructor(
@@ -360,7 +358,7 @@ export class CommentsRepo {
     const sortBy: string = await this.getSortBy(
       queryData.queryPagination.sortBy,
     );
-    const direction: SortDirection = sortDirection;
+    const direction: SortDirectionEnum = sortDirection;
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 

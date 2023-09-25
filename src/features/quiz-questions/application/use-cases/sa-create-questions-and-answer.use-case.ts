@@ -3,6 +3,7 @@ import { CreateQuizQuestionDto } from '../../dto/create-quiz-question.dto';
 import { GameQuizRepo } from '../../../pair-game-quiz/infrastructure/game-quiz-repo';
 import { QuestionsQuizEntity } from '../../../pair-game-quiz/entities/questions-quiz.entity';
 import { QuestionsModel } from '../../models/questions.model';
+import { TransformationService } from '../../common/transform-to-questions-model';
 
 export class SaCreateQuestionsAndAnswerCommand {
   constructor(public createQuizQuestionDto: CreateQuizQuestionDto) {}
@@ -12,7 +13,10 @@ export class SaCreateQuestionsAndAnswerCommand {
 export class SaCreateQuestionsAndAnswerUseCase
   implements ICommandHandler<SaCreateQuestionsAndAnswerCommand>
 {
-  constructor(protected gameQuizRepo: GameQuizRepo) {}
+  constructor(
+    protected gameQuizRepo: GameQuizRepo,
+    protected transformationService: TransformationService,
+  ) {}
   async execute(
     command: SaCreateQuestionsAndAnswerCommand,
   ): Promise<QuestionsModel> {
@@ -20,19 +24,11 @@ export class SaCreateQuestionsAndAnswerUseCase
     const newQuestion: QuestionsQuizEntity =
       await this.gameQuizRepo.saCreateQuestion(createQuizQuestionDto);
 
-    return await this.transformObject(newQuestion);
-  }
+    const newQuestionArr: QuestionsModel[] =
+      await this.transformationService.transformEntityToQuestionsModelArray([
+        newQuestion,
+      ]);
 
-  private async transformObject(
-    newQuestion: QuestionsQuizEntity,
-  ): Promise<QuestionsModel> {
-    return {
-      id: newQuestion.id,
-      body: newQuestion.questionText,
-      correctAnswers: newQuestion.hashedAnswers,
-      published: newQuestion.published,
-      createdAt: newQuestion.createdAt,
-      updatedAt: newQuestion.updatedAt,
-    };
+    return newQuestionArr[0];
   }
 }

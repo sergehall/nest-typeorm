@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import {
-  BanCondition,
-  ParseQueriesDto,
-  SortDirection,
-} from './dto/parse-queries.dto';
+import { ParseQueriesDto } from './dto/parse-queries.dto';
+import { PublishedStatusEnum } from './enums/published-status.enum';
+import { SortDirectionEnum } from './enums/sort-direction.enum';
+import { BanCondition } from './types/ban-condition.type';
 
 @Injectable()
 export class ParseQueriesService {
@@ -41,6 +40,13 @@ export class ParseQueriesService {
       : '%';
   }
 
+  private async parseBodySearchTerm(query: any): Promise<string> {
+    const queryBody = query.bodySearchTerm?.toString();
+    return queryBody && queryBody.length !== 0
+      ? `%${queryBody.toLowerCase()}%`
+      : '%';
+  }
+
   private async parseSearchNameTerm(query: any): Promise<string> {
     const queryName = query.searchNameTerm?.toString();
     return queryName && queryName.length !== 0 ? `%${queryName}%` : '%';
@@ -61,13 +67,13 @@ export class ParseQueriesService {
     return searchTitle && searchTitle.length !== 0 ? `%${searchTitle}%` : '%';
   }
 
-  private async parseSortDirection(query: any): Promise<SortDirection> {
+  private async parseSortDirection(query: any): Promise<SortDirectionEnum> {
     const querySortDirection = query?.sortDirection;
     return ['ascending', 'ASCENDING', 'asc', 'ASC', -1].includes(
       querySortDirection,
     )
-      ? SortDirection.ASC
-      : SortDirection.DESC;
+      ? SortDirectionEnum.ASC
+      : SortDirectionEnum.DESC;
   }
 
   private async parseBanStatus(query: any): Promise<BanCondition> {
@@ -79,6 +85,18 @@ export class ParseQueriesService {
       return [false];
     } else {
       return [true, false];
+    }
+  }
+
+  private async parsePublishedStatus(query: any): Promise<PublishedStatusEnum> {
+    const queryPublishedStatus = query.publishedStatus?.toString();
+
+    if (queryPublishedStatus === PublishedStatusEnum.PUBLISHED) {
+      return PublishedStatusEnum.PUBLISHED;
+    } else if (queryPublishedStatus === PublishedStatusEnum.NOTPUBLISHED) {
+      return PublishedStatusEnum.NOTPUBLISHED;
+    } else {
+      return PublishedStatusEnum.ALL;
     }
   }
 
@@ -98,7 +116,9 @@ export class ParseQueriesService {
       searchNameTerm: await this.parseSearchNameTerm(query),
       searchLoginTerm: await this.parseSearchLoginTerm(query),
       searchEmailTerm: await this.parseSearchEmailTerm(query),
+      bodySearchTerm: await this.parseBodySearchTerm(query),
       banStatus: await this.parseBanStatus(query),
+      publishedStatus: await this.parsePublishedStatus(query),
     };
   }
 }

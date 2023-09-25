@@ -18,10 +18,7 @@ import {
 } from '../entities/return-posts.entity';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
-import {
-  ParseQueriesDto,
-  SortDirection,
-} from '../../../common/query/dto/parse-queries.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
@@ -30,6 +27,7 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class PostsRepo {
   constructor(
@@ -627,7 +625,7 @@ export class PostsRepo {
     const sortBy: string = await this.getSortBy(
       queryData.queryPagination.sortBy,
     );
-    const direction: SortDirection = sortDirection;
+    const direction: SortDirectionEnum = sortDirection;
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 

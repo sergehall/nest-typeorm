@@ -3,6 +3,7 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs.dto';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -11,7 +12,7 @@ export class SaFindBlogsCommand {
 @CommandHandler(SaFindBlogsCommand)
 export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
   constructor(protected bloggerBlogsRepo: BloggerBlogsRepo) {}
-  async execute(command: SaFindBlogsCommand) {
+  async execute(command: SaFindBlogsCommand): Promise<PaginatedResultDto> {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

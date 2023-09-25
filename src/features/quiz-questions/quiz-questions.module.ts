@@ -7,7 +7,6 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
-import { CaslModule } from '../../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SaCreateQuestionsAndAnswerUseCase } from './application/use-cases/sa-create-questions-and-answer.use-case';
@@ -16,8 +15,14 @@ import { QuestionsQuizEntity } from '../pair-game-quiz/entities/questions-quiz.e
 import { PairsGameQuizEntity } from '../pair-game-quiz/entities/pairs-game-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../pair-game-quiz/entities/challenge-answers.entity';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { SaGetQuestionsUseCase } from './application/use-cases/sa-get-questions.use-case';
+import { TransformationService } from './common/transform-to-questions-model';
 
-const saQuizUseCases = [SaCreateQuestionsAndAnswerUseCase];
+const saQuizUseCases = [
+  SaCreateQuestionsAndAnswerUseCase,
+  SaGetQuestionsUseCase,
+];
 
 @Module({
   imports: [
@@ -28,18 +33,19 @@ const saQuizUseCases = [SaCreateQuestionsAndAnswerUseCase];
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
     ]),
-    CaslModule,
     CqrsModule,
   ],
   controllers: [QuizQuestionsController],
   providers: [
-    GameQuizRepo,
+    SaCreateSuperAdmin,
+    ParseQueriesService,
     QuizQuestionsService,
     UsersRepo,
-    SaCreateSuperAdmin,
+    GameQuizRepo,
     ExpirationDateCalculator,
     EncryptConfig,
     KeyResolver,
+    TransformationService,
     ...saQuizUseCases,
   ],
 })
