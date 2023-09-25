@@ -13,32 +13,17 @@ import { QuizQuestionsService } from '../application/quiz-questions.service';
 import { CreateQuizQuestionDto } from '../dto/create-quiz-question.dto';
 import { UpdateQuizQuestionDto } from '../dto/update-quiz-question.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
-import { CreateBlogsDto } from '../../blogger-blogs/dto/create-blogs.dto';
 import { CommandBus } from '@nestjs/cqrs';
 
-@Controller('sa/quiz-questions')
+@Controller('sa/quiz/questions')
 export class QuizQuestionsController {
   constructor(
     private readonly quizQuestionsService: QuizQuestionsService,
     private commandBus: CommandBus,
   ) {}
 
-  @Post('quiz/questions')
-  @UseGuards(BaseAuthGuard)
-  async saCreateQuestions(
-    @Request() req: any,
-    @Body() createBlogsDto: CreateBlogsDto,
-  ): Promise<boolean> {
-    const currentUserDto = req.user;
-
-    return true;
-    // return await this.commandBus.execute(
-    //   new SaCreateBlogCommand(createBlogsDto, currentUserDto),
-    // );
-  }
   @Get()
   findAll() {
-    console.log('++++');
     return this.quizQuestionsService.findAll();
   }
 
@@ -48,7 +33,16 @@ export class QuizQuestionsController {
   }
 
   @Post()
-  create(@Body() createQuizQuestionDto: CreateQuizQuestionDto) {
+  @UseGuards(BaseAuthGuard)
+  create(
+    @Request() req: any,
+    @Body() createQuizQuestionDto: CreateQuizQuestionDto,
+  ) {
+    const currentUserDto = req.user;
+    console.log(createQuizQuestionDto);
+    // return await this.commandBus.execute(
+    //   new SaCreateBlogCommand(createBlogsDto, currentUserDto),
+    // );
     return this.quizQuestionsService.create(createQuizQuestionDto);
   }
 
