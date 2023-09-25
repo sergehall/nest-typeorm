@@ -11,7 +11,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SaCreateQuestionsAndAnswerUseCase } from './application/use-cases/sa-create-questions-and-answer.use-case';
 import { GameQuizRepo } from '../pair-game-quiz/infrastructure/game-quiz-repo';
-import { QuestionsQuizEntity } from '../pair-game-quiz/entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from './entities/questions-quiz.entity';
 import { PairsGameQuizEntity } from '../pair-game-quiz/entities/pairs-game-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../pair-game-quiz/entities/challenge-answers.entity';

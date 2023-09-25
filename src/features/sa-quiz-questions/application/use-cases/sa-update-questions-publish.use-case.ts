@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../../pair-game-quiz/infrastructure/game-quiz-repo';
 import { NotFoundException } from '@nestjs/common';
-import { QuestionsQuizEntity } from '../../../pair-game-quiz/entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from '../../entities/questions-quiz.entity';
 import { UpdatePublishDto } from '../../dto/update-publish.dto';
 
 export class SaUpdateQuestionsPublishCommand {

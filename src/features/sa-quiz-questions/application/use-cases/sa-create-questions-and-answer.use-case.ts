@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateQuizQuestionDto } from '../../dto/create-quiz-question.dto';
 import { GameQuizRepo } from '../../../pair-game-quiz/infrastructure/game-quiz-repo';
-import { QuestionsQuizEntity } from '../../../pair-game-quiz/entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from '../../entities/questions-quiz.entity';
 import { QuestionsModel } from '../../models/questions.model';
 import { TransformationService } from '../../common/transform-to-questions-model';
 
