@@ -23,6 +23,7 @@ import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.en
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { QuestionsAndCountDto } from '../../quiz-questions/dto/questions-and-count.dto';
 import { UpdateQuizQuestionDto } from '../../quiz-questions/dto/update-quiz-question.dto';
+import { UpdatePublishDto } from '../../quiz-questions/dto/update-publish.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -198,6 +199,24 @@ export class GameQuizRepo {
       return { pair: createdGame, challengeQuestions };
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saUpdateQuestionPublish(
+    question: QuestionsQuizEntity,
+    updatePublishDto: UpdatePublishDto,
+  ): Promise<boolean> {
+    try {
+      question.published = updatePublishDto.published;
+      question.updatedAt = new Date().toISOString();
+
+      // Save updated question to the database
+      await this.questionsRepository.save(question);
+
+      return true;
+    } catch (error) {
+      console.error('Error inserting questions into the database:', error);
       throw new InternalServerErrorException(error.message);
     }
   }
