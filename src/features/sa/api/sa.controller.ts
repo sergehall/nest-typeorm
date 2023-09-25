@@ -275,4 +275,17 @@ export class SaController {
       new SaDeleteBlogByBlogIdCommand(params.id, currentUserDto),
     );
   }
+
+  @Post('quiz/questions')
+  @UseGuards(BaseAuthGuard)
+  async saCreateQuestions(
+    @Request() req: any,
+    @Body() createBlogsDto: CreateBlogsDto,
+  ): Promise<ReturnBloggerBlogsDto> {
+    const currentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new SaCreateBlogCommand(createBlogsDto, currentUserDto),
+    );
+  }
 }

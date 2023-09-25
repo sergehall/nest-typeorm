@@ -17,17 +17,17 @@ export class QuestionsQuizEntity {
 
   @Column({
     type: 'character varying',
-    length: 600,
+    length: 500,
     nullable: false,
   })
   questionText: string;
 
   @Column({
     type: 'character varying',
-    length: 20,
-    nullable: false,
+    array: true,
+    default: [],
   })
-  hashAnswer: string;
+  hashedAnswers: string[];
 
   @Column({
     type: 'enum',

@@ -23,7 +23,7 @@ export class MyCurrentGameUseCase
     const { currentUserDto } = command;
 
     const pairAndQuestionsByUserId: PairAndQuestionsDto | null =
-      await this.gameQuizRepo.getPairAndQuestionsForUser(currentUserDto);
+      await this.gameQuizRepo.getGameAndQuestionsForUser(currentUserDto);
 
     if (!pairAndQuestionsByUserId)
       throw new NotFoundException(
