@@ -17,6 +17,11 @@ import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { dictionaryQuestions } from '../questions/dictionary-questions';
 import { CreateQuizQuestionDto } from '../../quiz-questions/dto/create-quiz-question.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { QuestionsAndCountDto } from '../../quiz-questions/dto/questions-and-count.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -28,6 +33,7 @@ export class GameQuizRepo {
     private readonly challengeQuestionsRepository: Repository<ChallengeQuestionsEntity>,
     @InjectRepository(ChallengeAnswersEntity)
     private readonly challengeAnswersRepository: Repository<ChallengeAnswersEntity>,
+    protected keyResolver: KeyResolver,
   ) {}
 
   async getGameByUserId(userId: string): Promise<PairsGameQuizEntity | null> {
@@ -226,6 +232,73 @@ export class GameQuizRepo {
     return pairGameQuizEntity;
   }
 
+  async saGetQuestions(
+    queryData: ParseQueriesDto,
+  ): Promise<QuestionsAndCountDto> {
+    const bodySearchTerm = queryData.bodySearchTerm;
+    // Retrieve paging parameters
+    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
+    const { sortBy, direction, limit, offset } = pagingParams;
+
+    // Retrieve the order field for sorting
+    const orderByField = await this.getOrderField(sortBy);
+
+    try {
+      const queryBuilder = this.questionsRepository
+        .createQueryBuilder('questionsQuiz')
+        .where('questionsQuiz.questionText ILIKE :bodySearchTerm', {
+          bodySearchTerm,
+        })
+        .orderBy(`questionsQuiz.${orderByField}`, direction);
+
+      const questions: QuestionsQuizEntity[] = await queryBuilder
+        .skip(offset)
+        .take(limit)
+        .getMany();
+
+      const countQuestions = await queryBuilder.getCount();
+
+      if (questions.length === 0) {
+        return {
+          questions: [],
+          countQuestions: countQuestions,
+        };
+      }
+
+      return { questions, countQuestions };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async getOrderField(field: string): Promise<string> {
+    let orderByString;
+    try {
+      switch (field) {
+        case 'complexity':
+          orderByString = 'complexity';
+          break;
+        case 'topic':
+          orderByString = 'topic';
+          break;
+        case 'published':
+          orderByString = 'published ';
+          break;
+        case 'body':
+          orderByString = 'questionText';
+          break;
+        default:
+          orderByString = 'createdAt';
+      }
+
+      return orderByString;
+    } catch (error) {
+      console.log(error.message);
+      throw new Error('Invalid field in getOrderField(field: string)');
+    }
+  }
+
   private async getChallengeQuestions(
     pairGameQuizId: string,
     countAnswers: number,
@@ -331,7 +404,6 @@ export class GameQuizRepo {
 
       // Save the question to the database
       await this.questionsRepository.save(newQuestion);
-      newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
 
       return newQuestion;
     } catch (error) {
@@ -386,21 +458,28 @@ export class GameQuizRepo {
     return hashedArray;
   }
 
-  private async hashToString(
-    hash: string,
+  private async hashesToStrings(
+    hashes: string[],
     answers: string[],
-  ): Promise<string | null> {
-    for (const answer of answers) {
-      const computedHash = crypto
-        .createHash('sha256')
-        .update(answer)
-        .digest('hex');
-      if (computedHash.substring(0, hash.length) === hash) {
-        return answer;
+  ): Promise<string[]> {
+    const matchedStrings: string[] = [];
+
+    for (const hash of hashes) {
+      for (const answer of answers) {
+        const computedHash = crypto
+          .createHash('sha256')
+          .update(answer)
+          .digest('hex');
+        if (computedHash === hash) {
+          matchedStrings.push(answer);
+          break; // Break the inner loop once a match is found for the current hash
+        }
       }
     }
-    return null; // Hash doesn't match any of the original strings
+
+    return matchedStrings;
   }
+
   private async isInvalidUUIDError(error: any): Promise<boolean> {
     return error.message.includes('invalid input syntax for type uuid');
   }
@@ -408,5 +487,28 @@ export class GameQuizRepo {
   private async extractUserIdFromError(error: any): Promise<string | null> {
     const match = error.message.match(/"([^"]+)"/);
     return match ? match[1] : null;
+  }
+
+  private async getPagingParams(
+    queryData: ParseQueriesDto,
+  ): Promise<PagingParamsDto> {
+    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
+
+    const sortBy: string = await this.getSortBy(
+      queryData.queryPagination.sortBy,
+    );
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
+
+    return { sortBy, direction, limit, offset };
+  }
+
+  private async getSortBy(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      ['complexity', 'topic', 'published', 'bodySearchTerm'],
+      'createdAt',
+    );
   }
 }

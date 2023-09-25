@@ -13,16 +13,14 @@ import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import {
-  ParseQueriesDto,
-  SortDirection,
-} from '../../../common/query/dto/parse-queries.dto';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import * as uuid4 from 'uuid4';
 import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -336,7 +334,8 @@ export class PostsRawSqlRepository {
     const sortBy: string = await this.getSortBy(
       queryData.queryPagination.sortBy,
     );
-    const direction: SortDirection = queryData.queryPagination.sortDirection;
+    const direction: SortDirectionEnum =
+      queryData.queryPagination.sortDirection;
     const limit: number = queryData.queryPagination.pageSize;
     const offset: number = (queryData.queryPagination.pageNumber - 1) * limit;
 

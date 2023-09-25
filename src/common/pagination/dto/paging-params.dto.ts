@@ -1,11 +1,11 @@
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { SortDirection } from '../../query/dto/parse-queries.dto';
+import { SortDirectionEnum } from '../../query/enums/sort-direction.enum';
 
 export class PagingParamsDto {
   @IsString()
   sortBy: string;
-  @IsEnum(SortDirection)
-  direction: SortDirection;
+  @IsEnum(SortDirectionEnum)
+  direction: SortDirectionEnum;
   @IsNumber()
   limit: number;
   @IsNumber()
