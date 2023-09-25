@@ -22,6 +22,7 @@ import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dt
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { QuestionsAndCountDto } from '../../quiz-questions/dto/questions-and-count.dto';
+import { UpdateQuizQuestionDto } from '../../quiz-questions/dto/update-quiz-question.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -74,6 +75,30 @@ export class GameQuizRepo {
       if (await this.isInvalidUUIDError(error)) {
         const userId = await this.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getQuestionById(id: string): Promise<QuestionsQuizEntity | null> {
+    try {
+      const queryBuilder = this.questionsRepository
+        .createQueryBuilder('questionsQuiz')
+        .where('questionsQuiz.id = :id', {
+          id,
+        })
+        .andWhere('questionsQuiz.published = :published', {
+          published: false,
+        });
+
+      const questionsQuizEntity: QuestionsQuizEntity | null =
+        await queryBuilder.getOne();
+
+      return questionsQuizEntity ? questionsQuizEntity : null;
+    } catch (error) {
+      if (await this.isInvalidUUIDError(error)) {
+        const userId = await this.extractUserIdFromError(error);
+        throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -173,6 +198,56 @@ export class GameQuizRepo {
       return { pair: createdGame, challengeQuestions };
     } catch (error) {
       console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saUpdateQuestionAndAnswer(
+    question: QuestionsQuizEntity,
+    updateQuizQuestionDto: UpdateQuizQuestionDto,
+  ): Promise<boolean> {
+    try {
+      const hashedAnswers = await this.stringToHash(
+        updateQuizQuestionDto.correctAnswers,
+        20,
+      );
+
+      question.questionText = updateQuizQuestionDto.body;
+      question.hashedAnswers = hashedAnswers;
+      question.updatedAt = new Date().toISOString();
+
+      // Save updated question to the database
+      await this.questionsRepository.save(question);
+
+      return true;
+    } catch (error) {
+      console.error('Error inserting questions into the database:', error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saCreateQuestion(
+    createQuizQuestionDto: CreateQuizQuestionDto,
+  ): Promise<QuestionsQuizEntity> {
+    try {
+      const question = createQuizQuestionDto.body;
+      const correctAnswers = createQuizQuestionDto.correctAnswers;
+
+      const hashedAnswers = await this.stringToHash(correctAnswers, 20);
+
+      const newQuestion = new QuestionsQuizEntity();
+      newQuestion.questionText = question;
+      newQuestion.hashedAnswers = hashedAnswers;
+      newQuestion.complexity = ComplexityEnums.EASY;
+      newQuestion.published = false;
+      newQuestion.createdAt = new Date().toISOString();
+
+      // Save the question to the database
+      await this.questionsRepository.save(newQuestion);
+
+      return newQuestion;
+    } catch (error) {
+      console.error('Error inserting questions into the database:', error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -386,32 +461,6 @@ export class GameQuizRepo {
     return randomQuestions.slice(0, numberQuestions);
   }
 
-  async saCreateQuestion(
-    createQuizQuestionDto: CreateQuizQuestionDto,
-  ): Promise<QuestionsQuizEntity> {
-    try {
-      const question = createQuizQuestionDto.body;
-      const correctAnswers = createQuizQuestionDto.correctAnswers;
-
-      const hashedAnswers = await this.stringToHash(correctAnswers, 20);
-
-      const newQuestion = new QuestionsQuizEntity();
-      newQuestion.questionText = question;
-      newQuestion.hashedAnswers = hashedAnswers;
-      newQuestion.complexity = ComplexityEnums.EASY;
-      newQuestion.published = false;
-      newQuestion.createdAt = new Date().toISOString();
-
-      // Save the question to the database
-      await this.questionsRepository.save(newQuestion);
-
-      return newQuestion;
-    } catch (error) {
-      console.error('Error inserting questions into the database:', error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async createAndSaveQuestion(): Promise<boolean> {
     try {
       // Loop through each complexity level (easy, medium, difficult)
@@ -456,6 +505,22 @@ export class GameQuizRepo {
     }
 
     return hashedArray;
+  }
+
+  private async hashToString(
+    hash: string,
+    answers: string[],
+  ): Promise<string | null> {
+    for (const answer of answers) {
+      const computedHash = crypto
+        .createHash('sha256')
+        .update(answer)
+        .digest('hex');
+      if (computedHash === hash) {
+        return answer;
+      }
+    }
+    return null; // Hash doesn't match any of the original strings
   }
 
   private async hashesToStrings(
