@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import * as crypto from 'crypto';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
@@ -16,14 +16,14 @@ import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { dictionaryQuestions } from '../questions/dictionary-questions';
-import { CreateQuizQuestionDto } from '../../quiz-questions/dto/create-quiz-question.dto';
+import { CreateQuizQuestionDto } from '../../sa-quiz-questions/dto/create-quiz-question.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { QuestionsAndCountDto } from '../../quiz-questions/dto/questions-and-count.dto';
-import { UpdateQuizQuestionDto } from '../../quiz-questions/dto/update-quiz-question.dto';
-import { UpdatePublishDto } from '../../quiz-questions/dto/update-publish.dto';
+import { QuestionsAndCountDto } from '../../sa-quiz-questions/dto/questions-and-count.dto';
+import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-question.dto';
+import { UpdatePublishDto } from '../../sa-quiz-questions/dto/update-publish.dto';
 
 export class GameQuizRepo {
   constructor(

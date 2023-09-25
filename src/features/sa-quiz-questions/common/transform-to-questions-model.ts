@@ -1,4 +1,4 @@
-import { QuestionsQuizEntity } from '../../pair-game-quiz/entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
 import { QuestionsModel } from '../models/questions.model';
 import { Injectable } from '@nestjs/common';
 

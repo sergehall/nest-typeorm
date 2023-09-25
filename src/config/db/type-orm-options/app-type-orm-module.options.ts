@@ -11,7 +11,7 @@ import { LikeStatusCommentsEntity } from '../../../features/comments/entities/li
 import { InvalidJwtEntity } from '../../../features/auth/entities/invalid-jwt.entity';
 import { SentCodesLogEntity } from '../../../mails/infrastructure/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from '../../../features/users/entities/banned-users-for-blogs.entity';
-import { QuestionsQuizEntity } from '../../../features/pair-game-quiz/entities/questions-quiz.entity';
+import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../../../features/pair-game-quiz/entities/pairs-game-quiz.entity';

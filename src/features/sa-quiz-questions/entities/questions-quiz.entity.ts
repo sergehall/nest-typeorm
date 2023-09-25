@@ -5,9 +5,9 @@ import {
   OneToMany,
   Unique,
 } from 'typeorm';
-import { ComplexityEnums } from '../enums/complexity.enums';
-import { ChallengeQuestionsEntity } from './challenge-questions.entity';
-import { PairsGameQuizEntity } from './pairs-game-quiz.entity';
+import { ComplexityEnums } from '../../pair-game-quiz/enums/complexity.enums';
+import { ChallengeQuestionsEntity } from '../../pair-game-quiz/entities/challenge-questions.entity';
+import { PairsGameQuizEntity } from '../../pair-game-quiz/entities/pairs-game-quiz.entity';
 
 @Entity('QuestionsQuiz')
 @Unique(['id', 'questionText'])
