@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StartGameCommand } from './start-game.use-case';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameModel } from '../../models/game.model';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
 
@@ -25,10 +25,9 @@ export class MyCurrentGameUseCase
     const pairAndQuestionsByUserId: PairQuestionsScoreDto | null =
       await this.gameQuizRepo.getGameAndQuestionsForUser(currentUserDto);
 
-    if (!pairAndQuestionsByUserId)
-      throw new NotFoundException(
-        `Game with fot user ID ${currentUserDto.userId} not found`,
-      );
+    if (!pairAndQuestionsByUserId) {
+      throw new ForbiddenException('The user has no open, unfinished games.');
+    }
 
     return await this.mapPairGame.toGameModel(pairAndQuestionsByUserId);
   }
