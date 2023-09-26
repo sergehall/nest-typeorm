@@ -57,6 +57,7 @@ export class PairGameQuizController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('my-current/answer')
   async sentAnswer(
     @Param('id') id: string,
