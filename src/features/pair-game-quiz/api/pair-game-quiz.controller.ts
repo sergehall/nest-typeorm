@@ -16,6 +16,7 @@ import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.u
 import { GameModel } from '../models/game.model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 import { AnswerDto } from '../dto/answer.dto';
+import { AnswerToCurrentQuestionCommand } from '../application/use-cases/answer-for-current-question.use-case';
 
 @Controller('pair-game-quiz/pairs')
 export class PairGameQuizController {
@@ -65,6 +66,8 @@ export class PairGameQuizController {
   ) {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.pairGameQuizService.update(answerDto, currentUserDto);
+    return await this.commandBus.execute(
+      new AnswerToCurrentQuestionCommand(answerDto, currentUserDto),
+    );
   }
 }

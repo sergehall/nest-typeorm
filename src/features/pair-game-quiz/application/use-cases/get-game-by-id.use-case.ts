@@ -34,7 +34,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
 
     await this.checkPermission(gameById, currentUserDto);
 
-    const gameAndQuestions = await this.gameQuizRepo.addQuestionsToGame(
+    const gameAndQuestions = await this.gameQuizRepo.getNextQuestionsToGame(
       gameById,
       currentUserDto,
     );
