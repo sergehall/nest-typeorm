@@ -226,18 +226,15 @@ export class GameQuizRepo {
     updateQuizQuestionDto: UpdateQuizQuestionDto,
   ): Promise<boolean> {
     try {
-      const hashedAnswers = await this.stringsToHashes(
-        updateQuizQuestionDto.correctAnswers,
-        20,
-      );
+      // const hashedAnswers = await this.stringsToHashes(
+      //   updateQuizQuestionDto.correctAnswers,
+      //   20,
+      // );
+      // question.hashedAnswers = hashedAnswers;
 
       question.questionText = updateQuizQuestionDto.body;
-      question.hashedAnswers = hashedAnswers;
+      question.hashedAnswers = updateQuizQuestionDto.correctAnswers;
       question.updatedAt = new Date().toISOString();
-
-      // question.questionText = updateQuizQuestionDto.body;
-      // question.hashedAnswers = updateQuizQuestionDto.correctAnswers;
-      // question.updatedAt = new Date().toISOString();
 
       // Save updated question to the database
       await this.questionsRepository.save(question);
@@ -254,23 +251,16 @@ export class GameQuizRepo {
   ): Promise<QuestionsQuizEntity> {
     try {
       const question = createQuizQuestionDto.body;
-      const correctAnswers = createQuizQuestionDto.correctAnswers;
 
-      const hashedAnswers = await this.stringsToHashes(correctAnswers, 20);
+      // const hashedAnswers = await this.stringsToHashes(createQuizQuestionDto.correctAnswers, 20);
 
       const newQuestion = new QuestionsQuizEntity();
+      // newQuestion.hashedAnswers = hashedAnswers;
       newQuestion.questionText = question;
-      newQuestion.hashedAnswers = hashedAnswers;
+      newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
       newQuestion.complexity = ComplexityEnums.EASY;
       newQuestion.published = false;
       newQuestion.createdAt = new Date().toISOString();
-      //
-      // const newQuestion = new QuestionsQuizEntity();
-      // newQuestion.questionText = question;
-      // newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
-      // newQuestion.complexity = ComplexityEnums.EASY;
-      // newQuestion.published = false;
-      // newQuestion.createdAt = new Date().toISOString();
 
       // Save the question to the database
       await this.questionsRepository.save(newQuestion);
@@ -436,8 +426,12 @@ export class GameQuizRepo {
     const pairGameQuizEntity = new PairsGameQuizEntity();
     pairGameQuizEntity.id = pairGameQuizId;
 
+    // questionsIds to change the published status in the selected questions
+    const questionsIds: string[] = [];
+
     // Use map to create an array of promises for saving ChallengeQuestionsEntities
     const savePromises = questions.map(async (question) => {
+      questionsIds.push(question.id);
       const challengeQuestion: ChallengeQuestionsEntity = {
         id: uuid4(), // Make sure uuid4() generates a valid UUID
         pairGameQuiz: pairGameQuizEntity,
@@ -456,8 +450,32 @@ export class GameQuizRepo {
     // Wait for all promises to complete
     await Promise.all(savePromises);
 
+    await this.updatePublishedStatus(questionsIds);
+
     // Return the array of saved ChallengeQuestionsEntities
     return challengeQuestions;
+  }
+
+  private async updatePublishedStatus(ids: string[]): Promise<void> {
+    try {
+      // Start a transaction
+      await this.questionsRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          // Use the query builder to update records
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update(QuestionsQuizEntity)
+            .set({ published: true })
+            .whereInIds(ids)
+            .execute();
+        },
+      );
+
+      console.log(`Updated published status for ${ids.length} records.`);
+    } catch (error) {
+      console.error('Error updating published status:', error);
+      throw error;
+    }
   }
 
   private async getQuestionsByComplexity(
@@ -475,8 +493,9 @@ export class GameQuizRepo {
 
     for (const complexity of complexityLevels) {
       const levelQuestions = await this.questionsRepository
-        .createQueryBuilder('question')
-        .where('question.complexity = :complexity', { complexity })
+        .createQueryBuilder('questionsQuiz')
+        .where('questionsQuiz.complexity = :complexity', { complexity })
+        .andWhere('questionsQuiz.published = :published', { published: false })
         .orderBy('RANDOM()')
         .limit(questionsPerLevel)
         .getMany();

@@ -70,7 +70,7 @@ export class QuizQuestionsController {
   async updatePublish(
     @Param() params: IdParams,
     @Body() updatePublishDto: UpdatePublishDto,
-  ) {
+  ): Promise<boolean> {
     return await this.commandBus.execute(
       new SaUpdateQuestionsPublishCommand(params.id, updatePublishDto),
     );
