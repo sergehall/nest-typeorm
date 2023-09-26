@@ -2,10 +2,10 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameModel } from '../../models/game.model';
-import { PairAndQuestionsDto } from '../../dto/pair-questions.dto';
 import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
+import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -25,10 +25,10 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
 
     await this.checkPermission(game);
 
-    const pairAndQuestions: PairAndQuestionsDto =
+    const pairQuestionsScoreDto: PairQuestionsScoreDto =
       await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
 
-    return await this.mapPairGame.toGameModel(pairAndQuestions);
+    return await this.mapPairGame.toGameModel(pairQuestionsScoreDto);
   }
 
   private async checkPermission(

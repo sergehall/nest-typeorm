@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { GameModel, PlayerModel, QuestionModel } from '../models/game.model';
+import { PairQuestionsScoreDto } from '../dto/pair-questions-score.dto';
 
 @Injectable()
 export class MapPairGame {
   async toGameModel(
-    pairAndQuestionsDto: PairAndQuestionsDto,
+    pairQuestionsScoreDto: PairQuestionsScoreDto,
   ): Promise<GameModel> {
-    const { pair } = pairAndQuestionsDto;
-    const { challengeQuestions } = pairAndQuestionsDto;
+    const { pair, challengeQuestions, scores } = pairQuestionsScoreDto;
 
     const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
       ? {
@@ -33,12 +32,12 @@ export class MapPairGame {
           id: pair.firstPlayer.userId,
           login: pair.firstPlayer.login,
         },
-        score: 0,
+        score: scores.currentUserCorrectAnswerCount,
       },
       secondPlayerProgress: {
         answers: [],
         player: secondPlayer,
-        score: 0,
+        score: scores.competitorCorrectAnswerCount,
       },
       questions: questions,
       status: pair.status,

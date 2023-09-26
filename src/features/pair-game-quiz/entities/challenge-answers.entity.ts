@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import { PairsGameQuizEntity } from './pairs-game-quiz.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
@@ -12,7 +6,7 @@ import { AnswerStatusEnum } from '../enums/answer-status.enum';
 
 @Entity('ChallengeAnswers')
 export class ChallengeAnswersEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({ type: 'character varying', length: 50, nullable: false })

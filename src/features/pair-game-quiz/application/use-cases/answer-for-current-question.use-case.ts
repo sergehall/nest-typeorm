@@ -33,34 +33,35 @@ export class AnswerForCurrentQuestionUseCase
     const pairAndQuestionsDto: PairAndQuestionsDto | null =
       await this.gameQuizRepo.getNextQuestionsToGame(game!, currentUserDto);
 
-    if (pairAndQuestionsDto.challengeQuestions.length === 0) {
+    if (pairAndQuestionsDto.challengeQuestions.length === 5) {
       throw new ForbiddenException('The user answered all the questions.');
     }
 
     let answerStatus = AnswerStatusEnum.INCORRECT;
 
-    const nextQuestions: ChallengeQuestionsEntity =
+    const nextChallengeQuestion: ChallengeQuestionsEntity =
       pairAndQuestionsDto.challengeQuestions[0];
 
     const verifyAnswer = await this.gameQuizRepo.verifyAnswerByQuestionsId(
-      nextQuestions.id,
+      nextChallengeQuestion.question.id,
       answer,
     );
     if (verifyAnswer) {
       answerStatus = AnswerStatusEnum.CORRECT;
     }
 
-    const challengeAnswer = await this.gameQuizRepo.updateChallengeAnswers(
-      answer,
-      nextQuestions,
-      answerStatus,
-      currentUserDto,
-    );
-    console.log(challengeAnswer, 'challengeAnswer');
+    const updateChallengeAnswer =
+      await this.gameQuizRepo.updateChallengeAnswers(
+        answer,
+        nextChallengeQuestion,
+        answerStatus,
+        currentUserDto,
+      );
+
     return {
-      questionId: challengeAnswer.question.id,
-      answerStatus: challengeAnswer.answerStatus,
-      addedAt: challengeAnswer.addedAt,
+      questionId: updateChallengeAnswer.question.id,
+      answerStatus: updateChallengeAnswer.answerStatus,
+      addedAt: updateChallengeAnswer.addedAt,
     };
   }
 
