@@ -226,13 +226,17 @@ export class GameQuizRepo {
     updateQuizQuestionDto: UpdateQuizQuestionDto,
   ): Promise<boolean> {
     try {
-      const hashedAnswers = await this.stringsToHashes(
-        updateQuizQuestionDto.correctAnswers,
-        20,
-      );
+      // const hashedAnswers = await this.stringsToHashes(
+      //   updateQuizQuestionDto.correctAnswers,
+      //   20,
+      // );
+      //
+      // question.questionText = updateQuizQuestionDto.body;
+      // question.hashedAnswers = hashedAnswers;
+      // question.updatedAt = new Date().toISOString();
 
       question.questionText = updateQuizQuestionDto.body;
-      question.hashedAnswers = hashedAnswers;
+      question.hashedAnswers = updateQuizQuestionDto.correctAnswers;
       question.updatedAt = new Date().toISOString();
 
       // Save updated question to the database
@@ -250,13 +254,20 @@ export class GameQuizRepo {
   ): Promise<QuestionsQuizEntity> {
     try {
       const question = createQuizQuestionDto.body;
-      const correctAnswers = createQuizQuestionDto.correctAnswers;
+      // const correctAnswers = createQuizQuestionDto.correctAnswers;
 
-      const hashedAnswers = await this.stringsToHashes(correctAnswers, 20);
+      // const hashedAnswers = await this.stringsToHashes(correctAnswers, 20);
+      //
+      // const newQuestion = new QuestionsQuizEntity();
+      // newQuestion.questionText = question;
+      // newQuestion.hashedAnswers = hashedAnswers;
+      // newQuestion.complexity = ComplexityEnums.EASY;
+      // newQuestion.published = false;
+      // newQuestion.createdAt = new Date().toISOString();
 
       const newQuestion = new QuestionsQuizEntity();
       newQuestion.questionText = question;
-      newQuestion.hashedAnswers = hashedAnswers;
+      newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
       newQuestion.complexity = ComplexityEnums.EASY;
       newQuestion.published = false;
       newQuestion.createdAt = new Date().toISOString();
