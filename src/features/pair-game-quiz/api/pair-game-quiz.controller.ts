@@ -8,7 +8,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
-import { UpdatePairGameQuizDto } from '../dto/update-pair-game-quiz.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -16,6 +15,7 @@ import { StartGameCommand } from '../application/use-cases/start-game.use-case';
 import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';
 import { GameModel } from '../models/game.model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
+import { AnswerDto } from '../dto/answer.dto';
 
 @Controller('pair-game-quiz/pairs')
 export class PairGameQuizController {
@@ -59,10 +59,12 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Post('my-current/answer')
-  async sentAnswer(
-    @Param('id') id: string,
-    @Body() updatePairGameQuizDto: UpdatePairGameQuizDto,
+  async answerToCurrentQuestion(
+    @Request() req: any,
+    @Body() answerDto: AnswerDto,
   ) {
-    return await this.pairGameQuizService.update(+id, updatePairGameQuizDto);
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.pairGameQuizService.update(answerDto, currentUserDto);
   }
 }
