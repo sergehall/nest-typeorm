@@ -35,7 +35,7 @@ export class QuizQuestionsController {
 
   @Get()
   @UseGuards(BaseAuthGuard)
-  async getQuestions(@Query() query: any) {
+  async saGetQuestions(@Query() query: any) {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
     return this.commandBus.execute(new SaGetQuestionsCommand(queryData));
