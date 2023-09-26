@@ -12,7 +12,6 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
-import { PairAndQuestionsDto } from '../dto/pair-questions.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { dictionaryQuestions } from '../questions/dictionary-questions';
@@ -25,6 +24,8 @@ import { QuestionsAndCountDto } from '../../sa-quiz-questions/dto/questions-and-
 import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-question.dto';
 import { UpdatePublishDto } from '../../sa-quiz-questions/dto/update-publish.dto';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
+import { PairQuestionsScoreDto } from '../dto/pair-questions-score.dto';
+import { CorrectAnswerCountsAndBonusDto } from '../dto/correct-answer-counts-and-bonus.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -163,7 +164,7 @@ export class GameQuizRepo {
   async getNextQuestionsToGame(
     game: PairsGameQuizEntity,
     currentUserDto: CurrentUserDto,
-  ): Promise<PairAndQuestionsDto> {
+  ): Promise<PairQuestionsScoreDto> {
     try {
       const countAnswers = await this.getCountAnswers(
         game.id,
@@ -172,7 +173,14 @@ export class GameQuizRepo {
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(game.id, countAnswers);
 
-      return { pair: game, challengeQuestions };
+      return {
+        pair: game,
+        challengeQuestions,
+        scores: {
+          currentUserCorrectAnswerCount: 0,
+          competitorCorrectAnswerCount: 0,
+        },
+      };
     } catch (error) {
       if (await this.isInvalidUUIDError(error)) {
         const userId = await this.extractUserIdFromError(error);
@@ -201,6 +209,7 @@ export class GameQuizRepo {
     const challengeAnswer = new ChallengeAnswersEntity();
 
     try {
+      challengeAnswer.id = uuid4();
       challengeAnswer.answer = answer;
       challengeAnswer.answerStatus = answerStatus;
       challengeAnswer.addedAt = new Date().toISOString();
@@ -208,7 +217,7 @@ export class GameQuizRepo {
       challengeAnswer.question = questionsQuizEntity;
       challengeAnswer.answerOwner = answerOwnerEntity;
 
-      await this.challengeQuestionsRepository.save(challengeAnswer);
+      await this.challengeAnswersRepository.save(challengeAnswer);
 
       return challengeAnswer;
     } catch (error) {
@@ -219,7 +228,7 @@ export class GameQuizRepo {
 
   async getGameAndQuestionsForUser(
     currentUserDto: CurrentUserDto,
-  ): Promise<PairAndQuestionsDto | null> {
+  ): Promise<PairQuestionsScoreDto | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepository
         .createQueryBuilder('pairsGame')
@@ -240,17 +249,33 @@ export class GameQuizRepo {
 
       if (game.status === StatusGameEnum.PENDING) {
         const challengeQuestions: ChallengeQuestionsEntity[] = [];
-        return { pair: game, challengeQuestions };
+        return {
+          pair: game,
+          challengeQuestions,
+          scores: {
+            currentUserCorrectAnswerCount: 0,
+            competitorCorrectAnswerCount: 0,
+          },
+        };
       }
 
       const countAnswers = await this.getCountAnswers(
         game.id,
         currentUserDto.userId,
       );
+
+      const currentScores: CorrectAnswerCountsAndBonusDto =
+        await this.getScores(game.id, currentUserDto.userId);
+
+      // if (game.firstPlayer.userId === currentUserDto.userId) {
+      //   game;
+      //   return { pair: game, challengeQuestions, score: currentScore };
+      // }
+
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(game.id, countAnswers);
 
-      return { pair: game, challengeQuestions };
+      return { pair: game, challengeQuestions, scores: currentScores };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -259,7 +284,7 @@ export class GameQuizRepo {
 
   async getPendingPairOrCreateNew(
     currentUserDto: CurrentUserDto,
-  ): Promise<PairAndQuestionsDto> {
+  ): Promise<PairQuestionsScoreDto> {
     try {
       const pendingGame: PairsGameQuizEntity | null =
         await this.pairsGameQuizRepository.findOne({
@@ -278,7 +303,14 @@ export class GameQuizRepo {
         const challengeQuestions: ChallengeQuestionsEntity[] = [];
         await this.createChallengeQuestions(createdGame.id);
 
-        return { pair: createdGame, challengeQuestions };
+        return {
+          pair: createdGame,
+          challengeQuestions,
+          scores: {
+            currentUserCorrectAnswerCount: 0,
+            competitorCorrectAnswerCount: 0,
+          },
+        };
       }
 
       createdGame = await this.addSecondPlayerAndStarGame(
@@ -291,7 +323,14 @@ export class GameQuizRepo {
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(createdGame.id, countAnswers);
 
-      return { pair: createdGame, challengeQuestions };
+      return {
+        pair: createdGame,
+        challengeQuestions,
+        scores: {
+          currentUserCorrectAnswerCount: 0,
+          competitorCorrectAnswerCount: 0,
+        },
+      };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
@@ -366,6 +405,91 @@ export class GameQuizRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async getScores(
+    pairGameQuizId: string,
+    userId: string,
+  ): Promise<CorrectAnswerCountsAndBonusDto> {
+    const queryBuilder = this.challengeAnswersRepository
+      .createQueryBuilder('challengeAnswers')
+      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+        pairGameQuizId,
+      })
+      .orderBy('challengeAnswers.addedAt', 'ASC');
+
+    const answerArray = await queryBuilder.getMany();
+    console.log(answerArray);
+    const correctAnswerCounts: CorrectAnswerCountsAndBonusDto =
+      answerArray.reduce(
+        (counts, answer) => {
+          if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
+            if (answer.answerOwner.userId === userId) {
+              counts.currentUserCorrectAnswerCount++;
+            } else {
+              counts.competitorCorrectAnswerCount++;
+            }
+          }
+          return counts;
+        },
+        { currentUserCorrectAnswerCount: 0, competitorCorrectAnswerCount: 0 },
+      );
+
+    // Apply bonus points
+    const bonusPointForCurrentUser =
+      answerArray[0].answerOwner.userId === userId ? 1 : 0;
+    const bonusPointCompetitor: number = bonusPointForCurrentUser === 0 ? 1 : 0;
+
+    correctAnswerCounts.currentUserCorrectAnswerCount +=
+      bonusPointForCurrentUser;
+    correctAnswerCounts.competitorCorrectAnswerCount += bonusPointCompetitor;
+
+    return correctAnswerCounts;
+  }
+
+  // async getScores(
+  //   pairGameQuizId: string,
+  //   userId: string,
+  // ): Promise<CorrectAnswerCountsAndBonusDto> {
+  //   const queryBuilder = this.challengeAnswersRepository
+  //     .createQueryBuilder('challengeAnswers')
+  //     .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+  //     .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+  //     .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+  //       pairGameQuizId,
+  //     })
+  //     .orderBy('challengeAnswers.addedAt', 'DESC');
+  //
+  //   const answerArray = await queryBuilder.getMany();
+  //
+  //   const correctAnswerCounts: CorrectAnswerCountsAndBonusDto =
+  //     answerArray.reduce(
+  //       (counts, answer) => {
+  //         if (answer.answerStatus === 'Correct') {
+  //           if (answer.answerOwner.userId === userId) {
+  //             counts.currentUserCorrectAnswerCount++;
+  //           } else {
+  //             counts.competitorCorrectAnswerCount++;
+  //           }
+  //         }
+  //         return counts;
+  //       },
+  //       { currentUserCorrectAnswerCount: 0, competitorCorrectAnswerCount: 0 },
+  //     );
+  //
+  //   const bonusPointForCurrentUser =
+  //     answerArray[0].answerOwner.userId === userId ? 1 : 0;
+  //   let bonusPointCompetitor: number = 0;
+  //   if (!bonusPointForCurrentUser) {
+  //     bonusPointCompetitor++;
+  //   }
+  //   correctAnswerCounts.currentUserCorrectAnswerCount +
+  //     bonusPointForCurrentUser;
+  //   correctAnswerCounts.competitorCorrectAnswerCount + bonusPointCompetitor;
+  //
+  //   return correctAnswerCounts;
+  // }
 
   async getCountAnswers(
     pairGameQuizId: string,
@@ -655,6 +779,7 @@ export class GameQuizRepo {
       throw new Error(`Error while removing data for question id`);
     }
   }
+
   private async deleteQuestionsData(
     questionId: string,
     entityManager: EntityManager,

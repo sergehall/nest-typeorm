@@ -3,9 +3,9 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StartGameCommand } from './start-game.use-case';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameModel } from '../../models/game.model';
-import { PairAndQuestionsDto } from '../../dto/pair-questions.dto';
 import { NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
+import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
 
 export class MyCurrentGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -22,7 +22,7 @@ export class MyCurrentGameUseCase
   async execute(command: StartGameCommand): Promise<GameModel> {
     const { currentUserDto } = command;
 
-    const pairAndQuestionsByUserId: PairAndQuestionsDto | null =
+    const pairAndQuestionsByUserId: PairQuestionsScoreDto | null =
       await this.gameQuizRepo.getGameAndQuestionsForUser(currentUserDto);
 
     if (!pairAndQuestionsByUserId)
