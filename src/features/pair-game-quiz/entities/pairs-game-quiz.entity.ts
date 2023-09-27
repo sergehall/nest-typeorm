@@ -43,8 +43,8 @@ export class PairsGameQuizEntity {
   })
   status: StatusGameEnum;
 
-  @Column({ type: 'character varying', length: 50, nullable: true })
-  pairCreatedDate: string | null;
+  @Column({ type: 'character varying', length: 50, nullable: false })
+  pairCreatedDate: string;
 
   @Column({ type: 'character varying', length: 50, nullable: true })
   startGameDate: string | null;
@@ -58,60 +58,3 @@ export class PairsGameQuizEntity {
   )
   questions: ChallengeQuestionsEntity[];
 }
-
-// @Entity('PairGameQuiz)
-// export class PairGameQuizEntity {
-//   @PrimaryGeneratedColumn('uuid')
-//   id: string;
-//
-//   @Column('jsonb', { default: {} })
-//   firstPlayerProgress: {
-//     answers: {
-//       questionId: string;
-//       answerStatus: string;
-//       addedAt: string;
-//     }[];
-//     player: {
-//       id: string;
-//       login: string;
-//     };
-//     score: number;
-//   };
-//
-//   @Column('jsonb', { default: {} })
-//   secondPlayerProgress: {
-//     answers: {
-//       questionId: string;
-//       answerStatus: string;
-//       addedAt: string;
-//     }[];
-//     player: {
-//       id: string;
-//       login: string;
-//     };
-//     score: number;
-//   };
-//
-//   @Column('jsonb', { default: [] })
-//   questions: {
-//     id: string;
-//     body: string;
-//   }[];
-//
-//   @Column({
-//     type: 'enum',
-//     enum: StatusGameEnum,
-//     default: StatusGameEnum.PENDING,
-//     nullable: false,
-//   })
-//   status: StatusGameEnum;
-//
-//   @Column({ type: 'character varying', length: 50, nullable: false })
-//   pairCreatedDate: string;
-//
-//   @Column({ type: 'character varying', length: 50, nullable: false })
-//   startGameDate: string;
-//
-//   @Column({ type: 'character varying', length: 50, nullable: false })
-//   finishGameDate: string;
-// }

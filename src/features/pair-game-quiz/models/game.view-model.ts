@@ -3,13 +3,12 @@ import {
   IsArray,
   ValidateNested,
   IsEnum,
-  IsDate,
   Matches,
 } from 'class-validator';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
 
-class AnswerModel {
+export class AnswerModel {
   @IsString()
   questionId: string;
 
@@ -18,8 +17,8 @@ class AnswerModel {
   })
   answerStatus: AnswerStatusEnum;
 
-  @IsDate()
-  addedAt: Date;
+  @IsString()
+  addedAt: string;
 }
 
 export class PlayerModel {
@@ -50,7 +49,7 @@ export class QuestionModel {
   body: string;
 }
 
-export class GameModel {
+export class GameViewModel {
   @IsString()
   id: string;
 
@@ -77,10 +76,10 @@ export class GameModel {
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
-  startGameDate: string;
+  startGameDate: string | null;
 
   @Matches(
     '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
   )
-  finishGameDate: string;
+  finishGameDate: string | null;
 }

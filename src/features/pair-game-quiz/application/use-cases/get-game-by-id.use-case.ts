@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
-import { GameModel } from '../../models/game.model';
+import { GameViewModel } from '../../models/game.view-model';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
@@ -25,7 +25,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     protected gameQuizRepo: GameQuizRepo,
     protected mapPairGame: MapPairGame,
   ) {}
-  async execute(command: GetGameByIdCommand): Promise<GameModel> {
+  async execute(command: GetGameByIdCommand): Promise<GameViewModel> {
     const { id, currentUserDto } = command;
 
     const gameById: PairsGameQuizEntity | null =

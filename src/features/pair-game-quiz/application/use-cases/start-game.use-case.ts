@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
-import { GameModel } from '../../models/game.model';
+import { GameViewModel } from '../../models/game.view-model';
 import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
@@ -17,7 +17,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     protected gameQuizRepo: GameQuizRepo,
     protected mapPairGame: MapPairGame,
   ) {}
-  async execute(command: StartGameCommand): Promise<GameModel> {
+  async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
     const game: PairsGameQuizEntity | null =

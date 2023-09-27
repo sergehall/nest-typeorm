@@ -61,3 +61,11 @@ export const forbiddenDeleteDevice = {
   message: 'Cannot delete a device that does not belong to the current user.',
   params: 'deviceId',
 };
+export const noOpenGameMessage = {
+  message: 'The user has no open, unfinished games.',
+  useCase: 'AnswerForCurrentQuestionUseCase',
+};
+export const answeredAllQuestionsMessage = {
+  message: 'The user has already answered all of the questions.',
+  useCase: 'AnswerForCurrentQuestionUseCase',
+};
