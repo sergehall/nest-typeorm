@@ -13,11 +13,13 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { StartGameCommand } from '../application/use-cases/start-game.use-case';
 import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';
-import { GameModel } from '../models/game.model';
+import { GameViewModel } from '../models/game.view-model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 import { AnswerDto } from '../dto/answer.dto';
 import { AnswerToCurrentQuestionCommand } from '../application/use-cases/answer-for-current-question.use-case';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('pair-game-quiz/pairs')
 export class PairGameQuizController {
   constructor(
@@ -32,7 +34,7 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Get('my-current')
-  async findUnfinishedGame(@Request() req: any): Promise<GameModel> {
+  async findUnfinishedGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -42,7 +44,7 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Post('connection')
-  async startGame(@Request() req: any): Promise<GameModel> {
+  async startGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(new StartGameCommand(currentUserDto));

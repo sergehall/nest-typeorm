@@ -2,8 +2,8 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StartGameCommand } from './start-game.use-case';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
-import { GameModel } from '../../models/game.model';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { GameViewModel } from '../../models/game.view-model';
+import { ForbiddenException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
 
@@ -19,16 +19,16 @@ export class MyCurrentGameUseCase
     protected gameQuizRepo: GameQuizRepo,
     protected mapPairGame: MapPairGame,
   ) {}
-  async execute(command: StartGameCommand): Promise<GameModel> {
+  async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
-    const pairAndQuestionsByUserId: PairQuestionsScoreDto | null =
-      await this.gameQuizRepo.getGameAndQuestionsForUser(currentUserDto);
+    const pairByUserId: PairQuestionsScoreDto | null =
+      await this.gameQuizRepo.getCurrentGame(currentUserDto);
 
-    if (!pairAndQuestionsByUserId) {
+    if (!pairByUserId) {
       throw new ForbiddenException('The user has no open, unfinished games.');
     }
 
-    return await this.mapPairGame.toGameModel(pairAndQuestionsByUserId);
+    return await this.mapPairGame.toGameModel(pairByUserId);
   }
 }
