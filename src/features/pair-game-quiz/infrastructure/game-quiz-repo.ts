@@ -889,7 +889,7 @@ export class GameQuizRepo {
     // Wait for all promises to complete
     await Promise.all(savePromises);
 
-    await this.updatePublishedStatus(questionsIds, true);
+    // await this.updatePublishedStatus(questionsIds, true);
 
     // Return the array of saved ChallengeQuestionsEntities
     return challengeQuestions;
