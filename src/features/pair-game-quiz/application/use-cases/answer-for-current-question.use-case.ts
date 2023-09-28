@@ -73,9 +73,9 @@ export class AnswerForCurrentQuestionUseCase
               answerStatus,
               currentUserDto,
             );
-          if (counts.totalCountBoth === 9) {
-            await this.gameQuizRepo.updateQuestionsStatus(pairByUserId.id);
-          }
+          // if (counts.totalCountBoth === 9) {
+          //   await this.gameQuizRepo.updateQuestionsStatus(pairByUserId.id);
+          // }
 
           return {
             questionId: updateChallengeAnswer.question.id,
