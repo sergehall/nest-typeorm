@@ -539,7 +539,7 @@ export class GameQuizRepo {
       newQuestion.complexity = ComplexityEnums.EASY;
       newQuestion.published = false;
       newQuestion.createdAt = new Date().toISOString();
-
+      console.log(newQuestion, 'newQuestion');
       // Save the question to the database
       await this.questionsRepository.save(newQuestion);
 
