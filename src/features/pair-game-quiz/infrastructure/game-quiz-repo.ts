@@ -1130,7 +1130,7 @@ export class GameQuizRepo {
   private async getSortBy(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
-      ['complexity', 'topic', 'published', 'bodySearchTerm'],
+      ['complexity', 'topic', 'published', 'body'],
       'createdAt',
     );
   }
@@ -1148,7 +1148,7 @@ export class GameQuizRepo {
         case 'published':
           orderByString = 'published ';
           break;
-        case 'bodySearchTerm':
+        case 'body':
           orderByString = 'questionText';
           break;
         default:
