@@ -57,12 +57,15 @@ export class GameQuizRepo {
 
       return pair ? pair : null;
     } catch (error) {
-      console.log(error.message);
+      if (await this.isInvalidUUIDError(error)) {
+        const userId = await this.extractUserIdFromError(error);
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getCurrentGameByUserId(
+  async getActiveGameByUserId(
     userId: string,
   ): Promise<PairsGameQuizEntity | null> {
     try {
@@ -134,6 +137,27 @@ export class GameQuizRepo {
     }
   }
 
+  async getChallengeAnswersBothPlayers(
+    pairGameQuizId: string,
+  ): Promise<ChallengeAnswersEntity[]> {
+    const queryBuilder = this.challengeAnswersRepository
+      .createQueryBuilder('challengeAnswers')
+      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeAnswers.question', 'question')
+      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+        pairGameQuizId,
+      })
+      .orderBy('challengeAnswers.addedAt', 'DESC');
+
+    try {
+      return await queryBuilder.getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async verifyAnswerByQuestionsId(
     id: string,
     answer: string,
@@ -166,7 +190,7 @@ export class GameQuizRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsScoreDto> {
     try {
-      const challengeAnswersCount = await this.getChallengeAnswersCount(
+      const challengeAnswersCount = await this.getChallengeAnswersAndCount(
         game.id,
         currentUserDto.userId,
       );
@@ -174,7 +198,7 @@ export class GameQuizRepo {
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(
           game.id,
-          challengeAnswersCount.countAnswers,
+          challengeAnswersCount.countAnswersByUserId,
         );
 
       return {
@@ -191,6 +215,28 @@ export class GameQuizRepo {
         const userId = await this.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateQuestionsStatus(pairId: string): Promise<boolean> {
+    const queryBuilder = this.challengeQuestionsRepository
+      .createQueryBuilder('challengeQuestions')
+      .leftJoinAndSelect('challengeQuestions.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeQuestions.question', 'question')
+      .where('pairGameQuiz.id = :pairId', { pairId });
+
+    try {
+      const questions = await queryBuilder.getMany();
+
+      const ids = questions.map(
+        (challengeQuestion) => challengeQuestion.question.id,
+      );
+
+      await this.updatePublishedStatus(ids, false);
+      return true;
+    } catch (error) {
+      console.error('Error updateQuestionsStatus:', error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -240,7 +286,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getCurrentGame(
+  async getActiveGame(
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsScoreDto | null> {
     try {
@@ -277,8 +323,11 @@ export class GameQuizRepo {
 
       const challengeAnswersCount: {
         challengeAnswers: ChallengeAnswersEntity[];
-        countAnswers: number;
-      } = await this.getChallengeAnswersCount(game.id, currentUserDto.userId);
+        countAnswersByUserId: number;
+      } = await this.getChallengeAnswersAndCount(
+        game.id,
+        currentUserDto.userId,
+      );
 
       const currentScores: CorrectAnswerCountsAndBonusDto =
         await this.getScores1(game, challengeAnswersCount.challengeAnswers);
@@ -286,7 +335,7 @@ export class GameQuizRepo {
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(
           game.id,
-          challengeAnswersCount.countAnswers,
+          challengeAnswersCount.countAnswersByUserId,
         );
 
       return {
@@ -336,18 +385,17 @@ export class GameQuizRepo {
         };
       }
 
-      const challengeAnswersCount = await this.getChallengeAnswersCount(
+      const challengeAnswersCount = await this.getChallengeAnswersAndCount(
         game.id,
         currentUserDto.userId,
       );
-      console.log(challengeAnswersCount, 'challengeAnswersCount');
       const currentScores: CorrectAnswerCountsAndBonusDto =
         await this.getScores(game.id, currentUserDto.userId);
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestions(
           game.id,
-          challengeAnswersCount.countAnswers,
+          challengeAnswersCount.countAnswersByUserId,
         );
 
       return {
@@ -599,12 +647,12 @@ export class GameQuizRepo {
     return correctAnswerCounts;
   }
 
-  async getChallengeAnswersCount(
+  async getChallengeAnswersAndCount(
     pairGameQuizId: string,
     userId: string,
   ): Promise<{
     challengeAnswers: ChallengeAnswersEntity[];
-    countAnswers: number;
+    countAnswersByUserId: number;
   }> {
     const queryBuilder = this.challengeAnswersRepository
       .createQueryBuilder('challengeAnswers')
@@ -622,9 +670,9 @@ export class GameQuizRepo {
     queryBuilder.andWhere('challengeAnswers.answerOwnerId = :userId', {
       userId,
     });
-    const countAnswers = await queryBuilder.getCount();
+    const countAnswersByUserId = await queryBuilder.getCount();
 
-    return { challengeAnswers, countAnswers };
+    return { challengeAnswers, countAnswersByUserId };
   }
 
   private async addSecondPlayerAndStarGame(
@@ -635,10 +683,7 @@ export class GameQuizRepo {
     secondPlayer.userId = currentUserDto.userId;
     secondPlayer.login = currentUserDto.login;
     pairGameQuiz.secondPlayer = secondPlayer;
-
-    pairGameQuiz.pairCreatedDate = new Date().toISOString();
     pairGameQuiz.startGameDate = new Date().toISOString();
-
     pairGameQuiz.status = StatusGameEnum.ACTIVE;
 
     await this.pairsGameQuizRepository.save(pairGameQuiz);
@@ -858,7 +903,7 @@ export class GameQuizRepo {
   //   }
   // }
 
-  private async getChallengeQuestions(
+  async getChallengeQuestions(
     pairGameQuizId: string,
     countAnswers: number,
   ): Promise<ChallengeQuestionsEntity[]> {
@@ -914,13 +959,16 @@ export class GameQuizRepo {
     // Wait for all promises to complete
     await Promise.all(savePromises);
 
-    await this.updatePublishedStatus(questionsIds);
+    await this.updatePublishedStatus(questionsIds, true);
 
     // Return the array of saved ChallengeQuestionsEntities
     return challengeQuestions;
   }
 
-  private async updatePublishedStatus(ids: string[]): Promise<void> {
+  private async updatePublishedStatus(
+    ids: string[],
+    published: boolean,
+  ): Promise<void> {
     try {
       // Start a transaction
       await this.questionsRepository.manager.transaction(
@@ -929,7 +977,7 @@ export class GameQuizRepo {
           await transactionalEntityManager
             .createQueryBuilder()
             .update(QuestionsQuizEntity)
-            .set({ published: true })
+            .set({ published })
             .whereInIds(ids)
             .execute();
         },
