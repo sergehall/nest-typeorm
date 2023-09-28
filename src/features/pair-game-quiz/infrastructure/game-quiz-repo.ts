@@ -550,43 +550,20 @@ export class GameQuizRepo {
     }
   }
 
-  async getScores2(
-    game: PairsGameQuizEntity,
-    challengeAnswers: ChallengeAnswersEntity[],
-  ): Promise<CorrectAnswerCountsAndBonusDto> {
-    let currentUserBonus = true;
-    let competitorBonus = true;
-
-    const counts = {
-      currentUserCorrectAnswerCount: 0,
-      competitorCorrectAnswerCount: 0,
-    };
-
-    for (const answer of challengeAnswers) {
-      if (answer.answerStatus !== AnswerStatusEnum.CORRECT) {
-        continue; // Skip incorrect answers
-      }
-
-      if (answer.answerOwner.userId === game.firstPlayer.userId) {
-        if (currentUserBonus) {
-          counts.currentUserCorrectAnswerCount++;
-          counts.currentUserCorrectAnswerCount++;
-          currentUserBonus = false;
-        } else {
-          counts.currentUserCorrectAnswerCount++;
-        }
-      } else {
-        if (competitorBonus) {
-          counts.competitorCorrectAnswerCount++;
-          counts.competitorCorrectAnswerCount++;
-          competitorBonus = false;
-        } else {
-          counts.competitorCorrectAnswerCount++;
-        }
-      }
+  private async getRandomQuestions(
+    numberQuestions: number,
+  ): Promise<QuestionsQuizEntity[]> {
+    const queryBuilderQuestions = this.questionsRepository
+      .createQueryBuilder('questionsQuiz')
+      .where('questionsQuiz.published = :published', { published: false })
+      .orderBy('RANDOM()')
+      .limit(numberQuestions);
+    try {
+      return await queryBuilderQuestions.getMany();
+    } catch (error) {
+      console.error('Error inserting questions into the database:', error);
+      throw new InternalServerErrorException(error.message);
     }
-
-    return counts;
   }
 
   async getScores1(
@@ -881,8 +858,9 @@ export class GameQuizRepo {
 
     const challengeQuestions: ChallengeQuestionsEntity[] = [];
 
-    const questions: QuestionsQuizEntity[] =
-      await this.getQuestionsByComplexity(numberQuestions);
+    const questions: QuestionsQuizEntity[] = await this.getRandomQuestions(
+      numberQuestions,
+    );
 
     const pairGameQuizEntity = new PairsGameQuizEntity();
     pairGameQuizEntity.id = pairGameQuizId;
