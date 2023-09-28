@@ -15,6 +15,7 @@ import { MyCurrentGameUseCase } from './application/use-cases/my-current-game.us
 import { GetGameByIdUseCase } from './application/use-cases/get-game-by-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { AnswerForCurrentQuestionUseCase } from './application/use-cases/answer-for-current-question.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -22,6 +23,8 @@ const usersUseCases = [
   StartGameUseCase,
   AnswerForCurrentQuestionUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -39,7 +42,7 @@ const usersUseCases = [
     PairGameQuizService,
     GameQuizRepo,
     MapPairGame,
-    KeyResolver,
+    ...helpers,
     ...usersUseCases,
   ],
 })
