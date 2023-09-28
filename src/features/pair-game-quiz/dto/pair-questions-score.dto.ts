@@ -4,7 +4,7 @@ import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { CorrectAnswerCountsAndBonusDto } from './correct-answer-counts-and-bonus.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 
-export class PairQuestionsScoreDto {
+export class PairQuestionsAnswersScoresDto {
   @IsNotEmpty()
   pair: PairsGameQuizEntity;
   @IsNotEmpty()

@@ -21,8 +21,11 @@ import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -41,7 +44,6 @@ const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
     UsersService,
     BlogsService,
     PostsService,
-    KeyResolver,
     BloggerBlogsService,
     UsersRepo,
     UsersRawSqlRepository,
@@ -49,6 +51,7 @@ const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,
     InvalidJwtRepo,
+    ...helpers,
     ...blogsUseCases,
   ],
 })

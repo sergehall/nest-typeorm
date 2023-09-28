@@ -36,13 +36,13 @@ export class MyCurrentGameUseCase
     }
 
     if (game.status === StatusGameEnum.PENDING) {
-      return this.createPendingGameModel(game);
+      return this.createGameModelForPending(game);
     }
 
-    return this.createActiveGameModel(game, currentUserDto);
+    return this.createGameModelForActive(game, currentUserDto);
   }
 
-  private createPendingGameModel(
+  private createGameModelForPending(
     game: PairsGameQuizEntity,
   ): Promise<GameViewModel> {
     const challengeQuestions: ChallengeQuestionsEntity[] = [];
@@ -59,7 +59,7 @@ export class MyCurrentGameUseCase
     });
   }
 
-  private async createActiveGameModel(
+  private async createGameModelForActive(
     game: PairsGameQuizEntity,
     currentUserDto: CurrentUserDto,
   ): Promise<GameViewModel> {

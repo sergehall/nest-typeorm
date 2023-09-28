@@ -33,6 +33,7 @@ import { DeleteCommentUseCase } from './application/use-cases/delete-comment.use
 import { GetCommentsByPostIdUseCase } from './application/use-cases/get-comments-by-post-id.use-case';
 import { GetCommentByIdUseCase } from './application/use-cases/get-comment-by-id';
 import { GetCommentsByUserIdUseCase } from '../blogger-blogs/application/use-cases/get-comments-by-user-id.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -43,6 +44,8 @@ const commentsUseCases = [
   DeleteCommentUseCase,
   ChangeLikeStatusCommentUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -65,7 +68,6 @@ const commentsUseCases = [
     PostsService,
     AuthService,
     UsersService,
-    KeyResolver,
     UsersRepo,
     UsersRawSqlRepository,
     PostsRepo,
@@ -76,6 +78,7 @@ const commentsUseCases = [
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
+    ...helpers,
     ...commentsUseCases,
   ],
 })

@@ -5,7 +5,7 @@ import {
   PlayerModel,
   QuestionModel,
 } from '../models/game.view-model';
-import { PairQuestionsScoreDto } from '../dto/pair-questions-score.dto';
+import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
@@ -13,9 +13,10 @@ import { UsersEntity } from '../../users/entities/users.entity';
 @Injectable()
 export class MapPairGame {
   async toGameModel(
-    pairQuestionsScoreDto: PairQuestionsScoreDto,
+    pairQuestionsAnswersScoresDto: PairQuestionsAnswersScoresDto,
   ): Promise<GameViewModel> {
-    const { pair, challengeQuestions, scores } = pairQuestionsScoreDto;
+    const { pair, challengeQuestions, challengeAnswers, scores } =
+      pairQuestionsAnswersScoresDto;
 
     const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
       ? {
@@ -31,7 +32,7 @@ export class MapPairGame {
     const processAnswers = await this.processAnswers(
       pair.firstPlayer,
       pair.secondPlayer,
-      pairQuestionsScoreDto.challengeAnswers,
+      challengeAnswers,
     );
 
     const firstPlayerAnswers: AnswerModel[] =

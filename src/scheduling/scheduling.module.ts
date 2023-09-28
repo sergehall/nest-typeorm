@@ -20,6 +20,9 @@ import { InvalidJwtRepo } from '../features/auth/infrastructure/invalid-jwt-repo
 import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
 import { SecurityDevicesEntity } from '../features/security-devices/entities/session-devices.entity';
 import { SecurityDevicesRepo } from '../features/security-devices/infrastructure/security-devices.repo';
+import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -40,7 +43,6 @@ import { SecurityDevicesRepo } from '../features/security-devices/infrastructure
     ScheduledTasksService,
     UsersService,
     DataCleanupService,
-    KeyResolver,
     UsersRepo,
     UsersRawSqlRepository,
     PostsRawSqlRepository,
@@ -48,6 +50,7 @@ import { SecurityDevicesRepo } from '../features/security-devices/infrastructure
     SecurityDevicesRepo,
     BannedUsersForBlogsRawSqlRepository,
     SentCodeLogRepository,
+    ...helpers,
   ],
 })
 export class SchedulingModule {}

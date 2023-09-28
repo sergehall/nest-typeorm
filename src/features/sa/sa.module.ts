@@ -39,6 +39,7 @@ import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entit
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-post-by-post-id.use-case';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -56,6 +57,8 @@ const saUseCases = [
   SaUpdatePostsByPostIdUseCase,
   SaDeletePostByPostIdUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -77,7 +80,6 @@ const saUseCases = [
     UsersService,
     BloggerBlogsService,
     EncryptConfig,
-    KeyResolver,
     UsersRepo,
     SentCodeLogRepository,
     PostsRepo,
@@ -88,6 +90,7 @@ const saUseCases = [
     BloggerBlogsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
+    ...helpers,
     ...saUseCases,
   ],
 })

@@ -9,6 +9,9 @@ import { SecurityDevicesRepo } from '../features/security-devices/infrastructure
 import { SecurityDevicesEntity } from '../features/security-devices/entities/session-devices.entity';
 import { UsersRepo } from '../features/users/infrastructure/users-repo';
 import { UsersEntity } from '../features/users/entities/users.entity';
+import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -20,11 +23,11 @@ import { UsersEntity } from '../features/users/entities/users.entity';
     CqrsModule,
   ],
   providers: [
-    KeyResolver,
     DataCleanupService,
     UsersRepo,
     InvalidJwtRepo,
     SecurityDevicesRepo,
+    ...helpers,
   ],
 })
 export class DataCleanupModule {}

@@ -23,6 +23,7 @@ import { UsersEntity } from './entities/users.entity';
 import { FindUsersUseCase } from './application/use-cases/find-users.use-case';
 import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -38,6 +39,8 @@ const usersValidators = [
   CodeExistsValidator,
 ];
 
+const helpers = [KeyResolver, UuidErrorResolver];
+
 @Module({
   imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
   controllers: [UsersController],
@@ -51,8 +54,8 @@ const usersValidators = [
     AuthService,
     JwtService,
     EncryptConfig,
-    KeyResolver,
     ExpirationDateCalculator,
+    ...helpers,
     ...usersValidators,
     ...usersUseCases,
   ],

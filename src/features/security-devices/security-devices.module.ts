@@ -24,6 +24,7 @@ import { InvalidJwtRepo } from '../auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { UpdateDeviceUseCase } from './application/use-cases/update-device.use-case';
 import { DeleteDevicesAfterLogoutUseCase } from './application/use-cases/delete-devices-after-logout.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
@@ -33,6 +34,8 @@ const securityDevicesCases = [
   RemoveDevicesByDeviceIdUseCase,
   RemoveDevicesExceptCurrentUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -51,13 +54,13 @@ const securityDevicesCases = [
     JwtConfig,
     CaslAbilityFactory,
     UsersService,
-    KeyResolver,
     DecodeTokenService,
     SecurityDevicesService,
     SecurityDevicesRepo,
     SecurityDevicesRawSqlRepository,
     InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
+    ...helpers,
     ...securityDevicesCases,
   ],
 })

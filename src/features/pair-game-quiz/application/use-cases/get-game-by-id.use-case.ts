@@ -12,7 +12,7 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
+import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
 
 export class GetGameByIdCommand {
   constructor(public id: string, public currentUserDto: CurrentUserDto) {}
@@ -35,7 +35,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
 
     await this.checkPermission(gameById, currentUserDto);
 
-    const gameAndQuestions: PairQuestionsScoreDto =
+    const gameAndQuestions: PairQuestionsAnswersScoresDto =
       await this.gameQuizRepo.getNextQuestionsToGame(gameById, currentUserDto);
 
     return await this.mapPairGame.toGameModel(gameAndQuestions);
