@@ -26,6 +26,7 @@ import { UpdatePublishDto } from '../../sa-quiz-questions/dto/update-publish.dto
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
 import { CorrectAnswerCountsAndBonusDto } from '../dto/correct-answer-counts-and-bonus.dto';
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class GameQuizRepo {
   constructor(
@@ -38,6 +39,7 @@ export class GameQuizRepo {
     @InjectRepository(ChallengeAnswersEntity)
     private readonly challengeAnswersRepository: Repository<ChallengeAnswersEntity>,
     protected keyResolver: KeyResolver,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   async getGameByUserId(userId: string): Promise<PairsGameQuizEntity | null> {
@@ -57,8 +59,10 @@ export class GameQuizRepo {
 
       return pair ? pair : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -105,8 +109,10 @@ export class GameQuizRepo {
       const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
       return game ? game : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -129,8 +135,10 @@ export class GameQuizRepo {
 
       return questionsQuizEntity ? questionsQuizEntity : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -177,8 +185,10 @@ export class GameQuizRepo {
         questionsQuizEntity.hashedAnswers.includes(answer)
       );
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -211,8 +221,10 @@ export class GameQuizRepo {
         },
       };
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -730,8 +742,10 @@ export class GameQuizRepo {
 
       return game;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -1096,15 +1110,6 @@ export class GameQuizRepo {
     return matchedStrings;
   }
 
-  private async isInvalidUUIDError(error: any): Promise<boolean> {
-    return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async extractUserIdFromError(error: any): Promise<string | null> {
-    const match = error.message.match(/"([^"]+)"/);
-    return match ? match[1] : null;
-  }
-
   private async getPagingParams(
     queryData: ParseQueriesDto,
   ): Promise<PagingParamsDto> {
@@ -1141,7 +1146,7 @@ export class GameQuizRepo {
         case 'published':
           orderByString = 'published ';
           break;
-        case 'body':
+        case 'bodySearchTerm':
           orderByString = 'questionText';
           break;
         default:
