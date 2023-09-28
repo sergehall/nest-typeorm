@@ -40,6 +40,7 @@ import { AddInvalidJwtToBlacklistUseCase } from './application/use-cases/add-ref
 import { RefreshJwtUseCase } from './application/use-cases/refresh-jwt.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const authUseCases = [
   LoginUseCase,
@@ -61,6 +62,8 @@ const authUseCases = [
   ChangePasswordByRecoveryCodeUseCase,
 ];
 
+const helpers = [KeyResolver, UuidErrorResolver];
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
@@ -78,7 +81,6 @@ const authUseCases = [
     AuthService,
     EncryptConfig,
     MailsService,
-    KeyResolver,
     UsersRepo,
     DecodeTokenService,
     UsersRawSqlRepository,
@@ -87,6 +89,7 @@ const authUseCases = [
     InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
     SecurityDevicesRawSqlRepository,
+    ...helpers,
     ...authUseCases,
   ],
   exports: [AuthService],

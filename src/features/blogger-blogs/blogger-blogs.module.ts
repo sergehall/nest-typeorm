@@ -24,6 +24,7 @@ import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { BlogExistsValidator } from '../../common/validators/blog-exists.validator';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -35,6 +36,7 @@ const bloggersBlogUseCases = [
 ];
 
 const validators = [BlogExistsValidator];
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -52,13 +54,13 @@ const validators = [BlogExistsValidator];
     ParseQueriesService,
     BloggerBlogsService,
     PostsService,
-    KeyResolver,
     UsersRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     PostsRepo,
     PostsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
+    ...helpers,
     ...bloggersBlogUseCases,
     ...validators,
   ],

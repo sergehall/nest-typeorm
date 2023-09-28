@@ -21,6 +21,7 @@ import { TransformationService } from './common/transform-to-questions-model';
 import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-update-questions-and-answer.use-case';
 import { SaDeleteQuestionByIdUseCase } from './application/use-cases/sa-delete-question-by-id.use-case';
 import { SaUpdateQuestionsPublishUseCase } from './application/use-cases/sa-update-questions-publish.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
@@ -29,6 +30,8 @@ const saQuizUseCases = [
   SaDeleteQuestionByIdUseCase,
   SaUpdateQuestionsPublishUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -50,8 +53,8 @@ const saQuizUseCases = [
     GameQuizRepo,
     ExpirationDateCalculator,
     EncryptConfig,
-    KeyResolver,
     TransformationService,
+    ...helpers,
     ...saQuizUseCases,
   ],
 })

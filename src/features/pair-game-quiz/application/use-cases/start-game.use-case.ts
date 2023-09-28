@@ -5,7 +5,7 @@ import { GameViewModel } from '../../models/game.view-model';
 import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
-import { PairQuestionsScoreDto } from '../../dto/pair-questions-score.dto';
+import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -25,7 +25,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
 
     await this.checkPermission(game);
 
-    const pairQuestionsScoreDto: PairQuestionsScoreDto =
+    const pairQuestionsScoreDto: PairQuestionsAnswersScoresDto =
       await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
 
     return await this.mapPairGame.toGameModel(pairQuestionsScoreDto);

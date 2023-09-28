@@ -28,6 +28,7 @@ import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-co
 import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class PostsRepo {
   constructor(
@@ -38,6 +39,7 @@ export class PostsRepo {
     private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
@@ -53,8 +55,10 @@ export class PostsRepo {
 
       return post[0] ? post[0] : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -87,8 +91,10 @@ export class PostsRepo {
         currentUserDto,
       );
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -653,12 +659,12 @@ export class PostsRepo {
     );
   }
 
-  private async isInvalidUUIDError(error: any): Promise<boolean> {
-    return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async extractUserIdFromError(error: any): Promise<string | null> {
-    const match = error.message.match(/"([^"]+)"/);
-    return match ? match[1] : null;
-  }
+  // private async isInvalidUUIDError(error: any): Promise<boolean> {
+  //   return error.message.includes('invalid input syntax for type uuid');
+  // }
+  //
+  // private async extractUserIdFromError(error: any): Promise<string | null> {
+  //   const match = error.message.match(/"([^"]+)"/);
+  //   return match ? match[1] : null;
+  // }
 }

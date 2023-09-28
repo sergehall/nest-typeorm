@@ -39,6 +39,7 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { GetPostByIdUseCase } from './application/use-cases/get-post-by-id.use-case';
 import { GetPostsUseCase } from './application/use-cases/get-posts.use-case';
 import { GetPostsInBlogUseCase } from './application/use-cases/get-posts-in-blog.use-case';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -74,6 +75,7 @@ const postsUseCases = [
     JwtService,
     PostsService,
     KeyResolver,
+    UuidErrorResolver,
     CommentsService,
     UsersService,
     ParseQueriesService,

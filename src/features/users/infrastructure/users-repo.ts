@@ -14,12 +14,14 @@ import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { BanInfoDto } from '../dto/banInfo.dto';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class UsersRepo {
   constructor(
     private readonly keyResolver: KeyResolver,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   async findUsers(queryData: ParseQueriesDto): Promise<UsersEntity[]> {
@@ -105,8 +107,10 @@ export class UsersRepo {
 
       return user[0] ? user[0] : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -469,12 +473,12 @@ export class UsersRepo {
     );
   }
 
-  private async isInvalidUUIDError(error: any): Promise<boolean> {
-    return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async extractUserIdFromError(error: any): Promise<string | null> {
-    const match = error.message.match(/"([^"]+)"/);
-    return match ? match[1] : null;
-  }
+  // private async isInvalidUUIDError(error: any): Promise<boolean> {
+  //   return error.message.includes('invalid input syntax for type uuid');
+  // }
+  //
+  // private async extractUserIdFromError(error: any): Promise<string | null> {
+  //   const match = error.message.match(/"([^"]+)"/);
+  //   return match ? match[1] : null;
+  // }
 }
