@@ -796,6 +796,8 @@ export class GameQuizRepo {
     const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
     const { sortBy, direction, limit, offset } = pagingParams;
 
+    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+
     // Retrieve the order field for sorting
     const orderByField = await this.getOrderField(sortBy);
 
@@ -805,7 +807,7 @@ export class GameQuizRepo {
         .where('questionsQuiz.questionText ILIKE :bodySearchTerm', {
           bodySearchTerm,
         })
-        .orderBy(`questionsQuiz.${orderByField}`, direction);
+        .orderBy(`questionsQuiz.${orderByField}`, direction, collate);
 
       const questions: QuestionsQuizEntity[] = await queryBuilder
         .skip(offset)
