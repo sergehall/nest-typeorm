@@ -127,7 +127,7 @@ export class GameQuizRepo {
           id,
         })
         .andWhere('questionsQuiz.published = :published', {
-          published: false,
+          published: true,
         });
 
       const questionsQuizEntity: QuestionsQuizEntity | null =
@@ -554,7 +554,7 @@ export class GameQuizRepo {
   ): Promise<QuestionsQuizEntity[]> {
     const queryBuilderQuestions = this.questionsRepository
       .createQueryBuilder('questionsQuiz')
-      .where('questionsQuiz.published = :published', { published: false })
+      .where('questionsQuiz.published = :published', { published: true })
       .orderBy('RANDOM()')
       .limit(numberQuestions);
     try {
@@ -936,7 +936,7 @@ export class GameQuizRepo {
       const levelQuestions = await this.questionsRepository
         .createQueryBuilder('questionsQuiz')
         .where('questionsQuiz.complexity = :complexity', { complexity })
-        .andWhere('questionsQuiz.published = :published', { published: false })
+        .andWhere('questionsQuiz.published = :published', { published: true })
         .orderBy('RANDOM()')
         .limit(questionsPerLevel)
         .getMany();
