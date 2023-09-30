@@ -6,8 +6,6 @@ import {
   Param,
   UseGuards,
   Request,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -45,7 +43,6 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
   @Post('connection')
   async startGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
