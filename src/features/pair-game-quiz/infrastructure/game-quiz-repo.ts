@@ -80,13 +80,15 @@ export class GameQuizRepo {
         .where('firstPlayer.userId = :userId', {
           userId,
         })
+        .andWhere('pairsGame.status = :status', {
+          status: StatusGameEnum.ACTIVE,
+        })
         .orWhere('pairsGame.secondPlayerId = :userId', {
           userId,
         })
         .andWhere('pairsGame.status = :status', {
           status: StatusGameEnum.ACTIVE,
         });
-
       const pair: PairsGameQuizEntity | null = await queryBuilder.getOne();
 
       return pair ? pair : null;
