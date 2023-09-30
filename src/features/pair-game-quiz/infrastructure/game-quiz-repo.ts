@@ -2,6 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { ComplexityEnums } from '../enums/complexity.enums';
 import {
+  HttpException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -27,6 +29,7 @@ import { AnswerStatusEnum } from '../enums/answer-status.enum';
 import { CorrectAnswerCountsAndBonusDto } from '../dto/correct-answer-counts-and-bonus.dto';
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { idFormatError } from '../../../common/filters/custom-errors-messages';
 
 export class GameQuizRepo {
   constructor(
@@ -117,10 +120,15 @@ export class GameQuizRepo {
       return game ? game : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
+        const id = await this.uuidErrorResolver.extractUserIdFromError(error);
+        idFormatError.message = idFormatError.message + `ID ${id}`;
+
+        throw new HttpException(
+          {
+            message: [idFormatError],
+          },
+          HttpStatus.BAD_REQUEST,
         );
-        throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
