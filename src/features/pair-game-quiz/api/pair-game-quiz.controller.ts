@@ -6,6 +6,8 @@ import {
   Param,
   UseGuards,
   Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -28,6 +30,7 @@ export class PairGameQuizController {
   ) {}
 
   @Get('create-questions')
+  @HttpCode(HttpStatus.CREATED)
   async createAndSaveQuestion(): Promise<boolean> {
     return await this.pairGameQuizService.createAndSaveQuestion();
   }
