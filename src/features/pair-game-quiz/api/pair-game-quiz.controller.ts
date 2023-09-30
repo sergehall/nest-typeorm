@@ -46,7 +46,6 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
   @Post('connection')
   async startGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
