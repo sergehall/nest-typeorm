@@ -32,19 +32,18 @@ export class AnswerForCurrentQuestionUseCase
     const pairByUserId = await this.gameQuizRepo.getActiveGameByUserId(
       currentUserDto.userId,
     );
-    console.log(pairByUserId, 'pairByUserId');
+
     if (!pairByUserId) {
       throw new ForbiddenException(noOpenGameMessage);
     }
     const countChallengeAnswers: ChallengeAnswersEntity[] =
       await this.gameQuizRepo.getChallengeAnswersBothPlayers(pairByUserId.id);
 
-    console.log(countChallengeAnswers, 'countChallengeAnswers');
     const counts = await this.countsChallengeAnswers(
       countChallengeAnswers,
       currentUserDto.userId,
     );
-    console.log(counts, 'counts');
+
     const MAX_ANSWER_COUNT = 5;
 
     switch (counts.countAnswersUser) {
@@ -73,9 +72,6 @@ export class AnswerForCurrentQuestionUseCase
               answerStatus,
               currentUserDto,
             );
-          // if (counts.totalCountBoth === 9) {
-          //   await this.gameQuizRepo.updateQuestionsStatus(pairByUserId.id);
-          // }
 
           return {
             questionId: updateChallengeAnswer.question.id,

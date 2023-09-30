@@ -3,9 +3,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StartGameCommand } from './start-game.use-case';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameViewModel } from '../../models/game.view-model';
-import { ForbiddenException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
-import { noOpenGameMessage } from '../../../../common/filters/custom-errors-messages';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
@@ -29,10 +28,12 @@ export class MyCurrentGameUseCase
     const { currentUserDto } = command;
 
     const game: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getGameByUserId(currentUserDto.userId);
+      await this.gameQuizRepo.getActiveGameByUserId(currentUserDto.userId);
 
     if (!game) {
-      throw new ForbiddenException(noOpenGameMessage);
+      throw new NotFoundException(
+        `Active game for user ID ${currentUserDto.userId} not found.`,
+      );
     }
 
     if (game.status === StatusGameEnum.PENDING) {

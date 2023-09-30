@@ -93,7 +93,12 @@ export class GameQuizRepo {
 
       return pair ? pair : null;
     } catch (error) {
-      console.log(error.message);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
