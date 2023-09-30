@@ -536,8 +536,7 @@ export class GameQuizRepo {
       // newQuestion.hashedAnswers = hashedAnswers;
       newQuestion.questionText = question;
       newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
-      newQuestion.complexity = ComplexityEnums.EASY;
-      newQuestion.published = false;
+      newQuestion.published = true;
       newQuestion.createdAt = new Date().toISOString();
       console.log(newQuestion, 'newQuestion');
       // Save the question to the database
