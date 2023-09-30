@@ -553,7 +553,7 @@ export class GameQuizRepo {
       newQuestion.hashedAnswers = createQuizQuestionDto.correctAnswers;
       newQuestion.published = true;
       newQuestion.createdAt = new Date().toISOString();
-      console.log(newQuestion, 'newQuestion');
+
       // Save the question to the database
       await this.questionsRepository.save(newQuestion);
 
