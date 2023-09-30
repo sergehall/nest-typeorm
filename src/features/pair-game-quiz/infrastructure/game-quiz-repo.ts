@@ -972,7 +972,7 @@ export class GameQuizRepo {
           newQuestion.hashedAnswers = question.answers;
           newQuestion.complexity = question.complexity;
           newQuestion.topic = question.topic;
-          newQuestion.published = false;
+          newQuestion.published = true;
           newQuestion.createdAt = new Date().toISOString();
 
           // Save the question to the database
