@@ -50,68 +50,6 @@ export class PostsRawSqlRepository {
       return null;
     }
   }
-
-  async findPostByPostIdWithLikes(
-    postId: string,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-
-    try {
-      const postWithLikes: PostCountLikesDislikesStatusEntity[] =
-        await this.getPostWithLikesByPostId(
-          postId,
-          bannedFlags,
-          currentUserDto,
-        );
-
-      const post: ReturnPostsEntity[] = await this.processPostWithLikes(
-        postWithLikes,
-      );
-
-      return post[0];
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findPostsAndTotalCountPosts(
-    queryData: ParseQueriesDto,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostsAndCountDto> {
-    try {
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-
-      const pagingParams: PagingParamsDto = await this.getPagingParams(
-        queryData,
-      );
-
-      const postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[] =
-        await this.getPostsWithLikes(bannedFlags, pagingParams, currentUserDto);
-
-      if (postsWithLikes.length === 0) {
-        return {
-          posts: [],
-          countPosts: 0,
-        };
-      }
-
-      const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
-        postsWithLikes,
-        currentUserDto,
-      );
-
-      return {
-        posts,
-        countPosts: postsWithLikes[0].countPosts,
-      };
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async findPostsAndTotalCountPostsForBlog(
     blogId: string,
     queryData: ParseQueriesDto,
