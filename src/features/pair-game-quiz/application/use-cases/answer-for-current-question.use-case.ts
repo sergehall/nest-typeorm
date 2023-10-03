@@ -29,7 +29,7 @@ export class AnswerForCurrentQuestionUseCase
   async execute({ answerDto, currentUserDto }: AnswerToCurrentQuestionCommand) {
     const { answer } = answerDto;
 
-    const pairByUserId = await this.gameQuizRepo.getActiveGameByUserId(
+    const pairByUserId = await this.gameQuizRepo.getUnfinishedGameByUserId(
       currentUserDto.userId,
     );
 

@@ -27,35 +27,11 @@ export class MapPairGame {
       challengeAnswers,
       scores,
     );
+
     let questions: QuestionModel[] | null = null;
     if (pair.status === StatusGameEnum.ACTIVE) {
       questions = await this.processQuestions(challengeQuestions);
     }
-
-    // const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
-    //   ? {
-    //       id: pair.secondPlayer.userId,
-    //       login: pair.secondPlayer.login,
-    //     }
-    //   : null;
-    //
-    // const questions: QuestionModel[] = await this.processQuestions(
-    //   challengeQuestions,
-    // );
-    //
-    // const processAnswers = await this.processAnswers(
-    //   pair.firstPlayer,
-    //   pair.secondPlayer,
-    //   challengeAnswers,
-    // );
-    //
-    // const firstPlayerAnswers: AnswerModel[] =
-    //   processAnswers.get(pair.firstPlayer.userId) ?? [];
-    //
-    // let secondPlayerAnswers: AnswerModel[] = [];
-    // if (secondPlayer) {
-    //   secondPlayerAnswers = processAnswers.get(secondPlayer.id) ?? [];
-    // }
 
     return {
       id: pair.id,
