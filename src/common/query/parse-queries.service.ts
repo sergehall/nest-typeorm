@@ -7,11 +7,23 @@ import { BanCondition } from './types/ban-condition.type';
 @Injectable()
 export class ParseQueriesService {
   private async parsePageNumber(query: any): Promise<number> {
-    return parseInt(query.pageNumber, 10) || 1;
+    const parsedPageNumber = parseInt(query.pageSize, 10);
+
+    if (!isNaN(parsedPageNumber) && parsedPageNumber > 0) {
+      return parsedPageNumber;
+    } else {
+      return 1; // Default value when parsing fails or the value is not positive.
+    }
   }
 
   private async parsePageSize(query: any): Promise<number> {
-    return parseInt(query.pageSize, 10) || 10;
+    const parsedPageSize = parseInt(query.pageSize, 10);
+
+    if (!isNaN(parsedPageSize) && parsedPageSize > 0) {
+      return parsedPageSize;
+    } else {
+      return 10; // Default value when parsing fails or the value is not positive.
+    }
   }
 
   private async parseCode(query: any): Promise<string> {
