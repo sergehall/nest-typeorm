@@ -21,8 +21,7 @@ export class SaGetQuestionsUseCase
   async execute(command: SaGetQuestionsCommand): Promise<PaginatedResultDto> {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
-    console.log(pageNumber, 'pageNumber');
-    console.log(pageSize, 'pageSize');
+
     const questionsAndCount: QuestionsAndCountDto =
       await this.gameQuizRepo.saGetQuestions(queryData);
 
@@ -43,9 +42,6 @@ export class SaGetQuestionsUseCase
 
     const totalCount = questionsAndCount.countQuestions;
     const pagesCount = Math.ceil(totalCount / pageSize);
-
-    console.log(pageNumber, ' page pageNumber');
-    console.log(pageSize, 'pageSize');
 
     return {
       pagesCount: pagesCount,
