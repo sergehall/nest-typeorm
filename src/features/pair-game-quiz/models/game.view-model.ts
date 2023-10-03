@@ -29,13 +29,13 @@ export class PlayerModel {
   login: string;
 }
 
-class PlayerProgressModel {
+export class PlayerProgressModel {
   @ValidateNested({ each: true }) // Validates each answer object in the array
   @IsArray()
   answers: AnswerModel[];
 
   @ValidateNested()
-  player: PlayerModel | null;
+  player: PlayerModel;
 
   @IsString()
   score: number;
@@ -57,11 +57,11 @@ export class GameViewModel {
   firstPlayerProgress: PlayerProgressModel;
 
   @ValidateNested()
-  secondPlayerProgress: PlayerProgressModel;
+  secondPlayerProgress: PlayerProgressModel | null;
 
   @ValidateNested({ each: true }) // Validates each question object in the array
   @IsArray()
-  questions: QuestionModel[];
+  questions: QuestionModel[] | null;
 
   @IsEnum(StatusGameEnum, {
     message: 'Incorrect status must be type of Pending, Competing, Concluded',

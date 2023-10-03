@@ -3,12 +3,16 @@ import {
   AnswerModel,
   GameViewModel,
   PlayerModel,
+  PlayerProgressModel,
   QuestionModel,
 } from '../models/game.view-model';
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { StatusGameEnum } from '../enums/status-game.enum';
+import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
+import { CorrectAnswerCountsAndBonusDto } from '../dto/correct-answer-counts-and-bonus.dto';
 
 @Injectable()
 export class MapPairGame {
@@ -18,16 +22,79 @@ export class MapPairGame {
     const { pair, challengeQuestions, challengeAnswers, scores } =
       pairQuestionsAnswersScoresDto;
 
-    const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
-      ? {
-          id: pair.secondPlayer.userId,
-          login: pair.secondPlayer.login,
-        }
-      : null;
-
-    const questions: QuestionModel[] = await this.processQuestions(
-      challengeQuestions,
+    const processPlayersProgress = await this.processPlayersProgress(
+      pair,
+      challengeAnswers,
+      scores,
     );
+    let questions: QuestionModel[] | null = null;
+    if (pair.status === StatusGameEnum.ACTIVE) {
+      questions = await this.processQuestions(challengeQuestions);
+    }
+
+    // const secondPlayer: PlayerModel | null = pair.secondPlayer?.userId
+    //   ? {
+    //       id: pair.secondPlayer.userId,
+    //       login: pair.secondPlayer.login,
+    //     }
+    //   : null;
+    //
+    // const questions: QuestionModel[] = await this.processQuestions(
+    //   challengeQuestions,
+    // );
+    //
+    // const processAnswers = await this.processAnswers(
+    //   pair.firstPlayer,
+    //   pair.secondPlayer,
+    //   challengeAnswers,
+    // );
+    //
+    // const firstPlayerAnswers: AnswerModel[] =
+    //   processAnswers.get(pair.firstPlayer.userId) ?? [];
+    //
+    // let secondPlayerAnswers: AnswerModel[] = [];
+    // if (secondPlayer) {
+    //   secondPlayerAnswers = processAnswers.get(secondPlayer.id) ?? [];
+    // }
+
+    return {
+      id: pair.id,
+      firstPlayerProgress: processPlayersProgress.firstPlayerProgress,
+      secondPlayerProgress: processPlayersProgress.secondPlayerProgress,
+      questions: questions,
+      status: pair.status,
+      pairCreatedDate: pair.pairCreatedDate,
+      startGameDate: pair.startGameDate,
+      finishGameDate: pair.finishGameDate,
+    };
+  }
+
+  private async processPlayersProgress(
+    pair: PairsGameQuizEntity,
+    challengeAnswers: ChallengeAnswersEntity[],
+    scores: CorrectAnswerCountsAndBonusDto,
+  ): Promise<{
+    firstPlayerProgress: PlayerProgressModel;
+    secondPlayerProgress: PlayerProgressModel | null;
+  }> {
+    if (!pair.secondPlayer || pair.status === StatusGameEnum.PENDING) {
+      return {
+        firstPlayerProgress: {
+          answers: [],
+          player: {
+            id: pair.firstPlayer.userId,
+            login: pair.firstPlayer.login,
+          },
+          score: 0,
+        },
+        secondPlayerProgress: null,
+      };
+    }
+
+    const secondPlayer: PlayerModel = {
+      id: pair.secondPlayer.userId,
+      login: pair.secondPlayer.login,
+    };
 
     const processAnswers = await this.processAnswers(
       pair.firstPlayer,
@@ -37,14 +104,10 @@ export class MapPairGame {
 
     const firstPlayerAnswers: AnswerModel[] =
       processAnswers.get(pair.firstPlayer.userId) ?? [];
-
-    let secondPlayerAnswers: AnswerModel[] = [];
-    if (secondPlayer) {
-      secondPlayerAnswers = processAnswers.get(secondPlayer.id) ?? [];
-    }
+    const secondPlayerAnswers: AnswerModel[] =
+      processAnswers.get(pair.secondPlayer.userId) ?? [];
 
     return {
-      id: pair.id,
       firstPlayerProgress: {
         answers: firstPlayerAnswers,
         player: {
@@ -58,11 +121,6 @@ export class MapPairGame {
         player: secondPlayer,
         score: scores.competitorCorrectAnswerCount,
       },
-      questions: questions,
-      status: pair.status,
-      pairCreatedDate: pair.pairCreatedDate,
-      startGameDate: pair.startGameDate,
-      finishGameDate: pair.finishGameDate,
     };
   }
 
