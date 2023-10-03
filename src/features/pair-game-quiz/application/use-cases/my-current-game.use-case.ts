@@ -28,7 +28,7 @@ export class MyCurrentGameUseCase
     const { currentUserDto } = command;
 
     const game: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getActiveGameByUserId(currentUserDto.userId);
+      await this.gameQuizRepo.getUnfinishedGameByUserId(currentUserDto.userId);
 
     if (!game) {
       throw new NotFoundException(

@@ -72,7 +72,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getActiveGameByUserId(
+  async getUnfinishedGameByUserId(
     userId: string,
   ): Promise<PairsGameQuizEntity | null> {
     try {
@@ -80,18 +80,19 @@ export class GameQuizRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where('firstPlayer.userId = :userId', {
-          userId,
-        })
-        .andWhere('pairsGame.status = :status', {
-          status: StatusGameEnum.ACTIVE,
-        })
-        .orWhere('pairsGame.secondPlayerId = :userId', {
-          userId,
-        })
-        .andWhere('pairsGame.status = :status', {
-          status: StatusGameEnum.ACTIVE,
-        });
+        .where(
+          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
+          {
+            userId,
+          },
+        )
+        .andWhere(
+          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+          {
+            activeStatus: StatusGameEnum.ACTIVE,
+            pendingStatus: StatusGameEnum.PENDING,
+          },
+        );
       const pair: PairsGameQuizEntity | null = await queryBuilder.getOne();
 
       return pair ? pair : null;
