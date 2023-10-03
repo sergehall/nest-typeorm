@@ -90,12 +90,12 @@ export class MapPairGame {
           id: pair.firstPlayer.userId,
           login: pair.firstPlayer.login,
         },
-        score: scores.currentUserCorrectAnswerCount,
+        score: scores.firstPlayerCountCorrectAnswer,
       },
       secondPlayerProgress: {
         answers: secondPlayerAnswers,
         player: secondPlayer,
-        score: scores.competitorCorrectAnswerCount,
+        score: scores.secondPlayerCountCorrectAnswer,
       },
     };
   }

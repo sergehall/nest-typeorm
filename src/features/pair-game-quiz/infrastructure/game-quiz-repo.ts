@@ -263,8 +263,8 @@ export class GameQuizRepo {
         challengeQuestions,
         challengeAnswers: challengeAnswersCount.challengeAnswers,
         scores: {
-          currentUserCorrectAnswerCount: 0,
-          competitorCorrectAnswerCount: 0,
+          firstPlayerCountCorrectAnswer: 0,
+          secondPlayerCountCorrectAnswer: 0,
         },
       };
     } catch (error) {
@@ -374,8 +374,8 @@ export class GameQuizRepo {
           challengeQuestions,
           challengeAnswers,
           scores: {
-            currentUserCorrectAnswerCount: 0,
-            competitorCorrectAnswerCount: 0,
+            firstPlayerCountCorrectAnswer: 0,
+            secondPlayerCountCorrectAnswer: 0,
           },
         };
       }
@@ -438,8 +438,8 @@ export class GameQuizRepo {
           challengeQuestions,
           challengeAnswers,
           scores: {
-            currentUserCorrectAnswerCount: 0,
-            competitorCorrectAnswerCount: 0,
+            firstPlayerCountCorrectAnswer: 0,
+            secondPlayerCountCorrectAnswer: 0,
           },
         };
       }
@@ -496,8 +496,8 @@ export class GameQuizRepo {
           challengeQuestions,
           challengeAnswers,
           scores: {
-            currentUserCorrectAnswerCount: 0,
-            competitorCorrectAnswerCount: 0,
+            firstPlayerCountCorrectAnswer: 0,
+            secondPlayerCountCorrectAnswer: 0,
           },
         };
       }
@@ -518,8 +518,8 @@ export class GameQuizRepo {
         challengeQuestions,
         challengeAnswers,
         scores: {
-          currentUserCorrectAnswerCount: 0,
-          competitorCorrectAnswerCount: 0,
+          firstPlayerCountCorrectAnswer: 0,
+          secondPlayerCountCorrectAnswer: 0,
         },
       };
     } catch (error) {
@@ -622,21 +622,21 @@ export class GameQuizRepo {
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
           if (answer.answerOwner.userId === game.firstPlayer.userId) {
             if (bonusPoint) {
-              counts.currentUserCorrectAnswerCount++;
+              counts.firstPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
-            counts.currentUserCorrectAnswerCount++;
+            counts.firstPlayerCountCorrectAnswer++;
           } else {
             if (bonusPoint) {
-              counts.competitorCorrectAnswerCount++;
+              counts.secondPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
-            counts.competitorCorrectAnswerCount++;
+            counts.secondPlayerCountCorrectAnswer++;
           }
         }
         return counts;
       },
-      { currentUserCorrectAnswerCount: 0, competitorCorrectAnswerCount: 0 },
+      { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
     );
   }
 
@@ -660,14 +660,14 @@ export class GameQuizRepo {
         (counts, answer) => {
           if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
             if (answer.answerOwner.userId === userId) {
-              counts.currentUserCorrectAnswerCount++;
+              counts.firstPlayerCountCorrectAnswer++;
             } else {
-              counts.competitorCorrectAnswerCount++;
+              counts.secondPlayerCountCorrectAnswer++;
             }
           }
           return counts;
         },
-        { currentUserCorrectAnswerCount: 0, competitorCorrectAnswerCount: 0 },
+        { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
       );
 
     // Apply bonus points
@@ -675,9 +675,9 @@ export class GameQuizRepo {
       answerArray[0].answerOwner.userId === userId ? 1 : 0;
     const bonusPointCompetitor: number = bonusPointForCurrentUser === 0 ? 1 : 0;
 
-    correctAnswerCounts.currentUserCorrectAnswerCount +=
+    correctAnswerCounts.firstPlayerCountCorrectAnswer +=
       bonusPointForCurrentUser;
-    correctAnswerCounts.competitorCorrectAnswerCount += bonusPointCompetitor;
+    correctAnswerCounts.secondPlayerCountCorrectAnswer += bonusPointCompetitor;
 
     return correctAnswerCounts;
   }
@@ -697,7 +697,7 @@ export class GameQuizRepo {
       .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
         pairGameQuizId,
       })
-      .orderBy('challengeAnswers.addedAt', 'DESC');
+      .orderBy('challengeAnswers.addedAt', 'ASC');
 
     const challengeAnswers: ChallengeAnswersEntity[] =
       await queryBuilder.getMany();

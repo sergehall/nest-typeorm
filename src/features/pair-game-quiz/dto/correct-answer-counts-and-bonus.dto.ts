@@ -2,7 +2,7 @@ import { IsNumber } from 'class-validator';
 
 export class CorrectAnswerCountsAndBonusDto {
   @IsNumber()
-  currentUserCorrectAnswerCount: number;
+  firstPlayerCountCorrectAnswer: number;
   @IsNumber()
-  competitorCorrectAnswerCount: number;
+  secondPlayerCountCorrectAnswer: number;
 }
