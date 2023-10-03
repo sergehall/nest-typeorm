@@ -107,6 +107,37 @@ export class GameQuizRepo {
     }
   }
 
+  async getActiveGameByUserId(
+    userId: string,
+  ): Promise<PairsGameQuizEntity | null> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepository
+        .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+        .where(
+          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
+          {
+            userId,
+          },
+        )
+        .andWhere('(pairsGame.status = :activeStatus)', {
+          activeStatus: StatusGameEnum.ACTIVE,
+        });
+      const pair: PairsGameQuizEntity | null = await queryBuilder.getOne();
+
+      return pair ? pair : null;
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async getGameByPairId(id: string): Promise<PairsGameQuizEntity | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepository

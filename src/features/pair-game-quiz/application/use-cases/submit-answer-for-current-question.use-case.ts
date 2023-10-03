@@ -13,23 +13,23 @@ import {
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 
-export class AnswerToCurrentQuestionCommand {
+export class SubmitAnswerCommand {
   constructor(
     public answerDto: AnswerDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-@CommandHandler(AnswerToCurrentQuestionCommand)
-export class AnswerForCurrentQuestionUseCase
-  implements ICommandHandler<AnswerToCurrentQuestionCommand>
+@CommandHandler(SubmitAnswerCommand)
+export class SubmitAnswerForCurrentQuestionUseCase
+  implements ICommandHandler<SubmitAnswerCommand>
 {
   constructor(protected gameQuizRepo: GameQuizRepo) {}
 
-  async execute({ answerDto, currentUserDto }: AnswerToCurrentQuestionCommand) {
+  async execute({ answerDto, currentUserDto }: SubmitAnswerCommand) {
     const { answer } = answerDto;
 
-    const pairByUserId = await this.gameQuizRepo.getUnfinishedGameByUserId(
+    const pairByUserId = await this.gameQuizRepo.getActiveGameByUserId(
       currentUserDto.userId,
     );
 

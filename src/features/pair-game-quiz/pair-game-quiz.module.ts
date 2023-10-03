@@ -14,14 +14,14 @@ import { MapPairGame } from './common/map-pair-game-entity-to-game-model';
 import { MyCurrentGameUseCase } from './application/use-cases/my-current-game.use-case';
 import { GetGameByIdUseCase } from './application/use-cases/get-game-by-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
-import { AnswerForCurrentQuestionUseCase } from './application/use-cases/answer-for-current-question.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { SubmitAnswerForCurrentQuestionUseCase } from './application/use-cases/submit-answer-for-current-question.use-case';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
   GetGameByIdUseCase,
   StartGameUseCase,
-  AnswerForCurrentQuestionUseCase,
+  SubmitAnswerForCurrentQuestionUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];

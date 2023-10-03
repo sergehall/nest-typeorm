@@ -18,7 +18,7 @@ import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.u
 import { GameViewModel } from '../models/game.view-model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 import { AnswerDto } from '../dto/answer.dto';
-import { AnswerToCurrentQuestionCommand } from '../application/use-cases/answer-for-current-question.use-case';
+import { SubmitAnswerCommand } from '../application/use-cases/submit-answer-for-current-question.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
@@ -73,7 +73,7 @@ export class PairGameQuizController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new AnswerToCurrentQuestionCommand(answerDto, currentUserDto),
+      new SubmitAnswerCommand(answerDto, currentUserDto),
     );
   }
 }
