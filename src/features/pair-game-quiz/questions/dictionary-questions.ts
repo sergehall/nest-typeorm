@@ -20,7 +20,7 @@ export const dictionaryQuestions: DifficultyDictionary = {
     {
       id: '3',
       question: 'What does HTTP stand for?',
-      answers: [' Hypertext Transfer Protocol'],
+      answers: ['Hypertext Transfer Protocol'],
       topic: 'Computer science',
       complexity: ComplexityEnums.EASY,
     },

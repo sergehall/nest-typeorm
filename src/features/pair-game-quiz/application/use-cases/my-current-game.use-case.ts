@@ -54,8 +54,8 @@ export class MyCurrentGameUseCase
       challengeQuestions,
       challengeAnswers,
       scores: {
-        currentUserCorrectAnswerCount: 0,
-        competitorCorrectAnswerCount: 0,
+        firstPlayerCountCorrectAnswer: 0,
+        secondPlayerCountCorrectAnswer: 0,
       },
     });
   }
@@ -101,21 +101,21 @@ export class MyCurrentGameUseCase
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
           if (answer.answerOwner.userId === game.firstPlayer.userId) {
             if (bonusPoint) {
-              counts.currentUserCorrectAnswerCount++;
+              counts.firstPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
-            counts.currentUserCorrectAnswerCount++;
+            counts.firstPlayerCountCorrectAnswer++;
           } else {
             if (bonusPoint) {
-              counts.competitorCorrectAnswerCount++;
+              counts.secondPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
-            counts.competitorCorrectAnswerCount++;
+            counts.secondPlayerCountCorrectAnswer++;
           }
         }
         return counts;
       },
-      { currentUserCorrectAnswerCount: 0, competitorCorrectAnswerCount: 0 },
+      { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
     );
   }
 }
