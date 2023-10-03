@@ -7,7 +7,7 @@ import { BanCondition } from './types/ban-condition.type';
 @Injectable()
 export class ParseQueriesService {
   private async parsePageNumber(query: any): Promise<number> {
-    const parsedPageNumber = parseInt(query.pageSize, 10);
+    const parsedPageNumber = parseInt(query.pageNumber, 10);
 
     if (!isNaN(parsedPageNumber) && parsedPageNumber > 0) {
       return parsedPageNumber;
