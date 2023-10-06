@@ -78,10 +78,7 @@ export class MyCurrentGameUseCase
     );
 
     const challengeQuestions: ChallengeQuestionsEntity[] =
-      await this.gameQuizRepo.getChallengeQuestions(
-        game.id,
-        challengeAnswersCount.countAnswersByUserId,
-      );
+      await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
 
     return this.mapPairGame.toGameModel({
       pair: game,
