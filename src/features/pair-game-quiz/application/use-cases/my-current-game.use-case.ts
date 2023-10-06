@@ -97,13 +97,13 @@ export class MyCurrentGameUseCase
       (counts, answer) => {
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
           if (answer.answerOwner.userId === game.firstPlayer.userId) {
-            if (bonusPoint) {
+            if (bonusPoint && challengeAnswers.length == 10) {
               counts.firstPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
             counts.firstPlayerCountCorrectAnswer++;
           } else {
-            if (bonusPoint) {
+            if (bonusPoint && challengeAnswers.length == 10) {
               counts.secondPlayerCountCorrectAnswer++;
               bonusPoint = false;
             }
