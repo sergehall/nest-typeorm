@@ -34,9 +34,9 @@ export class PairGameQuizService {
 
     // add bonusPoint
     if (challengeAnswers.length == 10) {
-      if (challengeAnswers[0].answerStatus === AnswerStatusEnum.CORRECT) {
+      if (challengeAnswers[8].answerStatus === AnswerStatusEnum.CORRECT) {
         if (
-          challengeAnswers[0].answerOwner.userId === game.firstPlayer.userId
+          challengeAnswers[8].answerOwner.userId === game.firstPlayer.userId
         ) {
           counts.firstPlayerCountCorrectAnswer++;
         } else {
