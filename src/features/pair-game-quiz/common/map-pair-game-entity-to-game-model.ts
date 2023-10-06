@@ -105,7 +105,7 @@ export class MapPairGame {
   ): Promise<QuestionModel[]> {
     return challengeQuestions.length > 0
       ? challengeQuestions.map((challengeQuestion) => ({
-          id: challengeQuestion.id,
+          id: challengeQuestion.question.id,
           body: challengeQuestion.question.questionText,
         }))
       : [];
