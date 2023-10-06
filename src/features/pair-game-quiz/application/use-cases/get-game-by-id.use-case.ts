@@ -40,34 +40,25 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
 
     await this.checkPermission(pairByGameId, currentUserDto);
 
-    return this.createGameModelForActive(pairByGameId, currentUserDto);
+    return this.createGameModel(pairByGameId);
   }
 
-  private async createGameModelForActive(
+  private async createGameModel(
     game: PairsGameQuizEntity,
-    currentUserDto: CurrentUserDto,
   ): Promise<GameViewModel> {
-    const challengeAnswersCount: {
-      challengeAnswers: ChallengeAnswersEntity[];
-      countAnswersByUserId: number;
-    } = await this.gameQuizRepo.getChallengeAnswersAndCount(
-      game.id,
-      currentUserDto.userId,
-    );
-
-    const currentScores: CorrectAnswerCountsAndBonusDto =
-      await this.pairGameQuizService.getScores(
-        game,
-        challengeAnswersCount.challengeAnswers,
-      );
-
     const challengeQuestions: ChallengeQuestionsEntity[] =
       await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
+
+    const challengeAnswers: ChallengeAnswersEntity[] =
+      await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
+
+    const currentScores: CorrectAnswerCountsAndBonusDto =
+      await this.pairGameQuizService.getScores(game, challengeAnswers);
 
     return this.mapPairGame.toGameModel({
       pair: game,
       challengeQuestions,
-      challengeAnswers: challengeAnswersCount.challengeAnswers,
+      challengeAnswers: challengeAnswers,
       scores: currentScores,
     });
   }
