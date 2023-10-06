@@ -253,10 +253,7 @@ export class GameQuizRepo {
       );
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestions(
-          game.id,
-          challengeAnswersCount.countAnswersByUserId,
-        );
+        await this.getChallengeQuestionsByGameId(game.id);
 
       return {
         pair: game,
@@ -392,10 +389,7 @@ export class GameQuizRepo {
         await this.getScores1(game, challengeAnswersCount.challengeAnswers);
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestions(
-          game.id,
-          challengeAnswersCount.countAnswersByUserId,
-        );
+        await this.getChallengeQuestionsByGameId(game.id);
 
       return {
         pair: game,
@@ -452,10 +446,7 @@ export class GameQuizRepo {
         await this.getScores(game.id, currentUserDto.userId);
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestions(
-          game.id,
-          challengeAnswersCount.countAnswersByUserId,
-        );
+        await this.getChallengeQuestionsByGameId(game.id);
 
       return {
         pair: game,
@@ -473,14 +464,14 @@ export class GameQuizRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsAnswersScoresDto> {
     try {
+      let createdGame: PairsGameQuizEntity;
+
       const pendingGame: PairsGameQuizEntity | null =
         await this.pairsGameQuizRepository.findOne({
           where: {
             status: StatusGameEnum.PENDING,
           },
         });
-
-      let createdGame: PairsGameQuizEntity;
 
       if (!pendingGame) {
         createdGame = await this.createPairGameEntity(currentUserDto);
@@ -502,17 +493,17 @@ export class GameQuizRepo {
         };
       }
 
+      // if pendingGame.status === StatusGameEnum.PENDING
       createdGame = await this.addSecondPlayerAndStarGame(
         pendingGame,
         currentUserDto,
       );
 
-      const countAnswers = 0;
-
       const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestions(createdGame.id, countAnswers);
+        await this.getChallengeQuestionsByGameId(createdGame.id);
 
       const challengeAnswers: ChallengeAnswersEntity[] = [];
+
       return {
         pair: createdGame,
         challengeQuestions,
@@ -527,6 +518,65 @@ export class GameQuizRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  // async getPendingPairOrCreateNew(
+  //   currentUserDto: CurrentUserDto,
+  // ): Promise<PairQuestionsAnswersScoresDto> {
+  //   try {
+  //     const pendingGame: PairsGameQuizEntity | null =
+  //       await this.pairsGameQuizRepository.findOne({
+  //         where: {
+  //           status: StatusGameEnum.PENDING,
+  //         },
+  //       });
+  //
+  //     let createdGame: PairsGameQuizEntity;
+  //
+  //     if (!pendingGame) {
+  //       createdGame = await this.createPairGameEntity(currentUserDto);
+  //
+  //       await this.pairsGameQuizRepository.save(createdGame);
+  //
+  //       const challengeQuestions: ChallengeQuestionsEntity[] = [];
+  //       const challengeAnswers: ChallengeAnswersEntity[] = [];
+  //       await this.createChallengeQuestions(createdGame.id);
+  //
+  //       return {
+  //         pair: createdGame,
+  //         challengeQuestions,
+  //         challengeAnswers,
+  //         scores: {
+  //           firstPlayerCountCorrectAnswer: 0,
+  //           secondPlayerCountCorrectAnswer: 0,
+  //         },
+  //       };
+  //     }
+  //
+  //     createdGame = await this.addSecondPlayerAndStarGame(
+  //       pendingGame,
+  //       currentUserDto,
+  //     );
+  //
+  //     const countAnswers = 0;
+  //
+  //     const challengeQuestions: ChallengeQuestionsEntity[] =
+  //       await this.getChallengeQuestions(createdGame.id, countAnswers);
+  //
+  //     const challengeAnswers: ChallengeAnswersEntity[] = [];
+  //     return {
+  //       pair: createdGame,
+  //       challengeQuestions,
+  //       challengeAnswers,
+  //       scores: {
+  //         firstPlayerCountCorrectAnswer: 0,
+  //         secondPlayerCountCorrectAnswer: 0,
+  //       },
+  //     };
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async saUpdateQuestionPublish(
     question: QuestionsQuizEntity,
@@ -878,7 +928,24 @@ export class GameQuizRepo {
     }
   }
 
-  async getChallengeQuestions(
+  async getChallengeQuestionsByGameId(
+    pairGameQuizId: string,
+  ): Promise<ChallengeQuestionsEntity[]> {
+    try {
+      return await this.challengeQuestionsRepository
+        .createQueryBuilder('challengeQuestions')
+        .leftJoinAndSelect('challengeQuestions.pairGameQuiz', 'pairGameQuiz')
+        .leftJoinAndSelect('challengeQuestions.question', 'question')
+        .where('pairGameQuiz.id = :pairGameQuizId', { pairGameQuizId })
+        .orderBy('challengeQuestions.id', 'DESC')
+        .getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getChallengeQuestionsByCountAnswersUser(
     pairGameQuizId: string,
     countAnswers: number,
   ): Promise<ChallengeQuestionsEntity[]> {

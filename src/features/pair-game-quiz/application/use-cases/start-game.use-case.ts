@@ -6,6 +6,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
+import { StatusGameEnum } from '../../enums/status-game.enum';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -20,10 +21,10 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
-    const game: PairsGameQuizEntity | null =
+    const gameByUserId: PairsGameQuizEntity | null =
       await this.gameQuizRepo.getUnfinishedGameByUserId(currentUserDto.userId);
 
-    await this.checkPermission(game);
+    await this.checkPermission(gameByUserId);
 
     const pairQuestionsScoreDto: PairQuestionsAnswersScoresDto =
       await this.gameQuizRepo.getPendingPairOrCreateNew(currentUserDto);
@@ -32,9 +33,9 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   }
 
   private async checkPermission(
-    game: PairsGameQuizEntity | null,
+    gameByUserId: PairsGameQuizEntity | null,
   ): Promise<void> {
-    if (game) {
+    if (gameByUserId && gameByUserId.status !== StatusGameEnum.FINISHED) {
       throw new ForbiddenException(
         'The current player is already involved in an ongoing active game pairing.',
       );
