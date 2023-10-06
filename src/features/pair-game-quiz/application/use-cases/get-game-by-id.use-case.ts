@@ -40,13 +40,6 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
 
     await this.checkPermission(pairByGameId, currentUserDto);
 
-    // const gameAndQuestions: PairQuestionsAnswersScoresDto =
-    //   await this.gameQuizRepo.getNextQuestionsToGame(
-    //     pairByGameId,
-    //     currentUserDto,
-    //   );
-    //
-    // return await this.mapPairGame.toGameModel(gameAndQuestions);
     return this.createGameModelForActive(pairByGameId, currentUserDto);
   }
 
