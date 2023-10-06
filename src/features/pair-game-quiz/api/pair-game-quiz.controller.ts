@@ -36,6 +36,7 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @Get('my-current')
   async findUnfinishedGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
