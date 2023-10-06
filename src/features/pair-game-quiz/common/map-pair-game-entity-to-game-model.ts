@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import {
   AnswerModel,
   GameViewModel,
-  PlayerModel,
   PlayerProgressModel,
   QuestionModel,
 } from '../models/game.view-model';
@@ -67,25 +66,15 @@ export class MapPairGame {
       };
     }
 
-    const secondPlayer: PlayerModel = {
-      id: pair.secondPlayer.userId,
-      login: pair.secondPlayer.login,
-    };
-
     const processAnswers = await this.processAnswers(
       pair.firstPlayer,
       pair.secondPlayer,
       challengeAnswers,
     );
 
-    const firstPlayerAnswers: AnswerModel[] =
-      processAnswers.get(pair.firstPlayer.userId) ?? [];
-    const secondPlayerAnswers: AnswerModel[] =
-      processAnswers.get(pair.secondPlayer.userId) ?? [];
-
     return {
       firstPlayerProgress: {
-        answers: firstPlayerAnswers,
+        answers: processAnswers.firstPlayerAnswers,
         player: {
           id: pair.firstPlayer.userId,
           login: pair.firstPlayer.login,
@@ -93,8 +82,11 @@ export class MapPairGame {
         score: scores.firstPlayerCountCorrectAnswer,
       },
       secondPlayerProgress: {
-        answers: secondPlayerAnswers,
-        player: secondPlayer,
+        answers: processAnswers.secondPlayerAnswers,
+        player: {
+          id: pair.secondPlayer.userId,
+          login: pair.secondPlayer.login,
+        },
         score: scores.secondPlayerCountCorrectAnswer,
       },
     };
@@ -113,9 +105,12 @@ export class MapPairGame {
 
   private async processAnswers(
     firstPlayer: UsersEntity,
-    secondPlayer: UsersEntity | null,
+    secondPlayer: UsersEntity,
     answers: ChallengeAnswersEntity[],
-  ): Promise<Map<string, AnswerModel[]>> {
+  ): Promise<{
+    firstPlayerAnswers: AnswerModel[];
+    secondPlayerAnswers: AnswerModel[];
+  }> {
     const usersIds = [];
     usersIds.push(firstPlayer.userId);
     if (secondPlayer) {
@@ -153,6 +148,11 @@ export class MapPairGame {
     // Wait for all processing to complete
     await Promise.all(processingPromises);
 
-    return answersByUser;
+    const firstPlayerAnswers: AnswerModel[] =
+      answersByUser.get(firstPlayer.userId) ?? [];
+    const secondPlayerAnswers: AnswerModel[] =
+      answersByUser.get(secondPlayer.userId) ?? [];
+
+    return { firstPlayerAnswers, secondPlayerAnswers };
   }
 }

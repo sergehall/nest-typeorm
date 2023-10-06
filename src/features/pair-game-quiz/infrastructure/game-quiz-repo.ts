@@ -760,6 +760,31 @@ export class GameQuizRepo {
     return { challengeAnswers, countAnswersByUserId };
   }
 
+  async getChallengeAnswersByGameId(
+    pairGameQuizId: string,
+  ): Promise<ChallengeAnswersEntity[]> {
+    const queryBuilder = this.challengeAnswersRepository
+      .createQueryBuilder('challengeAnswers')
+      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeAnswers.question', 'question')
+      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+        pairGameQuizId,
+      })
+      .orderBy('challengeAnswers.addedAt', 'ASC');
+    try {
+      return await queryBuilder.getMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async addSecondPlayerAndStarGame(
     pairGameQuiz: PairsGameQuizEntity,
     currentUserDto: CurrentUserDto,
