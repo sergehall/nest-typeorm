@@ -65,6 +65,7 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @Post('my-current/answers')
   async answerToCurrentQuestion(
     @Request() req: any,
