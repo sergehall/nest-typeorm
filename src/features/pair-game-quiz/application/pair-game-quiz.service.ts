@@ -34,26 +34,17 @@ export class PairGameQuizService {
 
     // add bonusPoint
     if (challengeAnswers.length === 10) {
-      await this.findFirstCorrectAnswerFromPenultimate(
+      await this.findFirstCorrectAnswerFromEnd(
         challengeAnswers,
         game.firstPlayer.userId,
         counts,
       );
-      // if (challengeAnswers[8].answerStatus === AnswerStatusEnum.CORRECT) {
-      //   if (
-      //     challengeAnswers[8].answerOwner.userId === game.firstPlayer.userId
-      //   ) {
-      //     counts.firstPlayerCountCorrectAnswer++;
-      //   } else {
-      //     counts.secondPlayerCountCorrectAnswer++;
-      //   }
-      // }
     }
 
     return counts;
   }
 
-  private async findFirstCorrectAnswerFromPenultimate(
+  private async findFirstCorrectAnswerFromEnd(
     challengeAnswers: ChallengeAnswersEntity[],
     firstPlayerId: string,
     counts: CountCorrectAnswerDto,
@@ -65,6 +56,7 @@ export class PairGameQuizService {
         } else {
           counts.secondPlayerCountCorrectAnswer++;
         }
+        return counts;
       }
     }
     return counts;
