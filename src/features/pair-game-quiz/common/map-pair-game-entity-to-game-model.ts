@@ -111,24 +111,15 @@ export class MapPairGame {
     firstPlayerAnswers: AnswerModel[];
     secondPlayerAnswers: AnswerModel[];
   }> {
-    const usersIds = [];
-    usersIds.push(firstPlayer.userId);
-    if (secondPlayer) {
-      usersIds.push(secondPlayer.userId);
-    }
-
-    const answersByUser = new Map<string, AnswerModel[]>();
-
-    // Initialize the map with empty arrays for each user ID
-    usersIds.forEach((userID) => {
-      answersByUser.set(userID, []);
-    });
+    // Create an object to store answers by user ID
+    const answersByUser: Record<string, AnswerModel[]> = {};
 
     // Group answers by user ID
-    for (const challengeAnswer of answers) {
+    answers.forEach((challengeAnswer) => {
       const userID = challengeAnswer.answerOwner.userId;
-      // Use type assertion to indicate that the value is not undefined
-      const userAnswers = answersByUser.get(userID)!;
+      if (!answersByUser[userID]) {
+        answersByUser[userID] = [];
+      }
 
       const formattedAnswer: AnswerModel = {
         questionId: challengeAnswer.question.id,
@@ -136,22 +127,23 @@ export class MapPairGame {
         addedAt: challengeAnswer.addedAt,
       };
 
-      userAnswers.push(formattedAnswer);
-    }
+      answersByUser[userID].push(formattedAnswer);
+    });
 
     // Process each user's answers concurrently
-    const processingPromises = usersIds.map(async (userID) => {
-      const formattedAnswers = answersByUser.get(userID)!;
-      answersByUser.set(userID, formattedAnswers);
-    });
+    const processingPromises = Object.keys(answersByUser).map(
+      async (userID) => {
+        // You can perform additional processing here if needed
+        return userID;
+      },
+    );
 
     // Wait for all processing to complete
     await Promise.all(processingPromises);
 
-    const firstPlayerAnswers: AnswerModel[] =
-      answersByUser.get(firstPlayer.userId) ?? [];
-    const secondPlayerAnswers: AnswerModel[] =
-      answersByUser.get(secondPlayer.userId) ?? [];
+    // Retrieve processed answers for firstPlayer and secondPlayer (if provided)
+    const firstPlayerAnswers = answersByUser[firstPlayer.userId] || [];
+    const secondPlayerAnswers = answersByUser[secondPlayer.userId] || [];
 
     return { firstPlayerAnswers, secondPlayerAnswers };
   }
