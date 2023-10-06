@@ -92,27 +92,34 @@ export class MyCurrentGameUseCase
     game: PairsGameQuizEntity,
     challengeAnswers: ChallengeAnswersEntity[],
   ): Promise<CorrectAnswerCountsAndBonusDto> {
-    let bonusPoint = true;
-    return challengeAnswers.reduce(
+    const counts = challengeAnswers.reduce(
       (counts, answer) => {
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
           if (answer.answerOwner.userId === game.firstPlayer.userId) {
-            if (bonusPoint && challengeAnswers.length == 10) {
-              counts.firstPlayerCountCorrectAnswer++;
-              bonusPoint = false;
-            }
             counts.firstPlayerCountCorrectAnswer++;
           } else {
-            if (bonusPoint && challengeAnswers.length == 10) {
-              counts.secondPlayerCountCorrectAnswer++;
-              bonusPoint = false;
-            }
             counts.secondPlayerCountCorrectAnswer++;
           }
         }
         return counts;
       },
+
       { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
     );
+
+    // add bonusPoint
+    if (challengeAnswers.length == 10) {
+      if (challengeAnswers[0].answerStatus === AnswerStatusEnum.CORRECT) {
+        if (
+          challengeAnswers[0].answerOwner.userId === game.firstPlayer.userId
+        ) {
+          counts.firstPlayerCountCorrectAnswer++;
+        } else {
+          counts.secondPlayerCountCorrectAnswer++;
+        }
+      }
+    }
+
+    return counts;
   }
 }
