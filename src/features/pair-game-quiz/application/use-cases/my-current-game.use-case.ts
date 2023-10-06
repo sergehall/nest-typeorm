@@ -9,7 +9,7 @@ import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
-import { CorrectAnswerCountsAndBonusDto } from '../../dto/correct-answer-counts-and-bonus.dto';
+import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 
 export class MyCurrentGameCommand {
@@ -72,7 +72,7 @@ export class MyCurrentGameUseCase
       currentUserDto.userId,
     );
 
-    const currentScores: CorrectAnswerCountsAndBonusDto = await this.getScores(
+    const currentScores: CountCorrectAnswerDto = await this.getScores(
       game,
       challengeAnswersCount.challengeAnswers,
     );
@@ -91,7 +91,7 @@ export class MyCurrentGameUseCase
   private async getScores(
     game: PairsGameQuizEntity,
     challengeAnswers: ChallengeAnswersEntity[],
-  ): Promise<CorrectAnswerCountsAndBonusDto> {
+  ): Promise<CountCorrectAnswerDto> {
     const counts = challengeAnswers.reduce(
       (counts, answer) => {
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
