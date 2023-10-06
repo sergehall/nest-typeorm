@@ -21,7 +21,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     const { currentUserDto } = command;
 
     const game: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getGameByUserId(currentUserDto.userId);
+      await this.gameQuizRepo.getUnfinishedGameByUserId(currentUserDto.userId);
 
     await this.checkPermission(game);
 
