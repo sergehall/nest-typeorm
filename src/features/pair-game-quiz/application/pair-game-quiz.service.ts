@@ -49,7 +49,7 @@ export class PairGameQuizService {
     firstPlayerId: string,
     counts: CountCorrectAnswerDto,
   ): Promise<CountCorrectAnswerDto> {
-    for (let i = challengeAnswers.length - 1; i >= 0; i--) {
+    for (let i = challengeAnswers.length - 2; i >= 0; i--) {
       if (challengeAnswers[i].answerStatus === AnswerStatusEnum.CORRECT) {
         if (challengeAnswers[i].answerOwner.userId === firstPlayerId) {
           counts.firstPlayerCountCorrectAnswer++;
