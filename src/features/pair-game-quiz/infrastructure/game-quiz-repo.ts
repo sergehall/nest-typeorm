@@ -26,7 +26,7 @@ import { QuestionsAndCountDto } from '../../sa-quiz-questions/dto/questions-and-
 import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-question.dto';
 import { UpdatePublishDto } from '../../sa-quiz-questions/dto/update-publish.dto';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
-import { CorrectAnswerCountsAndBonusDto } from '../dto/correct-answer-counts-and-bonus.dto';
+import { CountCorrectAnswerDto } from '../dto/correct-answer-counts-and-bonus.dto';
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { idFormatError } from '../../../common/filters/custom-errors-messages';
@@ -385,8 +385,10 @@ export class GameQuizRepo {
         currentUserDto.userId,
       );
 
-      const currentScores: CorrectAnswerCountsAndBonusDto =
-        await this.getScores1(game, challengeAnswersCount.challengeAnswers);
+      const currentScores: CountCorrectAnswerDto = await this.getScores1(
+        game,
+        challengeAnswersCount.challengeAnswers,
+      );
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestionsByGameId(game.id);
@@ -442,8 +444,10 @@ export class GameQuizRepo {
         game.id,
         currentUserDto.userId,
       );
-      const currentScores: CorrectAnswerCountsAndBonusDto =
-        await this.getScores(game.id, currentUserDto.userId);
+      const currentScores: CountCorrectAnswerDto = await this.getScores(
+        game.id,
+        currentUserDto.userId,
+      );
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.getChallengeQuestionsByGameId(game.id);
@@ -665,7 +669,7 @@ export class GameQuizRepo {
   async getScores1(
     game: PairsGameQuizEntity,
     challengeAnswers: ChallengeAnswersEntity[],
-  ): Promise<CorrectAnswerCountsAndBonusDto> {
+  ): Promise<CountCorrectAnswerDto> {
     let bonusPoint = true;
     return challengeAnswers.reduce(
       (counts, answer) => {
@@ -693,7 +697,7 @@ export class GameQuizRepo {
   async getScores(
     pairGameQuizId: string,
     userId: string,
-  ): Promise<CorrectAnswerCountsAndBonusDto> {
+  ): Promise<CountCorrectAnswerDto> {
     const queryBuilder = this.challengeAnswersRepository
       .createQueryBuilder('challengeAnswers')
       .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
@@ -705,20 +709,19 @@ export class GameQuizRepo {
 
     const answerArray = await queryBuilder.getMany();
 
-    const correctAnswerCounts: CorrectAnswerCountsAndBonusDto =
-      answerArray.reduce(
-        (counts, answer) => {
-          if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
-            if (answer.answerOwner.userId === userId) {
-              counts.firstPlayerCountCorrectAnswer++;
-            } else {
-              counts.secondPlayerCountCorrectAnswer++;
-            }
+    const correctAnswerCounts: CountCorrectAnswerDto = answerArray.reduce(
+      (counts, answer) => {
+        if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
+          if (answer.answerOwner.userId === userId) {
+            counts.firstPlayerCountCorrectAnswer++;
+          } else {
+            counts.secondPlayerCountCorrectAnswer++;
           }
-          return counts;
-        },
-        { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
-      );
+        }
+        return counts;
+      },
+      { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
+    );
 
     // Apply bonus points
     const bonusPointForCurrentUser =

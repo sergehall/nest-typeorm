@@ -1,6 +1,6 @@
 import { IsNumber } from 'class-validator';
 
-export class CorrectAnswerCountsAndBonusDto {
+export class CountCorrectAnswerDto {
   @IsNumber()
   firstPlayerCountCorrectAnswer: number;
   @IsNumber()

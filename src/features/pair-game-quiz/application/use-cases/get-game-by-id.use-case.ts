@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { PairGameQuizService } from '../pair-game-quiz.service';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
-import { CorrectAnswerCountsAndBonusDto } from '../../dto/correct-answer-counts-and-bonus.dto';
+import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
 
 export class GetGameByIdCommand {
@@ -52,7 +52,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
 
-    const currentScores: CorrectAnswerCountsAndBonusDto =
+    const currentScores: CountCorrectAnswerDto =
       await this.pairGameQuizService.getScores(game, challengeAnswers);
 
     return this.mapPairGame.toGameModel({
