@@ -29,7 +29,7 @@ export class MapPairGame {
     );
 
     let questions: QuestionModel[] | null = null;
-    if (pair.status === StatusGameEnum.ACTIVE) {
+    if (pair.status !== StatusGameEnum.PENDING) {
       questions = await this.processQuestions(challengeQuestions);
     }
 

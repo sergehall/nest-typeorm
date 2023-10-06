@@ -12,7 +12,10 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
+import { PairGameQuizService } from '../pair-game-quiz.service';
+import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
+import { CorrectAnswerCountsAndBonusDto } from '../../dto/correct-answer-counts-and-bonus.dto';
+import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
 
 export class GetGameByIdCommand {
   constructor(public id: string, public currentUserDto: CurrentUserDto) {}
@@ -22,23 +25,58 @@ export class GetGameByIdCommand {
 export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
+    protected pairGameQuizService: PairGameQuizService,
     protected gameQuizRepo: GameQuizRepo,
     protected mapPairGame: MapPairGame,
   ) {}
   async execute(command: GetGameByIdCommand): Promise<GameViewModel> {
     const { id, currentUserDto } = command;
 
-    const gameById: PairsGameQuizEntity | null =
+    const pairByGameId: PairsGameQuizEntity | null =
       await this.gameQuizRepo.getGameByPairId(id);
 
-    if (!gameById) throw new NotFoundException(`Game with ID ${id} not found`);
+    if (!pairByGameId)
+      throw new NotFoundException(`Pair game with ID ${id} not found`);
 
-    await this.checkPermission(gameById, currentUserDto);
+    await this.checkPermission(pairByGameId, currentUserDto);
 
-    const gameAndQuestions: PairQuestionsAnswersScoresDto =
-      await this.gameQuizRepo.getNextQuestionsToGame(gameById, currentUserDto);
+    // const gameAndQuestions: PairQuestionsAnswersScoresDto =
+    //   await this.gameQuizRepo.getNextQuestionsToGame(
+    //     pairByGameId,
+    //     currentUserDto,
+    //   );
+    //
+    // return await this.mapPairGame.toGameModel(gameAndQuestions);
+    return this.createGameModelForActive(pairByGameId, currentUserDto);
+  }
 
-    return await this.mapPairGame.toGameModel(gameAndQuestions);
+  private async createGameModelForActive(
+    game: PairsGameQuizEntity,
+    currentUserDto: CurrentUserDto,
+  ): Promise<GameViewModel> {
+    const challengeAnswersCount: {
+      challengeAnswers: ChallengeAnswersEntity[];
+      countAnswersByUserId: number;
+    } = await this.gameQuizRepo.getChallengeAnswersAndCount(
+      game.id,
+      currentUserDto.userId,
+    );
+
+    const currentScores: CorrectAnswerCountsAndBonusDto =
+      await this.pairGameQuizService.getScores(
+        game,
+        challengeAnswersCount.challengeAnswers,
+      );
+
+    const challengeQuestions: ChallengeQuestionsEntity[] =
+      await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
+
+    return this.mapPairGame.toGameModel({
+      pair: game,
+      challengeQuestions,
+      challengeAnswers: challengeAnswersCount.challengeAnswers,
+      scores: currentScores,
+    });
   }
 
   private async checkPermission(
