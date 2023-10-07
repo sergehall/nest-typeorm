@@ -67,13 +67,11 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     game: PairsGameQuizEntity,
     currentUserDto: CurrentUserDto,
   ) {
-    let abilityId = 'invalidId';
+    let abilityId: string | undefined = 'invalidId';
+
     if (game.firstPlayer.userId === currentUserDto.userId) {
       abilityId = game.firstPlayer.userId;
-    } else if (
-      game.secondPlayer &&
-      game.secondPlayer.userId === currentUserDto.userId
-    ) {
+    } else if (game.secondPlayer?.userId === currentUserDto.userId) {
       abilityId = game.secondPlayer.userId;
     }
 

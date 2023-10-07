@@ -22,21 +22,49 @@ import { SubmitAnswerCommand } from '../application/use-cases/submit-answer-for-
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
-@Controller('pair-game-quiz/pairs')
+@Controller('pair-game-quiz')
 export class PairGameQuizController {
   constructor(
     private readonly pairGameQuizService: PairGameQuizService,
     protected commandBus: CommandBus,
   ) {}
 
-  @Get('create-questions')
+  @Get('pairs/create-questions')
   @HttpCode(HttpStatus.CREATED)
   async createAndSaveQuestion(): Promise<boolean> {
     return await this.pairGameQuizService.createAndSaveQuestion();
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('my-current')
+  @Get('pairs/my')
+  async getMyGames(@Request() req: any): Promise<GameViewModel> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    return await this.commandBus.execute(
+      new MyCurrentGameCommand(currentUserDto),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('users/my-statistic')
+  async getMyStatistic(@Request() req: any) {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    // return await this.commandBus.execute(
+    //   new MyCurrentGameCommand(currentUserDto),
+    // );
+    return {
+      sumScore: 0,
+      avgScores: 0,
+      gamesCount: 0,
+      winsCount: 0,
+      lossesCount: 0,
+      drawsCount: 0,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('pairs/my-current')
   async findUnfinishedGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
@@ -47,7 +75,7 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('connection')
+  @Post('pairs/connection')
   async startGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
@@ -55,7 +83,7 @@ export class PairGameQuizController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
+  @Get('pairs/:id')
   async findGameById(@Request() req: any, @Param('id') id: string) {
     const currentUserDto: CurrentUserDto = req.user;
 
@@ -66,7 +94,7 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('my-current/answers')
+  @Post('pairs/my-current/answers')
   async answerToCurrentQuestion(
     @Request() req: any,
     @Body() answerDto: AnswerDto,
