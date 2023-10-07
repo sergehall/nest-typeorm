@@ -10,7 +10,6 @@ import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.ent
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
-import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 import { PairGameQuizService } from '../pair-game-quiz.service';
 
 export class MyCurrentGameCommand {

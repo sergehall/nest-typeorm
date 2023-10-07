@@ -17,10 +17,12 @@ export class PairGameQuizService {
     game: PairsGameQuizEntity,
     challengeAnswers: ChallengeAnswersEntity[],
   ): Promise<CountCorrectAnswerDto> {
+    const firstPlayerUserId = game.firstPlayer.userId;
+
     const counts = challengeAnswers.reduce(
       (counts, answer) => {
         if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
-          if (answer.answerOwner.userId === game.firstPlayer.userId) {
+          if (answer.answerOwner.userId === firstPlayerUserId) {
             counts.firstPlayerCountCorrectAnswer++;
           } else {
             counts.secondPlayerCountCorrectAnswer++;
@@ -34,51 +36,25 @@ export class PairGameQuizService {
 
     // add bonusPoint
     if (challengeAnswers.length === 10) {
-      await this.findFirstCorrectAnswerFromEnd(
-        challengeAnswers,
-        game.firstPlayer.userId,
-        counts,
-      );
+      await this.addBonusPoint(challengeAnswers, firstPlayerUserId, counts);
     }
 
     return counts;
   }
 
-  private async findFirstCorrectAnswerFromEnd2(
+  private async addBonusPoint(
     challengeAnswers: ChallengeAnswersEntity[],
     firstPlayerId: string,
     counts: CountCorrectAnswerDto,
   ): Promise<CountCorrectAnswerDto> {
-    const previousId: string = '';
-    for (let i = challengeAnswers.length - 2; i >= 0; i--) {
-      if (
-        challengeAnswers[i].answerStatus === AnswerStatusEnum.CORRECT &&
-        challengeAnswers[i].answerOwner.userId !== previousId
-      ) {
-        if (challengeAnswers[i].answerOwner.userId === firstPlayerId) {
-          counts.firstPlayerCountCorrectAnswer++;
-        } else {
-          counts.secondPlayerCountCorrectAnswer++;
-        }
-        return counts;
-      }
-    }
-    return counts;
-  }
-
-  private async findFirstCorrectAnswerFromEnd(
-    challengeAnswers: ChallengeAnswersEntity[],
-    firstPlayerId: string,
-    counts: CountCorrectAnswerDto,
-  ): Promise<CountCorrectAnswerDto> {
-    let previousUserId: string | null = null;
+    const lastAnswerOwnerUserId: string =
+      challengeAnswers[challengeAnswers.length - 1].answerOwner.userId;
 
     for (let i = challengeAnswers.length - 1; i >= 0; i--) {
       const currentAnswer: ChallengeAnswersEntity = challengeAnswers[i];
-
       if (
         currentAnswer.answerStatus === AnswerStatusEnum.CORRECT &&
-        currentAnswer.answerOwner.userId !== previousUserId
+        currentAnswer.answerOwner.userId !== lastAnswerOwnerUserId
       ) {
         if (currentAnswer.answerOwner.userId === firstPlayerId) {
           counts.firstPlayerCountCorrectAnswer++;
@@ -87,7 +63,6 @@ export class PairGameQuizService {
         }
         break;
       }
-      previousUserId = currentAnswer.answerOwner.userId;
     }
     return counts;
   }
