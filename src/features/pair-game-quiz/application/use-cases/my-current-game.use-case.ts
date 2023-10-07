@@ -11,6 +11,7 @@ import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity'
 import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
+import { PairGameQuizService } from '../pair-game-quiz.service';
 
 export class MyCurrentGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -23,6 +24,7 @@ export class MyCurrentGameUseCase
   constructor(
     protected gameQuizRepo: GameQuizRepo,
     protected mapPairGame: MapPairGame,
+    protected pairGameQuizService: PairGameQuizService,
   ) {}
   async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
@@ -72,10 +74,11 @@ export class MyCurrentGameUseCase
       currentUserDto.userId,
     );
 
-    const currentScores: CountCorrectAnswerDto = await this.getScores(
-      game,
-      challengeAnswersCount.challengeAnswers,
-    );
+    const currentScores: CountCorrectAnswerDto =
+      await this.pairGameQuizService.getScores(
+        game,
+        challengeAnswersCount.challengeAnswers,
+      );
 
     const challengeQuestions: ChallengeQuestionsEntity[] =
       await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
@@ -86,40 +89,5 @@ export class MyCurrentGameUseCase
       challengeAnswers: challengeAnswersCount.challengeAnswers,
       scores: currentScores,
     });
-  }
-
-  private async getScores(
-    game: PairsGameQuizEntity,
-    challengeAnswers: ChallengeAnswersEntity[],
-  ): Promise<CountCorrectAnswerDto> {
-    const counts = challengeAnswers.reduce(
-      (counts, answer) => {
-        if (answer.answerStatus === AnswerStatusEnum.CORRECT) {
-          if (answer.answerOwner.userId === game.firstPlayer.userId) {
-            counts.firstPlayerCountCorrectAnswer++;
-          } else {
-            counts.secondPlayerCountCorrectAnswer++;
-          }
-        }
-        return counts;
-      },
-
-      { firstPlayerCountCorrectAnswer: 0, secondPlayerCountCorrectAnswer: 0 },
-    );
-
-    // add bonusPoint
-    if (challengeAnswers.length == 10) {
-      if (challengeAnswers[0].answerStatus === AnswerStatusEnum.CORRECT) {
-        if (
-          challengeAnswers[0].answerOwner.userId === game.firstPlayer.userId
-        ) {
-          counts.firstPlayerCountCorrectAnswer++;
-        } else {
-          counts.secondPlayerCountCorrectAnswer++;
-        }
-      }
-    }
-
-    return counts;
   }
 }
