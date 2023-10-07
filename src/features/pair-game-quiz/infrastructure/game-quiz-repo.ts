@@ -195,27 +195,6 @@ export class GameQuizRepo {
     }
   }
 
-  async getChallengeAnswersByGameId2(
-    pairGameQuizId: string,
-  ): Promise<ChallengeAnswersEntity[]> {
-    const queryBuilder = this.challengeAnswersRepository
-      .createQueryBuilder('challengeAnswers')
-      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
-      .leftJoinAndSelect('challengeAnswers.question', 'question')
-      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
-      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
-        pairGameQuizId,
-      })
-      .orderBy('challengeAnswers.addedAt', 'DESC');
-
-    try {
-      return await queryBuilder.getMany();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async verifyAnswerByQuestionsId(
     id: string,
     answer: string,
@@ -241,61 +220,6 @@ export class GameQuizRepo {
         );
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async getNextQuestionsToGame(
-    game: PairsGameQuizEntity,
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairQuestionsAnswersScoresDto> {
-    try {
-      const challengeAnswersCount = await this.getChallengeAnswersAndCount2(
-        game.id,
-        currentUserDto.userId,
-      );
-
-      const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestionsByGameId(game.id);
-
-      return {
-        pair: game,
-        challengeQuestions,
-        challengeAnswers: challengeAnswersCount.challengeAnswers,
-        scores: {
-          firstPlayerCountCorrectAnswer: 0,
-          secondPlayerCountCorrectAnswer: 0,
-        },
-      };
-    } catch (error) {
-      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
-        throw new NotFoundException(`Post with ID ${userId} not found`);
-      }
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async updateQuestionsStatus(pairId: string): Promise<boolean> {
-    const queryBuilder = this.challengeQuestionsRepository
-      .createQueryBuilder('challengeQuestions')
-      .leftJoinAndSelect('challengeQuestions.pairGameQuiz', 'pairGameQuiz')
-      .leftJoinAndSelect('challengeQuestions.question', 'question')
-      .where('pairGameQuiz.id = :pairId', { pairId });
-
-    try {
-      const questions = await queryBuilder.getMany();
-
-      const ids = questions.map(
-        (challengeQuestion) => challengeQuestion.question.id,
-      );
-
-      await this.updatePublishedStatus(ids, false);
-      return true;
-    } catch (error) {
-      console.error('Error updateQuestionsStatus:', error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -339,87 +263,6 @@ export class GameQuizRepo {
       return challengeAnswer;
     } catch (error) {
       console.error('Error inserting answer into the database:', error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async addGameResult(currentUserDto: CurrentUserDto) {
-    try {
-      const queryBuilder = this.gamesResultsRepository
-        .createQueryBuilder('gamesResults')
-        .leftJoinAndSelect('pairGameQuiz.gameId', 'pairGameQuiz')
-        .leftJoinAndSelect('player.playerId', 'player')
-        .where('firstPlayer.userId = :userId', {
-          userId: currentUserDto.userId,
-        })
-        .orWhere('pairsGame.secondPlayerId = :userId', {
-          userId: currentUserDto.userId,
-        });
-
-      const game = await queryBuilder.getOne();
-
-      return game;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async getGameAndQuestionsForUser2(
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairQuestionsAnswersScoresDto | null> {
-    try {
-      const queryBuilder = this.pairsGameQuizRepository
-        .createQueryBuilder('pairsGame')
-        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
-        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where('firstPlayer.userId = :userId', {
-          userId: currentUserDto.userId,
-        })
-        .orWhere('pairsGame.secondPlayerId = :userId', {
-          userId: currentUserDto.userId,
-        });
-
-      const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
-
-      if (!game) {
-        return null;
-      }
-
-      if (game.status === StatusGameEnum.PENDING) {
-        const challengeQuestions: ChallengeQuestionsEntity[] = [];
-        const challengeAnswers: ChallengeAnswersEntity[] = [];
-        return {
-          pair: game,
-          challengeQuestions,
-          challengeAnswers,
-          scores: {
-            firstPlayerCountCorrectAnswer: 0,
-            secondPlayerCountCorrectAnswer: 0,
-          },
-        };
-      }
-
-      const challengeAnswersCount = await this.getChallengeAnswersAndCount2(
-        game.id,
-        currentUserDto.userId,
-      );
-      const currentScores: CountCorrectAnswerDto = await this.getScores(
-        game.id,
-        currentUserDto.userId,
-      );
-
-      const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestionsByGameId(game.id);
-
-      return {
-        pair: game,
-        challengeQuestions,
-        challengeAnswers: challengeAnswersCount.challengeAnswers,
-        scores: currentScores,
-      };
-    } catch (error) {
-      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -482,65 +325,6 @@ export class GameQuizRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
-
-  // async getPendingPairOrCreateNew(
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<PairQuestionsAnswersScoresDto> {
-  //   try {
-  //     const pendingGame: PairsGameQuizEntity | null =
-  //       await this.pairsGameQuizRepository.findOne({
-  //         where: {
-  //           status: StatusGameEnum.PENDING,
-  //         },
-  //       });
-  //
-  //     let createdGame: PairsGameQuizEntity;
-  //
-  //     if (!pendingGame) {
-  //       createdGame = await this.createPairGameEntity(currentUserDto);
-  //
-  //       await this.pairsGameQuizRepository.save(createdGame);
-  //
-  //       const challengeQuestions: ChallengeQuestionsEntity[] = [];
-  //       const challengeAnswers: ChallengeAnswersEntity[] = [];
-  //       await this.createChallengeQuestions(createdGame.id);
-  //
-  //       return {
-  //         pair: createdGame,
-  //         challengeQuestions,
-  //         challengeAnswers,
-  //         scores: {
-  //           firstPlayerCountCorrectAnswer: 0,
-  //           secondPlayerCountCorrectAnswer: 0,
-  //         },
-  //       };
-  //     }
-  //
-  //     createdGame = await this.addSecondPlayerAndStarGame(
-  //       pendingGame,
-  //       currentUserDto,
-  //     );
-  //
-  //     const countAnswers = 0;
-  //
-  //     const challengeQuestions: ChallengeQuestionsEntity[] =
-  //       await this.getChallengeQuestions(createdGame.id, countAnswers);
-  //
-  //     const challengeAnswers: ChallengeAnswersEntity[] = [];
-  //     return {
-  //       pair: createdGame,
-  //       challengeQuestions,
-  //       challengeAnswers,
-  //       scores: {
-  //         firstPlayerCountCorrectAnswer: 0,
-  //         secondPlayerCountCorrectAnswer: 0,
-  //       },
-  //     };
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
 
   async saUpdateQuestionPublish(
     question: QuestionsQuizEntity,
@@ -804,16 +588,6 @@ export class GameQuizRepo {
     return pairGameQuiz;
   }
 
-  private async addFinishGameData(
-    pairGameQuiz: PairsGameQuizEntity,
-  ): Promise<PairsGameQuizEntity> {
-    pairGameQuiz.finishGameDate = new Date().toISOString();
-    pairGameQuiz.status = StatusGameEnum.ACTIVE;
-
-    await this.pairsGameQuizRepository.save(pairGameQuiz);
-    return pairGameQuiz;
-  }
-
   async updateGameStatusById(
     gameId: string,
     newStatus: StatusGameEnum,
@@ -852,42 +626,6 @@ export class GameQuizRepo {
       }
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  async getTotalChallengeAnswersCount(pairGameQuizId: string): Promise<number> {
-    const queryBuilder = this.challengeAnswersRepository
-      .createQueryBuilder('challengeAnswers')
-      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
-      .leftJoinAndSelect('challengeAnswers.question', 'question')
-      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
-      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
-        pairGameQuizId,
-      });
-
-    try {
-      return await queryBuilder.getCount();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async createPairGameEntity(
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairsGameQuizEntity> {
-    const firstPlayer = new UsersEntity();
-    firstPlayer.userId = currentUserDto.userId;
-    firstPlayer.login = currentUserDto.login;
-
-    const pairGameQuizEntity = new PairsGameQuizEntity();
-    pairGameQuizEntity.id = uuid4();
-    pairGameQuizEntity.firstPlayer = firstPlayer;
-    pairGameQuizEntity.secondPlayer = null;
-    pairGameQuizEntity.pairCreatedDate = new Date().toISOString();
-    pairGameQuizEntity.startGameDate = null;
-    pairGameQuizEntity.finishGameDate = null;
-
-    return pairGameQuizEntity;
   }
 
   async saGetQuestions(
@@ -1178,6 +916,24 @@ export class GameQuizRepo {
         `Error while removing data for question id ${questionId}`,
       );
     }
+  }
+
+  private async createPairGameEntity(
+    currentUserDto: CurrentUserDto,
+  ): Promise<PairsGameQuizEntity> {
+    const firstPlayer = new UsersEntity();
+    firstPlayer.userId = currentUserDto.userId;
+    firstPlayer.login = currentUserDto.login;
+
+    const pairGameQuizEntity = new PairsGameQuizEntity();
+    pairGameQuizEntity.id = uuid4();
+    pairGameQuizEntity.firstPlayer = firstPlayer;
+    pairGameQuizEntity.secondPlayer = null;
+    pairGameQuizEntity.pairCreatedDate = new Date().toISOString();
+    pairGameQuizEntity.startGameDate = null;
+    pairGameQuizEntity.finishGameDate = null;
+
+    return pairGameQuizEntity;
   }
 
   private async stringsToHashes(

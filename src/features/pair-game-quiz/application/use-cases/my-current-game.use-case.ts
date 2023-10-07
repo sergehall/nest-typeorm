@@ -41,7 +41,7 @@ export class MyCurrentGameUseCase
       return this.createGameModelForPending(game);
     }
 
-    return this.createGameModelForActive(game, currentUserDto);
+    return this.createGameModelForActive(game);
   }
 
   private createGameModelForPending(
@@ -63,16 +63,7 @@ export class MyCurrentGameUseCase
 
   private async createGameModelForActive(
     game: PairsGameQuizEntity,
-    currentUserDto: CurrentUserDto,
   ): Promise<GameViewModel> {
-    // const challengeAnswersCount: {
-    //   challengeAnswers: ChallengeAnswersEntity[];
-    //   countAnswersByUserId: number;
-    // } = await this.gameQuizRepo.getChallengeAnswersAndCount(
-    //   game.id,
-    //   currentUserDto.userId,
-    // );
-
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
 
