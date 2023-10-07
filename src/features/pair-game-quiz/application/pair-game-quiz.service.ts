@@ -71,24 +71,23 @@ export class PairGameQuizService {
     firstPlayerId: string,
     counts: CountCorrectAnswerDto,
   ): Promise<CountCorrectAnswerDto> {
-    let previousAnswer: ChallengeAnswersEntity | null = null;
+    let previousUserId: string | null = null;
 
     for (let i = challengeAnswers.length - 1; i >= 0; i--) {
-      const currentObject: ChallengeAnswersEntity = challengeAnswers[i];
+      const currentAnswer: ChallengeAnswersEntity = challengeAnswers[i];
 
       if (
-        currentObject.answerStatus === AnswerStatusEnum.CORRECT &&
-        (!previousAnswer ||
-          currentObject.answerOwner.userId !==
-            previousAnswer.answerOwner.userId)
+        currentAnswer.answerStatus === AnswerStatusEnum.CORRECT &&
+        currentAnswer.answerOwner.userId !== previousUserId
       ) {
-        if (challengeAnswers[i].answerOwner.userId === firstPlayerId) {
+        if (currentAnswer.answerOwner.userId === firstPlayerId) {
           counts.firstPlayerCountCorrectAnswer++;
         } else {
           counts.secondPlayerCountCorrectAnswer++;
         }
+        break;
       }
-      previousAnswer = currentObject;
+      previousUserId = currentAnswer.answerOwner.userId;
     }
     return counts;
   }
