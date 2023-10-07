@@ -15,6 +15,7 @@ import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entitie
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
 import { PairsGameQuizEntity } from '../../../features/pair-game-quiz/entities/pairs-game-quiz.entity';
+import { GamesResultsEntity } from '../../../features/pair-game-quiz/entities/games-results.entity';
 
 @Injectable()
 export class AppTypeOrmModuleOptions
@@ -52,6 +53,7 @@ export class AppTypeOrmModuleOptions
         PairsGameQuizEntity,
         ChallengeQuestionsEntity,
         ChallengeAnswersEntity,
+        GamesResultsEntity,
       ],
       synchronize: true,
       logging: false,

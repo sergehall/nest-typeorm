@@ -10,6 +10,7 @@ import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
 import { SentCodesLogEntity } from '../mails/infrastructure/entities/sent-codes-log.entity';
 import { DataSource } from 'typeorm';
 import 'dotenv/config';
+import { GamesResultsEntity } from '../features/pair-game-quiz/entities/games-results.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -31,6 +32,7 @@ export default new DataSource({
     LikeStatusCommentsEntity,
     InvalidJwtEntity,
     SentCodesLogEntity,
+    GamesResultsEntity,
   ],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });

@@ -16,6 +16,7 @@ import { GetGameByIdUseCase } from './application/use-cases/get-game-by-id.use-c
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { SubmitAnswerForCurrentQuestionUseCase } from './application/use-cases/submit-answer-for-current-question.use-case';
+import { GamesResultsEntity } from './entities/games-results.entity';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -33,6 +34,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PairsGameQuizEntity,
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
+      GamesResultsEntity,
     ]),
     CaslModule,
     CqrsModule,

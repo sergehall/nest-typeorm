@@ -30,6 +30,7 @@ import { CountCorrectAnswerDto } from '../dto/correct-answer-counts-and-bonus.dt
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { idFormatError } from '../../../common/filters/custom-errors-messages';
+import { GamesResultsEntity } from '../entities/games-results.entity';
 
 export class GameQuizRepo {
   constructor(
@@ -41,6 +42,8 @@ export class GameQuizRepo {
     private readonly challengeQuestionsRepository: Repository<ChallengeQuestionsEntity>,
     @InjectRepository(ChallengeAnswersEntity)
     private readonly challengeAnswersRepository: Repository<ChallengeAnswersEntity>,
+    @InjectRepository(GamesResultsEntity)
+    private readonly gamesResultsRepository: Repository<GamesResultsEntity>,
     protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
@@ -298,6 +301,7 @@ export class GameQuizRepo {
   }
 
   async updateChallengeAnswers(
+    countAnswersBoth: number,
     answer: string,
     nextQuestions: ChallengeQuestionsEntity,
     answerStatus: AnswerStatusEnum,
@@ -326,10 +330,8 @@ export class GameQuizRepo {
 
       await this.challengeAnswersRepository.save(challengeAnswer);
 
-      const totalAnswers = await this.getTotalChallengeAnswersCount(
-        pairsGameQuizEntity.id,
-      );
-      if (totalAnswers === 10) {
+      console.log(countAnswersBoth, 'countAnswersBoth');
+      if (countAnswersBoth === 10) {
         await this.updateGameStatusById(
           pairsGameQuizEntity.id,
           StatusGameEnum.FINISHED,
@@ -342,14 +344,12 @@ export class GameQuizRepo {
     }
   }
 
-  async getActiveGame(
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairQuestionsAnswersScoresDto | null> {
+  async addGameResult(currentUserDto: CurrentUserDto) {
     try {
-      const queryBuilder = this.pairsGameQuizRepository
-        .createQueryBuilder('pairsGame')
-        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
-        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+      const queryBuilder = this.gamesResultsRepository
+        .createQueryBuilder('gamesResults')
+        .leftJoinAndSelect('pairGameQuiz.gameId', 'pairGameQuiz')
+        .leftJoinAndSelect('player.playerId', 'player')
         .where('firstPlayer.userId = :userId', {
           userId: currentUserDto.userId,
         })
@@ -357,48 +357,9 @@ export class GameQuizRepo {
           userId: currentUserDto.userId,
         });
 
-      const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
+      const game = await queryBuilder.getOne();
 
-      if (!game) {
-        return null;
-      }
-
-      if (game.status === StatusGameEnum.PENDING) {
-        const challengeQuestions: ChallengeQuestionsEntity[] = [];
-        const challengeAnswers: ChallengeAnswersEntity[] = [];
-        return {
-          pair: game,
-          challengeQuestions,
-          challengeAnswers,
-          scores: {
-            firstPlayerCountCorrectAnswer: 0,
-            secondPlayerCountCorrectAnswer: 0,
-          },
-        };
-      }
-
-      const challengeAnswersCount: {
-        challengeAnswers: ChallengeAnswersEntity[];
-        countAnswersByUserId: number;
-      } = await this.getChallengeAnswersAndCount(
-        game.id,
-        currentUserDto.userId,
-      );
-
-      const currentScores: CountCorrectAnswerDto = await this.getScores1(
-        game,
-        challengeAnswersCount.challengeAnswers,
-      );
-
-      const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.getChallengeQuestionsByGameId(game.id);
-
-      return {
-        pair: game,
-        challengeQuestions,
-        challengeAnswers: challengeAnswersCount.challengeAnswers,
-        scores: currentScores,
-      };
+      return game;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
