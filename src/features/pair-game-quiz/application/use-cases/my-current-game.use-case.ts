@@ -65,19 +65,19 @@ export class MyCurrentGameUseCase
     game: PairsGameQuizEntity,
     currentUserDto: CurrentUserDto,
   ): Promise<GameViewModel> {
-    const challengeAnswersCount: {
-      challengeAnswers: ChallengeAnswersEntity[];
-      countAnswersByUserId: number;
-    } = await this.gameQuizRepo.getChallengeAnswersAndCount(
-      game.id,
-      currentUserDto.userId,
-    );
+    // const challengeAnswersCount: {
+    //   challengeAnswers: ChallengeAnswersEntity[];
+    //   countAnswersByUserId: number;
+    // } = await this.gameQuizRepo.getChallengeAnswersAndCount(
+    //   game.id,
+    //   currentUserDto.userId,
+    // );
+
+    const challengeAnswers: ChallengeAnswersEntity[] =
+      await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
 
     const currentScores: CountCorrectAnswerDto =
-      await this.pairGameQuizService.getScores(
-        game,
-        challengeAnswersCount.challengeAnswers,
-      );
+      await this.pairGameQuizService.getScores(game, challengeAnswers);
 
     const challengeQuestions: ChallengeQuestionsEntity[] =
       await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
@@ -85,7 +85,7 @@ export class MyCurrentGameUseCase
     return this.mapPairGame.toGameModel({
       pair: game,
       challengeQuestions,
-      challengeAnswers: challengeAnswersCount.challengeAnswers,
+      challengeAnswers: challengeAnswers,
       scores: currentScores,
     });
   }

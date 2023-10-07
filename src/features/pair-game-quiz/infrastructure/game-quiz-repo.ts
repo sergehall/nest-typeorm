@@ -195,7 +195,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getChallengeAnswersByGameId(
+  async getChallengeAnswersByGameId2(
     pairGameQuizId: string,
   ): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepository
@@ -250,7 +250,7 @@ export class GameQuizRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<PairQuestionsAnswersScoresDto> {
     try {
-      const challengeAnswersCount = await this.getChallengeAnswersAndCount(
+      const challengeAnswersCount = await this.getChallengeAnswersAndCount2(
         game.id,
         currentUserDto.userId,
       );
@@ -400,7 +400,7 @@ export class GameQuizRepo {
         };
       }
 
-      const challengeAnswersCount = await this.getChallengeAnswersAndCount(
+      const challengeAnswersCount = await this.getChallengeAnswersAndCount2(
         game.id,
         currentUserDto.userId,
       );
@@ -711,7 +711,32 @@ export class GameQuizRepo {
     return correctAnswerCounts;
   }
 
-  async getChallengeAnswersAndCount(
+  async getChallengeAnswersByGameId(
+    pairGameQuizId: string,
+  ): Promise<ChallengeAnswersEntity[]> {
+    const queryBuilder = this.challengeAnswersRepository
+      .createQueryBuilder('challengeAnswers')
+      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeAnswers.question', 'question')
+      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+      .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
+        pairGameQuizId,
+      })
+      .orderBy('challengeAnswers.addedAt', 'ASC');
+    try {
+      return await queryBuilder.getMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getChallengeAnswersAndCount2(
     pairGameQuizId: string,
     userId: string,
   ): Promise<{
@@ -739,7 +764,7 @@ export class GameQuizRepo {
     return { challengeAnswers, countAnswersByUserId };
   }
 
-  async getChallengeAnswersByGameId2(
+  async getChallengeAnswersByGameId3(
     pairGameQuizId: string,
   ): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepository
