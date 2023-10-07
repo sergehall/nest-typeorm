@@ -22,6 +22,7 @@ import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-up
 import { SaDeleteQuestionByIdUseCase } from './application/use-cases/sa-delete-question-by-id.use-case';
 import { SaUpdateQuestionsPublishUseCase } from './application/use-cases/sa-update-questions-publish.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamesResultsEntity } from '../pair-game-quiz/entities/games-results.entity';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
@@ -41,6 +42,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PairsGameQuizEntity,
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
+      GamesResultsEntity,
     ]),
     CqrsModule,
   ],

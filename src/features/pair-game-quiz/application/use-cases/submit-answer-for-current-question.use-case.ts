@@ -67,12 +67,12 @@ export class SubmitAnswerForCurrentQuestionUseCase
 
           const updateChallengeAnswer =
             await this.gameQuizRepo.updateChallengeAnswers(
+              counts.countAnswersBoth,
               answer,
               nextQuestion,
               answerStatus,
               currentUserDto,
             );
-
           return {
             questionId: updateChallengeAnswer.question.id,
             answerStatus: updateChallengeAnswer.answerStatus,
@@ -89,17 +89,17 @@ export class SubmitAnswerForCurrentQuestionUseCase
   private async countsChallengeAnswers(
     challengeAnswers: ChallengeAnswersEntity[],
     userId: string,
-  ): Promise<{ countAnswersUser: number; totalCountBoth: number }> {
+  ): Promise<{ countAnswersUser: number; countAnswersBoth: number }> {
     let countAnswersUser = 0;
-    let totalCountBoth = 0;
+    let countAnswersBoth = 0;
 
     for (let i = 0; i < challengeAnswers.length; i++) {
-      totalCountBoth++;
+      countAnswersBoth++;
       if (challengeAnswers[i].answerOwner.userId === userId) {
         countAnswersUser++;
       }
     }
 
-    return { countAnswersUser, totalCountBoth };
+    return { countAnswersUser, countAnswersBoth };
   }
 }
