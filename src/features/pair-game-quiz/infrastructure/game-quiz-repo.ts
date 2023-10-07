@@ -330,7 +330,7 @@ export class GameQuizRepo {
 
       await this.challengeAnswersRepository.save(challengeAnswer);
 
-      if (countAnswersBoth === 10) {
+      if (countAnswersBoth === 9) {
         await this.updateGameStatusById(
           pairsGameQuizEntity.id,
           StatusGameEnum.FINISHED,
