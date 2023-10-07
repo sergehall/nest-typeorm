@@ -44,13 +44,17 @@ export class PairGameQuizService {
     return counts;
   }
 
-  private async findFirstCorrectAnswerFromEnd(
+  private async findFirstCorrectAnswerFromEnd2(
     challengeAnswers: ChallengeAnswersEntity[],
     firstPlayerId: string,
     counts: CountCorrectAnswerDto,
   ): Promise<CountCorrectAnswerDto> {
+    const previousId: string = '';
     for (let i = challengeAnswers.length - 2; i >= 0; i--) {
-      if (challengeAnswers[i].answerStatus === AnswerStatusEnum.CORRECT) {
+      if (
+        challengeAnswers[i].answerStatus === AnswerStatusEnum.CORRECT &&
+        challengeAnswers[i].answerOwner.userId !== previousId
+      ) {
         if (challengeAnswers[i].answerOwner.userId === firstPlayerId) {
           counts.firstPlayerCountCorrectAnswer++;
         } else {
@@ -58,6 +62,33 @@ export class PairGameQuizService {
         }
         return counts;
       }
+    }
+    return counts;
+  }
+
+  private async findFirstCorrectAnswerFromEnd(
+    challengeAnswers: ChallengeAnswersEntity[],
+    firstPlayerId: string,
+    counts: CountCorrectAnswerDto,
+  ): Promise<CountCorrectAnswerDto> {
+    let previousAnswer: ChallengeAnswersEntity | null = null;
+
+    for (let i = challengeAnswers.length - 1; i >= 0; i--) {
+      const currentObject: ChallengeAnswersEntity = challengeAnswers[i];
+
+      if (
+        currentObject.answerStatus === AnswerStatusEnum.CORRECT &&
+        (!previousAnswer ||
+          currentObject.answerOwner.userId !==
+            previousAnswer.answerOwner.userId)
+      ) {
+        if (challengeAnswers[i].answerOwner.userId === firstPlayerId) {
+          counts.firstPlayerCountCorrectAnswer++;
+        } else {
+          counts.secondPlayerCountCorrectAnswer++;
+        }
+      }
+      previousAnswer = currentObject;
     }
     return counts;
   }
