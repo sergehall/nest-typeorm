@@ -17,12 +17,14 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { SubmitAnswerForCurrentQuestionUseCase } from './application/use-cases/submit-answer-for-current-question.use-case';
 import { GamesResultsEntity } from './entities/games-results.entity';
+import { AddResultGameToDbUseCase } from './application/use-cases/add-result-game-to-db.use-case';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
   GetGameByIdUseCase,
   StartGameUseCase,
   SubmitAnswerForCurrentQuestionUseCase,
+  AddResultGameToDbUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];

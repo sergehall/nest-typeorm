@@ -20,7 +20,6 @@ import { dictionaryQuestions } from '../questions/dictionary-questions';
 import { CreateQuizQuestionDto } from '../../sa-quiz-questions/dto/create-quiz-question.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
-import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { QuestionsAndCountDto } from '../../sa-quiz-questions/dto/questions-and-count.dto';
 import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-question.dto';
@@ -31,6 +30,7 @@ import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { idFormatError } from '../../../common/filters/custom-errors-messages';
 import { GamesResultsEntity } from '../entities/games-results.entity';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class GameQuizRepo {
   constructor(
@@ -195,7 +195,7 @@ export class GameQuizRepo {
     }
   }
 
-  async getChallengeAnswersBothPlayers(
+  async getChallengeAnswersByGameId(
     pairGameQuizId: string,
   ): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepository
@@ -330,7 +330,6 @@ export class GameQuizRepo {
 
       await this.challengeAnswersRepository.save(challengeAnswer);
 
-      console.log(countAnswersBoth, 'countAnswersBoth');
       if (countAnswersBoth === 10) {
         await this.updateGameStatusById(
           pairsGameQuizEntity.id,
@@ -611,6 +610,22 @@ export class GameQuizRepo {
     }
   }
 
+  async createGamesResults(
+    gamesResultsEntity: GamesResultsEntity[],
+  ): Promise<boolean> {
+    try {
+      await this.gamesResultsRepository.save(gamesResultsEntity);
+
+      return true;
+    } catch (error) {
+      console.error(
+        'Error inserting gamesResultsEntity into the database:',
+        error,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async getRandomQuestions(
     numberQuestions: number,
   ): Promise<QuestionsQuizEntity[]> {
@@ -724,7 +739,7 @@ export class GameQuizRepo {
     return { challengeAnswers, countAnswersByUserId };
   }
 
-  async getChallengeAnswersByGameId(
+  async getChallengeAnswersByGameId2(
     pairGameQuizId: string,
   ): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepository

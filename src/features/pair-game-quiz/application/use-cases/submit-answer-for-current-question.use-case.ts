@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { AnswerDto } from '../../dto/answer.dto';
 import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
@@ -12,6 +12,7 @@ import {
   noOpenGameMessage,
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
+import { AddResultGameToDbCommand } from './add-result-game-to-db.use-case';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -24,7 +25,10 @@ export class SubmitAnswerCommand {
 export class SubmitAnswerForCurrentQuestionUseCase
   implements ICommandHandler<SubmitAnswerCommand>
 {
-  constructor(protected gameQuizRepo: GameQuizRepo) {}
+  constructor(
+    protected gameQuizRepo: GameQuizRepo,
+    protected commandBus: CommandBus,
+  ) {}
 
   async execute({ answerDto, currentUserDto }: SubmitAnswerCommand) {
     const { answer } = answerDto;
@@ -36,11 +40,11 @@ export class SubmitAnswerForCurrentQuestionUseCase
     if (!pairByUserId) {
       throw new ForbiddenException(noOpenGameMessage);
     }
-    const countChallengeAnswers: ChallengeAnswersEntity[] =
-      await this.gameQuizRepo.getChallengeAnswersBothPlayers(pairByUserId.id);
+    const challengeAnswers: ChallengeAnswersEntity[] =
+      await this.gameQuizRepo.getChallengeAnswersByGameId(pairByUserId.id);
 
     const counts = await this.countsChallengeAnswers(
-      countChallengeAnswers,
+      challengeAnswers,
       currentUserDto.userId,
     );
 
@@ -73,6 +77,11 @@ export class SubmitAnswerForCurrentQuestionUseCase
               answerStatus,
               currentUserDto,
             );
+          if (counts.countAnswersBoth === 9) {
+            await this.commandBus.execute(
+              new AddResultGameToDbCommand(pairByUserId),
+            );
+          }
           return {
             questionId: updateChallengeAnswer.question.id,
             answerStatus: updateChallengeAnswer.answerStatus,
