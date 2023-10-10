@@ -51,7 +51,7 @@ export class PairGameQuizController {
     const currentUserDto: CurrentUserDto = req.user;
 
     // return await this.commandBus.execute(
-    //   new MyCurrentGameCommand(currentUserDto),
+    //   new MyGamesStatisticCommand(currentUserDto),
     // );
     return {
       sumScore: 0,
