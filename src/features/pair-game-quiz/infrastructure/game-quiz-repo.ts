@@ -31,6 +31,7 @@ import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { idFormatError } from '../../../common/filters/custom-errors-messages';
 import { GamesResultsEntity } from '../entities/games-results.entity';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { PlayersResultDto } from '../dto/players-result.dto';
 
 export class GameQuizRepo {
   constructor(
@@ -254,12 +255,13 @@ export class GameQuizRepo {
 
       await this.challengeAnswersRepository.save(challengeAnswer);
 
-      if (countAnswersBoth === 9) {
-        await this.updateGameStatusById(
-          pairsGameQuizEntity.id,
-          StatusGameEnum.FINISHED,
-        );
-      }
+      // console.log(countAnswersBoth, 'countAnswersBoth');
+      // if (countAnswersBoth === 9) {
+      //   await this.updateGameStatusById(
+      //     pairsGameQuizEntity.id,
+      //     StatusGameEnum.FINISHED,
+      //   );
+      // }
       return challengeAnswer;
     } catch (error) {
       console.error('Error inserting answer into the database:', error);
@@ -404,6 +406,42 @@ export class GameQuizRepo {
     } catch (error) {
       console.error(
         'Error inserting gamesResultsEntity into the database:',
+        error,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updatePairsGameQuizByResult(
+    game: PairsGameQuizEntity,
+    newStatus: StatusGameEnum,
+    playersData: PlayersResultDto[],
+  ): Promise<PairsGameQuizEntity> {
+    try {
+      const pairsGameQuizRepository = this.pairsGameQuizRepository;
+
+      // Update the first player's data
+      game.firstPlayer = playersData[0].player;
+      game.firstPlayerScore = playersData[0].sumScore;
+      game.firstPlayerGameResult = playersData[0].gameResult;
+
+      // Update the second player's data if provided
+      if (playersData[1]) {
+        game.secondPlayer = playersData[1].player;
+        game.secondPlayerScore = playersData[1].sumScore;
+        game.secondPlayerGameResult = playersData[1].gameResult;
+      }
+      // Update the game's status and add finishGameDate
+      game.status = newStatus;
+      game.finishGameDate = new Date().toISOString();
+
+      // Save the updated game back to the database
+      await pairsGameQuizRepository.save(game);
+
+      return game;
+    } catch (error) {
+      console.error(
+        'Error update PairsGameQuizEntity by updatePairsGameQuizByResult:',
         error,
       );
       throw new InternalServerErrorException(error.message);
@@ -603,7 +641,7 @@ export class GameQuizRepo {
         });
 
       const game: PairsGameQuizEntity | null = await queryBuilder.getOne();
-
+      console.log(game?.id, 'game updateGameStatusById');
       if (!game) {
         // If the game doesn't exist, return null or handle as needed
         return null;

@@ -10,6 +10,7 @@ import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 import { GamesResultsEntity } from './games-results.entity';
+import { GamesResultsEnum } from '../enums/games-results.enum';
 
 @Entity('PairsGameQuiz')
 export class PairsGameQuizEntity {
@@ -26,6 +27,16 @@ export class PairsGameQuizEntity {
   ])
   firstPlayer: UsersEntity;
 
+  @Column({ default: 0 })
+  firstPlayerScore: number;
+
+  @Column({
+    type: 'enum',
+    enum: GamesResultsEnum,
+    default: GamesResultsEnum.DRAW,
+  })
+  firstPlayerGameResult: GamesResultsEnum;
+
   @ManyToOne(() => UsersEntity, (user) => user.secondPlayer, {
     eager: true,
     nullable: true,
@@ -35,6 +46,16 @@ export class PairsGameQuizEntity {
     { name: 'secondPlayerLogin', referencedColumnName: 'login' },
   ])
   secondPlayer: UsersEntity | null;
+
+  @Column({ default: 0 })
+  secondPlayerScore: number;
+
+  @Column({
+    type: 'enum',
+    enum: GamesResultsEnum,
+    default: GamesResultsEnum.DRAW,
+  })
+  secondPlayerGameResult: GamesResultsEnum;
 
   @Column({
     type: 'enum',

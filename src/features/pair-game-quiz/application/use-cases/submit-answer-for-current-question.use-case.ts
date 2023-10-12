@@ -12,7 +12,7 @@ import {
   noOpenGameMessage,
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
-import { AddResultGameToDbCommand } from './add-result-game-to-db.use-case';
+import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -77,9 +77,10 @@ export class SubmitAnswerForCurrentQuestionUseCase
               answerStatus,
               currentUserDto,
             );
+          console.log(counts.countAnswersBoth, 'counts.countAnswersBoth');
           if (counts.countAnswersBoth === 9) {
             await this.commandBus.execute(
-              new AddResultGameToDbCommand(pairByUserId),
+              new AddResultToPairGameCommand(pairByUserId),
             );
           }
           return {
