@@ -123,42 +123,28 @@ export class ChallengesQuestionsRepo {
   ): Promise<ChallengeQuestionsEntity[]> {
     const numberQuestions = 5;
 
-    const challengeQuestions: ChallengeQuestionsEntity[] = [];
-
+    // Fetch random questions
     const questions: QuestionsQuizEntity[] =
       await this.gameQuestionsRepo.getRandomQuestions(numberQuestions);
 
     const pairGameQuizEntity = new PairsGameEntity();
     pairGameQuizEntity.id = pairGameQuizId;
 
-    // questionsIds to change the published status in the selected questions
-    const questionsIds: string[] = [];
+    return await Promise.all(
+      questions.map(async (question) => {
+        // Create a ChallengeQuestionsEntity
+        const challengeQuestion: ChallengeQuestionsEntity = {
+          id: uuid4(), // Ensure uuid4() generates a valid UUID
+          pairGameQuiz: pairGameQuizEntity,
+          question: question,
+          createdAt: new Date().toISOString(),
+        };
 
-    // Use map to create an array of promises for saving ChallengeQuestionsEntities
-    const savePromises = questions.map(async (question) => {
-      questionsIds.push(question.id);
-      const challengeQuestion: ChallengeQuestionsEntity = {
-        id: uuid4(), // Make sure uuid4() generates a valid UUID
-        pairGameQuiz: pairGameQuizEntity,
-        question: question,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Save the challengeQuestion entity to the repository
-      await this.challengeQuestionsRepo.save(challengeQuestion);
-
-      // Push the saved entity to the array
-      challengeQuestions.push(challengeQuestion);
-      return challengeQuestion; // Return the saved entity as a promise
-    });
-
-    // Wait for all promises to complete
-    await Promise.all(savePromises);
-
-    // await this.updatePublishedStatus(questionsIds, true);
-
-    // Return the array of saved ChallengeQuestionsEntities
-    return challengeQuestions;
+        // Save the challengeQuestion entity and return it
+        await this.challengeQuestionsRepo.save(challengeQuestion);
+        return challengeQuestion;
+      }),
+    );
   }
 
   async getChallengeQuestionsByCountAnswersUser(
