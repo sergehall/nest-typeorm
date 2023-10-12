@@ -161,7 +161,7 @@ export class PostsRepo {
     const orderByField = await this.getOrderField(sortBy);
 
     // Query posts and countPosts with pagination conditions
-    const query = this.postsRepository
+    const queryBuilder = this.postsRepository
       .createQueryBuilder('post')
       .where('post.dependencyIsBanned = :dependencyIsBanned', {
         dependencyIsBanned,
@@ -171,11 +171,11 @@ export class PostsRepo {
       .innerJoinAndSelect('post.postOwner', 'postOwner')
       .andWhere('blog.id = :blogId', { blogId });
 
-    query.orderBy(orderByField, direction);
+    queryBuilder.orderBy(orderByField, direction);
 
-    const countPosts = await query.getCount();
+    const countPosts = await queryBuilder.getCount();
 
-    const posts = await query.skip(offset).take(limit).getMany();
+    const posts = await queryBuilder.skip(offset).take(limit).getMany();
 
     // Retrieve posts with information about likes
     const postsWithLikes = await this.postsLikesAggregation(

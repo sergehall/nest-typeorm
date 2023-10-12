@@ -56,6 +56,25 @@ export class ChallengesQuestionsRepo {
     }
   }
 
+  async getChallengeQuestionsByGameIds(
+    pairGameQuizIds: string[],
+  ): Promise<ChallengeQuestionsEntity[]> {
+    try {
+      return await this.challengeQuestionsRepo
+        .createQueryBuilder('challengeQuestions')
+        .leftJoinAndSelect('challengeQuestions.pairGameQuiz', 'pairGameQuiz')
+        .leftJoinAndSelect('challengeQuestions.question', 'question')
+        .where('pairGameQuiz.id IN (:...pairGameQuizIds)', {
+          pairGameQuizIds,
+        })
+        .orderBy('challengeQuestions.id', 'DESC')
+        .getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   // async createChallengeQuestions(
   //   pairGameQuizId: string,
   // ): Promise<ChallengeQuestionsEntity[]> {

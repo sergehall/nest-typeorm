@@ -45,7 +45,7 @@ export class PairGameQuizController {
   async getMyGames(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<GameViewModel> {
+  ): Promise<GameViewModel[]> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
