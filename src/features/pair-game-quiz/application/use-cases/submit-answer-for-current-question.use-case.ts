@@ -16,6 +16,7 @@ import { GameQuestionsRepo } from '../../infrastructure/game-questions-repo';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
 import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { AnswerViewModel } from '../../models/answer-view.model';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -36,7 +37,10 @@ export class SubmitAnswerForCurrentQuestionUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute({ answerDto, currentUserDto }: SubmitAnswerCommand) {
+  async execute({
+    answerDto,
+    currentUserDto,
+  }: SubmitAnswerCommand): Promise<AnswerViewModel> {
     const { answer } = answerDto;
 
     const pairByUserId = await this.pairsGameRepo.getActiveGameByUserId(
