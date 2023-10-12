@@ -48,19 +48,12 @@ export class PairsGameRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where('firstPlayer.userId = :userId', {
-          userId,
-        })
-        .andWhere(
-          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+        .where(
+          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
           {
-            activeStatus: StatusGameEnum.ACTIVE,
-            pendingStatus: StatusGameEnum.FINISHED,
+            userId,
           },
         )
-        .orWhere('pairsGame.secondPlayerId = :userId', {
-          userId,
-        })
         .andWhere(
           '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
           {
@@ -68,6 +61,26 @@ export class PairsGameRepo {
             pendingStatus: StatusGameEnum.FINISHED,
           },
         );
+      // .where('firstPlayer.userId = :userId', {
+      //   userId,
+      // })
+      // .andWhere(
+      //   '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+      //   {
+      //     activeStatus: StatusGameEnum.ACTIVE,
+      //     pendingStatus: StatusGameEnum.FINISHED,
+      //   },
+      // )
+      // .orWhere('pairsGame.secondPlayerId = :userId', {
+      //   userId,
+      // })
+      // .andWhere(
+      //   '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+      //   {
+      //     activeStatus: StatusGameEnum.ACTIVE,
+      //     pendingStatus: StatusGameEnum.FINISHED,
+      //   },
+      // );
       queryBuilder.orderBy(orderByField, direction);
 
       const countPairsGame = await queryBuilder.getCount();
