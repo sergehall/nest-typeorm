@@ -34,7 +34,7 @@ export class GetCommentsByUserIdUseCase
 
     const { comments, countComments } = commentsAndCountComments;
 
-    if (comments.length === 0) {
+    if (countComments === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,

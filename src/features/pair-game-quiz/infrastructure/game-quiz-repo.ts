@@ -51,9 +51,23 @@ export class PairsGameRepo {
         .where('firstPlayer.userId = :userId', {
           userId,
         })
+        .andWhere(
+          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+          {
+            activeStatus: StatusGameEnum.ACTIVE,
+            pendingStatus: StatusGameEnum.FINISHED,
+          },
+        )
         .orWhere('pairsGame.secondPlayerId = :userId', {
           userId,
-        });
+        })
+        .andWhere(
+          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+          {
+            activeStatus: StatusGameEnum.ACTIVE,
+            pendingStatus: StatusGameEnum.FINISHED,
+          },
+        );
       queryBuilder.orderBy(orderByField, direction);
 
       const countPairsGame = await queryBuilder.getCount();
