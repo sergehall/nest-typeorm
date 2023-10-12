@@ -2,22 +2,26 @@ import { Module } from '@nestjs/common';
 import { CaslModule } from '../../ability/casl.module';
 import { PairGameQuizService } from './application/pair-game-quiz.service';
 import { PairGameQuizController } from './api/pair-game-quiz.controller';
-import { GameQuizRepo } from './infrastructure/game-quiz-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { StartGameUseCase } from './application/use-cases/start-game.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChallengeQuestionsEntity } from './entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from './entities/challenge-answers.entity';
-import { PairsGameQuizEntity } from './entities/pairs-game-quiz.entity';
 import { MapPairGame } from './common/map-pair-game-entity-to-game-model';
 import { MyCurrentGameUseCase } from './application/use-cases/my-current-game.use-case';
 import { GetGameByIdUseCase } from './application/use-cases/get-game-by-id.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { SubmitAnswerForCurrentQuestionUseCase } from './application/use-cases/submit-answer-for-current-question.use-case';
-import { GamesResultsEntity } from './entities/games-results.entity';
 import { AddResultToPairGameUseCase } from './application/use-cases/add-result-to-pair-game.use-case';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { GetMyGamesUseCase } from './application/use-cases/my-games.use-case';
+import { GameQuestionsRepo } from './infrastructure/game-questions-repo';
+import { ChallengesQuestionsRepo } from './infrastructure/challenges-questions-repo';
+import { ChallengesAnswersRepo } from './infrastructure/challenges-answers-repo';
+import { PairsGameEntity } from './entities/pairs-game.entity';
+import { PairsGameRepo } from './infrastructure/game-quiz-repo';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -25,6 +29,7 @@ const usersUseCases = [
   StartGameUseCase,
   SubmitAnswerForCurrentQuestionUseCase,
   AddResultToPairGameUseCase,
+  GetMyGamesUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
@@ -33,18 +38,21 @@ const helpers = [KeyResolver, UuidErrorResolver];
   imports: [
     TypeOrmModule.forFeature([
       QuestionsQuizEntity,
-      PairsGameQuizEntity,
+      PairsGameEntity,
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
-      GamesResultsEntity,
     ]),
     CaslModule,
     CqrsModule,
   ],
   controllers: [PairGameQuizController],
   providers: [
+    ParseQueriesService,
     PairGameQuizService,
-    GameQuizRepo,
+    GameQuestionsRepo,
+    PairsGameRepo,
+    ChallengesAnswersRepo,
+    ChallengesQuestionsRepo,
     MapPairGame,
     ...helpers,
     ...usersUseCases,

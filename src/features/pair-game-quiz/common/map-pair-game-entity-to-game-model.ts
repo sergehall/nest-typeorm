@@ -10,8 +10,8 @@ import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { StatusGameEnum } from '../enums/status-game.enum';
-import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { CountCorrectAnswerDto } from '../dto/correct-answer-counts-and-bonus.dto';
+import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 @Injectable()
 export class MapPairGame {
@@ -45,7 +45,7 @@ export class MapPairGame {
   }
 
   private async processPlayersProgress(
-    pair: PairsGameQuizEntity,
+    pair: PairsGameEntity,
     challengeAnswers: ChallengeAnswersEntity[],
     scores: CountCorrectAnswerDto,
   ): Promise<{

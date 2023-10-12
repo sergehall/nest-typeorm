@@ -1,12 +1,10 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameViewModel } from '../../models/game.view-model';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import {
   NotFoundException,
   ForbiddenException,
@@ -16,6 +14,10 @@ import { PairGameQuizService } from '../pair-game-quiz.service';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { PairsGameEntity } from '../../entities/pairs-game.entity';
+import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 
 export class GetGameByIdCommand {
   constructor(public id: string, public currentUserDto: CurrentUserDto) {}
@@ -26,14 +28,16 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected pairGameQuizService: PairGameQuizService,
-    protected gameQuizRepo: GameQuizRepo,
+    protected challengesQuestionsRepo: ChallengesQuestionsRepo,
+    protected challengesAnswersRepo: ChallengesAnswersRepo,
+    protected pairsGameRepo: PairsGameRepo,
     protected mapPairGame: MapPairGame,
   ) {}
   async execute(command: GetGameByIdCommand): Promise<GameViewModel> {
     const { id, currentUserDto } = command;
 
-    const pairByGameId: PairsGameQuizEntity | null =
-      await this.gameQuizRepo.getGameByPairId(id);
+    const pairByGameId: PairsGameEntity | null =
+      await this.pairsGameRepo.getGameByPairId(id);
 
     if (!pairByGameId)
       throw new NotFoundException(`Pair game with ID ${id} not found`);
@@ -43,14 +47,12 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     return this.createGameModel(pairByGameId);
   }
 
-  private async createGameModel(
-    game: PairsGameQuizEntity,
-  ): Promise<GameViewModel> {
+  private async createGameModel(game: PairsGameEntity): Promise<GameViewModel> {
     const challengeQuestions: ChallengeQuestionsEntity[] =
-      await this.gameQuizRepo.getChallengeQuestionsByGameId(game.id);
+      await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(game.id);
 
     const challengeAnswers: ChallengeAnswersEntity[] =
-      await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
+      await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
     const currentScores: CountCorrectAnswerDto =
       await this.pairGameQuizService.getScores(game, challengeAnswers);
@@ -64,7 +66,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
   }
 
   private async checkPermission(
-    game: PairsGameQuizEntity,
+    game: PairsGameEntity,
     currentUserDto: CurrentUserDto,
   ) {
     let abilityId: string | undefined = 'invalidId';

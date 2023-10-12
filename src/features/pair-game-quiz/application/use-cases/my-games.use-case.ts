@@ -1,6 +1,5 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { StartGameCommand } from './start-game.use-case';
 import { GameViewModel } from '../../models/game.view-model';
 import { NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
@@ -9,19 +8,21 @@ import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.ent
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { PairGameQuizService } from '../pair-game-quiz.service';
+import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 
-export class MyCurrentGameCommand {
-  constructor(public currentUserDto: CurrentUserDto) {}
+export class GetMyGamesCommand {
+  constructor(
+    public queryData: ParseQueriesDto,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 
-@CommandHandler(MyCurrentGameCommand)
-export class MyCurrentGameUseCase
-  implements ICommandHandler<MyCurrentGameCommand>
-{
+@CommandHandler(GetMyGamesCommand)
+export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   constructor(
     protected pairsGameRepo: PairsGameRepo,
     protected mapPairGame: MapPairGame,
@@ -29,23 +30,27 @@ export class MyCurrentGameUseCase
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
   ) {}
-  async execute(command: StartGameCommand): Promise<GameViewModel> {
-    const { currentUserDto } = command;
+  async execute(command: GetMyGamesCommand): Promise<GameViewModel> {
+    const { queryData, currentUserDto } = command;
 
-    const game: PairsGameEntity | null =
-      await this.pairsGameRepo.getUnfinishedGameByUserId(currentUserDto.userId);
+    const games: PairsGameEntity[] = await this.pairsGameRepo.getGamesByUserId(
+      queryData,
+      currentUserDto.userId,
+    );
 
-    if (!game) {
+    console.log(games, 'games');
+
+    if (games.length === 0) {
       throw new NotFoundException(
         `Active game for user ID ${currentUserDto.userId} not found.`,
       );
     }
 
-    if (game.status === StatusGameEnum.PENDING) {
-      return this.createGameModelForPending(game);
+    if (games[0].status === StatusGameEnum.PENDING) {
+      return this.createGameModelForPending(games[0]);
     }
 
-    return this.createGameModelForActive(game);
+    return this.createGameModelForActive(games[0]);
   }
 
   private createGameModelForPending(

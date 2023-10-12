@@ -1,7 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { AnswerDto } from '../../dto/answer.dto';
-import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import {
   ForbiddenException,
   InternalServerErrorException,
@@ -13,6 +12,10 @@ import {
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
+import { GameQuestionsRepo } from '../../infrastructure/game-questions-repo';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -26,14 +29,17 @@ export class SubmitAnswerForCurrentQuestionUseCase
   implements ICommandHandler<SubmitAnswerCommand>
 {
   constructor(
-    protected gameQuizRepo: GameQuizRepo,
+    protected pairsGameRepo: PairsGameRepo,
+    protected gameQuestionsRepo: GameQuestionsRepo,
+    protected challengesQuestionsRepo: ChallengesQuestionsRepo,
+    protected challengesAnswersRepo: ChallengesAnswersRepo,
     protected commandBus: CommandBus,
   ) {}
 
   async execute({ answerDto, currentUserDto }: SubmitAnswerCommand) {
     const { answer } = answerDto;
 
-    const pairByUserId = await this.gameQuizRepo.getActiveGameByUserId(
+    const pairByUserId = await this.pairsGameRepo.getActiveGameByUserId(
       currentUserDto.userId,
     );
 
@@ -41,7 +47,9 @@ export class SubmitAnswerForCurrentQuestionUseCase
       throw new ForbiddenException(noOpenGameMessage);
     }
     const challengeAnswers: ChallengeAnswersEntity[] =
-      await this.gameQuizRepo.getChallengeAnswersByGameId(pairByUserId.id);
+      await this.challengesAnswersRepo.getChallengeAnswersByGameId(
+        pairByUserId.id,
+      );
 
     const counts = await this.countsChallengeAnswers(
       challengeAnswers,
@@ -54,13 +62,14 @@ export class SubmitAnswerForCurrentQuestionUseCase
       case MAX_ANSWER_COUNT:
         throw new ForbiddenException(answeredAllQuestionsMessage);
       default:
-        const nextQuestion = await this.gameQuizRepo.getNextChallengeQuestions(
-          pairByUserId.id,
-          counts.countAnswersUser,
-        );
+        const nextQuestion =
+          await this.challengesQuestionsRepo.getNextChallengeQuestions(
+            pairByUserId.id,
+            counts.countAnswersUser,
+          );
         if (nextQuestion) {
           const verifyAnswer =
-            await this.gameQuizRepo.verifyAnswerByQuestionsId(
+            await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
               nextQuestion.question.id,
               answer,
             );
@@ -70,15 +79,20 @@ export class SubmitAnswerForCurrentQuestionUseCase
             : AnswerStatusEnum.INCORRECT;
 
           const updateChallengeAnswer =
-            await this.gameQuizRepo.updateChallengeAnswers(
+            await this.challengesAnswersRepo.updateChallengeAnswers(
               counts.countAnswersBoth,
               answer,
               nextQuestion,
               answerStatus,
               currentUserDto,
             );
-          console.log(counts.countAnswersBoth, 'counts.countAnswersBoth');
-          if (counts.countAnswersBoth === 9) {
+
+          let currentAnswer: number = 0;
+          if (updateChallengeAnswer) {
+            currentAnswer = 1;
+          }
+
+          if (counts.countAnswersBoth + currentAnswer === 10) {
             await this.commandBus.execute(
               new AddResultToPairGameCommand(pairByUserId),
             );

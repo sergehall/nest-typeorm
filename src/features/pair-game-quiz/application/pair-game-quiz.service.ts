@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { GameQuizRepo } from '../infrastructure/game-quiz-repo';
-import { PairsGameQuizEntity } from '../entities/pairs-game-quiz.entity';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../dto/correct-answer-counts-and-bonus.dto';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
+import { GameQuestionsRepo } from '../infrastructure/game-questions-repo';
+import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 @Injectable()
 export class PairGameQuizService {
-  constructor(protected gameQuizRepo: GameQuizRepo) {}
+  constructor(protected gameQuestionsRepo: GameQuestionsRepo) {}
 
   async createAndSaveQuestion(): Promise<boolean> {
-    return await this.gameQuizRepo.createAndSaveQuestion();
+    return await this.gameQuestionsRepo.createAndSaveQuestion();
   }
 
   async getScores(
-    game: PairsGameQuizEntity,
+    game: PairsGameEntity,
     challengeAnswers: ChallengeAnswersEntity[],
   ): Promise<CountCorrectAnswerDto> {
     const firstPlayerUserId = game.firstPlayer.userId;

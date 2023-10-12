@@ -14,8 +14,7 @@ import { BannedUsersForBlogsEntity } from '../../../features/users/entities/bann
 import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
-import { PairsGameQuizEntity } from '../../../features/pair-game-quiz/entities/pairs-game-quiz.entity';
-import { GamesResultsEntity } from '../../../features/pair-game-quiz/entities/games-results.entity';
+import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs-game.entity';
 
 @Injectable()
 export class AppTypeOrmModuleOptions
@@ -50,10 +49,9 @@ export class AppTypeOrmModuleOptions
         InvalidJwtEntity,
         SentCodesLogEntity,
         QuestionsQuizEntity,
-        PairsGameQuizEntity,
+        PairsGameEntity,
         ChallengeQuestionsEntity,
         ChallengeAnswersEntity,
-        GamesResultsEntity,
       ],
       synchronize: true,
       logging: false,

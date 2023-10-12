@@ -1,12 +1,12 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { GameViewModel } from '../../models/game.view-model';
 import { ForbiddenException } from '@nestjs/common';
-import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
 import { StatusGameEnum } from '../../enums/status-game.enum';
+import { PairsGameEntity } from '../../entities/pairs-game.entity';
+import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -15,13 +15,13 @@ export class StartGameCommand {
 @CommandHandler(StartGameCommand)
 export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   constructor(
-    protected gameQuizRepo: GameQuizRepo,
+    protected gameQuizRepo: PairsGameRepo,
     protected mapPairGame: MapPairGame,
   ) {}
   async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
-    const gameByUserId: PairsGameQuizEntity | null =
+    const gameByUserId: PairsGameEntity | null =
       await this.gameQuizRepo.getUnfinishedGameByUserId(currentUserDto.userId);
 
     await this.checkPermission(gameByUserId);
@@ -33,7 +33,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   }
 
   private async checkPermission(
-    gameByUserId: PairsGameQuizEntity | null,
+    gameByUserId: PairsGameEntity | null,
   ): Promise<void> {
     if (gameByUserId && gameByUserId.status !== StatusGameEnum.FINISHED) {
       throw new ForbiddenException(

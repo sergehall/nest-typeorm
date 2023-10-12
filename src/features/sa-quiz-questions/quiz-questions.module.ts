@@ -10,9 +10,7 @@ import { UsersEntity } from '../users/entities/users.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { SaCreateQuestionsAndAnswerUseCase } from './application/use-cases/sa-create-questions-and-answer.use-case';
-import { GameQuizRepo } from '../pair-game-quiz/infrastructure/game-quiz-repo';
 import { QuestionsQuizEntity } from './entities/questions-quiz.entity';
-import { PairsGameQuizEntity } from '../pair-game-quiz/entities/pairs-game-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../pair-game-quiz/entities/challenge-answers.entity';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
@@ -22,7 +20,11 @@ import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-up
 import { SaDeleteQuestionByIdUseCase } from './application/use-cases/sa-delete-question-by-id.use-case';
 import { SaUpdateQuestionsPublishUseCase } from './application/use-cases/sa-update-questions-publish.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
-import { GamesResultsEntity } from '../pair-game-quiz/entities/games-results.entity';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions-repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions-repo';
+import { ChallengesAnswersRepo } from '../pair-game-quiz/infrastructure/challenges-answers-repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { PairsGameRepo } from '../pair-game-quiz/infrastructure/game-quiz-repo';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
@@ -39,10 +41,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     TypeOrmModule.forFeature([
       UsersEntity,
       QuestionsQuizEntity,
-      PairsGameQuizEntity,
+      PairsGameEntity,
       ChallengeQuestionsEntity,
       ChallengeAnswersEntity,
-      GamesResultsEntity,
     ]),
     CqrsModule,
   ],
@@ -52,7 +53,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ParseQueriesService,
     QuizQuestionsService,
     UsersRepo,
-    GameQuizRepo,
+    PairsGameRepo,
+    GameQuestionsRepo,
+    ChallengesAnswersRepo,
+    ChallengesQuestionsRepo,
     ExpirationDateCalculator,
     EncryptConfig,
     TransformationService,

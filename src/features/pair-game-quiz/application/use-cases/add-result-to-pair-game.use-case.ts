@@ -1,17 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PairsGameQuizEntity } from '../../entities/pairs-game-quiz.entity';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
-import { GameQuizRepo } from '../../infrastructure/game-quiz-repo';
 import { PairGameQuizService } from '../pair-game-quiz.service';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
-import { GamesResultsEntity } from '../../entities/games-results.entity';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { PlayersResultDto } from '../../dto/players-result.dto';
 import { StatusGameEnum } from '../../enums/status-game.enum';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { PairsGameEntity } from '../../entities/pairs-game.entity';
+import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 
 export class AddResultToPairGameCommand {
-  constructor(public game: PairsGameQuizEntity) {}
+  constructor(public game: PairsGameEntity) {}
 }
 
 @CommandHandler(AddResultToPairGameCommand)
@@ -19,15 +18,16 @@ export class AddResultToPairGameUseCase
   implements ICommandHandler<AddResultToPairGameCommand>
 {
   constructor(
-    protected gameQuizRepo: GameQuizRepo,
+    protected gameQuizRepo: PairsGameRepo,
     protected pairGameQuizService: PairGameQuizService,
+    protected challengesAnswersRepo: ChallengesAnswersRepo,
   ) {}
 
   async execute(command: AddResultToPairGameCommand): Promise<boolean> {
     const { game } = command;
 
     const challengeAnswers: ChallengeAnswersEntity[] =
-      await this.gameQuizRepo.getChallengeAnswersByGameId(game.id);
+      await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
     const scores: CountCorrectAnswerDto =
       await this.pairGameQuizService.getScores(game, challengeAnswers);
@@ -51,32 +51,6 @@ export class AddResultToPairGameUseCase
     );
 
     return true;
-  }
-
-  private async createGameResultEntities(
-    game: PairsGameQuizEntity,
-    playersArr: PlayersResultDto[],
-  ): Promise<Array<GamesResultsEntity>> {
-    const gameResultEntities: Array<GamesResultsEntity> = [];
-
-    for (const playerData of playersArr) {
-      const { player, sumScore, gameResult } = playerData;
-
-      const gameResultEntity = new GamesResultsEntity();
-      gameResultEntity.sumScore = sumScore;
-      gameResultEntity.gameResult = gameResult;
-
-      const pairGameQuizEntity = new PairsGameQuizEntity();
-      pairGameQuizEntity.id = game.id;
-
-      // Set relationships
-      gameResultEntity.pairGameQuiz = pairGameQuizEntity;
-      gameResultEntity.player = player;
-
-      gameResultEntities.push(gameResultEntity);
-    }
-
-    return gameResultEntities;
   }
 
   private async gameResult(scores: CountCorrectAnswerDto): Promise<{
