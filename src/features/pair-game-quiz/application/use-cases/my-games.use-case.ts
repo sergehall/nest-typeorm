@@ -68,8 +68,6 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   private async createGameModels(
     games: PairsGameEntity[],
   ): Promise<GameViewModel[]> {
-    const pairsGame: GameViewModel[] = [];
-
     const gameIds = games
       .filter((game) => game.status === StatusGameEnum.FINISHED)
       .map((game) => game.id);
@@ -84,19 +82,22 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
       ]);
     }
 
+    const pairsGame: GameViewModel[] = [];
+
     for (const game of games) {
       if (game.status === StatusGameEnum.PENDING) {
         pairsGame.push(await this.createGameModelForPending(game));
       } else if (game.status === StatusGameEnum.ACTIVE) {
         pairsGame.push(await this.createGameModelForActive(game));
+      } else if (game.status === StatusGameEnum.FINISHED) {
+        pairsGame.push(
+          await this.createGameModelForFinished(
+            game,
+            questionsFinishedGames,
+            answersFinishedGames,
+          ),
+        );
       }
-      pairsGame.push(
-        await this.createGameModelForFinished(
-          game,
-          questionsFinishedGames,
-          answersFinishedGames,
-        ),
-      );
     }
     return pairsGame;
   }
