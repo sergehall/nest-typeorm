@@ -79,4 +79,29 @@ export class ChallengesAnswersRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async getChallengeAnswersByIds(
+    pairGameQuizIds: string[],
+  ): Promise<ChallengeAnswersEntity[]> {
+    const queryBuilder = this.challengeAnswersRepo
+      .createQueryBuilder('challengeAnswers')
+      .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
+      .leftJoinAndSelect('challengeAnswers.question', 'question')
+      .leftJoinAndSelect('challengeAnswers.answerOwner', 'answerOwner')
+      .where('challengeAnswers.pairGameQuizId IN (:...pairGameQuizIds)', {
+        pairGameQuizIds,
+      })
+      .orderBy('challengeAnswers.addedAt', 'ASC');
+    try {
+      return await queryBuilder.getMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

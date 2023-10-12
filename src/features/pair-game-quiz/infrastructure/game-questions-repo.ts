@@ -233,56 +233,6 @@ export class GameQuestionsRepo {
     }
   }
 
-  private async getPagingParams(
-    queryData: ParseQueriesDto,
-  ): Promise<PagingParamsDto> {
-    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
-
-    const sortBy: string = await this.getSortForComplexityQuestion(
-      queryData.queryPagination.sortBy,
-    );
-    const direction: SortDirectionEnum = sortDirection;
-    const limit: number = pageSize;
-    const offset: number = (pageNumber - 1) * limit;
-
-    return { sortBy, direction, limit, offset };
-  }
-
-  private async getSortForComplexityQuestion(sortBy: string): Promise<string> {
-    return await this.keyResolver.resolveKey(
-      sortBy,
-      ['complexity', 'topic', 'published', 'body'],
-      'createdAt',
-    );
-  }
-
-  private async getOrderField(field: string): Promise<string> {
-    let orderByString;
-    try {
-      switch (field) {
-        case 'complexity':
-          orderByString = 'complexity';
-          break;
-        case 'topic':
-          orderByString = 'topic';
-          break;
-        case 'published':
-          orderByString = 'published ';
-          break;
-        case 'body':
-          orderByString = 'questionText';
-          break;
-        default:
-          orderByString = 'createdAt';
-      }
-
-      return orderByString;
-    } catch (error) {
-      console.log(error.message);
-      throw new Error('Invalid field in getOrderField(field: string)');
-    }
-  }
-
   private async getQuestionsByComplexity(
     numberQuestions: number,
   ): Promise<QuestionsQuizEntity[]> {
@@ -398,6 +348,56 @@ export class GameQuestionsRepo {
       throw new Error(
         `Error while removing data for question id ${questionId}`,
       );
+    }
+  }
+
+  private async getPagingParams(
+    queryData: ParseQueriesDto,
+  ): Promise<PagingParamsDto> {
+    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
+
+    const sortBy: string = await this.getSortForComplexityQuestion(
+      queryData.queryPagination.sortBy,
+    );
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
+
+    return { sortBy, direction, limit, offset };
+  }
+
+  private async getSortForComplexityQuestion(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      ['complexity', 'topic', 'published', 'body'],
+      'createdAt',
+    );
+  }
+
+  private async getOrderField(field: string): Promise<string> {
+    let orderByString;
+    try {
+      switch (field) {
+        case 'complexity':
+          orderByString = 'complexity';
+          break;
+        case 'topic':
+          orderByString = 'topic';
+          break;
+        case 'published':
+          orderByString = 'published ';
+          break;
+        case 'body':
+          orderByString = 'questionText';
+          break;
+        default:
+          orderByString = 'createdAt';
+      }
+
+      return orderByString;
+    } catch (error) {
+      console.log(error.message);
+      throw new Error('Invalid field in getOrderField(field: string)');
     }
   }
 

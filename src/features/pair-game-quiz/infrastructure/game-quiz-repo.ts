@@ -41,7 +41,7 @@ export class PairsGameRepo {
 
     const { sortBy, direction, limit, offset } = pagingParams;
 
-    const orderField = await this.getOrderField(sortBy);
+    const orderByField = await this.getOrderField(sortBy);
 
     try {
       const queryBuilder = this.pairsGameQuizRepo
@@ -54,8 +54,9 @@ export class PairsGameRepo {
         .orWhere('pairsGame.secondPlayerId = :userId', {
           userId,
         });
+      queryBuilder.orderBy(orderByField, direction);
 
-      return await queryBuilder.getMany();
+      return await queryBuilder.skip(offset).take(limit).getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const userId = await this.uuidErrorResolver.extractUserIdFromError(
@@ -174,12 +175,7 @@ export class PairsGameRepo {
 
       if (!pendingGame) {
         createdGame = await this.createPairGameEntity(currentUserDto);
-        try {
-          await this.pairsGameQuizRepo.save(createdGame);
-        } catch (error) {
-          console.error('Error inserting game into pairsGameQuizRepo:', error);
-          throw new InternalServerErrorException(error.message);
-        }
+        await this.pairsGameQuizRepo.save(createdGame);
 
         const challengeQuestions: ChallengeQuestionsEntity[] = [];
         const challengeAnswers: ChallengeAnswersEntity[] = [];
