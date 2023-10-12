@@ -40,7 +40,8 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     );
 
     const { pairsGame, countPairsGame } = gamesAndCount;
-    if (pairsGame.length === 0) {
+
+    if (countPairsGame === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -54,7 +55,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     );
 
     const modelsGames = await this.createGameModels(pairsGame);
-    console.log(modelsGames, 'modelsGames');
+
     return {
       pagesCount: pagesCount,
       page: pageNumber,
