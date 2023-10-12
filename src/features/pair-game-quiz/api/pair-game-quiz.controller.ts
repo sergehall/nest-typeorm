@@ -25,6 +25,7 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
 import { AnswerViewModel } from '../models/answer-view.model';
+import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
@@ -46,7 +47,7 @@ export class PairGameQuizController {
   async getMyGames(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<GameViewModel[]> {
+  ): Promise<PaginatedResultDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);

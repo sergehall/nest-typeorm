@@ -64,4 +64,4 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ...saQuizUseCases,
   ],
 })
-export class QuizQuestionsModule {}
+export class SaQuizQuestionsModule {}

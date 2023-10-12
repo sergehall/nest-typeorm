@@ -6,7 +6,8 @@ import { ReturnPostsEntity } from '../../../features/posts/entities/return-posts
 import { IsArray, IsNumber, IsObject } from 'class-validator';
 import { ReturnBloggerBlogsDto } from '../../../features/blogger-blogs/entities/return-blogger-blogs.entity';
 import { ReturnUsersDto } from '../../../features/sa/dto/return-users.dto';
-import { QuestionsModel } from '../../../features/sa-quiz-questions/models/questions.model';
+import { QuestionsViewModel } from '../../../features/sa-quiz-questions/models/questions-view.model';
+import { GameViewModel } from '../../../features/pair-game-quiz/models/game-view.model';
 
 export class PaginatedResultDto {
   @IsNumber()
@@ -31,6 +32,7 @@ export class PaginatedResultDto {
     | ReturnBloggerBlogsDto
     | ReturnUsersDto
     | ReturnBannedUsersForBlogEntity
-    | QuestionsModel
+    | QuestionsViewModel
+    | GameViewModel
   )[];
 }

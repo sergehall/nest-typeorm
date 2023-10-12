@@ -1,6 +1,6 @@
 import { IsBoolean, IsString } from 'class-validator';
 
-export class QuestionsModel {
+export class QuestionsViewModel {
   @IsString()
   id: string;
 
