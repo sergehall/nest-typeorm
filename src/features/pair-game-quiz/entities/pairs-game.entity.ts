@@ -9,11 +9,10 @@ import {
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
-import { GamesResultsEntity } from './games-results.entity';
 import { GamesResultsEnum } from '../enums/games-results.enum';
 
-@Entity('PairsGameQuiz')
-export class PairsGameQuizEntity {
+@Entity('PairsGame')
+export class PairsGameEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -79,7 +78,4 @@ export class PairsGameQuizEntity {
     (challengeQuestion) => challengeQuestion.pairGameQuiz,
   )
   questions: ChallengeQuestionsEntity[];
-
-  @OneToMany(() => GamesResultsEntity, (game) => game.player)
-  gameResult: GamesResultsEntity[];
 }

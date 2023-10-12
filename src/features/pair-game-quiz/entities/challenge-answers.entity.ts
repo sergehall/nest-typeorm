@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
-import { PairsGameQuizEntity } from './pairs-game-quiz.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
+import { PairsGameEntity } from './pairs-game.entity';
 
 @Entity('ChallengeAnswers')
 export class ChallengeAnswersEntity {
@@ -21,16 +21,12 @@ export class ChallengeAnswersEntity {
   @Column({ type: 'character varying', length: 50, nullable: false })
   addedAt: string;
 
-  @ManyToOne(
-    () => PairsGameQuizEntity,
-    (pairGameQuiz) => pairGameQuiz.questions,
-    {
-      nullable: false,
-      eager: true,
-    },
-  )
+  @ManyToOne(() => PairsGameEntity, (pairGameQuiz) => pairGameQuiz.questions, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'pairGameQuizId', referencedColumnName: 'id' })
-  pairGameQuiz: PairsGameQuizEntity;
+  pairGameQuiz: PairsGameEntity;
 
   @ManyToOne(
     () => QuestionsQuizEntity,

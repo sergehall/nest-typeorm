@@ -8,6 +8,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -20,12 +21,16 @@ import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-
 import { AnswerDto } from '../dto/answer.dto';
 import { SubmitAnswerCommand } from '../application/use-cases/submit-answer-for-current-question.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
+import { ParseQueriesService } from '../../../common/query/parse-queries.service';
+import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
 export class PairGameQuizController {
   constructor(
     private readonly pairGameQuizService: PairGameQuizService,
+    protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
 
@@ -37,11 +42,16 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
-  async getMyGames(@Request() req: any): Promise<GameViewModel> {
+  async getMyGames(
+    @Request() req: any,
+    @Query() query: any,
+  ): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
-      new MyCurrentGameCommand(currentUserDto),
+      new GetMyGamesCommand(queryData, currentUserDto),
     );
   }
 

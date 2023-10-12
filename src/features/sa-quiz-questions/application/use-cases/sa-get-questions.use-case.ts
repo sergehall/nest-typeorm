@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { GameQuizRepo } from '../../../pair-game-quiz/infrastructure/game-quiz-repo';
 import { TransformationService } from '../../common/transform-to-questions-model';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { QuestionsAndCountDto } from '../../dto/questions-and-count.dto';
+import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions-repo';
 
 export class SaGetQuestionsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -14,7 +14,7 @@ export class SaGetQuestionsUseCase
   implements ICommandHandler<SaGetQuestionsCommand>
 {
   constructor(
-    protected gameQuizRepo: GameQuizRepo,
+    protected gameQuestionsRepo: GameQuestionsRepo,
     protected transformationService: TransformationService,
   ) {}
 
@@ -23,7 +23,7 @@ export class SaGetQuestionsUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const questionsAndCount: QuestionsAndCountDto =
-      await this.gameQuizRepo.saGetQuestions(queryData);
+      await this.gameQuestionsRepo.saGetQuestions(queryData);
 
     if (questionsAndCount.countQuestions === 0) {
       return {
