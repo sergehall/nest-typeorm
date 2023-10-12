@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateQuizQuestionDto } from '../../dto/create-quiz-question.dto';
 import { QuestionsQuizEntity } from '../../entities/questions-quiz.entity';
-import { QuestionsModel } from '../../models/questions.model';
+import { QuestionsViewModel } from '../../models/questions-view.model';
 import { TransformationService } from '../../common/transform-to-questions-model';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions-repo';
 
@@ -19,12 +19,12 @@ export class SaCreateQuestionsAndAnswerUseCase
   ) {}
   async execute(
     command: SaCreateQuestionsAndAnswerCommand,
-  ): Promise<QuestionsModel> {
+  ): Promise<QuestionsViewModel> {
     const { createQuizQuestionDto } = command;
     const newQuestion: QuestionsQuizEntity =
       await this.gameQuestionsRepo.saCreateQuestion(createQuizQuestionDto);
 
-    const newQuestionArr: QuestionsModel[] =
+    const newQuestionArr: QuestionsViewModel[] =
       await this.transformationService.transformEntityToQuestionsModelArray([
         newQuestion,
       ]);

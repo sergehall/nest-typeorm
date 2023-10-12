@@ -13,6 +13,7 @@ import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questio
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class GetMyGamesCommand {
   constructor(
@@ -30,21 +31,39 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
   ) {}
-  async execute(command: GetMyGamesCommand): Promise<GameViewModel[]> {
+  async execute(command: GetMyGamesCommand): Promise<PaginatedResultDto> {
     const { queryData, currentUserDto } = command;
+    const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const games: PairsGameEntity[] = await this.pairsGameRepo.getGamesByUserId(
+    const gamesAndCount = await this.pairsGameRepo.getGamesByUserId(
       queryData,
       currentUserDto.userId,
     );
 
-    if (games.length === 0) {
-      throw new NotFoundException(
-        `Games for user with ID ${currentUserDto.userId} not found`,
-      );
-    }
+    const { pairsGame, countPairsGame } = gamesAndCount;
 
-    return await this.createGameModels(games);
+    if (pairsGame.length === 0) {
+      return {
+        pagesCount: 0,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
+    const pagesCount = Math.ceil(
+      countPairsGame / command.queryData.queryPagination.pageSize,
+    );
+
+    const modelsGames = await this.createGameModels(pairsGame);
+
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: countPairsGame,
+      items: modelsGames,
+    };
   }
 
   private async createGameModels(

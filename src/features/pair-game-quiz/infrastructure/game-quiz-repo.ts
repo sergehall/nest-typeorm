@@ -35,7 +35,7 @@ export class PairsGameRepo {
   async getGamesByUserId(
     queryData: ParseQueriesDto,
     userId: string,
-  ): Promise<PairsGameEntity[]> {
+  ): Promise<{ pairsGame: PairsGameEntity[]; countPairsGame: number }> {
     // Retrieve paging parameters
     const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
 
@@ -56,7 +56,18 @@ export class PairsGameRepo {
         });
       queryBuilder.orderBy(orderByField, direction);
 
-      return await queryBuilder.skip(offset).take(limit).getMany();
+      const countPairsGame = await queryBuilder.getCount();
+      const pairsGame = await queryBuilder.skip(offset).take(limit).getMany();
+      if (pairsGame.length === 0) {
+        return {
+          pairsGame: [],
+          countPairsGame: countPairsGame,
+        };
+      }
+      return {
+        pairsGame: pairsGame,
+        countPairsGame: countPairsGame,
+      };
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const userId = await this.uuidErrorResolver.extractUserIdFromError(

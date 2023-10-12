@@ -1,18 +1,18 @@
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
-import { QuestionsModel } from '../models/questions.model';
+import { QuestionsViewModel } from '../models/questions-view.model';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TransformationService {
   async transformEntityToQuestionsModelArray(
     newQuestions: QuestionsQuizEntity[],
-  ): Promise<QuestionsModel[]> {
-    const transformedQuestions: QuestionsModel[] = [];
+  ): Promise<QuestionsViewModel[]> {
+    const transformedQuestions: QuestionsViewModel[] = [];
 
     for (let i = 0; i < newQuestions.length; i++) {
       const newQuestion = newQuestions[i];
 
-      const transformedQuestion: QuestionsModel = {
+      const transformedQuestion: QuestionsViewModel = {
         id: newQuestion.id,
         body: newQuestion.questionText,
         correctAnswers: newQuestion.hashedAnswers,
