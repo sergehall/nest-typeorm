@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StartGameCommand } from './start-game.use-case';
-import { GameViewModel } from '../../models/game.view-model';
+import { GameViewModel } from '../../models/game-view.model';
 import { NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { StatusGameEnum } from '../../enums/status-game.enum';
