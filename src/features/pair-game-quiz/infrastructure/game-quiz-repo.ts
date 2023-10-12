@@ -57,6 +57,7 @@ export class PairsGameRepo {
       queryBuilder.orderBy(orderByField, direction);
 
       const countPairsGame = await queryBuilder.getCount();
+
       const pairsGame = await queryBuilder.skip(offset).take(limit).getMany();
       if (pairsGame.length === 0) {
         return {

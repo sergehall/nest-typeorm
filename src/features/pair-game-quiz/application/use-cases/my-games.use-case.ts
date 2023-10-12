@@ -1,7 +1,6 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameViewModel } from '../../models/game-view.model';
-import { NotFoundException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
@@ -41,7 +40,6 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     );
 
     const { pairsGame, countPairsGame } = gamesAndCount;
-
     if (pairsGame.length === 0) {
       return {
         pagesCount: 0,
@@ -56,7 +54,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     );
 
     const modelsGames = await this.createGameModels(pairsGame);
-
+    console.log(modelsGames, 'modelsGames');
     return {
       pagesCount: pagesCount,
       page: pageNumber,
@@ -75,10 +73,15 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
       .filter((game) => game.status === StatusGameEnum.FINISHED)
       .map((game) => game.id);
 
-    const [questionsFinishedGames, answersFinishedGames] = await Promise.all([
-      this.getChallengeQuestionsFinishedGames(gameIds),
-      this.getChallengeAnswersFinishedGames(gameIds),
-    ]);
+    let questionsFinishedGames: ChallengeQuestionsEntity[] = [];
+    let answersFinishedGames: ChallengeAnswersEntity[] = [];
+
+    if (gameIds.length !== 0) {
+      [questionsFinishedGames, answersFinishedGames] = await Promise.all([
+        this.getChallengeQuestionsFinishedGames(gameIds),
+        this.getChallengeAnswersFinishedGames(gameIds),
+      ]);
+    }
 
     for (const game of games) {
       if (game.status === StatusGameEnum.PENDING) {
