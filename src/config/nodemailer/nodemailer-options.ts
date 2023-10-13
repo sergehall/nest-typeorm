@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { MailerConfig } from './mailer-config';
+import { MailerConfig } from '../mailer/mailer-config';
 
 @Injectable()
-export class MailerOptionsService
+export class NodemailerOptions
   extends MailerConfig
   implements MailerOptionsFactory
 {
