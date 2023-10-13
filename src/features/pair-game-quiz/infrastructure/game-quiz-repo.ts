@@ -61,6 +61,9 @@ export class PairsGameRepo {
             pendingStatus: StatusGameEnum.FINISHED,
           },
         );
+      console.log(orderByField, 'orderByField');
+      console.log(direction, 'direction');
+      queryBuilder.orderBy(orderByField, direction);
       // .where('firstPlayer.userId = :userId', {
       //   userId,
       // })
@@ -81,11 +84,11 @@ export class PairsGameRepo {
       //     pendingStatus: StatusGameEnum.FINISHED,
       //   },
       // );
-      queryBuilder.orderBy(orderByField, direction);
 
       const countPairsGame = await queryBuilder.getCount();
 
       const pairsGame = await queryBuilder.skip(offset).take(limit).getMany();
+      console.log(pairsGame, 'pairsGame');
       if (pairsGame.length === 0) {
         return {
           pairsGame: [],
