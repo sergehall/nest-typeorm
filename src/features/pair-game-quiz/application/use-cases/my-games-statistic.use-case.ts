@@ -52,14 +52,14 @@ export class MyGamesStatisticUseCase
           (isUserFirstPlayer &&
             game.firstPlayerGameResult === GamesResultsEnum.WON) ||
           (isUserSecondPlayer &&
-            game.secondPlayerGameResult === GamesResultsEnum.LOST)
+            game.secondPlayerGameResult === GamesResultsEnum.WON)
         ) {
           winsCount++;
         } else if (
           (isUserFirstPlayer &&
             game.firstPlayerGameResult === GamesResultsEnum.LOST) ||
           (isUserSecondPlayer &&
-            game.secondPlayerGameResult === GamesResultsEnum.WON)
+            game.secondPlayerGameResult === GamesResultsEnum.LOST)
         ) {
           lossesCount++;
         } else {
