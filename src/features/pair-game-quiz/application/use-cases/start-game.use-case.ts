@@ -6,7 +6,7 @@ import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class StartGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -15,7 +15,7 @@ export class StartGameCommand {
 @CommandHandler(StartGameCommand)
 export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   constructor(
-    protected gameQuizRepo: PairsGameRepo,
+    protected gameQuizRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
   ) {}
   async execute(command: StartGameCommand): Promise<GameViewModel> {

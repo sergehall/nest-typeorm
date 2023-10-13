@@ -12,11 +12,11 @@ import {
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
-import { GameQuestionsRepo } from '../../infrastructure/game-questions-repo';
-import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { GameQuestionsRepo } from '../../infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { AnswerViewModel } from '../../models/answer-view.model';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -30,18 +30,15 @@ export class SubmitAnswerForCurrentQuestionUseCase
   implements ICommandHandler<SubmitAnswerCommand>
 {
   constructor(
-    protected pairsGameRepo: PairsGameRepo,
+    protected pairsGameRepo: GamePairsRepo,
     protected gameQuestionsRepo: GameQuestionsRepo,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
     protected commandBus: CommandBus,
   ) {}
 
-  async execute({
-    answerDto,
-    currentUserDto,
-  }: SubmitAnswerCommand): Promise<AnswerViewModel> {
-    const { answer } = answerDto;
+  async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
+    const { answerDto, currentUserDto } = command;
 
     const pairByUserId = await this.pairsGameRepo.getActiveGameByUserId(
       currentUserDto.userId,
@@ -75,7 +72,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
           const verifyAnswer =
             await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
               nextQuestion.question.id,
-              answer,
+              answerDto.answer,
             );
 
           const answerStatus = verifyAnswer
@@ -84,8 +81,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
 
           const updateChallengeAnswer =
             await this.challengesAnswersRepo.updateChallengeAnswers(
-              counts.countAnswersBoth,
-              answer,
+              answerDto.answer,
               nextQuestion,
               answerStatus,
               currentUserDto,

@@ -26,6 +26,7 @@ import { ParseQueriesService } from '../../../common/query/parse-queries.service
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
 import { AnswerViewModel } from '../models/answer-view.model';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { MyGamesStatisticCommand } from '../application/use-cases/my-games-statistic.use-case';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
@@ -62,17 +63,9 @@ export class PairGameQuizController {
   async getMyStatistic(@Request() req: any) {
     const currentUserDto: CurrentUserDto = req.user;
 
-    // return await this.commandBus.execute(
-    //   new MyGamesStatisticCommand(currentUserDto),
-    // );
-    return {
-      sumScore: 0,
-      avgScores: 0,
-      gamesCount: 0,
-      winsCount: 0,
-      lossesCount: 0,
-      drawsCount: 0,
-    };
+    return await this.commandBus.execute(
+      new MyGamesStatisticCommand(currentUserDto),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

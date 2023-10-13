@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../../entities/questions-quiz.entity';
 import { UpdatePublishDto } from '../../dto/update-publish.dto';
-import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions-repo';
+import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 
 export class SaUpdateQuestionsPublishCommand {
   constructor(

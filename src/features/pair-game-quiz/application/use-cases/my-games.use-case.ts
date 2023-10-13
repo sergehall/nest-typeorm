@@ -8,11 +8,11 @@ import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity'
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { PairGameQuizService } from '../pair-game-quiz.service';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class GetMyGamesCommand {
   constructor(
@@ -24,7 +24,7 @@ export class GetMyGamesCommand {
 @CommandHandler(GetMyGamesCommand)
 export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   constructor(
-    protected pairsGameRepo: PairsGameRepo,
+    protected pairsGameRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
     protected pairGameQuizService: PairGameQuizService,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
@@ -34,7 +34,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const gamesAndCount = await this.pairsGameRepo.getGamesByUserId(
+    const gamesAndCount = await this.pairsGameRepo.getGamesByUserIdPaging(
       queryData,
       currentUserDto.userId,
     );

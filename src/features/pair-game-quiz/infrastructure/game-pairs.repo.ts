@@ -18,12 +18,12 @@ import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { idFormatError } from '../../../common/filters/custom-errors-messages';
 import { PlayersResultDto } from '../dto/players-result.dto';
-import { ChallengesQuestionsRepo } from './challenges-questions-repo';
+import { ChallengesQuestionsRepo } from './challenges-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
-export class PairsGameRepo {
+export class GamePairsRepo {
   constructor(
     @InjectRepository(PairsGameEntity)
     private readonly pairsGameQuizRepo: Repository<PairsGameEntity>,
@@ -32,7 +32,38 @@ export class PairsGameRepo {
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async getGamesByUserId(
+  async getAllGamesByUserId(userId: string): Promise<PairsGameEntity[]> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepo
+        .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+        .where(
+          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
+          {
+            userId,
+          },
+        )
+        .andWhere(
+          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+          {
+            activeStatus: StatusGameEnum.ACTIVE,
+            pendingStatus: StatusGameEnum.FINISHED,
+          },
+        );
+      return await queryBuilder.getMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getGamesByUserIdPaging(
     queryData: ParseQueriesDto,
     userId: string,
   ): Promise<{ pairsGame: PairsGameEntity[]; countPairsGame: number }> {
@@ -61,17 +92,17 @@ export class PairsGameRepo {
             pendingStatus: StatusGameEnum.FINISHED,
           },
         );
-      console.log(orderByField, 'orderByField');
-      console.log(direction, 'direction');
+
       queryBuilder.orderBy(orderByField, direction);
 
-      // Features of sorting the list: if the first criterion (for example, status) has the same values, we sort by pairCreatedDate desc
+      // Features of sorting the list: if the first criterion (for example, status)
+      // has the same values, we sort by pairCreatedDate desc
       queryBuilder.addOrderBy(`pairsGame.pairCreatedDate`, 'DESC');
 
       const countPairsGame = await queryBuilder.getCount();
 
       const pairsGame = await queryBuilder.skip(offset).take(limit).getMany();
-      console.log(pairsGame, 'pairsGame');
+
       if (pairsGame.length === 0) {
         return {
           pairsGame: [],

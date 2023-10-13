@@ -17,11 +17,12 @@ import { SubmitAnswerForCurrentQuestionUseCase } from './application/use-cases/s
 import { AddResultToPairGameUseCase } from './application/use-cases/add-result-to-pair-game.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { GetMyGamesUseCase } from './application/use-cases/my-games.use-case';
-import { GameQuestionsRepo } from './infrastructure/game-questions-repo';
-import { ChallengesQuestionsRepo } from './infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from './infrastructure/challenges-answers-repo';
+import { GameQuestionsRepo } from './infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from './infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from './infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from './entities/pairs-game.entity';
-import { PairsGameRepo } from './infrastructure/game-quiz-repo';
+import { MyGamesStatisticUseCase } from './application/use-cases/my-games-statistic.use-case';
+import { GamePairsRepo } from './infrastructure/game-pairs.repo';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -30,6 +31,7 @@ const usersUseCases = [
   SubmitAnswerForCurrentQuestionUseCase,
   AddResultToPairGameUseCase,
   GetMyGamesUseCase,
+  MyGamesStatisticUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
@@ -50,7 +52,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ParseQueriesService,
     PairGameQuizService,
     GameQuestionsRepo,
-    PairsGameRepo,
+    GamePairsRepo,
     ChallengesAnswersRepo,
     ChallengesQuestionsRepo,
     MapPairGame,
