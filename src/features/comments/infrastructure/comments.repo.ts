@@ -27,7 +27,7 @@ import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-com
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { LikesDislikesMyStatusInfoDto } from '../dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
-import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 export class CommentsRepo {
   constructor(

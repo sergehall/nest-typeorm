@@ -6,7 +6,7 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 class CommentatorInfo {
   @IsUUID()
