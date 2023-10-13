@@ -1,6 +1,6 @@
 import { IsInt, IsNumber, IsPositive, Min } from 'class-validator';
 
-export class GameSummaryModel {
+export class GameSummaryViewModel {
   @IsNumber()
   sumScore: number;
 

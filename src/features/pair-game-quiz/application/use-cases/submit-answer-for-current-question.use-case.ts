@@ -15,7 +15,7 @@ import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
 import { GameQuestionsRepo } from '../../infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
-import { AnswerViewModel } from '../../models/answer-view.model';
+import { AnswerViewModel } from '../../view-models/answer.view-model';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class SubmitAnswerCommand {

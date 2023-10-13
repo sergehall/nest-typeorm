@@ -1,6 +1,6 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { GameViewModel } from '../../models/game-view.model';
+import { GameViewModel } from '../../view-models/game.view-model';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
@@ -24,7 +24,7 @@ export class GetMyGamesCommand {
 @CommandHandler(GetMyGamesCommand)
 export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   constructor(
-    protected pairsGameRepo: GamePairsRepo,
+    protected gamePairsRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
     protected pairGameQuizService: PairGameQuizService,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
@@ -34,7 +34,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const gamesAndCount = await this.pairsGameRepo.getGamesByUserIdPaging(
+    const gamesAndCount = await this.gamePairsRepo.getGamesByUserIdPaging(
       queryData,
       currentUserDto.userId,
     );
