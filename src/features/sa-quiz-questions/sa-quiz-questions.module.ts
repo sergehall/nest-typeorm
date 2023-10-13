@@ -20,11 +20,11 @@ import { SaUpdateQuestionsAndAnswerUseCase } from './application/use-cases/sa-up
 import { SaDeleteQuestionByIdUseCase } from './application/use-cases/sa-delete-question-by-id.use-case';
 import { SaUpdateQuestionsPublishUseCase } from './application/use-cases/sa-update-questions-publish.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
-import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions-repo';
-import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from '../pair-game-quiz/infrastructure/challenges-answers-repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from '../pair-game-quiz/infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
-import { PairsGameRepo } from '../pair-game-quiz/infrastructure/game-quiz-repo';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
@@ -53,7 +53,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ParseQueriesService,
     QuizQuestionsService,
     UsersRepo,
-    PairsGameRepo,
+    GamePairsRepo,
     GameQuestionsRepo,
     ChallengesAnswersRepo,
     ChallengesQuestionsRepo,

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuestionsQuizEntity } from '../../entities/questions-quiz.entity';
 import { NotFoundException } from '@nestjs/common';
-import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions-repo';
+import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 
 export class SaDeleteQuestionByIdCommand {
   constructor(public questionId: string) {}

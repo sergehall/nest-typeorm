@@ -5,9 +5,9 @@ import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { StatusGameEnum } from '../../enums/status-game.enum';
-import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class AddResultToPairGameCommand {
   constructor(public game: PairsGameEntity) {}
@@ -18,7 +18,7 @@ export class AddResultToPairGameUseCase
   implements ICommandHandler<AddResultToPairGameCommand>
 {
   constructor(
-    protected gameQuizRepo: PairsGameRepo,
+    protected gameQuizRepo: GamePairsRepo,
     protected pairGameQuizService: PairGameQuizService,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
   ) {}

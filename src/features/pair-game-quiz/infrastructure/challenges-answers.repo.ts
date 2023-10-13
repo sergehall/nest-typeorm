@@ -22,7 +22,6 @@ export class ChallengesAnswersRepo {
   ) {}
 
   async updateChallengeAnswers(
-    countAnswersBoth: number,
     answer: string,
     nextQuestions: ChallengeQuestionsEntity,
     answerStatus: AnswerStatusEnum,

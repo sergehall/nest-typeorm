@@ -9,10 +9,10 @@ import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.ent
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { PairGameQuizService } from '../pair-game-quiz.service';
-import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class MyCurrentGameCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
@@ -23,7 +23,7 @@ export class MyCurrentGameUseCase
   implements ICommandHandler<MyCurrentGameCommand>
 {
   constructor(
-    protected pairsGameRepo: PairsGameRepo,
+    protected pairsGameRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
     protected pairGameQuizService: PairGameQuizService,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,

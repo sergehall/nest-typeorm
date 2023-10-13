@@ -14,10 +14,10 @@ import { PairGameQuizService } from '../pair-game-quiz.service';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
-import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions-repo';
-import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers-repo';
+import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
+import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PairsGameRepo } from '../../infrastructure/game-quiz-repo';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class GetGameByIdCommand {
   constructor(public id: string, public currentUserDto: CurrentUserDto) {}
@@ -30,7 +30,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     protected pairGameQuizService: PairGameQuizService,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
-    protected pairsGameRepo: PairsGameRepo,
+    protected pairsGameRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
   ) {}
   async execute(command: GetGameByIdCommand): Promise<GameViewModel> {

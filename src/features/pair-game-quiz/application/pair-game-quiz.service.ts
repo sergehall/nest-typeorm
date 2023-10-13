@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { CountCorrectAnswerDto } from '../dto/correct-answer-counts-and-bonus.dto';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
-import { GameQuestionsRepo } from '../infrastructure/game-questions-repo';
+import { GameQuestionsRepo } from '../infrastructure/game-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 @Injectable()
