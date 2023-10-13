@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { GameSummaryModel } from '../../models/game-summary.model';
+import { GameSummaryViewModel } from '../../view-models/game-summary.view-model';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 
@@ -19,7 +19,8 @@ export class MyGamesStatisticUseCase
     const { currentUserDto } = command;
     const { userId } = currentUserDto;
 
-    const allGames = await this.pairsGameRepo.getAllGamesByUserId(userId);
+    const allGames: PairsGameEntity[] =
+      await this.pairsGameRepo.getAllGamesByUserId(userId);
 
     return await this.calculateUserGameStats(allGames, userId);
   }
@@ -27,7 +28,7 @@ export class MyGamesStatisticUseCase
   private async calculateUserGameStats(
     arrayGames: PairsGameEntity[],
     userId: string,
-  ): Promise<GameSummaryModel> {
+  ): Promise<GameSummaryViewModel> {
     let sumScore = 0;
     let gamesCount = 0;
     let winsCount = 0;

@@ -16,7 +16,7 @@ import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { StartGameCommand } from '../application/use-cases/start-game.use-case';
 import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';
-import { GameViewModel } from '../models/game-view.model';
+import { GameViewModel } from '../view-models/game.view-model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 import { AnswerDto } from '../dto/answer.dto';
 import { SubmitAnswerCommand } from '../application/use-cases/submit-answer-for-current-question.use-case';
@@ -24,7 +24,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
-import { AnswerViewModel } from '../models/answer-view.model';
+import { AnswerViewModel } from '../view-models/answer.view-model';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { MyGamesStatisticCommand } from '../application/use-cases/my-games-statistic.use-case';
 

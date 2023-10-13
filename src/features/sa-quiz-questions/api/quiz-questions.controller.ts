@@ -16,7 +16,7 @@ import { UpdateQuizQuestionDto } from '../dto/update-quiz-question.dto';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { SaCreateQuestionsAndAnswerCommand } from '../application/use-cases/sa-create-questions-and-answer.use-case';
-import { QuestionsViewModel } from '../models/questions-view.model';
+import { QuestionsViewModel } from '../view-models/questions.view-model';
 import { SaGetQuestionsCommand } from '../application/use-cases/sa-get-questions.use-case';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
