@@ -9,7 +9,7 @@ import {
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsEntity } from './posts.entity';
-import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
 
 @Entity('LikeStatusPosts')
 @Unique(['id'])

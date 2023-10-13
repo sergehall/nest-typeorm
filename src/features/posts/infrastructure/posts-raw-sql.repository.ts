@@ -8,7 +8,6 @@ import {
   ExtendedLikesInfo,
   ReturnPostsEntity,
 } from '../entities/return-posts.entity';
-import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
@@ -21,6 +20,7 @@ import * as uuid4 from 'uuid4';
 import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
 
 export class PostsRawSqlRepository {
   constructor(

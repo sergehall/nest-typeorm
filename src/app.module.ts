@@ -20,16 +20,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerOptions } from './config/throttle/throttler-options';
 import { HttpLoggingMiddleware } from './middlewares/http-logging.middleware';
 import { DataCleanupModule } from './data-cleanup/data-cleanup.module';
-import { AppTypeOrmModuleOptions } from './config/db/type-orm-options/app-type-orm-module.options';
 import { CustomConfigModule } from './config/custom.config-module';
 import { SaQuizQuestionsModule } from './features/sa-quiz-questions/sa-quiz-questions.module';
 import { PairGameQuizModule } from './features/pair-game-quiz/pair-game-quiz.module';
+import { TypeOrmPostgresOptions } from './db/type-orm/options/type-orm-postgres.options';
 
 @Module({
   imports: [
     CustomConfigModule,
     TypeOrmModule.forRootAsync({
-      useClass: AppTypeOrmModuleOptions, // Use the OrmOptions class as the factory
+      useClass: TypeOrmPostgresOptions, // Use the OrmOptions class as the factory
     }),
     ThrottlerModule.forRootAsync({
       useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
