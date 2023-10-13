@@ -35,32 +35,24 @@ export class MyGamesStatisticUseCase
     let drawsCount = 0;
 
     for (const game of arrayGames) {
-      // Check if the current user is one of the players in the game
       const isUserFirstPlayer = game.firstPlayer.userId === userId;
       const isUserSecondPlayer = game.secondPlayer!.userId === userId;
 
       if (isUserFirstPlayer || isUserSecondPlayer) {
         gamesCount++;
-
-        // Calculate sumScore based on the current user's score
-        sumScore += isUserFirstPlayer
+        const currentUserScore = isUserFirstPlayer
           ? game.firstPlayerScore
           : game.secondPlayerScore;
 
-        // Check the game result for the current user
-        if (
-          (isUserFirstPlayer &&
-            game.firstPlayerGameResult === GamesResultsEnum.WON) ||
-          (isUserSecondPlayer &&
-            game.secondPlayerGameResult === GamesResultsEnum.WON)
-        ) {
+        sumScore += currentUserScore;
+
+        const gameResult = isUserFirstPlayer
+          ? game.firstPlayerGameResult
+          : game.secondPlayerGameResult;
+
+        if (gameResult === GamesResultsEnum.WON) {
           winsCount++;
-        } else if (
-          (isUserFirstPlayer &&
-            game.firstPlayerGameResult === GamesResultsEnum.LOST) ||
-          (isUserSecondPlayer &&
-            game.secondPlayerGameResult === GamesResultsEnum.LOST)
-        ) {
+        } else if (gameResult === GamesResultsEnum.LOST) {
           lossesCount++;
         } else {
           drawsCount++;
@@ -68,8 +60,7 @@ export class MyGamesStatisticUseCase
       }
     }
 
-    const avgScores =
-      gamesCount > 0 ? Number((sumScore / gamesCount).toFixed(2)) : 0;
+    const avgScores = gamesCount > 0 ? +(sumScore / gamesCount).toFixed(2) : 0;
 
     return {
       sumScore,
