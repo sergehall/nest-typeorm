@@ -64,26 +64,9 @@ export class PairsGameRepo {
       console.log(orderByField, 'orderByField');
       console.log(direction, 'direction');
       queryBuilder.orderBy(orderByField, direction);
-      // .where('firstPlayer.userId = :userId', {
-      //   userId,
-      // })
-      // .andWhere(
-      //   '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-      //   {
-      //     activeStatus: StatusGameEnum.ACTIVE,
-      //     pendingStatus: StatusGameEnum.FINISHED,
-      //   },
-      // )
-      // .orWhere('pairsGame.secondPlayerId = :userId', {
-      //   userId,
-      // })
-      // .andWhere(
-      //   '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-      //   {
-      //     activeStatus: StatusGameEnum.ACTIVE,
-      //     pendingStatus: StatusGameEnum.FINISHED,
-      //   },
-      // );
+
+      // Features of sorting the list: if the first criterion (for example, status) has the same values, we sort by pairCreatedDate desc
+      queryBuilder.addOrderBy(`pairsGame.pairCreatedDate`, 'DESC');
 
       const countPairsGame = await queryBuilder.getCount();
 
