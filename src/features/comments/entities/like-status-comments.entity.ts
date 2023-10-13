@@ -10,7 +10,7 @@ import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
-import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 @Entity('LikeStatusComments')
 @Unique(['id'])

@@ -12,7 +12,7 @@ import { MailOptionsBuilder } from './mail-options/mail-options-builder';
 import { SentCodeLogRepo } from './infrastructure/sent-code-log.repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentCodesLogEntity } from './infrastructure/entities/sent-codes-log.entity';
-import { NodemailerOptions } from '../config/nodemailer/nodemailer-options';
+import { NodemailerOptions } from './nodemailer/nodemailer-options';
 
 const mailsUseCases = [
   EmailSendingUseCase,

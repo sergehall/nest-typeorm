@@ -28,7 +28,7 @@ import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-co
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
-import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 export class PostsRepo {
   constructor(

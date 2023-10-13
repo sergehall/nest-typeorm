@@ -1,4 +1,4 @@
-import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 export type LikesDislikesMyStatusInfoDto = {
   id: string;
