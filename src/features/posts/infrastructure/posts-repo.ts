@@ -25,10 +25,10 @@ import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
-import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
 
 export class PostsRepo {
   constructor(

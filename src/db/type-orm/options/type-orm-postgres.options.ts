@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { PostgresConfig } from '../postgres/postgres.config';
+import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { SecurityDevicesEntity } from '../../../features/security-devices/entities/session-devices.entity';
 import { BloggerBlogsEntity } from '../../../features/blogger-blogs/entities/blogger-blogs.entity';
@@ -17,7 +17,7 @@ import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entitie
 import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs-game.entity';
 
 @Injectable()
-export class AppTypeOrmModuleOptions
+export class TypeOrmPostgresOptions
   extends PostgresConfig
   implements TypeOrmOptionsFactory
 {

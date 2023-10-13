@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { LikeStatusEnums } from '../../../config/db/mongo/enums/like-status.enums';
+import { LikeStatusEnums } from '../../../common/enums/like-status.enums';
 
 export class TablesLikeStatusPostsEntity {
   @IsNotEmpty()
