@@ -17,6 +17,7 @@ export class GamesStatisticUseCase
 
   async execute(): Promise<GamesStatisticsViewModel[]> {
     const allGames: PairsGameEntity[] = await this.pairsGameRepo.getAllGames();
+
     const userStatisticsMap = new Map<string, GamesStatisticsViewModel>();
 
     for (const game of allGames) {
