@@ -72,8 +72,13 @@ export class PairGameQuizController {
   }
 
   @Get('users/top')
-  async getGamesStatistic(): Promise<GamesStatisticsViewModel[]> {
-    return await this.commandBus.execute(new GamesStatisticCommand());
+  async getGamesStatistic(
+    @Query() query: any,
+  ): Promise<GamesStatisticsViewModel[]> {
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(new GamesStatisticCommand(queryData));
   }
 
   @UseGuards(JwtAuthGuard)
