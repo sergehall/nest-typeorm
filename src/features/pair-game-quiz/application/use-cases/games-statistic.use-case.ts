@@ -40,7 +40,7 @@ export class GamesStatisticUseCase
       await this.gamesStatistics(allGames);
 
     const sortedGamesStatistics: GamesStatisticsViewModel[] =
-      await this.customSort(sort, gamesStatistics);
+      await this.customSort(sort, pageNumber, pageSize, gamesStatistics);
 
     const totalCount = gamesStatistics.length;
 
@@ -85,9 +85,13 @@ export class GamesStatisticUseCase
 
   private async customSort(
     sortPriority: SortType,
+    pageNumber: number,
+    pageSize: number,
     arr: GamesStatisticsViewModel[],
   ): Promise<GamesStatisticsViewModel[]> {
-    return arr.sort((a, b) => {
+    const startIndex = (pageNumber - 1) * pageSize;
+
+    const sortedArray = arr.sort((a, b) => {
       if (sortPriority.avgScores === SortDirectionEnum.ASC) {
         if (a.avgScores < b.avgScores) return -1;
         if (a.avgScores > b.avgScores) return 1;
@@ -122,6 +126,9 @@ export class GamesStatisticUseCase
 
       return 0; // If all properties are equal
     });
+
+    // Return a slice of the sorted array based on startIndex and pageSize
+    return sortedArray.slice(startIndex, startIndex + pageSize);
   }
 
   private async updateUserStatistics(
