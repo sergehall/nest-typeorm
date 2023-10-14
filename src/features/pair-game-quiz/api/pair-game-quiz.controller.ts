@@ -28,6 +28,8 @@ import { AnswerViewModel } from '../view-models/answer.view-model';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { MyGamesStatisticCommand } from '../application/use-cases/my-games-statistic.use-case';
 import { GameSummaryViewModel } from '../view-models/game-summary.view-model';
+import { GamesStatisticCommand } from '../application/use-cases/games-statistic.use-case';
+import { GamesStatisticsViewModel } from '../view-models/games-statistics.view-model';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
@@ -69,14 +71,9 @@ export class PairGameQuizController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('users/top')
-  async getGamesStatistic(@Request() req: any) {
-    const currentUserDto: CurrentUserDto = req.user;
-
-    return await this.commandBus.execute(
-      new MyGamesStatisticCommand(currentUserDto),
-    );
+  async getGamesStatistic(): Promise<GamesStatisticsViewModel[]> {
+    return await this.commandBus.execute(new GamesStatisticCommand());
   }
 
   @UseGuards(JwtAuthGuard)

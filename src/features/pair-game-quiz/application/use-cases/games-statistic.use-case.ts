@@ -2,13 +2,22 @@ import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
+import { GamesStatisticsViewModel } from '../../view-models/games-statistics.view-model';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class GamesStatisticUseCase {
+export class GamesStatisticCommand {
+  constructor() {}
+}
+
+@CommandHandler(GamesStatisticCommand)
+export class GamesStatisticUseCase
+  implements ICommandHandler<GamesStatisticCommand>
+{
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(): Promise<UserGameStatistics[]> {
+  async execute(): Promise<GamesStatisticsViewModel[]> {
     const allGames: PairsGameEntity[] = await this.pairsGameRepo.getAllGames();
-    const userStatisticsMap = new Map<string, UserGameStatistics>();
+    const userStatisticsMap = new Map<string, GamesStatisticsViewModel>();
 
     for (const game of allGames) {
       // Process the first player
@@ -34,7 +43,7 @@ export class GamesStatisticUseCase {
   }
 
   private updateUserStatistics(
-    userStatisticsMap: Map<string, UserGameStatistics>,
+    userStatisticsMap: Map<string, GamesStatisticsViewModel>,
     player: UsersEntity,
     score: number,
     gameResult: GamesResultsEnum,
@@ -66,17 +75,4 @@ export class GamesStatisticUseCase {
       ).toFixed(2);
     }
   }
-}
-
-interface UserGameStatistics {
-  sumScore: number;
-  avgScores: number;
-  gamesCount: number;
-  winsCount: number;
-  lossesCount: number;
-  drawsCount: number;
-  player: {
-    id: string;
-    login: string;
-  };
 }

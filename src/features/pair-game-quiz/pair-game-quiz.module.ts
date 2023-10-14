@@ -23,6 +23,7 @@ import { ChallengesAnswersRepo } from './infrastructure/challenges-answers.repo'
 import { PairsGameEntity } from './entities/pairs-game.entity';
 import { MyGamesStatisticUseCase } from './application/use-cases/my-games-statistic.use-case';
 import { GamePairsRepo } from './infrastructure/game-pairs.repo';
+import { GamesStatisticUseCase } from './application/use-cases/games-statistic.use-case';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -32,6 +33,7 @@ const usersUseCases = [
   AddResultToPairGameUseCase,
   GetMyGamesUseCase,
   MyGamesStatisticUseCase,
+  GamesStatisticUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
