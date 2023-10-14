@@ -25,6 +25,12 @@ import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { UpdateDeviceUseCase } from './application/use-cases/update-device.use-case';
 import { DeleteDevicesAfterLogoutUseCase } from './application/use-cases/delete-devices-after-logout.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
@@ -43,6 +49,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       SecurityDevicesEntity,
       UsersEntity,
       InvalidJwtEntity,
+      PairsGameEntity,
+      ChallengeQuestionsEntity,
+      QuestionsQuizEntity,
     ]),
     CqrsModule,
   ],
@@ -60,6 +69,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     SecurityDevicesRawSqlRepository,
     InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...securityDevicesCases,
   ],

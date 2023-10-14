@@ -21,6 +21,12 @@ import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
 import { SecurityDevicesEntity } from '../features/security-devices/entities/session-devices.entity';
 import { SecurityDevicesRepo } from '../features/security-devices/infrastructure/security-devices.repo';
 import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
+import { PairsGameEntity } from '../features/pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../features/sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../features/pair-game-quiz/entities/challenge-questions.entity';
+import { GamePairsRepo } from '../features/pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../features/pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../features/pair-game-quiz/infrastructure/challenges-questions.repo';
 
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -30,6 +36,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       UsersEntity,
       InvalidJwtEntity,
       SecurityDevicesEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     MailsModule,
     CaslModule,
@@ -50,6 +59,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     SecurityDevicesRepo,
     BannedUsersForBlogsRawSqlRepository,
     SentCodeLogRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
   ],
 })

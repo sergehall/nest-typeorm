@@ -40,6 +40,12 @@ import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-post-by-post-id.use-case';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -68,6 +74,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PostsEntity,
       LikeStatusPostsEntity,
       CommentsEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -90,6 +99,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BloggerBlogsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...saUseCases,
   ],

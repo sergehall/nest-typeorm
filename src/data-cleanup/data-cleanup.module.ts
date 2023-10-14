@@ -10,6 +10,12 @@ import { SecurityDevicesEntity } from '../features/security-devices/entities/ses
 import { UsersRepo } from '../features/users/infrastructure/users-repo';
 import { UsersEntity } from '../features/users/entities/users.entity';
 import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../features/pair-game-quiz/infrastructure/game-pairs.repo';
+import { PairsGameEntity } from '../features/pair-game-quiz/entities/pairs-game.entity';
+import { ChallengeQuestionsEntity } from '../features/pair-game-quiz/entities/challenge-questions.entity';
+import { ChallengesQuestionsRepo } from '../features/pair-game-quiz/infrastructure/challenges-questions.repo';
+import { QuestionsQuizEntity } from '../features/sa-quiz-questions/entities/questions-quiz.entity';
+import { GameQuestionsRepo } from '../features/pair-game-quiz/infrastructure/game-questions.repo';
 
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -19,6 +25,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       UsersEntity,
       InvalidJwtEntity,
       SecurityDevicesEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CqrsModule,
   ],
@@ -27,6 +36,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRepo,
     InvalidJwtRepo,
     SecurityDevicesRepo,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
   ],
 })

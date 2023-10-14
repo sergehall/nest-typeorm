@@ -41,6 +41,12 @@ import { RefreshJwtUseCase } from './application/use-cases/refresh-jwt.use-case'
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 
 const authUseCases = [
   LoginUseCase,
@@ -66,7 +72,13 @@ const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, InvalidJwtEntity]),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      InvalidJwtEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
+    ]),
     UsersModule,
     PassportModule,
     JwtModule,
@@ -89,6 +101,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
     SecurityDevicesRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...authUseCases,
   ],

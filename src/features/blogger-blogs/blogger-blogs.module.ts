@@ -25,6 +25,12 @@ import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entit
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { BlogExistsValidator } from '../../common/validators/blog-exists.validator';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -45,6 +51,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       CommentsEntity,
       BloggerBlogsEntity,
       LikeStatusPostsEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CqrsModule,
   ],
@@ -60,6 +69,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PostsRepo,
     PostsRawSqlRepository,
     BannedUsersForBlogsRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...bloggersBlogUseCases,
     ...validators,
