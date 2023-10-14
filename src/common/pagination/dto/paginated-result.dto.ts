@@ -8,6 +8,7 @@ import { ReturnBloggerBlogsDto } from '../../../features/blogger-blogs/entities/
 import { ReturnUsersDto } from '../../../features/sa/dto/return-users.dto';
 import { QuestionsViewModel } from '../../../features/sa-quiz-questions/view-models/questions.view-model';
 import { GameViewModel } from '../../../features/pair-game-quiz/view-models/game.view-model';
+import { GamesStatisticsViewModel } from '../../../features/pair-game-quiz/view-models/games-statistics.view-model';
 
 export class PaginatedResultDto {
   @IsNumber()
@@ -34,5 +35,6 @@ export class PaginatedResultDto {
     | ReturnBannedUsersForBlogEntity
     | QuestionsViewModel
     | GameViewModel
+    | GamesStatisticsViewModel
   )[];
 }

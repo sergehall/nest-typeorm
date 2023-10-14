@@ -7,6 +7,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SortType } from '../../../../common/query/types/sort.type';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
+import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 
 export class GamesStatisticCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -18,18 +19,40 @@ export class GamesStatisticUseCase
 {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(
-    command: GamesStatisticCommand,
-  ): Promise<GamesStatisticsViewModel[]> {
+  async execute(command: GamesStatisticCommand): Promise<PaginatedResultDto> {
     const { queryData } = command;
+    const { pageNumber, pageSize } = queryData.queryPagination;
     const { sort } = queryData;
 
     const allGames: PairsGameEntity[] = await this.pairsGameRepo.getAllGames();
 
+    if (allGames.length === 0) {
+      return {
+        pagesCount: 0,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: 0,
+        items: [],
+      };
+    }
+
     const gamesStatistics: GamesStatisticsViewModel[] =
       await this.gamesStatistics(allGames);
 
-    return await this.customSort(sort, gamesStatistics);
+    const sortedGamesStatistics: GamesStatisticsViewModel[] =
+      await this.customSort(sort, gamesStatistics);
+
+    const totalCount = gamesStatistics.length;
+
+    const pagesCount = Math.ceil(totalCount / pageSize);
+
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: totalCount,
+      items: sortedGamesStatistics,
+    };
   }
 
   private async gamesStatistics(
@@ -39,7 +62,7 @@ export class GamesStatisticUseCase
 
     for (const game of allGames) {
       // Process the first player
-      this.updateUserStatistics(
+      await this.updateUserStatistics(
         userStatisticsMap,
         game.firstPlayer,
         game.firstPlayerScore,
@@ -48,7 +71,7 @@ export class GamesStatisticUseCase
 
       // Process the second player if it exists
       if (game.secondPlayer) {
-        this.updateUserStatistics(
+        await this.updateUserStatistics(
           userStatisticsMap,
           game.secondPlayer,
           game.secondPlayerScore,
