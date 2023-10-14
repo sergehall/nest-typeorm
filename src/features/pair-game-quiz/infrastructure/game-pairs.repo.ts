@@ -36,6 +36,8 @@ export class GamePairsRepo {
     try {
       const queryBuilder = this.pairsGameQuizRepo
         .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
         .where(
           '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
           {
