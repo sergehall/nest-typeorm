@@ -3,6 +3,7 @@ import { ParseQueriesDto } from './dto/parse-queries.dto';
 import { PublishedStatusEnum } from './enums/published-status.enum';
 import { SortDirectionEnum } from './enums/sort-direction.enum';
 import { BanCondition } from './types/ban-condition.type';
+import { SortType } from './types/sort.type';
 
 @Injectable()
 export class ParseQueriesService {
@@ -36,6 +37,52 @@ export class ParseQueriesService {
 
   private async parseSortBy(query: any): Promise<string> {
     return query?.sortBy?.toString() || '';
+  }
+
+  private async parseSort(query: any): Promise<SortType> {
+    // Default value
+    const parsedSort: SortType = {
+      avgScores: SortDirectionEnum.DESC,
+      sumScore: SortDirectionEnum.DESC,
+    };
+
+    const sortParams = query?.sort
+      ?.toString()
+      .split(',')
+      .map((param: any) => param.trim());
+
+    if (sortParams === undefined) {
+      return parsedSort; // Return the default object if sortParams is undefined
+    }
+    const directionValueArr = ['ascending', 'ASCENDING', 'asc', 'ASC', -1];
+
+    sortParams.forEach((param: any) => {
+      const [property, direction] = param.split(' ');
+      switch (property) {
+        case 'avgScores':
+          parsedSort.avgScores = directionValueArr.includes(direction)
+            ? SortDirectionEnum.ASC
+            : SortDirectionEnum.DESC;
+          break;
+        case 'sumScore':
+          parsedSort.sumScore = directionValueArr.includes(direction)
+            ? SortDirectionEnum.ASC
+            : SortDirectionEnum.DESC;
+          break;
+        case 'winsCount':
+          parsedSort.winsCount = directionValueArr.includes(direction)
+            ? SortDirectionEnum.ASC
+            : SortDirectionEnum.DESC;
+          break;
+        case 'lossesCount':
+          parsedSort.lossesCount = directionValueArr.includes(direction)
+            ? SortDirectionEnum.ASC
+            : SortDirectionEnum.DESC;
+          break;
+      }
+    });
+
+    return parsedSort;
   }
 
   private async parseSearchLoginTerm(query: any): Promise<string> {
@@ -120,6 +167,7 @@ export class ParseQueriesService {
         sortBy: await this.parseSortBy(query),
         sortDirection: await this.parseSortDirection(query),
       },
+      sort: await this.parseSort(query),
       title: await this.parseTitle(query),
       userName: await this.parseUserName(query),
       code: await this.parseCode(query),

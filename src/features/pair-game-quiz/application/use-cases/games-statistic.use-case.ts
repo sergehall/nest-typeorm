@@ -4,9 +4,12 @@ import { UsersEntity } from '../../../users/entities/users.entity';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 import { GamesStatisticsViewModel } from '../../view-models/games-statistics.view-model';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SortType } from '../../../../common/query/types/sort.type';
+import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
+import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
 
 export class GamesStatisticCommand {
-  constructor() {}
+  constructor(public queryData: ParseQueriesDto) {}
 }
 
 @CommandHandler(GamesStatisticCommand)
@@ -15,9 +18,23 @@ export class GamesStatisticUseCase
 {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(): Promise<GamesStatisticsViewModel[]> {
+  async execute(
+    command: GamesStatisticCommand,
+  ): Promise<GamesStatisticsViewModel[]> {
+    const { queryData } = command;
+    const { sort } = queryData;
+
     const allGames: PairsGameEntity[] = await this.pairsGameRepo.getAllGames();
 
+    const gamesStatistics: GamesStatisticsViewModel[] =
+      await this.gamesStatistics(allGames);
+
+    return await this.customSort(sort, gamesStatistics);
+  }
+
+  private async gamesStatistics(
+    allGames: PairsGameEntity[],
+  ): Promise<GamesStatisticsViewModel[]> {
     const userStatisticsMap = new Map<string, GamesStatisticsViewModel>();
 
     for (const game of allGames) {
@@ -43,7 +60,48 @@ export class GamesStatisticUseCase
     return Array.from(userStatisticsMap.values());
   }
 
-  private updateUserStatistics(
+  private async customSort(
+    sortPriority: SortType,
+    arr: GamesStatisticsViewModel[],
+  ): Promise<GamesStatisticsViewModel[]> {
+    return arr.sort((a, b) => {
+      if (sortPriority.avgScores === SortDirectionEnum.ASC) {
+        if (a.avgScores < b.avgScores) return -1;
+        if (a.avgScores > b.avgScores) return 1;
+      } else if (sortPriority.avgScores === SortDirectionEnum.DESC) {
+        if (a.avgScores > b.avgScores) return -1;
+        if (a.avgScores < b.avgScores) return 1;
+      }
+
+      if (sortPriority.sumScore === SortDirectionEnum.ASC) {
+        if (a.sumScore < b.sumScore) return -1;
+        if (a.sumScore > b.sumScore) return 1;
+      } else if (sortPriority.sumScore === SortDirectionEnum.DESC) {
+        if (a.sumScore > b.sumScore) return -1;
+        if (a.sumScore < b.sumScore) return 1;
+      }
+
+      if (sortPriority.winsCount === SortDirectionEnum.ASC) {
+        if (a.winsCount < b.winsCount) return -1;
+        if (a.winsCount > b.winsCount) return 1;
+      } else if (sortPriority.winsCount === SortDirectionEnum.DESC) {
+        if (a.winsCount > b.winsCount) return -1;
+        if (a.winsCount < b.winsCount) return 1;
+      }
+
+      if (sortPriority.lossesCount === SortDirectionEnum.ASC) {
+        if (a.lossesCount < b.lossesCount) return -1;
+        if (a.lossesCount > b.lossesCount) return 1;
+      } else if (sortPriority.lossesCount === SortDirectionEnum.DESC) {
+        if (a.lossesCount > b.lossesCount) return -1;
+        if (a.lossesCount < b.lossesCount) return 1;
+      }
+
+      return 0; // If all properties are equal
+    });
+  }
+
+  private async updateUserStatistics(
     userStatisticsMap: Map<string, GamesStatisticsViewModel>,
     player: UsersEntity,
     score: number,
