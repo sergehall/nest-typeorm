@@ -34,6 +34,12 @@ import { GetCommentsByPostIdUseCase } from './application/use-cases/get-comments
 import { GetCommentByIdUseCase } from './application/use-cases/get-comment-by-id';
 import { GetCommentsByUserIdUseCase } from '../blogger-blogs/application/use-cases/get-comments-by-user-id.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -56,6 +62,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       LikeStatusPostsEntity,
       LikeStatusCommentsEntity,
       InvalidJwtEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -78,6 +87,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...commentsUseCases,
   ],

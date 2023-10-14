@@ -40,6 +40,12 @@ import { GetPostByIdUseCase } from './application/use-cases/get-post-by-id.use-c
 import { GetPostsUseCase } from './application/use-cases/get-posts.use-case';
 import { GetPostsInBlogUseCase } from './application/use-cases/get-posts-in-blog.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -61,6 +67,9 @@ const postsUseCases = [
       CommentsEntity,
       InvalidJwtEntity,
       LikeStatusPostsEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -90,6 +99,9 @@ const postsUseCases = [
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
     BannedUsersForBlogsRawSqlRepository,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...postsUseCases,
   ],
 })

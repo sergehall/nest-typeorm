@@ -24,6 +24,12 @@ import { FindUsersUseCase } from './application/use-cases/find-users.use-case';
 import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -42,7 +48,16 @@ const usersValidators = [
 const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity]), CaslModule, CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
+    ]),
+    CaslModule,
+    CqrsModule,
+  ],
   controllers: [UsersController],
   providers: [
     ParseQueriesService,
@@ -55,6 +70,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     JwtService,
     EncryptConfig,
     ExpirationDateCalculator,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...usersValidators,
     ...usersUseCases,

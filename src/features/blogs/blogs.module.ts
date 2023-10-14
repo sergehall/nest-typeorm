@@ -22,6 +22,12 @@ import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
+import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -33,6 +39,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       UsersEntity,
       InvalidJwtEntity,
       BloggerBlogsEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -51,6 +60,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BloggerBlogsRawSqlRepository,
     PostsRawSqlRepository,
     InvalidJwtRepo,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...helpers,
     ...blogsUseCases,
   ],

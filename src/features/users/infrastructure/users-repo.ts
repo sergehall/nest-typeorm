@@ -15,13 +15,16 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { BanInfoDto } from '../dto/banInfo.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';
+import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
 
 export class UsersRepo {
   constructor(
-    private readonly keyResolver: KeyResolver,
     @InjectRepository(UsersEntity)
-    private readonly usersRepository: Repository<UsersEntity>,
+    protected usersRepository: Repository<UsersEntity>,
+    protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
+    protected gamePairsRepo: GamePairsRepo,
   ) {}
 
   async findUsers(queryData: ParseQueriesDto): Promise<UsersEntity[]> {
@@ -370,12 +373,23 @@ export class UsersRepo {
     entityManager: EntityManager,
   ): Promise<void> {
     try {
+      const allGames: PairsGameEntity[] =
+        await this.gamePairsRepo.getAllGamesByUserIdForDelete(userId);
+
+      const allGamesIds = allGames.map((game) => game.id);
+
       await Promise.all([
         await entityManager
           .createQueryBuilder()
           .delete()
           .from('ChallengeAnswers')
           .where('answerOwnerId = :userId', { userId })
+          .execute(),
+        entityManager
+          .createQueryBuilder()
+          .delete()
+          .from('challengeQuestions')
+          .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
           .execute(),
         entityManager.delete('SecurityDevices', { user: userId }),
         entityManager.delete('BannedUsersForBlogs', {
@@ -390,7 +404,7 @@ export class UsersRepo {
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('PairsGameQuiz')
+        .from('PairsGame')
         .where('firstPlayerId = :userId', { userId })
         .orWhere('secondPlayerId = :userId', { userId })
         .execute();

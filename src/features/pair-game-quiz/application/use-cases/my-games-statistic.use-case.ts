@@ -15,7 +15,9 @@ export class MyGamesStatisticUseCase
 {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(command: MyGamesStatisticCommand) {
+  async execute(
+    command: MyGamesStatisticCommand,
+  ): Promise<GameSummaryViewModel> {
     const { currentUserDto } = command;
     const { userId } = currentUserDto;
 

@@ -32,6 +32,24 @@ export class GamePairsRepo {
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
+  async getAllGames(): Promise<PairsGameEntity[]> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepo
+        .createQueryBuilder('pairsGame')
+        .where(
+          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
+          {
+            activeStatus: StatusGameEnum.ACTIVE,
+            pendingStatus: StatusGameEnum.FINISHED,
+          },
+        );
+      return await queryBuilder.getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async getAllGamesByUserId(userId: string): Promise<PairsGameEntity[]> {
     try {
       const queryBuilder = this.pairsGameQuizRepo
@@ -49,6 +67,32 @@ export class GamePairsRepo {
           {
             activeStatus: StatusGameEnum.ACTIVE,
             pendingStatus: StatusGameEnum.FINISHED,
+          },
+        );
+      return await queryBuilder.getMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getAllGamesByUserIdForDelete(
+    userId: string,
+  ): Promise<PairsGameEntity[]> {
+    try {
+      const queryBuilder = this.pairsGameQuizRepo
+        .createQueryBuilder('pairsGame')
+        .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
+        .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
+        .where(
+          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
+          {
+            userId,
           },
         );
       return await queryBuilder.getMany();
