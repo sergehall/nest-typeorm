@@ -50,9 +50,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
         items: [],
       };
     }
-    const pagesCount = Math.ceil(
-      countPairsGame / command.queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(countPairsGame / pageSize);
 
     const modelsGames = await this.createGameModels(pairsGame);
 
