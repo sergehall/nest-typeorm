@@ -6,8 +6,8 @@ import { GamesStatisticsViewModel } from '../../view-models/games-statistics.vie
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SortType } from '../../../../common/query/types/sort.type';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
 
 export class GamesStatisticCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -91,45 +91,103 @@ export class GamesStatisticUseCase
   ): Promise<GamesStatisticsViewModel[]> {
     const startIndex = (pageNumber - 1) * pageSize;
 
-    const sortedArray = arr.sort((a, b) => {
-      if (sortPriority.avgScores === SortDirectionEnum.ASC) {
-        if (a.avgScores < b.avgScores) return -1;
-        if (a.avgScores > b.avgScores) return 1;
-      } else if (sortPriority.avgScores === SortDirectionEnum.DESC) {
-        if (a.avgScores > b.avgScores) return -1;
-        if (a.avgScores < b.avgScores) return 1;
+    const sortedArray = [...arr]; // Create a shallow copy of the original array
+
+    sortedArray.sort((a, b) => {
+      for (const field of sortPriority) {
+        const key = Object.keys(field)[0];
+
+        // Check if the key is included in FieldsType
+        if (
+          key === 'avgScores' ||
+          key === 'sumScore' ||
+          key === 'winsCount' ||
+          key === 'lossesCount'
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const direction: SortDirectionEnum = field[key];
+
+          const compareValue =
+            direction === SortDirectionEnum.ASC
+              ? a[key] - b[key]
+              : b[key] - a[key];
+
+          if (compareValue !== 0) {
+            return compareValue;
+          }
+        }
       }
 
-      if (sortPriority.sumScore === SortDirectionEnum.ASC) {
-        if (a.sumScore < b.sumScore) return -1;
-        if (a.sumScore > b.sumScore) return 1;
-      } else if (sortPriority.sumScore === SortDirectionEnum.DESC) {
-        if (a.sumScore > b.sumScore) return -1;
-        if (a.sumScore < b.sumScore) return 1;
-      }
-
-      if (sortPriority.winsCount === SortDirectionEnum.ASC) {
-        if (a.winsCount < b.winsCount) return -1;
-        if (a.winsCount > b.winsCount) return 1;
-      } else if (sortPriority.winsCount === SortDirectionEnum.DESC) {
-        if (a.winsCount > b.winsCount) return -1;
-        if (a.winsCount < b.winsCount) return 1;
-      }
-
-      if (sortPriority.lossesCount === SortDirectionEnum.ASC) {
-        if (a.lossesCount < b.lossesCount) return -1;
-        if (a.lossesCount > b.lossesCount) return 1;
-      } else if (sortPriority.lossesCount === SortDirectionEnum.DESC) {
-        if (a.lossesCount > b.lossesCount) return -1;
-        if (a.lossesCount < b.lossesCount) return 1;
-      }
-
-      return 0; // If all properties are equal
+      // If no specific sorting order is specified for properties, maintain the original order.
+      return 0;
     });
 
     // Return a slice of the sorted array based on startIndex and pageSize
     return sortedArray.slice(startIndex, startIndex + pageSize);
+    // return [
+    //   {
+    //     gamesCount: 9,
+    //     winsCount: 4,
+    //     lossesCount: 4,
+    //     drawsCount: 1,
+    //     sumScore: 20,
+    //     avgScores: 2.22,
+    //     player: {
+    //       id: 'ca0db718-e2b8-4a12-843c-2f909532e3d8',
+    //       login: '3869lg',
+    //     },
+    //   },
+    // ];
   }
+
+  // private async customSort(
+  //   sortPriority: SortType,
+  //   pageNumber: number,
+  //   pageSize: number,
+  //   arr: GamesStatisticsViewModel[],
+  // ): Promise<GamesStatisticsViewModel[]> {
+  //   const startIndex = (pageNumber - 1) * pageSize;
+  //
+  //   const sortedArray = arr.sort((a, b) => {
+  //     if (sortPriority.avgScores === SortDirectionEnum.ASC) {
+  //       if (a.avgScores < b.avgScores) return -1;
+  //       if (a.avgScores > b.avgScores) return 1;
+  //     } else if (sortPriority.avgScores === SortDirectionEnum.DESC) {
+  //       if (a.avgScores > b.avgScores) return -1;
+  //       if (a.avgScores < b.avgScores) return 1;
+  //     }
+  //
+  //     if (sortPriority.sumScore === SortDirectionEnum.ASC) {
+  //       if (a.sumScore < b.sumScore) return -1;
+  //       if (a.sumScore > b.sumScore) return 1;
+  //     } else if (sortPriority.sumScore === SortDirectionEnum.DESC) {
+  //       if (a.sumScore > b.sumScore) return -1;
+  //       if (a.sumScore < b.sumScore) return 1;
+  //     }
+  //
+  //     if (sortPriority.winsCount === SortDirectionEnum.ASC) {
+  //       if (a.winsCount < b.winsCount) return -1;
+  //       if (a.winsCount > b.winsCount) return 1;
+  //     } else if (sortPriority.winsCount === SortDirectionEnum.DESC) {
+  //       if (a.winsCount > b.winsCount) return -1;
+  //       if (a.winsCount < b.winsCount) return 1;
+  //     }
+  //
+  //     if (sortPriority.lossesCount === SortDirectionEnum.ASC) {
+  //       if (a.lossesCount < b.lossesCount) return -1;
+  //       if (a.lossesCount > b.lossesCount) return 1;
+  //     } else if (sortPriority.lossesCount === SortDirectionEnum.DESC) {
+  //       if (a.lossesCount > b.lossesCount) return -1;
+  //       if (a.lossesCount < b.lossesCount) return 1;
+  //     }
+  //
+  //     return 0; // If all properties are equal
+  //   });
+  //
+  //   // Return a slice of the sorted array based on startIndex and pageSize
+  //   return sortedArray.slice(startIndex, startIndex + pageSize);
+  // }
 
   private async updateUserStatistics(
     userStatisticsMap: Map<string, GamesStatisticsViewModel>,

@@ -41,15 +41,23 @@ export class ParseQueriesService {
 
   private async parseSort(query: any): Promise<SortType> {
     // Default value
-    const parsedSort: SortType = {
-      avgScores: SortDirectionEnum.DESC,
-      sumScore: SortDirectionEnum.DESC,
-    };
+    const parsedSort: SortType = [
+      {
+        avgScores: SortDirectionEnum.DESC,
+      },
+      {
+        sumScore: SortDirectionEnum.DESC,
+      },
+    ];
+
+    const sort: any[] = [];
 
     const sortParams = query?.sort
       ?.toString()
       .split(',')
       .map((param: any) => param.trim());
+
+    console.log(sortParams);
 
     if (sortParams === undefined) {
       return parsedSort; // Return the default object if sortParams is undefined
@@ -58,32 +66,149 @@ export class ParseQueriesService {
 
     sortParams.forEach((param: any) => {
       const [property, direction] = param.split(' ');
-      switch (property) {
-        case 'avgScores':
-          parsedSort.avgScores = directionValueArr.includes(direction)
-            ? SortDirectionEnum.ASC
-            : SortDirectionEnum.DESC;
-          break;
-        case 'sumScore':
-          parsedSort.sumScore = directionValueArr.includes(direction)
-            ? SortDirectionEnum.ASC
-            : SortDirectionEnum.DESC;
-          break;
-        case 'winsCount':
-          parsedSort.winsCount = directionValueArr.includes(direction)
-            ? SortDirectionEnum.ASC
-            : SortDirectionEnum.DESC;
-          break;
-        case 'lossesCount':
-          parsedSort.lossesCount = directionValueArr.includes(direction)
-            ? SortDirectionEnum.ASC
-            : SortDirectionEnum.DESC;
-          break;
-      }
-    });
 
-    return parsedSort;
+      const directionAvgScores = directionValueArr.includes(direction)
+        ? SortDirectionEnum.ASC
+        : SortDirectionEnum.DESC;
+      sort.push({ [property]: directionAvgScores });
+    });
+    const hasAvgScores = sort.some((obj) => 'avgScores' in obj);
+    const hasSumScore = sort.some((obj) => 'sumScore' in obj);
+    if (!hasAvgScores) {
+      sort.push(parsedSort[0]);
+    }
+    if (!hasSumScore) {
+      sort.push(parsedSort[1]);
+    }
+    return sort;
   }
+
+  // private async parseSort(query: any): Promise<SortType> {
+  //   // Default value
+  //   const parsedSort = [
+  //     { avgScores: SortDirectionEnum.DESC },
+  //     { sumScore: SortDirectionEnum.DESC },
+  //   ];
+  //
+  //   const sortParams = query?.sort
+  //     ?.toString()
+  //     .split(',')
+  //     .map((param: any) => param.trim());
+  //
+  //   if (sortParams === undefined) {
+  //     return parsedSort; // Return the default object if sortParams is undefined
+  //   }
+  //   const directionValueArr = ['ascending', 'ASCENDING', 'asc', 'ASC', -1];
+  //
+  //   sortParams.forEach((param: any) => {
+  //     const [property, direction] = param.split(' ');
+  //     switch (property) {
+  //       case 'avgScores':
+  //         parsedSort = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'sumScore':
+  //         parsedSort.sumScore = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'winsCount':
+  //         parsedSort.winsCount = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'lossesCount':
+  //         parsedSort.lossesCount = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //     }
+  //   });
+  //   console.log(parsedSort, 'parsedSort');
+  //   return parsedSort;
+  // }
+
+  // private async parseSor(sortStrings: string[]): Promise<SortType> {
+  //   const parsedSort: SortType = [
+  //     { avgScores: SortDirectionEnum.DESC },
+  //     { sumScore: SortDirectionEnum.DESC },
+  //     { winsCount: undefined },
+  //     { lossesCount: undefined },
+  //   ];
+  //
+  //   // Create a map to track the sequence of properties
+  //   const propertySequence: { [property: string]: number } = {};
+  //
+  //   for (const sortString of sortStrings) {
+  //     const [property, direction] = sortString.split(' ');
+  //     const directionEnum =
+  //       direction.toLowerCase() === 'asc'
+  //         ? SortDirectionEnum.ASC
+  //         : SortDirectionEnum.DESC;
+  //
+  //     if (property in propertySequence) {
+  //       const index = propertySequence[property];
+  //       parsedSort[index][property] = directionEnum;
+  //     } else {
+  //       // If the property is not in the parsedSort array, add it at the end
+  //       parsedSort.push({ [property]: directionEnum });
+  //
+  //       // Track the sequence of properties
+  //       propertySequence[property] = parsedSort.length - 1;
+  //     }
+  //   }
+  //
+  //   return parsedSort;
+  // }
+
+  // private async parseSort(query: any): Promise<SortType> {
+  //   // Default value
+  //   const parsedSort: SortType = {
+  //     avgScores: SortDirectionEnum.DESC,
+  //     sumScore: SortDirectionEnum.DESC,
+  //   };
+  //
+  //   const sortParams = query?.sort
+  //     ?.toString()
+  //     .split(',')
+  //     .map((param: any) => param.trim());
+  //
+  //   console.log(sortParams);
+  //
+  //   if (sortParams === undefined) {
+  //     return parsedSort; // Return the default object if sortParams is undefined
+  //   }
+  //   const directionValueArr = ['ascending', 'ASCENDING', 'asc', 'ASC', -1];
+  //
+  //   sortParams.forEach((param: any) => {
+  //     const [property, direction] = param.split(' ');
+  //     switch (property) {
+  //       case 'avgScores':
+  //         parsedSort.avgScores = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'sumScore':
+  //         parsedSort.sumScore = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'winsCount':
+  //         parsedSort.winsCount = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //       case 'lossesCount':
+  //         parsedSort.lossesCount = directionValueArr.includes(direction)
+  //           ? SortDirectionEnum.ASC
+  //           : SortDirectionEnum.DESC;
+  //         break;
+  //     }
+  //   });
+  //   console.log(parsedSort, 'parsedSort');
+  //   return parsedSort;
+  // }
 
   private async parseSearchLoginTerm(query: any): Promise<string> {
     const queryLogin = query.searchLoginTerm?.toString();
