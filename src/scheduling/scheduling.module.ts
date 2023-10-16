@@ -5,8 +5,6 @@ import { UsersService } from '../features/users/application/users.service';
 import { CaslModule } from '../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
-import { PostsRawSqlRepository } from '../features/posts/infrastructure/posts-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../features/users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { MailerConfig } from '../config/mailer/mailer-config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
@@ -54,10 +52,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
     DataCleanupService,
     UsersRepo,
     UsersRawSqlRepository,
-    PostsRawSqlRepository,
     InvalidJwtRepo,
     SecurityDevicesRepo,
-    BannedUsersForBlogsRawSqlRepository,
     SentCodeLogRepository,
     GamePairsRepo,
     GameQuestionsRepo,

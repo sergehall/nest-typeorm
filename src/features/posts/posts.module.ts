@@ -13,9 +13,7 @@ import { CreatePostUseCase } from './application/use-cases/create-post.use-case'
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
@@ -46,6 +44,8 @@ import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo'
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-by-post-id.use-case';
+import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
+import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -70,6 +70,7 @@ const postsUseCases = [
       PairsGameEntity,
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
+      BannedUsersForBlogsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -91,14 +92,13 @@ const postsUseCases = [
     BloggerBlogsService,
     UsersRepo,
     UsersRawSqlRepository,
+    BannedUsersForBlogsRepo,
     PostsRepo,
-    PostsRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     LikeStatusPostsRepo,
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,
-    BannedUsersForBlogsRawSqlRepository,
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,

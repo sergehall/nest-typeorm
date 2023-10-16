@@ -1,6 +1,6 @@
 import { TablesUsersEntity } from '../../../features/users/entities/tables-users.entity';
 import { TableBloggerBlogsRawSqlEntity } from '../../../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { ReturnBannedUsersForBlogEntity } from '../../../features/blogger-blogs/entities/return-banned-users-for-blog.entity';
+import { BannedUserForBlogViewModel } from '../../../features/users/view-models/banned-user-for-blog.view-model';
 import { CommentViewModel } from '../../../features/comments/view-models/comment.view-model';
 import { PostWithLikesInfoViewModel } from '../../../features/posts/view-models/post-with-likes-info.view-model';
 import { IsArray, IsNumber, IsObject } from 'class-validator';
@@ -32,7 +32,7 @@ export class PaginatedResultDto {
     | PostWithLikesInfoViewModel
     | ReturnBloggerBlogsDto
     | ReturnUsersDto
-    | ReturnBannedUsersForBlogEntity
+    | BannedUserForBlogViewModel
     | QuestionsViewModel
     | GameViewModel
     | GamesStatisticsViewModel

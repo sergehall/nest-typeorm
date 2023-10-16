@@ -8,7 +8,6 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
 import { IdParams } from '../../../../common/query/params/id.params';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 
@@ -22,7 +21,6 @@ export class DeletePostByIdUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRawSqlRepository: PostsRawSqlRepository,
     protected postsRepo: PostsRepo,
   ) {}
   async execute(command: DeletePostByIdCommand): Promise<boolean> {

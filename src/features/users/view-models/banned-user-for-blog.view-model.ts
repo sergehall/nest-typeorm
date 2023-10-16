@@ -16,7 +16,7 @@ class BanInfo {
   banReason: string;
 }
 
-export class ReturnBannedUsersForBlogEntity {
+export class BannedUserForBlogViewModel {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id! Must be max 100 ch.',
