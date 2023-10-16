@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { CommentsEntity } from '../../entities/comments.entity';
 import { LikeStatusCommentsRepo } from '../../infrastructure/like-status-comments.repo';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 import { LikeStatusCommentsEntity } from '../../entities/like-status-comments.entity';
+import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 
 export class ChangeLikeStatusCommentCommand {
   constructor(
@@ -29,7 +29,7 @@ export class ChangeLikeStatusCommentUseCase
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected commentsRepo: CommentsRepo,
-    protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+    protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
     protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
   async execute(
@@ -58,11 +58,10 @@ export class ChangeLikeStatusCommentUseCase
   }
 
   private async checkUserPermission(userId: string, postInfoBlogId: string) {
-    const userIsBannedForBlog =
-      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        userId,
-        postInfoBlogId,
-      );
+    const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
+      userId,
+      postInfoBlogId,
+    );
     if (userIsBannedForBlog)
       throw new ForbiddenException(userNotHavePermissionForBlog);
   }

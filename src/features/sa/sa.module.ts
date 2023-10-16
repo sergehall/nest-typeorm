@@ -8,9 +8,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
-import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { SecurityDevicesRawSqlRepository } from '../security-devices/infrastructure/security-devices-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
@@ -92,13 +90,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRepo,
     SentCodeLogRepository,
     PostsRepo,
-    PostsRawSqlRepository,
     UsersRawSqlRepository,
     ExpirationDateCalculator,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
-    BannedUsersForBlogsRawSqlRepository,
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,

@@ -1,6 +1,6 @@
-import { ReturnBannedUsersForBlogEntity } from '../entities/return-banned-users-for-blog.entity';
+import { BannedUsersForBlogsEntity } from '../../users/entities/banned-users-for-blogs.entity';
 
-export class BannedUsersCountBannedUsersDto {
-  bannedUsers: ReturnBannedUsersForBlogEntity[];
+export class BannedUsersEntityAndCountDto {
+  bannedUsers: BannedUsersForBlogsEntity[];
   countBannedUsers: number;
 }

@@ -3,10 +3,10 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 import { CommentViewModel } from '../../view-models/comment.view-model';
+import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 
 export class CreateCommentCommand {
   constructor(
@@ -22,7 +22,7 @@ export class CreateCommentUseCase
   constructor(
     protected postsRepo: PostsRepo,
     protected commentsRepo: CommentsRepo,
-    protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+    protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
   async execute(command: CreateCommentCommand): Promise<CommentViewModel> {
     const { postId, createCommentDto, currentUserDto } = command;
@@ -43,11 +43,10 @@ export class CreateCommentUseCase
     userId: string,
     blogId: string,
   ): Promise<void> {
-    const userIsBannedForBlog =
-      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        userId,
-        blogId,
-      );
+    const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
+      userId,
+      blogId,
+    );
     if (userIsBannedForBlog)
       throw new ForbiddenException(userNotHavePermissionForBlog);
   }

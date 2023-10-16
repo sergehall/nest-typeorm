@@ -7,9 +7,7 @@ import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
 import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
-import { PostsRawSqlRepository } from '../posts/infrastructure/posts-raw-sql.repository';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBannedUsersInBlogUseCase } from './application/use-cases/search-banned-users-in-blog.use.case';
@@ -31,6 +29,8 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
+import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -54,6 +54,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PairsGameEntity,
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
+      BannedUsersForBlogsEntity,
     ]),
     CqrsModule,
   ],
@@ -67,11 +68,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
     PostsRepo,
-    PostsRawSqlRepository,
-    BannedUsersForBlogsRawSqlRepository,
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
+    BannedUsersForBlogsRepo,
     ...helpers,
     ...bloggersBlogUseCases,
     ...validators,

@@ -9,12 +9,12 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CreatePostDto } from '../../dto/create-post.dto';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { PostViewModel } from '../../view-models/post.view-model';
+import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 
 export class CreatePostCommand {
   constructor(
@@ -30,7 +30,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
-    private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+    private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
   async execute(command: CreatePostCommand): Promise<PostViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
@@ -55,11 +55,10 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     currentUserDto: CurrentUserDto,
   ) {
     // Check if the user is banned from posting in this blog
-    const userIsBannedForBlog =
-      await this.bannedUsersForBlogsRawSqlRepository.userIsBanned(
-        currentUserDto.userId,
-        blog.id,
-      );
+    const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
+      currentUserDto.userId,
+      blog.id,
+    );
 
     // Check if the user has the permission to create a post in this blog
     const ability = this.caslAbilityFactory.createForUserId({

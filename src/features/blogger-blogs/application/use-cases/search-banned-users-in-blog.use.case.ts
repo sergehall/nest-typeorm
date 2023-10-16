@@ -1,15 +1,16 @@
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { BannedUsersCountBannedUsersDto } from '../../dto/banned-users-count-banned-users.dto';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
+import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
+import { BannedUsersEntityAndCountDto } from '../../dto/banned-users-count-banned-users.dto';
+import { BannedUserForBlogViewModel } from '../../../users/view-models/banned-user-for-blog.view-model';
+import { BannedUsersForBlogsEntity } from '../../../users/entities/banned-users-for-blogs.entity';
 
 export class SearchBannedUsersInBlogCommand {
   constructor(
@@ -25,9 +26,8 @@ export class SearchBannedUsersInBlogUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
     protected commandBus: CommandBus,
   ) {}
   async execute(
@@ -37,21 +37,19 @@ export class SearchBannedUsersInBlogUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     // Check if the blog exists
-    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
-    if (!blog) throw new NotFoundException('Not found blog.');
+    const blog = await this.bloggerBlogsRepo.findBlogById(blogId);
+    if (!blog) throw new NotFoundException(`Blog with id: ${blogId} not found`);
 
     // Check user's permission to ban the user
-    await this.checkUserPermission(currentUser.userId, blog.blogOwnerId);
+    await this.checkUserPermission(currentUser.userId, blog.blogOwner.userId);
 
     // Find all banned users for the blog
-    const bannedUsersAndCount: BannedUsersCountBannedUsersDto =
-      await this.bannedUsersForBlogsRawSqlRepository.findBannedUsers(
-        blogId,
-        queryData,
-      );
+    const bannedUsersAndCount: BannedUsersEntityAndCountDto =
+      await this.bannedUsersForBlogsRepo.findBannedUsers(blogId, queryData);
 
     // Get the total count of banned users for pagination purposes
     const totalCount = bannedUsersAndCount.countBannedUsers;
+
     if (totalCount === 0) {
       return {
         pagesCount: 0,
@@ -67,13 +65,16 @@ export class SearchBannedUsersInBlogUseCase
       totalCount / queryData.queryPagination.pageSize,
     );
 
+    const transformedBannedUsers: BannedUserForBlogViewModel[] =
+      await this.transformedBannedUsers(bannedUsersAndCount.bannedUsers);
+
     // Return the paginated and transformed banned users data
     return {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,
       pageSize: queryData.queryPagination.pageSize,
       totalCount: totalCount,
-      items: bannedUsersAndCount.bannedUsers,
+      items: transformedBannedUsers,
     };
   }
 
@@ -89,5 +90,22 @@ export class SearchBannedUsersInBlogUseCase
         'You are not allowed to ban a user for this blog. ' + error.message,
       );
     }
+  }
+
+  private async transformedBannedUsers(
+    bannedUsers: BannedUsersForBlogsEntity[],
+  ): Promise<BannedUserForBlogViewModel[]> {
+    return bannedUsers.reduce<BannedUserForBlogViewModel[]>((acc, user) => {
+      acc.push({
+        id: user.bannedUserForBlogs.userId,
+        login: user.bannedUserForBlogs.login,
+        banInfo: {
+          isBanned: user.isBanned,
+          banDate: user.banDate,
+          banReason: user.banReason,
+        },
+      });
+      return acc;
+    }, []);
   }
 }
