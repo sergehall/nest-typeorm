@@ -15,7 +15,6 @@ import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.rep
 import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PostsRawSqlRepository } from './infrastructure/posts-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
-import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post.use-case';
 import { BannedUsersForBlogsRawSqlRepository } from '../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -46,6 +45,7 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
+import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-by-post-id.use-case';
 
 const postsUseCases = [
   GetPostsUseCase,

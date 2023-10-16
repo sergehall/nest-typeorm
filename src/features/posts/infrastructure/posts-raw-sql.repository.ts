@@ -2,14 +2,12 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { TablesPostsEntity } from '../entities/tables-posts-entity';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import {
   ExtendedLikesInfo,
-  ReturnPostsEntity,
-} from '../entities/return-posts.entity';
+  PostWithLikesInfoViewModel,
+} from '../view-models/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import { PostCountLikesDislikesStatusEntity } from '../entities/post-count-likes-dislikes-status.entity';
 import { PostsCountPostsLikesDislikesStatusEntity } from '../entities/posts-count-posts-likes-dislikes-status.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -17,10 +15,11 @@ import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dt
 import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import * as uuid4 from 'uuid4';
-import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
+import { PostViewModel } from '../view-models/post.view-model';
+import { TablesPostsEntity } from '../entities/tables-posts-entity';
 
 export class PostsRawSqlRepository {
   constructor(
@@ -77,10 +76,8 @@ export class PostsRawSqlRepository {
         };
       }
 
-      const posts: ReturnPostsEntity[] = await this.processPostsWithLikes(
-        postsWithLikes,
-        currentUserDto,
-      );
+      const posts: PostWithLikesInfoViewModel[] =
+        await this.processPostsWithLikes(postsWithLikes, currentUserDto);
 
       return {
         posts,
@@ -96,7 +93,7 @@ export class PostsRawSqlRepository {
     blog: TableBloggerBlogsRawSqlEntity,
     createPostDto: CreatePostDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const postEntity: TablesPostsEntity = await this.getTablesPostsEntity(
       blog,
       createPostDto,
@@ -129,7 +126,7 @@ export class PostsRawSqlRepository {
     ];
 
     try {
-      const insertPost: PartialPostsEntity[] = await this.db.query(
+      const insertPost: PostViewModel[] = await this.db.query(
         query,
         parameters,
       );
@@ -374,85 +371,88 @@ export class PostsRawSqlRepository {
   private async processPostsWithLikes(
     postsWithLikes: PostsCountPostsLikesDislikesStatusEntity[],
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity[]> {
-    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
+  ): Promise<PostWithLikesInfoViewModel[]> {
+    const postWithLikes: { [key: string]: PostWithLikesInfoViewModel } = {};
 
-    return postsWithLikes.reduce<ReturnPostsEntity[]>((result, row) => {
-      const postId = row.id;
+    return postsWithLikes.reduce<PostWithLikesInfoViewModel[]>(
+      (result, row) => {
+        const postId = row.id;
 
-      let postEntity = postWithLikes[postId];
-      if (!postEntity) {
-        postEntity = {
-          id: row.id,
-          title: row.title,
-          shortDescription: row.shortDescription,
-          content: row.content,
-          blogId: row.blogId,
-          blogName: row.blogName,
-          createdAt: row.createdAt,
-          extendedLikesInfo: {
-            likesCount: row.likesCount,
-            dislikesCount: row.dislikesCount,
-            myStatus: currentUserDto ? row.myStatus : LikeStatusEnums.NONE,
-            newestLikes: [],
-          },
-        };
-        postWithLikes[postId] = postEntity;
-        result.push(postEntity);
-      }
+        let postEntity = postWithLikes[postId];
+        if (!postEntity) {
+          postEntity = {
+            id: row.id,
+            title: row.title,
+            shortDescription: row.shortDescription,
+            content: row.content,
+            blogId: row.blogId,
+            blogName: row.blogName,
+            createdAt: row.createdAt,
+            extendedLikesInfo: {
+              likesCount: row.likesCount,
+              dislikesCount: row.dislikesCount,
+              myStatus: currentUserDto ? row.myStatus : LikeStatusEnums.NONE,
+              newestLikes: [],
+            },
+          };
+          postWithLikes[postId] = postEntity;
+          result.push(postEntity);
+        }
 
-      if (row.likeStatus === LikeStatusEnums.LIKE) {
-        postEntity.extendedLikesInfo.newestLikes.push({
-          addedAt: row.addedAt,
-          userId: row.userId,
-          login: row.login,
-        });
-      }
+        if (row.likeStatus === LikeStatusEnums.LIKE) {
+          postEntity.extendedLikesInfo.newestLikes.push({
+            addedAt: row.addedAt,
+            userId: row.userId,
+            login: row.login,
+          });
+        }
 
-      return result;
-    }, []);
+        return result;
+      },
+      [],
+    );
   }
 
-  private async processPostWithLikes(
-    post: PostCountLikesDislikesStatusEntity[],
-  ): Promise<ReturnPostsEntity[]> {
-    const postWithLikes: { [key: string]: ReturnPostsEntity } = {};
-
-    return post.reduce<ReturnPostsEntity[]>((result, row) => {
-      const postId = row.id;
-
-      let postEntity = postWithLikes[postId];
-      if (!postEntity) {
-        postEntity = {
-          id: row.id,
-          title: row.title,
-          shortDescription: row.shortDescription,
-          content: row.content,
-          blogId: row.blogId,
-          blogName: row.blogName,
-          createdAt: row.createdAt,
-          extendedLikesInfo: {
-            likesCount: row.likesCount,
-            dislikesCount: row.dislikesCount,
-            myStatus: row.myStatus,
-            newestLikes: [],
-          },
-        };
-        postWithLikes[postId] = postEntity;
-        result.push(postEntity);
-      }
-
-      if (row.likeStatus === LikeStatusEnums.LIKE) {
-        postEntity.extendedLikesInfo.newestLikes.push({
-          addedAt: row.addedAt,
-          login: row.login,
-          userId: row.userId,
-        });
-      }
-
-      return result;
-    }, []);
-  }
+  // private async processPostWithLikes(
+  //   post: PostCountLikesDislikesStatusEntity[],
+  // ): Promise<PostWithLikesInfoViewModel[]> {
+  //   const postWithLikes: { [key: string]: PostWithLikesInfoViewModel } = {};
+  //
+  //   return post.reduce<PostWithLikesInfoViewModel[]>((result, row) => {
+  //     const postId = row.id;
+  //
+  //     let postEntity = postWithLikes[postId];
+  //     if (!postEntity) {
+  //       postEntity = {
+  //         id: row.id,
+  //         title: row.title,
+  //         shortDescription: row.shortDescription,
+  //         content: row.content,
+  //         blogId: row.blogId,
+  //         blogName: row.blogName,
+  //         createdAt: row.createdAt,
+  //         extendedLikesInfo: {
+  //           likesCount: row.likesCount,
+  //           dislikesCount: row.dislikesCount,
+  //           myStatus: row.myStatus,
+  //           newestLikes: [],
+  //         },
+  //       };
+  //       postWithLikes[postId] = postEntity;
+  //       result.push(postEntity);
+  //     }
+  //
+  //     if (row.likeStatus === LikeStatusEnums.LIKE) {
+  //       postEntity.extendedLikesInfo.newestLikes.push({
+  //         addedAt: row.addedAt,
+  //         login: row.login,
+  //         userId: row.userId,
+  //       });
+  //     }
+  //
+  //     return result;
+  //   }, []);
+  // }
 
   private async getTablesPostsEntity(
     blog: TableBloggerBlogsRawSqlEntity,
@@ -476,8 +476,8 @@ export class PostsRawSqlRepository {
   }
 
   private async addExtendedLikesInfoToPostsEntity(
-    newPost: PartialPostsEntity,
-  ): Promise<ReturnPostsEntity> {
+    newPost: PostViewModel,
+  ): Promise<PostWithLikesInfoViewModel> {
     const extendedLikesInfo = new ExtendedLikesInfo();
     return {
       ...newPost, // Spread properties of newPost

@@ -14,7 +14,7 @@ import { userNotHavePermissionForPost } from '../../../../common/filters/custom-
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { ReturnPostsEntity } from '../../entities/return-posts.entity';
+import { PostViewModel } from '../../view-models/post.view-model';
 
 export class CreatePostCommand {
   constructor(
@@ -32,7 +32,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreatePostCommand): Promise<ReturnPostsEntity> {
+  async execute(command: CreatePostCommand): Promise<PostViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
 
     const blog: BloggerBlogsEntity | null =

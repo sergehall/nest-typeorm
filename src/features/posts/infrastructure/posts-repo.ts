@@ -10,12 +10,11 @@ import {
 import { CreatePostDto } from '../dto/create-post.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { PartialPostsEntity } from '../dto/return-posts-entity.dto';
 import {
   ExtendedLikesInfo,
   NewestLikes,
-  ReturnPostsEntity,
-} from '../entities/return-posts.entity';
+  PostWithLikesInfoViewModel,
+} from '../view-models/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -29,6 +28,7 @@ import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
+import { PostViewModel } from '../view-models/post.view-model';
 
 export class PostsRepo {
   constructor(
@@ -68,7 +68,7 @@ export class PostsRepo {
   async getPostByIdWithLikes(
     id: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity[] | null> {
+  ): Promise<PostWithLikesInfoViewModel[] | null> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
@@ -105,7 +105,7 @@ export class PostsRepo {
     blog: BloggerBlogsEntity,
     createPostDto: CreatePostDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const postEntity: PostsEntity = await this.creatPostsEntity(
       blog,
       createPostDto,
@@ -228,7 +228,7 @@ export class PostsRepo {
       };
     }
 
-    const postsWithLikes: ReturnPostsEntity[] =
+    const postsWithLikes: PostWithLikesInfoViewModel[] =
       await this.postsLikesAggregation(posts, numberLastLikes, currentUserDto);
 
     return {
@@ -336,8 +336,8 @@ export class PostsRepo {
     posts: PostsEntity[],
     limitPerPost: number,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnPostsEntity[]> {
-    const result: ReturnPostsEntity[] = [];
+  ): Promise<PostWithLikesInfoViewModel[]> {
+    const result: PostWithLikesInfoViewModel[] = [];
 
     const postIds = posts.map((post) => post.id);
 
@@ -495,8 +495,8 @@ export class PostsRepo {
   //   posts: PostsEntity[],
   //   numberLastLikes: number,
   //   currentUserDto: CurrentUserDto | null,
-  // ): Promise<ReturnPostsEntity[]> {
-  //   const result: ReturnPostsEntity[] = [];
+  // ): Promise<PostWithLikesInfoViewModel[]> {
+  //   const result: PostWithLikesInfoViewModel[] = [];
   //
   //   for (const post of posts) {
   //     const queryBuilder: SelectQueryBuilder<LikeStatusPostsEntity> =
@@ -605,8 +605,8 @@ export class PostsRepo {
   }
 
   private async addExtendedLikesInfoToPostsEntity(
-    newPost: PartialPostsEntity,
-  ): Promise<ReturnPostsEntity> {
+    newPost: PostViewModel,
+  ): Promise<PostWithLikesInfoViewModel> {
     const extendedLikesInfo = new ExtendedLikesInfo();
     return {
       ...newPost, // Spread properties of newPost

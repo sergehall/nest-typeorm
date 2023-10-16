@@ -2,7 +2,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { NotFoundException } from '@nestjs/common';
-import { ReturnPostsEntity } from '../../entities/return-posts.entity';
+import { PostWithLikesInfoViewModel } from '../../view-models/post-with-likes-info.view-model';
 
 export class GetPostByIdCommand {
   constructor(
@@ -17,10 +17,12 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     private readonly postsRepo: PostsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: GetPostByIdCommand): Promise<ReturnPostsEntity> {
+  async execute(
+    command: GetPostByIdCommand,
+  ): Promise<PostWithLikesInfoViewModel> {
     const { postId, currentUserDto } = command;
 
-    const post: ReturnPostsEntity[] | null =
+    const post: PostWithLikesInfoViewModel[] | null =
       await this.postsRepo.getPostByIdWithLikes(postId, currentUserDto);
 
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);

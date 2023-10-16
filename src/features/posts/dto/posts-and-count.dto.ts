@@ -1,6 +1,9 @@
-import { ReturnPostsEntity } from '../entities/return-posts.entity';
+import { PostWithLikesInfoViewModel } from '../view-models/post-with-likes-info.view-model';
+import { IsArray, IsNumber } from 'class-validator';
 
 export class PostsAndCountDto {
-  posts: ReturnPostsEntity[];
+  @IsArray()
+  posts: PostWithLikesInfoViewModel[];
+  @IsNumber()
   countPosts: number;
 }
