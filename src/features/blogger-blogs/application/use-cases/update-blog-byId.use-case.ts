@@ -5,8 +5,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 
 export class UpdateBlogByIdCommand {
   constructor(
@@ -20,33 +19,31 @@ export class UpdateBlogByIdUseCase
   implements ICommandHandler<UpdateBlogByIdCommand>
 {
   constructor(
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
 
   async execute(command: UpdateBlogByIdCommand): Promise<boolean> {
     const { id, updateBlogDto, currentUserDto } = command;
-    const blogToUpdate = await this.bloggerBlogsRawSqlRepository.findBlogById(
-      id,
-    );
+    const blogToUpdate = await this.bloggerBlogsRepo.findBlogById(id);
     if (!blogToUpdate) {
       throw new NotFoundException(`Blog with id: ${id} not found`);
     }
 
-    await this.checkUpdatePermission(blogToUpdate, currentUserDto);
-
-    return await this.bloggerBlogsRawSqlRepository.updatedBlogById(
-      id,
-      updateBlogDto,
+    await this.checkUpdatePermission(
+      blogToUpdate.blogOwner.userId,
+      currentUserDto,
     );
+
+    return await this.bloggerBlogsRepo.updateBlogById(id, updateBlogDto);
   }
 
   private async checkUpdatePermission(
-    blogToUpdate: TableBloggerBlogsRawSqlEntity,
+    blogOwnerId: string,
     currentUser: CurrentUserDto,
   ): Promise<void> {
     const ability = this.caslAbilityFactory.createForUserId({
-      id: blogToUpdate.blogOwnerId,
+      id: blogOwnerId,
     });
 
     try {
