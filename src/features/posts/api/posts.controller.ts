@@ -37,7 +37,7 @@ import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
-import { ReturnCommentsEntity } from '../../comments/entities/return-comments.entity';
+import { CommentViewModel } from '../../comments/view-models/comment.view-model';
 import { ReturnPostsEntity } from '../entities/return-posts.entity';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
@@ -122,7 +122,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Body() createCommentDto: CreateCommentDto,
-  ): Promise<ReturnCommentsEntity> {
+  ): Promise<CommentViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     return await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),

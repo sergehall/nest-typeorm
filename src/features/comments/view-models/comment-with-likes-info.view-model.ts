@@ -29,7 +29,7 @@ class LikesInfo {
   myStatus: LikeStatusEnums;
 }
 
-export class ReturnCommentWithLikesInfoDto {
+export class CommentWithLikesInfoViewModel {
   @IsString()
   id: string;
 

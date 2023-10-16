@@ -1,7 +1,7 @@
 import { TablesUsersEntity } from '../../../features/users/entities/tables-users.entity';
 import { TableBloggerBlogsRawSqlEntity } from '../../../features/blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 import { ReturnBannedUsersForBlogEntity } from '../../../features/blogger-blogs/entities/return-banned-users-for-blog.entity';
-import { ReturnCommentsEntity } from '../../../features/comments/entities/return-comments.entity';
+import { CommentViewModel } from '../../../features/comments/view-models/comment.view-model';
 import { ReturnPostsEntity } from '../../../features/posts/entities/return-posts.entity';
 import { IsArray, IsNumber, IsObject } from 'class-validator';
 import { ReturnBloggerBlogsDto } from '../../../features/blogger-blogs/entities/return-blogger-blogs.entity';
@@ -28,7 +28,7 @@ export class PaginatedResultDto {
   items: (
     | TablesUsersEntity
     | TableBloggerBlogsRawSqlEntity
-    | ReturnCommentsEntity
+    | CommentViewModel
     | ReturnPostsEntity
     | ReturnBloggerBlogsDto
     | ReturnUsersDto

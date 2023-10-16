@@ -2,8 +2,8 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { ReturnCommentsCountCommentsDto } from '../../../comments/dto/return-comments-count-comments.dto';
 import { CommentsRepo } from '../../../comments/infrastructure/comments.repo';
+import { CommentsAndCountDto } from '../../../comments/dto/comments-and-count.dto';
 
 export class GetCommentsByUserIdCommand {
   constructor(
@@ -26,7 +26,7 @@ export class GetCommentsByUserIdUseCase
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
-    const commentsAndCountComments: ReturnCommentsCountCommentsDto =
+    const commentsAndCountComments: CommentsAndCountDto =
       await this.commentsRepo.getCommentsWithLikesByUserId(
         queryData,
         currentUserDto,

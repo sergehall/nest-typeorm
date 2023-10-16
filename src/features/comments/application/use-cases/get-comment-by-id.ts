@@ -1,9 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
+import { CommentViewModel } from '../../view-models/comment.view-model';
 import { NotFoundException } from '@nestjs/common';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
-import { ReturnCommentWithLikesInfoDto } from '../../dto/return-comment-with-likes-info.dto';
+import { CommentWithLikesInfoViewModel } from '../../view-models/comment-with-likes-info.view-model';
 
 export class GetCommentByIdCommand {
   constructor(
@@ -20,10 +20,10 @@ export class GetCommentByIdUseCase
     protected commandBus: CommandBus,
     protected commentsRepo: CommentsRepo,
   ) {}
-  async execute(command: GetCommentByIdCommand): Promise<ReturnCommentsEntity> {
+  async execute(command: GetCommentByIdCommand): Promise<CommentViewModel> {
     const { commentId, currentUserDto } = command;
 
-    const comment: ReturnCommentWithLikesInfoDto | null =
+    const comment: CommentWithLikesInfoViewModel | null =
       await this.commentsRepo.getCommentWithLikesById(
         commentId,
         currentUserDto,

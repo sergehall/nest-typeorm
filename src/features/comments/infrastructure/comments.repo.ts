@@ -13,21 +13,18 @@ import { PostsEntity } from '../../posts/entities/posts.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { CreateCommentDto } from '../dto/create-comment.dto';
-import { PartialTablesCommentsEntity } from '../entities/partialTablesComments.entity';
-import {
-  LikesInfo,
-  ReturnCommentsEntity,
-} from '../entities/return-comments.entity';
+import { LikesInfo, CommentViewModel } from '../view-models/comment.view-model';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
-import { ReturnCommentWithLikesInfoDto } from '../dto/return-comment-with-likes-info.dto';
+import { CommentWithLikesInfoViewModel } from '../view-models/comment-with-likes-info.view-model';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
-import { ReturnCommentsCountCommentsDto } from '../dto/return-comments-count-comments.dto';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { LikesDislikesMyStatusInfoDto } from '../dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
+import { PartialCommentsDto } from '../dto/partial-comments.dto';
+import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
 
 export class CommentsRepo {
   constructor(
@@ -61,7 +58,7 @@ export class CommentsRepo {
   async getCommentWithLikesById(
     id: string,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentWithLikesInfoDto | null> {
+  ): Promise<CommentWithLikesInfoViewModel | null> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
@@ -77,7 +74,7 @@ export class CommentsRepo {
         return null;
       }
 
-      const result: ReturnCommentWithLikesInfoDto[] =
+      const result: CommentWithLikesInfoViewModel[] =
         await this.commentsLikesAggregation(comment, currentUserDto);
 
       return result[0];
@@ -94,7 +91,7 @@ export class CommentsRepo {
     postId: string,
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentsCountCommentsDto> {
+  ): Promise<CommentsAndCountDto> {
     try {
       const queryBuilder = await this.createCommentsQueryBuilder(
         queryData,
@@ -121,7 +118,7 @@ export class CommentsRepo {
       }
 
       // Retrieve comments with information about likes
-      const commentsWithLikes: ReturnCommentsEntity[] =
+      const commentsWithLikes: CommentViewModel[] =
         await this.commentsLikesAggregation(comments, currentUserDto);
 
       return {
@@ -137,7 +134,7 @@ export class CommentsRepo {
   async getCommentsWithLikesByUserId(
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ReturnCommentsCountCommentsDto> {
+  ): Promise<CommentsAndCountDto> {
     try {
       const pagingParams: PagingParamsDto = await this.getPagingParams(
         queryData,
@@ -165,7 +162,7 @@ export class CommentsRepo {
       }
 
       // Retrieve comments with information about likes
-      const commentsWithLikes: ReturnCommentsEntity[] =
+      const commentsWithLikes: CommentViewModel[] =
         await this.commentsLikesAggregation(comments, currentUserDto);
 
       return {
@@ -218,7 +215,7 @@ export class CommentsRepo {
     post: PostsEntity,
     createCommentDto: CreateCommentDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ReturnCommentsEntity> {
+  ): Promise<CommentViewModel> {
     const commentsEntity: CommentsEntity = await this.creatCommentEntity(
       post,
       createCommentDto,
@@ -325,8 +322,8 @@ export class CommentsRepo {
   }
 
   private async addLikesInfoAndTransformedComment(
-    comment: PartialTablesCommentsEntity,
-  ): Promise<ReturnCommentsEntity> {
+    comment: PartialCommentsDto,
+  ): Promise<CommentViewModel> {
     const commentatorInfo = {
       userId: comment.commentatorId,
       userLogin: comment.commentatorLogin,
@@ -368,13 +365,13 @@ export class CommentsRepo {
   async commentsLikesAggregation(
     comments: CommentsEntity[],
     currentUserDto: CurrentUserDto | null,
-  ): Promise<ReturnCommentsEntity[]> {
+  ): Promise<CommentViewModel[]> {
     const commentIds = comments.map((comment) => comment.id);
 
     const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
       await this.getCommentsLikesDislikesMyStatus(commentIds, currentUserDto);
 
-    return comments.map((comment: CommentsEntity): ReturnCommentsEntity => {
+    return comments.map((comment: CommentsEntity): CommentViewModel => {
       const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
         likesInfoArr.find(
           (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
