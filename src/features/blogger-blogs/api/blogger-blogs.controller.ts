@@ -27,10 +27,9 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
-import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
+import { PostWithLikesInfoViewModel } from '../../posts/view-models/post-with-likes-info.view-model';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
@@ -42,6 +41,7 @@ import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
+import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -132,7 +132,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Body() createPostDto: CreatePostDto,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

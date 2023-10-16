@@ -40,7 +40,7 @@ import { SaUpdateBlogByIdCommand } from '../application/use-cases/sa-update-blog
 import { SaDeleteBlogByBlogIdCommand } from '../application/use-cases/sa-delete-blog-by-id.use-case';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
-import { ReturnPostsEntity } from '../../posts/entities/return-posts.entity';
+import { PostWithLikesInfoViewModel } from '../../posts/view-models/post-with-likes-info.view-model';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
@@ -153,7 +153,7 @@ export class SaController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Body() createPostDto: CreatePostDto,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

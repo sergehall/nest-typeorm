@@ -34,15 +34,15 @@ import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-res
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
-import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post.use-case';
 import { PostExistValidationPipe } from '../../../common/pipes/post-exist-validation.pipe';
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
 import { CommentViewModel } from '../../comments/view-models/comment.view-model';
-import { ReturnPostsEntity } from '../entities/return-posts.entity';
+import { PostWithLikesInfoViewModel } from '../view-models/post-with-likes-info.view-model';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
 import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-case';
 import { GetPostsCommand } from '../application/use-cases/get-posts.use-case';
+import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post-by-post-id.use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -74,7 +74,7 @@ export class PostsController {
   async openFindPostById(
     @Request() req: any,
     @Param('id', PostExistValidationPipe) id: string,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
     return await this.commandBus.execute(
@@ -107,7 +107,7 @@ export class PostsController {
   async createPost(
     @Request() req: any,
     @Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto,
-  ): Promise<ReturnPostsEntity> {
+  ): Promise<PostWithLikesInfoViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const { blogId, ...createPostDto } = createPostWithBlogIdDto;
 
@@ -132,20 +132,24 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BaseAuthGuard)
   @Put(':id')
-  async updatePost(
+  async updatePostByPostId(
     @Request() req: any,
     @Param() params: IdParams,
     @Body() updatePostWithBlogIdDto: UpdatePostWithBlogIdDto,
   ): Promise<boolean> {
     const currentUserDto = req.user;
     const { blogId, ...updatePostDto } = updatePostWithBlogIdDto;
-    const idBlogId: BlogIdPostIdParams = {
+    const postIdBlogId: BlogIdPostIdParams = {
       postId: params.id,
       blogId: blogId,
     };
 
     return await this.commandBus.execute(
-      new UpdatePostByPostIdCommand(idBlogId, updatePostDto, currentUserDto),
+      new UpdatePostByPostIdCommand(
+        postIdBlogId,
+        updatePostDto,
+        currentUserDto,
+      ),
     );
   }
 
