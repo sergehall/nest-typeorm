@@ -9,10 +9,10 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
-import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
-import { PostsRawSqlRepository } from '../../infrastructure/posts-raw-sql.repository';
-import { TablesPostsEntity } from '../../entities/tables-posts-entity';
+import { PostsRepo } from '../../infrastructure/posts-repo';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { PostsEntity } from '../../entities/posts.entity';
 
 export class DeletePostByPostIdAndBlogIdCommand {
   constructor(
@@ -27,25 +27,28 @@ export class DeletePostByPostIdAndBlogIdUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    private readonly postsRepository: PostsRawSqlRepository,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
+    private readonly postsRepo: PostsRepo,
   ) {}
   async execute(command: DeletePostByPostIdAndBlogIdCommand): Promise<boolean> {
     const { params, currentUserDto } = command;
     const { blogId, postId } = params;
 
-    const blog: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) throw new NotFoundException(`Blog with id: ${blogId} not found`);
 
-    const postToRemove: TablesPostsEntity | null =
-      await this.postsRepository.getPostById(postId);
+    const postToRemove: PostsEntity | null =
+      await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!postToRemove)
       throw new NotFoundException(`Post with id: ${postId} not found`);
 
-    await this.checkUserPermission(postToRemove.postOwnerId, currentUserDto);
+    await this.checkUserPermission(
+      postToRemove.postOwner.userId,
+      currentUserDto,
+    );
 
-    return await this.postsRepository.deletePostByPostId(postToRemove.id);
+    return await this.postsRepo.deletePostByPostId(postToRemove.id);
   }
 
   private async checkUserPermission(
