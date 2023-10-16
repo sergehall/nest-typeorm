@@ -370,7 +370,7 @@ export class UsersRepo {
 
   private async deleteUserData(
     userId: string,
-    entityManager: EntityManager,
+    transactionalEntityManager: EntityManager,
   ): Promise<void> {
     try {
       const allGames: PairsGameEntity[] =
@@ -379,50 +379,54 @@ export class UsersRepo {
       const allGamesIds = allGames.map((game) => game.id);
 
       await Promise.all([
-        await entityManager
+        await transactionalEntityManager
           .createQueryBuilder()
           .delete()
           .from('ChallengeAnswers')
           .where('answerOwnerId = :userId', { userId })
           .execute(),
-        entityManager
+        transactionalEntityManager
           .createQueryBuilder()
           .delete()
           .from('challengeQuestions')
           .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
           .execute(),
-        entityManager.delete('SecurityDevices', { user: userId }),
-        entityManager.delete('BannedUsersForBlogs', {
+        transactionalEntityManager.delete('SecurityDevices', { user: userId }),
+        transactionalEntityManager.delete('BannedUsersForBlogs', {
           bannedUserForBlogs: userId,
         }),
-        entityManager.delete('SentCodesLog', { sentForUser: userId }),
-        entityManager.delete('LikeStatusComments', {
+        transactionalEntityManager.delete('SentCodesLog', {
+          sentForUser: userId,
+        }),
+        transactionalEntityManager.delete('LikeStatusComments', {
           ratedCommentUser: userId,
         }),
-        entityManager.delete('LikeStatusPosts', { ratedPostUser: userId }),
+        transactionalEntityManager.delete('LikeStatusPosts', {
+          ratedPostUser: userId,
+        }),
       ]);
-      await entityManager
+      await transactionalEntityManager
         .createQueryBuilder()
         .delete()
         .from('PairsGame')
         .where('firstPlayerId = :userId', { userId })
         .orWhere('secondPlayerId = :userId', { userId })
         .execute();
-      await entityManager
+      await transactionalEntityManager
         .createQueryBuilder()
         .delete()
         .from('Comments')
         .where('commentatorId = :userId', { userId })
         .execute();
-      await entityManager.delete('Posts', { postOwner: userId });
-      await entityManager
+      await transactionalEntityManager.delete('Posts', { postOwner: userId });
+      await transactionalEntityManager
         .createQueryBuilder()
         .delete()
         .from('BloggerBlogs')
         .where('blogOwnerId = :userId', { userId })
         .execute();
 
-      await entityManager.delete('Users', { userId });
+      await transactionalEntityManager.delete('Users', { userId });
     } catch (error) {
       console.error(
         `Error while removing data for user ${userId}: ${error.message}`,

@@ -21,7 +21,7 @@ export class ChallengeAnswersEntity {
   @Column({ type: 'character varying', length: 50, nullable: false })
   addedAt: string;
 
-  @ManyToOne(() => PairsGameEntity, (pairGameQuiz) => pairGameQuiz.questions, {
+  @ManyToOne(() => PairsGameEntity, (pairGameQuiz) => pairGameQuiz.answers, {
     nullable: false,
     eager: true,
   })

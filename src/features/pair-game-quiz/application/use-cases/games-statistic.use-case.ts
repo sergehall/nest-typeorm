@@ -83,6 +83,40 @@ export class GamesStatisticUseCase
     return Array.from(userStatisticsMap.values());
   }
 
+  private async updateUserStatistics(
+    userStatisticsMap: Map<string, GamesStatisticsViewModel>,
+    player: UsersEntity,
+    score: number,
+    gameResult: GamesResultsEnum,
+  ) {
+    const userId = player.userId;
+    const userStats = userStatisticsMap.get(userId);
+
+    if (!userStats) {
+      userStatisticsMap.set(userId, {
+        sumScore: score,
+        gamesCount: 1,
+        winsCount: gameResult === GamesResultsEnum.WON ? 1 : 0,
+        lossesCount: gameResult === GamesResultsEnum.LOST ? 1 : 0,
+        drawsCount: gameResult === GamesResultsEnum.DRAW ? 1 : 0,
+        avgScores: score,
+        player: {
+          id: userId,
+          login: player.login,
+        },
+      });
+    } else {
+      userStats.sumScore += score;
+      userStats.gamesCount += 1;
+      userStats.winsCount += gameResult === GamesResultsEnum.WON ? 1 : 0;
+      userStats.lossesCount += gameResult === GamesResultsEnum.LOST ? 1 : 0;
+      userStats.drawsCount += gameResult === GamesResultsEnum.DRAW ? 1 : 0;
+      userStats.avgScores = +(
+        userStats.sumScore / userStats.gamesCount
+      ).toFixed(2);
+    }
+  }
+
   private async customSort(
     sortPriority: SortType,
     pageNumber: number,
@@ -125,101 +159,5 @@ export class GamesStatisticUseCase
 
     // Return a slice of the sorted array based on startIndex and pageSize
     return sortedArray.slice(startIndex, startIndex + pageSize);
-    // return [
-    //   {
-    //     gamesCount: 9,
-    //     winsCount: 4,
-    //     lossesCount: 4,
-    //     drawsCount: 1,
-    //     sumScore: 20,
-    //     avgScores: 2.22,
-    //     player: {
-    //       id: 'ca0db718-e2b8-4a12-843c-2f909532e3d8',
-    //       login: '3869lg',
-    //     },
-    //   },
-    // ];
-  }
-
-  // private async customSort(
-  //   sortPriority: SortType,
-  //   pageNumber: number,
-  //   pageSize: number,
-  //   arr: GamesStatisticsViewModel[],
-  // ): Promise<GamesStatisticsViewModel[]> {
-  //   const startIndex = (pageNumber - 1) * pageSize;
-  //
-  //   const sortedArray = arr.sort((a, b) => {
-  //     if (sortPriority.avgScores === SortDirectionEnum.ASC) {
-  //       if (a.avgScores < b.avgScores) return -1;
-  //       if (a.avgScores > b.avgScores) return 1;
-  //     } else if (sortPriority.avgScores === SortDirectionEnum.DESC) {
-  //       if (a.avgScores > b.avgScores) return -1;
-  //       if (a.avgScores < b.avgScores) return 1;
-  //     }
-  //
-  //     if (sortPriority.sumScore === SortDirectionEnum.ASC) {
-  //       if (a.sumScore < b.sumScore) return -1;
-  //       if (a.sumScore > b.sumScore) return 1;
-  //     } else if (sortPriority.sumScore === SortDirectionEnum.DESC) {
-  //       if (a.sumScore > b.sumScore) return -1;
-  //       if (a.sumScore < b.sumScore) return 1;
-  //     }
-  //
-  //     if (sortPriority.winsCount === SortDirectionEnum.ASC) {
-  //       if (a.winsCount < b.winsCount) return -1;
-  //       if (a.winsCount > b.winsCount) return 1;
-  //     } else if (sortPriority.winsCount === SortDirectionEnum.DESC) {
-  //       if (a.winsCount > b.winsCount) return -1;
-  //       if (a.winsCount < b.winsCount) return 1;
-  //     }
-  //
-  //     if (sortPriority.lossesCount === SortDirectionEnum.ASC) {
-  //       if (a.lossesCount < b.lossesCount) return -1;
-  //       if (a.lossesCount > b.lossesCount) return 1;
-  //     } else if (sortPriority.lossesCount === SortDirectionEnum.DESC) {
-  //       if (a.lossesCount > b.lossesCount) return -1;
-  //       if (a.lossesCount < b.lossesCount) return 1;
-  //     }
-  //
-  //     return 0; // If all properties are equal
-  //   });
-  //
-  //   // Return a slice of the sorted array based on startIndex and pageSize
-  //   return sortedArray.slice(startIndex, startIndex + pageSize);
-  // }
-
-  private async updateUserStatistics(
-    userStatisticsMap: Map<string, GamesStatisticsViewModel>,
-    player: UsersEntity,
-    score: number,
-    gameResult: GamesResultsEnum,
-  ) {
-    const userId = player.userId;
-    const userStats = userStatisticsMap.get(userId);
-
-    if (!userStats) {
-      userStatisticsMap.set(userId, {
-        sumScore: score,
-        gamesCount: 1,
-        winsCount: gameResult === GamesResultsEnum.WON ? 1 : 0,
-        lossesCount: gameResult === GamesResultsEnum.LOST ? 1 : 0,
-        drawsCount: gameResult === GamesResultsEnum.DRAW ? 1 : 0,
-        avgScores: score,
-        player: {
-          id: userId,
-          login: player.login,
-        },
-      });
-    } else {
-      userStats.sumScore += score;
-      userStats.gamesCount += 1;
-      userStats.winsCount += gameResult === GamesResultsEnum.WON ? 1 : 0;
-      userStats.lossesCount += gameResult === GamesResultsEnum.LOST ? 1 : 0;
-      userStats.drawsCount += gameResult === GamesResultsEnum.DRAW ? 1 : 0;
-      userStats.avgScores = +(
-        userStats.sumScore / userStats.gamesCount
-      ).toFixed(2);
-    }
   }
 }

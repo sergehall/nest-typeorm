@@ -2,7 +2,6 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
-  IsString,
   Length,
   Matches,
   MaxLength,
@@ -10,31 +9,11 @@ import {
 } from 'class-validator';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
-class PostInfo {
-  @IsNotEmpty()
-  @Length(1, 100, {
-    message: 'Incorrect id length! Must be min 1, max 100 ch.',
-  })
-  id: string;
-  @IsNotEmpty()
-  @Length(0, 30, {
-    message: 'Incorrect title length! Must be min 0, max 30 ch.',
-  })
-  title: string;
-  @IsNotEmpty()
-  @IsString()
-  @Length(0, 100, {
-    message: 'Incorrect blogId length! Must be max 100 ch.',
-  })
-  blogId: string;
-  @IsNotEmpty()
-  @Length(0, 100, {
-    message: 'Incorrect blogName length! Must be min 0, max 100 ch.',
-  })
-  blogName: string;
-}
-
 class CommentatorInfo {
+  @IsNotEmpty()
+  @Length(0, 100, {
+    message: 'Incorrect userId length! Must be min 0, max 100 ch.',
+  })
   userId: string;
   @IsNotEmpty()
   @Length(3, 10, {
@@ -47,18 +26,18 @@ class CommentatorInfo {
 export class LikesInfo {
   @IsNotEmpty()
   @IsNumber()
-  likesCount: number;
+  likesCount = 0; // Set default value
   @IsNotEmpty()
   @IsNumber()
-  dislikesCount: number;
+  dislikesCount = 0; // Set default value
   @IsNotEmpty()
   @IsEnum(LikeStatusEnums, {
     message: 'Incorrect likeStatus must be type of Like, Dislike or None.',
   })
-  myStatus: LikeStatusEnums;
+  myStatus: LikeStatusEnums = LikeStatusEnums.NONE; // Set default value
 }
 
-export class ReturnCommentsWithPostInfoEntity {
+export class CommentViewModel {
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect id length! Must be min 0, max 100 ch.',
@@ -78,5 +57,4 @@ export class ReturnCommentsWithPostInfoEntity {
   createdAt: string;
   commentatorInfo: CommentatorInfo;
   likesInfo: LikesInfo;
-  postInfo: PostInfo;
 }

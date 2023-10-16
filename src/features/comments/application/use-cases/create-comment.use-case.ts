@@ -6,7 +6,7 @@ import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-
 import { BannedUsersForBlogsRawSqlRepository } from '../../../users/infrastructure/banned-users-for-blogs-raw-sql.repository';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
-import { ReturnCommentsEntity } from '../../entities/return-comments.entity';
+import { CommentViewModel } from '../../view-models/comment.view-model';
 
 export class CreateCommentCommand {
   constructor(
@@ -24,7 +24,7 @@ export class CreateCommentUseCase
     protected commentsRepo: CommentsRepo,
     protected bannedUsersForBlogsRawSqlRepository: BannedUsersForBlogsRawSqlRepository,
   ) {}
-  async execute(command: CreateCommentCommand): Promise<ReturnCommentsEntity> {
+  async execute(command: CreateCommentCommand): Promise<CommentViewModel> {
     const { postId, createCommentDto, currentUserDto } = command;
 
     const post = await this.postsRepo.getPostByIdWithoutLikes(postId);

@@ -10,6 +10,7 @@ import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 import { GamesResultsEnum } from '../enums/games-results.enum';
+import { ChallengeAnswersEntity } from './challenge-answers.entity';
 
 @Entity('PairsGame')
 export class PairsGameEntity {
@@ -78,4 +79,10 @@ export class PairsGameEntity {
     (challengeQuestion) => challengeQuestion.pairGameQuiz,
   )
   questions: ChallengeQuestionsEntity[];
+
+  @OneToMany(
+    () => ChallengeAnswersEntity,
+    (challengeAnswer) => challengeAnswer.pairGameQuiz,
+  )
+  answers: ChallengeAnswersEntity[];
 }

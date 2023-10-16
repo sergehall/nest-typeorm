@@ -3,9 +3,9 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { ReturnCommentsCountCommentsDto } from '../../dto/return-comments-count-comments.dto';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
+import { CommentsAndCountDto } from '../../dto/comments-and-count.dto';
 
 export class GetCommentsByPostIdCommand {
   constructor(
@@ -33,7 +33,7 @@ export class GetCommentsByPostIdUseCase
     const post = await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
-    const commentsAndCountComments: ReturnCommentsCountCommentsDto =
+    const commentsAndCountComments: CommentsAndCountDto =
       await this.commentsRepo.getCommentsWithLikesByPostId(
         postId,
         queryData,
