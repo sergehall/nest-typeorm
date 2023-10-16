@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { NotFoundException } from '@nestjs/common';
 import { ReturnBloggerBlogsDto } from '../../../blogger-blogs/entities/return-blogger-blogs.entity';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -10,13 +10,13 @@ export class GetBlogByIdCommand {
 @CommandHandler(GetBlogByIdCommand)
 export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
   constructor(
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: GetBlogByIdCommand): Promise<ReturnBloggerBlogsDto> {
     const { blogId } = command;
 
-    const blog = await this.bloggerBlogsRawSqlRepository.findBlogById(blogId);
+    const blog = await this.bloggerBlogsRepo.findBlogById(blogId);
 
     if (!blog) {
       throw new NotFoundException(`Blog with id: ${blogId} not found`);

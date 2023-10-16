@@ -6,7 +6,8 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { IdDto } from '../../../../ability/dto/id.dto';
 import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 
 export class DeleteBlogByBlogIdCommand {
   constructor(public blogId: string, public currentUserDto: CurrentUserDto) {}
@@ -18,18 +19,22 @@ export class DeleteBlogByBlogIdUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly bloggerBlogsRepository: BloggerBlogsRawSqlRepository,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
+    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: DeleteBlogByBlogIdCommand): Promise<boolean> {
     const { blogId, currentUserDto } = command;
 
-    const blogToRemove: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRepository.findBlogById(blogId);
+    const blogToRemove: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blogToRemove) throw new NotFoundException('Not found blog.');
 
-    await this.checkUserPermission(currentUserDto, blogToRemove.blogOwnerId);
+    await this.checkUserPermission(
+      currentUserDto,
+      blogToRemove.blogOwner.userId,
+    );
 
-    return await this.bloggerBlogsRepository.deleteBlogByBlogId(blogId);
+    return await this.bloggerBlogsRawSqlRepository.deleteBlogByBlogId(blogId);
   }
 
   private async checkUserPermission(
