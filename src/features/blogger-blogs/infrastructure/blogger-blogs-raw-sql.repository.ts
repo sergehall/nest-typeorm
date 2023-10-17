@@ -4,13 +4,9 @@ import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-r
 import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { TableBannedUsersForBlogsEntity } from '../entities/table-banned-users-for-blogs.entity';
-import { KeyResolver } from '../../../common/helpers/key-resolver';
 
 export class BloggerBlogsRawSqlRepository {
-  constructor(
-    @InjectDataSource() private readonly db: DataSource,
-    protected keyResolver: KeyResolver,
-  ) {}
+  constructor(@InjectDataSource() private readonly db: DataSource) {}
 
   async deleteBlogByBlogId(blogId: string): Promise<boolean> {
     try {
@@ -70,7 +66,7 @@ export class BloggerBlogsRawSqlRepository {
     }
   }
 
-  async findBlogByBlogId(
+  async findBlogByBlogId2(
     blogId: string,
   ): Promise<TableBloggerBlogsRawSqlEntity | null> {
     try {

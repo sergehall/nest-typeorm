@@ -5,6 +5,7 @@ import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-
 import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../blogger-blogs.service';
+import { BloggerBlogsViewModel } from '../../view-models/blogger-blogs.view-model';
 
 export class GetBlogsOwnedByCurrentUserCommand {
   constructor(
@@ -41,10 +42,9 @@ export class GetBlogsOwnedByCurrentUserUseCase
       };
     }
 
-    const totalCount = blogsCountBlogsDto.countBlogs;
-    const transformedBlogs = await this.bloggerBlogsService.transformedBlogs(
-      blogsCountBlogsDto.blogs,
-    );
+    const totalCount: number = blogsCountBlogsDto.countBlogs;
+    const transformedBlogs: BloggerBlogsViewModel[] =
+      await this.bloggerBlogsService.transformedBlogs(blogsCountBlogsDto.blogs);
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 

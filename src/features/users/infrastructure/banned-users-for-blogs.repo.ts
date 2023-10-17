@@ -4,11 +4,15 @@ import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.en
 import { InternalServerErrorException } from '@nestjs/common';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { BannedUsersEntityAndCountDto } from '../../blogger-blogs/dto/banned-users-count-banned-users.dto';
+import { UsersEntity } from '../entities/users.entity';
+import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import * as uuid4 from 'uuid4';
 
 export class BannedUsersForBlogsRepo {
   constructor(
     @InjectRepository(BannedUsersForBlogsEntity)
-    private readonly bannedUsersForBlogsEntity: Repository<BannedUsersForBlogsEntity>,
+    private readonly bannedUsersForBlogsRepo: Repository<BannedUsersForBlogsEntity>,
   ) {}
 
   async findBannedUsers(
@@ -22,7 +26,7 @@ export class BannedUsersForBlogsRepo {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      const queryBuilder = this.bannedUsersForBlogsEntity
+      const queryBuilder = this.bannedUsersForBlogsRepo
         .createQueryBuilder('banned_users')
         .select([
           'banned_users.id',
@@ -66,7 +70,7 @@ export class BannedUsersForBlogsRepo {
 
   async userIsBanned(userId: string, blogId: string): Promise<boolean> {
     try {
-      const bannedUser = await this.bannedUsersForBlogsEntity
+      const bannedUser = await this.bannedUsersForBlogsRepo
         .createQueryBuilder('banned_users')
         .leftJoinAndSelect(
           'banned_users.bannedUserForBlogs',
@@ -84,5 +88,22 @@ export class BannedUsersForBlogsRepo {
       // Handle any errors and return false
       return false;
     }
+  }
+
+  async createBannedUserEntity(
+    user: UsersEntity,
+    blog: BloggerBlogsEntity,
+    updateBanUserDto: UpdateBanUserDto,
+  ): Promise<BannedUsersForBlogsEntity> {
+    const { isBanned, banReason } = updateBanUserDto;
+
+    const bannedUser = new BannedUsersForBlogsEntity();
+    bannedUser.id = uuid4().toString();
+    bannedUser.isBanned = isBanned;
+    bannedUser.banReason = banReason;
+    bannedUser.bannedBlog = blog;
+    bannedUser.bannedUserForBlogs = user;
+
+    return bannedUser;
   }
 }
