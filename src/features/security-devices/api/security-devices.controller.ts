@@ -14,7 +14,7 @@ import { RemoveDevicesExceptCurrentCommand } from '../application/use-cases/remo
 import { CommandBus } from '@nestjs/cqrs';
 import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-by-deviceId.use-case';
 import { DeviceIdParams } from '../../../common/query/params/deviceId.params';
-import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
+import { SecurityDeviceViewModel } from '../view-models/security-device.view-model';
 import { DecodeTokenService } from '../../../config/jwt/decode.service/decode-token-service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { SearchDevicesCommand } from '../application/use-cases/search-devices.use-case';
@@ -29,9 +29,7 @@ export class SecurityDevicesController {
 
   @UseGuards(CookiesJwtVerificationGuard)
   @Get('devices')
-  async findDevices(
-    @Request() req: any,
-  ): Promise<ReturnSecurityDeviceEntity[]> {
+  async findDevices(@Request() req: any): Promise<SecurityDeviceViewModel[]> {
     const currentPayload: PayloadDto =
       await this.decodeTokenService.toExtractPayload(req.cookies.refreshToken);
 

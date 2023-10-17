@@ -1,17 +1,48 @@
-import { LessThan, Repository } from 'typeorm';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SecurityDevicesEntity } from '../entities/session-devices.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { PayloadDto } from '../../auth/dto/payload.dto';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 @Injectable()
 export class SecurityDevicesRepo {
   constructor(
     @InjectRepository(SecurityDevicesEntity)
     private readonly securityDevicesRepository: Repository<SecurityDevicesEntity>,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
+
+  async findDeviceByDeviceId(
+    deviceId: string,
+  ): Promise<SecurityDevicesEntity[]> {
+    try {
+      const currentTime = new Date().toISOString();
+
+      return await this.securityDevicesRepository.find({
+        where: {
+          deviceId,
+          expirationDate: MoreThanOrEqual(currentTime),
+        },
+      });
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const deviceId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(
+          `SecurityDevicesEntity with ID ${deviceId} not found`,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async createDevice(
     newPayload: PayloadDto,
@@ -87,6 +118,24 @@ export class SecurityDevicesRepo {
       });
       if (deleteDevice && deleteDevice.affected) {
         return deleteDevice.affected > 0;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async deleteDeviceByDeviceId(deviceId: string): Promise<boolean> {
+    try {
+      const deleteResult = await this.securityDevicesRepository.delete({
+        deviceId,
+      });
+
+      // Check if any records were deleted (affected > 0)
+      if (deleteResult && deleteResult.affected) {
+        return deleteResult.affected > 0;
       } else {
         return false;
       }
