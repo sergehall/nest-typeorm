@@ -415,35 +415,31 @@ export class BloggerBlogsRepo {
     try {
       await queryRunner.startTransaction();
 
-      // Update LikeStatusComments table
+      // Update LikeStatusCommentsEntity
       await connection.manager.update(
         LikeStatusCommentsEntity,
         { blog },
         { isBanned },
       );
 
-      // Update LikeStatusPosts table
+      // Update LikeStatusPostsEntity
       await connection.manager.update(
         LikeStatusPostsEntity,
         { blog },
         { isBanned },
       );
 
-      // Update Comments table
-      await connection.manager.update(
-        CommentsEntity,
-        { blog },
-        { isBanned: isBanned },
-      );
+      // Update CommentsEntity
+      await connection.manager.update(CommentsEntity, { blog }, { isBanned });
 
-      // Update Posts table
+      // Update PostsEntity
       await connection.manager.update(
         PostsEntity,
         { blog },
         { dependencyIsBanned: isBanned },
       );
 
-      // Update BloggerBlogs table
+      // Update BloggerBlogsEntity
       await connection.manager.update(
         BloggerBlogsEntity,
         { id: blog.id },
