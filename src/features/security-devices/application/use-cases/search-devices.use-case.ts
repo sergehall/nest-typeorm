@@ -1,7 +1,7 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SecurityDevicesRawSqlRepository } from '../../infrastructure/security-devices-raw-sql.repository';
 import { SecurityDeviceViewModel } from '../../view-models/security-device.view-model';
+import { SecurityDevicesRepo } from '../../infrastructure/security-devices.repo';
 
 export class SearchDevicesCommand {
   constructor(public currentPayload: PayloadDto) {}
@@ -11,15 +11,11 @@ export class SearchDevicesCommand {
 export class SearchDevicesUseCase
   implements ICommandHandler<SearchDevicesCommand>
 {
-  constructor(
-    protected securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
-  ) {}
+  constructor(protected securityDevicesRepo: SecurityDevicesRepo) {}
 
   async execute(
     command: SearchDevicesCommand,
   ): Promise<SecurityDeviceViewModel[]> {
-    return await this.securityDevicesRawSqlRepository.findDevices(
-      command.currentPayload,
-    );
+    return await this.securityDevicesRepo.findDevices(command.currentPayload);
   }
 }

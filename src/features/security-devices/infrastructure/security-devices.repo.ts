@@ -10,6 +10,7 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { SecurityDeviceViewModel } from '../view-models/security-device.view-model';
 
 @Injectable()
 export class SecurityDevicesRepo {
@@ -40,6 +41,31 @@ export class SecurityDevicesRepo {
           `SecurityDevicesEntity with ID ${deviceId} not found`,
         );
       }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findDevices(payload: PayloadDto): Promise<SecurityDeviceViewModel[]> {
+    try {
+      const currentTime = new Date().toISOString();
+      const limit = 1000;
+      const offset = 0;
+
+      return await this.securityDevicesRepository
+        .createQueryBuilder('device')
+        .select([
+          'device.ip',
+          'device.title',
+          'device.lastActiveDate',
+          'device.deviceId',
+        ])
+        .where('device.userId = :userId', { userId: payload.userId })
+        .andWhere('device.expirationDate >= :currentTime', { currentTime })
+        .orderBy('device.lastActiveDate', 'DESC')
+        .skip(offset)
+        .take(limit)
+        .getRawMany();
+    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -149,19 +175,18 @@ export class SecurityDevicesRepo {
     currentPayload: PayloadDto,
   ): Promise<boolean> {
     try {
-      const deletedResult = await this.securityDevicesRepository
+      const deleteResult = await this.securityDevicesRepository
         .createQueryBuilder()
         .delete()
-        .from(SecurityDevicesEntity)
-        .where('"userId" = :userId AND "deviceId" <> :deviceId', {
-          userId: currentPayload.userId,
+        .where('"userId" = :userId', { userId: currentPayload.userId })
+        .andWhere('"deviceId" <> :deviceId', {
           deviceId: currentPayload.deviceId,
         })
         .execute();
 
       // Check if any records were deleted (affected > 0)
-      if (deletedResult && deletedResult.affected) {
-        return deletedResult.affected > 0;
+      if (deleteResult && deleteResult.affected) {
+        return deleteResult.affected > 0;
       } else {
         return false;
       }
