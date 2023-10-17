@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { TestingRawSqlRepository } from '../infrastructure/testing-raw-sql.repository';
+import { TestingDeleteAllDataRepository } from '../infrastructure/testing-delete-all-data.repository';
 
 @Injectable()
 export class TestingService {
-  constructor(protected testingRawSqlRepository: TestingRawSqlRepository) {}
+  constructor(
+    protected testingDeleteAllDataRepository: TestingDeleteAllDataRepository,
+  ) {}
   async removeAllDataRawSQL(): Promise<void> {
-    return await this.testingRawSqlRepository.removeAllData();
+    return await this.testingDeleteAllDataRepository.removeAllData();
   }
 }
