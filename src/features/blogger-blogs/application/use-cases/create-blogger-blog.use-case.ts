@@ -7,9 +7,9 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ReturnBloggerBlogsDto } from '../../entities/return-blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { CreateBlogsDto } from '../../dto/create-blogs.dto';
+import { BloggerBlogsViewModel } from '../../view-models/blogger-blogs.view-model';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -28,7 +28,7 @@ export class CreateBloggerBlogUseCase
   ) {}
   async execute(
     command: CreateBloggerBlogCommand,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<BloggerBlogsViewModel> {
     const { createBloggerBlogsDto, currentUser } = command;
 
     await this.checkPermission(command.currentUser);

@@ -1,6 +1,6 @@
-import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
+import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 
 export class BlogsCountBlogsDto {
-  blogs: ReturnBloggerBlogsDto[];
+  blogs: BloggerBlogsEntity[];
   countBlogs: number;
 }
