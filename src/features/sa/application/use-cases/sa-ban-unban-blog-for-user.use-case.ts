@@ -10,8 +10,9 @@ import {
 import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenError } from '@casl/ability';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { cannotBlockOwnBlog } from '../../../../common/filters/custom-errors-messages';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 
 export class SaBanUnbanBlogCommand {
   constructor(
@@ -27,31 +28,28 @@ export class SaBanUnbanBlogUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(command: SaBanUnbanBlogCommand) {
     const { blogId, saBanBlogDto, currentUserDto } = command;
 
-    const blogForBan = await this.saGetBlogForBan(blogId);
+    const blogForBan: BloggerBlogsEntity = await this.saGetBlogForBan(blogId);
 
-    if (blogForBan.blogOwnerId === currentUserDto.userId) {
+    if (blogForBan.blogOwner.userId === currentUserDto.userId) {
       throw new HttpException(
         { message: cannotBlockOwnBlog },
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    await this.checkUserPermission(currentUserDto, blogForBan.blogOwnerId);
+    await this.checkUserPermission(currentUserDto, blogForBan.blogOwner.userId);
 
-    return await this.bloggerBlogsRawSqlRepository.saBanUnbanBlog(
-      blogId,
-      saBanBlogDto,
-    );
+    return await this.bloggerBlogsRepo.saBanUnbanBlog(blogForBan, saBanBlogDto);
   }
 
-  private async saGetBlogForBan(blogId: string) {
-    const blogForBan =
-      await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
+  private async saGetBlogForBan(blogId: string): Promise<BloggerBlogsEntity> {
+    const blogForBan: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blogForBan) throw new NotFoundException('Not found blog.');
     return blogForBan;
   }

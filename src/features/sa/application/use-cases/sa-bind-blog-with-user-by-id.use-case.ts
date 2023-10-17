@@ -2,14 +2,13 @@ import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { IdUserIdParams } from '../../../../common/query/params/id-userId.params';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { TableBloggerBlogsRawSqlEntity } from '../../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
-import { SecurityDevicesRawSqlRepository } from '../../../security-devices/infrastructure/security-devices-raw-sql.repository';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { UsersEntity } from '../../../users/entities/users.entity';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class SaBindBlogWithUserByIdCommand {
   constructor(
@@ -24,21 +23,20 @@ export class SaBindBlogWithUserByIdUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly usersRawSqlRepository: UsersRawSqlRepository,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
-    private readonly securityDevicesRawSqlRepository: SecurityDevicesRawSqlRepository,
+    private readonly usersRepo: UsersRepo,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(command: SaBindBlogWithUserByIdCommand): Promise<boolean> {
     const { id, userId } = command.params;
     const { currentUserDto } = command;
 
-    const blogForBind = await this.getBlogForBind(id);
+    const blogForBind: BloggerBlogsEntity = await this.getBlogForBind(id);
 
-    const userForBind = await this.getUserForBind(userId);
+    const userForBind: UsersEntity = await this.getUserForBind(userId);
 
     await this.checkUserPermission(currentUserDto, userId);
 
-    return await this.securityDevicesRawSqlRepository.saBindUserAndBlog(
+    return await this.bloggerBlogsRepo.saBindBlogWithUser(
       userForBind,
       blogForBind,
     );
@@ -60,18 +58,19 @@ export class SaBindBlogWithUserByIdUseCase
     }
   }
 
-  private async getUserForBind(userId: string) {
-    const userForBind: TablesUsersWithIdEntity | null =
-      await this.usersRawSqlRepository.saFindUserByUserId(userId);
+  private async getUserForBind(userId: string): Promise<UsersEntity> {
+    const userForBind: UsersEntity | null = await this.usersRepo.findUserById(
+      userId,
+    );
     if (!userForBind) {
       throw new NotFoundException('Not found user.');
     }
     return userForBind;
   }
 
-  private async getBlogForBind(blogId: string) {
-    const blogForBind: TableBloggerBlogsRawSqlEntity | null =
-      await this.bloggerBlogsRawSqlRepository.saFindBlogByBlogId(blogId);
+  private async getBlogForBind(blogId: string): Promise<BloggerBlogsEntity> {
+    const blogForBind: BloggerBlogsEntity | null =
+      await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blogForBind) {
       throw new NotFoundException('Not found blog.');
     }

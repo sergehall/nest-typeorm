@@ -17,6 +17,8 @@ import { BannedUsersForBlogsEntity } from '../../users/entities/banned-users-for
 import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
+import { PostsEntity } from '../../posts/entities/posts.entity';
+import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 
 export class BloggerBlogsRepo {
   constructor(
@@ -339,6 +341,139 @@ export class BloggerBlogsRepo {
         `Error occurred while banning user ${userId} for blog ${blogId}:`,
         error,
       );
+      await queryRunner.rollbackTransaction();
+      return false;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async saBindBlogWithUser(
+    userForBind: UsersEntity,
+    blogForBind: BloggerBlogsEntity,
+  ): Promise<boolean> {
+    const connection = this.bloggerBlogsRepository.manager.connection;
+    const queryRunner = connection.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      await queryRunner.startTransaction();
+
+      // Update Comments table
+      await connection.manager.update(
+        CommentsEntity,
+        {
+          blog: blogForBind.id,
+          blogOwner: userForBind.userId,
+        },
+        { blogOwner: userForBind },
+      );
+
+      // Update Posts table
+      await connection.manager.update(
+        PostsEntity,
+        { blog: blogForBind.id },
+        { postOwner: userForBind },
+      );
+
+      // Update BloggerBlogs table
+      blogForBind.blogOwner = userForBind;
+      await connection.manager.save(blogForBind);
+
+      // Commit the transaction
+      await queryRunner.commitTransaction();
+
+      console.log(
+        `"🔗 Blog ${blogForBind.id} has been successfully bound with user ${userForBind.userId}. 🔗"`,
+      );
+
+      return true;
+    } catch (error) {
+      console.error(
+        `Error occurred while binding blog ${blogForBind.id} with user ${userForBind.userId}:`,
+        error,
+      );
+      console.log('rollbackTransaction');
+      await queryRunner.rollbackTransaction();
+      return false;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async saBanUnbanBlog(
+    blog: BloggerBlogsEntity,
+    saBanBlogDto: SaBanBlogDto,
+  ): Promise<boolean> {
+    const { isBanned } = saBanBlogDto;
+    const isBannedDate = isBanned ? new Date().toISOString() : null;
+
+    const connection = this.bloggerBlogsRepository.manager.connection;
+    const queryRunner = connection.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      await queryRunner.startTransaction();
+
+      // Update LikeStatusComments table
+      await connection.manager.update(
+        LikeStatusCommentsEntity,
+        { blog },
+        { isBanned },
+      );
+
+      // Update LikeStatusPosts table
+      await connection.manager.update(
+        LikeStatusPostsEntity,
+        { blog },
+        { isBanned },
+      );
+
+      // Update Comments table
+      await connection.manager.update(
+        CommentsEntity,
+        { blog },
+        { isBanned: isBanned },
+      );
+
+      // Update Posts table
+      await connection.manager.update(
+        PostsEntity,
+        { blog },
+        { dependencyIsBanned: isBanned },
+      );
+
+      // Update BloggerBlogs table
+      await connection.manager.update(
+        BloggerBlogsEntity,
+        { id: blog.id },
+        {
+          banInfoIsBanned: isBanned,
+          banInfoBanDate: isBannedDate,
+        },
+      );
+
+      // Commit the transaction
+      await queryRunner.commitTransaction();
+
+      if (isBanned) {
+        console.log(
+          `Blog Locked 🔒. The blog with ID ${blog.id} has been locked for the user. Access to the blog and its content has been restricted as per the defined policies or circumstances. Thank you for your understanding.`,
+        );
+      } else {
+        // Successful Blog Unlock Message
+        console.log(
+          `Blog Unlocked 🚪. The blog with ID ${blog.id} has been successfully unlocked. Users can now access the blog and its content without any restrictions. Thank you for your attention to ensuring a positive user experience.`,
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.error(
+        `Error occurred while banning blog for blog ID ${blog.id}:`,
+        error,
+      );
+      console.log('rollbackTransaction');
       await queryRunner.rollbackTransaction();
       return false;
     } finally {

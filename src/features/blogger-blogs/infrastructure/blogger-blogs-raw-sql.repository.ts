@@ -1,35 +1,11 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { TableBloggerBlogsRawSqlEntity } from '../entities/table-blogger-blogs-raw-sql.entity';
-import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 
 export class BloggerBlogsRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-
-  async saFindBlogByBlogId(
-    blogId: string,
-  ): Promise<TableBloggerBlogsRawSqlEntity | null> {
-    try {
-      const blog = await this.db.query(
-        `
-      SELECT "id", "createdAt", "isMembership", 
-      "blogOwnerId", "dependencyIsBanned",
-      "banInfoIsBanned", "banInfoBanDate", "banInfoBanReason", 
-      "name", "description", "websiteUrl"
-      FROM public."BloggerBlogs"
-      WHERE "id" = $1
-      `,
-        [blogId],
-      );
-      // Return the first blog if found, if not found return null
-      return blog[0] || null;
-    } catch (error) {
-      console.log(error.message);
-      // if not blogId not UUID will be error, and return null
-      return null;
-    }
-  }
 
   async saBanUnbanBlog(
     blogId: string,
@@ -112,8 +88,8 @@ export class BloggerBlogsRawSqlRepository {
   }
 
   async saBindBlogWithUser(
-    userForBind: TablesUsersWithIdEntity,
-    blogForBind: TableBloggerBlogsRawSqlEntity,
+    userForBind: UsersEntity,
+    blogForBind: BloggerBlogsEntity,
   ): Promise<boolean> {
     try {
       await this.db.transaction(async (client) => {
