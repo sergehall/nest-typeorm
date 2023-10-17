@@ -10,13 +10,13 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
-import { TableBannedUsersForBlogsEntity } from '../../entities/table-banned-users-for-blogs.entity';
-import * as uuid4 from 'uuid4';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
-import { TableBloggerBlogsRawSqlEntity } from '../../entities/table-blogger-blogs-raw-sql.entity';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
+import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
+import { BannedUsersForBlogsEntity } from '../../../users/entities/banned-users-for-blogs.entity';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class ManageBlogAccessCommand {
   constructor(
@@ -32,8 +32,9 @@ export class ManageBlogAccessUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
-    private readonly usersRawSqlRepository: UsersRawSqlRepository,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
+    private readonly bloggerBlogsRepo: BloggerBlogsRepo,
+    private readonly usersRepo: UsersRepo,
+    private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
 
   // This method is executed when the BanUserForBlogCommand is dispatched to this handler.
@@ -48,56 +49,43 @@ export class ManageBlogAccessUseCase
     }
 
     // Fetch the user to be banned from the repository.
-    const userForBan = await this.getUserToBan(userId);
+    const userForBan: UsersEntity = await this.getUserToBan(userId);
 
     // Fetch the blog associated with the ban from the repository.
-    const blogForBan = await this.getBlogForBan(updateBanUserDto.blogId);
+    const blogForBan: BloggerBlogsEntity = await this.getBlogForBan(
+      updateBanUserDto.blogId,
+    );
 
     // Check if the current user has permission to perform the ban action.
-    await this.checkUserPermission(blogForBan.blogOwnerId, currentUserDto);
+    await this.checkUserPermission(blogForBan.blogOwner.userId, currentUserDto);
 
-    // Create a TableBannedUsersForBlogsEntity object that represents the ban entity.
-    const bannedUserForBlogEntity: TableBannedUsersForBlogsEntity =
-      this.createBannedUserEntity(userForBan, updateBanUserDto);
+    // Creates a new instance bannedUserEntity
+    const bannedUserEntity: BannedUsersForBlogsEntity =
+      await this.bannedUsersForBlogsRepo.createBannedUserEntity(
+        userForBan,
+        blogForBan,
+        updateBanUserDto,
+      );
 
-    return await this.bloggerBlogsRawSqlRepository.manageBlogAccess(
-      bannedUserForBlogEntity,
-    );
+    return await this.bloggerBlogsRepo.manageBlogAccess(bannedUserEntity);
   }
 
   // Fetches the user to be banned from the repository based on the provided user ID.
-  private async getUserToBan(userId: string): Promise<TablesUsersWithIdEntity> {
-    const userToBan: TablesUsersWithIdEntity | null =
-      await this.usersRawSqlRepository.findUserByUserId(userId);
-    if (!userToBan) throw new NotFoundException('Not found user.');
+  private async getUserToBan(userId: string): Promise<UsersEntity> {
+    const userToBan: UsersEntity | null = await this.usersRepo.findUserById(
+      userId,
+    );
+    if (!userToBan)
+      throw new NotFoundException(`User with id: ${userId} not found`);
     return userToBan;
   }
 
   // Fetches the blog associated with the ban from the repository based on the provided blog ID.
-  private async getBlogForBan(
-    blogId: string,
-  ): Promise<TableBloggerBlogsRawSqlEntity> {
-    const blogForBan = await this.bloggerBlogsRawSqlRepository.findBlogByBlogId(
-      blogId,
-    );
-    if (!blogForBan) throw new NotFoundException('Not found blog.');
+  private async getBlogForBan(blogId: string): Promise<BloggerBlogsEntity> {
+    const blogForBan = await this.bloggerBlogsRepo.findBlogById(blogId);
+    if (!blogForBan)
+      throw new NotFoundException(`Blog with id: ${blogId} not found`);
     return blogForBan;
-  }
-
-  // Creates a new instance of TableBannedUsersForBlogsEntity using the user and DTO information.
-  private createBannedUserEntity(
-    userToBan: TablesUsersWithIdEntity,
-    updateBanUserDto: UpdateBanUserDto,
-  ): TableBannedUsersForBlogsEntity {
-    return {
-      id: uuid4().toString(),
-      userId: userToBan.userId,
-      blogId: updateBanUserDto.blogId,
-      login: userToBan.login,
-      isBanned: updateBanUserDto.isBanned,
-      banReason: updateBanUserDto.banReason,
-      banDate: new Date().toISOString(),
-    };
   }
 
   // Checks if the current user has permission to ban the user associated with the provided user ID.

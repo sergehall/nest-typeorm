@@ -31,6 +31,8 @@ import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questio
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
+import { UsersRepo } from '../users/infrastructure/users-repo';
+import { UsersEntity } from '../users/entities/users.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -47,6 +49,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      UsersEntity,
       PostsEntity,
       CommentsEntity,
       BloggerBlogsEntity,
@@ -67,6 +70,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRawSqlRepository,
     BloggerBlogsRepo,
     BloggerBlogsRawSqlRepository,
+    UsersRepo,
     PostsRepo,
     GamePairsRepo,
     GameQuestionsRepo,

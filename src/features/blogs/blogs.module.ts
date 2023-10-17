@@ -27,6 +27,8 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
+import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -41,6 +43,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PairsGameEntity,
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
+      BannedUsersForBlogsEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -61,6 +64,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
+    BannedUsersForBlogsRepo,
     ...helpers,
     ...blogsUseCases,
   ],
