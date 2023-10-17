@@ -1,6 +1,6 @@
 import { IsNotEmpty, Length, Matches } from 'class-validator';
 
-export class ReturnSecurityDeviceEntity {
+export class SecurityDeviceViewModel {
   @IsNotEmpty()
   @Length(0, 20, {
     message: 'Incorrect ip! Must be max 20 ch.',

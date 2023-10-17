@@ -3,14 +3,12 @@ import { DataSource } from 'typeorm';
 import { TablesSessionDevicesEntity } from '../entities/tables-security-device.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
-import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
+import { SecurityDeviceViewModel } from '../view-models/security-device.view-model';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
 
-  async findDevices(
-    payload: PayloadDto,
-  ): Promise<ReturnSecurityDeviceEntity[]> {
+  async findDevices(payload: PayloadDto): Promise<SecurityDeviceViewModel[]> {
     try {
       const currentTime = new Date().toISOString();
       const limit = 1000;
