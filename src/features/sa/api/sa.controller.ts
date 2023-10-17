@@ -49,9 +49,9 @@ import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ReturnUserDto } from '../../users/dto/return-user.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
-import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-case';
+import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
 
 @SkipThrottle()
 @Controller('sa')
@@ -124,7 +124,7 @@ export class SaController {
   async saCreateBlog(
     @Request() req: any,
     @Body() createBlogsDto: CreateBlogsDto,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<BloggerBlogsViewModel> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

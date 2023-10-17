@@ -2,8 +2,9 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { BloggerBlogsService } from '../blogger-blogs.service';
 
 export class GetBlogsOwnedByCurrentUserCommand {
   constructor(
@@ -17,8 +18,9 @@ export class GetBlogsOwnedByCurrentUserUseCase
   implements ICommandHandler<GetBlogsOwnedByCurrentUserCommand>
 {
   constructor(
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commandBus: CommandBus,
+    protected bloggerBlogsService: BloggerBlogsService,
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(
     command: GetBlogsOwnedByCurrentUserCommand,
@@ -26,13 +28,10 @@ export class GetBlogsOwnedByCurrentUserUseCase
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogsAndCountBlogs: BlogsCountBlogsDto =
-      await this.bloggerBlogsRawSqlRepository.searchUserBlogsAndCountBlogs(
-        currentUserDto,
-        queryData,
-      );
+    const blogsCountBlogsDto: BlogsCountBlogsDto =
+      await this.bloggerBlogsRepo.getUserBlogs(currentUserDto, queryData);
 
-    if (blogsAndCountBlogs.countBlogs === 0) {
+    if (blogsCountBlogsDto.countBlogs === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -42,15 +41,19 @@ export class GetBlogsOwnedByCurrentUserUseCase
       };
     }
 
-    const totalCount = blogsAndCountBlogs.countBlogs;
+    const totalCount = blogsCountBlogsDto.countBlogs;
+    const transformedBlogs = await this.bloggerBlogsService.transformedBlogs(
+      blogsCountBlogsDto.blogs,
+    );
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
+
     return {
       pagesCount: pagesCount,
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: blogsAndCountBlogs.blogs,
+      items: transformedBlogs,
     };
   }
 }

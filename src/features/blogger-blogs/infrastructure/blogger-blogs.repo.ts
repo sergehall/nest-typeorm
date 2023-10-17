@@ -1,7 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, InsertResult, Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import * as uuid4 from 'uuid4';
@@ -9,13 +12,110 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class BloggerBlogsRepo {
   constructor(
     @InjectRepository(BloggerBlogsEntity)
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
     protected keyResolver: KeyResolver,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
+  async getBlogsOpenApi(
+    queryData: ParseQueriesDto,
+  ): Promise<BlogsCountBlogsDto> {
+    const blogOwnerBanStatus = false;
+    const banInfoBanStatus = false;
+    const searchNameTerm = queryData.searchNameTerm;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+    const direction = queryData.queryPagination.sortDirection;
+    const limit = queryData.queryPagination.pageSize;
+    const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
+    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder('blogs')
+      .select([
+        'blogs.id',
+        'blogs.name',
+        'blogs.description',
+        'blogs.websiteUrl',
+        'blogs.createdAt',
+        'blogs.isMembership',
+      ])
+      .where('"dependencyIsBanned" = :dependencyIsBanned', {
+        dependencyIsBanned: blogOwnerBanStatus,
+      })
+      .andWhere('"banInfoIsBanned" = :banInfoIsBanned', {
+        banInfoIsBanned: banInfoBanStatus,
+      })
+      .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm });
+
+    try {
+      const countBlogs = await queryBuilder.getCount();
+
+      queryBuilder.orderBy(`blogs.${sortBy}`, direction, collate);
+      queryBuilder.limit(limit);
+      queryBuilder.offset(offset);
+
+      const blogs: BloggerBlogsEntity[] = await queryBuilder.getMany();
+
+      return { blogs, countBlogs };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getUserBlogs(
+    currentUserDto: CurrentUserDto,
+    queryData: ParseQueriesDto,
+  ): Promise<BlogsCountBlogsDto> {
+    const blogOwnerBanStatus = false;
+    const banInfoBanStatus = false;
+    const { userId } = currentUserDto;
+    const searchNameTerm = queryData.searchNameTerm;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+    const direction = queryData.queryPagination.sortDirection;
+    const limit = queryData.queryPagination.pageSize;
+    const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder('Blogs')
+      .select([
+        'id',
+        'name',
+        'description',
+        'websiteUrl',
+        'createdAt',
+        'isMembership',
+      ])
+      .addSelect('(COUNT(*) OVER())', 'countBlogs')
+      .where('"dependencyIsBanned" = :dependencyIsBanned', {
+        dependencyIsBanned: blogOwnerBanStatus,
+      })
+      .andWhere('"banInfoIsBanned" = :banInfoIsBanned', {
+        banInfoIsBanned: banInfoBanStatus,
+      })
+      .andWhere('"blogOwnerId" = :blogOwnerId', { blogOwnerId: userId })
+      .andWhere('"name" ILIKE :searchNameTerm', { searchNameTerm })
+      .orderBy(`"${sortBy}"`, direction);
+
+    try {
+      const countBlogs = await queryBuilder.getCount();
+
+      queryBuilder.limit(limit);
+      queryBuilder.offset(offset);
+
+      const blogs: BloggerBlogsEntity[] = await queryBuilder.getMany();
+
+      return { blogs, countBlogs };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async searchBlogsForSa(
     queryData: ParseQueriesDto,
@@ -74,17 +174,28 @@ export class BloggerBlogsRepo {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
 
-    const blog = await this.bloggerBlogsRepository
+    const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
       .where('blog.id = :blogId', { blogId })
       .andWhere('blog.dependencyIsBanned = :dependencyIsBanned', {
         dependencyIsBanned,
       })
-      .andWhere('blog.banInfoIsBanned = :banInfoIsBanned', { banInfoIsBanned })
-      .getOne(); // Execute the query and get a single result
+      .andWhere('blog.banInfoIsBanned = :banInfoIsBanned', { banInfoIsBanned });
 
-    return blog || null; // Return the retrieved blog with its associated blogOwner
+    try {
+      const blog = await queryBuilder.getOne(); // Execute the query and get a single result
+
+      return blog || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async createBlogs(

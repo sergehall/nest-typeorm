@@ -1,7 +1,8 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BloggerBlogsRawSqlRepository } from '../../../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
 
 export class SearchBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -10,18 +11,19 @@ export class SearchBlogsCommand {
 @CommandHandler(SearchBlogsCommand)
 export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
   constructor(
-    protected bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
     protected commandBus: CommandBus,
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected bloggerBlogsService: BloggerBlogsService,
   ) {}
   async execute(command: SearchBlogsCommand): Promise<PaginatedResultDto> {
     const { queryData } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogs = await this.bloggerBlogsRawSqlRepository.openSearchBlogs(
+    const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsOpenApi(
       queryData,
     );
 
-    if (blogs.length === 0) {
+    if (blogsCountBlogsDto.countBlogs === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -31,17 +33,19 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       };
     }
 
-    const totalCount = await this.bloggerBlogsRawSqlRepository.openCountBlogs(
-      queryData,
+    const totalCount = blogsCountBlogsDto.countBlogs;
+    const transformedBlogs = await this.bloggerBlogsService.transformedBlogs(
+      blogsCountBlogsDto.blogs,
     );
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
+
     return {
       pagesCount: pagesCount,
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: blogs,
+      items: transformedBlogs,
     };
   }
 }

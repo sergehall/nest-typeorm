@@ -37,11 +37,11 @@ import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-ac
 import { GetBlogsOwnedByCurrentUserCommand } from '../application/use-cases/get-blogs-owned-by-current-user.use-case';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { DeletePostByPostIdAndBlogIdCommand } from '../../posts/application/use-cases/delete-post-by-post-id-and-blog-id.use-case';
-import { ReturnBloggerBlogsDto } from '../entities/return-blogger-blogs.entity';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
+import { BloggerBlogsViewModel } from '../view-models/blogger-blogs.view-model';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -86,7 +86,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBlogsDto,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<BloggerBlogsViewModel> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

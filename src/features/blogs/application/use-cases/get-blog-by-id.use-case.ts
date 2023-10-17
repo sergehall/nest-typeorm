@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
-import { ReturnBloggerBlogsDto } from '../../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { BloggerBlogsViewModel } from '../../../blogger-blogs/view-models/blogger-blogs.view-model';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -13,7 +13,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: GetBlogByIdCommand): Promise<ReturnBloggerBlogsDto> {
+  async execute(command: GetBlogByIdCommand): Promise<BloggerBlogsViewModel> {
     const { blogId } = command;
 
     const blog = await this.bloggerBlogsRepo.findBlogById(blogId);

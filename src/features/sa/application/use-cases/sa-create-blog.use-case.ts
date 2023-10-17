@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreateBlogsDto } from '../../../blogger-blogs/dto/create-blogs.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { ReturnBloggerBlogsDto } from '../../../blogger-blogs/entities/return-blogger-blogs.entity';
+import { BloggerBlogsViewModel } from '../../../blogger-blogs/view-models/blogger-blogs.view-model';
 
 export class SaCreateBlogCommand {
   constructor(
@@ -26,7 +26,7 @@ export class SaCreateBlogUseCase
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
-  async execute(command: SaCreateBlogCommand): Promise<ReturnBloggerBlogsDto> {
+  async execute(command: SaCreateBlogCommand): Promise<BloggerBlogsViewModel> {
     const { createBlogsDto, currentUser } = command;
 
     await this.checkPermission(command.currentUser);

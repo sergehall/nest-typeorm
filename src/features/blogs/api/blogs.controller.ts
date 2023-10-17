@@ -19,8 +19,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
-import { ReturnBloggerBlogsDto } from '../../blogger-blogs/entities/return-blogger-blogs.entity';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
+import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -43,7 +43,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openGetBlogById(
     @Param() params: IdParams,
-  ): Promise<ReturnBloggerBlogsDto> {
+  ): Promise<BloggerBlogsViewModel> {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
