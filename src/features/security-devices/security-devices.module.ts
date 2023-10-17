@@ -8,7 +8,6 @@ import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { SecurityDevicesRawSqlRepository } from './infrastructure/security-devices-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-by-deviceId.use-case';
@@ -66,7 +65,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     DecodeTokenService,
     SecurityDevicesService,
     SecurityDevicesRepo,
-    SecurityDevicesRawSqlRepository,
     InvalidJwtRepo,
     BlacklistJwtRawSqlRepository,
     GamePairsRepo,

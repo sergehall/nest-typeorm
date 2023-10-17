@@ -1,10 +1,9 @@
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
-export class TestingRawSqlRepository {
-  constructor(@InjectDataSource() private readonly db: DataSource) {}
+export class TestingDeleteAllDataRepository {
+  constructor(private readonly entityManager: EntityManager) {}
 
   async removeAllData(): Promise<void> {
     const tablesToDelete = [
@@ -25,14 +24,21 @@ export class TestingRawSqlRepository {
     ];
 
     try {
-      for (const table of tablesToDelete) {
-        const query = `DELETE FROM public."${table}"`;
-        await this.db.query(query);
-      }
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          for (const table of tablesToDelete) {
+            await transactionalEntityManager
+              .createQueryBuilder()
+              .delete()
+              .from(table)
+              .execute();
+          }
+        },
+      );
     } catch (error) {
       console.error(error.message);
       throw new InternalServerErrorException(
-        'Failed to remove data.' + error.message,
+        'Failed to remove data. ' + error.message,
       );
     }
   }
