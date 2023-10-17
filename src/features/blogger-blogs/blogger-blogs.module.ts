@@ -5,8 +5,7 @@ import { PostsService } from '../posts/application/posts.service';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { CreateBloggerBlogUseCase } from './application/use-cases/create-blogger-blog.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-byId.use-case';
-import { BloggerBlogsRawSqlRepository } from './infrastructure/blogger-blogs-raw-sql.repository';
+import { UpdateBlogByIdUseCase } from './application/use-cases/update-blog-by-id.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -69,7 +68,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PostsService,
     UsersRawSqlRepository,
     BloggerBlogsRepo,
-    BloggerBlogsRawSqlRepository,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

@@ -12,7 +12,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -95,7 +94,6 @@ const postsUseCases = [
     BannedUsersForBlogsRepo,
     PostsRepo,
     BloggerBlogsRepo,
-    BloggerBlogsRawSqlRepository,
     LikeStatusPostsRepo,
     BlacklistJwtRawSqlRepository,
     InvalidJwtRepo,

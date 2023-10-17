@@ -36,7 +36,6 @@ import { PostsEntity } from '../posts/entities/posts.entity';
 import { LikeStatusPostsEntity } from '../posts/entities/like-status-posts.entity';
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaDeletePostByPostIdUseCase } from './application/use-cases/sa-delete-post-by-post-id.use-case';
-import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
@@ -96,7 +95,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRawSqlRepository,
     ExpirationDateCalculator,
     BloggerBlogsRepo,
-    BloggerBlogsRawSqlRepository,
     SecurityDevicesRawSqlRepository,
     BannedUsersForBlogsRepo,
     GamePairsRepo,

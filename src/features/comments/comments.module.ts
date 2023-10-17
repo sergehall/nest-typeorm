@@ -11,7 +11,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
 import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BloggerBlogsRawSqlRepository } from '../blogger-blogs/infrastructure/blogger-blogs-raw-sql.repository';
 import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -82,7 +81,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRawSqlRepository,
     PostsRepo,
     BannedUsersForBlogsRepo,
-    BloggerBlogsRawSqlRepository,
     CommentsRepo,
     LikeStatusCommentsRepo,
     BlacklistJwtRawSqlRepository,

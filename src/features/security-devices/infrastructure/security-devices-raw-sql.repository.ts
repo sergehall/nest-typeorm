@@ -4,46 +4,9 @@ import { TablesSessionDevicesEntity } from '../entities/tables-security-device.e
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReturnSecurityDeviceEntity } from '../entities/return-security-device.entity';
-import { TablesUsersWithIdEntity } from '../../users/entities/tables-user-with-id.entity';
-import { TableBloggerBlogsRawSqlEntity } from '../../blogger-blogs/entities/table-blogger-blogs-raw-sql.entity';
 
 export class SecurityDevicesRawSqlRepository {
   constructor(@InjectDataSource() private readonly db: DataSource) {}
-
-  async createNewDevice(
-    newDevices: TablesSessionDevicesEntity,
-  ): Promise<boolean> {
-    try {
-      const createOrUpdateDevice = await this.db.query(
-        `
-      INSERT INTO public."SecurityDevices"
-      ("id",
-      "userId", 
-      "deviceId",
-      "ip",
-      "title",
-      "lastActiveDate",
-      "expirationDate"
-       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING "userId"
-      `,
-        [
-          newDevices.id,
-          newDevices.userId,
-          newDevices.deviceId,
-          newDevices.ip,
-          newDevices.title,
-          newDevices.lastActiveDate,
-          newDevices.expirationDate,
-        ],
-      );
-      return createOrUpdateDevice[0] != null;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
 
   async findDevices(
     payload: PayloadDto,
@@ -63,25 +26,6 @@ export class SecurityDevicesRawSqlRepository {
         [payload.userId, currentTime, limit, offset],
       );
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeDeviceByDeviceIdAfterLogout(
-    payload: PayloadDto,
-  ): Promise<boolean> {
-    try {
-      const removeCurrentDevice = await this.db.query(
-        `
-      DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1 AND "deviceId" = $2
-      RETURNING "userId"
-      `,
-        [payload.userId, payload.deviceId],
-      );
-      return removeCurrentDevice[0] != null;
-    } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -132,81 +76,6 @@ export class SecurityDevicesRawSqlRepository {
       `,
         [currentPayload.userId, currentPayload.deviceId],
       );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async clearingDevicesWithExpiredDate() {
-    try {
-      const currentTime = new Date().toISOString();
-      return await this.db.query(
-        `
-      DELETE FROM public."SecurityDevices"
-      WHERE "expirationDate" < $1
-      `,
-        [currentTime],
-      );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async removeDevicesBannedUser(userId: string) {
-    try {
-      const removeCurrentDevices = await this.db.query(
-        `
-      DELETE FROM public."SecurityDevices"
-      WHERE "userId" = $1
-      RETURNING "userId"
-      `,
-        [userId],
-      );
-      return removeCurrentDevices[0] != null;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async saBindUserAndBlog(
-    userForBind: TablesUsersWithIdEntity,
-    blogForBind: TableBloggerBlogsRawSqlEntity,
-  ): Promise<boolean> {
-    const blogId = blogForBind.id;
-    const userId = userForBind.userId;
-    const login = userForBind.login;
-
-    try {
-      await this.db.transaction(async (client) => {
-        await client.query(
-          `
-          UPDATE public."Comments"
-          SET "postInfoBlogOwnerId" = $2
-          WHERE "postInfoBlogId" = $1
-          `,
-          [blogId, userId],
-        );
-        await client.query(
-          `
-          UPDATE public."Posts"
-          SET "postOwnerId" = $2
-          WHERE "blogId" = $1
-          `,
-          [blogId, userId],
-        );
-        await client.query(
-          `
-          UPDATE public."BloggerBlogs"
-          SET "blogOwnerId" = $2, "blogOwnerLogin" = $3
-          WHERE "id" = $1
-          `,
-          [blogId, userId, login],
-        );
-      });
-      return true;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);

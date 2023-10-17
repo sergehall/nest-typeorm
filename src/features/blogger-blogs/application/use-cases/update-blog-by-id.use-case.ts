@@ -1,4 +1,3 @@
-import { UpdateBBlogsDto } from '../../dto/update-blogger-blogs.dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
@@ -6,11 +5,12 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { UpdateBloggerBlogsDto } from '../../dto/update-blogger-blogs.dto';
 
 export class UpdateBlogByIdCommand {
   constructor(
     public id: string,
-    public updateBlogDto: UpdateBBlogsDto,
+    public updateBlogDto: UpdateBloggerBlogsDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }

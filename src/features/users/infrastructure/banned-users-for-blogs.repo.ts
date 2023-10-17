@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { BannedUsersForBlogsEntity } from '../entities/banned-users-for-blogs.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { BannedUsersEntityAndCountDto } from '../../blogger-blogs/dto/banned-users-count-banned-users.dto';
+import { BannedUsersEntityAndCountDto } from '../../blogger-blogs/dto/banned-users-entity-and-count.dto';
 import { UsersEntity } from '../entities/users.entity';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
