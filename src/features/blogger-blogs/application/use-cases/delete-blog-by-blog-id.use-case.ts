@@ -5,7 +5,6 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { IdDto } from '../../../../ability/dto/id.dto';
-import { BloggerBlogsRawSqlRepository } from '../../infrastructure/blogger-blogs-raw-sql.repository';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 
@@ -20,7 +19,6 @@ export class DeleteBlogByBlogIdUseCase
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
-    private readonly bloggerBlogsRawSqlRepository: BloggerBlogsRawSqlRepository,
   ) {}
   async execute(command: DeleteBlogByBlogIdCommand): Promise<boolean> {
     const { blogId, currentUserDto } = command;
@@ -34,7 +32,7 @@ export class DeleteBlogByBlogIdUseCase
       blogToRemove.blogOwner.userId,
     );
 
-    return await this.bloggerBlogsRawSqlRepository.deleteBlogByBlogId(blogId);
+    return await this.bloggerBlogsRepo.saDeleteBlogDataById(blogId);
   }
 
   private async checkUserPermission(
