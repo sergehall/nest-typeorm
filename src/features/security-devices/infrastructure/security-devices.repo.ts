@@ -145,6 +145,32 @@ export class SecurityDevicesRepo {
     }
   }
 
+  async deleteDevicesExceptCurrent(
+    currentPayload: PayloadDto,
+  ): Promise<boolean> {
+    try {
+      const deletedResult = await this.securityDevicesRepository
+        .createQueryBuilder()
+        .delete()
+        .from(SecurityDevicesEntity)
+        .where('"userId" = :userId AND "deviceId" <> :deviceId', {
+          userId: currentPayload.userId,
+          deviceId: currentPayload.deviceId,
+        })
+        .execute();
+
+      // Check if any records were deleted (affected > 0)
+      if (deletedResult && deletedResult.affected) {
+        return deletedResult.affected > 0;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async createSecurityDevice(
     newPayload: PayloadDto,
     clientIp: string,
