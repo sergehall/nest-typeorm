@@ -1,4 +1,4 @@
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GameViewModel } from '../../view-models/game.view-model';
 import { ForbiddenException } from '@nestjs/common';

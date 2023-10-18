@@ -7,7 +7,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../dto/currentUser.dto';
+import { CurrentUserDto } from '../../dto/current-user.dto';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
 
@@ -27,7 +27,7 @@ export class RemoveUserByIdUseCase
     const { id, currentUserDto } = command;
 
     const userToDelete: UsersEntity | null =
-      await this.usersRepo.findUserByUserId(command.id);
+      await this.usersRepo.findNotBannedUserById(command.id);
     if (!userToDelete) throw new NotFoundException('Not found user.');
 
     try {

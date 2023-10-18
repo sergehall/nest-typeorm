@@ -6,7 +6,6 @@ import { SaController } from './api/sa.controller';
 import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
-import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
@@ -15,7 +14,6 @@ import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
 import { SaBindBlogWithUserByIdUseCase } from './application/use-cases/sa-bind-blog-with-user-by-id.use-case';
 import { SaBanUnbanBlogUseCase } from './application/use-cases/sa-ban-unban-blog-for-user.use-case';
-import { SentCodeLogRepository } from '../../mails/infrastructure/sent-code-log.repository';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -83,21 +81,19 @@ const helpers = [KeyResolver, UuidErrorResolver];
   controllers: [SaController],
   providers: [
     SaCreateSuperAdmin,
+    EncryptConfig,
     ParseQueriesService,
     SaService,
     UsersService,
     BloggerBlogsService,
-    EncryptConfig,
     UsersRepo,
-    SentCodeLogRepository,
     PostsRepo,
-    UsersRawSqlRepository,
-    ExpirationDateCalculator,
-    BloggerBlogsRepo,
-    BannedUsersForBlogsRepo,
     GamePairsRepo,
+    BloggerBlogsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
+    BannedUsersForBlogsRepo,
+    ExpirationDateCalculator,
     ...helpers,
     ...saUseCases,
   ],

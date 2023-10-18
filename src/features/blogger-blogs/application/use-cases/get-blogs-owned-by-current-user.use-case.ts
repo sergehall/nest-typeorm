@@ -1,5 +1,5 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';

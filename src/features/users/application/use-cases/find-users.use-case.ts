@@ -2,6 +2,7 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { UsersRepo } from '../../infrastructure/users-repo';
+import { UsersEntity } from '../../entities/users.entity';
 
 export class FindUsersCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -13,7 +14,7 @@ export class FindUsersUseCase implements ICommandHandler<FindUsersCommand> {
   async execute(command: FindUsersCommand): Promise<PaginatedResultDto> {
     const { queryData } = command;
 
-    const users = await this.usersRepo.findUsers(queryData);
+    const users: UsersEntity[] = await this.usersRepo.findUsers(queryData);
 
     const totalCount = await this.usersRepo.totalCountUsers(queryData);
 

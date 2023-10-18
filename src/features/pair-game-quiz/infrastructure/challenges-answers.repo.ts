@@ -3,7 +3,7 @@ import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { Repository } from 'typeorm';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';

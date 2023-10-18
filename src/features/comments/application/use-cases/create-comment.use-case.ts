@@ -1,12 +1,13 @@
 import { CreateCommentDto } from '../../dto/create-comment.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 import { CommentViewModel } from '../../view-models/comment.view-model';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
+import { PostsEntity } from '../../../posts/entities/posts.entity';
 
 export class CreateCommentCommand {
   constructor(
@@ -27,8 +28,10 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<CommentViewModel> {
     const { postId, createCommentDto, currentUserDto } = command;
 
-    const post = await this.postsRepo.getPostByIdWithoutLikes(postId);
-    if (!post) throw new NotFoundException('Not found post.');
+    const post: PostsEntity | null =
+      await this.postsRepo.getPostByIdWithoutLikes(postId);
+
+    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkUserPermission(currentUserDto.userId, post.blog.id);
 

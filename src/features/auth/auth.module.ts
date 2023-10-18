@@ -19,8 +19,6 @@ import { SignRefreshJwtUseCase } from './application/use-cases/sign-refresh-jwt.
 import { UpdateRefreshJwtUseCase } from './application/use-cases/update-refresh-jwt.use-case';
 import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.use-case';
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
-import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BlacklistJwtRawSqlRepository } from './infrastructure/blacklist-jwt-raw-sql.repository';
 import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
@@ -92,16 +90,14 @@ const helpers = [KeyResolver, UuidErrorResolver];
     AuthService,
     EncryptConfig,
     MailsService,
-    UsersRepo,
     DecodeTokenService,
-    UsersRawSqlRepository,
     SecurityDevicesService,
-    ExpirationDateCalculator,
-    InvalidJwtRepo,
-    BlacklistJwtRawSqlRepository,
+    UsersRepo,
     GamePairsRepo,
+    InvalidJwtRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
+    ExpirationDateCalculator,
     ...helpers,
     ...authUseCases,
   ],

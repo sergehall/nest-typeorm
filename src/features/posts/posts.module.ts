@@ -11,8 +11,6 @@ import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreatePostUseCase } from './application/use-cases/create-post.use-case';
 import { ChangeLikeStatusPostUseCase } from './application/use-cases/change-likeStatus-post.use-case';
-import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { DeletePostByIdUseCase } from './application/use-cases/delete-post-by-id.use-case';
@@ -77,29 +75,27 @@ const postsUseCases = [
   controllers: [PostsController],
   providers: [
     SaCreateSuperAdmin,
-    ExpirationDateCalculator,
     EncryptConfig,
     JwtConfig,
     AuthService,
     JwtService,
     PostsService,
-    KeyResolver,
-    UuidErrorResolver,
-    CommentsService,
     UsersService,
+    CommentsService,
     ParseQueriesService,
     BloggerBlogsService,
     UsersRepo,
-    UsersRawSqlRepository,
-    BannedUsersForBlogsRepo,
     PostsRepo,
-    BloggerBlogsRepo,
-    LikeStatusPostsRepo,
-    BlacklistJwtRawSqlRepository,
-    InvalidJwtRepo,
     GamePairsRepo,
+    InvalidJwtRepo,
+    BloggerBlogsRepo,
     GameQuestionsRepo,
+    LikeStatusPostsRepo,
+    BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,
+    KeyResolver,
+    UuidErrorResolver,
+    ExpirationDateCalculator,
     ...postsUseCases,
   ],
 })

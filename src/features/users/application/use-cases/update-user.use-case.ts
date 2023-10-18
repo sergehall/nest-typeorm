@@ -4,7 +4,7 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../dto/currentUser.dto';
+import { CurrentUserDto } from '../../dto/current-user.dto';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
 
@@ -25,7 +25,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
     const { userId, updateUserDto, currentUserDto } = command;
 
     const userToUpdate: UsersEntity | null =
-      await this.usersRepo.findUserByUserId(userId);
+      await this.usersRepo.findNotBannedUserById(userId);
 
     if (!userToUpdate) {
       throw new NotFoundException(`User with ID ${userId} not found`);

@@ -22,7 +22,7 @@ import { CreateUserCommand } from '../../users/application/use-cases/create-user
 import { IdParams } from '../../../common/query/params/id.params';
 import { SaBanUserDto } from '../dto/sa-ban-user..dto';
 import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -47,11 +47,11 @@ import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SaUpdatePostsByPostIdCommand } from '../application/use-cases/sa-update-post.use-case';
 import { SaDeletePostByPostIdCommand } from '../application/use-cases/sa-delete-post-by-post-id.use-case';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
-import { ReturnUserDto } from '../../users/dto/return-user.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-case';
 import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
+import { UserViewModel } from '../../users/view-models/user.view-model';
 
 @SkipThrottle()
 @Controller('sa')
@@ -103,7 +103,7 @@ export class SaController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<ReturnUserDto> {
+  ): Promise<UserViewModel> {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );

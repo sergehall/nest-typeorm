@@ -9,7 +9,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
-import { UsersRawSqlRepository } from './infrastructure/users-raw-sql.repository';
 import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
@@ -60,19 +59,18 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [UsersController],
   providers: [
+    JwtConfig,
+    EncryptConfig,
     ParseQueriesService,
     SaCreateSuperAdmin,
     UsersService,
-    JwtConfig,
-    UsersRawSqlRepository,
     UsersRepo,
     AuthService,
     JwtService,
-    EncryptConfig,
-    ExpirationDateCalculator,
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
+    ExpirationDateCalculator,
     ...helpers,
     ...usersValidators,
     ...usersUseCases,

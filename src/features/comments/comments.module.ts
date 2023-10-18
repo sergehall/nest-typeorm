@@ -10,8 +10,6 @@ import { JwtConfig } from '../../config/jwt/jwt-config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
-import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
-import { BlacklistJwtRawSqlRepository } from '../auth/infrastructure/blacklist-jwt-raw-sql.repository';
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
@@ -77,16 +75,14 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PostsService,
     AuthService,
     UsersService,
-    UsersRepo,
-    UsersRawSqlRepository,
-    PostsRepo,
-    BannedUsersForBlogsRepo,
     CommentsRepo,
-    LikeStatusCommentsRepo,
-    BlacklistJwtRawSqlRepository,
+    UsersRepo,
+    PostsRepo,
     InvalidJwtRepo,
     GamePairsRepo,
     GameQuestionsRepo,
+    LikeStatusCommentsRepo,
+    BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,
     ...helpers,
     ...commentsUseCases,

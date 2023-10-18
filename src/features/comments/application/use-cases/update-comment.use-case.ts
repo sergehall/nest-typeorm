@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { IdDto } from '../../../../ability/dto/id.dto';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 

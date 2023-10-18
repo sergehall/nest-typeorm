@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { CommentsEntity } from '../../entities/comments.entity';
 import { LikeStatusCommentsRepo } from '../../infrastructure/like-status-comments.repo';

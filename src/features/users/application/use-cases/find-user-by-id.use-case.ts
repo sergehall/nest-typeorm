@@ -16,7 +16,7 @@ export class FindUserByIdUseCase
   async execute(command: FindUserByICommand): Promise<UsersEntity> {
     const { userId } = command;
 
-    const user: UsersEntity | null = await this.usersRepo.findUserByUserId(
+    const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(
       userId,
     );
 

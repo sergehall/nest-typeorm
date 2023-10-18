@@ -4,7 +4,7 @@ import { LikeStatusDto } from '../dto/like-status.dto';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import * as uuid4 from 'uuid4';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { PostsEntity } from '../entities/posts.entity';

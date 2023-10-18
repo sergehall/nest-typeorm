@@ -1,4 +1,4 @@
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { IdUserIdParams } from '../../../../common/query/params/id-userId.params';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -69,7 +69,7 @@ export class SaBindBlogWithUserUseCase
 
   private async getBlogForBind(blogId: string): Promise<BloggerBlogsEntity> {
     const blogForBind: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+      await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
     if (!blogForBind) {
       throw new NotFoundException('Not found blog.');
     }

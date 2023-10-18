@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { ReturnUsersDto } from '../../dto/return-users.dto';
+import { UserViewModel } from '../../../users/view-models/user.view-model';
 
 export class SaFindUsersCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -35,7 +35,7 @@ export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
 
   private async transformedArrUsers(
     usersArr: UsersEntity[],
-  ): Promise<ReturnUsersDto[]> {
+  ): Promise<UserViewModel[]> {
     return usersArr.map((user: UsersEntity) => ({
       id: user.userId,
       login: user.login,

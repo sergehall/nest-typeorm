@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { PairGameQuizService } from '../application/pair-game-quiz.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { StartGameCommand } from '../application/use-cases/start-game.use-case';
 import { MyCurrentGameCommand } from '../application/use-cases/my-current-game.use-case';

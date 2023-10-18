@@ -1,6 +1,6 @@
 import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
 import { UpdatePostDto } from '../../dto/update-post.dto';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import {
@@ -38,7 +38,7 @@ export class UpdatePostByPostIdUseCase
     const { blogId, postId } = params;
 
     const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+      await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
 
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
