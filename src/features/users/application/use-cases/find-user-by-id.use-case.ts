@@ -16,7 +16,9 @@ export class FindUserByIdUseCase
   async execute(command: FindUserByICommand): Promise<UsersEntity> {
     const { userId } = command;
 
-    const user: UsersEntity | null = await this.usersRepo.findUserById(userId);
+    const user: UsersEntity | null = await this.usersRepo.findUserByUserId(
+      userId,
+    );
 
     if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 

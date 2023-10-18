@@ -5,6 +5,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class SaDeleteUserByUserIdCommand {
   constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
@@ -20,7 +21,8 @@ export class SaDeleteUserByUserIdUseCase
   async execute(command: SaDeleteUserByUserIdCommand): Promise<boolean> {
     const { userId, currentUserDto } = command;
 
-    const userToRemove = await this.usersRepo.findUserById(userId);
+    const userToRemove: UsersEntity | null =
+      await this.usersRepo.findUserByUserId(userId);
 
     if (!userToRemove)
       throw new NotFoundException(`User with ID ${userId} not found`);

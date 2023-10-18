@@ -11,9 +11,9 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
 import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
-import { TablesUsersWithIdEntity } from '../../../users/entities/tables-user-with-id.entity';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class SaBanUnbanUserCommand {
   constructor(
@@ -43,8 +43,9 @@ export class SaBanUnbanUserUseCase
       );
     }
 
-    const userToBan: TablesUsersWithIdEntity | null =
-      await this.usersRepo.findUserById(userId);
+    const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(
+      userId,
+    );
     if (!userToBan)
       throw new NotFoundException(`User with ID ${userId} not found`);
 
@@ -62,7 +63,7 @@ export class SaBanUnbanUserUseCase
 
   private async checkUserPermission(
     currentUserDto: CurrentUserDto,
-    userToBan: TablesUsersWithIdEntity,
+    userToBan: UsersEntity,
   ) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {

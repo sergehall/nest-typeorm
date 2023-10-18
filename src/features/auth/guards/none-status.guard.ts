@@ -4,6 +4,7 @@ import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt
 import { PayloadDto } from '../dto/payload.dto';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
 import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @Injectable()
 export class NoneStatusGuard implements CanActivate {
@@ -26,7 +27,9 @@ export class NoneStatusGuard implements CanActivate {
         await this.invalidJwtRepo.JwtExistInBlackList(accessToken);
 
       if (payload && !jwtExistInBlackList) {
-        const user = await this.usersRepo.findUserById(payload.userId);
+        const user: UsersEntity | null = await this.usersRepo.findUserByUserId(
+          payload.userId,
+        );
 
         request.user =
           user && !user.isBanned
