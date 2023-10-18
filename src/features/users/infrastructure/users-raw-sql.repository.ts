@@ -113,24 +113,24 @@ export class UsersRawSqlRepository {
   //   }
   // }
 
-  async isConfirmedUserByCode2(confirmationCode: string): Promise<boolean> {
-    const isConfirmed = true;
-    const isConfirmedDate = new Date().toISOString();
-    try {
-      const user = await this.db.query(
-        `
-      UPDATE public."Users"
-      SET  "isConfirmed" = $2, "isConfirmedDate" = $3
-      WHERE "confirmationCode" = $1
-      `,
-        [confirmationCode, isConfirmed, isConfirmedDate],
-      );
-      return user[1] === 1;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
+  // async isConfirmedUserByCode(confirmationCode: string): Promise<boolean> {
+  //   const isConfirmed = true;
+  //   const isConfirmedDate = new Date().toISOString();
+  //   try {
+  //     const user = await this.db.query(
+  //       `
+  //     UPDATE public."Users"
+  //     SET  "isConfirmed" = $2, "isConfirmedDate" = $3
+  //     WHERE "confirmationCode" = $1
+  //     `,
+  //       [confirmationCode, isConfirmed, isConfirmedDate],
+  //     );
+  //     return user[1] === 1;
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async updateUserPasswordHashByRecoveryCode(
     recoveryCode: string,
