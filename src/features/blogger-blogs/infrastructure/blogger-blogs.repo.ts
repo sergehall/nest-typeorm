@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -178,6 +178,29 @@ export class BloggerBlogsRepo {
   }
 
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder('blog') // Start building a query
+      .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
+      .where('blog.id = :blogId', { blogId });
+
+    try {
+      const blog = await queryBuilder.getOne(); // Execute the query and get a single result
+
+      return blog || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findNotBannedBlogById(
+    blogId: string,
+  ): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
     const banInfoIsBanned = false;
 
@@ -355,7 +378,7 @@ export class BloggerBlogsRepo {
     const connection = this.bloggerBlogsRepository.manager.connection;
     const queryRunner = connection.createQueryRunner();
     await queryRunner.connect();
-
+    console.log(userForBind.userId);
     try {
       await queryRunner.startTransaction();
 
@@ -363,8 +386,7 @@ export class BloggerBlogsRepo {
       await connection.manager.update(
         CommentsEntity,
         {
-          blog: blogForBind.id,
-          blogOwner: userForBind.userId,
+          blog: blogForBind,
         },
         { blogOwner: userForBind },
       );
@@ -372,7 +394,9 @@ export class BloggerBlogsRepo {
       // Update Posts table
       await connection.manager.update(
         PostsEntity,
-        { blog: blogForBind.id },
+        {
+          blog: blogForBind,
+        },
         { postOwner: userForBind },
       );
 
@@ -401,7 +425,7 @@ export class BloggerBlogsRepo {
     }
   }
 
-  async saBanUnbanBlog(
+  async saManageBlogAccess(
     blog: BloggerBlogsEntity,
     saBanBlogDto: SaBanBlogDto,
   ): Promise<boolean> {
@@ -454,7 +478,7 @@ export class BloggerBlogsRepo {
 
       if (isBanned) {
         console.log(
-          `Blog Locked 🔒. The blog with ID ${blog.id} has been locked for the user. Access to the blog and its content has been restricted as per the defined policies or circumstances. Thank you for your understanding.`,
+          `Blog Locked 🔒. The blog with ID ${blog.id} has been locked for the users. Access to the blog and its content has been restricted as per the defined policies or circumstances. Thank you for your understanding.`,
         );
       } else {
         // Successful Blog Unlock Message

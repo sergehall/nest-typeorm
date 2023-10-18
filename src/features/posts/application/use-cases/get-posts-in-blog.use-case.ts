@@ -1,5 +1,5 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';

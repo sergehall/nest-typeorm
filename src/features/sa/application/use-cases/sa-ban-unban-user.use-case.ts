@@ -9,7 +9,7 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { BanInfoDto } from '../../../users/dto/banInfo.dto';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
@@ -46,6 +46,7 @@ export class SaBanUnbanUserUseCase
     const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(
       userId,
     );
+
     if (!userToBan)
       throw new NotFoundException(`User with ID ${userId} not found`);
 

@@ -78,7 +78,7 @@ export class BannedUsersForBlogsRepo {
         )
         .leftJoinAndSelect('banned_users.bannedBlog', 'bannedBlog')
         .where('bannedUserForBlogs.userId = :userId', { userId })
-        .andWhere('bannedBlog.blogId = :blogId', { blogId })
+        .andWhere('bannedBlog.id = :blogId', { blogId })
         .getOne();
 
       // Check if the user is found

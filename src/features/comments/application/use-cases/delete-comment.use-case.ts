@@ -7,7 +7,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { IdDto } from '../../../../ability/dto/id.dto';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 

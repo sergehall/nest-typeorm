@@ -24,7 +24,7 @@ import { RegistrationUserCommand } from '../application/use-cases/registration-u
 import { UpdateSentConfirmationCodeCommand } from '../../users/application/use-cases/update-sent-confirmation-code.use-case';
 import { AccessTokenDto } from '../dto/access-token.dto';
 import { NewPasswordRecoveryDto } from '../dto/new-password-recovery.dto';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ConfirmUserByCodeCommand } from '../application/use-cases/confirm-user-by-code.use-case';
 import { ChangePasswordByRecoveryCodeCommand } from '../application/use-cases/change-password-by-recovery-code.use-case';
 import { PasswordRecoveryCommand } from '../application/use-cases/password-recovery.use-case';

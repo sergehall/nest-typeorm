@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 import { AccessTokenDto } from '../../dto/access-token.dto';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 
 export class SignAccessJwtUseCommand {
   constructor(public currentUserDto: CurrentUserDto) {}

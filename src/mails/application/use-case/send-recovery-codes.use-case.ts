@@ -1,9 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailSendingCommand } from './email-sending-use-case';
-import { SentCodeLogRepository } from '../../infrastructure/sent-code-log.repository';
 import { ConfirmationCodeEmailOptions } from '../dto/confirmation-code-email-options';
 import { MailOptionsBuilder } from '../../mail-options/mail-options-builder';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
+import { SentCodeLogRepo } from '../../infrastructure/sent-code-log.repo';
 
 export class SendRecoveryCodesCommand {
   constructor(public updatedUser: UsersEntity) {}
@@ -16,7 +16,7 @@ export class SendRecoveryCodesUseCase
   constructor(
     protected commandBus: CommandBus,
     protected mailOptionsBuilder: MailOptionsBuilder,
-    protected sentCodeLogRepository: SentCodeLogRepository,
+    protected sentCodeLogRepo: SentCodeLogRepo,
   ) {}
 
   async execute(command: SendRecoveryCodesCommand): Promise<boolean> {
@@ -31,7 +31,7 @@ export class SendRecoveryCodesUseCase
 
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 
-    await this.sentCodeLogRepository.addTime(updatedUser);
+    await this.sentCodeLogRepo.addTime(updatedUser);
     return true;
   }
 }

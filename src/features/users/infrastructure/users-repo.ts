@@ -115,6 +115,25 @@ export class UsersRepo {
       const user = await this.usersRepository.findOne({
         where: {
           userId: userId,
+        },
+      });
+      return user || null;
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findNotBannedUserById(userId: string): Promise<UsersEntity | null> {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: {
+          userId: userId,
           isBanned: false, // Assuming you want to exclude banned users
         },
       });
@@ -207,7 +226,7 @@ export class UsersRepo {
             .createQueryBuilder()
             .update('Comments')
             .set({ dependencyIsBanned: isBanned })
-            .where('commentatorInfoUserId = :userId', { userId })
+            .where('commentator.userId = :userId', { userId })
             .execute();
           await transactionalEntityManager
             .createQueryBuilder()

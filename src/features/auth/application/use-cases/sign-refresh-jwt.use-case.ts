@@ -2,7 +2,7 @@ import * as uuid4 from 'uuid4';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { JwtConfig } from '../../../../config/jwt/jwt-config';
 
 export class SignRefreshJwtCommand {

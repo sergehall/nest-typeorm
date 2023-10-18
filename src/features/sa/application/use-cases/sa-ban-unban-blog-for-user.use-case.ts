@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Action } from '../../../../ability/roles/action.enum';
 import { ForbiddenError } from '@casl/ability';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { cannotBlockOwnBlog } from '../../../../common/filters/custom-errors-messages';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
@@ -44,13 +44,17 @@ export class SaBanUnbanBlogUseCase
 
     await this.checkUserPermission(currentUserDto, blogForBan.blogOwner.userId);
 
-    return await this.bloggerBlogsRepo.saBanUnbanBlog(blogForBan, saBanBlogDto);
+    return await this.bloggerBlogsRepo.saManageBlogAccess(
+      blogForBan,
+      saBanBlogDto,
+    );
   }
 
   private async saGetBlogForBan(blogId: string): Promise<BloggerBlogsEntity> {
     const blogForBan: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findBlogById(blogId);
-    if (!blogForBan) throw new NotFoundException('Not found blog.');
+    if (!blogForBan)
+      throw new NotFoundException(`Blog with ID ${blogId} not found`);
     return blogForBan;
   }
 

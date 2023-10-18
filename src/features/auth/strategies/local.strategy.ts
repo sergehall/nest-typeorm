@@ -10,7 +10,7 @@ import {
   validatePasswordFailed,
 } from '../../../common/filters/custom-errors-messages';
 import { CustomErrorsMessagesType } from '../../../common/filters/types/custom-errors-messages.types';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {

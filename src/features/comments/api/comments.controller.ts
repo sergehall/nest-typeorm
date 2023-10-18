@@ -23,7 +23,7 @@ import { UpdateCommentCommand } from '../application/use-cases/update-comment.us
 import { DeleteCommentCommand } from '../application/use-cases/delete-comment.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { CommentIdParams } from '../../../common/query/params/commentId.params';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommentViewModel } from '../view-models/comment.view-model';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';

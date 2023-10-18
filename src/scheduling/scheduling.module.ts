@@ -4,11 +4,9 @@ import { MailsModule } from '../mails/mails.module';
 import { UsersService } from '../features/users/application/users.service';
 import { CaslModule } from '../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../features/users/infrastructure/users-raw-sql.repository';
 import { MailerConfig } from '../config/mailer/mailer-config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
-import { SentCodeLogRepository } from '../mails/infrastructure/sent-code-log.repository';
 import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
 import { KeyResolver } from '../common/helpers/key-resolver';
 import { UsersRepo } from '../features/users/infrastructure/users-repo';
@@ -47,16 +45,14 @@ const helpers = [KeyResolver, UuidErrorResolver];
     MailerConfig,
     MailOptionsBuilder,
     PostgresConfig,
-    ScheduledTasksService,
     UsersService,
     DataCleanupService,
+    ScheduledTasksService,
     UsersRepo,
-    UsersRawSqlRepository,
-    InvalidJwtRepo,
-    SecurityDevicesRepo,
-    SentCodeLogRepository,
     GamePairsRepo,
+    InvalidJwtRepo,
     GameQuestionsRepo,
+    SecurityDevicesRepo,
     ChallengesQuestionsRepo,
     ...helpers,
   ],

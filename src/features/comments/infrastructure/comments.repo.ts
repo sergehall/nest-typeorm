@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';

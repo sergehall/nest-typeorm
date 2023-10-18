@@ -1,7 +1,7 @@
 import { LikeStatusDto } from '../../../comments/dto/like-status.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { PostsRepo } from '../../infrastructure/posts-repo';

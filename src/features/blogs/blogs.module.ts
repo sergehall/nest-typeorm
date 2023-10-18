@@ -7,7 +7,6 @@ import { PostsService } from '../posts/application/posts.service';
 import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../users/infrastructure/users-raw-sql.repository';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { SearchBlogsUseCase } from './application/use-cases/search-blogs.use-case';
@@ -50,16 +49,15 @@ const helpers = [KeyResolver, UuidErrorResolver];
   controllers: [BlogsController],
   providers: [
     AuthService,
-    ParseQueriesService,
     UsersService,
     BlogsService,
     PostsService,
+    ParseQueriesService,
     BloggerBlogsService,
     UsersRepo,
-    UsersRawSqlRepository,
-    BloggerBlogsRepo,
-    InvalidJwtRepo,
     GamePairsRepo,
+    InvalidJwtRepo,
+    BloggerBlogsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,

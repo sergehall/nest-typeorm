@@ -1,4 +1,4 @@
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { GameSummaryViewModel } from '../../view-models/game-summary.view-model';

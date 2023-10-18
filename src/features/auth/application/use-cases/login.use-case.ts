@@ -3,7 +3,7 @@ import { DecodeTokenService } from '../../../../config/jwt/decode.service/decode
 import { PayloadDto } from '../../dto/payload.dto';
 import { SignRefreshJwtCommand } from './sign-refresh-jwt.use-case';
 import { CreateDeviceCommand } from '../../../security-devices/application/use-cases/create-device.use-case';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { Response } from 'express';
 import { SignAccessJwtUseCommand } from './sign-access-jwt.use-case';
 import { AccessTokenDto } from '../../dto/access-token.dto';

@@ -7,7 +7,7 @@ import {
 } from '@casl/ability';
 import { Action } from './roles/action.enum';
 import { IdDto } from './dto/id.dto';
-import { CurrentUserDto } from '../features/users/dto/currentUser.dto';
+import { CurrentUserDto } from '../features/users/dto/current-user.dto';
 import { UserRolesEnums } from './enums/user-roles.enums';
 
 type AppAbility = PureAbility<AbilityTuple, MatchConditions>;

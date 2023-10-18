@@ -23,7 +23,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { CreatePostCommand } from '../application/use-cases/create-post.use-case';
 import { ChangeLikeStatusPostCommand } from '../application/use-cases/change-likeStatus-post.use-case';
 import { PostIdParams } from '../../../common/query/params/postId.params';

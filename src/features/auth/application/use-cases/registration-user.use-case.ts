@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { MailsService } from '../../../../mails/application/mails.service';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { ReturnUserDto } from '../../../users/dto/return-user.dto';
+import { UserViewModel } from '../../../users/view-models/user.view-model';
 
 export class RegistrationUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -17,7 +17,7 @@ export class RegistrationUserUseCase
     protected mailsService: MailsService,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: RegistrationUserCommand): Promise<ReturnUserDto> {
+  async execute(command: RegistrationUserCommand): Promise<UserViewModel> {
     const { createUserDto } = command;
 
     const newUser: UsersEntity = await this.commandBus.execute(

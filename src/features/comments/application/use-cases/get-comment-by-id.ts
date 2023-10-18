@@ -1,5 +1,5 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/currentUser.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommentViewModel } from '../../view-models/comment.view-model';
 import { NotFoundException } from '@nestjs/common';
 import { CommentsRepo } from '../../infrastructure/comments.repo';

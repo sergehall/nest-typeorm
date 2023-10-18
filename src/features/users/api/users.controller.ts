@@ -24,16 +24,15 @@ import { CreateUserCommand } from '../application/use-cases/create-user.use-case
 import { UpdateUserCommand } from '../application/use-cases/update-user.use-case';
 import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
-import { CurrentUserDto } from '../dto/currentUser.dto';
+import { CurrentUserDto } from '../dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { TablesUsersWithIdEntity } from '../entities/tables-user-with-id.entity';
-import { ReturnUserDto } from '../dto/return-user.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
 import { UsersEntity } from '../entities/users.entity';
 import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
+import { UserViewModel } from '../view-models/user.view-model';
 
 @SkipThrottle()
 @Controller('users')
@@ -58,9 +57,7 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUserByUserId(
-    @Param() params: IdParams,
-  ): Promise<TablesUsersWithIdEntity> {
+  async findUserByUserId(@Param() params: IdParams): Promise<UsersEntity> {
     return await this.commandBus.execute(new FindUserByICommand(params.id));
   }
 
@@ -70,7 +67,7 @@ export class UsersController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async createUser(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<ReturnUserDto> {
+  ): Promise<UserViewModel> {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
