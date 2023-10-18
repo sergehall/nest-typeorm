@@ -145,6 +145,26 @@ export class UsersRepo {
     }
   }
 
+  async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
+    try {
+      const currentTime = new Date().toISOString();
+
+      const user = await this.usersRepository.findOne({
+        select: ['userId'],
+        where: {
+          confirmationCode: confirmationCode,
+          isConfirmed: false,
+          expirationDate: MoreThan(currentTime),
+        },
+      });
+
+      return !!user;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async loginOrEmailAlreadyExist(key: string): Promise<string | null> {
     try {
       const keyLowerCase = key.toLowerCase();
@@ -313,6 +333,25 @@ export class UsersRepo {
     }
   }
 
+  async updateUserPasswordHashByRecoveryCode(
+    recoveryCode: string,
+    newPasswordHash: string,
+  ): Promise<boolean> {
+    try {
+      const updateResult = await this.usersRepository
+        .createQueryBuilder()
+        .update(UsersEntity)
+        .set({ passwordHash: newPasswordHash })
+        .where('confirmationCode = :code', { code: recoveryCode })
+        .execute();
+
+      return updateResult.affected === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async updateUserRole(userId: string): Promise<UsersEntity | null> {
     const newRoles = [UserRolesEnums.SA];
 
@@ -375,26 +414,6 @@ export class UsersRepo {
       throw new InternalServerErrorException(
         `Error while removing data for users`,
       );
-    }
-  }
-
-  async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
-    try {
-      const currentTime = new Date().toISOString();
-
-      const user = await this.usersRepository.findOne({
-        select: ['userId'],
-        where: {
-          confirmationCode: confirmationCode,
-          isConfirmed: false,
-          expirationDate: MoreThan(currentTime),
-        },
-      });
-
-      return !!user;
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
     }
   }
 

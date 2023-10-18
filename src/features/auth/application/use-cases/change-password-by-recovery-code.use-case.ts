@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
 import { NewPasswordRecoveryDto } from '../../dto/new-password-recovery.dto';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class ChangePasswordByRecoveryCodeCommand {
   constructor(public newPasswordRecoveryDto: NewPasswordRecoveryDto) {}
@@ -12,7 +12,7 @@ export class ChangePasswordByRecoveryCodeUseCase
   implements ICommandHandler<ChangePasswordByRecoveryCodeCommand>
 {
   constructor(
-    protected usersRawSqlRepository: UsersRawSqlRepository,
+    protected usersRepo: UsersRepo,
     protected encryptConfig: EncryptConfig,
   ) {}
   async execute(
@@ -22,7 +22,7 @@ export class ChangePasswordByRecoveryCodeUseCase
 
     const passwordHash = await this.encryptConfig.getPasswordHash(newPassword);
 
-    return await this.usersRawSqlRepository.updateUserPasswordHashByRecoveryCode(
+    return await this.usersRepo.updateUserPasswordHashByRecoveryCode(
       recoveryCode,
       passwordHash,
     );
