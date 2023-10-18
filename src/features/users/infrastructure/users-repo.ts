@@ -467,19 +467,21 @@ export class UsersRepo {
         await this.gamePairsRepo.getAllGamesByUserIdForDelete(userId);
 
       const allGamesIds = allGames.map((game) => game.id);
-
-      await Promise.all([
+      console.log(allGamesIds);
+      if (allGames.length > 0) {
         await transactionalEntityManager
-          .createQueryBuilder()
-          .delete()
-          .from('ChallengeAnswers')
-          .where('answerOwnerId = :userId', { userId })
-          .execute(),
-        transactionalEntityManager
           .createQueryBuilder()
           .delete()
           .from('challengeQuestions')
           .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
+          .execute();
+      }
+      await Promise.all([
+        transactionalEntityManager
+          .createQueryBuilder()
+          .delete()
+          .from('ChallengeAnswers')
+          .where('answerOwnerId = :userId', { userId })
           .execute(),
         transactionalEntityManager.delete('SecurityDevices', { user: userId }),
         transactionalEntityManager.delete('BannedUsersForBlogs', {
