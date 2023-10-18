@@ -5,12 +5,12 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../dto/currentUser.dto';
-import { UsersRawSqlRepository } from '../../infrastructure/users-raw-sql.repository';
-import { TablesUsersWithIdEntity } from '../../entities/tables-user-with-id.entity';
+import { UsersRepo } from '../../infrastructure/users-repo';
+import { UsersEntity } from '../../entities/users.entity';
 
 export class UpdateUserCommand {
   constructor(
-    public id: string,
+    public userId: string,
     public updateUserDto: UpdateUserDto,
     public currentUserDto: CurrentUserDto,
   ) {}
@@ -19,26 +19,26 @@ export class UpdateUserCommand {
 export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected usersRawSqlRepository: UsersRawSqlRepository,
+    protected usersRepo: UsersRepo,
   ) {}
   async execute(command: UpdateUserCommand): Promise<boolean> {
-    const { id, updateUserDto, currentUserDto } = command;
+    const { userId, updateUserDto, currentUserDto } = command;
 
-    const userToUpdate: TablesUsersWithIdEntity | null =
-      await this.usersRawSqlRepository.findUserByUserId(id);
+    const userToUpdate: UsersEntity | null =
+      await this.usersRepo.findUserByUserId(userId);
 
     if (!userToUpdate) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
     await this.checkUserPermission(userToUpdate, currentUserDto);
 
     // Call DB  to update user
-    console.log(updateUserDto, `This action update a #${id} user`);
+    console.log(updateUserDto, `This action update a #${userId} user`);
     return true;
   }
   private async checkUserPermission(
-    userToUpdate: TablesUsersWithIdEntity,
+    userToUpdate: UsersEntity,
     currentUserDto: CurrentUserDto,
   ) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
