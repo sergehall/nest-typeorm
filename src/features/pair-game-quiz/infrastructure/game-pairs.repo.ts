@@ -360,6 +360,15 @@ export class GamePairsRepo {
     }
   }
 
+  async saveGame(game: PairsGameEntity): Promise<PairsGameEntity> {
+    try {
+      return await this.pairsGameQuizRepo.save(game);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async addSecondPlayerAndStarGame(
     pairGameQuiz: PairsGameEntity,
     currentUserDto: CurrentUserDto,
