@@ -41,77 +41,79 @@ export class UsersRawSqlRepository {
   //   }
   // }
 
-  async createUser(
-    tablesUsersEntity: TablesUsersEntity,
-  ): Promise<TablesUsersWithIdEntity> {
-    try {
-      const query = `
-        INSERT INTO public."Users" 
-        ( "login", "email", "passwordHash", "createdAt", "orgId", "roles", 
-          "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate", 
-          "isConfirmed", "isConfirmedDate")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-          RETURNING "userId" AS "id"
-          `;
+  // async createUser(
+  //   tablesUsersEntity: TablesUsersEntity,
+  // ): Promise<TablesUsersWithIdEntity> {
+  //   try {
+  //     const query = `
+  //       INSERT INTO public."Users"
+  //       ( "login", "email", "passwordHash", "createdAt", "orgId", "roles",
+  //         "isBanned", "banDate", "banReason", "confirmationCode", "expirationDate",
+  //         "isConfirmed", "isConfirmedDate")
+  //         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+  //         RETURNING "userId" AS "id"
+  //         `;
+  //
+  //     const parameters = [
+  //       tablesUsersEntity.login,
+  //       tablesUsersEntity.email,
+  //       tablesUsersEntity.passwordHash,
+  //       tablesUsersEntity.createdAt,
+  //       tablesUsersEntity.orgId,
+  //       tablesUsersEntity.roles,
+  //       tablesUsersEntity.isBanned,
+  //       tablesUsersEntity.banDate,
+  //       tablesUsersEntity.banReason,
+  //       tablesUsersEntity.confirmationCode,
+  //       tablesUsersEntity.expirationDate,
+  //       tablesUsersEntity.isConfirmed,
+  //       tablesUsersEntity.isConfirmedDate,
+  //     ];
+  //
+  //     const insertNewUser = await this.db.query(query, parameters);
+  //
+  //     // Because I delegated the creation of the user ID to the database itself.
+  //     return { userId: insertNewUser[0].userId, ...tablesUsersEntity };
+  //   } catch (error) {
+  //     if (
+  //       error.message.includes('duplicate key value violates unique constraint')
+  //     ) {
+  //       loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
+  //       throw new HttpException(
+  //         { message: [loginOrEmailAlreadyExists] },
+  //         HttpStatus.BAD_REQUEST,
+  //       );
+  //     }
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
-      const parameters = [
-        tablesUsersEntity.login,
-        tablesUsersEntity.email,
-        tablesUsersEntity.passwordHash,
-        tablesUsersEntity.createdAt,
-        tablesUsersEntity.orgId,
-        tablesUsersEntity.roles,
-        tablesUsersEntity.isBanned,
-        tablesUsersEntity.banDate,
-        tablesUsersEntity.banReason,
-        tablesUsersEntity.confirmationCode,
-        tablesUsersEntity.expirationDate,
-        tablesUsersEntity.isConfirmed,
-        tablesUsersEntity.isConfirmedDate,
-      ];
+  // async findUserByConfirmationCode(
+  //   confirmationCode: string,
+  // ): Promise<boolean> {
+  //   try {
+  //     const currentTime = new Date().toISOString();
+  //
+  //     const query = `
+  //       SELECT
+  //       "userId" AS "id", "login", "email", "passwordHash", "createdAt",
+  //       "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+  //       "expirationDate", "isConfirmed", "isConfirmedDate"
+  //       FROM public."Users"
+  //       WHERE "confirmationCode" = $1
+  //       AND "isConfirmed" = false
+  //       AND "expirationDate" > $2
+  //       `;
+  //
+  //     const user = await this.db.query(query, [confirmationCode, currentTime]);
+  //
+  //     return !!user[0];
+  //   } catch (error) {
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
-      const insertNewUser = await this.db.query(query, parameters);
-
-      // Because I delegated the creation of the user ID to the database itself.
-      return { userId: insertNewUser[0].userId, ...tablesUsersEntity };
-    } catch (error) {
-      if (
-        error.message.includes('duplicate key value violates unique constraint')
-      ) {
-        loginOrEmailAlreadyExists.field = error.message.match(/"(.*?)"/)[1];
-        throw new HttpException(
-          { message: [loginOrEmailAlreadyExists] },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
-    try {
-      const currentTime = new Date().toISOString();
-
-      const query = `
-        SELECT 
-        "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode", 
-        "expirationDate", "isConfirmed", "isConfirmedDate"
-        FROM public."Users"
-        WHERE "confirmationCode" = $1  
-        AND "isConfirmed" = false 
-        AND "expirationDate" > $2
-        `;
-
-      const user = await this.db.query(query, [confirmationCode, currentTime]);
-
-      return !!user[0];
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async isConfirmedUserByCode(confirmationCode: string): Promise<boolean> {
+  async isConfirmedUserByCode2(confirmationCode: string): Promise<boolean> {
     const isConfirmed = true;
     const isConfirmedDate = new Date().toISOString();
     try {

@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRawSqlRepository } from '../../../users/infrastructure/users-raw-sql.repository';
+import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class ConfirmUserByCodeCommand {
   constructor(public code: string) {}
@@ -9,12 +9,11 @@ export class ConfirmUserByCodeCommand {
 export class ConfirmUserByCodeUseCase
   implements ICommandHandler<ConfirmUserByCodeCommand>
 {
-  constructor(protected usersRawSqlRepository: UsersRawSqlRepository) {}
+  constructor(protected usersRepo: UsersRepo) {}
   async execute(command: ConfirmUserByCodeCommand): Promise<boolean> {
     const { code } = command;
 
-    const updateIsConfirmed =
-      await this.usersRawSqlRepository.isConfirmedUserByCode(code);
+    const updateIsConfirmed = await this.usersRepo.isConfirmedUserByCode(code);
     if (!updateIsConfirmed) {
       return false;
     }

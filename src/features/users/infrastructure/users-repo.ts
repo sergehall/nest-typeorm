@@ -1,5 +1,11 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, LessThan, Repository, UpdateResult } from 'typeorm';
+import {
+  EntityManager,
+  LessThan,
+  MoreThan,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import {
   HttpException,
   HttpStatus,
@@ -372,6 +378,48 @@ export class UsersRepo {
     }
   }
 
+  async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
+    try {
+      const currentTime = new Date().toISOString();
+
+      const user = await this.usersRepository.findOne({
+        select: ['userId'],
+        where: {
+          confirmationCode: confirmationCode,
+          isConfirmed: false,
+          expirationDate: MoreThan(currentTime),
+        },
+      });
+
+      return !!user;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async isConfirmedUserByCode(confirmationCode: string): Promise<boolean> {
+    try {
+      const isConfirmed = true;
+      const isConfirmedDate = new Date().toISOString();
+
+      const updateResult = await this.usersRepository
+        .createQueryBuilder()
+        .update(UsersEntity)
+        .set({
+          isConfirmed: isConfirmed,
+          isConfirmedDate: isConfirmedDate,
+        })
+        .where('confirmationCode = :code', { code: confirmationCode })
+        .execute();
+
+      return updateResult.raw.affectedRows === 1;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async deleteUserData(
     userId: string,
     transactionalEntityManager: EntityManager,
@@ -449,7 +497,7 @@ export class UsersRepo {
   ): Promise<UsersEntity> {
     const { login, email, passwordHash, expirationDate } = dto;
 
-    const user = new UsersEntity();
+    const user: UsersEntity = new UsersEntity();
     user.userId = uuid4();
     user.login = login.toLowerCase();
     user.email = email.toLowerCase();
