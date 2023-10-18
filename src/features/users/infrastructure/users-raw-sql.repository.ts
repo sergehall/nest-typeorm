@@ -19,47 +19,27 @@ export class UsersRawSqlRepository {
     protected keyResolver: KeyResolver,
   ) {}
 
-  async saFindUserByUserId(
-    userId: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
-    try {
-      const user = await this.db.query(
-        `
-      SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-      "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-      "expirationDate", "isConfirmed", "isConfirmedDate"
-      FROM public."Users"
-      WHERE "userId" = $1`,
-        [userId],
-      );
-      return user[0];
-    } catch (error) {
-      console.log(error.message);
-      return null;
-    }
-  }
-
-  async findUserByUserId(
-    userId: string,
-  ): Promise<TablesUsersWithIdEntity | null> {
-    const isBanned = false;
-    try {
-      const user = await this.db.query(
-        `
-        SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt", 
-        "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
-        "expirationDate", "isConfirmed", "isConfirmedDate"
-        FROM public."Users"
-        WHERE "userId" = $1 AND "isBanned" = $2
-      `,
-        [userId, isBanned],
-      );
-      return user[0];
-    } catch (error) {
-      console.log(error.message);
-      return null;
-    }
-  }
+  // async findUserByUserId(
+  //   userId: string,
+  // ): Promise<TablesUsersWithIdEntity | null> {
+  //   const isBanned = false;
+  //   try {
+  //     const user = await this.db.query(
+  //       `
+  //       SELECT "userId" AS "id", "login", "email", "passwordHash", "createdAt",
+  //       "orgId", "roles", "isBanned", "banDate", "banReason", "confirmationCode",
+  //       "expirationDate", "isConfirmed", "isConfirmedDate"
+  //       FROM public."Users"
+  //       WHERE "userId" = $1 AND "isBanned" = $2
+  //     `,
+  //       [userId, isBanned],
+  //     );
+  //     return user[0];
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     return null;
+  //   }
+  // }
 
   async createUser(
     tablesUsersEntity: TablesUsersEntity,

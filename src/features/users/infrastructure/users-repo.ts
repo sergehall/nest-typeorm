@@ -104,11 +104,15 @@ export class UsersRepo {
     }
   }
 
-  async findUserById(userId: string): Promise<UsersEntity | null> {
+  async findUserByUserId(userId: string): Promise<UsersEntity | null> {
     try {
-      const user = await this.usersRepository.findBy({ userId });
-
-      return user[0] ? user[0] : null;
+      const user = await this.usersRepository.findOne({
+        where: {
+          userId: userId,
+          isBanned: false, // Assuming you want to exclude banned users
+        },
+      });
+      return user || null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const userId = await this.uuidErrorResolver.extractUserIdFromError(

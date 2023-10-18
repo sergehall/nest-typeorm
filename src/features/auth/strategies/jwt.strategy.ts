@@ -5,6 +5,7 @@ import { PayloadDto } from '../dto/payload.dto';
 import { JwtConfig } from '../../../config/jwt/jwt-config';
 import { CurrentUserDto } from '../../users/dto/currentUser.dto';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,7 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: PayloadDto): Promise<CurrentUserDto | null> {
-    const user = await this.usersRepo.findUserById(payload.userId);
+    const user: UsersEntity | null = await this.usersRepo.findUserByUserId(
+      payload.userId,
+    );
     if (user && !user.isBanned) {
       return {
         userId: user.userId,

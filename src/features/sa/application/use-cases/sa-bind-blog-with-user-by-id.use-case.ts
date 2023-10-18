@@ -59,9 +59,8 @@ export class SaBindBlogWithUserByIdUseCase
   }
 
   private async getUserForBind(userId: string): Promise<UsersEntity> {
-    const userForBind: UsersEntity | null = await this.usersRepo.findUserById(
-      userId,
-    );
+    const userForBind: UsersEntity | null =
+      await this.usersRepo.findUserByUserId(userId);
     if (!userForBind) {
       throw new NotFoundException('Not found user.');
     }
