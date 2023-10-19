@@ -17,6 +17,7 @@ import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questio
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { AnswerViewModel } from '../../view-models/answer.view-model';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
+import { PlayerAnswersAllQuestionsCommand } from './player-answers-all-questions.use-case';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -40,24 +41,31 @@ export class SubmitAnswerForCurrentQuestionUseCase
   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
     const { answerDto, currentUserDto } = command;
 
-    const pairByUserId = await this.pairsGameRepo.getActiveGameByUserId(
+    const pair = await this.pairsGameRepo.getActiveGameByUserId(
       currentUserDto.userId,
     );
 
-    if (!pairByUserId) {
+    if (!pair) {
       throw new ForbiddenException(noOpenGameMessage);
     }
+    pair.version = 2;
+    const pairByUserId = pair;
+
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(
         pairByUserId.id,
       );
 
-    const counts = await this.countsChallengeAnswers(
-      challengeAnswers,
-      currentUserDto.userId,
-    );
+    const counts: { countAnswersUser: number; countAnswersBoth: number } =
+      await this.countsChallengeAnswers(
+        challengeAnswers,
+        currentUserDto.userId,
+      );
 
     const MAX_ANSWER_COUNT = 5;
+
+    const countDifferenceBoth =
+      counts.countAnswersBoth - counts.countAnswersUser;
 
     switch (counts.countAnswersUser) {
       case MAX_ANSWER_COUNT:
@@ -79,29 +87,39 @@ export class SubmitAnswerForCurrentQuestionUseCase
             ? AnswerStatusEnum.CORRECT
             : AnswerStatusEnum.INCORRECT;
 
-          const updateChallengeAnswer =
-            await this.challengesAnswersRepo.updateChallengeAnswers(
+          const saveChallengeAnswer: ChallengeAnswersEntity | null =
+            await this.challengesAnswersRepo.saveChallengeAnswer(
               answerDto.answer,
               nextQuestion,
               answerStatus,
               currentUserDto,
             );
 
-          let currentAnswer: number = 0;
-          if (updateChallengeAnswer) {
-            currentAnswer = 1;
-          }
+          // let currentAnswer: number = 0;
 
-          if (counts.countAnswersBoth + currentAnswer === 10) {
-            await this.commandBus.execute(
-              new AddResultToPairGameCommand(pairByUserId),
-            );
+          if (saveChallengeAnswer) {
+            const currentAnswer: number = 1;
+
+            if (counts.countAnswersUser + currentAnswer === 5) {
+              await this.commandBus.execute(
+                new PlayerAnswersAllQuestionsCommand(
+                  pairByUserId,
+                  currentUserDto,
+                ),
+              );
+            }
+
+            if (counts.countAnswersBoth + currentAnswer === 10) {
+              await this.commandBus.execute(
+                new AddResultToPairGameCommand(pairByUserId),
+              );
+            }
+            return {
+              questionId: saveChallengeAnswer.question.id,
+              answerStatus: saveChallengeAnswer.answerStatus,
+              addedAt: saveChallengeAnswer.addedAt,
+            };
           }
-          return {
-            questionId: updateChallengeAnswer.question.id,
-            answerStatus: updateChallengeAnswer.answerStatus,
-            addedAt: updateChallengeAnswer.addedAt,
-          };
         }
 
         throw new InternalServerErrorException(
@@ -109,6 +127,91 @@ export class SubmitAnswerForCurrentQuestionUseCase
         );
     }
   }
+
+  // async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
+  //   const { answerDto, currentUserDto } = command;
+  //
+  //   const pairByUserId = await this.pairsGameRepo.getActiveGameByUserId(
+  //     currentUserDto.userId,
+  //   );
+  //
+  //   if (!pairByUserId) {
+  //     throw new ForbiddenException(noOpenGameMessage);
+  //   }
+  //   const challengeAnswers: ChallengeAnswersEntity[] =
+  //     await this.challengesAnswersRepo.getChallengeAnswersByGameId(
+  //       pairByUserId.id,
+  //     );
+  //
+  //   const counts: { countAnswersUser: number; countAnswersBoth: number } =
+  //     await this.countsChallengeAnswers(
+  //       challengeAnswers,
+  //       currentUserDto.userId,
+  //     );
+  //
+  //   const MAX_ANSWER_COUNT = 5;
+  //   const COUNT_DIFFERENCE = counts.countAnswersBoth - counts.countAnswersUser;
+  //
+  //   if (counts.countAnswersUser === MAX_ANSWER_COUNT) {
+  //     throw new ForbiddenException(answeredAllQuestionsMessage);
+  //   } else if (COUNT_DIFFERENCE >= 5) {
+  //     throw new ForbiddenException(theGameIsOver);
+  //   } else {
+  //     const nextQuestion =
+  //       await this.challengesQuestionsRepo.getNextChallengeQuestions(
+  //         pairByUserId.id,
+  //         counts.countAnswersUser,
+  //       );
+  //
+  //     if (nextQuestion) {
+  //       const verifyAnswer =
+  //         await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
+  //           nextQuestion.question.id,
+  //           answerDto.answer,
+  //         );
+  //
+  //       const answerStatus = verifyAnswer
+  //         ? AnswerStatusEnum.CORRECT
+  //         : AnswerStatusEnum.INCORRECT;
+  //
+  //       const saveChallengeAnswer =
+  //         await this.challengesAnswersRepo.saveChallengeAnswer(
+  //           answerDto.answer,
+  //           nextQuestion,
+  //           answerStatus,
+  //           currentUserDto,
+  //         );
+  //
+  //       if (saveChallengeAnswer) {
+  //         const currentAnswer = 1;
+  //
+  //         if (counts.countAnswersUser + currentAnswer === 5) {
+  //           await this.commandBus.execute(
+  //             new PlayerAnswersAllQuestionsCommand(
+  //               pairByUserId,
+  //               currentUserDto,
+  //             ),
+  //           );
+  //         }
+  //
+  //         if (counts.countAnswersBoth + currentAnswer === 10) {
+  //           await this.commandBus.execute(
+  //             new AddResultToPairGameCommand(pairByUserId),
+  //           );
+  //         }
+  //         return {
+  //           questionId: saveChallengeAnswer.question.id,
+  //           answerStatus: saveChallengeAnswer.answerStatus,
+  //           addedAt: saveChallengeAnswer.addedAt,
+  //         };
+  //       }
+  //     }
+  //
+  //     throw new InternalServerErrorException(
+  //       'Failed with AnswerForCurrentQuestionUseCase.',
+  //     );
+  //   }
+  // }
 
   private async countsChallengeAnswers(
     challengeAnswers: ChallengeAnswersEntity[],

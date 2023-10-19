@@ -24,6 +24,7 @@ import { PairsGameEntity } from './entities/pairs-game.entity';
 import { MyGamesStatisticUseCase } from './application/use-cases/my-games-statistic.use-case';
 import { GamePairsRepo } from './infrastructure/game-pairs.repo';
 import { GamesStatisticUseCase } from './application/use-cases/games-statistic.use-case';
+import { PlayerAnswersAllQuestionsUseCase } from './application/use-cases/player-answers-all-questions.use-case';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -34,6 +35,7 @@ const usersUseCases = [
   GetMyGamesUseCase,
   MyGamesStatisticUseCase,
   GamesStatisticUseCase,
+  PlayerAnswersAllQuestionsUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];

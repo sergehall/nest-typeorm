@@ -218,7 +218,7 @@ export class GamePairsRepo {
           },
         )
         .andWhere('(pairsGame.status = :activeStatus)', {
-          activeStatus: StatusGameEnum.ACTIVE,
+          activeStatus: StatusGameEnum.FINISHED,
         });
       const pair: PairsGameEntity | null = await queryBuilder.getOne();
 
@@ -240,7 +240,7 @@ export class GamePairsRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .andWhere('pairsGame.id = :id', {
+        .where('pairsGame.id = :id', {
           id,
         });
 
@@ -391,15 +391,15 @@ export class GamePairsRepo {
     firstPlayer.userId = currentUserDto.userId;
     firstPlayer.login = currentUserDto.login;
 
-    const pairGameQuizEntity = new PairsGameEntity();
-    pairGameQuizEntity.id = uuid4();
-    pairGameQuizEntity.firstPlayer = firstPlayer;
-    pairGameQuizEntity.secondPlayer = null;
-    pairGameQuizEntity.pairCreatedDate = new Date().toISOString();
-    pairGameQuizEntity.startGameDate = null;
-    pairGameQuizEntity.finishGameDate = null;
+    const pairGame = new PairsGameEntity();
+    pairGame.id = uuid4();
+    pairGame.firstPlayer = firstPlayer;
+    pairGame.secondPlayer = null;
+    pairGame.pairCreatedDate = new Date().toISOString();
+    pairGame.startGameDate = null;
+    pairGame.finishGameDate = null;
 
-    return pairGameQuizEntity;
+    return pairGame;
   }
 
   private async getPagingParams(

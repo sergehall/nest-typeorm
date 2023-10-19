@@ -85,4 +85,7 @@ export class PairsGameEntity {
     (challengeAnswer) => challengeAnswer.pairGameQuiz,
   )
   answers: ChallengeAnswersEntity[];
+
+  @Column({ nullable: true, default: 0 })
+  version: number;
 }
