@@ -69,6 +69,10 @@ export const answeredAllQuestionsMessage = {
   message: 'The user has already answered all of the questions.',
   useCase: 'AnswerForCurrentQuestionUseCase',
 };
+export const theGameIsOver = {
+  message: 'The opponent gave all the answer and 10 seconds passed.',
+  useCase: 'AnswerForCurrentQuestionUseCase',
+};
 export const idFormatError = {
   message: `The ID provided in the parameters is in an incorrect format.`,
   params: 'id',

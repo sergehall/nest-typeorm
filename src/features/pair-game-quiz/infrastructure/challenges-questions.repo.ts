@@ -39,6 +39,31 @@ export class ChallengesQuestionsRepo {
     }
   }
 
+  async getRemainingChallengeQuestions(
+    pairGameQuizId: string,
+    countAnswers: number,
+  ): Promise<ChallengeQuestionsEntity[]> {
+    try {
+      const offset = countAnswers;
+      const limit = 5;
+      const queryBuilder = this.challengeQuestionsRepo
+        .createQueryBuilder('challengeQuestions')
+        .leftJoinAndSelect('challengeQuestions.pairGameQuiz', 'pairGameQuiz')
+        .leftJoinAndSelect('challengeQuestions.question', 'question')
+        .where('pairGameQuiz.id = :pairGameQuizId', { pairGameQuizId })
+        .orderBy('challengeQuestions.id', 'DESC')
+        .skip(offset)
+        .take(limit);
+
+      return await queryBuilder.getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'Failed to retrieve Challenge Questions.' + error.message,
+      );
+    }
+  }
+
   async getChallengeQuestionsByGameId(
     pairGameQuizId: string,
   ): Promise<ChallengeQuestionsEntity[]> {

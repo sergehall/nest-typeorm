@@ -467,7 +467,7 @@ export class UsersRepo {
         await this.gamePairsRepo.getAllGamesByUserIdForDelete(userId);
 
       const allGamesIds = allGames.map((game) => game.id);
-      console.log(allGamesIds);
+
       if (allGames.length > 0) {
         await transactionalEntityManager
           .createQueryBuilder()

@@ -378,7 +378,7 @@ export class BloggerBlogsRepo {
     const connection = this.bloggerBlogsRepository.manager.connection;
     const queryRunner = connection.createQueryRunner();
     await queryRunner.connect();
-    console.log(userForBind.userId);
+
     try {
       await queryRunner.startTransaction();
 
