@@ -12,50 +12,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
-import { GamePairsRepo } from './game-pairs.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 export class ChallengesAnswersRepo {
   constructor(
     @InjectRepository(ChallengeAnswersEntity)
     private readonly challengeAnswersRepo: Repository<ChallengeAnswersEntity>,
-    protected gamePairsRepo: GamePairsRepo,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
-
-  // async saveChallengeAnswer(
-  //   answer: string,
-  //   nextQuestions: ChallengeQuestionsEntity,
-  //   answerStatus: AnswerStatusEnum,
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<ChallengeAnswersEntity> {
-  //   const pairsGameQuizEntity: PairsGameEntity = nextQuestions.pairGameQuiz;
-  //
-  //   // pairsGameQuizEntity.version = nextQuestions.pairGameQuiz.version + 1;
-  //
-  //   const questionsQuizEntity = new QuestionsQuizEntity();
-  //   questionsQuizEntity.id = nextQuestions.question.id;
-  //   questionsQuizEntity.questionText = nextQuestions.question.questionText;
-  //
-  //   const answerOwnerEntity = new UsersEntity();
-  //   answerOwnerEntity.userId = currentUserDto.userId;
-  //
-  //   const challengeAnswer = new ChallengeAnswersEntity();
-  //   challengeAnswer.id = uuid4();
-  //   challengeAnswer.answer = answer;
-  //   challengeAnswer.answerStatus = answerStatus;
-  //   challengeAnswer.addedAt = new Date().toISOString();
-  //   challengeAnswer.pairGameQuiz = pairsGameQuizEntity;
-  //   challengeAnswer.question = questionsQuizEntity;
-  //   challengeAnswer.answerOwner = answerOwnerEntity;
-  //
-  //   try {
-  //     return await this.challengeAnswersRepo.save(challengeAnswer);
-  //   } catch (error) {
-  //     console.error('Error inserting answer into the database:', error);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
 
   async saveChallengeAnswer(
     answer: string,
