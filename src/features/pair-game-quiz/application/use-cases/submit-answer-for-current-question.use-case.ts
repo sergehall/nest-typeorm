@@ -62,9 +62,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
       );
 
     const MAX_ANSWER_COUNT = 5;
-
-    // const countDifferenceBoth =
-    //   counts.countAnswersBoth - counts.countAnswersUser;
+    const MAX_ANSWER_BOTH_COUNT = 10;
 
     switch (counts.countAnswersUser) {
       case MAX_ANSWER_COUNT:
@@ -97,12 +95,10 @@ export class SubmitAnswerForCurrentQuestionUseCase
               currentUserDto,
             );
 
-          // let currentAnswer: number = 0;
-
           if (saveChallengeAnswer) {
             const currentAnswer: number = 1;
 
-            if (counts.countAnswersUser + currentAnswer === 1) {
+            if (counts.countAnswersUser + currentAnswer === MAX_ANSWER_COUNT) {
               await this.commandBus.execute(
                 new PlayerAnswersAllQuestionsCommand(
                   activeGame,
@@ -111,7 +107,10 @@ export class SubmitAnswerForCurrentQuestionUseCase
               );
             }
 
-            if (counts.countAnswersBoth + currentAnswer === 10) {
+            if (
+              counts.countAnswersBoth + currentAnswer ===
+              MAX_ANSWER_BOTH_COUNT
+            ) {
               await this.commandBus.execute(
                 new AddResultToPairGameCommand(activeGame),
               );
