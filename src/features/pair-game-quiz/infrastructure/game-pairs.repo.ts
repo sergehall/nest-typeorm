@@ -218,7 +218,7 @@ export class GamePairsRepo {
           },
         )
         .andWhere('(pairsGame.status = :activeStatus)', {
-          activeStatus: StatusGameEnum.FINISHED,
+          activeStatus: StatusGameEnum.ACTIVE,
         });
       const pair: PairsGameEntity | null = await queryBuilder.getOne();
 

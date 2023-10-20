@@ -62,7 +62,7 @@ export const forbiddenDeleteDevice = {
   params: 'deviceId',
 };
 export const noOpenGameMessage = {
-  message: 'The user has no open, unfinished games.',
+  message: 'The user has no open, active games.',
   useCase: 'AnswerForCurrentQuestionUseCase',
 };
 export const answeredAllQuestionsMessage = {
@@ -71,6 +71,10 @@ export const answeredAllQuestionsMessage = {
 };
 export const theGameIsOver = {
   message: 'The opponent gave all the answer and 10 seconds passed.',
+  useCase: 'AnswerForCurrentQuestionUseCase',
+};
+export const notFoundChallengeQuestions = {
+  message: 'Challenge questions Not Found for the Current Game.',
   useCase: 'AnswerForCurrentQuestionUseCase',
 };
 export const idFormatError = {

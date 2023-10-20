@@ -1,5 +1,4 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { AnswerDto } from '../../dto/answer.dto';
 import {
   ForbiddenException,
@@ -8,7 +7,7 @@ import {
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 import {
   answeredAllQuestionsMessage,
-  noOpenGameMessage,
+  notFoundChallengeQuestions,
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
@@ -18,11 +17,12 @@ import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.r
 import { AnswerViewModel } from '../../view-models/answer.view-model';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { PlayerAnswersAllQuestionsCommand } from './player-answers-all-questions.use-case';
+import { CurrentUserAndActiveGameDto } from '../../../users/dto/current-user-and-active-game.dto';
 
 export class SubmitAnswerCommand {
   constructor(
     public answerDto: AnswerDto,
-    public currentUserDto: CurrentUserDto,
+    public currentUserDto: CurrentUserAndActiveGameDto,
   ) {}
 }
 
@@ -40,20 +40,19 @@ export class SubmitAnswerForCurrentQuestionUseCase
 
   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
     const { answerDto, currentUserDto } = command;
+    const { activeGame } = currentUserDto;
 
-    const pair = await this.pairsGameRepo.getActiveGameByUserId(
-      currentUserDto.userId,
-    );
-
-    if (!pair) {
-      throw new ForbiddenException(noOpenGameMessage);
-    }
-    pair.version = 2;
-    const pairByUserId = pair;
+    // const pairGame = await this.pairsGameRepo.getActiveGameByUserId(
+    //   currentUserDto.userId,
+    // );
+    //
+    // if (!pairGame) {
+    //   throw new ForbiddenException(noOpenGameMessage);
+    // }
 
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(
-        pairByUserId.id,
+        activeGame.id,
       );
 
     const counts: { countAnswersUser: number; countAnswersBoth: number } =
@@ -64,8 +63,8 @@ export class SubmitAnswerForCurrentQuestionUseCase
 
     const MAX_ANSWER_COUNT = 5;
 
-    const countDifferenceBoth =
-      counts.countAnswersBoth - counts.countAnswersUser;
+    // const countDifferenceBoth =
+    //   counts.countAnswersBoth - counts.countAnswersUser;
 
     switch (counts.countAnswersUser) {
       case MAX_ANSWER_COUNT:
@@ -73,17 +72,20 @@ export class SubmitAnswerForCurrentQuestionUseCase
       default:
         const nextQuestion =
           await this.challengesQuestionsRepo.getNextChallengeQuestions(
-            pairByUserId.id,
+            activeGame.id,
             counts.countAnswersUser,
           );
-        if (nextQuestion) {
+
+        if (!nextQuestion) {
+          throw new ForbiddenException(notFoundChallengeQuestions);
+        } else if (nextQuestion) {
           const verifyAnswer =
             await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
               nextQuestion.question.id,
               answerDto.answer,
             );
 
-          const answerStatus = verifyAnswer
+          const answerStatus: AnswerStatusEnum = verifyAnswer
             ? AnswerStatusEnum.CORRECT
             : AnswerStatusEnum.INCORRECT;
 
@@ -100,10 +102,10 @@ export class SubmitAnswerForCurrentQuestionUseCase
           if (saveChallengeAnswer) {
             const currentAnswer: number = 1;
 
-            if (counts.countAnswersUser + currentAnswer === 5) {
+            if (counts.countAnswersUser + currentAnswer === 1) {
               await this.commandBus.execute(
                 new PlayerAnswersAllQuestionsCommand(
-                  pairByUserId,
+                  activeGame,
                   currentUserDto,
                 ),
               );
@@ -111,7 +113,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
 
             if (counts.countAnswersBoth + currentAnswer === 10) {
               await this.commandBus.execute(
-                new AddResultToPairGameCommand(pairByUserId),
+                new AddResultToPairGameCommand(activeGame),
               );
             }
             return {
