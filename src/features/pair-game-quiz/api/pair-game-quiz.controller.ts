@@ -32,6 +32,7 @@ import { GamesStatisticCommand } from '../application/use-cases/games-statistic.
 import { GamesStatisticsViewModel } from '../view-models/games-statistics.view-model';
 import { JwtAuthAndActiveGameGuard } from '../../auth/guards/jwt-auth-and-active-game.guard';
 import { CurrentUserAndActiveGameDto } from '../../users/dto/current-user-and-active-game.dto';
+import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
@@ -112,7 +113,6 @@ export class PairGameQuizController {
     );
   }
 
-  // @UseGuards(JwtAuthGuard)
   @UseGuards(JwtAuthAndActiveGameGuard)
   @HttpCode(HttpStatus.OK)
   @Post('pairs/my-current/answers')
@@ -120,10 +120,21 @@ export class PairGameQuizController {
     @Request() req: any,
     @Body() answerDto: AnswerDto,
   ): Promise<AnswerViewModel> {
-    const currentUserDto: CurrentUserAndActiveGameDto = req.user;
+    const currentUserAndActiveGameDto: CurrentUserAndActiveGameDto = req.user;
+
+    const currentUserDto: CurrentUserDto = {
+      userId: currentUserAndActiveGameDto.userId,
+      login: currentUserAndActiveGameDto.login,
+      email: currentUserAndActiveGameDto.email,
+      orgId: currentUserAndActiveGameDto.orgId,
+      roles: currentUserAndActiveGameDto.roles,
+      isBanned: currentUserAndActiveGameDto.isBanned,
+    };
+
+    const activeGame: PairsGameEntity = currentUserAndActiveGameDto.activeGame;
 
     return await this.commandBus.execute(
-      new SubmitAnswerCommand(answerDto, currentUserDto),
+      new SubmitAnswerCommand(answerDto, activeGame, currentUserDto),
     );
   }
 }

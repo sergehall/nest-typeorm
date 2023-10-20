@@ -34,11 +34,9 @@ export class PlayerAnswersAllQuestionsUseCase
   async execute(command: PlayerAnswersAllQuestionsCommand): Promise<boolean> {
     const { game, currentUserDto } = command;
     const TEN_SECONDS = 10000; // 10 seconds in milliseconds
-    console.log('TEN_SECONDS start');
     // Schedule a separate asynchronous operation for saveGame after a 10-second delay
     setTimeout(async () => {
-      // After the 10-second delay, update the game status StatusGameEnum.FINISHED and finishGameDate
-      console.log('TEN_SECONDS end');
+      // After the 10-second delay, update the game status StatusGameEnum.FINISHED and add finishGameDate
       game.status = StatusGameEnum.FINISHED;
       game.finishGameDate = new Date().toISOString();
 
@@ -52,32 +50,6 @@ export class PlayerAnswersAllQuestionsUseCase
     // Return true immediately
     return true;
   }
-
-  // async execute(command: PlayerAnswersAllQuestionsCommand): Promise<boolean> {
-  //   const { game, currentUserDto } = command;
-  //   const TEN_SECONDS = 10000; // 10 seconds in milliseconds
-  //
-  //   return new Promise<boolean>((resolve) => {
-  //     setTimeout(async () => {
-  //       // Timer has expired, update the game status and finishGameDate.
-  //       // game.status = StatusGameEnum.FINISHED;
-  //       // game.finishGameDate = new Date().toISOString();
-  //
-  //       console.log(game, 'game');
-  //
-  //       game.version = game.version + 1;
-  //       const saveGame = await this.gamePairsRepo.saveGame(game);
-  //
-  //       console.log(saveGame, 'saveGame');
-  //
-  //       // await this.finishForAnotherUser(game, currentUserDto);
-  //
-  //       // await this.commandBus.execute(new AddResultToPairGameCommand(game));
-  //
-  //       resolve(true); // Resolve the promise when the changes are saved and questions are checked.
-  //     }, TEN_SECONDS);
-  //   });
-  // }
 
   // New method to check unanswered questions by the second user.
   private async finishForAnotherUser(

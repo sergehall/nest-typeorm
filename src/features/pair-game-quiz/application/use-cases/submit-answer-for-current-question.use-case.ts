@@ -15,14 +15,15 @@ import { GameQuestionsRepo } from '../../infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { AnswerViewModel } from '../../view-models/answer.view-model';
-import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { PlayerAnswersAllQuestionsCommand } from './player-answers-all-questions.use-case';
-import { CurrentUserAndActiveGameDto } from '../../../users/dto/current-user-and-active-game.dto';
+import { PairsGameEntity } from '../../entities/pairs-game.entity';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 
 export class SubmitAnswerCommand {
   constructor(
     public answerDto: AnswerDto,
-    public currentUserDto: CurrentUserAndActiveGameDto,
+    public activeGame: PairsGameEntity,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -31,7 +32,6 @@ export class SubmitAnswerForCurrentQuestionUseCase
   implements ICommandHandler<SubmitAnswerCommand>
 {
   constructor(
-    protected pairsGameRepo: GamePairsRepo,
     protected gameQuestionsRepo: GameQuestionsRepo,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
@@ -39,16 +39,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
   ) {}
 
   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
-    const { answerDto, currentUserDto } = command;
-    const { activeGame } = currentUserDto;
-
-    // const pairGame = await this.pairsGameRepo.getActiveGameByUserId(
-    //   currentUserDto.userId,
-    // );
-    //
-    // if (!pairGame) {
-    //   throw new ForbiddenException(noOpenGameMessage);
-    // }
+    const { answerDto, activeGame, currentUserDto } = command;
 
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(
