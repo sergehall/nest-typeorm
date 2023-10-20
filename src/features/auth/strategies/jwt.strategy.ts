@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(
       payload.userId,
     );
+
     if (user && !user.isBanned) {
       return {
         userId: user.userId,

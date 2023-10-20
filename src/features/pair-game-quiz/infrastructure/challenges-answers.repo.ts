@@ -8,12 +8,12 @@ import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-
 import { UsersEntity } from '../../users/entities/users.entity';
 import * as uuid4 from 'uuid4';
 import {
-  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from './game-pairs.repo';
+import { PairsGameEntity } from '../entities/pairs-game.entity';
 
 export class ChallengesAnswersRepo {
   constructor(
@@ -64,10 +64,6 @@ export class ChallengesAnswersRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<ChallengeAnswersEntity | null> {
     const { question, pairGameQuiz } = nextQuestions;
-    console.log(pairGameQuiz.version, 'pairGameQuiz.version');
-    const currentGame = await this.gamePairsRepo.getGameByPairId(
-      pairGameQuiz.id,
-    );
 
     const questionsQuizEntity = new QuestionsQuizEntity();
     questionsQuizEntity.id = question.id;
@@ -85,19 +81,89 @@ export class ChallengesAnswersRepo {
     challengeAnswer.question = questionsQuizEntity;
     challengeAnswer.answerOwner = answerOwnerEntity;
 
-    if (currentGame && pairGameQuiz.version === currentGame.version) {
-      console.log(currentGame.version, 'currentGame.version');
+    const connection = this.challengeAnswersRepo.manager.connection;
+    const queryRunner = connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-      try {
-        return await this.challengeAnswersRepo.save(challengeAnswer);
-      } catch (error) {
-        console.log(error.message);
-        throw new InternalServerErrorException();
+    try {
+      // Use QueryBuilder to save the ChallengeAnswersEntity
+      await queryRunner.manager
+        .createQueryBuilder()
+        .insert()
+        .into(ChallengeAnswersEntity)
+        .values(challengeAnswer)
+        .execute();
+
+      // Query the current version of the associated PairsGameEntity using a subquery
+      const currentVersion = await queryRunner.manager
+        .createQueryBuilder()
+        .select('pairGame.version', 'version')
+        .select('pairGame.status', 'status')
+        .from(PairsGameEntity, 'pairGame')
+        .where('pairGame.id = :id', { id: pairGameQuiz.id })
+        .getRawOne();
+
+      if (currentVersion?.status !== pairGameQuiz.status) {
+        // Status do not match, so roll back. Must be StatusGameEnum.ACTIVE
+        await queryRunner.rollbackTransaction();
+        return null; // Return null on failure
       }
-    } else {
-      throw new ForbiddenException('Optimistic lock failed');
+
+      // Commit the transaction
+      await queryRunner.commitTransaction();
+      return challengeAnswer; // Return the saved ChallengeAnswersEntity
+    } catch (error) {
+      console.error('Error inserting answer into the database:', error);
+      // Roll back the transaction in case of an error
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(error.message);
+    } finally {
+      await queryRunner.release();
     }
   }
+
+  // async saveChallengeAnswer(
+  //   answer: string,
+  //   nextQuestions: ChallengeQuestionsEntity,
+  //   answerStatus: AnswerStatusEnum,
+  //   currentUserDto: CurrentUserDto,
+  // ): Promise<ChallengeAnswersEntity | null> {
+  //   const { question, pairGameQuiz } = nextQuestions;
+  //   console.log(pairGameQuiz.version, 'pairGameQuiz.version');
+  //   const currentGame = await this.gamePairsRepo.getGameByPairId(
+  //     pairGameQuiz.id,
+  //   );
+  //
+  //   const questionsQuizEntity = new QuestionsQuizEntity();
+  //   questionsQuizEntity.id = question.id;
+  //   questionsQuizEntity.questionText = question.questionText;
+  //
+  //   const answerOwnerEntity = new UsersEntity();
+  //   answerOwnerEntity.userId = currentUserDto.userId;
+  //
+  //   const challengeAnswer = new ChallengeAnswersEntity();
+  //   challengeAnswer.id = uuid4();
+  //   challengeAnswer.answer = answer;
+  //   challengeAnswer.answerStatus = answerStatus;
+  //   challengeAnswer.addedAt = new Date().toISOString();
+  //   challengeAnswer.pairGameQuiz = pairGameQuiz;
+  //   challengeAnswer.question = questionsQuizEntity;
+  //   challengeAnswer.answerOwner = answerOwnerEntity;
+  //
+  //   if (currentGame && pairGameQuiz.version === currentGame.version) {
+  //     console.log(currentGame.version, 'currentGame.version');
+  //
+  //     try {
+  //       return await this.challengeAnswersRepo.save(challengeAnswer);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       throw new InternalServerErrorException();
+  //     }
+  //   } else {
+  //     throw new ForbiddenException('Optimistic lock failed');
+  //   }
+  // }
 
   // async saveChallengeAnswer(
   //   answer: string,
@@ -208,12 +274,9 @@ export class ChallengesAnswersRepo {
       .where('challengeAnswers.pairGameQuizId = :pairGameQuizId', {
         pairGameQuizId,
       })
-      .andWhere(
-        '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-        {
-          userId,
-        },
-      )
+      .andWhere('answerOwner.userId = :userId', {
+        userId,
+      })
       .orderBy('challengeAnswers.addedAt', 'ASC');
     try {
       return await queryBuilder.getMany();

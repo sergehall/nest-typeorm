@@ -5,11 +5,12 @@ import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity'
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
-import uuid4 from 'uuid4';
+import * as uuid4 from 'uuid4';
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { QuestionsQuizEntity } from '../../../sa-quiz-questions/entities/questions-quiz.entity';
 import { StatusGameEnum } from '../../enums/status-game.enum';
+import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
 
 export class PlayerAnswersAllQuestionsCommand {
   constructor(
@@ -31,22 +32,18 @@ export class PlayerAnswersAllQuestionsUseCase
 
   async execute(command: PlayerAnswersAllQuestionsCommand): Promise<boolean> {
     const { game, currentUserDto } = command;
-    const TEN_SECONDS = 20000; // 10 seconds in milliseconds
-    console.log(TEN_SECONDS, 'TEN_SECONDS-------TEN_SECONDS');
+    const TEN_SECONDS = 1000; // 10 seconds in milliseconds
+    console.log('TEN_SECONDS start');
     // Schedule a separate asynchronous operation for saveGame after a 10-second delay
     setTimeout(async () => {
-      // After the 10-second delay, update the game status and finishGameDate
-      game.version = game.version + 1;
-
+      // After the 10-second delay, update the game status StatusGameEnum.FINISHED and finishGameDate
+      console.log('TEN_SECONDS end');
       game.status = StatusGameEnum.FINISHED;
       game.finishGameDate = new Date().toISOString();
 
-      console.log(game, 'game');
-
-      // game.version = game.version + 1;
       const saveGame = await this.gamePairsRepo.saveGame(game);
-
-      console.log(saveGame, 'saveGame');
+      console.log(saveGame.id, 'saveGame.id');
+      await this.finishForAnotherUser(game, currentUserDto);
     }, TEN_SECONDS);
 
     // Return true immediately
@@ -83,11 +80,11 @@ export class PlayerAnswersAllQuestionsUseCase
   private async finishForAnotherUser(
     game: PairsGameEntity,
     currentUserDto: CurrentUserDto,
-  ) {
+  ): Promise<boolean> {
     const anotherUserId =
       game.firstPlayer.userId === currentUserDto.userId
-        ? game.firstPlayer.userId
-        : game.secondPlayer!.userId;
+        ? game.secondPlayer!.userId
+        : game.firstPlayer.userId;
 
     const challengesAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getCountChallengeAnswersByGameIdUserId(
@@ -97,7 +94,7 @@ export class PlayerAnswersAllQuestionsUseCase
 
     const countChallengeAnswers = challengesAnswers.length;
 
-    const remainingQuestion =
+    const remainingQuestions: ChallengeQuestionsEntity[] =
       await this.challengesQuestionsRepo.getRemainingChallengeQuestions(
         game.id,
         countChallengeAnswers,
@@ -105,44 +102,32 @@ export class PlayerAnswersAllQuestionsUseCase
 
     const challengeAnswers: ChallengeAnswersEntity[] = [];
 
-    if (remainingQuestion && remainingQuestion.length > 0) {
-      for (const question of remainingQuestion) {
+    if (remainingQuestions && remainingQuestions.length > 0) {
+      for (const challengeQuestion of remainingQuestions) {
         const answerOwnerEntity = new UsersEntity();
         answerOwnerEntity.userId = anotherUserId;
 
         const questionsQuizEntity = new QuestionsQuizEntity();
-        questionsQuizEntity.id = question.id;
-        questionsQuizEntity.questionText = question.question.questionText;
+        questionsQuizEntity.id = challengeQuestion.question.id;
+        questionsQuizEntity.questionText =
+          challengeQuestion.question.questionText;
 
-        const challengeAnswer = new ChallengeAnswersEntity();
+        const challengeAnswer: ChallengeAnswersEntity =
+          new ChallengeAnswersEntity();
         challengeAnswer.id = uuid4();
-        challengeAnswer.answer = 'No answer';
+        challengeAnswer.answer = 'The timer ran out 10 sec.';
         challengeAnswer.answerStatus = AnswerStatusEnum.INCORRECT;
         challengeAnswer.addedAt = new Date().toISOString();
         challengeAnswer.pairGameQuiz = game;
-        challengeAnswer.question = questionsQuizEntity; // Use the current question
+        challengeAnswer.question = questionsQuizEntity;
         challengeAnswer.answerOwner = answerOwnerEntity;
-
+        console.log();
         challengeAnswers.push(challengeAnswer);
       }
     } else {
       console.log('No remaining questions to answer.');
     }
-    // if (allGames.length > 0) {
-    //   const deleteChallengeQuestionsPromise = transactionalEntityManager
-    //     .createQueryBuilder()
-    //     .delete()
-    //     .from('challengeQuestions')
-    //     .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
-    //     .execute();
-    //
-    //   // Other promises for data deletion can be added here if needed
-    //
-    //   await Promise.all([
-    //     deleteChallengeQuestionsPromise,
-    //     // Add other promises for data deletion here if needed
-    //   ]);
-    // }
+    console.log(challengeAnswers);
     await this.challengesAnswersRepo.saveEntities(challengeAnswers);
     return true;
   }

@@ -30,6 +30,8 @@ import { MyGamesStatisticCommand } from '../application/use-cases/my-games-stati
 import { GameSummaryViewModel } from '../view-models/game-summary.view-model';
 import { GamesStatisticCommand } from '../application/use-cases/games-statistic.use-case';
 import { GamesStatisticsViewModel } from '../view-models/games-statistics.view-model';
+import { JwtAuthAndActiveGameGuard } from '../../auth/guards/jwt-auth-and-active-game.guard';
+import { CurrentUserAndActiveGameDto } from '../../users/dto/current-user-and-active-game.dto';
 
 @SkipThrottle()
 @Controller('pair-game-quiz')
@@ -110,14 +112,15 @@ export class PairGameQuizController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthAndActiveGameGuard)
   @HttpCode(HttpStatus.OK)
   @Post('pairs/my-current/answers')
   async answerToCurrentQuestion(
     @Request() req: any,
     @Body() answerDto: AnswerDto,
   ): Promise<AnswerViewModel> {
-    const currentUserDto: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserAndActiveGameDto = req.user;
 
     return await this.commandBus.execute(
       new SubmitAnswerCommand(answerDto, currentUserDto),

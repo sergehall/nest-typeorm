@@ -44,6 +44,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
+import { JwtAndActiveGameStrategy } from './strategies/jwt-and-active-game.strategy';
 
 const authUseCases = [
   LoginUseCase,
@@ -77,7 +78,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       ChallengeQuestionsEntity,
     ]),
     UsersModule,
-    PassportModule,
+    PassportModule.register({ customStrategy: 'jwt-active-game' }),
     JwtModule,
     CqrsModule,
   ],
@@ -85,6 +86,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   providers: [
     LocalStrategy,
     JwtStrategy,
+    JwtAndActiveGameStrategy,
     JwtConfig,
     ParseQueriesService,
     AuthService,
