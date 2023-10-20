@@ -123,109 +123,6 @@ export class ChallengesAnswersRepo {
     }
   }
 
-  // async saveChallengeAnswer(
-  //   answer: string,
-  //   nextQuestions: ChallengeQuestionsEntity,
-  //   answerStatus: AnswerStatusEnum,
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<ChallengeAnswersEntity | null> {
-  //   const { question, pairGameQuiz } = nextQuestions;
-  //   console.log(pairGameQuiz.version, 'pairGameQuiz.version');
-  //   const currentGame = await this.gamePairsRepo.getGameByPairId(
-  //     pairGameQuiz.id,
-  //   );
-  //
-  //   const questionsQuizEntity = new QuestionsQuizEntity();
-  //   questionsQuizEntity.id = question.id;
-  //   questionsQuizEntity.questionText = question.questionText;
-  //
-  //   const answerOwnerEntity = new UsersEntity();
-  //   answerOwnerEntity.userId = currentUserDto.userId;
-  //
-  //   const challengeAnswer = new ChallengeAnswersEntity();
-  //   challengeAnswer.id = uuid4();
-  //   challengeAnswer.answer = answer;
-  //   challengeAnswer.answerStatus = answerStatus;
-  //   challengeAnswer.addedAt = new Date().toISOString();
-  //   challengeAnswer.pairGameQuiz = pairGameQuiz;
-  //   challengeAnswer.question = questionsQuizEntity;
-  //   challengeAnswer.answerOwner = answerOwnerEntity;
-  //
-  //   if (currentGame && pairGameQuiz.version === currentGame.version) {
-  //     console.log(currentGame.version, 'currentGame.version');
-  //
-  //     try {
-  //       return await this.challengeAnswersRepo.save(challengeAnswer);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       throw new InternalServerErrorException();
-  //     }
-  //   } else {
-  //     throw new ForbiddenException('Optimistic lock failed');
-  //   }
-  // }
-
-  // async saveChallengeAnswer(
-  //   answer: string,
-  //   nextQuestions: ChallengeQuestionsEntity,
-  //   answerStatus: AnswerStatusEnum,
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<ChallengeAnswersEntity | null> {
-  //   const { question, pairGameQuiz } = nextQuestions;
-  //
-  //   const currentGame = await this.gamePairsRepo.getGameByPairId(
-  //     pairGameQuiz.id,
-  //   );
-  //
-  //   const questionsQuizEntity = new QuestionsQuizEntity();
-  //   questionsQuizEntity.id = question.id;
-  //   questionsQuizEntity.questionText = question.questionText;
-  //
-  //   const answerOwnerEntity = new UsersEntity();
-  //   answerOwnerEntity.userId = currentUserDto.userId;
-  //
-  //   const challengeAnswer = new ChallengeAnswersEntity();
-  //   challengeAnswer.id = uuid4();
-  //   challengeAnswer.answer = answer;
-  //   challengeAnswer.answerStatus = answerStatus;
-  //   challengeAnswer.addedAt = new Date().toISOString();
-  //   challengeAnswer.pairGameQuiz = pairGameQuiz;
-  //   challengeAnswer.question = questionsQuizEntity;
-  //   challengeAnswer.answerOwner = answerOwnerEntity;
-  //
-  //   const connection = this.challengeAnswersRepo.manager.connection;
-  //   const queryRunner = connection.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction();
-  //
-  //   try {
-  //     // Use QueryBuilder to save the ChallengeAnswersEntity
-  //     const affected = await queryRunner.manager
-  //       .createQueryBuilder()
-  //       .insert()
-  //       .into(ChallengeAnswersEntity)
-  //       .values(challengeAnswer)
-  //       .execute();
-  //
-  //     if (!affected.identifiers.length) {
-  //       // Versions do not match, so roll back
-  //       await queryRunner.rollbackTransaction();
-  //       return null; // Return null on failure
-  //     }
-  //
-  //     // Commit the transaction
-  //     await queryRunner.commitTransaction();
-  //     return challengeAnswer; // Return the saved ChallengeAnswersEntity
-  //   } catch (error) {
-  //     console.error('Error inserting answer into the database:', error.message);
-  //     // Roll back the transaction in case of an error
-  //     await queryRunner.rollbackTransaction();
-  //     throw new InternalServerErrorException(error.message);
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
-
   async getChallengeAnswersByGameId(
     pairGameQuizId: string,
   ): Promise<ChallengeAnswersEntity[]> {
@@ -251,7 +148,7 @@ export class ChallengesAnswersRepo {
     }
   }
 
-  async saveEntities(
+  async saveChallengeAnswersEntities(
     entities: ChallengeAnswersEntity[],
   ): Promise<ChallengeAnswersEntity[]> {
     try {

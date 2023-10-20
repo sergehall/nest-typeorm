@@ -11,6 +11,7 @@ import { UsersEntity } from '../../../users/entities/users.entity';
 import { QuestionsQuizEntity } from '../../../sa-quiz-questions/entities/questions-quiz.entity';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
+import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
 
 export class PlayerAnswersAllQuestionsCommand {
   constructor(
@@ -32,7 +33,7 @@ export class PlayerAnswersAllQuestionsUseCase
 
   async execute(command: PlayerAnswersAllQuestionsCommand): Promise<boolean> {
     const { game, currentUserDto } = command;
-    const TEN_SECONDS = 1000; // 10 seconds in milliseconds
+    const TEN_SECONDS = 10000; // 10 seconds in milliseconds
     console.log('TEN_SECONDS start');
     // Schedule a separate asynchronous operation for saveGame after a 10-second delay
     setTimeout(async () => {
@@ -41,9 +42,11 @@ export class PlayerAnswersAllQuestionsUseCase
       game.status = StatusGameEnum.FINISHED;
       game.finishGameDate = new Date().toISOString();
 
-      const saveGame = await this.gamePairsRepo.saveGame(game);
-      console.log(saveGame.id, 'saveGame.id');
+      await this.gamePairsRepo.saveGame(game);
+
       await this.finishForAnotherUser(game, currentUserDto);
+
+      await this.commandBus.execute(new AddResultToPairGameCommand(game));
     }, TEN_SECONDS);
 
     // Return true immediately
@@ -121,14 +124,16 @@ export class PlayerAnswersAllQuestionsUseCase
         challengeAnswer.pairGameQuiz = game;
         challengeAnswer.question = questionsQuizEntity;
         challengeAnswer.answerOwner = answerOwnerEntity;
-        console.log();
+
         challengeAnswers.push(challengeAnswer);
       }
     } else {
       console.log('No remaining questions to answer.');
     }
-    console.log(challengeAnswers);
-    await this.challengesAnswersRepo.saveEntities(challengeAnswers);
+
+    await this.challengesAnswersRepo.saveChallengeAnswersEntities(
+      challengeAnswers,
+    );
     return true;
   }
 }
