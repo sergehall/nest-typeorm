@@ -21,6 +21,7 @@ import { PlayersResultDto } from '../dto/players-result.dto';
 import { ChallengesQuestionsRepo } from './challenges-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { PairsCountPairsDto } from '../dto/pairs-count-pairs.dto';
 
 export class GamePairsRepo {
   constructor(
@@ -111,7 +112,7 @@ export class GamePairsRepo {
   async getGamesByUserIdPaging(
     queryData: ParseQueriesDto,
     userId: string,
-  ): Promise<{ pairsGame: PairsGameEntity[]; countPairsGame: number }> {
+  ): Promise<PairsCountPairsDto> {
     // Retrieve paging parameters
     const { sortBy, sortDirection, pageSize, pageNumber } =
       queryData.queryPagination;
