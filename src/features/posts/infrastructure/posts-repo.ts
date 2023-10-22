@@ -16,7 +16,6 @@ import {
   PostWithLikesInfoViewModel,
 } from '../view-models/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -146,19 +145,12 @@ export class PostsRepo {
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
-    // Retrieve banned flags
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { sortBy, direction, limit, offset } = pagingParams;
+    // Retrieve common parameters and flags
+    const { dependencyIsBanned, isBanned, field, direction, limit, offset } =
+      await this.getCommonParamsAndFlags(queryData);
 
     // Retrieve the number of last likes
     const numberLastLikes = await this.numberLastLikes();
-
-    // Retrieve the order field for sorting
-    const orderByField = await this.getOrderField(sortBy);
 
     // Query posts and countPosts with pagination conditions
     const queryBuilder = this.postsRepository
@@ -171,7 +163,7 @@ export class PostsRepo {
       .innerJoinAndSelect('post.postOwner', 'postOwner')
       .andWhere('blog.id = :blogId', { blogId });
 
-    queryBuilder.orderBy(orderByField, direction);
+    queryBuilder.orderBy(field, direction);
 
     const countPosts = await queryBuilder.getCount();
 
@@ -194,17 +186,11 @@ export class PostsRepo {
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
-    // Retrieve banned flags
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { sortBy, direction, limit, offset } = pagingParams;
+    // Retrieve common parameters and flags
+    const { dependencyIsBanned, isBanned, field, direction, limit, offset } =
+      await this.getCommonParamsAndFlags(queryData);
 
     const numberLastLikes = await this.numberLastLikes();
-
-    const orderByField = await this.getOrderField(sortBy);
 
     const query = this.postsRepository
       .createQueryBuilder('post')
@@ -215,7 +201,7 @@ export class PostsRepo {
       .innerJoinAndSelect('post.blog', 'blog')
       .innerJoinAndSelect('post.postOwner', 'postOwner');
 
-    query.orderBy(orderByField, direction);
+    query.orderBy(field, direction);
 
     const countPosts = await query.getCount();
 
@@ -290,45 +276,6 @@ export class PostsRepo {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async getOrderField(field: string): Promise<string> {
-    let orderByString;
-    try {
-      switch (field) {
-        case 'blogName':
-          orderByString = 'blog.name';
-          break;
-        case 'title':
-          orderByString = 'post.title';
-          break;
-        case 'shortDescription':
-          orderByString = 'post.shortDescription ';
-          break;
-        case 'content':
-          orderByString = 'post.content';
-          break;
-        case 'dependencyIsBanned':
-          orderByString = 'post.dependencyIsBanned';
-          break;
-        case 'isBanned':
-          orderByString = 'post.isBanned';
-          break;
-        case 'banDate':
-          orderByString = 'post.banDate';
-          break;
-        case 'banReason':
-          orderByString = 'post.banReason';
-          break;
-        default:
-          orderByString = 'post.createdAt';
-      }
-
-      return orderByString;
-    } catch (error) {
-      console.log(error.message);
-      throw new Error('Invalid field in getOrderField(field: string)');
     }
   }
 
@@ -508,26 +455,26 @@ export class PostsRepo {
     };
   }
 
-  private async getPagingParams(
-    queryData: ParseQueriesDto,
-  ): Promise<PagingParamsDto> {
-    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
+  private async getCommonParamsAndFlags(queryData: ParseQueriesDto) {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
 
-    const sortBy: string = await this.getSortBy(
-      queryData.queryPagination.sortBy,
-    );
+    const { sortDirection, pageSize, pageNumber, sortBy } =
+      queryData.queryPagination;
+
+    const field: string = await this.getSortByField(sortBy);
     const direction: SortDirectionEnum = sortDirection;
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 
-    return { sortBy, direction, limit, offset };
+    return { dependencyIsBanned, isBanned, field, direction, limit, offset };
   }
 
   private async numberLastLikes(): Promise<number> {
     return 3;
   }
 
-  private async getSortBy(sortBy: string): Promise<string> {
+  private async getSortByField(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
       [
