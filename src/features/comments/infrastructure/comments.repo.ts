@@ -321,32 +321,6 @@ export class CommentsRepo {
     return commentsEntity;
   }
 
-  private async addLikesInfoAndTransformedComment(
-    comment: PartialCommentsDto,
-  ): Promise<CommentViewModel> {
-    const commentatorInfo = {
-      userId: comment.commentatorId,
-      userLogin: comment.commentatorLogin,
-    };
-    const likesInfo = new LikesInfo();
-    return {
-      id: comment.id,
-      content: comment.content,
-      createdAt: comment.createdAt,
-      commentatorInfo,
-      likesInfo,
-    };
-  }
-
-  private async getBannedFlags(): Promise<BannedFlagsDto> {
-    return {
-      commentatorInfoIsBanned: false,
-      dependencyIsBanned: false,
-      banInfoIsBanned: false,
-      isBanned: false,
-    };
-  }
-
   async commentsLikesAggregation(
     comments: CommentsEntity[],
     currentUserDto: CurrentUserDto | null,
@@ -380,6 +354,32 @@ export class CommentsRepo {
         },
       };
     });
+  }
+
+  private async addLikesInfoAndTransformedComment(
+    comment: PartialCommentsDto,
+  ): Promise<CommentViewModel> {
+    const commentatorInfo = {
+      userId: comment.commentatorId,
+      userLogin: comment.commentatorLogin,
+    };
+    const likesInfo = new LikesInfo();
+    return {
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      commentatorInfo,
+      likesInfo,
+    };
+  }
+
+  private async getBannedFlags(): Promise<BannedFlagsDto> {
+    return {
+      commentatorInfoIsBanned: false,
+      dependencyIsBanned: false,
+      banInfoIsBanned: false,
+      isBanned: false,
+    };
   }
 
   private async getSortByField(sortBy: string): Promise<string> {
