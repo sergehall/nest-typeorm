@@ -10,7 +10,7 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SaBanUserDto } from '../../dto/sa-ban-user..dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { BanInfoDto } from '../../../users/dto/banInfo.dto';
+import { BanInfoDto } from '../../../users/dto/ban-info.dto';
 import { cannotBlockYourself } from '../../../../common/filters/custom-errors-messages';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';

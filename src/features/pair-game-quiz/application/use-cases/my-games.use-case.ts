@@ -11,7 +11,7 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class GetMyGamesCommand {
@@ -30,7 +30,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
   ) {}
-  async execute(command: GetMyGamesCommand): Promise<PaginatedResultDto> {
+  async execute(command: GetMyGamesCommand): Promise<PaginatorDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

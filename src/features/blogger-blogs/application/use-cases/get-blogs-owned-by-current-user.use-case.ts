@@ -1,7 +1,7 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../blogger-blogs.service';
@@ -25,7 +25,7 @@ export class GetBlogsOwnedByCurrentUserUseCase
   ) {}
   async execute(
     command: GetBlogsOwnedByCurrentUserCommand,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 

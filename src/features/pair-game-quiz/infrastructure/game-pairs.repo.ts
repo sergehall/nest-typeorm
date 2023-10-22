@@ -20,7 +20,6 @@ import { idFormatError } from '../../../common/filters/custom-errors-messages';
 import { PlayersResultDto } from '../dto/players-result.dto';
 import { ChallengesQuestionsRepo } from './challenges-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
-import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class GamePairsRepo {
@@ -114,11 +113,13 @@ export class GamePairsRepo {
     userId: string,
   ): Promise<{ pairsGame: PairsGameEntity[]; countPairsGame: number }> {
     // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
+    const { sortBy, sortDirection, pageSize, pageNumber } =
+      queryData.queryPagination;
 
-    const { sortBy, direction, limit, offset } = pagingParams;
-
-    const orderByField = await this.getOrderField(sortBy);
+    const field: string = await this.getSortField(sortBy);
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
 
     try {
       const queryBuilder = this.pairsGameQuizRepo
@@ -139,7 +140,7 @@ export class GamePairsRepo {
           },
         );
 
-      queryBuilder.orderBy(orderByField, direction);
+      queryBuilder.orderBy(`pairsGame.${field}`, direction);
 
       // Features of sorting the list: if the first criterion (for example, status)
       // has the same values, we sort by pairCreatedDate desc
@@ -402,20 +403,7 @@ export class GamePairsRepo {
     return pairGame;
   }
 
-  private async getPagingParams(
-    queryData: ParseQueriesDto,
-  ): Promise<PagingParamsDto> {
-    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
-
-    const sortBy: string = await this.getSort(queryData.queryPagination.sortBy);
-    const direction: SortDirectionEnum = sortDirection;
-    const limit: number = pageSize;
-    const offset: number = (pageNumber - 1) * limit;
-
-    return { sortBy, direction, limit, offset };
-  }
-
-  private async getSort(sortBy: string): Promise<string> {
+  private async getSortField(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
       [
@@ -431,47 +419,5 @@ export class GamePairsRepo {
       ],
       'pairCreatedDate',
     );
-  }
-
-  private async getOrderField(field: string): Promise<string> {
-    let orderByString;
-    try {
-      switch (field) {
-        case 'status':
-          orderByString = 'pairsGame.status';
-          break;
-        case 'startGameDate':
-          orderByString = 'pairsGame.startGameDate';
-          break;
-        case 'finishGameDate':
-          orderByString = 'pairsGame.finishGameDate';
-          break;
-        case 'firstPlayerLogin':
-          orderByString = 'pairsGame.firstPlayerLogin';
-          break;
-        case 'secondPlayerLogin':
-          orderByString = 'pairsGame.secondPlayerLogin';
-          break;
-        case 'firstPlayerScore':
-          orderByString = 'pairsGame.firstPlayerScore';
-          break;
-        case 'secondPlayerScore':
-          orderByString = 'pairsGame.secondPlayerScore';
-          break;
-        case 'firstPlayerGameResult':
-          orderByString = 'pairsGame.firstPlayerGameResult';
-          break;
-        case 'secondPlayerGameResult':
-          orderByString = 'pairsGame.secondPlayerGameResult';
-          break;
-        default:
-          orderByString = 'pairsGame.pairCreatedDate';
-      }
-
-      return orderByString;
-    } catch (error) {
-      console.log(error.message);
-      throw new Error('Invalid field in getOrderField(field: string)');
-    }
   }
 }

@@ -19,7 +19,7 @@ import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { BanInfoDto } from '../dto/banInfo.dto';
+import { BanInfoDto } from '../dto/ban-info.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
@@ -45,22 +45,6 @@ export class UsersRepo {
 
       const query = this.usersRepository
         .createQueryBuilder('user')
-        .select([
-          'user.userId',
-          'user.login',
-          'user.email',
-          'user.passwordHash',
-          'user.createdAt',
-          'user.orgId',
-          'user.roles',
-          'user.isBanned',
-          'user.banDate',
-          'user.banReason',
-          'user.confirmationCode',
-          'user.expirationDate',
-          'user.isConfirmed',
-          'user.isConfirmedDate',
-        ])
         .where(
           '(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin',
           {

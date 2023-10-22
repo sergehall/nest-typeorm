@@ -13,7 +13,7 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';
@@ -32,7 +32,7 @@ export class BlogsController {
 
   @Get()
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchBlogs(@Query() query: any): Promise<PaginatedResultDto> {
+  async searchBlogs(@Query() query: any): Promise<PaginatorDto> {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
@@ -54,7 +54,7 @@ export class BlogsController {
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
     const queryData: ParseQueriesDto =

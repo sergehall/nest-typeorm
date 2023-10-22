@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { TransformationService } from '../../common/transform-to-questions-model';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { QuestionsAndCountDto } from '../../dto/questions-and-count.dto';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 
@@ -18,7 +18,7 @@ export class SaGetQuestionsUseCase
     protected transformationService: TransformationService,
   ) {}
 
-  async execute(command: SaGetQuestionsCommand): Promise<PaginatedResultDto> {
+  async execute(command: SaGetQuestionsCommand): Promise<PaginatorDto> {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

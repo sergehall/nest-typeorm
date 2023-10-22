@@ -29,7 +29,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
@@ -65,7 +65,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async saFindUsers(@Query() query: any): Promise<PaginatedResultDto> {
+  async saFindUsers(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(new SaFindUsersCommand(queryData));
@@ -75,7 +75,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchBlogsForSa(@Query() query: any): Promise<PaginatedResultDto> {
+  async searchBlogsForSa(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(new SaFindBlogsCommand(queryData));
   }
@@ -87,7 +87,7 @@ export class SaController {
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
