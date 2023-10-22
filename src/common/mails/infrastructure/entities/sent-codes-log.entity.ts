@@ -5,7 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { UsersEntity } from '../../../features/users/entities/users.entity';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
 
 @Entity('SentCodesLog')
 export class SentCodesLogEntity {

@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InvalidJwtRepo } from '../features/auth/infrastructure/invalid-jwt-repo';
-import { SecurityDevicesRepo } from '../features/security-devices/infrastructure/security-devices.repo';
-import { UsersRepo } from '../features/users/infrastructure/users-repo';
+import { InvalidJwtRepo } from '../../features/auth/infrastructure/invalid-jwt-repo';
+import { SecurityDevicesRepo } from '../../features/security-devices/infrastructure/security-devices.repo';
+import { UsersRepo } from '../../features/users/infrastructure/users-repo';
 
 @Injectable()
 export class DataCleanupService {

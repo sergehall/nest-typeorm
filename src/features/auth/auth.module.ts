@@ -26,7 +26,7 @@ import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
-import { MailsService } from '../../mails/application/mails.service';
+import { MailsService } from '../../common/mails/application/mails.service';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { TypeOrmModule } from '@nestjs/typeorm';

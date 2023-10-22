@@ -9,7 +9,7 @@ import { Request, Response } from 'express';
 import { ErrorResponseType } from './types/error-response.types';
 
 @Catch(HttpException)
-export class CustomHttpExceptionFilter implements ExceptionFilter {
+export class HttpExceptionResponseFilter implements ExceptionFilter {
   /**
    * Catch method that handles instances of HttpException and formats the response as per the ErrorResponseType.
    * @param {HttpException} exception - The HttpException instance that was thrown.

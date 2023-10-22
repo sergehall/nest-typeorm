@@ -11,6 +11,7 @@ import { jwtCookiesIncorrect } from '../../../common/filters/custom-errors-messa
 import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { validate } from 'class-validator';
+import { PayloadDto } from '../dto/payload.dto';
 
 @Injectable()
 export class CookiesJwtVerificationGuard implements CanActivate {
@@ -32,12 +33,11 @@ export class CookiesJwtVerificationGuard implements CanActivate {
     }
     const { refreshToken } = refreshTokenDto;
 
-    const jwtExistsInBlacklist = await this.invalidJwtRepo.JwtExistInBlackList(
-      refreshToken,
-    );
+    const jwtExistsInBlacklist: boolean =
+      await this.invalidJwtRepo.jwtExistInBlackList(refreshToken);
 
     if (!jwtExistsInBlacklist) {
-      const validRefreshJwt = await this.commandBus.execute(
+      const validRefreshJwt: PayloadDto | null = await this.commandBus.execute(
         new ValidRefreshJwtCommand(refreshToken),
       );
 

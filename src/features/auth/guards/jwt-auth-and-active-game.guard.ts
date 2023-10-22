@@ -18,13 +18,8 @@ export class JwtAuthAndActiveGameGuard extends AuthGuard('jwt-active-game') {
       throw (
         err ||
         new HttpException({ message: [jwtIncorrect] }, HttpStatus.UNAUTHORIZED)
-        // No UNAUTHORIZED user return 401
       );
     }
-
-    // if (!user.activeGameId) {
-    //   throw new ForbiddenException(noOpenGameMessage); // No active game found, return 403
-    // }
     return user;
   }
 }

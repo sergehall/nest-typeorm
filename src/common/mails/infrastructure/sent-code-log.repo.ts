@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SentCodesLogEntity } from './entities/sent-codes-log.entity';
-import { UsersEntity } from '../../features/users/entities/users.entity';
+import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class SentCodeLogRepo {

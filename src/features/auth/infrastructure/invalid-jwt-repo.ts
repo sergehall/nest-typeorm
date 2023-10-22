@@ -19,7 +19,10 @@ export class InvalidJwtRepo {
         expirationDate: expirationDate,
       });
 
-      const result = await this.invalidJwtRepository.save(invalidJwtEntity);
+      const result: InvalidJwtEntity = await this.invalidJwtRepository.save(
+        invalidJwtEntity,
+      );
+
       return !!result.id;
     } catch (error) {
       console.log(error);
@@ -27,13 +30,14 @@ export class InvalidJwtRepo {
     }
   }
 
-  async JwtExistInBlackList(jwt: string): Promise<boolean> {
+  async jwtExistInBlackList(jwt: string): Promise<boolean> {
     try {
-      const findJwt = await this.invalidJwtRepository.findOne({
-        where: {
-          hashedRefreshToken: await this.hashRefreshToken(jwt),
-        },
-      });
+      const findJwt: InvalidJwtEntity | null =
+        await this.invalidJwtRepository.findOne({
+          where: {
+            hashedRefreshToken: await this.hashRefreshToken(jwt),
+          },
+        });
       return !!findJwt;
     } catch (error) {
       throw new InternalServerErrorException(error.message);

@@ -1,7 +1,7 @@
 import { CreateUserDto } from '../../../users/dto/create-user.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
-import { MailsService } from '../../../../mails/application/mails.service';
+import { MailsService } from '../../../../common/mails/application/mails.service';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { UserViewModel } from '../../../users/view-models/user.view-model';
 

@@ -6,8 +6,8 @@ import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 export class ScheduledTasksService {
   constructor(protected dataCleanupService: DataCleanupService) {}
 
-  // every 3 hours
-  @Cron('0 */3 * * *')
+  // every 4:00 AM
+  @Cron('0 4 * * *')
   async clearingExpiredJwt() {
     await this.dataCleanupService.clearingExpiredJwt();
   }
@@ -18,8 +18,8 @@ export class ScheduledTasksService {
     await this.dataCleanupService.clearingExpiredUsersData();
   }
 
-  // every 1 hour
-  @Cron('0 */1 * * *')
+  // every 3:00 AM
+  @Cron('0 3 * * *')
   async clearingExpiredDevices() {
     await this.dataCleanupService.clearingExpiredDevices();
   }

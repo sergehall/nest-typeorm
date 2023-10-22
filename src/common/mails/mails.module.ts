@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MailsService } from './application/mails.service';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { MailerConfig } from '../config/mailer/mailer-config';
-import { PostgresConfig } from '../config/db/postgres/postgres.config';
+import { MailerConfig } from '../../config/mailer/mailer-config';
+import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { EmailSendingUseCase } from './application/use-case/email-sending-use-case';
 import { SendConfirmationCodesUseCase } from './application/use-case/send-confirmation-codes.use-case';

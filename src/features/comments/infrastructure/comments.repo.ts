@@ -25,6 +25,7 @@ import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.en
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 import { PartialCommentsDto } from '../dto/partial-comments.dto';
 import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class CommentsRepo {
   constructor(
@@ -33,6 +34,7 @@ export class CommentsRepo {
     private readonly commentsRepository: Repository<CommentsEntity>,
     @InjectRepository(LikeStatusCommentsEntity)
     private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
+    private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   async getCommentByIdWithoutLikes(id: string): Promise<CommentsEntity | null> {
@@ -47,9 +49,11 @@ export class CommentsRepo {
       });
       return comment[0] ? comment[0] : null;
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
-        throw new NotFoundException(`User with ID ${userId} not found`);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -79,14 +83,15 @@ export class CommentsRepo {
 
       return result[0];
     } catch (error) {
-      if (await this.isInvalidUUIDError(error)) {
-        const userId = await this.extractUserIdFromError(error);
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
-
   async getCommentsWithLikesByPostId(
     postId: string,
     queryData: ParseQueriesDto,
@@ -477,14 +482,5 @@ export class CommentsRepo {
         'Invalid field in getOrderField(field: string)' + error.message,
       );
     }
-  }
-
-  private async isInvalidUUIDError(error: any): Promise<boolean> {
-    return error.message.includes('invalid input syntax for type uuid');
-  }
-
-  private async extractUserIdFromError(error: any): Promise<string | null> {
-    const match = error.message.match(/"([^"]+)"/);
-    return match ? match[1] : null;
   }
 }
