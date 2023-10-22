@@ -43,6 +43,7 @@ export class GetBlogsOwnedByCurrentUserUseCase
     }
 
     const totalCount: number = blogsCountBlogsDto.countBlogs;
+
     const transformedBlogs: BloggerBlogsViewModel[] =
       await this.bloggerBlogsService.transformedBlogs(blogsCountBlogsDto.blogs);
 
