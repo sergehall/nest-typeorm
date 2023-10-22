@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
-import { MailsService } from '../../../../mails/application/mails.service';
+import { MailsService } from '../../../../common/mails/application/mails.service';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';

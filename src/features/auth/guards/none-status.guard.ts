@@ -24,7 +24,7 @@ export class NoneStatusGuard implements CanActivate {
       );
 
       const jwtExistInBlackList: boolean =
-        await this.invalidJwtRepo.JwtExistInBlackList(accessToken);
+        await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
 
       if (payload && !jwtExistInBlackList) {
         const user: UsersEntity | null =

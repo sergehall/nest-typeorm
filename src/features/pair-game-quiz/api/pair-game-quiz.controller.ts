@@ -39,8 +39,8 @@ import { PairsGameEntity } from '../entities/pairs-game.entity';
 export class PairGameQuizController {
   constructor(
     private readonly pairGameQuizService: PairGameQuizService,
-    protected parseQueriesService: ParseQueriesService,
-    protected commandBus: CommandBus,
+    private readonly parseQueriesService: ParseQueriesService,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Get('pairs/create-questions')

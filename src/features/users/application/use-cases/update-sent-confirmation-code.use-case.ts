@@ -1,7 +1,7 @@
 import * as uuid4 from 'uuid4';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
-import { MailsService } from '../../../../mails/application/mails.service';
+import { MailsService } from '../../../../common/mails/application/mails.service';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
 

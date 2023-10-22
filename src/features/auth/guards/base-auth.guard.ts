@@ -27,13 +27,13 @@ export class BaseAuthGuard extends SaConfig implements CanActivate {
   }
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const basicAuth = await this.getBasicAuth('BASIC_AUTH');
+    const basicAuth: string = await this.getBasicAuth('BASIC_AUTH');
     const exceptedAuthInput = 'Basic ' + basicAuth;
 
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
     } else {
-      if (request.headers.authorization != exceptedAuthInput) {
+      if (request.headers.authorization !== exceptedAuthInput) {
         throw new HttpException(
           {
             message: [loginOrPassInvalid],
@@ -42,7 +42,7 @@ export class BaseAuthGuard extends SaConfig implements CanActivate {
         );
       }
 
-      request.user = await this.saCreateSuperAdmin.create();
+      request.user = await this.saCreateSuperAdmin.createUserSa();
       return true;
     }
   }

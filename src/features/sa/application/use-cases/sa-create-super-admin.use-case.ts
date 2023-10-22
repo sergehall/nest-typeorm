@@ -4,15 +4,16 @@ import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dto';
 import { Injectable } from '@nestjs/common';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 @Injectable()
 export class SaCreateSuperAdmin {
   constructor(
-    private readonly expirationDateCalculator: ExpirationDateCalculator,
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
+    private readonly expirationDateCalculator: ExpirationDateCalculator,
   ) {}
-  async create(): Promise<CurrentUserDto> {
+  async createUserSa(): Promise<CurrentUserDto> {
     const login = 'admin';
     const email = 'admin@gmail.com';
 
@@ -33,7 +34,9 @@ export class SaCreateSuperAdmin {
       expirationDate,
     };
 
-    const sa = await this.usersRepo.createSaUser(dataForCreateUserDto);
+    const sa: UsersEntity = await this.usersRepo.createSaUser(
+      dataForCreateUserDto,
+    );
     return {
       userId: sa.userId,
       login: sa.login,

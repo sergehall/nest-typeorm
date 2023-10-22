@@ -41,11 +41,13 @@ export class SubmitAnswerForCurrentQuestionUseCase
   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
     const { answerDto, activeGame, currentUserDto } = command;
 
+    // Fetch challenge answers for the active game
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(
         activeGame.id,
       );
 
+    // Count user's answers and total answers
     const counts: { countAnswersUser: number; countAnswersBoth: number } =
       await this.countsChallengeAnswers(
         challengeAnswers,
@@ -59,6 +61,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
       case MAX_ANSWER_COUNT:
         throw new ForbiddenException(answeredAllQuestionsMessage);
       default:
+        // Get the next challenge question
         const nextQuestion =
           await this.challengesQuestionsRepo.getNextChallengeQuestions(
             activeGame.id,
@@ -68,6 +71,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
         if (!nextQuestion) {
           throw new ForbiddenException(notFoundChallengeQuestions);
         } else if (nextQuestion) {
+          // Verify the answer for the next question
           const verifyAnswer =
             await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
               nextQuestion.question.id,
@@ -89,6 +93,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
           if (saveChallengeAnswer) {
             const currentAnswer: number = 1;
 
+            // Check if the user has answered all questions
             if (counts.countAnswersUser + currentAnswer === MAX_ANSWER_COUNT) {
               await this.commandBus.execute(
                 new PlayerAnswersAllQuestionsCommand(
@@ -120,6 +125,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
     }
   }
 
+  // Helper function to count user's answers and total answers
   private async countsChallengeAnswers(
     challengeAnswers: ChallengeAnswersEntity[],
     userId: string,

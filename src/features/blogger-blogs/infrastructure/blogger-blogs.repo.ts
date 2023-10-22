@@ -24,8 +24,8 @@ export class BloggerBlogsRepo {
   constructor(
     @InjectRepository(BloggerBlogsEntity)
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
-    protected keyResolver: KeyResolver,
-    protected uuidErrorResolver: UuidErrorResolver,
+    private readonly keyResolver: KeyResolver,
+    private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   async getBlogsOpenApi(
