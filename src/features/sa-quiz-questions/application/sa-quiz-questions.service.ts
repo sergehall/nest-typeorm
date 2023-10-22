@@ -1,9 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
 import { QuestionsViewModel } from '../view-models/questions.view-model';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class TransformationService {
+export class SaQuizQuestionsService {
   async transformEntityToQuestionsModelArray(
     newQuestions: QuestionsQuizEntity[],
   ): Promise<QuestionsViewModel[]> {

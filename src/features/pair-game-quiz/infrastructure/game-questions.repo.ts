@@ -176,7 +176,7 @@ export class GameQuestionsRepo {
     const direction: SortDirectionEnum = sortDirection;
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
-    const field: string = await this.getSortByWithComplexity(sortBy);
+    const field: string = await this.getSortByField(sortBy);
 
     const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
@@ -218,6 +218,7 @@ export class GameQuestionsRepo {
         ComplexityEnums.DIFFICULT,
       ]) {
         const questions = dictionaryQuestions[complexity];
+        console.log(questions);
 
         // Loop through the questions and insert them into the database
         for (const question of questions) {
@@ -295,7 +296,7 @@ export class GameQuestionsRepo {
     }
   }
 
-  private async getSortByWithComplexity(sortBy: string): Promise<string> {
+  private async getSortByField(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
       ['complexity', 'topic', 'published', 'body'],

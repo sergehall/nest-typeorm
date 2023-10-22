@@ -1,7 +1,6 @@
 import { ComplexityEnums } from '../../enums/complexity.enums';
 
 type Question = {
-  id: string;
   question: string;
   answers: string[];
   topic: string;

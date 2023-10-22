@@ -27,7 +27,7 @@ import { UpdatePublishDto } from '../dto/update-publish.dto';
 import { SaUpdateQuestionsPublishCommand } from '../application/use-cases/sa-update-questions-publish.use-case';
 
 @Controller('sa/quiz/questions')
-export class QuizQuestionsController {
+export class SaQuizQuestionsController {
   constructor(
     protected parseQueriesService: ParseQueriesService,
     private commandBus: CommandBus,
@@ -38,6 +38,7 @@ export class QuizQuestionsController {
   async saGetQuestions(@Query() query: any) {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
+
     return this.commandBus.execute(new SaGetQuestionsCommand(queryData));
   }
 

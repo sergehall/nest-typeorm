@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { TransformationService } from '../../common/transform-to-questions-model';
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { QuestionsAndCountDto } from '../../dto/questions-and-count.dto';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
+import { SaQuizQuestionsService } from '../sa-quiz-questions.service';
+import { QuestionsViewModel } from '../../view-models/questions.view-model';
 
 export class SaGetQuestionsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -15,7 +16,7 @@ export class SaGetQuestionsUseCase
 {
   constructor(
     protected gameQuestionsRepo: GameQuestionsRepo,
-    protected transformationService: TransformationService,
+    protected quizQuestionsService: SaQuizQuestionsService,
   ) {}
 
   async execute(command: SaGetQuestionsCommand): Promise<PaginatorDto> {
@@ -35,8 +36,8 @@ export class SaGetQuestionsUseCase
       };
     }
 
-    const questionsModels =
-      await this.transformationService.transformEntityToQuestionsModelArray(
+    const questionsModels: QuestionsViewModel[] =
+      await this.quizQuestionsService.transformEntityToQuestionsModelArray(
         questionsAndCount.questions,
       );
 
