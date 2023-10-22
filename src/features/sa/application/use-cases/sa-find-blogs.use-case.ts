@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs.dto';
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
+import { SaService } from '../sa.service';
+import { SaBloggerBlogsViewModel } from '../../view-models/sa-blogger-blogs.view-model';
 
 export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -11,7 +12,10 @@ export class SaFindBlogsCommand {
 
 @CommandHandler(SaFindBlogsCommand)
 export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
-  constructor(protected bloggerBlogsRepo: BloggerBlogsRepo) {}
+  constructor(
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected saService: SaService,
+  ) {}
   async execute(command: SaFindBlogsCommand): Promise<PaginatorDto> {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
@@ -19,7 +23,9 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
     const blogsAndCount: BlogsCountBlogsDto =
       await this.bloggerBlogsRepo.searchBlogsForSa(queryData);
 
-    if (blogsAndCount.blogs.length === 0) {
+    const { blogs, countBlogs } = blogsAndCount;
+
+    if (countBlogs === 0) {
       return {
         pagesCount: 0,
         page: pageNumber,
@@ -29,24 +35,8 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
       };
     }
 
-    const transformedArrBlogs = blogsAndCount.blogs.map(
-      (blog: BloggerBlogsEntity) => ({
-        id: blog.id,
-        name: blog.name,
-        description: blog.description,
-        websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
-        isMembership: blog.isMembership,
-        blogOwnerInfo: {
-          userId: blog.blogOwner.userId,
-          userLogin: blog.blogOwner.login,
-        },
-        banInfo: {
-          isBanned: blog.banInfoIsBanned,
-          banDate: blog.banInfoBanDate,
-        },
-      }),
-    );
+    const transformedBlogs: SaBloggerBlogsViewModel[] =
+      await this.saService.transformBlogsForSa(blogs);
 
     const totalCount = blogsAndCount.countBlogs;
 
@@ -57,7 +47,7 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: transformedArrBlogs,
+      items: transformedBlogs,
     };
   }
 }

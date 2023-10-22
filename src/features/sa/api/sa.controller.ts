@@ -75,7 +75,7 @@ export class SaController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchBlogsForSa(@Query() query: any): Promise<PaginatorDto> {
+  async saGetBlogs(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(new SaFindBlogsCommand(queryData));
   }
