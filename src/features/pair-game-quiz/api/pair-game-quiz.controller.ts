@@ -25,7 +25,7 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
 import { AnswerViewModel } from '../view-models/answer.view-model';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { MyGamesStatisticCommand } from '../application/use-cases/my-games-statistic.use-case';
 import { GameSummaryViewModel } from '../view-models/game-summary.view-model';
 import { GamesStatisticCommand } from '../application/use-cases/games-statistic.use-case';
@@ -54,7 +54,7 @@ export class PairGameQuizController {
   async getMyGames(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);

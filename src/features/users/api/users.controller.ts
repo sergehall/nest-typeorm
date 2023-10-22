@@ -28,7 +28,7 @@ import { CurrentUserDto } from '../dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { UsersEntity } from '../entities/users.entity';
 import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
@@ -46,7 +46,7 @@ export class UsersController {
   @UseGuards(BaseAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUsers(@Query() query: any): Promise<PaginatedResultDto> {
+  async findUsers(@Query() query: any): Promise<PaginatorDto> {
     const queryData: ParseQueriesDto = await this.parseQueries.getQueriesData(
       query,
     );

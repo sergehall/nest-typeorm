@@ -16,7 +16,6 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { LikesInfo, CommentViewModel } from '../view-models/comment.view-model';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { CommentWithLikesInfoViewModel } from '../view-models/comment-with-likes-info.view-model';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
@@ -26,14 +25,14 @@ import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 import { PartialCommentsDto } from '../dto/partial-comments.dto';
 import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { LikeStatusCommentsRepo } from './like-status-comments.repo';
 
 export class CommentsRepo {
   constructor(
-    private readonly keyResolver: KeyResolver,
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,
-    @InjectRepository(LikeStatusCommentsEntity)
-    private readonly likeCommentRepository: Repository<LikeStatusCommentsEntity>,
+    private readonly likeStatusCommentsRepo: LikeStatusCommentsRepo,
+    private readonly keyResolver: KeyResolver,
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
@@ -98,17 +97,16 @@ export class CommentsRepo {
     currentUserDto: CurrentUserDto | null,
   ): Promise<CommentsAndCountDto> {
     try {
+      const { pageNumber, pageSize } = queryData.queryPagination;
+      const limit: number = pageSize;
+      const offset: number = (pageNumber - 1) * limit;
+
       const queryBuilder = await this.createCommentsQueryBuilder(
         queryData,
         'postId',
         postId,
       );
       const countComment = await queryBuilder.getCount();
-
-      const pagingParams: PagingParamsDto = await this.getPagingParams(
-        queryData,
-      );
-      const { limit, offset } = pagingParams;
 
       const comments: CommentsEntity[] = await queryBuilder
         .skip(offset)
@@ -141,10 +139,9 @@ export class CommentsRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<CommentsAndCountDto> {
     try {
-      const pagingParams: PagingParamsDto = await this.getPagingParams(
-        queryData,
-      );
-      const { limit, offset } = pagingParams;
+      const { pageNumber, pageSize } = queryData.queryPagination;
+      const limit: number = pageSize;
+      const offset: number = (pageNumber - 1) * limit;
 
       const queryBuilder = await this.createCommentsQueryBuilder(
         queryData,
@@ -189,11 +186,9 @@ export class CommentsRepo {
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { sortBy, direction } = pagingParams;
-
-    // Retrieve the order field for sorting
-    const orderByField = await this.getOrderField(sortBy);
+    const { sortBy, sortDirection } = queryData.queryPagination;
+    const field: string = await this.getSortByField(sortBy);
+    const direction: SortDirectionEnum = sortDirection;
 
     const queryBuilder = this.commentsRepository
       .createQueryBuilder('comment')
@@ -211,7 +206,7 @@ export class CommentsRepo {
         postId: value,
       });
     }
-    queryBuilder.orderBy(orderByField, direction);
+    queryBuilder.orderBy(`comment.${field}`, direction);
 
     return queryBuilder;
   }
@@ -352,21 +347,6 @@ export class CommentsRepo {
     };
   }
 
-  private async getPagingParams(
-    queryData: ParseQueriesDto,
-  ): Promise<PagingParamsDto> {
-    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
-
-    const sortBy: string = await this.getSortBy(
-      queryData.queryPagination.sortBy,
-    );
-    const direction: SortDirectionEnum = sortDirection;
-    const limit: number = pageSize;
-    const offset: number = (pageNumber - 1) * limit;
-
-    return { sortBy, direction, limit, offset };
-  }
-
   async commentsLikesAggregation(
     comments: CommentsEntity[],
     currentUserDto: CurrentUserDto | null,
@@ -374,7 +354,10 @@ export class CommentsRepo {
     const commentIds = comments.map((comment) => comment.id);
 
     const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
-      await this.getCommentsLikesDislikesMyStatus(commentIds, currentUserDto);
+      await this.likeStatusCommentsRepo.getCommentsLikesDislikesMyStatus(
+        commentIds,
+        currentUserDto,
+      );
 
     return comments.map((comment: CommentsEntity): CommentViewModel => {
       const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
@@ -399,39 +382,7 @@ export class CommentsRepo {
     });
   }
 
-  private async getCommentsLikesDislikesMyStatus(
-    commentIds: string[],
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<LikesDislikesMyStatusInfoDto[]> {
-    try {
-      return this.likeCommentRepository
-        .createQueryBuilder('likeStatusComments')
-        .select([
-          'likeStatusComments.commentId AS "id"',
-          'COUNT(CASE WHEN likeStatusComments.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
-          'COUNT(CASE WHEN likeStatusComments.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
-          'COALESCE(MAX(CASE WHEN likeStatusComments.ratedCommentUser.userId = :userId THEN likeStatusComments.likeStatus ELSE NULL END), \'None\') AS "myStatus"',
-        ])
-        .where('likeStatusComments.commentId IN (:...commentIds)', {
-          commentIds,
-        })
-        .andWhere('likeStatusComments.isBanned = :isBanned', {
-          isBanned: false,
-        })
-        .setParameters({
-          likeStatus: LikeStatusEnums.LIKE,
-          dislikeStatus: LikeStatusEnums.DISLIKE,
-          userId: currentUserDto?.userId,
-        })
-        .groupBy('likeStatusComments.commentId')
-        .getRawMany();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async getSortBy(sortBy: string): Promise<string> {
+  private async getSortByField(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
       [
@@ -445,42 +396,5 @@ export class CommentsRepo {
       ],
       'createdAt',
     );
-  }
-
-  private async getOrderField(field: string): Promise<string> {
-    let orderByString;
-    try {
-      switch (field) {
-        case 'postTitle':
-          orderByString = 'comment.post.postTitle';
-          break;
-        case 'blogName':
-          orderByString = 'comment.blog.blogName';
-          break;
-        case 'commentatorLogin':
-          orderByString = 'commentator.commentatorLogin ';
-          break;
-        case 'isBanned':
-          orderByString = 'comment.isBanned';
-          break;
-        case 'dependencyIsBanned':
-          orderByString = 'comment.dependencyIsBanned';
-          break;
-        case 'banDate':
-          orderByString = 'comment.banDate';
-          break;
-        case 'banReason':
-          orderByString = 'comment.banReason';
-          break;
-        default:
-          orderByString = 'comment.createdAt';
-      }
-      return orderByString;
-    } catch (error) {
-      console.log(error.message);
-      throw new Error(
-        'Invalid field in getOrderField(field: string)' + error.message,
-      );
-    }
   }
 }

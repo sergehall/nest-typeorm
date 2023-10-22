@@ -1,6 +1,6 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
 
@@ -15,7 +15,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected bloggerBlogsService: BloggerBlogsService,
   ) {}
-  async execute(command: SearchBlogsCommand): Promise<PaginatedResultDto> {
+  async execute(command: SearchBlogsCommand): Promise<PaginatorDto> {
     const { queryData } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 

@@ -11,12 +11,11 @@ import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-q
 import { CreateQuizQuestionDto } from '../../sa-quiz-questions/dto/create-quiz-question.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { QuestionsAndCountDto } from '../../sa-quiz-questions/dto/questions-and-count.dto';
-import { PagingParamsDto } from '../../../common/pagination/dto/paging-params.dto';
 import { ComplexityEnums } from '../enums/complexity.enums';
 import { dictionaryQuestions } from '../questions/dictionary-questions';
-import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import * as crypto from 'crypto';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 
 export class GameQuestionsRepo {
   constructor(
@@ -25,32 +24,6 @@ export class GameQuestionsRepo {
     protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
-
-  // async getQuestionById(id: string): Promise<QuestionsQuizEntity | null> {
-  //   try {
-  //     const queryBuilder = this.questionsRepository
-  //       .createQueryBuilder('questionsQuiz')
-  //       .where('questionsQuiz.id = :id', {
-  //         id,
-  //       })
-  //       .andWhere('questionsQuiz.published = :published', {
-  //         published: true,
-  //       });
-  //
-  //     const questionsQuizEntity: QuestionsQuizEntity | null =
-  //       await queryBuilder.getOne();
-  //
-  //     return questionsQuizEntity ? questionsQuizEntity : null;
-  //   } catch (error) {
-  //     if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-  //       const userId = await this.uuidErrorResolver.extractUserIdFromError(
-  //         error,
-  //       );
-  //       throw new NotFoundException(`Questions with ID ${userId} not found`);
-  //     }
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
 
   async getQuestionById(id: string): Promise<QuestionsQuizEntity | null> {
     try {
@@ -195,14 +168,17 @@ export class GameQuestionsRepo {
     queryData: ParseQueriesDto,
   ): Promise<QuestionsAndCountDto> {
     const bodySearchTerm = queryData.bodySearchTerm;
+
+    const { sortBy, sortDirection, pageSize, pageNumber } =
+      queryData.queryPagination;
+
     // Retrieve paging parameters
-    const pagingParams: PagingParamsDto = await this.getPagingParams(queryData);
-    const { sortBy, direction, limit, offset } = pagingParams;
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
+    const field: string = await this.getSortByWithComplexity(sortBy);
 
     const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
-
-    // Retrieve the order field for sorting
-    const orderByField = await this.getOrderField(sortBy);
 
     try {
       const queryBuilder = this.questionsRepository
@@ -210,7 +186,7 @@ export class GameQuestionsRepo {
         .where('questionsQuiz.questionText ILIKE :bodySearchTerm', {
           bodySearchTerm,
         })
-        .orderBy(`questionsQuiz.${orderByField}`, direction, collate);
+        .orderBy(`questionsQuiz.${field}`, direction, collate);
 
       const questions: QuestionsQuizEntity[] = await queryBuilder
         .skip(offset)
@@ -231,38 +207,6 @@ export class GameQuestionsRepo {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  private async getQuestionsByComplexity(
-    numberQuestions: number,
-  ): Promise<QuestionsQuizEntity[]> {
-    const complexityLevels = [
-      ComplexityEnums.EASY,
-      ComplexityEnums.MEDIUM,
-      ComplexityEnums.DIFFICULT,
-    ];
-
-    const questionsPerLevel = 2; // Adjust as needed
-
-    const randomQuestions: QuestionsQuizEntity[] = [];
-
-    for (const complexity of complexityLevels) {
-      const levelQuestions = await this.questionsRepository
-        .createQueryBuilder('questionsQuiz')
-        .where('questionsQuiz.complexity = :complexity', { complexity })
-        .andWhere('questionsQuiz.published = :published', { published: true })
-        .orderBy('RANDOM()')
-        .limit(questionsPerLevel)
-        .getMany();
-
-      randomQuestions.push(...levelQuestions);
-    }
-
-    // Shuffle the combined results
-    randomQuestions.sort(() => Math.random() - 0.5);
-
-    // Return the first 'numberQuestions' questions
-    return randomQuestions.slice(0, numberQuestions);
   }
 
   async createAndSaveQuestion(): Promise<boolean> {
@@ -351,22 +295,7 @@ export class GameQuestionsRepo {
     }
   }
 
-  private async getPagingParams(
-    queryData: ParseQueriesDto,
-  ): Promise<PagingParamsDto> {
-    const { sortDirection, pageSize, pageNumber } = queryData.queryPagination;
-
-    const sortBy: string = await this.getSortForComplexityQuestion(
-      queryData.queryPagination.sortBy,
-    );
-    const direction: SortDirectionEnum = sortDirection;
-    const limit: number = pageSize;
-    const offset: number = (pageNumber - 1) * limit;
-
-    return { sortBy, direction, limit, offset };
-  }
-
-  private async getSortForComplexityQuestion(sortBy: string): Promise<string> {
+  private async getSortByWithComplexity(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
       ['complexity', 'topic', 'published', 'body'],
@@ -374,31 +303,36 @@ export class GameQuestionsRepo {
     );
   }
 
-  private async getOrderField(field: string): Promise<string> {
-    let orderByString;
-    try {
-      switch (field) {
-        case 'complexity':
-          orderByString = 'complexity';
-          break;
-        case 'topic':
-          orderByString = 'topic';
-          break;
-        case 'published':
-          orderByString = 'published ';
-          break;
-        case 'body':
-          orderByString = 'questionText';
-          break;
-        default:
-          orderByString = 'createdAt';
-      }
+  private async getQuestionsByComplexity(
+    numberQuestions: number,
+  ): Promise<QuestionsQuizEntity[]> {
+    const complexityLevels = [
+      ComplexityEnums.EASY,
+      ComplexityEnums.MEDIUM,
+      ComplexityEnums.DIFFICULT,
+    ];
 
-      return orderByString;
-    } catch (error) {
-      console.log(error.message);
-      throw new Error('Invalid field in getOrderField(field: string)');
+    const questionsPerLevel = 2; // Adjust as needed
+
+    const randomQuestions: QuestionsQuizEntity[] = [];
+
+    for (const complexity of complexityLevels) {
+      const levelQuestions = await this.questionsRepository
+        .createQueryBuilder('questionsQuiz')
+        .where('questionsQuiz.complexity = :complexity', { complexity })
+        .andWhere('questionsQuiz.published = :published', { published: true })
+        .orderBy('RANDOM()')
+        .limit(questionsPerLevel)
+        .getMany();
+
+      randomQuestions.push(...levelQuestions);
     }
+
+    // Shuffle the combined results
+    randomQuestions.sort(() => Math.random() - 0.5);
+
+    // Return the first 'numberQuestions' questions
+    return randomQuestions.slice(0, numberQuestions);
   }
 
   private async stringsToHashes(

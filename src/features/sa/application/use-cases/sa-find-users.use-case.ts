@@ -1,6 +1,6 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { UserViewModel } from '../../../users/view-models/user.view-model';
@@ -12,7 +12,7 @@ export class SaFindUsersCommand {
 @CommandHandler(SaFindUsersCommand)
 export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
   constructor(protected usersRepo: UsersRepo) {}
-  async execute(command: SaFindUsersCommand): Promise<PaginatedResultDto> {
+  async execute(command: SaFindUsersCommand): Promise<PaginatorDto> {
     const { queryData } = command;
 
     const arrUsers = await this.usersRepo.findUsers(queryData);

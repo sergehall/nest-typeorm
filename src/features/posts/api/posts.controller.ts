@@ -30,7 +30,7 @@ import { PostIdParams } from '../../../common/query/params/postId.params';
 import { IdParams } from '../../../common/query/params/id.params';
 import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostWithBlogIdDto } from '../dto/update-post-with-blog-id.dto';
 import { CreatePostWithBlogIdDto } from '../dto/create-post-with-blog-id.dto';
@@ -58,7 +58,7 @@ export class PostsController {
   async openFindPosts(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
@@ -90,7 +90,7 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);

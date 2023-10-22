@@ -4,7 +4,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -32,7 +32,7 @@ export class SearchBannedUsersInBlogUseCase
   ) {}
   async execute(
     command: SearchBannedUsersInBlogCommand,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const { blogId, queryData, currentUser } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 

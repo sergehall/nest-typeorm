@@ -6,7 +6,7 @@ import { GamesStatisticsViewModel } from '../../view-models/games-statistics.vie
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SortType } from '../../../../common/query/types/sort.type';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
 
 export class GamesStatisticCommand {
@@ -19,7 +19,7 @@ export class GamesStatisticUseCase
 {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(command: GamesStatisticCommand): Promise<PaginatedResultDto> {
+  async execute(command: GamesStatisticCommand): Promise<PaginatorDto> {
     const { queryData } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
     const { sort } = queryData;

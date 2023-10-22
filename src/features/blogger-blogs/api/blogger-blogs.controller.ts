@@ -30,7 +30,7 @@ import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PostWithLikesInfoViewModel } from '../../posts/view-models/post-with-likes-info.view-model';
-import { PaginatedResultDto } from '../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
@@ -55,7 +55,7 @@ export class BloggerBlogsController {
   async getBlogsOwnedByCurrentUser(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
 
     const queryData: ParseQueriesDto =
@@ -71,7 +71,7 @@ export class BloggerBlogsController {
   async getCommentsOwnedByCurrentUser(
     @Request() req: any,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
@@ -116,7 +116,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
@@ -146,7 +146,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: IdParams,
     @Query() query: any,
-  ): Promise<PaginatedResultDto> {
+  ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);

@@ -9,7 +9,7 @@ import { GamesStatisticsViewModel } from '../../../features/pair-game-quiz/view-
 import { BloggerBlogsViewModel } from '../../../features/blogger-blogs/view-models/blogger-blogs.view-model';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 
-export class PaginatedResultDto {
+export class PaginatorDto {
   @IsNumber()
   pagesCount: number;
 

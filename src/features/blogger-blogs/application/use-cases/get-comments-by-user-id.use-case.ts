@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatedResultDto } from '../../../../common/pagination/dto/paginated-result.dto';
+import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { CommentsRepo } from '../../../comments/infrastructure/comments.repo';
 import { CommentsAndCountDto } from '../../../comments/dto/comments-and-count.dto';
 
@@ -20,9 +20,7 @@ export class GetCommentsByUserIdUseCase
     protected commentsRepo: CommentsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(
-    command: GetCommentsByUserIdCommand,
-  ): Promise<PaginatedResultDto> {
+  async execute(command: GetCommentsByUserIdCommand): Promise<PaginatorDto> {
     const { queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
