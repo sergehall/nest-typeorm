@@ -134,7 +134,7 @@ export class BloggerBlogsRepo {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+      const collate = direction === 'DESC' ? `NULLS FIRST` : `NULLS LAST`;
 
       const queryBuilder = this.bloggerBlogsRepository
         .createQueryBuilder('blog')
