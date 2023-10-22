@@ -19,7 +19,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
     const { queryData } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsOpenApi(
+    const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsPublic(
       queryData,
     );
 

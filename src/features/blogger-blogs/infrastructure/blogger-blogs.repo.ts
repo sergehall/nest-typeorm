@@ -28,18 +28,19 @@ export class BloggerBlogsRepo {
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async getBlogsOpenApi(
+  async getBlogsPublic(
     queryData: ParseQueriesDto,
   ): Promise<BlogsCountBlogsDto> {
     const blogOwnerBanStatus = false;
     const banInfoBanStatus = false;
+
     const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+    const collate = direction === 'DESC' ? `NULLS FIRST` : `NULLS LAST`;
 
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blogs')
