@@ -21,7 +21,7 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const blogsAndCount: BlogsCountBlogsDto =
-      await this.bloggerBlogsRepo.searchBlogsForSa(queryData);
+      await this.bloggerBlogsRepo.getBlogsSa(queryData);
 
     const { blogs, countBlogs } = blogsAndCount;
 
