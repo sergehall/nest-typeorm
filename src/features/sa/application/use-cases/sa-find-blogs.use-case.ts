@@ -5,6 +5,7 @@ import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { SaService } from '../sa.service';
 import { SaBloggerBlogsViewModel } from '../../view-models/sa-blogger-blogs.view-model';
+import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
 
 export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -14,6 +15,7 @@ export class SaFindBlogsCommand {
 export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
   constructor(
     protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected bloggerBlogsService: BloggerBlogsService,
     protected saService: SaService,
   ) {}
   async execute(command: SaFindBlogsCommand): Promise<PaginatorDto> {
@@ -36,7 +38,7 @@ export class SaFindBlogsUseCase implements ICommandHandler<SaFindBlogsCommand> {
     }
 
     const transformedBlogs: SaBloggerBlogsViewModel[] =
-      await this.saService.transformBlogsForSa(blogs);
+      await this.bloggerBlogsService.transformBlogsForSa(blogs);
 
     const totalCount = blogsAndCount.countBlogs;
 

@@ -138,17 +138,17 @@ export class CommentsRepo {
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto,
   ): Promise<CommentsAndCountDto> {
+    const { pageNumber, pageSize } = queryData.queryPagination;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
+
+    const queryBuilder = await this.createCommentsQueryBuilder(
+      queryData,
+      'commentatorId',
+      currentUserDto.userId,
+    );
+
     try {
-      const { pageNumber, pageSize } = queryData.queryPagination;
-      const limit: number = pageSize;
-      const offset: number = (pageNumber - 1) * limit;
-
-      const queryBuilder = await this.createCommentsQueryBuilder(
-        queryData,
-        'commentatorId',
-        currentUserDto.userId,
-      );
-
       const countComment = await queryBuilder.getCount();
 
       const comments: CommentsEntity[] = await queryBuilder

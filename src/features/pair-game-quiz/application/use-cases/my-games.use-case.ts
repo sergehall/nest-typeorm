@@ -24,8 +24,8 @@ export class GetMyGamesCommand {
 @CommandHandler(GetMyGamesCommand)
 export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   constructor(
-    protected gamePairsRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
+    protected gamePairsRepo: GamePairsRepo,
     protected pairGameQuizService: PairGameQuizService,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
