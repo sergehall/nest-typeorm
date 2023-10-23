@@ -159,8 +159,8 @@ export class BloggerBlogsRepo {
         .orderBy(
           `
           CASE
-            WHEN ASCII(SUBSTRING(blog.${sortBy}, 1, 1)) BETWEEN 65 AND 90 THEN 0 
-              ELSE 1 
+            WHEN ASCII(SUBSTRING(blog.${sortBy}, 1, 1)) 
+            BETWEEN 65 AND 90 THEN 1 ELSE 0
           END`,
           direction,
           collate,
