@@ -133,7 +133,7 @@ export class BloggerBlogsRepo {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      const collate = direction === 'ASC' ? `NULLS LAST` : `NULLS FIRST`;
+      const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
       console.log(searchNameTerm, 'searchNameTerm');
       console.log(collate, 'collate');
@@ -154,7 +154,9 @@ export class BloggerBlogsRepo {
         .where('blog.name ILIKE :searchNameTerm', {
           searchNameTerm,
         })
-        .orderBy(`blog.${sortBy}`, direction, collate);
+        // .orderBy(`blog.${sortBy}`, direction, collate);
+        .addSelect(`blog.${sortBy} COLLATE "C"`, 'sortedColumn')
+        .orderBy('sortedColumn', direction);
 
       const blogs: BloggerBlogsEntity[] = await queryBuilder
         .skip(offset)
