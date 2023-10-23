@@ -58,16 +58,16 @@ export class BloggerBlogsRepo {
       .andWhere('"banInfoIsBanned" = :banInfoIsBanned', {
         banInfoIsBanned: banInfoBanStatus,
       })
-      .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm });
+      .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm })
+      .orderBy(`blogs.${sortBy}`, direction, collate);
 
     try {
       const countBlogs = await queryBuilder.getCount();
 
-      queryBuilder.orderBy(`blogs.${sortBy}`, direction, collate);
-      queryBuilder.limit(limit);
-      queryBuilder.offset(offset);
-
-      const blogs: BloggerBlogsEntity[] = await queryBuilder.getMany();
+      const blogs: BloggerBlogsEntity[] = await queryBuilder
+        .offset(offset)
+        .limit(limit)
+        .getMany();
 
       return { blogs, countBlogs };
     } catch (error) {
@@ -126,53 +126,42 @@ export class BloggerBlogsRepo {
   }
 
   async getBlogsSa(queryData: ParseQueriesDto): Promise<BlogsCountBlogsDto> {
+    const searchNameTerm = queryData.searchNameTerm;
+    const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
+    const direction = queryData.queryPagination.sortDirection;
+    const limit = queryData.queryPagination.pageSize;
+    const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+
+    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+
+    console.log(searchNameTerm, 'searchNameTerm');
+    console.log(collate, 'collate');
+    console.log(sortBy, 'sortBy');
+    console.log(direction, 'direction');
+
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder('blogs')
+      .select([
+        'blogs.id',
+        'blogs.name',
+        'blogs.description',
+        'blogs.websiteUrl',
+        'blogs.createdAt',
+        'blogs.isMembership',
+      ])
+      .leftJoinAndSelect('blogs.blogOwner', 'blogOwner')
+      .where('blogs.name ILIKE :searchNameTerm', {
+        searchNameTerm,
+      })
+      .orderBy(`blogs."${sortBy}" COLLATE "C"`, direction, collate);
+
     try {
-      const searchNameTerm = queryData.searchNameTerm;
-      const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
-
-      const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
-
-      console.log(searchNameTerm, 'searchNameTerm');
-      console.log(collate, 'collate');
-      console.log(sortBy, 'sortBy');
-      console.log(direction, 'direction');
-
-      const queryBuilder = this.bloggerBlogsRepository
-        .createQueryBuilder('blog')
-        .select([
-          'blog.id',
-          'blog.name',
-          'blog.description',
-          'blog.websiteUrl',
-          'blog.createdAt',
-          'blog.isMembership',
-        ])
-        .leftJoinAndSelect('blog.blogOwner', 'blogOwner')
-        .where('blog.name ILIKE :searchNameTerm', {
-          searchNameTerm,
-        })
-        // .orderBy(`blog.${sortBy}`, direction, collate);
-        // .orderBy(`blog.${sortBy} COLLATE "C"`, direction);
-        .orderBy(
-          `
-          CASE
-            WHEN ASCII(SUBSTRING(blog.${sortBy}, 1, 1)) 
-            BETWEEN 65 AND 90 THEN 1 ELSE 0
-          END`,
-          direction,
-          collate,
-        )
-        .orderBy(`blog.${sortBy}`, direction, collate);
+      const countBlogs = await queryBuilder.getCount();
 
       const blogs: BloggerBlogsEntity[] = await queryBuilder
-        .skip(offset)
-        .take(limit)
+        .offset(offset)
+        .limit(limit)
         .getMany();
-
-      const countBlogs = await queryBuilder.getCount();
 
       if (blogs.length === 0) {
         return {
