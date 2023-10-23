@@ -40,7 +40,7 @@ export class BloggerBlogsRepo {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    const collate = direction === 'DESC' ? `NULLS FIRST` : `NULLS LAST`;
+    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blogs')
@@ -125,9 +125,7 @@ export class BloggerBlogsRepo {
     }
   }
 
-  async searchBlogsForSa(
-    queryData: ParseQueriesDto,
-  ): Promise<BlogsCountBlogsDto> {
+  async getBlogsSa(queryData: ParseQueriesDto): Promise<BlogsCountBlogsDto> {
     try {
       const searchNameTerm = queryData.searchNameTerm;
       const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
@@ -135,7 +133,12 @@ export class BloggerBlogsRepo {
       const limit = queryData.queryPagination.pageSize;
       const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-      const collate = direction === 'DESC' ? `NULLS FIRST` : `NULLS LAST`;
+      const collate = direction === 'ASC' ? `NULLS LAST` : `NULLS FIRST`;
+
+      console.log(searchNameTerm, 'searchNameTerm');
+      console.log(collate, 'collate');
+      console.log(sortBy, 'sortBy');
+      console.log(direction, 'direction');
 
       const queryBuilder = this.bloggerBlogsRepository
         .createQueryBuilder('blog')
@@ -146,14 +149,10 @@ export class BloggerBlogsRepo {
           'blog.websiteUrl',
           'blog.createdAt',
           'blog.isMembership',
-          'blog.blogOwnerId',
-          'blog.blogOwnerLogin',
-          'blog.banInfoIsBanned',
-          'blog.banInfoBanDate',
         ])
         .leftJoinAndSelect('blog.blogOwner', 'blogOwner')
         .where('blog.name ILIKE :searchNameTerm', {
-          searchNameTerm: searchNameTerm,
+          searchNameTerm,
         })
         .orderBy(`blog.${sortBy}`, direction, collate);
 
