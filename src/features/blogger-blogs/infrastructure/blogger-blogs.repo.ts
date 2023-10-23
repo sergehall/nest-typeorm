@@ -157,11 +157,13 @@ export class BloggerBlogsRepo {
         // .orderBy(`blog.${sortBy}`, direction, collate);
         // .orderBy(`blog.${sortBy} COLLATE "C"`, direction);
         .orderBy(
-          `CASE 
-    WHEN ASCII(SUBSTRING(blog.name, 1, 1)) BETWEEN 65 AND 90 THEN 0 
-    ELSE 1 
-  END`,
-          'ASC',
+          `
+          CASE
+            WHEN ASCII(SUBSTRING(blog.${sortBy}, 1, 1)) BETWEEN 65 AND 90 THEN 0 
+              ELSE 1 
+          END`,
+          direction,
+          collate,
         )
         .orderBy(`blog.${sortBy}`, direction, collate);
 
