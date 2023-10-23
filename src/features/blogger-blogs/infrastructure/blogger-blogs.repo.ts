@@ -40,7 +40,7 @@ export class BloggerBlogsRepo {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+    const nullsDirection = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blogs')
@@ -59,10 +59,10 @@ export class BloggerBlogsRepo {
         banInfoIsBanned: banInfoBanStatus,
       })
       .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm })
-      .orderBy(`blogs.${sortBy}`, direction, collate);
+      .orderBy(`blogs.${sortBy} COLLATE "C"`, direction, nullsDirection);
 
     try {
-      const countBlogs = await queryBuilder.getCount();
+      const countBlogs: number = await queryBuilder.getCount();
 
       const blogs: BloggerBlogsEntity[] = await queryBuilder
         .offset(offset)
@@ -132,10 +132,10 @@ export class BloggerBlogsRepo {
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
-    const collate = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
+    const nullsDirection = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
     console.log(searchNameTerm, 'searchNameTerm');
-    console.log(collate, 'collate');
+    console.log(nullsDirection, 'nullsDirection');
     console.log(sortBy, 'sortBy');
     console.log(direction, 'direction');
 
@@ -153,10 +153,10 @@ export class BloggerBlogsRepo {
       .where('blogs.name ILIKE :searchNameTerm', {
         searchNameTerm,
       })
-      .orderBy(`blogs."${sortBy}" COLLATE "C"`, direction, collate);
+      .orderBy(`blogs.${sortBy} COLLATE "C"`, direction, nullsDirection);
 
     try {
-      const countBlogs = await queryBuilder.getCount();
+      const countBlogs: number = await queryBuilder.getCount();
 
       const blogs: BloggerBlogsEntity[] = await queryBuilder
         .offset(offset)
@@ -170,7 +170,7 @@ export class BloggerBlogsRepo {
         };
       }
 
-      return { blogs: blogs, countBlogs: countBlogs };
+      return { blogs, countBlogs };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
