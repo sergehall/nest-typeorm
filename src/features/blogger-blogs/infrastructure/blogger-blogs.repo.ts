@@ -76,47 +76,50 @@ export class BloggerBlogsRepo {
     }
   }
 
-  async getUserBlogs(
+  async getBlogsOwnedByCurrentUser(
     currentUserDto: CurrentUserDto,
     queryData: ParseQueriesDto,
   ): Promise<BlogsCountBlogsDto> {
-    const blogOwnerBanStatus = false;
-    const banInfoBanStatus = false;
     const { userId } = currentUserDto;
+    // ban flags should be false
+    const dependencyIsBanned = false;
+    const banInfoIsBanned = false;
+
     const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
     const direction = queryData.queryPagination.sortDirection;
     const limit = queryData.queryPagination.pageSize;
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+    const nullsDirection = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
 
     const queryBuilder = this.bloggerBlogsRepository
-      .createQueryBuilder('Blogs')
+      .createQueryBuilder('blogs')
       .select([
-        'id',
-        'name',
-        'description',
-        'websiteUrl',
-        'createdAt',
-        'isMembership',
+        'blogs.id',
+        'blogs.name',
+        'blogs.description',
+        'blogs.websiteUrl',
+        'blogs.createdAt',
+        'blogs.isMembership',
       ])
-      .addSelect('(COUNT(*) OVER())', 'countBlogs')
-      .where('"dependencyIsBanned" = :dependencyIsBanned', {
-        dependencyIsBanned: blogOwnerBanStatus,
+      .leftJoinAndSelect('blogs.blogOwner', 'blogOwner')
+      .where('blogOwner.userId = :userId', { userId })
+      .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm })
+      .andWhere('blogs.dependencyIsBanned = :dependencyIsBanned', {
+        dependencyIsBanned,
       })
-      .andWhere('"banInfoIsBanned" = :banInfoIsBanned', {
-        banInfoIsBanned: banInfoBanStatus,
+      .andWhere('blogs.banInfoIsBanned = :banInfoIsBanned', {
+        banInfoIsBanned,
       })
-      .andWhere('"blogOwnerId" = :blogOwnerId', { blogOwnerId: userId })
-      .andWhere('"name" ILIKE :searchNameTerm', { searchNameTerm })
-      .orderBy(`"${sortBy}"`, direction);
+      .orderBy(`blogs.${sortBy} COLLATE "C"`, direction, nullsDirection);
 
     try {
       const countBlogs = await queryBuilder.getCount();
 
-      queryBuilder.limit(limit);
-      queryBuilder.offset(offset);
-
-      const blogs: BloggerBlogsEntity[] = await queryBuilder.getMany();
+      const blogs: BloggerBlogsEntity[] = await queryBuilder
+        .offset(offset)
+        .limit(limit)
+        .getMany();
 
       return { blogs, countBlogs };
     } catch (error) {
@@ -133,11 +136,6 @@ export class BloggerBlogsRepo {
     const offset = (queryData.queryPagination.pageNumber - 1) * limit;
 
     const nullsDirection = direction === 'ASC' ? `NULLS FIRST` : `NULLS LAST`;
-
-    console.log(searchNameTerm, 'searchNameTerm');
-    console.log(nullsDirection, 'nullsDirection');
-    console.log(sortBy, 'sortBy');
-    console.log(direction, 'direction');
 
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blogs')
@@ -237,16 +235,16 @@ export class BloggerBlogsRepo {
       currentUser,
     );
 
-    try {
-      const queryBuilder = this.bloggerBlogsRepository
-        .createQueryBuilder()
-        .insert()
-        .into(BloggerBlogsEntity)
-        .values(blogEntity)
-        .returning(
-          `"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
-        );
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(BloggerBlogsEntity)
+      .values(blogEntity)
+      .returning(
+        `"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
+      );
 
+    try {
       const result: InsertResult = await queryBuilder.execute();
 
       return result.raw[0];

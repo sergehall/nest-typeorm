@@ -30,7 +30,10 @@ export class GetBlogsOwnedByCurrentUserUseCase
     const { pageSize, pageNumber } = queryData.queryPagination;
 
     const blogsCountBlogsDto: BlogsCountBlogsDto =
-      await this.bloggerBlogsRepo.getUserBlogs(currentUserDto, queryData);
+      await this.bloggerBlogsRepo.getBlogsOwnedByCurrentUser(
+        currentUserDto,
+        queryData,
+      );
 
     if (blogsCountBlogsDto.countBlogs === 0) {
       return {
