@@ -152,11 +152,9 @@ export class BloggerBlogsRepo {
         ])
         .leftJoinAndSelect('blog.blogOwner', 'blogOwner')
         .where('blog.name ILIKE :searchNameTerm', {
-          searchNameTerm,
+          searchNameTerm: searchNameTerm.toLowerCase(),
         })
-        // .orderBy(`blog.${sortBy}`, direction, collate);
-        .addSelect(`blog.${sortBy} COLLATE "C"`, 'sortedColumn')
-        .orderBy('sortedColumn', direction);
+        .orderBy(`blog.${sortBy}`, direction, collate);
 
       const blogs: BloggerBlogsEntity[] = await queryBuilder
         .skip(offset)
