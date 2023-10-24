@@ -4,6 +4,7 @@ import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-
 import { MailsService } from '../../../../common/mails/application/mails.service';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
+import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -22,17 +23,14 @@ export class UpdateSentConfirmationCodeUseCase
 
     const confirmationCode = uuid4().toString();
 
-    const expirationDate = await this.expirationDateCalculator.createExpDate(
-      0,
-      1,
-      0,
-    );
+    const expirationDateDto: ExpirationDateDto =
+      await this.expirationDateCalculator.createExpDate(0, 1, 0);
 
     const updatedUser: UsersEntity | null =
       await this.usersRepo.updateCodeAndExpirationByEmail(
         email,
         confirmationCode,
-        expirationDate,
+        expirationDateDto.expirationDate,
       );
 
     if (!updatedUser) {

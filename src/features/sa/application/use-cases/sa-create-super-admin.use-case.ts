@@ -5,6 +5,7 @@ import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dt
 import { Injectable } from '@nestjs/common';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { UsersEntity } from '../../../users/entities/users.entity';
+import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
 
 @Injectable()
 export class SaCreateSuperAdmin {
@@ -21,17 +22,14 @@ export class SaCreateSuperAdmin {
     const passwordHash = await this.encryptConfig.getSaPasswordHash();
 
     // Return the expirationDate in ISO format for user registration.
-    const expirationDate = await this.expirationDateCalculator.createExpDate(
-      0,
-      3,
-      0,
-    );
+    const expirationDateDto: ExpirationDateDto =
+      await this.expirationDateCalculator.createExpDate(0, 3, 0);
 
     const dataForCreateUserDto: DataForCreateUserDto = {
       login,
       email,
       passwordHash,
-      expirationDate,
+      expirationDate: expirationDateDto.expirationDate,
     };
 
     const sa: UsersEntity = await this.usersRepo.createSaUser(
