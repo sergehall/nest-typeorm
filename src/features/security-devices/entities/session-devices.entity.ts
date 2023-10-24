@@ -1,5 +1,7 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { PayloadDto } from '../../auth/dto/payload.dto';
+import * as uuid4 from 'uuid4';
 
 @Entity('SecurityDevices')
 export class SecurityDevicesEntity {
@@ -43,4 +45,24 @@ export class SecurityDevicesEntity {
   })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UsersEntity;
+
+  static createSecurityDevicesEntity(
+    newPayload: PayloadDto,
+    clientIp: string,
+    userAgent: string,
+  ): SecurityDevicesEntity {
+    const user = new UsersEntity();
+    user.userId = newPayload.userId;
+
+    const newDevice: SecurityDevicesEntity = new SecurityDevicesEntity();
+    newDevice.id = uuid4();
+    newDevice.deviceId = newPayload.deviceId;
+    newDevice.ip = clientIp;
+    newDevice.title = userAgent;
+    newDevice.lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
+    newDevice.expirationDate = new Date(newPayload.exp * 1000).toISOString();
+    newDevice.user = user;
+
+    return newDevice;
+  }
 }
