@@ -72,7 +72,7 @@ export class BloggerBlogsEntity {
   @OneToMany(() => CommentsEntity, (comments) => comments.blog)
   comments: CommentsEntity[];
 
-  static createBlog(
+  static createBlogEntity(
     dto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): BloggerBlogsEntity {

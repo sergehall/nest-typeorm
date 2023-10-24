@@ -7,11 +7,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { PostsEntity } from '../../posts/entities/posts.entity';
-import { UsersEntity } from '../../users/entities/users.entity';
-import * as uuid4 from 'uuid4';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { LikesInfo, CommentViewModel } from '../view-models/comment.view-model';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
@@ -91,6 +88,7 @@ export class CommentsRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async getCommentsWithLikesByPostId(
     postId: string,
     queryData: ParseQueriesDto,
@@ -176,6 +174,7 @@ export class CommentsRepo {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   private async createCommentsQueryBuilder(
     queryData: ParseQueriesDto,
     keyword: 'commentatorId' | 'postId',
@@ -216,7 +215,7 @@ export class CommentsRepo {
     createCommentDto: CreateCommentDto,
     currentUserDto: CurrentUserDto,
   ): Promise<CommentViewModel> {
-    const commentsEntity: CommentsEntity = await this.creatCommentEntity(
+    const commentsEntity: CommentsEntity = CommentsEntity.createCommentsEntity(
       post,
       createCommentDto,
       currentUserDto,
@@ -284,41 +283,6 @@ export class CommentsRepo {
         throw new InternalServerErrorException(error.message);
       }
     });
-  }
-
-  private async creatCommentEntity(
-    post: PostsEntity,
-    createCommentDto: CreateCommentDto,
-    currentUserDto: CurrentUserDto,
-  ): Promise<CommentsEntity> {
-    const { content } = createCommentDto;
-
-    const commentator = new UsersEntity();
-    commentator.userId = currentUserDto.userId;
-    commentator.login = currentUserDto.login;
-
-    const blogOwner = new UsersEntity();
-    blogOwner.userId = post.postOwner.userId;
-
-    const blog = new BloggerBlogsEntity();
-    blog.id = post.blog.id;
-    blog.name = post.blog.name;
-
-    const commentsEntity = new CommentsEntity();
-    commentsEntity.id = uuid4().toString();
-    commentsEntity.content = content;
-    commentsEntity.createdAt = new Date().toISOString();
-    commentsEntity.isBanned = false;
-    commentsEntity.banDate = null;
-    commentsEntity.banReason = null;
-    commentsEntity.dependencyIsBanned = false;
-    commentsEntity.isBanned = false;
-    commentsEntity.blog = blog;
-    commentsEntity.blogOwner = blogOwner;
-    commentsEntity.post = post;
-    commentsEntity.commentator = commentator;
-
-    return commentsEntity;
   }
 
   async commentsLikesAggregation(

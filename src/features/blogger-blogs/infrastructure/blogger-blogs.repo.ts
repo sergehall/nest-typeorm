@@ -229,7 +229,7 @@ export class BloggerBlogsRepo {
     createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
-    const blogEntity: BloggerBlogsEntity = BloggerBlogsEntity.createBlog(
+    const blogEntity: BloggerBlogsEntity = BloggerBlogsEntity.createBlogEntity(
       createBloggerBlogsDto,
       currentUser,
     );
