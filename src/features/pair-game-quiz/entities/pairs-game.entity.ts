@@ -11,6 +11,9 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 import { GamesResultsEnum } from '../enums/games-results.enum';
 import { ChallengeAnswersEntity } from './challenge-answers.entity';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import * as uuid4 from 'uuid4';
+import { PlayersResultDto } from '../dto/players-result.dto';
 
 @Entity('PairsGame')
 export class PairsGameEntity {
@@ -85,4 +88,57 @@ export class PairsGameEntity {
     (challengeAnswer) => challengeAnswer.pairGameQuiz,
   )
   answers: ChallengeAnswersEntity[];
+
+  events: any[] = [];
+
+  static createPairsGameEntity(
+    currentUserDto: CurrentUserDto,
+  ): PairsGameEntity {
+    const firstPlayer = new UsersEntity();
+    firstPlayer.userId = currentUserDto.userId;
+    firstPlayer.login = currentUserDto.login;
+
+    const pairGame = new PairsGameEntity();
+    pairGame.id = uuid4();
+    pairGame.firstPlayer = firstPlayer;
+    pairGame.secondPlayer = null;
+    pairGame.pairCreatedDate = new Date().toISOString();
+    pairGame.startGameDate = null;
+    pairGame.finishGameDate = null;
+
+    return pairGame;
+  }
+
+  static addSecondPlayer(
+    pairGameQuiz: PairsGameEntity,
+    currentUserDto: CurrentUserDto,
+  ): PairsGameEntity {
+    const secondPlayer = new UsersEntity();
+    secondPlayer.userId = currentUserDto.userId;
+    secondPlayer.login = currentUserDto.login;
+
+    pairGameQuiz.secondPlayer = secondPlayer;
+    pairGameQuiz.startGameDate = new Date().toISOString();
+    pairGameQuiz.status = StatusGameEnum.ACTIVE;
+
+    return pairGameQuiz;
+  }
+
+  static updateGameResult(
+    game: PairsGameEntity,
+    playersData: PlayersResultDto,
+  ): PairsGameEntity {
+    // Update the first player's data
+    game.firstPlayer = playersData.firstPlayer.player;
+    game.firstPlayerScore = playersData.firstPlayer.sumScore;
+    game.firstPlayerGameResult = playersData.firstPlayer.gameResult;
+
+    // Update the second player's data if provided
+
+    game.secondPlayer = playersData.secondPlayer.player;
+    game.secondPlayerScore = playersData.secondPlayer.sumScore;
+    game.secondPlayerGameResult = playersData.secondPlayer.gameResult;
+
+    return game;
+  }
 }

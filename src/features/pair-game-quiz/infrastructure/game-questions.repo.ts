@@ -218,7 +218,6 @@ export class GameQuestionsRepo {
         ComplexityEnums.DIFFICULT,
       ]) {
         const questions = dictionaryQuestions[complexity];
-        console.log(questions);
 
         // Loop through the questions and insert them into the database
         for (const question of questions) {

@@ -2,7 +2,7 @@ import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 import { GamesResultsEnum } from '../enums/games-results.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 
-export class PlayersResultDto {
+class PlayerResult {
   @IsNotEmpty()
   player: UsersEntity;
 
@@ -11,4 +11,9 @@ export class PlayersResultDto {
 
   @IsEnum(GamesResultsEnum)
   gameResult: GamesResultsEnum;
+}
+
+export class PlayersResultDto {
+  firstPlayer: PlayerResult;
+  secondPlayer: PlayerResult;
 }

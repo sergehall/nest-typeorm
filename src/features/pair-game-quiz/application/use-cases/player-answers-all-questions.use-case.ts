@@ -1,5 +1,10 @@
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+} from '@nestjs/cqrs';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
@@ -11,7 +16,6 @@ import { UsersEntity } from '../../../users/entities/users.entity';
 import { QuestionsQuizEntity } from '../../../sa-quiz-questions/entities/questions-quiz.entity';
 import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengeQuestionsEntity } from '../../entities/challenge-questions.entity';
-import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
 
 export class PlayerAnswersAllQuestionsCommand {
   constructor(
@@ -29,6 +33,7 @@ export class PlayerAnswersAllQuestionsUseCase
     protected challengesAnswersRepo: ChallengesAnswersRepo,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected commandBus: CommandBus,
+    protected eventBus: EventBus,
   ) {}
 
   async execute(command: PlayerAnswersAllQuestionsCommand): Promise<boolean> {
@@ -41,14 +46,16 @@ export class PlayerAnswersAllQuestionsUseCase
       game.status = StatusGameEnum.FINISHED;
       game.finishGameDate = new Date().toISOString();
 
-      // Save the updated game status
+      // Save the updated game StatusGameEnum.FINISHED
       await this.gamePairsRepo.saveGame(game);
 
       // Handle unanswered questions for the other player
       await this.finishForAnotherUser(game, currentUserDto);
 
-      // Trigger AddResultToPairGameCommand to add results to the game
-      await this.commandBus.execute(new AddResultToPairGameCommand(game));
+      // publish gameOverEvent
+      game.events.forEach((e) => {
+        this.eventBus.publish(e);
+      });
     }, TEN_SECONDS);
 
     // Return true immediately

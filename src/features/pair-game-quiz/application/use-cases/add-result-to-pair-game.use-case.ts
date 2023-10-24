@@ -4,7 +4,6 @@ import { PairGameQuizService } from '../pair-game-quiz.service';
 import { CountCorrectAnswerDto } from '../../dto/correct-answer-counts-and-bonus.dto';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { StatusGameEnum } from '../../enums/status-game.enum';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
@@ -44,11 +43,10 @@ export class AddResultToPairGameUseCase
       sumScore: scores.secondPlayerCountCorrectAnswer,
       gameResult: gameResult.secondPlayer,
     };
-    await this.gameQuizRepo.updatePairsGameQuizByResult(
-      game,
-      StatusGameEnum.FINISHED,
-      [firstPlayer, secondPlayer],
-    );
+    await this.gameQuizRepo.saveGameResult(game, {
+      firstPlayer,
+      secondPlayer,
+    });
 
     return true;
   }
