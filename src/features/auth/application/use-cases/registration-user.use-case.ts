@@ -1,7 +1,11 @@
 import { CreateUserDto } from '../../../users/dto/create-user.dto';
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+} from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
-import { MailsService } from '../../../../common/mails/application/mails.service';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { UserViewModel } from '../../../users/view-models/user.view-model';
 
@@ -13,10 +17,7 @@ export class RegistrationUserCommand {
 export class RegistrationUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
-  constructor(
-    protected mailsService: MailsService,
-    protected commandBus: CommandBus,
-  ) {}
+  constructor(protected commandBus: CommandBus, protected eventBus: EventBus) {}
   async execute(command: RegistrationUserCommand): Promise<UserViewModel> {
     const { createUserDto } = command;
 
@@ -24,7 +25,9 @@ export class RegistrationUserUseCase
       new CreateUserCommand(createUserDto),
     );
 
-    await this.mailsService.sendConfirmationCode(newUser);
+    newUser.events.forEach((e) => {
+      this.eventBus.publish(e);
+    });
 
     return {
       id: newUser.userId,

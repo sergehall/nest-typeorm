@@ -14,9 +14,7 @@ import {
 } from '@nestjs/common';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import { UsersEntity } from '../entities/users.entity';
-import * as uuid4 from 'uuid4';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
-import { OrgIdEnums } from '../enums/org-id.enums';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { BanInfoDto } from '../dto/ban-info.dto';
@@ -261,9 +259,9 @@ export class UsersRepo {
     dataForCreateUserDto: DataForCreateUserDto,
   ): Promise<UsersEntity> {
     try {
-      const newUserEntity: UsersEntity = await this.createUserEntity(
-        dataForCreateUserDto,
-      );
+      const newUserEntity: UsersEntity =
+        UsersEntity.createUser(dataForCreateUserDto);
+
       return await this.usersRepository.save(newUserEntity);
     } catch (error) {
       if (
@@ -306,10 +304,9 @@ export class UsersRepo {
       return existingUser;
     }
 
-    // If no existing user found, create a new user
-    const newSaUserEntity: UsersEntity = await this.createSaUserEntity(
-      dataForCreateUserDto,
-    );
+    // If no existing user found, create a new userSaEntity
+    const newSaUserEntity: UsersEntity =
+      UsersEntity.createSaUser(dataForCreateUserDto);
 
     return await this.usersRepository.save(newSaUserEntity);
   }
@@ -514,37 +511,6 @@ export class UsersRepo {
   private async extractValueFromMessage(message: string) {
     const match = /\(([^)]+)\)/.exec(message);
     return match ? match[1] : 'null';
-  }
-
-  private async createUserEntity(
-    dto: DataForCreateUserDto,
-  ): Promise<UsersEntity> {
-    const { login, email, passwordHash, expirationDate } = dto;
-
-    const user: UsersEntity = new UsersEntity();
-    user.userId = uuid4();
-    user.login = login.toLowerCase();
-    user.email = email.toLowerCase();
-    user.passwordHash = passwordHash;
-    user.createdAt = new Date().toISOString();
-    user.orgId = OrgIdEnums.IT_INCUBATOR;
-    user.roles = [UserRolesEnums.USER];
-    user.isBanned = false;
-    user.banDate = null;
-    user.banReason = null;
-    user.confirmationCode = uuid4();
-    user.expirationDate = expirationDate;
-    user.isConfirmed = false;
-
-    return user;
-  }
-
-  private async createSaUserEntity(
-    dto: DataForCreateUserDto,
-  ): Promise<UsersEntity> {
-    const user = await this.createUserEntity(dto);
-    user.roles = [UserRolesEnums.SA];
-    return user;
   }
 
   private async getSortBy(sortBy: string): Promise<string> {
