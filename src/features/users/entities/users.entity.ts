@@ -13,7 +13,6 @@ import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import * as uuid4 from 'uuid4';
-import { CreateUserEvent } from '../events/create-user.event';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
@@ -148,9 +147,6 @@ export class UsersEntity {
     user.confirmationCode = uuid4();
     user.expirationDate = expirationDate;
     user.isConfirmed = false;
-
-    const event = new CreateUserEvent(user);
-    user.events.push(event);
 
     return user;
   }
