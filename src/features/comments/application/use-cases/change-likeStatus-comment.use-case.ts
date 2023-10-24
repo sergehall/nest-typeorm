@@ -46,7 +46,7 @@ export class ChangeLikeStatusCommentUseCase
     await this.checkUserPermission(currentUserDto.userId, findComment.blog.id);
 
     try {
-      return await this.likeStatusCommentsRepo.updateLikeStatusComment(
+      return await this.likeStatusCommentsRepo.updateOrCreateLikeStatusComment(
         findComment,
         likeStatusDto,
         currentUserDto,
