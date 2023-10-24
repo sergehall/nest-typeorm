@@ -11,6 +11,9 @@ import { SentCodesLogEntity } from '../../../common/mails/infrastructure/entitie
 import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
+import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
+import * as uuid4 from 'uuid4';
+import { CreateUserEvent } from '../events/create-user.event';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
@@ -125,4 +128,38 @@ export class UsersEntity {
 
   @OneToMany(() => ChallengeAnswersEntity, (answer) => answer.answerOwner)
   answerOwner: ChallengeAnswersEntity[];
+
+  events: any[] = [];
+
+  static createUser(dto: DataForCreateUserDto): UsersEntity {
+    const { login, email, passwordHash, expirationDate } = dto;
+
+    const user: UsersEntity = new UsersEntity();
+    user.userId = uuid4();
+    user.login = login.toLowerCase();
+    user.email = email.toLowerCase();
+    user.passwordHash = passwordHash;
+    user.createdAt = new Date().toISOString();
+    user.orgId = OrgIdEnums.IT_INCUBATOR;
+    user.roles = [UserRolesEnums.USER];
+    user.isBanned = false;
+    user.banDate = null;
+    user.banReason = null;
+    user.confirmationCode = uuid4();
+    user.expirationDate = expirationDate;
+    user.isConfirmed = false;
+
+    const event = new CreateUserEvent(user);
+    user.events.push(event);
+
+    return user;
+  }
+
+  static createSaUser(dto: DataForCreateUserDto): UsersEntity {
+    const userSaEntity = this.createUser(dto);
+
+    userSaEntity.roles.push(UserRolesEnums.SA);
+
+    return userSaEntity;
+  }
 }

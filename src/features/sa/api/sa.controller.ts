@@ -30,7 +30,6 @@ import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blo
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
 import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
-import { ChangeRoleCommand } from '../application/use-cases/sa-change-role.use-case';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 import { CreateBlogsDto } from '../../blogger-blogs/dto/create-blogs.dto';
@@ -107,7 +106,7 @@ export class SaController {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
-    await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
+    // await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
 
     return {
       id: newUser.userId,
