@@ -76,13 +76,14 @@ export class FinishGameForAnotherUserUseCase
       }
     } else {
       console.log('No remaining questions to answer.');
+      const event: GameOverEvent = new GameOverEvent(game);
+      game.events.push(event);
       return game;
     }
 
     await this.challengesAnswersRepo.saveChallengeAnswersEntities(
       challengeAnswers,
     );
-
     const event: GameOverEvent = new GameOverEvent(game);
     game.events.push(event);
 
