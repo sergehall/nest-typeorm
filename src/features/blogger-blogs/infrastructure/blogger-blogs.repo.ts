@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -230,7 +229,7 @@ export class BloggerBlogsRepo {
     createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
   ): Promise<BloggerBlogsEntity> {
-    const blogEntity: BloggerBlogsEntity = await this.createBlogsEntity(
+    const blogEntity: BloggerBlogsEntity = BloggerBlogsEntity.createBlog(
       createBloggerBlogsDto,
       currentUser,
     );
@@ -497,33 +496,6 @@ export class BloggerBlogsRepo {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  private async createBlogsEntity(
-    dto: CreateBlogsDto,
-    currentUser: CurrentUserDto,
-  ): Promise<BloggerBlogsEntity> {
-    const { userId, login, isBanned } = currentUser;
-    const { name, description, websiteUrl } = dto;
-
-    const user = new UsersEntity();
-    user.userId = userId;
-    user.login = login;
-
-    const newBlog = new BloggerBlogsEntity();
-    newBlog.id = uuid4();
-    newBlog.name = name;
-    newBlog.description = description;
-    newBlog.websiteUrl = websiteUrl;
-    newBlog.createdAt = new Date().toISOString();
-    newBlog.isMembership = false;
-    newBlog.dependencyIsBanned = isBanned;
-    newBlog.banInfoIsBanned = false;
-    newBlog.banInfoBanDate = null;
-    newBlog.banInfoBanReason = null;
-    newBlog.blogOwner = user;
-
-    return newBlog;
   }
 
   async saDeleteBlogDataById(id: string): Promise<boolean> {
