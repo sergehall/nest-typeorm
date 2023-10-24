@@ -6,6 +6,7 @@ import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
 import { UsersEntity } from '../../entities/users.entity';
+import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
 
 export class CreateUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -27,16 +28,14 @@ export class CreateUserUseCase
     const passwordHash = await this.encryptConfig.getPasswordHash(password);
 
     // Return the expirationDate in ISO format for user registration.
-    const expirationDate = await this.expirationDateCalculator.createExpDate(
-      0,
-      2,
-      0,
-    );
+    const expirationDateDto: ExpirationDateDto =
+      await this.expirationDateCalculator.createExpDate(0, 2, 0);
+
     const dataForCreateUserDto: DataForCreateUserDto = {
       login,
       email,
       passwordHash,
-      expirationDate,
+      expirationDate: expirationDateDto.expirationDate,
     };
 
     return await this.usersRepo.createUser(dataForCreateUserDto);

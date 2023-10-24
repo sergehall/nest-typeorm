@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ExpirationDateDto } from './dto/expiration-date.dto';
 
 // Function to calculate the expiration date
 @Injectable()
@@ -7,7 +8,7 @@ export class ExpirationDateCalculator {
     days: number,
     hours: number,
     minutes: number,
-  ): Promise<string> {
+  ): Promise<ExpirationDateDto> {
     // Convert days, hours, and minutes to milliseconds
     const daysInMilliseconds: number = days * 24 * 60 * 60 * 1000;
     const hoursInMilliseconds: number = hours * 60 * 60 * 1000;
@@ -21,6 +22,6 @@ export class ExpirationDateCalculator {
     const futureDate: Date = new Date(Date.now() + totalTimeInMilliseconds);
 
     // Return the future date in ISO format
-    return futureDate.toISOString();
+    return { expirationDate: futureDate.toISOString() };
   }
 }
