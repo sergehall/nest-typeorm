@@ -130,7 +130,7 @@ export class UsersEntity {
 
   events: any[] = [];
 
-  static createUser(dto: DataForCreateUserDto): UsersEntity {
+  static createUserEntity(dto: DataForCreateUserDto): UsersEntity {
     const { login, email, passwordHash, expirationDate } = dto;
 
     const user: UsersEntity = new UsersEntity();
@@ -152,7 +152,7 @@ export class UsersEntity {
   }
 
   static createSaUser(dto: DataForCreateUserDto): UsersEntity {
-    const userSaEntity = this.createUser(dto);
+    const userSaEntity = this.createUserEntity(dto);
 
     userSaEntity.roles.push(UserRolesEnums.SA);
 

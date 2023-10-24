@@ -9,6 +9,9 @@ import {
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import * as uuid4 from 'uuid4';
 
 @Entity('Comments')
 @Unique(['id'])
@@ -78,4 +81,39 @@ export class CommentsEntity {
     { name: 'commentatorLogin', referencedColumnName: 'login' },
   ])
   commentator: UsersEntity;
+
+  static createCommentsEntity(
+    post: PostsEntity,
+    createCommentDto: CreateCommentDto,
+    currentUserDto: CurrentUserDto,
+  ): CommentsEntity {
+    const { content } = createCommentDto;
+
+    const commentator = new UsersEntity();
+    commentator.userId = currentUserDto.userId;
+    commentator.login = currentUserDto.login;
+
+    const blogOwner = new UsersEntity();
+    blogOwner.userId = post.postOwner.userId;
+
+    const blog = new BloggerBlogsEntity();
+    blog.id = post.blog.id;
+    blog.name = post.blog.name;
+
+    const commentsEntity = new CommentsEntity();
+    commentsEntity.id = uuid4().toString();
+    commentsEntity.content = content;
+    commentsEntity.createdAt = new Date().toISOString();
+    commentsEntity.isBanned = false;
+    commentsEntity.banDate = null;
+    commentsEntity.banReason = null;
+    commentsEntity.dependencyIsBanned = false;
+    commentsEntity.isBanned = false;
+    commentsEntity.blog = blog;
+    commentsEntity.blogOwner = blogOwner;
+    commentsEntity.post = post;
+    commentsEntity.commentator = commentator;
+
+    return commentsEntity;
+  }
 }

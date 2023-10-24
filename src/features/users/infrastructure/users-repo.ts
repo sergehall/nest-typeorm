@@ -260,7 +260,7 @@ export class UsersRepo {
   ): Promise<UsersEntity> {
     try {
       const newUserEntity: UsersEntity =
-        UsersEntity.createUser(dataForCreateUserDto);
+        UsersEntity.createUserEntity(dataForCreateUserDto);
 
       return await this.usersRepository.save(newUserEntity);
     } catch (error) {
