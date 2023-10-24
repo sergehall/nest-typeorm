@@ -12,6 +12,9 @@ import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { BannedUsersForBlogsEntity } from '../../users/entities/banned-users-for-blogs.entity';
+import * as uuid4 from 'uuid4';
+import { CreateBlogsDto } from '../dto/create-blogs.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
 
 @Entity('BloggerBlogs')
 @Unique(['id'])
@@ -68,4 +71,31 @@ export class BloggerBlogsEntity {
 
   @OneToMany(() => CommentsEntity, (comments) => comments.blog)
   comments: CommentsEntity[];
+
+  static createBlog(
+    dto: CreateBlogsDto,
+    currentUser: CurrentUserDto,
+  ): BloggerBlogsEntity {
+    const { userId, login, isBanned } = currentUser;
+    const { name, description, websiteUrl } = dto;
+
+    const user = new UsersEntity();
+    user.userId = userId;
+    user.login = login;
+
+    const newBlog = new BloggerBlogsEntity();
+    newBlog.id = uuid4();
+    newBlog.name = name;
+    newBlog.description = description;
+    newBlog.websiteUrl = websiteUrl;
+    newBlog.createdAt = new Date().toISOString();
+    newBlog.isMembership = false;
+    newBlog.dependencyIsBanned = isBanned;
+    newBlog.banInfoIsBanned = false;
+    newBlog.banInfoBanDate = null;
+    newBlog.banInfoBanReason = null;
+    newBlog.blogOwner = user;
+
+    return newBlog;
+  }
 }
