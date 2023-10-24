@@ -20,7 +20,6 @@ import { ChallengesQuestionsRepo } from './challenges-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { PairsCountPairsDto } from '../dto/pairs-count-pairs.dto';
-import { GameOverEvent } from '../events/game-over.event';
 
 export class GamePairsRepo {
   constructor(
@@ -349,12 +348,7 @@ export class GamePairsRepo {
 
   async saveGame(game: PairsGameEntity): Promise<PairsGameEntity> {
     try {
-      const saveGame = await this.pairsGameQuizRepo.save(game);
-
-      const event: GameOverEvent = new GameOverEvent(game);
-      game.events.push(event);
-
-      return saveGame;
+      return await this.pairsGameQuizRepo.save(game);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
