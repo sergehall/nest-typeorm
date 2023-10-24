@@ -8,8 +8,6 @@ import {
 } from '@nestjs/common';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
-import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -22,6 +20,7 @@ import { ChallengesQuestionsRepo } from './challenges-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { PairsCountPairsDto } from '../dto/pairs-count-pairs.dto';
+import { GameOverEvent } from '../events/game-over.event';
 
 export class GamePairsRepo {
   constructor(
@@ -278,15 +277,18 @@ export class GamePairsRepo {
         });
 
       if (!pendingGame) {
-        createdGame = await this.createPairGameEntity(currentUserDto);
+        createdGame = PairsGameEntity.createPairsGameEntity(currentUserDto);
         await this.pairsGameQuizRepo.save(createdGame);
 
         const challengeQuestions: ChallengeQuestionsEntity[] = [];
         const challengeAnswers: ChallengeAnswersEntity[] = [];
-        await this.challengesQuestionsRepo.createChallengeQuestions(
-          createdGame.id,
-        );
-
+        const challengesQuestion =
+          await this.challengesQuestionsRepo.createChallengeQuestions(
+            createdGame.id,
+          );
+        if (challengesQuestion.length === 0) {
+          // handle the error if there are not enough questions for the game
+        }
         return {
           pair: createdGame,
           challengeQuestions,
@@ -298,11 +300,12 @@ export class GamePairsRepo {
         };
       }
 
-      // if pendingGame.status === StatusGameEnum.PENDING
-      createdGame = await this.addSecondPlayerAndStarGame(
+      createdGame = PairsGameEntity.addSecondPlayer(
         pendingGame,
         currentUserDto,
       );
+
+      await this.pairsGameQuizRepo.save(createdGame);
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
         await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(
@@ -326,33 +329,15 @@ export class GamePairsRepo {
     }
   }
 
-  async updatePairsGameQuizByResult(
+  async saveGameResult(
     game: PairsGameEntity,
-    newStatus: StatusGameEnum,
-    playersData: PlayersResultDto[],
+    playersData: PlayersResultDto,
   ): Promise<PairsGameEntity> {
     try {
-      const pairsGameQuizRepository = this.pairsGameQuizRepo;
-
-      // Update the first player's data
-      game.firstPlayer = playersData[0].player;
-      game.firstPlayerScore = playersData[0].sumScore;
-      game.firstPlayerGameResult = playersData[0].gameResult;
-
-      // Update the second player's data if provided
-      if (playersData[1]) {
-        game.secondPlayer = playersData[1].player;
-        game.secondPlayerScore = playersData[1].sumScore;
-        game.secondPlayerGameResult = playersData[1].gameResult;
-      }
-      // Update the game's status and add finishGameDate
-      game.status = newStatus;
-      game.finishGameDate = new Date().toISOString();
+      const updatedGame = PairsGameEntity.updateGameResult(game, playersData);
 
       // Save the updated game back to the database
-      await pairsGameQuizRepository.save(game);
-
-      return game;
+      return await this.pairsGameQuizRepo.save(updatedGame);
     } catch (error) {
       console.error(
         'Error update PairsGameQuizEntity by updatePairsGameQuizByResult:',
@@ -364,44 +349,16 @@ export class GamePairsRepo {
 
   async saveGame(game: PairsGameEntity): Promise<PairsGameEntity> {
     try {
-      return await this.pairsGameQuizRepo.save(game);
+      const saveGame = await this.pairsGameQuizRepo.save(game);
+
+      const event: GameOverEvent = new GameOverEvent(game);
+      game.events.push(event);
+
+      return saveGame;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  private async addSecondPlayerAndStarGame(
-    pairGameQuiz: PairsGameEntity,
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairsGameEntity> {
-    const secondPlayer = new UsersEntity();
-    secondPlayer.userId = currentUserDto.userId;
-    secondPlayer.login = currentUserDto.login;
-    pairGameQuiz.secondPlayer = secondPlayer;
-    pairGameQuiz.startGameDate = new Date().toISOString();
-    pairGameQuiz.status = StatusGameEnum.ACTIVE;
-
-    await this.pairsGameQuizRepo.save(pairGameQuiz);
-    return pairGameQuiz;
-  }
-
-  private async createPairGameEntity(
-    currentUserDto: CurrentUserDto,
-  ): Promise<PairsGameEntity> {
-    const firstPlayer = new UsersEntity();
-    firstPlayer.userId = currentUserDto.userId;
-    firstPlayer.login = currentUserDto.login;
-
-    const pairGame = new PairsGameEntity();
-    pairGame.id = uuid4();
-    pairGame.firstPlayer = firstPlayer;
-    pairGame.secondPlayer = null;
-    pairGame.pairCreatedDate = new Date().toISOString();
-    pairGame.startGameDate = null;
-    pairGame.finishGameDate = null;
-
-    return pairGame;
   }
 
   private async getSortField(sortBy: string): Promise<string> {
