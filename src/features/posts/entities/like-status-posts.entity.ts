@@ -10,6 +10,9 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { PostsEntity } from './posts.entity';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
+import { LikeStatusDto } from '../dto/like-status.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import * as uuid4 from 'uuid4';
 
 @Entity('LikeStatusPosts')
 @Unique(['id'])
@@ -62,4 +65,33 @@ export class LikeStatusPostsEntity {
   })
   @JoinColumn({ name: 'postId', referencedColumnName: 'id' })
   post: PostsEntity;
+
+  static createLikeStatusPostsEntity(
+    post: PostsEntity,
+    likeStatusDto: LikeStatusDto,
+    currentUserDto: CurrentUserDto,
+  ): LikeStatusPostsEntity {
+    const blogEntity = new BloggerBlogsEntity();
+    blogEntity.id = post.blog.id;
+
+    const postOwnerEntity = new UsersEntity();
+    postOwnerEntity.userId = post.postOwner.userId;
+
+    const ratedPostUserEntity = new UsersEntity();
+    ratedPostUserEntity.userId = currentUserDto.userId;
+    ratedPostUserEntity.login = currentUserDto.login;
+    ratedPostUserEntity.isBanned = currentUserDto.isBanned;
+
+    const likeStatusPost = new LikeStatusPostsEntity();
+    likeStatusPost.id = uuid4().toString();
+    likeStatusPost.likeStatus = likeStatusDto.likeStatus;
+    likeStatusPost.addedAt = new Date().toISOString();
+    likeStatusPost.isBanned = false;
+    likeStatusPost.blog = blogEntity;
+    likeStatusPost.post = post;
+    likeStatusPost.postOwner = postOwnerEntity;
+    likeStatusPost.ratedPostUser = ratedPostUserEntity;
+
+    return likeStatusPost;
+  }
 }
