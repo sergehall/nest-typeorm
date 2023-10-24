@@ -11,6 +11,9 @@ import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.e
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import * as uuid4 from 'uuid4';
 
 @Entity('Posts')
 @Unique(['id'])
@@ -81,4 +84,30 @@ export class PostsEntity {
 
   @OneToMany(() => LikeStatusCommentsEntity, (LikeStatus) => LikeStatus.post)
   likeStatusComments: LikeStatusCommentsEntity[];
+
+  static createPostEntity(
+    blog: BloggerBlogsEntity,
+    createPostDto: CreatePostDto,
+    currentUserDto: CurrentUserDto,
+  ): PostsEntity {
+    const { title, shortDescription, content } = createPostDto;
+
+    const user = new UsersEntity();
+    user.userId = currentUserDto.userId;
+
+    const postEntity = new PostsEntity();
+    postEntity.id = uuid4().toString();
+    postEntity.title = title;
+    postEntity.shortDescription = shortDescription;
+    postEntity.content = content;
+    postEntity.createdAt = new Date().toISOString();
+    postEntity.dependencyIsBanned = false;
+    postEntity.isBanned = false;
+    postEntity.banDate = null;
+    postEntity.banReason = null;
+    postEntity.blog = blog;
+    postEntity.postOwner = user;
+
+    return postEntity;
+  }
 }

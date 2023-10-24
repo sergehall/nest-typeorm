@@ -8,8 +8,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
-import * as uuid4 from 'uuid4';
-import { UsersEntity } from '../../users/entities/users.entity';
 import {
   ExtendedLikesInfo,
   NewestLikes,
@@ -105,7 +103,7 @@ export class PostsRepo {
     createPostDto: CreatePostDto,
     currentUserDto: CurrentUserDto,
   ): Promise<PostWithLikesInfoViewModel> {
-    const postEntity: PostsEntity = await this.creatPostsEntity(
+    const postEntity: PostsEntity = PostsEntity.createPostEntity(
       blog,
       createPostDto,
       currentUserDto,
@@ -408,32 +406,6 @@ export class PostsRepo {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  private async creatPostsEntity(
-    blog: BloggerBlogsEntity,
-    createPostDto: CreatePostDto,
-    currentUserDto: CurrentUserDto,
-  ): Promise<PostsEntity> {
-    const { title, shortDescription, content } = createPostDto;
-
-    const user = new UsersEntity();
-    user.userId = currentUserDto.userId;
-
-    const postEntity = new PostsEntity();
-    postEntity.id = uuid4().toString();
-    postEntity.title = title;
-    postEntity.shortDescription = shortDescription;
-    postEntity.content = content;
-    postEntity.createdAt = new Date().toISOString();
-    postEntity.dependencyIsBanned = false;
-    postEntity.isBanned = false;
-    postEntity.banDate = null;
-    postEntity.banReason = null;
-    postEntity.blog = blog;
-    postEntity.postOwner = user;
-
-    return postEntity;
   }
 
   private async addExtendedLikesInfoToPostsEntity(
