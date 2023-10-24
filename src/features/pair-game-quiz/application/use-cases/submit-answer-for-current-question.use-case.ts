@@ -1,4 +1,9 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+} from '@nestjs/cqrs';
 import { AnswerDto } from '../../dto/answer.dto';
 import {
   ForbiddenException,
@@ -10,7 +15,6 @@ import {
   notFoundChallengeQuestions,
 } from '../../../../common/filters/custom-errors-messages';
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
-import { AddResultToPairGameCommand } from './add-result-to-pair-game.use-case';
 import { GameQuestionsRepo } from '../../infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
@@ -18,6 +22,9 @@ import { AnswerViewModel } from '../../view-models/answer.view-model';
 import { PlayerAnswersAllQuestionsCommand } from './player-answers-all-questions.use-case';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
+import { GameOverEvent } from '../../events/game-over.event';
+import { StatusGameEnum } from '../../enums/status-game.enum';
+import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class SubmitAnswerCommand {
   constructor(
@@ -32,10 +39,12 @@ export class SubmitAnswerForCurrentQuestionUseCase
   implements ICommandHandler<SubmitAnswerCommand>
 {
   constructor(
+    protected gameQuizRepo: GamePairsRepo,
     protected gameQuestionsRepo: GameQuestionsRepo,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
     protected challengesAnswersRepo: ChallengesAnswersRepo,
     protected commandBus: CommandBus,
+    protected eventBus: EventBus,
   ) {}
 
   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
@@ -54,10 +63,13 @@ export class SubmitAnswerForCurrentQuestionUseCase
         currentUserDto.userId,
       );
 
+    const countAnswersUser = counts.countAnswersUser;
+    const countAnswersBoth = counts.countAnswersBoth;
+
     const MAX_ANSWER_COUNT = 5;
     const MAX_ANSWER_BOTH_COUNT = 10;
 
-    switch (counts.countAnswersUser) {
+    switch (countAnswersUser) {
       case MAX_ANSWER_COUNT:
         throw new ForbiddenException(answeredAllQuestionsMessage);
       default:
@@ -65,7 +77,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
         const nextQuestion =
           await this.challengesQuestionsRepo.getNextChallengeQuestions(
             activeGame.id,
-            counts.countAnswersUser,
+            countAnswersUser,
           );
 
         if (!nextQuestion) {
@@ -93,24 +105,36 @@ export class SubmitAnswerForCurrentQuestionUseCase
           if (saveChallengeAnswer) {
             const currentAnswer: number = 1;
 
-            // Check if the user has answered all questions
-            if (counts.countAnswersUser + currentAnswer === MAX_ANSWER_COUNT) {
+            if (
+              // Check if the user has answered all questions
+              countAnswersUser + currentAnswer === MAX_ANSWER_COUNT &&
+              countAnswersBoth + currentAnswer !== MAX_ANSWER_BOTH_COUNT
+            ) {
               await this.commandBus.execute(
                 new PlayerAnswersAllQuestionsCommand(
                   activeGame,
                   currentUserDto,
                 ),
               );
-            }
-
-            if (
-              counts.countAnswersBoth + currentAnswer ===
+            } else if (
+              countAnswersBoth + currentAnswer ===
               MAX_ANSWER_BOTH_COUNT
             ) {
-              await this.commandBus.execute(
-                new AddResultToPairGameCommand(activeGame),
-              );
+              activeGame.status = StatusGameEnum.FINISHED;
+              activeGame.finishGameDate = new Date().toISOString();
+
+              // Save the updated game StatusGameEnum.FINISHED
+              await this.gameQuizRepo.saveGame(activeGame);
+
+              const event: GameOverEvent = new GameOverEvent(activeGame);
+              activeGame.events.push(event);
+
+              // publish when after GameOver
+              activeGame.events.forEach((e) => {
+                this.eventBus.publish(e);
+              });
             }
+
             return {
               questionId: saveChallengeAnswer.question.id,
               answerStatus: saveChallengeAnswer.answerStatus,

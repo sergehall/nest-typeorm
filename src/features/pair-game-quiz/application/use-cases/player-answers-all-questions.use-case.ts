@@ -33,22 +33,26 @@ export class PlayerAnswersAllQuestionsUseCase
 
     // Schedule a separate asynchronous operation to finish the game after a 10-second delay
     setTimeout(async () => {
-      // After the 10-second delay, update the game status to "FINISHED" and record the finishGameDate
-      game.status = StatusGameEnum.FINISHED;
-      game.finishGameDate = new Date().toISOString();
+      const currentGame = await this.gamePairsRepo.getGameByPairId(game.id);
 
-      // Save the updated game StatusGameEnum.FINISHED
-      await this.gamePairsRepo.saveGame(game);
+      if (currentGame && currentGame.status !== StatusGameEnum.FINISHED) {
+        // After the 10-second delay, update the game status to "FINISHED" and record the finishGameDate
+        currentGame.status = StatusGameEnum.FINISHED;
+        currentGame.finishGameDate = new Date().toISOString();
 
-      // Handle unanswered questions for the other player
-      await this.commandBus.execute(
-        new FinishGameForAnotherUseCommand(game, currentUserDto),
-      );
+        // Save the updated game StatusGameEnum.FINISHED
+        await this.gamePairsRepo.saveGame(currentGame);
 
-      // publish when after FinishGameForAnotherUseCommand
-      game.events.forEach((e) => {
-        this.eventBus.publish(e);
-      });
+        // Handle unanswered questions for the other player
+        await this.commandBus.execute(
+          new FinishGameForAnotherUseCommand(currentGame, currentUserDto),
+        );
+
+        // publish when after FinishGameForAnotherUseCommand
+        currentGame.events.forEach((e) => {
+          this.eventBus.publish(e);
+        });
+      }
     }, TEN_SECONDS);
 
     // Return true immediately
