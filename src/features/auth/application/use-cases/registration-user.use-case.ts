@@ -8,6 +8,7 @@ import {
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { UserViewModel } from '../../../users/view-models/user.view-model';
+import { RegistrationUserEvent } from '../../../users/events/registration-user.event';
 
 export class RegistrationUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -24,6 +25,9 @@ export class RegistrationUserUseCase
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
+
+    const event: RegistrationUserEvent = new RegistrationUserEvent(newUser);
+    newUser.events.push(event);
 
     newUser.events.forEach((e) => {
       this.eventBus.publish(e);

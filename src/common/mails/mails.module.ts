@@ -12,7 +12,7 @@ import { SentCodeLogRepo } from './infrastructure/sent-code-log.repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentCodesLogEntity } from './infrastructure/entities/sent-codes-log.entity';
 import { NodemailerOptions } from './nodemailer/nodemailer-options';
-import { SendConfirmationCodeWhenUserCreatedEventHandler } from './events-handlers/send-confirmation-code-when-user-created.event.handler';
+import { SendConfirmationCodeWhenRegistrationUserEventHandler } from './events-handlers/send-confirmation-code-when-registration-user.event.handler';
 
 const mailsUseCases = [
   EmailSendingUseCase,
@@ -20,7 +20,9 @@ const mailsUseCases = [
   SendRecoveryCodesUseCase,
 ];
 
-const mailsEventHandlers = [SendConfirmationCodeWhenUserCreatedEventHandler];
+const mailsEventHandlers = [
+  SendConfirmationCodeWhenRegistrationUserEventHandler,
+];
 
 @Module({
   imports: [
