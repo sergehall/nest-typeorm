@@ -30,8 +30,8 @@ export class BloggerBlogsRepo {
   async getBlogsPublic(
     queryData: ParseQueriesDto,
   ): Promise<BlogsCountBlogsDto> {
-    const blogOwnerBanStatus = false;
-    const banInfoBanStatus = false;
+    const dependencyIsBanned = false;
+    const isBanned = false;
 
     const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
@@ -52,10 +52,10 @@ export class BloggerBlogsRepo {
         'blogs.isMembership',
       ])
       .where('"dependencyIsBanned" = :dependencyIsBanned', {
-        dependencyIsBanned: blogOwnerBanStatus,
+        dependencyIsBanned: dependencyIsBanned,
       })
-      .andWhere('"banInfoIsBanned" = :banInfoIsBanned', {
-        banInfoIsBanned: banInfoBanStatus,
+      .andWhere('"isBanned" = :isBanned', {
+        isBanned: isBanned,
       })
       .andWhere('blogs.name ILIKE :searchNameTerm', { searchNameTerm })
       .orderBy(`blogs.${sortBy} COLLATE "C"`, direction, nullsDirection);
@@ -82,7 +82,7 @@ export class BloggerBlogsRepo {
     const { userId } = currentUserDto;
     // ban flags should be false
     const dependencyIsBanned = false;
-    const banInfoIsBanned = false;
+    const isBanned = false;
 
     const searchNameTerm = queryData.searchNameTerm;
     const sortBy = await this.getSortBy(queryData.queryPagination.sortBy);
@@ -107,8 +107,8 @@ export class BloggerBlogsRepo {
       .andWhere('blogs.dependencyIsBanned = :dependencyIsBanned', {
         dependencyIsBanned,
       })
-      .andWhere('blogs.banInfoIsBanned = :banInfoIsBanned', {
-        banInfoIsBanned,
+      .andWhere('blogs.isBanned = :isBanned', {
+        isBanned,
       })
       .orderBy(`blogs.${sortBy} COLLATE "C"`, direction, nullsDirection);
 
@@ -199,7 +199,7 @@ export class BloggerBlogsRepo {
     blogId: string,
   ): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
-    const banInfoIsBanned = false;
+    const isBanned = false;
 
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
@@ -208,7 +208,7 @@ export class BloggerBlogsRepo {
       .andWhere('blog.dependencyIsBanned = :dependencyIsBanned', {
         dependencyIsBanned,
       })
-      .andWhere('blog.banInfoIsBanned = :banInfoIsBanned', { banInfoIsBanned });
+      .andWhere('blog.isBanned = :isBanned', { isBanned });
 
     try {
       const blog = await queryBuilder.getOne(); // Execute the query and get a single result
@@ -428,6 +428,7 @@ export class BloggerBlogsRepo {
   ): Promise<boolean> {
     const { isBanned } = saBanBlogDto;
     const isBannedDate = isBanned ? new Date().toISOString() : null;
+    const banReason = isBanned ? 'Super admin did it' : null;
 
     const connection = this.bloggerBlogsRepository.manager.connection;
     const queryRunner = connection.createQueryRunner();
@@ -465,8 +466,9 @@ export class BloggerBlogsRepo {
         BloggerBlogsEntity,
         { id: blog.id },
         {
-          banInfoIsBanned: isBanned,
-          banInfoBanDate: isBannedDate,
+          isBanned: isBanned,
+          banDate: isBannedDate,
+          banReason: banReason,
         },
       );
 
@@ -554,9 +556,9 @@ export class BloggerBlogsRepo {
         'isMembership',
         'blogLogin',
         'dependencyIsBanned',
-        'banInfoIsBanned',
-        'banInfoBanDate',
-        'banInfoBanReason',
+        'isBanned',
+        'banDate',
+        'banReason',
         'name',
         'description',
         'websiteUrl',

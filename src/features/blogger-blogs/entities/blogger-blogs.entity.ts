@@ -32,17 +32,17 @@ export class BloggerBlogsEntity {
   @Column({ nullable: false, default: false })
   dependencyIsBanned: boolean;
 
+  // @Column({ nullable: false, default: false })
+  // isBanned: boolean;
+
   @Column({ nullable: false, default: false })
   isBanned: boolean;
 
-  @Column({ nullable: false, default: false })
-  banInfoIsBanned: boolean;
+  @Column({ type: 'character varying', nullable: true })
+  banDate: string | null = null;
 
   @Column({ type: 'character varying', nullable: true })
-  banInfoBanDate: string | null = null;
-
-  @Column({ type: 'character varying', nullable: true })
-  banInfoBanReason: string | null = null;
+  banReason: string | null = null;
 
   @Column({ type: 'character varying', length: 15, nullable: false })
   name: string;
@@ -91,9 +91,9 @@ export class BloggerBlogsEntity {
     newBlog.createdAt = new Date().toISOString();
     newBlog.isMembership = false;
     newBlog.dependencyIsBanned = isBanned;
-    newBlog.banInfoIsBanned = false;
-    newBlog.banInfoBanDate = null;
-    newBlog.banInfoBanReason = null;
+    newBlog.isBanned = false;
+    newBlog.banDate = null;
+    newBlog.banReason = null;
     newBlog.blogOwner = user;
 
     return newBlog;
