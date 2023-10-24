@@ -25,6 +25,8 @@ import { MyGamesStatisticUseCase } from './application/use-cases/my-games-statis
 import { GamePairsRepo } from './infrastructure/game-pairs.repo';
 import { GamesStatisticUseCase } from './application/use-cases/games-statistic.use-case';
 import { PlayerAnswersAllQuestionsUseCase } from './application/use-cases/player-answers-all-questions.use-case';
+import { FinishGameForAnotherUserUseCase } from './application/use-cases/finish-game-for-another-user.use-case';
+import { AddResultToFinishedGameEventHandler } from './events-handlers/add-result-to-finished-game.event.handler';
 
 const usersUseCases = [
   MyCurrentGameUseCase,
@@ -36,7 +38,10 @@ const usersUseCases = [
   MyGamesStatisticUseCase,
   GamesStatisticUseCase,
   PlayerAnswersAllQuestionsUseCase,
+  FinishGameForAnotherUserUseCase,
 ];
+
+const gamesEventHandlers = [AddResultToFinishedGameEventHandler];
 
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -60,6 +65,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ChallengesAnswersRepo,
     ChallengesQuestionsRepo,
     MapPairGame,
+    ...gamesEventHandlers,
     ...helpers,
     ...usersUseCases,
   ],
