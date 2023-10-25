@@ -13,6 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentCodesLogEntity } from './infrastructure/entities/sent-codes-log.entity';
 import { NodemailerOptions } from './nodemailer/nodemailer-options';
 import { SendConfirmationCodeWhenRegistrationUserEventHandler } from './events-handlers/send-confirmation-code-when-registration-user.event.handler';
+import { ReSendConfirmationCodeEventHandler } from './events-handlers/re-send-confirmation-code.event.handler';
 
 const mailsUseCases = [
   EmailSendingUseCase,
@@ -22,6 +23,7 @@ const mailsUseCases = [
 
 const mailsEventHandlers = [
   SendConfirmationCodeWhenRegistrationUserEventHandler,
+  ReSendConfirmationCodeEventHandler,
 ];
 
 @Module({

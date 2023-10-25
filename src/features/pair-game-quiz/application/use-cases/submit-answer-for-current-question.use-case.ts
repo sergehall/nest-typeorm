@@ -77,18 +77,12 @@ export class SubmitAnswerForCurrentQuestionUseCase
       answerDto.answer,
     );
 
-    const savedAnswer = await this.saveAnswer(
+    const savedAnswer: ChallengeAnswersEntity = await this.saveAnswer(
       answerDto,
       nextQuestion,
       isAnswerCorrect,
       currentUserDto,
     );
-
-    if (!savedAnswer) {
-      throw new InternalServerErrorException(
-        'Failed to save the challenge Answer.',
-      );
-    }
 
     await this.handleGameProgress(
       countAnswersUser,
@@ -137,16 +131,23 @@ export class SubmitAnswerForCurrentQuestionUseCase
     nextQuestion: ChallengeQuestionsEntity,
     isAnswerCorrect: boolean,
     user: CurrentUserDto,
-  ): Promise<ChallengeAnswersEntity | null> {
+  ): Promise<ChallengeAnswersEntity> {
     const answerStatus = isAnswerCorrect
       ? AnswerStatusEnum.CORRECT
       : AnswerStatusEnum.INCORRECT;
-    return await this.challengesAnswersRepo.saveChallengeAnswer(
+    const savedAnswer = await this.challengesAnswersRepo.saveChallengeAnswer(
       answerDto.answer,
       nextQuestion,
       answerStatus,
       user,
     );
+
+    if (!savedAnswer) {
+      throw new InternalServerErrorException(
+        'Failed to save the challenge Answer.',
+      );
+    }
+    return savedAnswer;
   }
 
   private async handleGameProgress(
@@ -208,138 +209,3 @@ export class SubmitAnswerForCurrentQuestionUseCase
     );
   }
 }
-
-// @CommandHandler(SubmitAnswerCommand)
-// export class SubmitAnswerForCurrentQuestionUseCase
-//   implements ICommandHandler<SubmitAnswerCommand>
-// {
-//   constructor(
-//     protected gameQuizRepo: GamePairsRepo,
-//     protected gameQuestionsRepo: GameQuestionsRepo,
-//     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
-//     protected challengesAnswersRepo: ChallengesAnswersRepo,
-//     protected commandBus: CommandBus,
-//     protected eventBus: EventBus,
-//   ) {}
-//
-//   async execute(command: SubmitAnswerCommand): Promise<AnswerViewModel> {
-//     const { answerDto, activeGame, currentUserDto } = command;
-//
-//     // Fetch challenge answers for the active game
-//     const challengeAnswers: ChallengeAnswersEntity[] =
-//       await this.challengesAnswersRepo.getChallengeAnswersByGameId(
-//         activeGame.id,
-//       );
-//
-//     // Count user's answers and total answers
-//     const counts: { countAnswersUser: number; countAnswersBoth: number } =
-//       await this.countsChallengeAnswers(
-//         challengeAnswers,
-//         currentUserDto.userId,
-//       );
-//
-//     const countAnswersUser = counts.countAnswersUser;
-//     const countAnswersBoth = counts.countAnswersBoth;
-//
-//     const MAX_ANSWER_COUNT = 5;
-//     const MAX_ANSWER_BOTH_COUNT = 10;
-//
-//     switch (countAnswersUser) {
-//       case MAX_ANSWER_COUNT:
-//         throw new ForbiddenException(answeredAllQuestionsMessage);
-//       default:
-//         // Get the next challenge question
-//         const nextQuestion =
-//           await this.challengesQuestionsRepo.getNextChallengeQuestions(
-//             activeGame.id,
-//             countAnswersUser,
-//           );
-//
-//         if (!nextQuestion) {
-//           throw new ForbiddenException(notFoundChallengeQuestions);
-//         } else if (nextQuestion) {
-//           // Verify the answer for the next question
-//           const verifyAnswer =
-//             await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
-//               nextQuestion.question.id,
-//               answerDto.answer,
-//             );
-//
-//           const answerStatus: AnswerStatusEnum = verifyAnswer
-//             ? AnswerStatusEnum.CORRECT
-//             : AnswerStatusEnum.INCORRECT;
-//
-//           const saveChallengeAnswer: ChallengeAnswersEntity | null =
-//             await this.challengesAnswersRepo.saveChallengeAnswer(
-//               answerDto.answer,
-//               nextQuestion,
-//               answerStatus,
-//               currentUserDto,
-//             );
-//
-//           if (saveChallengeAnswer) {
-//             const currentAnswer: number = 1;
-//
-//             if (
-//               // if one of the two users has answered all the questions
-//               countAnswersUser + currentAnswer === MAX_ANSWER_COUNT &&
-//               countAnswersBoth + currentAnswer !== MAX_ANSWER_BOTH_COUNT
-//             ) {
-//               await this.commandBus.execute(
-//                 new PlayerAnswersAllQuestionsCommand(
-//                   activeGame,
-//                   currentUserDto,
-//                 ),
-//               );
-//             } else if (
-//               // if both users has answered all the questions
-//               countAnswersBoth + currentAnswer ===
-//               MAX_ANSWER_BOTH_COUNT
-//             ) {
-//               activeGame.status = StatusGameEnum.FINISHED;
-//               activeGame.finishGameDate = new Date().toISOString();
-//
-//               // Save the updated game StatusGameEnum.FINISHED
-//               await this.gameQuizRepo.saveGame(activeGame);
-//
-//               const event: GameOverEvent = new GameOverEvent(activeGame);
-//               activeGame.events.push(event);
-//
-//               // publish GameOverEvent
-//               activeGame.events.forEach((e) => {
-//                 this.eventBus.publish(e);
-//               });
-//             }
-//
-//             return {
-//               questionId: saveChallengeAnswer.question.id,
-//               answerStatus: saveChallengeAnswer.answerStatus,
-//               addedAt: saveChallengeAnswer.addedAt,
-//             };
-//           }
-//         }
-//
-//         throw new InternalServerErrorException(
-//           'Failed with AnswerForCurrentQuestionUseCase.',
-//         );
-//     }
-//   }
-//
-//   // Helper function to count user's answers and total answers
-//   private async countsChallengeAnswers(
-//     challengeAnswers: ChallengeAnswersEntity[],
-//     userId: string,
-//   ): Promise<{ countAnswersUser: number; countAnswersBoth: number }> {
-//     let countAnswersUser = 0;
-//     let countAnswersBoth = 0;
-//
-//     for (let i = 0; i < challengeAnswers.length; i++) {
-//       countAnswersBoth++;
-//       if (challengeAnswers[i].answerOwner.userId === userId) {
-//         countAnswersUser++;
-//       }
-//     }
-//
-//     return { countAnswersUser, countAnswersBoth };
-//   }
-// }
