@@ -21,6 +21,7 @@ import { BanInfoDto } from '../dto/ban-info.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
+import { UpdatedConfirmationCodeEvent } from '../../auth/events/updated-confirmation-code.event';
 
 export class UsersRepo {
   constructor(
@@ -315,18 +316,23 @@ export class UsersRepo {
     email: string,
     confirmationCode: string,
     expirationDate: string,
-  ): Promise<UsersEntity | null> {
+  ): Promise<UsersEntity> {
     try {
       const userToUpdate = await this.usersRepository.findOneBy({ email });
 
-      if (!userToUpdate) {
-        return null;
-      }
+      if (!userToUpdate)
+        throw new NotFoundException(`User with email ${email} not found`);
 
       userToUpdate.confirmationCode = confirmationCode;
       userToUpdate.expirationDate = expirationDate;
 
-      return await this.usersRepository.save(userToUpdate);
+      const updatedUser = await this.usersRepository.save(userToUpdate);
+
+      const event: UpdatedConfirmationCodeEvent =
+        new UpdatedConfirmationCodeEvent(updatedUser);
+      updatedUser.events.push(event);
+
+      return updatedUser;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
