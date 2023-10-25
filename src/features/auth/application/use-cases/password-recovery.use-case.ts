@@ -1,11 +1,11 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import * as uuid4 from 'uuid4';
-import { MailsService } from '../../../../common/mails/application/mails.service';
 import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
+import { UpdatedConfirmationCodeByRecoveryCodeEvent } from '../../events/updated-confirmation-code-by-recovery-code.event';
 
 export class PasswordRecoveryCommand {
   constructor(public email: string) {}
@@ -17,8 +17,8 @@ export class PasswordRecoveryUseCase
 {
   constructor(
     private readonly usersRepo: UsersRepo,
+    private readonly eventBus: EventBus,
     private readonly expirationDateCalculator: ExpirationDateCalculator,
-    private readonly mailsService: MailsService,
   ) {}
   async execute(command: PasswordRecoveryCommand): Promise<boolean> {
     const { email } = command;
@@ -39,6 +39,14 @@ export class PasswordRecoveryUseCase
       throw new NotFoundException(`User with email: ${email} not found`);
     }
 
-    return await this.mailsService.sendRecoveryCode(updatedUser);
+    const event: UpdatedConfirmationCodeByRecoveryCodeEvent =
+      new UpdatedConfirmationCodeByRecoveryCodeEvent(updatedUser);
+    updatedUser.events.push(event);
+
+    updatedUser.events.forEach((e) => {
+      this.eventBus.publish(e);
+    });
+
+    return true;
   }
 }

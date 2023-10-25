@@ -14,6 +14,7 @@ import { SentCodesLogEntity } from './infrastructure/entities/sent-codes-log.ent
 import { NodemailerOptions } from './nodemailer/nodemailer-options';
 import { SendConfirmationCodeWhenRegistrationUserEventHandler } from './events-handlers/send-confirmation-code-when-registration-user.event.handler';
 import { ReSendConfirmationCodeEventHandler } from './events-handlers/re-send-confirmation-code.event.handler';
+import { SendRecoveryCodeEventHandler } from './events-handlers/send-recovery-code.event.handler';
 
 const mailsUseCases = [
   EmailSendingUseCase,
@@ -22,8 +23,9 @@ const mailsUseCases = [
 ];
 
 const mailsEventHandlers = [
-  SendConfirmationCodeWhenRegistrationUserEventHandler,
+  SendRecoveryCodeEventHandler,
   ReSendConfirmationCodeEventHandler,
+  SendConfirmationCodeWhenRegistrationUserEventHandler,
 ];
 
 @Module({
