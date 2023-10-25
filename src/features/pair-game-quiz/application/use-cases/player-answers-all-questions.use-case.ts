@@ -48,7 +48,7 @@ export class PlayerAnswersAllQuestionsUseCase
           new FinishGameForAnotherUseCommand(currentGame, currentUserDto),
         );
 
-        // publish when after FinishGameForAnotherUseCommand
+        // publish GameOverEvent
         currentGame.events.forEach((e) => {
           this.eventBus.publish(e);
         });
