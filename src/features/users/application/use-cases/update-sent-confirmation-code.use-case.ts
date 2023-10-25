@@ -4,6 +4,7 @@ import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
 import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
+import { UpdatedConfirmationCodeEvent } from '../../../auth/events/updated-confirmation-code.event';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -31,6 +32,10 @@ export class UpdateSentConfirmationCodeUseCase
         confirmationCode,
         expirationDateDto.expirationDate,
       );
+
+    const event: UpdatedConfirmationCodeEvent =
+      new UpdatedConfirmationCodeEvent(updatedUser);
+    updatedUser.events.push(event);
 
     updatedUser.events.forEach((e) => {
       this.eventBus.publish(e);

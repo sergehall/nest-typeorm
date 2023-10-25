@@ -21,7 +21,6 @@ import { BanInfoDto } from '../dto/ban-info.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
-import { UpdatedConfirmationCodeEvent } from '../../auth/events/updated-confirmation-code.event';
 
 export class UsersRepo {
   constructor(
@@ -326,13 +325,7 @@ export class UsersRepo {
       userToUpdate.confirmationCode = confirmationCode;
       userToUpdate.expirationDate = expirationDate;
 
-      const updatedUser = await this.usersRepository.save(userToUpdate);
-
-      const event: UpdatedConfirmationCodeEvent =
-        new UpdatedConfirmationCodeEvent(updatedUser);
-      updatedUser.events.push(event);
-
-      return updatedUser;
+      return await this.usersRepository.save(userToUpdate);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
