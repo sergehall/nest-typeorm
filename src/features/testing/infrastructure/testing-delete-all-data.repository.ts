@@ -1,9 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { DatabaseHasBeenClearedEvent } from '../events/database-has-been-cleared.event';
+import { EventBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class TestingDeleteAllDataRepository {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    protected eventBus: EventBus,
+  ) {}
 
   async removeAllData(): Promise<void> {
     const tablesToDelete = [
@@ -23,6 +28,7 @@ export class TestingDeleteAllDataRepository {
       'Users',
     ];
 
+    // the database has been cleared
     try {
       await this.entityManager.transaction(
         async (transactionalEntityManager) => {
@@ -35,6 +41,8 @@ export class TestingDeleteAllDataRepository {
           }
         },
       );
+
+      this.eventBus.publish(new DatabaseHasBeenClearedEvent(tablesToDelete));
     } catch (error) {
       console.error(error.message);
       throw new InternalServerErrorException(
