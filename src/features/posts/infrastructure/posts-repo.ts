@@ -10,7 +10,6 @@ import {
 import { CreatePostDto } from '../dto/create-post.dto';
 import {
   ExtendedLikesInfo,
-  NewestLikes,
   PostWithLikesInfoViewModel,
 } from '../view-models/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
@@ -20,19 +19,15 @@ import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
-import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
-import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 import { PostViewModel } from '../view-models/post.view-model';
 import { LikeStatusPostsRepo } from './like-status-posts.repo';
 
 export class PostsRepo {
   constructor(
     @InjectRepository(PostsEntity)
-    private readonly postsRepository: Repository<PostsEntity>,
-    // @InjectRepository(LikeStatusPostsEntity)
-    // private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
+    protected postsRepository: Repository<PostsEntity>,
     protected likeStatusPostsRepo: LikeStatusPostsRepo,
     protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
@@ -80,7 +75,8 @@ export class PostsRepo {
       if (post.length === 0) {
         return null;
       }
-      return await this.postsLikesAggregation(
+
+      return await this.likeStatusPostsRepo.postsLikesAggregation(
         post,
         numberLastLikes,
         currentUserDto,
@@ -175,7 +171,7 @@ export class PostsRepo {
     const posts = await queryBuilder.skip(offset).take(limit).getMany();
 
     // Retrieve posts with information about likes
-    const postsWithLikes = await this.postsLikesAggregation(
+    const postsWithLikes = await this.likeStatusPostsRepo.postsLikesAggregation(
       posts,
       numberLastLikes,
       currentUserDto,
@@ -229,7 +225,11 @@ export class PostsRepo {
     }
 
     const postsWithLikes: PostWithLikesInfoViewModel[] =
-      await this.postsLikesAggregation(posts, numberLastLikes, currentUserDto);
+      await this.likeStatusPostsRepo.postsLikesAggregation(
+        posts,
+        numberLastLikes,
+        currentUserDto,
+      );
 
     return {
       posts: postsWithLikes,
@@ -291,89 +291,6 @@ export class PostsRepo {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
-  }
-
-  private async postsLikesAggregation(
-    posts: PostsEntity[],
-    limitPerPost: number,
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<PostWithLikesInfoViewModel[]> {
-    const result: PostWithLikesInfoViewModel[] = [];
-
-    const postIds = posts.map((post) => post.id);
-
-    const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
-      await this.likeStatusPostsRepo.getPostsLikesDislikesMyStatus(
-        postIds,
-        currentUserDto,
-      );
-
-    const lookupExtendedLikesInfo = await this.createLookupTable(likesInfoArr);
-
-    for (const post of posts) {
-      const postId = post.id; // Get the post ID
-
-      const likesInfo: LikesDislikesMyStatusInfoDto =
-        lookupExtendedLikesInfo(postId);
-
-      const lastThreeLikes =
-        await this.likeStatusPostsRepo.getLastThreeLastLikesByPostId(
-          postId,
-          limitPerPost,
-        );
-
-      const lastLikes: NewestLikes[] = lastThreeLikes.reduce(
-        (accumulator: NewestLikes[], item: LikeStatusPostsEntity) => {
-          accumulator.push({
-            addedAt: item.addedAt,
-            userId: item.ratedPostUser.userId,
-            login: item.ratedPostUser.login,
-          });
-
-          return accumulator;
-        },
-        [],
-      );
-
-      result.push({
-        id: post.id,
-        title: post.title,
-        shortDescription: post.shortDescription,
-        content: post.content,
-        blogId: post.blog.id,
-        blogName: post.blog.name,
-        createdAt: post.createdAt,
-        extendedLikesInfo: {
-          likesCount: Number(likesInfo.likesCount),
-          dislikesCount: Number(likesInfo.dislikesCount),
-          myStatus: likesInfo.myStatus,
-          newestLikes: lastLikes,
-        },
-      });
-    }
-
-    return result;
-  }
-
-  private async createLookupTable(
-    array: LikesDislikesMyStatusInfoDto[],
-  ): Promise<(id: string) => LikesDislikesMyStatusInfoDto> {
-    const lookupTable = new Map<string, LikesDislikesMyStatusInfoDto>();
-
-    for (const item of array) {
-      lookupTable.set(item.id, item);
-    }
-
-    return (id: string) => {
-      return (
-        lookupTable.get(id) || {
-          id,
-          likesCount: '0',
-          dislikesCount: '0',
-          myStatus: LikeStatusEnums.NONE,
-        }
-      );
-    };
   }
 
   private async addExtendedLikesInfoToPostsEntity(
