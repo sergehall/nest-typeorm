@@ -81,7 +81,6 @@ export class PostsRepo {
       if (post.length === 0) {
         return null;
       }
-      console.log(post, 'post');
       return await this.postsLikesAggregation(
         post,
         numberLastLikes,
@@ -143,9 +142,18 @@ export class PostsRepo {
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
-    // Retrieve common parameters and flags
-    const { dependencyIsBanned, isBanned, field, direction, limit, offset } =
-      await this.getCommonParamsAndFlags(queryData);
+    // Retrieve banned flags
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
+    // Retrieve common parameters
+    const { sortDirection, sortBy, pageNumber, pageSize } =
+      queryData.queryPagination;
+
+    const field: string = await this.getSortByField(sortBy);
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
 
     // Retrieve the number of last likes
     const numberLastLikes = await this.numberLastLikes();
@@ -184,9 +192,18 @@ export class PostsRepo {
     queryData: ParseQueriesDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostsAndCountDto> {
-    // Retrieve common parameters and flags
-    const { dependencyIsBanned, isBanned, field, direction, limit, offset } =
-      await this.getCommonParamsAndFlags(queryData);
+    // Retrieve banned flags
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
+    // Retrieve common parameters
+    const { sortDirection, sortBy, pageNumber, pageSize } =
+      queryData.queryPagination;
+
+    const field: string = await this.getSortByField(sortBy);
+    const direction: SortDirectionEnum = sortDirection;
+    const limit: number = pageSize;
+    const offset: number = (pageNumber - 1) * limit;
 
     const numberLastLikes = await this.numberLastLikes();
 
@@ -277,6 +294,29 @@ export class PostsRepo {
     }
   }
 
+  private async getLastThreeLastLikesByPostId(
+    postId: string,
+    limitPerPost: number,
+  ): Promise<LikeStatusPostsEntity[]> {
+    try {
+      return await this.likePostsRepository
+        .createQueryBuilder('likeStatusPosts')
+        .leftJoinAndSelect('likeStatusPosts.post', 'post')
+        .leftJoinAndSelect('likeStatusPosts.ratedPostUser', 'ratedPostUser')
+        .where('likeStatusPosts.postId = :postId', { postId })
+        .andWhere('likeStatusPosts.likeStatus = :likeStatus', {
+          likeStatus: LikeStatusEnums.LIKE,
+        })
+        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned: false })
+        .orderBy('likeStatusPosts.addedAt', 'DESC')
+        .take(limitPerPost)
+        .getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   private async postsLikesAggregation(
     posts: PostsEntity[],
     limitPerPost: number,
@@ -356,32 +396,12 @@ export class PostsRepo {
     };
   }
 
-  private async getLastThreeLastLikesByPostId(
-    postId: string,
-    limitPerPost: number,
-  ): Promise<LikeStatusPostsEntity[]> {
-    try {
-      return await this.likePostsRepository
-        .createQueryBuilder('likeStatusPosts')
-        .leftJoinAndSelect('likeStatusPosts.post', 'post')
-        .leftJoinAndSelect('likeStatusPosts.ratedPostUser', 'ratedPostUser')
-        .where('likeStatusPosts.postId = :postId', { postId })
-        .andWhere('likeStatusPosts.likeStatus = :likeStatus', {
-          likeStatus: LikeStatusEnums.LIKE,
-        })
-        .orderBy('likeStatusPosts.addedAt', 'DESC')
-        .take(limitPerPost)
-        .getMany();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   private async getPostsLikesDislikesMyStatus(
     postIds: string[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<LikesDislikesMyStatusInfoDto[]> {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const isBanned = bannedFlags.isBanned;
     try {
       return this.likePostsRepository
         .createQueryBuilder('likeStatusPosts')
@@ -394,7 +414,7 @@ export class PostsRepo {
         .where('likeStatusPosts.postId IN (:...postIds)', {
           postIds,
         })
-        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned: false })
+        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned })
         .setParameters({
           likeStatus: LikeStatusEnums.LIKE,
           dislikeStatus: LikeStatusEnums.DISLIKE,
@@ -425,21 +445,6 @@ export class PostsRepo {
       banInfoIsBanned: false,
       isBanned: false,
     };
-  }
-
-  private async getCommonParamsAndFlags(queryData: ParseQueriesDto) {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    const { sortDirection, pageSize, pageNumber, sortBy } =
-      queryData.queryPagination;
-
-    const field: string = await this.getSortByField(sortBy);
-    const direction: SortDirectionEnum = sortDirection;
-    const limit: number = pageSize;
-    const offset: number = (pageNumber - 1) * limit;
-
-    return { dependencyIsBanned, isBanned, field, direction, limit, offset };
   }
 
   private async numberLastLikes(): Promise<number> {
