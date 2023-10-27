@@ -42,6 +42,7 @@ import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questio
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
+import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -91,6 +92,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GamePairsRepo,
     BloggerBlogsRepo,
     GameQuestionsRepo,
+    LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
     ExpirationDateCalculator,

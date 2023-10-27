@@ -37,6 +37,7 @@ import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-qui
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
+import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -81,6 +82,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     InvalidJwtRepo,
     GamePairsRepo,
     GameQuestionsRepo,
+    LikeStatusPostsRepo,
     LikeStatusCommentsRepo,
     BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,

@@ -31,6 +31,7 @@ import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-fo
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
+import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -70,6 +71,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GamePairsRepo,
     BloggerBlogsRepo,
     GameQuestionsRepo,
+    LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
     ...helpers,
