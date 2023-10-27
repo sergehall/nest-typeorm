@@ -18,7 +18,6 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { PostsAndCountDto } from '../dto/posts-and-count.dto';
-import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
@@ -26,16 +25,16 @@ import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.en
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 import { PostViewModel } from '../view-models/post.view-model';
+import { LikeStatusPostsRepo } from './like-status-posts.repo';
 
 export class PostsRepo {
   constructor(
-    protected keyResolver: KeyResolver,
     @InjectRepository(PostsEntity)
     private readonly postsRepository: Repository<PostsEntity>,
-    @InjectRepository(LikeStatusPostsEntity)
-    private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
-    @InjectRepository(CommentsEntity)
-    private readonly commentsRepository: Repository<CommentsEntity>,
+    // @InjectRepository(LikeStatusPostsEntity)
+    // private readonly likePostsRepository: Repository<LikeStatusPostsEntity>,
+    protected likeStatusPostsRepo: LikeStatusPostsRepo,
+    protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
@@ -294,29 +293,6 @@ export class PostsRepo {
     }
   }
 
-  private async getLastThreeLastLikesByPostId(
-    postId: string,
-    limitPerPost: number,
-  ): Promise<LikeStatusPostsEntity[]> {
-    try {
-      return await this.likePostsRepository
-        .createQueryBuilder('likeStatusPosts')
-        .leftJoinAndSelect('likeStatusPosts.post', 'post')
-        .leftJoinAndSelect('likeStatusPosts.ratedPostUser', 'ratedPostUser')
-        .where('likeStatusPosts.postId = :postId', { postId })
-        .andWhere('likeStatusPosts.likeStatus = :likeStatus', {
-          likeStatus: LikeStatusEnums.LIKE,
-        })
-        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned: false })
-        .orderBy('likeStatusPosts.addedAt', 'DESC')
-        .take(limitPerPost)
-        .getMany();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   private async postsLikesAggregation(
     posts: PostsEntity[],
     limitPerPost: number,
@@ -327,7 +303,10 @@ export class PostsRepo {
     const postIds = posts.map((post) => post.id);
 
     const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
-      await this.getPostsLikesDislikesMyStatus(postIds, currentUserDto);
+      await this.likeStatusPostsRepo.getPostsLikesDislikesMyStatus(
+        postIds,
+        currentUserDto,
+      );
 
     const lookupExtendedLikesInfo = await this.createLookupTable(likesInfoArr);
 
@@ -337,10 +316,11 @@ export class PostsRepo {
       const likesInfo: LikesDislikesMyStatusInfoDto =
         lookupExtendedLikesInfo(postId);
 
-      const lastThreeLikes = await this.getLastThreeLastLikesByPostId(
-        postId,
-        limitPerPost,
-      );
+      const lastThreeLikes =
+        await this.likeStatusPostsRepo.getLastThreeLastLikesByPostId(
+          postId,
+          limitPerPost,
+        );
 
       const lastLikes: NewestLikes[] = lastThreeLikes.reduce(
         (accumulator: NewestLikes[], item: LikeStatusPostsEntity) => {
@@ -394,38 +374,6 @@ export class PostsRepo {
         }
       );
     };
-  }
-
-  private async getPostsLikesDislikesMyStatus(
-    postIds: string[],
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<LikesDislikesMyStatusInfoDto[]> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const isBanned = bannedFlags.isBanned;
-    try {
-      return this.likePostsRepository
-        .createQueryBuilder('likeStatusPosts')
-        .select([
-          'likeStatusPosts.postId AS "id"',
-          'COUNT(CASE WHEN likeStatusPosts.likeStatus = :likeStatus THEN 1 ELSE NULL END) AS "likesCount"',
-          'COUNT(CASE WHEN likeStatusPosts.likeStatus = :dislikeStatus THEN 1 ELSE NULL END) AS "dislikesCount"',
-          'COALESCE(MAX(CASE WHEN likeStatusPosts.ratedPostUser.userId = :userId THEN likeStatusPosts.likeStatus ELSE NULL END), \'None\') AS "myStatus"',
-        ])
-        .where('likeStatusPosts.postId IN (:...postIds)', {
-          postIds,
-        })
-        .andWhere('likeStatusPosts.isBanned = :isBanned', { isBanned })
-        .setParameters({
-          likeStatus: LikeStatusEnums.LIKE,
-          dislikeStatus: LikeStatusEnums.DISLIKE,
-          userId: currentUserDto?.userId,
-        })
-        .groupBy('likeStatusPosts.postId')
-        .getRawMany();
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
   }
 
   private async addExtendedLikesInfoToPostsEntity(
