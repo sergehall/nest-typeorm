@@ -8,6 +8,7 @@ import { GameViewModel } from '../../../features/pair-game-quiz/view-models/game
 import { GamesStatisticsViewModel } from '../../../features/pair-game-quiz/view-models/games-statistics.view-model';
 import { BloggerBlogsViewModel } from '../../../features/blogger-blogs/view-models/blogger-blogs.view-model';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
+import { SaUserViewModel } from '../../../features/sa/view-models/sa-user-view-model';
 
 export class PaginatorDto {
   @IsNumber()
@@ -27,6 +28,7 @@ export class PaginatorDto {
   items: (
     | UsersEntity
     | UserViewModel
+    | SaUserViewModel
     | CommentViewModel
     | PostWithLikesInfoViewModel
     | BloggerBlogsViewModel

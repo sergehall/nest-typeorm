@@ -50,13 +50,15 @@ import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-pos
 import { UsersEntity } from '../../users/entities/users.entity';
 import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-case';
 import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
-import { UserViewModel } from '../../users/view-models/user.view-model';
+import { UsersService } from '../../users/application/users.service';
+import { SaUserViewModel } from '../view-models/sa-user-view-model';
 
 @SkipThrottle()
 @Controller('sa')
 export class SaController {
   constructor(
     private parseQueriesService: ParseQueriesService,
+    private usersService: UsersService,
     private commandBus: CommandBus,
   ) {}
 
@@ -102,18 +104,14 @@ export class SaController {
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<UserViewModel> {
+  ): Promise<SaUserViewModel> {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
-    // await this.commandBus.execute(new ChangeRoleCommand(newUser.userId));
+    const transformedUser: SaUserViewModel[] =
+      await this.usersService.transformUserForSa([newUser]);
 
-    return {
-      id: newUser.userId,
-      login: newUser.login,
-      email: newUser.email,
-      createdAt: newUser.createdAt,
-    };
+    return transformedUser[0];
   }
 
   @Post('blogs')

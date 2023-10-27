@@ -2,8 +2,8 @@ import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
-import { UsersEntity } from '../../../users/entities/users.entity';
-import { UserViewModel } from '../../../users/view-models/user.view-model';
+import { UsersService } from '../../../users/application/users.service';
+import { SaUserViewModel } from '../../view-models/sa-user-view-model';
 
 export class SaFindUsersCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -11,19 +11,24 @@ export class SaFindUsersCommand {
 
 @CommandHandler(SaFindUsersCommand)
 export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
-  constructor(protected usersRepo: UsersRepo) {}
+  constructor(
+    protected usersRepo: UsersRepo,
+    protected usersService: UsersService,
+  ) {}
   async execute(command: SaFindUsersCommand): Promise<PaginatorDto> {
     const { queryData } = command;
 
     const arrUsers = await this.usersRepo.findUsers(queryData);
-
-    const transformedArrUsers = await this.transformedArrUsers(arrUsers);
 
     const totalCount = await this.usersRepo.totalCountUsers(queryData);
 
     const pagesCount = Math.ceil(
       totalCount / queryData.queryPagination.pageSize,
     );
+
+    const transformedArrUsers: SaUserViewModel[] =
+      await this.usersService.transformUserForSa(arrUsers);
+
     return {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,
@@ -31,16 +36,5 @@ export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
       totalCount: totalCount,
       items: transformedArrUsers,
     };
-  }
-
-  private async transformedArrUsers(
-    usersArr: UsersEntity[],
-  ): Promise<UserViewModel[]> {
-    return usersArr.map((user: UsersEntity) => ({
-      id: user.userId,
-      login: user.login,
-      email: user.email,
-      createdAt: user.createdAt,
-    }));
   }
 }
