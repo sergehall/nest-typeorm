@@ -81,7 +81,7 @@ export class PostsRepo {
       if (post.length === 0) {
         return null;
       }
-
+      console.log(post, 'post');
       return await this.postsLikesAggregation(
         post,
         numberLastLikes,

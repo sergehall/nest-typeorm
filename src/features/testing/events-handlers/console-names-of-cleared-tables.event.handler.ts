@@ -8,6 +8,7 @@ export class ConsoleNamesOfClearedTablesEventHandler
   constructor() {}
 
   async handle(event: DatabaseHasBeenClearedEvent) {
-    console.log('The names of cleared tables', event.arrTables);
+    //    console.log(clearedTables)
+    console.log('The names of cleared tables....', event.arrTables.length);
   }
 }

@@ -78,6 +78,7 @@ export class SaController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindBlogs(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
+
     return await this.commandBus.execute(new SaFindBlogsCommand(queryData));
   }
 
@@ -108,6 +109,7 @@ export class SaController {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
+
     const transformedUser: SaUserViewModel[] =
       await this.usersService.transformUserForSa([newUser]);
 
