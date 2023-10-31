@@ -12,7 +12,6 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { BlogsCountBlogsDto } from '../dto/blogs-count-blogs.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
-import { BannedUsersForBlogsEntity } from '../../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
@@ -272,99 +271,6 @@ export class BloggerBlogsRepo {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async manageBlogAccess(
-    bannedUserForBlogEntity: BannedUsersForBlogsEntity,
-  ): Promise<boolean> {
-    const connection = this.bloggerBlogsRepository.manager.connection;
-    const queryRunner = connection.createQueryRunner();
-    await queryRunner.connect();
-
-    const userId = bannedUserForBlogEntity.bannedUserForBlogs.userId;
-    const blogId = bannedUserForBlogEntity.bannedBlog.id;
-
-    try {
-      await queryRunner.startTransaction();
-
-      await connection.manager.update(
-        LikeStatusPostsEntity,
-        {
-          ratedPostUser: userId,
-          blog: blogId,
-        },
-        { isBanned: bannedUserForBlogEntity.isBanned },
-      );
-
-      // Update LikeStatusComments table
-      await connection.manager.update(
-        LikeStatusCommentsEntity,
-        [
-          {
-            ratedCommentUser: userId,
-            blog: blogId,
-          },
-          {
-            commentOwner: userId,
-            blog: blogId,
-          },
-        ],
-        { isBanned: bannedUserForBlogEntity.isBanned },
-      );
-
-      // Update Comments table
-      await connection.manager.update(
-        CommentsEntity,
-        {
-          commentator: userId,
-          blog: blogId,
-        },
-        {
-          isBanned: bannedUserForBlogEntity.isBanned,
-          banDate: bannedUserForBlogEntity.banDate,
-          banReason: bannedUserForBlogEntity.banReason,
-        },
-      );
-
-      if (bannedUserForBlogEntity.isBanned) {
-        // Insert if banned
-        await connection.manager.save(
-          BannedUsersForBlogsEntity,
-          bannedUserForBlogEntity,
-        );
-        await queryRunner.commitTransaction();
-      } else {
-        // Delete record from BannedUsersForBlogs if unBan user
-        await connection.manager.delete(BannedUsersForBlogsEntity, {
-          bannedUserForBlogs: userId,
-          bannedBlog: blogId,
-        });
-        await queryRunner.commitTransaction();
-      }
-
-      if (bannedUserForBlogEntity.isBanned) {
-        // Successful User Ban Message
-        console.log(
-          `User ${userId} has been blocked from accessing Blog ${blogId}. 🚫`,
-        );
-      } else {
-        // Successful User unBan Message
-        console.log(
-          `User with ID ${userId} has been unbanned for the blog with ID ${blogId} 🚪`,
-        );
-      }
-      return true;
-    } catch (error) {
-      console.log('rollbackTransaction');
-      console.error(
-        `Error occurred while banning user ${userId} for blog ${blogId}:`,
-        error,
-      );
-      await queryRunner.rollbackTransaction();
-      return false;
-    } finally {
-      await queryRunner.release();
     }
   }
 
