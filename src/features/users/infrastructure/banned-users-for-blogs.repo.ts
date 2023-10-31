@@ -173,7 +173,7 @@ export class BannedUsersForBlogsRepo {
       if (updateBanUserDto.isBanned) {
         // Successful User Ban Message
         console.log(
-          `User ${user.userId} has been blocked from accessing Blog ${blog.id}. 🚫`,
+          `User ${user.userId} has been blocked from accessing Blog ID ${blog.id}. 🚫`,
         );
       } else {
         // Successful User unBan Message
@@ -185,7 +185,7 @@ export class BannedUsersForBlogsRepo {
     } catch (error) {
       console.log('rollbackTransaction');
       console.error(
-        `Error occurred while banning user ${user.userId} for blog ${blog.id}:`,
+        `Error occurred while banning user ${user.userId} for Blog ID ${blog.id}:`,
         error,
       );
       await queryRunner.rollbackTransaction();
