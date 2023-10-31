@@ -34,8 +34,6 @@ export class BannedUsersForBlogsRepo {
       const limit: number = pageSize;
       const offset: number = (pageNumber - 1) * limit;
 
-      console.log(field, 'sortBy');
-
       const queryBuilder = this.bannedUsersForBlogsRepo
         .createQueryBuilder('banned_users')
         .select([
