@@ -4,7 +4,6 @@ import {
   Unique,
   PrimaryColumn,
   JoinColumn,
-  OneToOne,
   ManyToOne,
 } from 'typeorm';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
@@ -27,7 +26,7 @@ export class BannedUsersForBlogsEntity {
   @Column({ nullable: false, default: true })
   isBanned: boolean;
 
-  @OneToOne(() => BloggerBlogsEntity, (blog) => blog.bannedBlog, {
+  @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.bannedBlog, {
     nullable: false,
     eager: true,
   })

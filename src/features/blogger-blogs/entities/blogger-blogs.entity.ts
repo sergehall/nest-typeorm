@@ -6,7 +6,6 @@ import {
   OneToMany,
   ManyToOne,
   Unique,
-  OneToOne,
 } from 'typeorm';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
@@ -63,8 +62,8 @@ export class BloggerBlogsEntity {
   ])
   blogOwner: UsersEntity;
 
-  @OneToOne(() => BannedUsersForBlogsEntity, (ban) => ban.bannedBlog)
-  bannedBlog: BannedUsersForBlogsEntity;
+  @OneToMany(() => BannedUsersForBlogsEntity, (ban) => ban.bannedBlog)
+  bannedBlog: BannedUsersForBlogsEntity[];
 
   @OneToMany(() => PostsEntity, (posts) => posts.blog)
   posts: PostsEntity[];
