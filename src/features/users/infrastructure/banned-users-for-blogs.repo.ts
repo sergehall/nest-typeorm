@@ -7,24 +7,34 @@ import { BannedUsersEntityAndCountDto } from '../../blogger-blogs/dto/banned-use
 import { UsersEntity } from '../entities/users.entity';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import * as uuid4 from 'uuid4';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
+import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
+import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
+import { CommentsEntity } from '../../comments/entities/comments.entity';
 
 export class BannedUsersForBlogsRepo {
   constructor(
     @InjectRepository(BannedUsersForBlogsEntity)
     private readonly bannedUsersForBlogsRepo: Repository<BannedUsersForBlogsEntity>,
+    protected keyResolver: KeyResolver,
   ) {}
 
   async findBannedUsers(
     blogId: string,
     queryData: ParseQueriesDto,
   ): Promise<BannedUsersEntityAndCountDto> {
+    const { sortBy, sortDirection, pageSize, pageNumber } =
+      queryData.queryPagination;
+
     try {
       const searchLoginTerm = queryData.searchLoginTerm;
-      const sortBy = queryData.queryPagination.sortBy;
-      const direction = queryData.queryPagination.sortDirection;
-      const limit = queryData.queryPagination.pageSize;
-      const offset = (queryData.queryPagination.pageNumber - 1) * limit;
+      const field: string = await this.getSortByField(sortBy);
+      const direction: SortDirectionEnum = sortDirection;
+      const limit: number = pageSize;
+      const offset: number = (pageNumber - 1) * limit;
+
+      console.log(field, 'sortBy');
 
       const queryBuilder = this.bannedUsersForBlogsRepo
         .createQueryBuilder('banned_users')
@@ -41,13 +51,14 @@ export class BannedUsersForBlogsRepo {
           'banned_users.bannedUserForBlogs',
           'bannedUserForBlogs',
         )
+        .leftJoinAndSelect('banned_users.bannedBlog', 'bannedBlog')
         .where('banned_users.blogId = :blogId', { blogId })
         .andWhere('banned_users.login ILIKE :searchLoginTerm', {
           searchLoginTerm: searchLoginTerm,
         })
-        .orderBy(`banned_users.${sortBy}`, direction)
-        .skip(offset)
-        .take(limit);
+        .orderBy(`banned_users.${field}`, direction)
+        .offset(offset)
+        .limit(limit);
 
       const [bannedUsers, count] = await queryBuilder.getManyAndCount();
 
@@ -90,20 +101,107 @@ export class BannedUsersForBlogsRepo {
     }
   }
 
-  async createBannedUserEntity(
+  async manageBlogAccess(
     user: UsersEntity,
     blog: BloggerBlogsEntity,
     updateBanUserDto: UpdateBanUserDto,
-  ): Promise<BannedUsersForBlogsEntity> {
-    const { isBanned, banReason } = updateBanUserDto;
+  ): Promise<boolean> {
+    const connection = this.bannedUsersForBlogsRepo.manager.connection;
+    const queryRunner = connection.createQueryRunner();
+    await queryRunner.connect();
 
-    const bannedUser = new BannedUsersForBlogsEntity();
-    bannedUser.id = uuid4().toString();
-    bannedUser.isBanned = isBanned;
-    bannedUser.banReason = banReason;
-    bannedUser.bannedBlog = blog;
-    bannedUser.bannedUserForBlogs = user;
+    const bannedUserEntity: BannedUsersForBlogsEntity =
+      BannedUsersForBlogsEntity.createBannedUserEntity(
+        user,
+        blog,
+        updateBanUserDto,
+      );
 
-    return bannedUser;
+    try {
+      await queryRunner.startTransaction();
+
+      await connection.manager.update(
+        LikeStatusPostsEntity,
+        {
+          ratedPostUser: user,
+          blog: blog,
+        },
+        { isBanned: updateBanUserDto.isBanned },
+      );
+
+      // Update LikeStatusComments table
+      await connection.manager.update(
+        LikeStatusCommentsEntity,
+        [
+          {
+            ratedCommentUser: user,
+            blog: blog,
+          },
+          {
+            commentOwner: user,
+            blog: blog,
+          },
+        ],
+        { isBanned: updateBanUserDto.isBanned },
+      );
+
+      await connection.manager.update(
+        CommentsEntity,
+        {
+          commentator: user,
+          blog: blog,
+        },
+        {
+          dependencyIsBanned: updateBanUserDto.isBanned,
+        },
+      );
+
+      if (updateBanUserDto.isBanned) {
+        // Insert if banned
+        await connection.manager.save(
+          BannedUsersForBlogsEntity,
+          bannedUserEntity,
+        );
+        await queryRunner.commitTransaction();
+      } else {
+        // Delete record from BannedUsersForBlogs if unBan user
+        await connection.manager.delete(BannedUsersForBlogsEntity, {
+          bannedUserForBlogs: user,
+          bannedBlog: blog,
+        });
+        await queryRunner.commitTransaction();
+      }
+
+      if (updateBanUserDto.isBanned) {
+        // Successful User Ban Message
+        console.log(
+          `User ${user.userId} has been blocked from accessing Blog ${blog.id}. 🚫`,
+        );
+      } else {
+        // Successful User unBan Message
+        console.log(
+          `User with ID ${user.userId} has been unbanned for the blog with ID ${blog.id} 🚪`,
+        );
+      }
+      return true;
+    } catch (error) {
+      console.log('rollbackTransaction');
+      console.error(
+        `Error occurred while banning user ${user.userId} for blog ${blog.id}:`,
+        error,
+      );
+      await queryRunner.rollbackTransaction();
+      return false;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async getSortByField(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      ['banDate', 'banReason', 'isBanned', 'login'],
+      'banDate',
+    );
   }
 }

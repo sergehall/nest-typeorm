@@ -7,8 +7,10 @@ import {
   OneToOne,
   ManyToOne,
 } from 'typeorm';
+import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from './users.entity';
+import * as uuid4 from 'uuid4';
 
 @Entity('BannedUsersForBlogs')
 @Unique(['id'])
@@ -41,4 +43,22 @@ export class BannedUsersForBlogsEntity {
     { name: 'login', referencedColumnName: 'login' },
   ])
   bannedUserForBlogs: UsersEntity;
+
+  static createBannedUserEntity(
+    user: UsersEntity,
+    blog: BloggerBlogsEntity,
+    updateBanUserDto: UpdateBanUserDto,
+  ): BannedUsersForBlogsEntity {
+    const { isBanned, banReason } = updateBanUserDto;
+
+    const bannedUser = new BannedUsersForBlogsEntity();
+    bannedUser.id = uuid4().toString();
+    bannedUser.isBanned = isBanned;
+    bannedUser.banReason = banReason;
+    bannedUser.banDate = new Date().toISOString();
+    bannedUser.bannedBlog = blog;
+    bannedUser.bannedUserForBlogs = user;
+
+    return bannedUser;
+  }
 }

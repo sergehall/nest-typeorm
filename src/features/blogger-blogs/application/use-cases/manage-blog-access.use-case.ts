@@ -14,7 +14,6 @@ import { cannotBlockYourself } from '../../../../common/filters/custom-errors-me
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
-import { BannedUsersForBlogsEntity } from '../../../users/entities/banned-users-for-blogs.entity';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 
@@ -59,15 +58,11 @@ export class ManageBlogAccessUseCase
     // Check if the current user has permission to perform the ban action.
     await this.checkUserPermission(blogForBan.blogOwner.userId, currentUserDto);
 
-    // Creates a new instance bannedUserEntity
-    const bannedUserEntity: BannedUsersForBlogsEntity =
-      await this.bannedUsersForBlogsRepo.createBannedUserEntity(
-        userForBan,
-        blogForBan,
-        updateBanUserDto,
-      );
-
-    return await this.bloggerBlogsRepo.manageBlogAccess(bannedUserEntity);
+    return await this.bannedUsersForBlogsRepo.manageBlogAccess(
+      userForBan,
+      blogForBan,
+      updateBanUserDto,
+    );
   }
 
   // Fetches the user to be banned from the repository based on the provided user ID.
