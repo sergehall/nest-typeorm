@@ -100,7 +100,7 @@ export class CommentsRepo {
       const limit: number = pageSize;
       const offset: number = (pageNumber - 1) * limit;
 
-      const queryBuilder = await this.createPostsCommentsQueryBuilder(
+      const queryBuilder = await this.createQueryBuilderForPostsComments(
         queryData,
         postId,
       );
@@ -140,7 +140,7 @@ export class CommentsRepo {
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 
-    const queryBuilder = await this.createAllUserBlogsCommentsQueryBuilder(
+    const queryBuilder = await this.createQueryBuilderForUserBlogsComments(
       queryData,
       currentUserDto.userId,
     );
@@ -173,7 +173,7 @@ export class CommentsRepo {
     }
   }
 
-  private async createPostsCommentsQueryBuilder(
+  private async createQueryBuilderForPostsComments(
     queryData: ParseQueriesDto,
     postId: string,
   ): Promise<SelectQueryBuilder<CommentsEntity>> {
@@ -202,7 +202,7 @@ export class CommentsRepo {
     return queryBuilder;
   }
 
-  private async createAllUserBlogsCommentsQueryBuilder(
+  private async createQueryBuilderForUserBlogsComments(
     queryData: ParseQueriesDto,
     userId: string,
   ): Promise<SelectQueryBuilder<CommentsEntity>> {
