@@ -38,7 +38,7 @@ export class PostsRepo {
       const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
       const { dependencyIsBanned, isBanned } = bannedFlags;
 
-      const post = await this.postsRepository.findBy({
+      const post: PostsEntity[] = await this.postsRepository.findBy({
         id,
         dependencyIsBanned,
         isBanned,

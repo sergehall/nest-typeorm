@@ -174,10 +174,12 @@ export class BloggerBlogsRepo {
   }
 
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const isBanned = false;
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
-      .where('blog.id = :blogId', { blogId });
+      .where('blog.id = :blogId', { blogId })
+      .andWhere({ isBanned });
 
     try {
       const blog = await queryBuilder.getOne(); // Execute the query and get a single result
@@ -204,10 +206,8 @@ export class BloggerBlogsRepo {
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
       .where('blog.id = :blogId', { blogId })
-      .andWhere('blog.dependencyIsBanned = :dependencyIsBanned', {
-        dependencyIsBanned,
-      })
-      .andWhere('blog.isBanned = :isBanned', { isBanned });
+      .andWhere({ dependencyIsBanned })
+      .andWhere({ isBanned });
 
     try {
       const blog = await queryBuilder.getOne(); // Execute the query and get a single result
