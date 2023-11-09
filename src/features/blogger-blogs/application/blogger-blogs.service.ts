@@ -32,6 +32,10 @@ export class BloggerBlogsService {
         userId: blog.blogOwner.userId,
         userLogin: blog.blogOwner.login,
       },
+      banInfo: {
+        isBanned: blog.isBanned,
+        banDate: blog.banDate,
+      },
     }));
   }
 }

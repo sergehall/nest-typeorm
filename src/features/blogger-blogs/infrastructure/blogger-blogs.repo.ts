@@ -144,6 +144,8 @@ export class BloggerBlogsRepo {
         'blogs.websiteUrl',
         'blogs.createdAt',
         'blogs.isMembership',
+        'blogs.isBanned',
+        'blogs.banDate',
       ])
       .leftJoinAndSelect('blogs.blogOwner', 'blogOwner')
       .where('blogs.name ILIKE :searchNameTerm', {
