@@ -23,6 +23,7 @@ import { PartialCommentsDto } from '../dto/partial-comments.dto';
 import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { LikeStatusCommentsRepo } from './like-status-comments.repo';
+import { BloggerCommentViewModel } from '../../blogger-blogs/view-models/bloggers-blogs.view-model';
 
 export class CommentsRepo {
   constructor(
@@ -163,7 +164,7 @@ export class CommentsRepo {
 
       // Retrieve comments with information about likes
       const commentsWithLikes: CommentViewModel[] =
-        await this.commentsLikesAggregation(comments, currentUserDto);
+        await this.commentsLikesAggregationForBlogger(comments, currentUserDto);
 
       return {
         comments: commentsWithLikes,
@@ -193,8 +194,9 @@ export class CommentsRepo {
       .createQueryBuilder('comments')
       .where({ dependencyIsBanned })
       .andWhere({ isBanned })
-      .innerJoinAndSelect('comments.post', 'post')
-      .innerJoinAndSelect('comments.commentator', 'commentator');
+      .leftJoinAndSelect('comments.post', 'post')
+      .leftJoinAndSelect('comments.blog', 'blog')
+      .leftJoinAndSelect('comments.commentator', 'commentator');
 
     if (keyword === 'commentatorId') {
       queryBuilder.andWhere('commentator.userId = :commentatorId', {
@@ -315,6 +317,47 @@ export class CommentsRepo {
           likesCount: likesInfo ? parseInt(likesInfo.likesCount) : 0,
           dislikesCount: likesInfo ? parseInt(likesInfo.dislikesCount) : 0,
           myStatus: likesInfo ? likesInfo.myStatus : LikeStatusEnums.NONE,
+        },
+      };
+    });
+  }
+
+  async commentsLikesAggregationForBlogger(
+    comments: CommentsEntity[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<BloggerCommentViewModel[]> {
+    const commentIds = comments.map((comment) => comment.id);
+
+    const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
+      await this.likeStatusCommentsRepo.getCommentsLikesDislikesMyStatus(
+        commentIds,
+        currentUserDto,
+      );
+
+    return comments.map((comment: CommentsEntity): BloggerCommentViewModel => {
+      const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
+        likesInfoArr.find(
+          (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
+        );
+
+      return {
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.commentator.userId,
+          userLogin: comment.commentator.login,
+        },
+        likesInfo: {
+          likesCount: likesInfo ? parseInt(likesInfo.likesCount) : 0,
+          dislikesCount: likesInfo ? parseInt(likesInfo.dislikesCount) : 0,
+          myStatus: likesInfo ? likesInfo.myStatus : LikeStatusEnums.NONE,
+        },
+        postInfo: {
+          id: comment.post.id,
+          title: comment.post.title,
+          blogId: comment.blog.id,
+          blogName: comment.blog.name,
         },
       };
     });
