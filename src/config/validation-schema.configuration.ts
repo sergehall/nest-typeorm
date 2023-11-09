@@ -44,7 +44,7 @@ export const validationSchemaConfiguration = Joi.object({
   THROTTLE_LIMIT: Joi.number().required(),
   PORT: Joi.number().default(5000),
   PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
-  PG_HOST_HEROKU: Joi.string().min(40).max(40).required(),
+  PG_HOST_HEROKU: Joi.string().min(39).max(39).required(),
   DATABASE_URL: Joi.string().min(10).max(170).required(),
   PG_HEROKU_USER_NAME: Joi.string()
     .min(2)
@@ -60,7 +60,7 @@ export const validationSchemaConfiguration = Joi.object({
   PG_LOCAL_USER_PASSWORD: Joi.string().min(2).max(20).required(),
   PG_PORT: Joi.number().default(5432),
   PG_HEROKU_NAME_DATABASE: Joi.string()
-    .pattern(new RegExp('^[-a-zA-Z0-9]{14}$'))
+    .pattern(new RegExp('^[-a-zA-Z0-9]{13}$'))
     .required(),
   PG_DOMAIN_HEROKU: Joi.string()
     .pattern(
