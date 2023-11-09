@@ -190,11 +190,11 @@ export class CommentsRepo {
     const direction: SortDirectionEnum = sortDirection;
 
     const queryBuilder = this.commentsRepository
-      .createQueryBuilder('comment')
+      .createQueryBuilder('comments')
       .where({ dependencyIsBanned })
       .andWhere({ isBanned })
-      .innerJoinAndSelect('comment.post', 'post')
-      .innerJoinAndSelect('comment.commentator', 'commentator');
+      .innerJoinAndSelect('comments.post', 'post')
+      .innerJoinAndSelect('comments.commentator', 'commentator');
 
     if (keyword === 'commentatorId') {
       queryBuilder.andWhere('commentator.userId = :commentatorId', {
@@ -205,7 +205,7 @@ export class CommentsRepo {
         postId: value,
       });
     }
-    queryBuilder.orderBy(`comment.${field}`, direction);
+    queryBuilder.orderBy(`comments.${field}`, direction);
 
     return queryBuilder;
   }

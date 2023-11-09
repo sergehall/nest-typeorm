@@ -155,20 +155,21 @@ export class PostsRepo {
 
     // Query posts and countPosts with pagination conditions
     const queryBuilder = this.postsRepository
-      .createQueryBuilder('post')
-      .where('post.dependencyIsBanned = :dependencyIsBanned', {
-        dependencyIsBanned,
-      })
-      .andWhere('post.isBanned = :isBanned', { isBanned })
-      .innerJoinAndSelect('post.blog', 'blog')
-      .innerJoinAndSelect('post.postOwner', 'postOwner')
+      .createQueryBuilder('posts')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned })
+      .innerJoinAndSelect('posts.blog', 'blog')
+      .innerJoinAndSelect('posts.postOwner', 'postOwner')
       .andWhere('blog.id = :blogId', { blogId });
 
-    queryBuilder.orderBy(field, direction);
+    queryBuilder.orderBy(`posts.${field}`, direction);
 
     const countPosts = await queryBuilder.getCount();
 
-    const posts = await queryBuilder.skip(offset).take(limit).getMany();
+    const posts: PostsEntity[] = await queryBuilder
+      .skip(offset)
+      .take(limit)
+      .getMany();
 
     // Retrieve posts with information about likes
     const postsWithLikes = await this.likeStatusPostsRepo.postsLikesAggregation(
@@ -202,20 +203,21 @@ export class PostsRepo {
 
     const numberLastLikes = await this.numberLastLikes();
 
-    const query = this.postsRepository
-      .createQueryBuilder('post')
-      .where('post.dependencyIsBanned = :dependencyIsBanned', {
-        dependencyIsBanned,
-      })
-      .andWhere('post.isBanned = :isBanned', { isBanned })
-      .innerJoinAndSelect('post.blog', 'blog')
-      .innerJoinAndSelect('post.postOwner', 'postOwner');
+    const queryBuilder = this.postsRepository
+      .createQueryBuilder('posts')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned })
+      .leftJoinAndSelect('posts.blog', 'blog')
+      .leftJoinAndSelect('posts.postOwner', 'postOwner');
 
-    query.orderBy(field, direction);
+    queryBuilder.orderBy(`posts.${field}`, direction);
 
-    const countPosts = await query.getCount();
+    const countPosts: number = await queryBuilder.getCount();
 
-    const posts = await query.skip(offset).take(limit).getMany();
+    const posts: PostsEntity[] = await queryBuilder
+      .offset(offset)
+      .limit(limit)
+      .getMany();
 
     if (posts.length === 0) {
       return {
