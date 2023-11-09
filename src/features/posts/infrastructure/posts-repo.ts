@@ -205,10 +205,10 @@ export class PostsRepo {
 
     const queryBuilder = this.postsRepository
       .createQueryBuilder('posts')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
       .leftJoinAndSelect('posts.blog', 'blog')
-      .leftJoinAndSelect('posts.postOwner', 'postOwner');
+      .leftJoinAndSelect('posts.postOwner', 'postOwner')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned });
 
     queryBuilder.orderBy(`posts.${field}`, direction);
 
