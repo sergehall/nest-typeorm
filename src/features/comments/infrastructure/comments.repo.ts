@@ -23,7 +23,7 @@ import { PartialCommentsDto } from '../dto/partial-comments.dto';
 import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { LikeStatusCommentsRepo } from './like-status-comments.repo';
-import { BloggerCommentViewModel } from '../../blogger-blogs/view-models/bloggers-blogs.view-model';
+import { BloggerCommentViewModel } from '../../blogger-blogs/view-models/blogger-comment.view-model';
 
 export class CommentsRepo {
   constructor(
@@ -141,12 +141,16 @@ export class CommentsRepo {
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 
-    const queryBuilder = await this.createCommentsQueryBuilder(
+    // const queryBuilder = await this.createCommentsQueryBuilder(
+    //   queryData,
+    //   'commentatorId',
+    //   currentUserDto.userId,
+    // );
+
+    const queryBuilder = await this.createAllUserBlogsCommentsQueryBuilder(
       queryData,
-      'commentatorId',
       currentUserDto.userId,
     );
-
     try {
       const countComment = await queryBuilder.getCount();
 
@@ -161,7 +165,6 @@ export class CommentsRepo {
           countComments: countComment,
         };
       }
-
       // Retrieve comments with information about likes
       const commentsWithLikes: CommentViewModel[] =
         await this.commentsLikesAggregationForBlogger(comments, currentUserDto);
@@ -192,11 +195,11 @@ export class CommentsRepo {
 
     const queryBuilder = this.commentsRepository
       .createQueryBuilder('comments')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
       .leftJoinAndSelect('comments.post', 'post')
       .leftJoinAndSelect('comments.blog', 'blog')
-      .leftJoinAndSelect('comments.commentator', 'commentator');
+      .leftJoinAndSelect('comments.commentator', 'commentator')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned });
 
     if (keyword === 'commentatorId') {
       queryBuilder.andWhere('commentator.userId = :commentatorId', {
@@ -207,6 +210,36 @@ export class CommentsRepo {
         postId: value,
       });
     }
+    queryBuilder.orderBy(`comments.${field}`, direction);
+
+    return queryBuilder;
+  }
+
+  private async createAllUserBlogsCommentsQueryBuilder(
+    queryData: ParseQueriesDto,
+    userId: string,
+  ): Promise<SelectQueryBuilder<CommentsEntity>> {
+    // Retrieve banned flags
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
+    // Retrieve paging parameters
+    const { sortBy, sortDirection } = queryData.queryPagination;
+    const field: string = await this.getSortByField(sortBy);
+    const direction: SortDirectionEnum = sortDirection;
+
+    const queryBuilder = this.commentsRepository
+      .createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.post', 'post')
+      .leftJoinAndSelect('comments.blog', 'blog')
+      .leftJoinAndSelect('comments.blogOwner', 'blogOwner')
+      .leftJoinAndSelect('comments.commentator', 'commentator')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned })
+      .andWhere('comments.blogOwnerId = :userId', {
+        userId,
+      });
+
     queryBuilder.orderBy(`comments.${field}`, direction);
 
     return queryBuilder;

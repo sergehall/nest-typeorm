@@ -50,7 +50,7 @@ export class LikeStatusCommentsEntity {
     nullable: false,
     eager: true,
   })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   ratedCommentUser: UsersEntity;
 
   @ManyToOne(() => BloggerBlogsEntity, (blog) => blog.id, {
