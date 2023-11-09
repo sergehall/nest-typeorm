@@ -100,9 +100,8 @@ export class CommentsRepo {
       const limit: number = pageSize;
       const offset: number = (pageNumber - 1) * limit;
 
-      const queryBuilder = await this.createCommentsQueryBuilder(
+      const queryBuilder = await this.createPostsCommentsQueryBuilder(
         queryData,
-        'postId',
         postId,
       );
       const countComment = await queryBuilder.getCount();
@@ -141,12 +140,6 @@ export class CommentsRepo {
     const limit: number = pageSize;
     const offset: number = (pageNumber - 1) * limit;
 
-    // const queryBuilder = await this.createCommentsQueryBuilder(
-    //   queryData,
-    //   'commentatorId',
-    //   currentUserDto.userId,
-    // );
-
     const queryBuilder = await this.createAllUserBlogsCommentsQueryBuilder(
       queryData,
       currentUserDto.userId,
@@ -165,6 +158,7 @@ export class CommentsRepo {
           countComments: countComment,
         };
       }
+
       // Retrieve comments with information about likes
       const commentsWithLikes: CommentViewModel[] =
         await this.commentsLikesAggregationForBlogger(comments, currentUserDto);
@@ -179,10 +173,9 @@ export class CommentsRepo {
     }
   }
 
-  private async createCommentsQueryBuilder(
+  private async createPostsCommentsQueryBuilder(
     queryData: ParseQueriesDto,
-    keyword: 'commentatorId' | 'postId',
-    value: string,
+    postId: string,
   ): Promise<SelectQueryBuilder<CommentsEntity>> {
     // Retrieve banned flags
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
@@ -199,17 +192,11 @@ export class CommentsRepo {
       .leftJoinAndSelect('comments.blog', 'blog')
       .leftJoinAndSelect('comments.commentator', 'commentator')
       .where({ dependencyIsBanned })
-      .andWhere({ isBanned });
+      .andWhere({ isBanned })
+      .andWhere('post.id = :postId', {
+        postId: postId,
+      });
 
-    if (keyword === 'commentatorId') {
-      queryBuilder.andWhere('commentator.userId = :commentatorId', {
-        commentatorId: value,
-      });
-    } else if (keyword === 'postId') {
-      queryBuilder.andWhere('post.id = :postId', {
-        postId: value,
-      });
-    }
     queryBuilder.orderBy(`comments.${field}`, direction);
 
     return queryBuilder;
