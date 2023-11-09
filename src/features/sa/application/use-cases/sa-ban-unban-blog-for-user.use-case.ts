@@ -52,7 +52,7 @@ export class SaBanUnbanBlogUseCase
 
   private async saGetBlogForBan(blogId: string): Promise<BloggerBlogsEntity> {
     const blogForBan: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+      await this.bloggerBlogsRepo.saGetBlogForBan(blogId);
     if (!blogForBan)
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     return blogForBan;

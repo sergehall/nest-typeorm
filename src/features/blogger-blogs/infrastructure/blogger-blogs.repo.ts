@@ -175,11 +175,34 @@ export class BloggerBlogsRepo {
 
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const isBanned = false;
+    const dependencyIsBanned = false;
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
       .where('blog.id = :blogId', { blogId })
-      .andWhere({ isBanned });
+      .andWhere({ isBanned })
+      .andWhere({ dependencyIsBanned });
+
+    try {
+      const blog = await queryBuilder.getOne(); // Execute the query and get a single result
+
+      return blog || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(`Post with ID ${userId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async saGetBlogForBan(blogId: string): Promise<BloggerBlogsEntity | null> {
+    const queryBuilder = this.bloggerBlogsRepository
+      .createQueryBuilder('blog') // Start building a query
+      .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
+      .where('blog.id = :blogId', { blogId });
 
     try {
       const blog = await queryBuilder.getOne(); // Execute the query and get a single result
