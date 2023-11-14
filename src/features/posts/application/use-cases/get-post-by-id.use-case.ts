@@ -2,7 +2,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { NotFoundException } from '@nestjs/common';
-import { PostWithLikesInfoViewModel } from '../../view-models/post-with-likes-info.view-model';
+import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 
 export class GetPostByIdCommand {
   constructor(

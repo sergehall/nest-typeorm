@@ -1,9 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { CommentViewModel } from '../../view-models/comment.view-model';
+import { CommentViewModel } from '../../views/comment.view-model';
 import { NotFoundException } from '@nestjs/common';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
-import { CommentWithLikesInfoViewModel } from '../../view-models/comment-with-likes-info.view-model';
+import { CommentWithLikesInfoViewModel } from '../../views/comment-with-likes-info.view-model';
 
 export class GetCommentByIdCommand {
   constructor(

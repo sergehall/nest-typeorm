@@ -1,6 +1,6 @@
 import { PayloadDto } from '../../../auth/dto/payload.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SecurityDeviceViewModel } from '../../view-models/security-device.view-model';
+import { SecurityDeviceViewModel } from '../../views/security-device.view-model';
 import { SecurityDevicesRepo } from '../../infrastructure/security-devices.repo';
 
 export class SearchDevicesCommand {

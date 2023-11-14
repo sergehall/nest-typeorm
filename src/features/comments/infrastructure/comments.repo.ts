@@ -10,10 +10,10 @@ import {
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
-import { LikesInfo, CommentViewModel } from '../view-models/comment.view-model';
+import { LikesInfo, CommentViewModel } from '../views/comment.view-model';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { CommentWithLikesInfoViewModel } from '../view-models/comment-with-likes-info.view-model';
+import { CommentWithLikesInfoViewModel } from '../views/comment-with-likes-info.view-model';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { LikesDislikesMyStatusInfoDto } from '../dto/likes-dislikes-my-status-info.dto';
@@ -23,7 +23,7 @@ import { PartialCommentsDto } from '../dto/partial-comments.dto';
 import { CommentsAndCountDto } from '../dto/comments-and-count.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { LikeStatusCommentsRepo } from './like-status-comments.repo';
-import { BloggerCommentViewModel } from '../../blogger-blogs/view-models/blogger-comment.view-model';
+import { BloggerCommentViewModel } from '../../blogger-blogs/views/blogger-comment.view-model';
 
 export class CommentsRepo {
   constructor(

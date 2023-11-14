@@ -2,7 +2,7 @@ import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
-import { GamesStatisticsViewModel } from '../../view-models/games-statistics.view-model';
+import { GamesStatisticsViewModel } from '../../views/games-statistics.view-model';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SortType } from '../../../../common/query/types/sort.type';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';

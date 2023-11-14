@@ -1,4 +1,4 @@
-import { CommentViewModel } from '../view-models/comment.view-model';
+import { CommentViewModel } from '../views/comment.view-model';
 import { IsArray, IsInt, ValidateNested } from 'class-validator';
 
 export class CommentsAndCountDto {

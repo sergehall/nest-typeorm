@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { BloggerBlogsViewModel } from '../../../blogger-blogs/view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../../../blogger-blogs/views/blogger-blogs.view-model';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 
 export class GetBlogByIdCommand {

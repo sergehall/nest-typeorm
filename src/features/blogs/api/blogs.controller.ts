@@ -20,7 +20,7 @@ import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-ca
 import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-case';
 import { IdParams } from '../../../common/query/params/id.params';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
-import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.view-model';
 
 @SkipThrottle()
 @Controller('blogs')

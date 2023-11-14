@@ -29,7 +29,7 @@ import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PostWithLikesInfoViewModel } from '../../posts/view-models/post-with-likes-info.view-model';
+import { PostWithLikesInfoViewModel } from '../../posts/views/post-with-likes-info.view-model';
 import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
@@ -41,7 +41,7 @@ import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
-import { BloggerBlogsViewModel } from '../view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 
 @SkipThrottle()
 @Controller('blogger')

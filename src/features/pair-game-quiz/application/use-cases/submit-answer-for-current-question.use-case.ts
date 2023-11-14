@@ -18,7 +18,7 @@ import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity'
 import { GameQuestionsRepo } from '../../infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questions.repo';
 import { ChallengesAnswersRepo } from '../../infrastructure/challenges-answers.repo';
-import { AnswerViewModel } from '../../view-models/answer.view-model';
+import { AnswerViewModel } from '../../views/answer.view-model';
 import { PlayerAnswersAllQuestionsCommand } from './player-answers-all-questions.use-case';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';

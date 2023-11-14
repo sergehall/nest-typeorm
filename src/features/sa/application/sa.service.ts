@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import { SaBloggerBlogsViewModel } from '../view-models/sa-blogger-blogs.view-model';
+import { SaBloggerBlogsViewModel } from '../views/sa-blogger-blogs.view-model';
 
 @Injectable()
 export class SaService {

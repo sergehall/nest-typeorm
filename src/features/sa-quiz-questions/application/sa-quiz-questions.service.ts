@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../entities/questions-quiz.entity';
-import { QuestionsViewModel } from '../view-models/questions.view-model';
+import { QuestionsViewModel } from '../views/questions.view-model';
 
 @Injectable()
 export class SaQuizQuestionsService {
