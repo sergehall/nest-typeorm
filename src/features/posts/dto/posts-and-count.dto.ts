@@ -1,4 +1,4 @@
-import { PostWithLikesInfoViewModel } from '../view-models/post-with-likes-info.view-model';
+import { PostWithLikesInfoViewModel } from '../views/post-with-likes-info.view-model';
 import { IsArray, IsNumber } from 'class-validator';
 
 export class PostsAndCountDto {

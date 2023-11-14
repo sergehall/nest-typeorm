@@ -32,7 +32,7 @@ import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
 import { UsersEntity } from '../entities/users.entity';
 import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
-import { UserViewModel } from '../view-models/user.view-model';
+import { UserViewModel } from '../views/user.view-model';
 
 @SkipThrottle()
 @Controller('users')

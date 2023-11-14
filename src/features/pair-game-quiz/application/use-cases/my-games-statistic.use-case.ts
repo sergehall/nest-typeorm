@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import { GameSummaryViewModel } from '../../view-models/game-summary.view-model';
+import { GameSummaryViewModel } from '../../views/game-summary.view-model';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { GamesResultsEnum } from '../../enums/games-results.enum';
 

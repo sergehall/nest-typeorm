@@ -11,7 +11,7 @@ import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import {
   NewestLikes,
   PostWithLikesInfoViewModel,
-} from '../view-models/post-with-likes-info.view-model';
+} from '../views/post-with-likes-info.view-model';
 
 export class LikeStatusPostsRepo {
   constructor(

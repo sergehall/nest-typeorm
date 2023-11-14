@@ -11,7 +11,7 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import {
   ExtendedLikesInfo,
   PostWithLikesInfoViewModel,
-} from '../view-models/post-with-likes-info.view-model';
+} from '../views/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
@@ -21,7 +21,7 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.enum';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
-import { PostViewModel } from '../view-models/post.view-model';
+import { PostViewModel } from '../views/post.view-model';
 import { LikeStatusPostsRepo } from './like-status-posts.repo';
 
 export class PostsRepo {

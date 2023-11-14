@@ -4,7 +4,7 @@ import {
   GameViewModel,
   PlayerProgressModel,
   QuestionModel,
-} from '../view-models/game.view-model';
+} from '../views/game.view-model';
 import { PairQuestionsAnswersScoresDto } from '../dto/pair-questions-score.dto';
 import { ChallengeAnswersEntity } from '../entities/challenge-answers.entity';
 import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity';

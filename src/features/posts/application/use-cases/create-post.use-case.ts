@@ -13,7 +13,7 @@ import { userNotHavePermissionForPost } from '../../../../common/filters/custom-
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { PostViewModel } from '../../view-models/post.view-model';
+import { PostViewModel } from '../../views/post.view-model';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 
 export class CreatePostCommand {

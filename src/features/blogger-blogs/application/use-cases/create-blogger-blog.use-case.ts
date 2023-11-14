@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { CreateBlogsDto } from '../../dto/create-blogs.dto';
-import { BloggerBlogsViewModel } from '../../view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../../views/blogger-blogs.view-model';
 
 export class CreateBloggerBlogCommand {
   constructor(

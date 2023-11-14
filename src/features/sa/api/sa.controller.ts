@@ -39,7 +39,7 @@ import { SaUpdateBlogByIdCommand } from '../application/use-cases/sa-update-blog
 import { SaDeleteBlogByBlogIdCommand } from '../application/use-cases/sa-delete-blog-by-id.use-case';
 import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
-import { PostWithLikesInfoViewModel } from '../../posts/view-models/post-with-likes-info.view-model';
+import { PostWithLikesInfoViewModel } from '../../posts/views/post-with-likes-info.view-model';
 import { CreatePostCommand } from '../../posts/application/use-cases/create-post.use-case';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
@@ -49,9 +49,9 @@ import { BlogIdPostIdParams } from '../../../common/query/params/blogId-postId.p
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-case';
-import { BloggerBlogsViewModel } from '../../blogger-blogs/view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.view-model';
 import { UsersService } from '../../users/application/users.service';
-import { SaUserViewModel } from '../view-models/sa-user-view-model';
+import { SaUserViewModel } from '../views/sa-user-view-model';
 
 @SkipThrottle()
 @Controller('sa')

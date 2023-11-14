@@ -25,7 +25,7 @@ import { IdParams } from '../../../common/query/params/id.params';
 import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import { CommentViewModel } from '../view-models/comment.view-model';
+import { CommentViewModel } from '../views/comment.view-model';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { GetCommentByIdCommand } from '../application/use-cases/get-comment-by-id';
 

@@ -1,6 +1,6 @@
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { GameViewModel } from '../../view-models/game.view-model';
+import { GameViewModel } from '../../views/game.view-model';
 import { ForbiddenException } from '@nestjs/common';
 import { MapPairGame } from '../../common/map-pair-game-entity-to-game-model';
 import { PairQuestionsAnswersScoresDto } from '../../dto/pair-questions-score.dto';

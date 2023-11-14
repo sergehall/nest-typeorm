@@ -5,7 +5,7 @@ import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { BlogsCountBlogsDto } from '../../dto/blogs-count-blogs.dto';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../blogger-blogs.service';
-import { BloggerBlogsViewModel } from '../../view-models/blogger-blogs.view-model';
+import { BloggerBlogsViewModel } from '../../views/blogger-blogs.view-model';
 
 export class GetBlogsOwnedByCurrentUserCommand {
   constructor(

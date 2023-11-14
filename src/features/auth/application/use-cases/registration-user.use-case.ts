@@ -7,7 +7,7 @@ import {
 } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../../../users/application/use-cases/create-user.use-case';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { UserViewModel } from '../../../users/view-models/user.view-model';
+import { UserViewModel } from '../../../users/views/user.view-model';
 import { RegistrationUserEvent } from '../../../users/events/registration-user.event';
 
 export class RegistrationUserCommand {

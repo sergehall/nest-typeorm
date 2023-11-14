@@ -5,7 +5,7 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { userNotHavePermissionForBlog } from '../../../../common/filters/custom-errors-messages';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
-import { CommentViewModel } from '../../view-models/comment.view-model';
+import { CommentViewModel } from '../../views/comment.view-model';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 

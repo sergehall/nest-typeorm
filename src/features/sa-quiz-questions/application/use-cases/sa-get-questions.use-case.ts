@@ -4,7 +4,7 @@ import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { QuestionsAndCountDto } from '../../dto/questions-and-count.dto';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 import { SaQuizQuestionsService } from '../sa-quiz-questions.service';
-import { QuestionsViewModel } from '../../view-models/questions.view-model';
+import { QuestionsViewModel } from '../../views/questions.view-model';
 
 export class SaGetQuestionsCommand {
   constructor(public queryData: ParseQueriesDto) {}

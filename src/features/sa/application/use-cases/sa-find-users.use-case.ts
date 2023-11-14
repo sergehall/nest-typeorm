@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersService } from '../../../users/application/users.service';
-import { SaUserViewModel } from '../../view-models/sa-user-view-model';
+import { SaUserViewModel } from '../../views/sa-user-view-model';
 
 export class SaFindUsersCommand {
   constructor(public queryData: ParseQueriesDto) {}

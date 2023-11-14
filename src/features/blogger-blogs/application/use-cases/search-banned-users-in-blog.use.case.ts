@@ -9,7 +9,7 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BannedUsersEntityAndCountDto } from '../../dto/banned-users-entity-and-count.dto';
-import { BannedUserForBlogViewModel } from '../../../users/view-models/banned-user-for-blog.view-model';
+import { BannedUserForBlogViewModel } from '../../../users/views/banned-user-for-blog.view-model';
 import { BannedUsersForBlogsEntity } from '../../../users/entities/banned-users-for-blogs.entity';
 
 export class SearchBannedUsersInBlogCommand {

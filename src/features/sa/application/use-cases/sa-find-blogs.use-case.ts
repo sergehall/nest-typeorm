@@ -4,7 +4,7 @@ import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-
 import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs.dto';
 import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
 import { SaService } from '../sa.service';
-import { SaBloggerBlogsViewModel } from '../../view-models/sa-blogger-blogs.view-model';
+import { SaBloggerBlogsViewModel } from '../../views/sa-blogger-blogs.view-model';
 
 export class SaFindBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}

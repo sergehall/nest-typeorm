@@ -1,6 +1,6 @@
 import { UsersEntity } from '../entities/users.entity';
-import { SaUserViewModel } from '../../sa/view-models/sa-user-view-model';
-import { UserViewModel } from '../view-models/user.view-model';
+import { SaUserViewModel } from '../../sa/views/sa-user-view-model';
+import { UserViewModel } from '../views/user.view-model';
 
 export class UsersService {
   async transformUserForSa(
