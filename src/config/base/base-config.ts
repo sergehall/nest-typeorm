@@ -14,6 +14,7 @@ import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
 import { BasicAuthTypes } from '../sa/types/basic-auth.types';
+import { AwsAccessKeyType } from '../aws/types/aws-access-key-types';
 
 @Injectable()
 export class BaseConfig {
@@ -26,6 +27,20 @@ export class BaseConfig {
     return this.configService.get('ENV', {
       infer: true,
     });
+  }
+
+  protected async getValueAccessKeyId(key: AwsAccessKeyType): Promise<string> {
+    return this.configService.get('db.aws', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueSecretAccessKey(
+    key: AwsAccessKeyType,
+  ): Promise<string> {
+    return this.configService.get('db.aws', {
+      infer: true,
+    })[key];
   }
 
   /**
