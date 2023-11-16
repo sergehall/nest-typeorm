@@ -128,10 +128,9 @@ export class PostsController {
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
     );
   }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
   @Put(':id')
+  @UseGuards(BaseAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePostByPostId(
     @Request() req: any,
     @Param() params: IdParams,
