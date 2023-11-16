@@ -50,6 +50,22 @@ export class BloggerBlogsController {
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
+  @Post('blogs/:blogId/post/:postId/images/main')
+  @UseGuards(JwtAuthGuard)
+  async uploadImageForPost(
+    @Request() req: any,
+    @Param() params: BlogIdPostIdParams,
+    @Query() query: any,
+  ): Promise<PaginatorDto> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const queryData: ParseQueriesDto =
+      await this.parseQueriesService.getQueriesData(query);
+
+    return await this.commandBus.execute(
+      new GetPostsInBlogCommand(params.blogId, queryData, currentUserDto),
+    );
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(
