@@ -150,6 +150,17 @@ class Configuration {
     return Number(this.readEnvVariableWithDefault('SALT_FACTOR', 10));
   }
 
+  private static getAwsAccessKeyId(): string {
+    return this.readEnvVariableWithDefault('ACCESS_KEY_ID', 'ACCESS_KEY_ID');
+  }
+
+  private static getAwsAccessSecretKey(): string {
+    return this.readEnvVariableWithDefault(
+      'SECRET_ACCESS_KEY',
+      'SECRET_ACCESS_KEY',
+    );
+  }
+
   static getConfiguration() {
     const ENV = Configuration.getEnvName();
     return {
@@ -192,6 +203,10 @@ class Configuration {
             DEV_DATABASE: Configuration.geDevDB(),
             PROD_NEST_DATABASE: Configuration.getProdDB(),
           },
+        },
+        aws: {
+          ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
+          SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
         },
       },
       mail: {

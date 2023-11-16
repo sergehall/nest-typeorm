@@ -69,6 +69,8 @@ export const validationSchemaConfiguration = Joi.object({
       ),
     )
     .required(),
+  ACCESS_KEY_ID: Joi.string().min(2).max(50).required(),
+  SECRET_ACCESS_KEY: Joi.string().min(2).max(70).required(),
 }).options({
   abortEarly: false,
   messages: {
