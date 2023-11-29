@@ -12,8 +12,9 @@ export class HttpLoggingMiddleware implements NestMiddleware {
 
   // Middleware entry point
   use(req: Request, res: Response, next: NextFunction) {
-    const { ip, method, originalUrl } = req;
+    const { method, originalUrl } = req;
     const userAgent = req.get('user-agent') || '';
+    const ip = req.ip ? req.ip : '';
 
     // Log request details when response finishes
     res.on('finish', () => {
