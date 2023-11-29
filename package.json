@@ -5,6 +5,11 @@
   "author": "Serge Hall",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "18.x",
+    "yarn": "1.x"
+  },
+  "packageManager": "yarn@4.0.2",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -114,6 +119,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "packageManager": "yarn@3.6.1"
+  }
 }
