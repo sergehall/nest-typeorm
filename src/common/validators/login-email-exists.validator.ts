@@ -6,8 +6,8 @@ import {
 } from 'class-validator';
 import { UsersRepo } from '../../features/users/infrastructure/users-repo';
 
-@ValidatorConstraint({ name: 'LoginEmailExistsValidator', async: true })
 @Injectable()
+@ValidatorConstraint({ name: 'LoginEmailExistsValidator', async: true })
 export class LoginEmailExistsValidator implements ValidatorConstraintInterface {
   constructor(protected usersRepo: UsersRepo) {}
 
