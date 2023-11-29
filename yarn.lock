@@ -3108,7 +3108,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.5.1":
+"@types/node@npm:*, @types/node@npm:^20.10.0":
   version: 20.10.0
   resolution: "@types/node@npm:20.10.0"
   dependencies:
@@ -9488,7 +9488,7 @@ __metadata:
     "@types/jest": "npm:^29.5.3"
     "@types/md5": "npm:^2.3.2"
     "@types/multer": "npm:^1.4.11"
-    "@types/node": "npm:^20.5.1"
+    "@types/node": "npm:^20.10.0"
     "@types/nodemailer": "npm:^6.4.7"
     "@types/passport-jwt": "npm:^3.0.7"
     "@types/passport-local": "npm:^1.0.34"
