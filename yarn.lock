@@ -1909,22 +1909,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:9.0.5":
-  version: 9.0.5
-  resolution: "@nestjs/core@npm:9.0.5"
+"@nestjs/core@npm:^10.2.10":
+  version: 10.2.10
+  resolution: "@nestjs/core@npm:10.2.10"
   dependencies:
     "@nuxtjs/opencollective": "npm:0.3.2"
     fast-safe-stringify: "npm:2.1.1"
     iterare: "npm:1.2.1"
-    object-hash: "npm:3.0.0"
     path-to-regexp: "npm:3.2.0"
-    tslib: "npm:2.4.0"
-    uuid: "npm:8.3.2"
+    tslib: "npm:2.6.2"
+    uid: "npm:2.0.2"
   peerDependencies:
-    "@nestjs/common": ^9.0.0
-    "@nestjs/microservices": ^9.0.0
-    "@nestjs/platform-express": ^9.0.0
-    "@nestjs/websockets": ^9.0.0
+    "@nestjs/common": ^10.0.0
+    "@nestjs/microservices": ^10.0.0
+    "@nestjs/platform-express": ^10.0.0
+    "@nestjs/websockets": ^10.0.0
     reflect-metadata: ^0.1.12
     rxjs: ^7.1.0
   peerDependenciesMeta:
@@ -1934,7 +1933,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: e66b9b571c16622d300980db8066ab90af9787447e4fa4401de32455fee09726f62f08ed5f6677277ebd6511f962c53d8c0fb2fbca4c5001ede16d94dec1a5b1
+  checksum: 80c29a768a70f2b26245b9f99054733e5cbbd7e9ebf9e4452d7c311423c8c1a211386958ccce44fd3cea11ef754d033b9359295bfa3ff916400fc30789cc7a50
   languageName: node
   linkType: hard
 
@@ -9468,7 +9467,7 @@ __metadata:
     "@nestjs/cli": "npm:^10.1.12"
     "@nestjs/common": "npm:^9.0.0"
     "@nestjs/config": "npm:^2.2.0"
-    "@nestjs/core": "npm:9.0.5"
+    "@nestjs/core": "npm:^10.2.10"
     "@nestjs/cqrs": "npm:^9.0.1"
     "@nestjs/jwt": "npm:^9.0.0"
     "@nestjs/mapped-types": "npm:*"
@@ -9744,13 +9743,6 @@ __metadata:
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
   checksum: 1f4df9945120325d041ccf7b86f31e8bcc14e73d29171e37a7903050e96b81323784ec59f93f102ec635bcf6fa8034ba3ea0a8c7e69fa202b87ae3b6cec5a414
-  languageName: node
-  linkType: hard
-
-"object-hash@npm:3.0.0":
-  version: 3.0.0
-  resolution: "object-hash@npm:3.0.0"
-  checksum: a06844537107b960c1c8b96cd2ac8592a265186bfa0f6ccafe0d34eabdb526f6fa81da1f37c43df7ed13b12a4ae3457a16071603bcd39d8beddb5f08c37b0f47
   languageName: node
   linkType: hard
 
@@ -12255,13 +12247,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.4.0":
-  version: 2.4.0
-  resolution: "tslib@npm:2.4.0"
-  checksum: eb19bda3ae545b03caea6a244b34593468e23d53b26bf8649fbc20fce43e9b21a71127fd6d2b9662c0fe48ee6ff668ead48fd00d3b88b2b716b1c12edae25b5d
-  languageName: node
-  linkType: hard
-
 "tslib@npm:2.5.3":
   version: 2.5.3
   resolution: "tslib@npm:2.5.3"
@@ -12590,15 +12575,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:8.3.2, uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
-  languageName: node
-  linkType: hard
-
 "uuid@npm:9.0.0":
   version: 9.0.0
   resolution: "uuid@npm:9.0.0"
@@ -12614,6 +12590,15 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
   languageName: node
   linkType: hard
 
