@@ -34,7 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   ) {}
   async execute(command: CreatePostCommand): Promise<PostViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
-
+    //
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
