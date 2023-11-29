@@ -81,3 +81,20 @@ export const idFormatError = {
   message: `The ID provided in the parameters is in an incorrect format.`,
   params: 'id',
 };
+export const fileNotProvided = {
+  message: 'File not provided',
+  file: 'file',
+};
+export const fileSizeLimit = {
+  message: 'File size exceeds the allowed limit. Max 100KB',
+  file: 'file.size',
+};
+
+export const invalidImageDimensions = {
+  message: 'Invalid dimensions maxWidth: 940 and maxHeight: 432',
+  file: 'file.dimensions',
+};
+export const invalidFileExtension = {
+  message: 'Invalid file extension. allowedExtensions are .png, .jpg, .jpeg',
+  file: 'file.extension',
+};

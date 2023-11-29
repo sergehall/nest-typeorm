@@ -161,6 +161,13 @@ class Configuration {
     );
   }
 
+  private static getBucketNameHallAws(): string {
+    return this.readEnvVariableWithDefault(
+      'BUCKET_HALL_AWS',
+      'BUCKET_HALL_AWS',
+    );
+  }
+
   static getConfiguration() {
     const ENV = Configuration.getEnvName();
     return {
@@ -205,8 +212,13 @@ class Configuration {
           },
         },
         aws: {
-          ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
-          SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
+          accessKeys: {
+            ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
+            SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
+          },
+          buckets: {
+            BUCKET_HALL_AWS: Configuration.getBucketNameHallAws(),
+          },
         },
       },
       mail: {

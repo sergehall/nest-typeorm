@@ -11,7 +11,10 @@ import {
   HttpStatus,
   Put,
   Delete,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -42,6 +45,9 @@ import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-pos
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
+import { Express } from 'express';
+import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
+import { FileDto } from '../dto/file-upload.dto';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -50,20 +56,22 @@ export class BloggerBlogsController {
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
-  @Post('blogs/:blogId/post/:postId/images/main')
-  @UseGuards(JwtAuthGuard)
+  @Post('blogs/:blogId/posts/:postId/images/main')
+  // @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   async uploadImageForPost(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
-    @Query() query: any,
-  ): Promise<PaginatorDto> {
+    @UploadedFile(new FileSizeValidationPipe()) file: Express.Multer.File,
+    // @Body() body: FileUploadDto, // Use ValidationPipe to validate the DTO
+  ): Promise<any> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
-
-    return await this.commandBus.execute(
-      new GetPostsInBlogCommand(params.blogId, queryData, currentUserDto),
-    );
+    const fileUpload: FileDto = file;
+    console.log(currentUserDto, 'currentUserDto');
+    console.log(fileUpload, 'file');
+    console.log(params, 'params');
+    // Return a success response or any relevant data
+    return { success: true, message: 'Image uploaded successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
