@@ -10119,7 +10119,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg: "npm:^8.11.3"
     prettier: "npm:^2.3.2"
-    reflect-metadata: "npm:^0.1.13"
+    reflect-metadata: "npm:0.1.13"
     rimraf: "npm:^3.0.2"
     rxjs: "npm:^7.2.0"
     sharp: "npm:^0.32.6"
@@ -11913,6 +11913,13 @@ __metadata:
   version: 0.2.1
   resolution: "reflect-metadata@npm:0.2.1"
   checksum: 6ca3c674bb43cf8ec3a3f5f38c8730a6116335f8e562fcdcdf3a492af168c5a7f0e8f17476a5710c3fe6bf9b5d22e8a463f14c0e26e326339cab65e099900ef7
+  languageName: node
+  linkType: hard
+
+"reflect-metadata@npm:0.1.13":
+  version: 0.1.13
+  resolution: "reflect-metadata@npm:0.1.13"
+  checksum: 728bff0b376b05639fd11ed80c648b61f7fe653c5b506d7ca118e58b6752b9b00810fe0c86227ecf02bd88da6251ab3eb19fd403aaf2e9ff5ef36a2fda643026
   languageName: node
   linkType: hard
 
