@@ -174,7 +174,7 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
-
+    //
     return await this.commandBus.execute(
       new SearchBannedUsersInBlogCommand(params.id, queryData, currentUserDto),
     );
