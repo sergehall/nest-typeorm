@@ -18,6 +18,7 @@ import { CustomErrorsMessagesType } from '../filters/types/custom-errors-message
 @Injectable()
 export class FileSizeValidationPipe implements PipeTransform {
   async transform(value: any, metadata: ArgumentMetadata): Promise<FileDto> {
+    // allowed are '.png', '.jpg', '.jpeg'
     const constraints = {
       maxSize: 100 * 1024, // 100KB
       allowedExtensions: ['.png', '.jpg', '.jpeg'],
