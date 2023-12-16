@@ -41,5 +41,3 @@ lerna-debug.log*
 
 /.pnp.cjs
 /.pnp.loader.mjs
-/.gitattributes
-/.editorconfig
