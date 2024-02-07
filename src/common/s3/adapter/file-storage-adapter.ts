@@ -27,7 +27,8 @@ export class FileStorageAdapter {
     const fileExtension = await this.getFileExtension(mimetype);
     const s3Client = await this.s3Service.getS3Client();
     const bucketName = await this.s3Service.getS3BucketName();
-
+    console.log(mimetype, 'mimetype');
+    console.log(fileExtension, 'fileExtension');
     const bucketParams = {
       Bucket: bucketName,
       Key: `content/users/${currentUserDto.userId}/blog/${blogId}/post/${postId}_post.${fileExtension}`,
@@ -51,7 +52,7 @@ export class FileStorageAdapter {
    * @returns Unique key for the file.
    */
   private async getFileExtension(originalname: string): Promise<string> {
-    const parts = originalname.split('.');
+    const parts = originalname.split('/');
     return parts.length > 1 ? parts[parts.length - 1] : '';
   }
 
