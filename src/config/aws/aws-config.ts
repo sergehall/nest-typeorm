@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { AwsAccessKeyType } from './types/aws-access-key.type';
 import { BaseConfig } from '../base/base-config';
-import { BucketNamesType } from './types/bucket-names.type';
+import { AwsEndpointType } from './types/aws-endpoint.type';
+import { S3BucketNameType } from './types/s3-bucket-name.type';
+import { S3RegionNameType } from './types/s3-region-name.type';
 
 @Injectable()
 export class AwsConfig extends BaseConfig {
@@ -12,7 +14,15 @@ export class AwsConfig extends BaseConfig {
     return await this.getValueSecretAccessKey(key);
   }
 
-  async getBucketName(key: BucketNamesType): Promise<string> {
+  async getEndpoint(key: AwsEndpointType): Promise<string> {
+    return await this.getEndpointName(key);
+  }
+
+  async getS3BucketName(key: S3BucketNameType): Promise<string> {
     return await this.getValueBucketName(key);
+  }
+
+  async getS3RegionName(key: S3RegionNameType): Promise<string> {
+    return await this.getValueRegionName(key);
   }
 }

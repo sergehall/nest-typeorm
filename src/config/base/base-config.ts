@@ -15,7 +15,9 @@ import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.type
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
 import { BasicAuthTypes } from '../sa/types/basic-auth.types';
 import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
-import { BucketNamesType } from '../aws/types/bucket-names.type';
+import { S3BucketNameType } from '../aws/types/s3-bucket-name.type';
+import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
+import { S3RegionNameType } from '../aws/types/s3-region-name.type';
 
 @Injectable()
 export class BaseConfig {
@@ -30,14 +32,26 @@ export class BaseConfig {
     });
   }
 
-  protected async getValueBucketName(key: BucketNamesType): Promise<string> {
-    return this.configService.get('db.aws.buckets', {
+  protected async getEndpointName(key: AwsEndpointType): Promise<string> {
+    return this.configService.get('db.aws.endpoint', {
       infer: true,
     })[key];
   }
 
   protected async getValueAccessKeyId(key: AwsAccessKeyType): Promise<string> {
     return this.configService.get('db.aws.accessKeys', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueBucketName(key: S3BucketNameType): Promise<string> {
+    return this.configService.get('db.aws.buckets', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueRegionName(key: S3RegionNameType): Promise<string> {
+    return this.configService.get('db.aws.region', {
       infer: true,
     })[key];
   }

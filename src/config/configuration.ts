@@ -161,11 +161,16 @@ class Configuration {
     );
   }
 
-  private static getBucketNameHallAws(): string {
-    return this.readEnvVariableWithDefault(
-      'BUCKET_HALL_AWS',
-      'BUCKET_HALL_AWS',
-    );
+  private static getS3Bucket(): string {
+    return this.readEnvVariableWithDefault('S3_BUCKET', 'S3_BUCKET');
+  }
+
+  private static getEndpointNameAws(): string {
+    return this.readEnvVariableWithDefault('AWS_ENDPOINT', 'AWS_ENDPOINT');
+  }
+
+  private static getS3Region(): string {
+    return this.readEnvVariableWithDefault('S3_REGION', 'S3_REGION');
   }
 
   static getConfiguration() {
@@ -216,8 +221,14 @@ class Configuration {
             ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
             SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
           },
+          endpoint: {
+            AWS_ENDPOINT: Configuration.getEndpointNameAws(),
+          },
           buckets: {
-            BUCKET_HALL_AWS: Configuration.getBucketNameHallAws(),
+            S3_BUCKET: Configuration.getS3Bucket(),
+          },
+          region: {
+            S3_REGION: Configuration.getS3Region(),
           },
         },
       },
