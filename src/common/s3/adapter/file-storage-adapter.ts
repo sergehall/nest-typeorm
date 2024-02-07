@@ -55,15 +55,4 @@ export class FileStorageAdapter {
     const parts = originalname.split('/');
     return parts.length > 1 ? parts[parts.length - 1] : '';
   }
-
-  /**
-   * Retrieves the name of the S3 bucket to use for file storage.
-   * This could be fetched from a configuration or determined dynamically.
-   * For demonstration purposes, this method returns a hardcoded bucket name.
-   * @returns Name of the S3 bucket.
-   */
-  private async getBucketName(): Promise<string> {
-    // For demonstration purposes, return a hardcoded bucket name
-    return 'your-bucket-name';
-  }
 }
