@@ -1,11 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  S3Client,
-  PutObjectCommand,
-  PutObjectCommandOutput,
-  HeadBucketCommand,
-  CreateBucketCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, CreateBucketCommand } from '@aws-sdk/client-s3';
 import { AwsConfig } from '../../../config/aws/aws-config';
 
 @Injectable()
