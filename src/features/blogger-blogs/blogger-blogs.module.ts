@@ -32,6 +32,10 @@ import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-bl
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
+import { AwsConfig } from '../../config/aws/aws-config';
+import { UploadImageForPostUseCase } from './application/use-cases/upload-image-for-post-use-case';
+import { S3Service } from '../../common/s3/service/s3-service';
+import { FileStorageAdapter } from '../../common/s3/adapter/file-storage-adapter';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -40,6 +44,7 @@ const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   DeleteBlogByBlogIdUseCase,
+  UploadImageForPostUseCase,
 ];
 
 const validators = [BlogExistsValidator];
@@ -62,7 +67,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [BloggerBlogsController],
   providers: [
+    AwsConfig,
     CaslAbilityFactory,
+    S3Service,
+    FileStorageAdapter,
     ParseQueriesService,
     BloggerBlogsService,
     PostsService,

@@ -47,7 +47,8 @@ import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/upd
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import { Express } from 'express';
 import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
-import { FileDto } from '../dto/file-upload.dto';
+import { FileUploadDtoDto } from '../dto/file-upload.dto';
+import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -57,19 +58,21 @@ export class BloggerBlogsController {
     protected commandBus: CommandBus,
   ) {}
   @Post('blogs/:blogId/posts/:postId/images/main')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageForPost(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
     @UploadedFile(new FileSizeValidationPipe()) file: Express.Multer.File,
-    // @Body() body: FileUploadDto, // Use ValidationPipe to validate the DTO
   ): Promise<any> {
     const currentUserDto: CurrentUserDto = req.user;
-    const fileUpload: FileDto = file;
+    const fileUpload: FileUploadDtoDto = file;
     console.log(currentUserDto, 'currentUserDto');
     console.log(fileUpload, 'file');
     console.log(params, 'params');
+    await this.commandBus.execute(
+      new UploadImageForPostCommand(params, fileUpload, currentUserDto),
+    );
     // Return a success response or any relevant data
     return { success: true, message: 'Image uploaded successfully' };
   }
@@ -174,7 +177,6 @@ export class BloggerBlogsController {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
-    //
     return await this.commandBus.execute(
       new SearchBannedUsersInBlogCommand(params.id, queryData, currentUserDto),
     );

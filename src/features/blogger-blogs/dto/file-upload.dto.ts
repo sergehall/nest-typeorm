@@ -1,6 +1,6 @@
 import { IsDefined, IsIn, IsNumber, Max } from 'class-validator';
 
-export class FileDto {
+export class FileUploadDtoDto {
   @IsDefined({ message: 'Fieldname is required' })
   fieldname: string;
 

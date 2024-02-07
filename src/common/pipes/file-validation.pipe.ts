@@ -12,12 +12,15 @@ import {
   invalidImageDimensions,
 } from '../filters/custom-errors-messages';
 import * as sharp from 'sharp';
-import { FileDto } from '../../features/blogger-blogs/dto/file-upload.dto';
+import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CustomErrorsMessagesType } from '../filters/types/custom-errors-messages.types';
 
 @Injectable()
 export class FileSizeValidationPipe implements PipeTransform {
-  async transform(value: any, metadata: ArgumentMetadata): Promise<FileDto> {
+  async transform(
+    value: any,
+    metadata: ArgumentMetadata,
+  ): Promise<FileUploadDtoDto> {
     // allowed are '.png', '.jpg', '.jpeg'
     const constraints = {
       maxSize: 100 * 1024, // 100KB
