@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BlogIdPostIdParams } from '../../query/params/blogId-postId.params';
 import { FileUploadDtoDto } from '../../../features/blogger-blogs/dto/file-upload.dto';
 import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
 import { AwsConfig } from '../../../config/aws/aws-config';
 import { S3Service } from '../service/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
+import { UploadedDto } from '../../../features/blogger-blogs/dto/uploaded-file.dto';
 
 @Injectable()
 export class FileStorageAdapter {
@@ -21,28 +22,35 @@ export class FileStorageAdapter {
     params: BlogIdPostIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<PutObjectCommandOutput> {
+  ): Promise<UploadedDto> {
     const { blogId, postId } = params;
     const { buffer, mimetype } = fileUploadDto;
     const fileExtension = await this.getFileExtension(mimetype);
     const s3Client = await this.s3Service.getS3Client();
     const bucketName = await this.s3Service.getS3BucketName();
-    console.log(mimetype, 'mimetype');
-    console.log(fileExtension, 'fileExtension');
+    const key = `content/users/${currentUserDto.userId}/blogs/${blogId}/posts/${postId}_post.${fileExtension}`;
+
     const bucketParams = {
       Bucket: bucketName,
-      Key: `content/users/${currentUserDto.userId}/blog/${blogId}/post/${postId}_post.${fileExtension}`,
+      Key: key,
       Body: buffer,
       ContentType: mimetype,
     };
 
-    const command = new PutObjectCommand(bucketParams);
-
+    const command: PutObjectCommand = new PutObjectCommand(bucketParams);
+    const resultUploaded: PutObjectCommandOutput = await s3Client.send(command);
+    const eTag = resultUploaded.ETag;
+    if (!eTag) {
+      console.error('Error uploading file to S3:');
+      throw new InternalServerErrorException('Error uploading file to S3:');
+    }
     try {
-      return await s3Client.send(command);
+      return { url: key, eTag: eTag };
     } catch (error) {
       console.error('Error uploading file to S3:', error);
-      throw error;
+      throw new InternalServerErrorException(
+        'Error uploading file to S3:' + error.message,
+      );
     }
   }
 

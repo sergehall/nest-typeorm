@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3Client, CreateBucketCommand } from '@aws-sdk/client-s3';
 import { AwsConfig } from '../../../config/aws/aws-config';
 
@@ -33,8 +33,9 @@ export class S3Service {
         credentials: { accessKeyId, secretAccessKey },
       });
     } catch (error) {
-      console.error('Error initializing S3 client:', error);
-      throw error;
+      throw new InternalServerErrorException(
+        'Error initializing S3 client:' + error.message,
+      );
     }
   }
 
@@ -52,7 +53,9 @@ export class S3Service {
         return false;
       } else {
         console.error('Error checking bucket existence:', error);
-        throw error;
+        throw new InternalServerErrorException(
+          'Error checking bucket existence:' + error.message,
+        );
       }
     }
   }
@@ -68,7 +71,9 @@ export class S3Service {
       await this.s3Client.send(new CreateBucketCommand(params));
     } catch (error) {
       console.error('Error creating S3 bucket:', error);
-      throw error;
+      throw new InternalServerErrorException(
+        'Error creating S3 bucket:' + error.message,
+      );
     }
   }
 
@@ -85,7 +90,9 @@ export class S3Service {
       return await this.awsConfig.getS3BucketName('S3_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
-      throw error; // Re-throw the error to propagate it to the caller
+      throw new InternalServerErrorException(
+        'Error fetching S3 bucket name:' + error.message,
+      );
     }
   }
 }
