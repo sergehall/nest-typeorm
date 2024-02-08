@@ -49,6 +49,8 @@ import { Express } from 'express';
 import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
+import { PutObjectCommandOutput } from '@aws-sdk/client-s3';
+import { PostImagesViewModel } from '../views/post-images.view-model';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -64,17 +66,12 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
     @UploadedFile(new FileSizeValidationPipe()) file: Express.Multer.File,
-  ): Promise<any> {
+  ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUpload: FileUploadDtoDto = file;
-    console.log(currentUserDto, 'currentUserDto');
-    console.log(fileUpload, 'file');
-    console.log(params, 'params');
-    await this.commandBus.execute(
+    return await this.commandBus.execute(
       new UploadImageForPostCommand(params, fileUpload, currentUserDto),
     );
-    // Return a success response or any relevant data
-    return { success: true, message: 'Image uploaded successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
