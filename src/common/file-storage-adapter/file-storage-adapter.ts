@@ -4,7 +4,7 @@ import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.d
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
-import { UrlEtagDto } from '../../features/blogger-blogs/dto/uploaded-file.dto';
+import { UrlEtagDto } from '../../features/blogger-blogs/dto/url-etag.dto';
 
 @Injectable()
 export class FileStorageAdapter {

@@ -15,11 +15,11 @@ import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDtoDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
-import * as sharp from 'sharp';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
-import { UrlEtagDto } from '../../dto/uploaded-file.dto';
+import { UrlEtagDto } from '../../dto/url-etag.dto';
+import { PostsImagesFileMetadataRepo } from '../../../posts/infrastructure/posts-images-file-metadata.repo';
 
 export class UploadImageForPostCommand {
   constructor(
@@ -39,43 +39,15 @@ export class UploadImageForPostUseCase
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
     protected fileMetadataService: FileMetadataService,
+    protected postsImagesFileMetadataRepo: PostsImagesFileMetadataRepo,
   ) {}
 
   async execute(
     command: UploadImageForPostCommand,
   ): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
+    const { blogId, postId } = params;
 
-    await this.checkBlogAndPostExistence(params.blogId, params.postId);
-
-    await this.checkUserPermission(params.blogId, currentUserDto);
-
-    const metadata: FileMetadata =
-      await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
-
-    const uploadedFile: UrlEtagDto =
-      await this.fileStorageAdapter.uploadFileForPost(
-        params,
-        fileUploadDto,
-        currentUserDto,
-      );
-
-    return {
-      main: [
-        {
-          url: uploadedFile.url,
-          width: metadata.width,
-          height: metadata.height,
-          fileSize: metadata.fileSize,
-        },
-      ],
-    };
-  }
-
-  private async checkBlogAndPostExistence(
-    blogId: string,
-    postId: string,
-  ): Promise<void> {
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
     if (!blog) {
@@ -87,13 +59,46 @@ export class UploadImageForPostUseCase
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
+
+    await this.userPermission(blog.blogOwner.userId, currentUserDto);
+
+    const metadata: FileMetadata =
+      await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
+
+    const urlEtagDto: UrlEtagDto =
+      await this.fileStorageAdapter.uploadFileForPost(
+        params,
+        fileUploadDto,
+        currentUserDto,
+      );
+
+    await this.postsImagesFileMetadataRepo.createPostsImagesFileMetadata(
+      blog,
+      post,
+      fileUploadDto,
+      urlEtagDto,
+      currentUserDto,
+    );
+
+    return {
+      main: [
+        {
+          url: urlEtagDto.url,
+          width: metadata.width,
+          height: metadata.height,
+          fileSize: metadata.fileSize,
+        },
+      ],
+    };
   }
 
-  private async checkUserPermission(
-    blogId: string,
+  private async userPermission(
+    blogOwnerUserId: string,
     currentUserDto: CurrentUserDto,
   ): Promise<void> {
-    const ability = this.caslAbilityFactory.createForUserId({ id: blogId });
+    const ability = this.caslAbilityFactory.createForUserId({
+      id: blogOwnerUserId,
+    });
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: currentUserDto.userId,

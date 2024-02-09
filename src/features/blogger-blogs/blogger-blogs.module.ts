@@ -37,6 +37,8 @@ import { UploadImageForPostUseCase } from './application/use-cases/upload-image-
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { PostsImagesFileMetadataRepo } from '../posts/infrastructure/posts-images-file-metadata.repo';
+import { PostsImagesFileMetadataEntity } from '../posts/entities/posts-images-file-metadata.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -63,6 +65,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
+      PostsImagesFileMetadataEntity,
     ]),
     CqrsModule,
   ],
@@ -84,6 +87,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
+    PostsImagesFileMetadataRepo,
     ...helpers,
     ...bloggersBlogUseCases,
     ...validators,

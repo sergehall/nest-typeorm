@@ -15,6 +15,7 @@ import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entitie
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
 import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs-game.entity';
+import { PostsImagesFileMetadataEntity } from '../../../features/posts/entities/posts-images-file-metadata.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -52,6 +53,7 @@ export class TypeOrmPostgresOptions
         PairsGameEntity,
         ChallengeQuestionsEntity,
         ChallengeAnswersEntity,
+        PostsImagesFileMetadataEntity,
       ],
       synchronize: true,
       logging: false,
