@@ -4,7 +4,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';

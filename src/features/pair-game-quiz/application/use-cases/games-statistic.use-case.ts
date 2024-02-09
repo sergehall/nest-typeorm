@@ -6,7 +6,7 @@ import { GamesStatisticsViewModel } from '../../views/games-statistics.view-mode
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SortType } from '../../../../common/query/types/sort.type';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
 import { SortDirectionEnum } from '../../../../common/query/enums/sort-direction.enum';
 
 export class GamesStatisticCommand {

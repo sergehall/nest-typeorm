@@ -33,7 +33,7 @@ import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PostWithLikesInfoViewModel } from '../../posts/views/post-with-likes-info.view-model';
-import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
 import { ManageBlogAccessCommand } from '../application/use-cases/manage-blog-access.use-case';
@@ -49,7 +49,6 @@ import { Express } from 'express';
 import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
-import { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import { PostImagesViewModel } from '../views/post-images.view-model';
 
 @SkipThrottle()

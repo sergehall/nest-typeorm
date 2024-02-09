@@ -29,7 +29,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
-import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
 import { SaFindUsersCommand } from '../application/use-cases/sa-find-users.use-case';
 import { SaDeleteUserByUserIdCommand } from '../application/use-cases/sa-delete-user-by-user-id.use-case';
 import { CreateBlogsDto } from '../../blogger-blogs/dto/create-blogs.dto';

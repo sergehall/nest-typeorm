@@ -28,7 +28,7 @@ import { CurrentUserDto } from '../dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
 import { UsersEntity } from '../entities/users.entity';
 import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class UploadedDto {
+export class UrlEtagFileDto {
   @IsNotEmpty({ message: 'URL must not be empty' })
   @IsString({ message: 'URL must be a string' })
   url: string;

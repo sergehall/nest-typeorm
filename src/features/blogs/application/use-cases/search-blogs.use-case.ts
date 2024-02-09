@@ -1,6 +1,6 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
 
