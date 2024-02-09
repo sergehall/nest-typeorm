@@ -24,14 +24,43 @@ export class PostsImagesFileMetadataRepo {
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<PostsImagesFileMetadataEntity> {
-    const postsImagesFileMetadataEntity: PostsImagesFileMetadataEntity =
-      PostsImagesFileMetadataEntity.createPostsImagesFileMetadataEntity(
-        blog,
-        post,
-        fileUploadDto,
-        urlEtagDto,
-        currentUserDto,
-      );
+    const bannedFlags = await this.getBannedFlags();
+    let postsImagesFileMetadataEntity: PostsImagesFileMetadataEntity;
+
+    const queryBuilder = this.postsImagesFileMetadataRepository
+      .createQueryBuilder('image') // Start building a query
+      .leftJoinAndSelect('image.blog', 'blog')
+      .leftJoinAndSelect('image.post', 'post')
+      .where('blog.id = :blogId', { blogId: blog.id })
+      .andWhere('post.id = :postId', { postId: post.id })
+      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+      .andWhere({ isBanned: bannedFlags.isBanned });
+
+    // Check if entity already exists
+    const existingEntity: PostsImagesFileMetadataEntity | null =
+      await queryBuilder.getOne();
+
+    // If entity exists, update it; otherwise, create a new one
+    if (existingEntity) {
+      existingEntity.url = urlEtagDto.url;
+      existingEntity.eTag = urlEtagDto.eTag;
+      existingEntity.originalName = fileUploadDto.originalname;
+      existingEntity.encoding = fileUploadDto.encoding;
+      existingEntity.mimetype = fileUploadDto.mimetype;
+      existingEntity.buffer = fileUploadDto.buffer;
+      existingEntity.size = fileUploadDto.size;
+      existingEntity.createdAt = new Date().toISOString();
+      postsImagesFileMetadataEntity = existingEntity;
+    } else {
+      postsImagesFileMetadataEntity =
+        PostsImagesFileMetadataEntity.createPostsImagesFileMetadataEntity(
+          blog,
+          post,
+          fileUploadDto,
+          urlEtagDto,
+          currentUserDto,
+        );
+    }
 
     try {
       return await this.postsImagesFileMetadataRepository.save(
@@ -40,7 +69,7 @@ export class PostsImagesFileMetadataRepo {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
-        'An error occurred while creating a new post.',
+        'An error occurred while creating or updating the post image file metadata.',
       );
     }
   }
