@@ -14,6 +14,7 @@ import { PairsGameEntity } from '../features/pair-game-quiz/entities/pairs-game.
 import { ChallengeQuestionsEntity } from '../features/pair-game-quiz/entities/challenge-questions.entity';
 import { QuestionsQuizEntity } from '../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeAnswersEntity } from '../features/pair-game-quiz/entities/challenge-answers.entity';
+import { PostsImagesFileMetadataEntity } from '../features/posts/entities/posts-images-file-metadata.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -39,6 +40,7 @@ export default new DataSource({
     ChallengeQuestionsEntity,
     QuestionsQuizEntity,
     ChallengeAnswersEntity,
+    PostsImagesFileMetadataEntity,
   ],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });

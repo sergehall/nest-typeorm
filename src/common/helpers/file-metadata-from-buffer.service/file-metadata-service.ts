@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import sharp from 'sharp';
+import * as sharp from 'sharp';
 import { FileMetadata } from './dto/file-metadata';
 
 @Injectable()
