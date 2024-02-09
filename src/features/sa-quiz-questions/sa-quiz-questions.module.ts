@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { SaQuizQuestionsService } from './application/sa-quiz-questions.service';
 import { SaQuizQuestionsController } from './api/sa-quiz-questions.controller';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
-import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { KeyResolver } from '../../common/helpers/key-resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -24,6 +23,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { ChallengesAnswersRepo } from '../pair-game-quiz/infrastructure/challenges-answers.repo';
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
 import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const saQuizUseCases = [
   SaCreateQuestionsAndAnswerUseCase,
@@ -56,7 +56,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GameQuestionsRepo,
     ChallengesAnswersRepo,
     ChallengesQuestionsRepo,
-    ExpirationDateCalculator,
+    CalculatorExpirationDate,
     EncryptConfig,
     ...helpers,
     ...saQuizUseCases,

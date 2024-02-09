@@ -7,7 +7,6 @@ import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
-import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
@@ -43,6 +42,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -95,7 +95,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
-    ExpirationDateCalculator,
+    CalculatorExpirationDate,
     ...helpers,
     ...saUseCases,
   ],
