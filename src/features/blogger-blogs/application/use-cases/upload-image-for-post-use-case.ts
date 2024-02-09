@@ -19,6 +19,7 @@ import * as sharp from 'sharp';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
+import { UrlEtagDto } from '../../dto/uploaded-file.dto';
 
 export class UploadImageForPostCommand {
   constructor(
@@ -52,11 +53,12 @@ export class UploadImageForPostUseCase
     const metadata: FileMetadata =
       await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
 
-    const uploadedFile = await this.fileStorageAdapter.uploadFileForPost(
-      params,
-      fileUploadDto,
-      currentUserDto,
-    );
+    const uploadedFile: UrlEtagDto =
+      await this.fileStorageAdapter.uploadFileForPost(
+        params,
+        fileUploadDto,
+        currentUserDto,
+      );
 
     return {
       main: [

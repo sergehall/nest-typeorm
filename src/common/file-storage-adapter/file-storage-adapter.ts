@@ -2,14 +2,13 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BlogIdPostIdParams } from '../query/params/blogId-postId.params';
 import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
-import { AwsConfig } from '../../config/aws/aws-config';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
-import { UrlEtagFileDto } from '../../features/blogger-blogs/dto/uploaded-file.dto';
+import { UrlEtagDto } from '../../features/blogger-blogs/dto/uploaded-file.dto';
 
 @Injectable()
 export class FileStorageAdapter {
-  constructor(protected awsConfig: AwsConfig, private s3Service: S3Service) {}
+  constructor(private s3Service: S3Service) {}
 
   /**
    * Uploads a file to AWS S3 for a specific blog post.
@@ -22,7 +21,7 @@ export class FileStorageAdapter {
     params: BlogIdPostIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UrlEtagFileDto> {
+  ): Promise<UrlEtagDto> {
     const { blogId, postId } = params;
     const { buffer, mimetype } = fileUploadDto;
     const fileExtension = await this.getFileExtension(mimetype);

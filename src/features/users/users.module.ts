@@ -9,7 +9,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
 import { RemoveUserByIdUseCase } from './application/use-cases/remove-user-byId.use-case';
-import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { LoginEmailExistsValidator } from '../../common/validators/login-email-exists.validator';
@@ -29,6 +28,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -70,7 +70,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GamePairsRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
-    ExpirationDateCalculator,
+    CalculatorExpirationDate,
     ...helpers,
     ...usersValidators,
     ...usersUseCases,

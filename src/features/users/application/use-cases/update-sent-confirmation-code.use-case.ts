@@ -1,10 +1,10 @@
 import * as uuid4 from 'uuid4';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
-import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
+import { ExpirationDateDto } from '../../../../common/helpers/calculator-expiration-date/dto/expiration-date.dto';
 import { UpdatedConfirmationCodeEvent } from '../../../auth/events/updated-confirmation-code.event';
+import { CalculatorExpirationDate } from '../../../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -16,7 +16,7 @@ export class UpdateSentConfirmationCodeUseCase
   constructor(
     private readonly usersRepo: UsersRepo,
     private readonly eventBus: EventBus,
-    private readonly expirationDateCalculator: ExpirationDateCalculator,
+    private readonly expirationDateCalculator: CalculatorExpirationDate,
   ) {}
   async execute(command: UpdateSentConfirmationCodeCommand): Promise<boolean> {
     const { email } = command;

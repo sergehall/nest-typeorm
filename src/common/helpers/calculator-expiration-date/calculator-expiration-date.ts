@@ -3,7 +3,7 @@ import { ExpirationDateDto } from './dto/expiration-date.dto';
 
 // Function to calculate the expiration date
 @Injectable()
-export class ExpirationDateCalculator {
+export class CalculatorExpirationDate {
   async createExpDate(
     days: number,
     hours: number,

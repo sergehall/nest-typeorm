@@ -28,7 +28,6 @@ import { LikeStatusPostsEntity } from './entities/like-status-posts.entity';
 import { LikeStatusPostsRepo } from './infrastructure/like-status-posts.repo';
 import { CommentsEntity } from '../comments/entities/comments.entity';
 import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
-import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { GetPostByIdUseCase } from './application/use-cases/get-post-by-id.use-case';
 import { GetPostsUseCase } from './application/use-cases/get-posts.use-case';
@@ -43,6 +42,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-by-post-id.use-case';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -95,7 +95,7 @@ const postsUseCases = [
     ChallengesQuestionsRepo,
     KeyResolver,
     UuidErrorResolver,
-    ExpirationDateCalculator,
+    CalculatorExpirationDate,
     ...postsUseCases,
   ],
 })

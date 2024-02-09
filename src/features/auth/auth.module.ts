@@ -21,7 +21,6 @@ import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
 import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
-import { ExpirationDateCalculator } from '../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../config/encrypt/encrypt-config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
@@ -45,6 +44,7 @@ import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { JwtAndActiveGameStrategy } from './strategies/jwt-and-active-game.strategy';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const authUseCases = [
   LoginUseCase,
@@ -99,7 +99,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     InvalidJwtRepo,
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
-    ExpirationDateCalculator,
+    CalculatorExpirationDate,
     ...helpers,
     ...authUseCases,
   ],

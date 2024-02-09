@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
-import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
 import { UsersEntity } from '../../entities/users.entity';
-import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
+import { ExpirationDateDto } from '../../../../common/helpers/calculator-expiration-date/dto/expiration-date.dto';
+import { CalculatorExpirationDate } from '../../../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 export class CreateUserCommand {
   constructor(public createUserDto: CreateUserDto) {}
@@ -17,7 +17,7 @@ export class CreateUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
   constructor(
-    private readonly expirationDateCalculator: ExpirationDateCalculator,
+    private readonly expirationDateCalculator: CalculatorExpirationDate,
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
   ) {}

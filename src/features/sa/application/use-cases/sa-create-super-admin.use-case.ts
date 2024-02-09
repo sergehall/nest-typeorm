@@ -1,18 +1,18 @@
-import { ExpirationDateCalculator } from '../../../../common/helpers/expiration-date-calculator';
 import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dto';
 import { Injectable } from '@nestjs/common';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { ExpirationDateDto } from '../../../../common/helpers/dto/expiration-date.dto';
+import { ExpirationDateDto } from '../../../../common/helpers/calculator-expiration-date/dto/expiration-date.dto';
+import { CalculatorExpirationDate } from '../../../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 @Injectable()
 export class SaCreateSuperAdmin {
   constructor(
     private readonly usersRepo: UsersRepo,
     private readonly encryptConfig: EncryptConfig,
-    private readonly expirationDateCalculator: ExpirationDateCalculator,
+    private readonly expirationDateCalculator: CalculatorExpirationDate,
   ) {}
   async createUserSa(): Promise<CurrentUserDto> {
     const login = 'admin';
