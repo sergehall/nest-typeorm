@@ -54,10 +54,6 @@ export class PostsImagesFileMetadataRepo {
     };
   }
 
-  private async numberLastLikes(): Promise<number> {
-    return 3;
-  }
-
   private async getSortByField(sortBy: string): Promise<string> {
     return await this.keyResolver.resolveKey(
       sortBy,
