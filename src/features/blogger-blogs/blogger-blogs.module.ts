@@ -34,8 +34,9 @@ import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { AwsConfig } from '../../config/aws/aws-config';
 import { UploadImageForPostUseCase } from './application/use-cases/upload-image-for-post-use-case';
-import { S3Service } from '../../common/s3/service/s3-service';
-import { FileStorageAdapter } from '../../common/s3/adapter/file-storage-adapter';
+import { S3Service } from '../../config/aws/s3/s3-service';
+import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
+import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -71,6 +72,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     CaslAbilityFactory,
     S3Service,
     FileStorageAdapter,
+    FileMetadataService,
     ParseQueriesService,
     BloggerBlogsService,
     PostsService,

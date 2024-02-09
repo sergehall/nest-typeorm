@@ -1,11 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { BlogIdPostIdParams } from '../../query/params/blogId-postId.params';
-import { FileUploadDtoDto } from '../../../features/blogger-blogs/dto/file-upload.dto';
-import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
-import { AwsConfig } from '../../../config/aws/aws-config';
-import { S3Service } from '../service/s3-service';
+import { BlogIdPostIdParams } from '../query/params/blogId-postId.params';
+import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
+import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
+import { AwsConfig } from '../../config/aws/aws-config';
+import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
-import { UploadedDto } from '../../../features/blogger-blogs/dto/uploaded-file.dto';
+import { UrlEtagFileDto } from '../../features/blogger-blogs/dto/uploaded-file.dto';
 
 @Injectable()
 export class FileStorageAdapter {
@@ -22,7 +22,7 @@ export class FileStorageAdapter {
     params: BlogIdPostIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UploadedDto> {
+  ): Promise<UrlEtagFileDto> {
     const { blogId, postId } = params;
     const { buffer, mimetype } = fileUploadDto;
     const fileExtension = await this.getFileExtension(mimetype);

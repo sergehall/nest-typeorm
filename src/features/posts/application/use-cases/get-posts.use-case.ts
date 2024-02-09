@@ -1,7 +1,7 @@
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 

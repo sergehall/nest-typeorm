@@ -13,7 +13,7 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
-import { PaginatorDto } from '../../../common/pagination/dto/paginator.dto';
+import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { SearchBlogsCommand } from '../application/use-cases/search-blogs.use-case';

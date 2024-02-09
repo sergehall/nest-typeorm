@@ -14,9 +14,11 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDtoDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/s3/adapter/file-storage-adapter';
+import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import * as sharp from 'sharp';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
+import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 
 export class UploadImageForPostCommand {
   constructor(
@@ -35,6 +37,7 @@ export class UploadImageForPostUseCase
     protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
+    protected fileMetadataService: FileMetadataService,
   ) {}
 
   async execute(
@@ -46,24 +49,22 @@ export class UploadImageForPostUseCase
 
     await this.checkUserPermission(params.blogId, currentUserDto);
 
+    const metadata: FileMetadata =
+      await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
+
     const uploadedFile = await this.fileStorageAdapter.uploadFileForPost(
       params,
       fileUploadDto,
       currentUserDto,
     );
 
-    const metadata = await sharp(fileUploadDto.buffer).metadata();
-    const width = metadata.width || 0;
-    const height = metadata.height || 0;
-    const fileSize = fileUploadDto.size;
-
     return {
       main: [
         {
           url: uploadedFile.url,
-          width: width,
-          height: height,
-          fileSize: fileSize,
+          width: metadata.width,
+          height: metadata.height,
+          fileSize: metadata.fileSize,
         },
       ],
     };
