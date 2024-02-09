@@ -29,6 +29,7 @@ export class UploadImageForPostCommand {
   ) {}
 }
 
+/** Command handler for the UploadImageForPostCommand. */
 @CommandHandler(UploadImageForPostCommand)
 export class UploadImageForPostUseCase
   implements ICommandHandler<UploadImageForPostCommand>
@@ -42,29 +43,39 @@ export class UploadImageForPostUseCase
     protected postsImagesFileMetadataRepo: PostsImagesFileMetadataRepo,
   ) {}
 
+  /**
+   * Execute method to handle the command.
+   * @param command The UploadImageForPostCommand.
+   * @returns A promise that resolves to the post images view model.
+   */
   async execute(
     command: UploadImageForPostCommand,
   ): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId, postId } = params;
 
+    // Check if the blog exists
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
 
+    // Check if the post exists
     const post: PostsEntity | null =
       await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
+    // Check user permission
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
+    // Extract file metadata
     const metadata: FileMetadata =
       await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
 
+    // Upload file for the post to s3
     const urlEtagDto: UrlEtagDto =
       await this.fileStorageAdapter.uploadFileForPost(
         params,
@@ -72,6 +83,7 @@ export class UploadImageForPostUseCase
         currentUserDto,
       );
 
+    // Create post images file metadata into postgresSql
     await this.postsImagesFileMetadataRepo.createPostsImagesFileMetadata(
       blog,
       post,
@@ -80,6 +92,7 @@ export class UploadImageForPostUseCase
       currentUserDto,
     );
 
+    // Return post images view model
     return {
       main: [
         {
@@ -92,6 +105,13 @@ export class UploadImageForPostUseCase
     };
   }
 
+  /**
+   * Check user permission to upload file.
+   * @param blogOwnerUserId The ID of the blog owner user.
+   * @param currentUserDto The current user DTO.
+   * @throws ForbiddenException if user does not have permission.
+   * @throws InternalServerErrorException on internal errors.
+   */
   private async userPermission(
     blogOwnerUserId: string,
     currentUserDto: CurrentUserDto,
