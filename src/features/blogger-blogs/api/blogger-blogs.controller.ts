@@ -68,6 +68,7 @@ export class BloggerBlogsController {
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUpload: FileUploadDtoDto = file;
+
     return await this.commandBus.execute(
       new UploadImageForPostCommand(params, fileUpload, currentUserDto),
     );
