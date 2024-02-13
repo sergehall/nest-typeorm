@@ -9,11 +9,14 @@ import { PostsEntity } from '../entities/posts.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
+import { ImagesBlogWallpaperFileMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-file-metadata.entity';
 
-export class PostsImagesFileMetadataRepo {
+export class ImagesFileMetadataRepo {
   constructor(
     @InjectRepository(PostsImagesFileMetadataEntity)
-    protected postsImagesFileMetadataRepository: Repository<PostsImagesFileMetadataEntity>,
+    protected imagesPostFileMetadataRepository: Repository<PostsImagesFileMetadataEntity>,
+    @InjectRepository(ImagesBlogWallpaperFileMetadataEntity)
+    protected imagesBlogWallpaperFileMetadataRepository: Repository<ImagesBlogWallpaperFileMetadataEntity>,
     protected keyResolver: KeyResolver,
   ) {}
 
@@ -27,7 +30,7 @@ export class PostsImagesFileMetadataRepo {
     const bannedFlags = await this.getBannedFlags();
     let postsImagesFileMetadataEntity: PostsImagesFileMetadataEntity;
 
-    const queryBuilder = this.postsImagesFileMetadataRepository
+    const queryBuilder = this.imagesPostFileMetadataRepository
       .createQueryBuilder('image') // Start building a query
       .leftJoinAndSelect('image.blog', 'blog')
       .leftJoinAndSelect('image.post', 'post')
@@ -63,8 +66,61 @@ export class PostsImagesFileMetadataRepo {
     }
 
     try {
-      return await this.postsImagesFileMetadataRepository.save(
+      return await this.imagesPostFileMetadataRepository.save(
         postsImagesFileMetadataEntity,
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating or updating the post image file metadata.',
+      );
+    }
+  }
+
+  async createImagesBlogWallpaper(
+    blog: BloggerBlogsEntity,
+    fileUploadDto: FileUploadDtoDto,
+    urlEtagDto: UrlEtagDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ImagesBlogWallpaperFileMetadataEntity> {
+    const bannedFlags = await this.getBannedFlags();
+    let imagesBlogWallpaperFileMetadataEntity: ImagesBlogWallpaperFileMetadataEntity;
+
+    const queryBuilder = this.imagesBlogWallpaperFileMetadataRepository
+      .createQueryBuilder('image') // Start building a query
+      .leftJoinAndSelect('image.blog', 'blog')
+      .where('blog.id = :blogId', { blogId: blog.id })
+      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+      .andWhere({ isBanned: bannedFlags.isBanned });
+
+    // Check if entity already exists
+    const existingEntity: ImagesBlogWallpaperFileMetadataEntity | null =
+      await queryBuilder.getOne();
+
+    // If entity exists, update it; otherwise, create a new one
+    if (existingEntity) {
+      existingEntity.url = urlEtagDto.url;
+      existingEntity.eTag = urlEtagDto.eTag;
+      existingEntity.originalName = fileUploadDto.originalname;
+      existingEntity.encoding = fileUploadDto.encoding;
+      existingEntity.mimetype = fileUploadDto.mimetype;
+      existingEntity.buffer = fileUploadDto.buffer;
+      existingEntity.size = fileUploadDto.size;
+      existingEntity.createdAt = new Date().toISOString();
+      imagesBlogWallpaperFileMetadataEntity = existingEntity;
+    } else {
+      imagesBlogWallpaperFileMetadataEntity =
+        ImagesBlogWallpaperFileMetadataEntity.createImagesBlogWallpaperFileMetadataEntity(
+          blog,
+          fileUploadDto,
+          urlEtagDto,
+          currentUserDto,
+        );
+    }
+
+    try {
+      return await this.imagesBlogWallpaperFileMetadataRepository.save(
+        imagesBlogWallpaperFileMetadataEntity,
       );
     } catch (error) {
       console.log(error.message);

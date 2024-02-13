@@ -46,11 +46,12 @@ import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comment
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 import { Express } from 'express';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
-import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
 import { PostImagesViewModel } from '../views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
+import { UploadImagesPostCommand } from '../application/use-cases/upload-images-post-use-case';
+import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-images-blog-wallpaper-use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -72,16 +73,16 @@ export class BloggerBlogsController {
     const fileUpload: FileUploadDtoDto = file;
 
     return await this.commandBus.execute(
-      new UploadImageForPostCommand(params, fileUpload, currentUserDto),
+      new UploadImagesPostCommand(params, fileUpload, currentUserDto),
     );
   }
 
-  @Post('blogs/:blogId/posts/:postId/images/wallpaper')
+  @Post('blogs/:blogId/images/wallpaper')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImageWallpaperForBlog(
+  async uploadImageBlogWallpaper(
     @Request() req: any,
-    @Param() params: BlogIdPostIdParams,
+    @Param() params: BlogIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogWallpaper))
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
@@ -89,7 +90,7 @@ export class BloggerBlogsController {
     const fileUpload: FileUploadDtoDto = file;
 
     return await this.commandBus.execute(
-      new UploadImageForPostCommand(params, fileUpload, currentUserDto),
+      new UploadImageBlogWallpaperCommand(params, fileUpload, currentUserDto),
     );
   }
 

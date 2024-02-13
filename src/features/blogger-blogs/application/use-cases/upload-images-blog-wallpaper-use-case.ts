@@ -19,53 +19,41 @@ import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlEtagDto } from '../../dto/url-etag.dto';
-import { PostsImagesFileMetadataRepo } from '../../../posts/infrastructure/posts-images-file-metadata.repo';
+import { ImagesFileMetadataRepo } from '../../../posts/infrastructure/images-file-metadata.repo';
+import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 
-export class UploadImageForPostCommand {
+export class UploadImageBlogWallpaperCommand {
   constructor(
-    public params: BlogIdPostIdParams,
+    public params: BlogIdParams,
     public fileUploadDto: FileUploadDtoDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-/** Command handler for the UploadImageForPostCommand. */
-@CommandHandler(UploadImageForPostCommand)
-export class UploadImageForPostUseCase
-  implements ICommandHandler<UploadImageForPostCommand>
+/** Command handler for the UploadImageBlogWallpaperCommand. */
+@CommandHandler(UploadImageBlogWallpaperCommand)
+export class UploadImagesBlogWallpaperUseCase
+  implements ICommandHandler<UploadImageBlogWallpaperCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
     protected fileMetadataService: FileMetadataService,
-    protected postsImagesFileMetadataRepo: PostsImagesFileMetadataRepo,
+    protected postsImagesFileMetadataRepo: ImagesFileMetadataRepo,
   ) {}
 
-  /**
-   * Execute method to handle the command.
-   * @param command The UploadImageForPostCommand.
-   * @returns A promise that resolves to the post images view model.
-   */
   async execute(
-    command: UploadImageForPostCommand,
+    command: UploadImageBlogWallpaperCommand,
   ): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
-    const { blogId, postId } = params;
+    const { blogId } = params;
 
     // Check if the blog exists
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
-    }
-
-    // Check if the post exists
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
-    if (!post) {
-      throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
     // Check user permission
@@ -77,16 +65,15 @@ export class UploadImageForPostUseCase
 
     // Upload file for the post to s3
     const urlEtagDto: UrlEtagDto =
-      await this.fileStorageAdapter.uploadFileForPost(
+      await this.fileStorageAdapter.uploadFileImageBlogWallpaper(
         params,
         fileUploadDto,
         currentUserDto,
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createPostsImagesFileMetadata(
+    await this.postsImagesFileMetadataRepo.createImagesBlogWallpaper(
       blog,
-      post,
       fileUploadDto,
       urlEtagDto,
       currentUserDto,
@@ -105,13 +92,6 @@ export class UploadImageForPostUseCase
     };
   }
 
-  /**
-   * Check user permission to upload file.
-   * @param blogOwnerUserId The ID of the blog owner user.
-   * @param currentUserDto The current user DTO.
-   * @throws ForbiddenException if user does not have permission.
-   * @throws InternalServerErrorException on internal errors.
-   */
   private async userPermission(
     blogOwnerUserId: string,
     currentUserDto: CurrentUserDto,

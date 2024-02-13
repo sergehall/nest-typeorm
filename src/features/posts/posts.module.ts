@@ -43,8 +43,9 @@ import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-b
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { PostsImagesFileMetadataRepo } from './infrastructure/posts-images-file-metadata.repo';
+import { ImagesFileMetadataRepo } from './infrastructure/images-file-metadata.repo';
 import { PostsImagesFileMetadataEntity } from './entities/posts-images-file-metadata.entity';
+import { ImagesBlogWallpaperFileMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-file-metadata.entity';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -71,6 +72,7 @@ const postsUseCases = [
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
       PostsImagesFileMetadataEntity,
+      ImagesBlogWallpaperFileMetadataEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -96,7 +98,7 @@ const postsUseCases = [
     LikeStatusPostsRepo,
     BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,
-    PostsImagesFileMetadataRepo,
+    ImagesFileMetadataRepo,
     KeyResolver,
     UuidErrorResolver,
     CalculatorExpirationDate,
