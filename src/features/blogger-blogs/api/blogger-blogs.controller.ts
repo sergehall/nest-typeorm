@@ -50,6 +50,7 @@ import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pi
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
 import { PostImagesViewModel } from '../views/post-images.view-model';
+import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -110,7 +111,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBlogsDto,
-  ): Promise<BloggerBlogsViewModel> {
+  ): Promise<BloggerBlogsWithImagesViewModel> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

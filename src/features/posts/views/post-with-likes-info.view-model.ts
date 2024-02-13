@@ -32,13 +32,13 @@ export class ExtendedLikesInfo {
     message: 'Incorrect likesCount length! Must be min 1, max 50 ch.',
   })
   @IsNumber()
-  likesCount = 0; // Set default value
+  likesCount: number = 0; // Set default value
   @IsNotEmpty()
   @Length(0, 50, {
     message: 'Incorrect dislikesCount length! Must be min 1, max 50 ch.',
   })
   @IsNumber()
-  dislikesCount = 0; // Set default value
+  dislikesCount: number = 0; // Set default value
   @IsNotEmpty()
   @Length(4, 7, {
     message: 'Incorrect myStatus length! Must be min 4, max 7 ch.',

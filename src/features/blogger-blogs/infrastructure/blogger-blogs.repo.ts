@@ -1,5 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, InsertResult, Repository } from 'typeorm';
+import {
+  EntityManager,
+  InsertQueryBuilder,
+  InsertResult,
+  Repository,
+} from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import {
   InternalServerErrorException,
@@ -17,6 +22,11 @@ import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-co
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
+import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
+import {
+  BloggerBlogsWithImagesViewModel,
+  Images,
+} from '../views/blogger-blogs-with-images.view-model';
 
 export class BloggerBlogsRepo {
   constructor(
@@ -252,31 +262,42 @@ export class BloggerBlogsRepo {
   async createBlogs(
     createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
-  ): Promise<BloggerBlogsEntity> {
+  ): Promise<BloggerBlogsWithImagesViewModel> {
     const blogEntity: BloggerBlogsEntity = BloggerBlogsEntity.createBlogEntity(
       createBloggerBlogsDto,
       currentUser,
     );
 
-    const queryBuilder = this.bloggerBlogsRepository
-      .createQueryBuilder()
-      .insert()
-      .into(BloggerBlogsEntity)
-      .values(blogEntity)
-      .returning(
-        `"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
-      );
+    const queryBuilder: InsertQueryBuilder<BloggerBlogsEntity> =
+      this.bloggerBlogsRepository
+        .createQueryBuilder()
+        .insert()
+        .into(BloggerBlogsEntity)
+        .values(blogEntity)
+        .returning(
+          `"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
+        );
 
     try {
       const result: InsertResult = await queryBuilder.execute();
 
-      return result.raw[0];
+      return await this.addImagesToBlogsEntity(result.raw[0]);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
         'An error occurred while creating a new blog.',
       );
     }
+  }
+
+  private async addImagesToBlogsEntity(
+    newBlog: BloggerBlogsViewModel,
+  ): Promise<BloggerBlogsWithImagesViewModel> {
+    const images = new Images();
+    return {
+      ...newBlog, // Spread properties of newBlog
+      images, // Add extended images
+    };
   }
 
   async updateBlogById(
