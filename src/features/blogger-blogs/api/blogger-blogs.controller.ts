@@ -44,7 +44,6 @@ import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
-import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import { Express } from 'express';
 import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
