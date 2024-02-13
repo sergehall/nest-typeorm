@@ -45,11 +45,12 @@ import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-pos
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 import { Express } from 'express';
-import { FileSizeValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UploadImageForPostCommand } from '../application/use-cases/upload-image-for-post-use-case';
 import { PostImagesViewModel } from '../views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
+import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
+import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -64,7 +65,25 @@ export class BloggerBlogsController {
   async uploadImageForPost(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
-    @UploadedFile(new FileSizeValidationPipe()) file: Express.Multer.File,
+    @UploadedFile(new FileValidationPipe(getFileConstraints.imagePost))
+    file: Express.Multer.File,
+  ): Promise<PostImagesViewModel> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const fileUpload: FileUploadDtoDto = file;
+
+    return await this.commandBus.execute(
+      new UploadImageForPostCommand(params, fileUpload, currentUserDto),
+    );
+  }
+
+  @Post('blogs/:blogId/posts/:postId/images/wallpaper')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImageWallpaperForBlog(
+    @Request() req: any,
+    @Param() params: BlogIdPostIdParams,
+    @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogWallpaper))
+    file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUpload: FileUploadDtoDto = file;
