@@ -77,7 +77,7 @@ export class UploadImagesPostUseCase
 
     // Upload file for the post to s3
     const urlEtagDto: UrlEtagDto =
-      await this.fileStorageAdapter.uploadFileForPost(
+      await this.fileStorageAdapter.uploadFileImagePost(
         params,
         fileUploadDto,
         currentUserDto,
