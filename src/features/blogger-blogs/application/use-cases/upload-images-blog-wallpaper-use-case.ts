@@ -1,4 +1,3 @@
-import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -9,10 +8,8 @@ import {
 } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
-import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDtoDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
