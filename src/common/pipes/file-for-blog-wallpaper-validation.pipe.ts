@@ -4,7 +4,6 @@ import {
   ArgumentMetadata,
   HttpException,
   HttpStatus,
-  Inject,
 } from '@nestjs/common';
 import {
   fileNotProvided,
@@ -15,23 +14,21 @@ import {
 import * as sharp from 'sharp';
 import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CustomErrorsMessagesType } from '../filters/types/custom-errors-messages.types';
-import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 
 @Injectable()
-export class FileValidationPipe implements PipeTransform {
-  constructor(private readonly key: FileConstraintsDto) {}
-
+export class FileForBlogWallpaperValidationPipe implements PipeTransform {
   async transform(
     value: any,
     metadata: ArgumentMetadata,
   ): Promise<FileUploadDtoDto> {
-    const constraints: FileConstraintsDto = this.key;
-    if (!constraints) {
-      throw new HttpException(
-        { message: 'Constraints not found for the specified key' },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // allowed are '.png', '.jpg', '.jpeg'
+    const constraints = {
+      maxSize: 100 * 1024, // 100KB
+      allowedExtensions: ['.png', '.jpg', '.jpeg'],
+      maxWidth: 1028,
+      maxHeight: 312,
+    };
+
     const errorMessage: CustomErrorsMessagesType[] = [];
 
     await this.checkFileNotProvided(value, errorMessage);
