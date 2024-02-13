@@ -23,6 +23,7 @@ import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.en
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { PostViewModel } from '../views/post.view-model';
 import { LikeStatusPostsRepo } from './like-status-posts.repo';
+import { PostsImagesFileMetadataEntity } from '../entities/posts-images-file-metadata.entity';
 
 export class PostsRepo {
   constructor(
@@ -242,6 +243,11 @@ export class PostsRepo {
   async deletePostByPostId(postId: string): Promise<boolean> {
     return this.postsRepository.manager.transaction(async (manager) => {
       try {
+        // Delete images associated with the post
+        await manager.delete(PostsImagesFileMetadataEntity, {
+          post: { id: postId },
+        });
+
         // Delete likes posts associated with the post
         await manager.delete(LikeStatusPostsEntity, { post: { id: postId } });
 
