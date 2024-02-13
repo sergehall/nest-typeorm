@@ -7,8 +7,8 @@ import * as uuid4 from 'uuid4';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
 
-@Entity('PostsImagesFileMetadata')
-export class PostsImagesFileMetadataEntity {
+@Entity('ImagesPostMetadata')
+export class ImagesPostMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
@@ -88,14 +88,14 @@ export class PostsImagesFileMetadataEntity {
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): PostsImagesFileMetadataEntity {
+  ): ImagesPostMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
       fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
 
-    const postsImagesFileMetadataEntity = new PostsImagesFileMetadataEntity();
+    const postsImagesFileMetadataEntity = new ImagesPostMetadataEntity();
     postsImagesFileMetadataEntity.id = uuid4().toString();
     postsImagesFileMetadataEntity.url = urlEtagDto.url;
     postsImagesFileMetadataEntity.eTag = urlEtagDto.eTag;

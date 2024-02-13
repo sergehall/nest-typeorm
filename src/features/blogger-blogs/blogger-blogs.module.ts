@@ -38,9 +38,9 @@ import { S3Service } from '../../config/aws/s3/s3-service';
 import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { ImagesFileMetadataRepo } from '../posts/infrastructure/images-file-metadata.repo';
-import { PostsImagesFileMetadataEntity } from '../posts/entities/posts-images-file-metadata.entity';
+import { ImagesPostMetadataEntity } from '../posts/entities/images-post-metadata.entity';
 import { UploadImagesBlogWallpaperUseCase } from './application/use-cases/upload-images-blog-wallpaper-use-case';
-import { ImagesBlogWallpaperFileMetadataEntity } from './entities/images-blog-wallpaper-file-metadata.entity';
+import { ImagesBlogWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -68,8 +68,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      PostsImagesFileMetadataEntity,
-      ImagesBlogWallpaperFileMetadataEntity,
+      ImagesPostMetadataEntity,
+      ImagesBlogWallpaperMetadataEntity,
     ]),
     CqrsModule,
   ],
