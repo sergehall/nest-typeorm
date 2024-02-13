@@ -4,11 +4,11 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UrlEtagDto } from '../dto/url-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { PostsImagesFileMetadataEntity } from '../../posts/entities/posts-images-file-metadata.entity';
+import { ImagesPostMetadataEntity } from '../../posts/entities/images-post-metadata.entity';
 import * as uuid4 from 'uuid4';
 
-@Entity('ImagesBlogWallpaperFileMetadata')
-export class ImagesBlogWallpaperFileMetadataEntity {
+@Entity('ImagesBlogWallpaperMetadata')
+export class ImagesBlogWallpaperMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
@@ -77,14 +77,14 @@ export class ImagesBlogWallpaperFileMetadataEntity {
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): ImagesBlogWallpaperFileMetadataEntity {
+  ): ImagesBlogWallpaperMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
       fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
 
-    const postsImagesFileMetadataEntity = new PostsImagesFileMetadataEntity();
+    const postsImagesFileMetadataEntity = new ImagesPostMetadataEntity();
     postsImagesFileMetadataEntity.id = uuid4().toString();
     postsImagesFileMetadataEntity.url = urlEtagDto.url;
     postsImagesFileMetadataEntity.eTag = urlEtagDto.eTag;

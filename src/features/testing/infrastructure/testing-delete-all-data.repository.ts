@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { DatabaseHasBeenClearedEvent } from '../events/database-has-been-cleared.event';
 import { EventBus } from '@nestjs/cqrs';
+import { ImagesPostMetadataEntity } from '../../posts/entities/images-post-metadata.entity';
 
 @Injectable()
 export class TestingDeleteAllDataRepository {
@@ -12,7 +13,8 @@ export class TestingDeleteAllDataRepository {
 
   async removeAllData(): Promise<void> {
     const tablesToDelete = [
-      'PostsImagesFileMetadata',
+      'ImagesBlogWallpaperFileMetadata',
+      'ImagesPostMetadata',
       'ChallengeAnswers',
       'ChallengeQuestions',
       'PairsGame',

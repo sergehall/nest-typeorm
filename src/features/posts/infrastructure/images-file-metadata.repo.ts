@@ -1,5 +1,5 @@
 import { KeyResolver } from '../../../common/helpers/key-resolver';
-import { PostsImagesFileMetadataEntity } from '../entities/posts-images-file-metadata.entity';
+import { ImagesPostMetadataEntity } from '../entities/images-post-metadata.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { Repository } from 'typeorm';
@@ -9,14 +9,14 @@ import { PostsEntity } from '../entities/posts.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
-import { ImagesBlogWallpaperFileMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-file-metadata.entity';
+import { ImagesBlogWallpaperMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 
 export class ImagesFileMetadataRepo {
   constructor(
-    @InjectRepository(PostsImagesFileMetadataEntity)
-    protected imagesPostFileMetadataRepository: Repository<PostsImagesFileMetadataEntity>,
-    @InjectRepository(ImagesBlogWallpaperFileMetadataEntity)
-    protected imagesBlogWallpaperFileMetadataRepository: Repository<ImagesBlogWallpaperFileMetadataEntity>,
+    @InjectRepository(ImagesPostMetadataEntity)
+    protected imagesPostFileMetadataRepository: Repository<ImagesPostMetadataEntity>,
+    @InjectRepository(ImagesBlogWallpaperMetadataEntity)
+    protected imagesBlogWallpaperFileMetadataRepository: Repository<ImagesBlogWallpaperMetadataEntity>,
     protected keyResolver: KeyResolver,
   ) {}
 
@@ -26,9 +26,9 @@ export class ImagesFileMetadataRepo {
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<PostsImagesFileMetadataEntity> {
+  ): Promise<ImagesPostMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
-    let postsImagesFileMetadataEntity: PostsImagesFileMetadataEntity;
+    let postsImagesFileMetadataEntity: ImagesPostMetadataEntity;
 
     const queryBuilder = this.imagesPostFileMetadataRepository
       .createQueryBuilder('image') // Start building a query
@@ -40,7 +40,7 @@ export class ImagesFileMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: PostsImagesFileMetadataEntity | null =
+    const existingEntity: ImagesPostMetadataEntity | null =
       await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
@@ -56,7 +56,7 @@ export class ImagesFileMetadataRepo {
       postsImagesFileMetadataEntity = existingEntity;
     } else {
       postsImagesFileMetadataEntity =
-        PostsImagesFileMetadataEntity.createPostsImagesFileMetadataEntity(
+        ImagesPostMetadataEntity.createPostsImagesFileMetadataEntity(
           blog,
           post,
           fileUploadDto,
@@ -82,9 +82,9 @@ export class ImagesFileMetadataRepo {
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ImagesBlogWallpaperFileMetadataEntity> {
+  ): Promise<ImagesBlogWallpaperMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
-    let imagesBlogWallpaperFileMetadataEntity: ImagesBlogWallpaperFileMetadataEntity;
+    let imagesBlogWallpaperFileMetadataEntity: ImagesBlogWallpaperMetadataEntity;
 
     const queryBuilder = this.imagesBlogWallpaperFileMetadataRepository
       .createQueryBuilder('image') // Start building a query
@@ -94,7 +94,7 @@ export class ImagesFileMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesBlogWallpaperFileMetadataEntity | null =
+    const existingEntity: ImagesBlogWallpaperMetadataEntity | null =
       await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
@@ -110,7 +110,7 @@ export class ImagesFileMetadataRepo {
       imagesBlogWallpaperFileMetadataEntity = existingEntity;
     } else {
       imagesBlogWallpaperFileMetadataEntity =
-        ImagesBlogWallpaperFileMetadataEntity.createImagesBlogWallpaperFileMetadataEntity(
+        ImagesBlogWallpaperMetadataEntity.createImagesBlogWallpaperFileMetadataEntity(
           blog,
           fileUploadDto,
           urlEtagDto,

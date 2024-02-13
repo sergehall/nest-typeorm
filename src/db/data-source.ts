@@ -14,8 +14,8 @@ import { PairsGameEntity } from '../features/pair-game-quiz/entities/pairs-game.
 import { ChallengeQuestionsEntity } from '../features/pair-game-quiz/entities/challenge-questions.entity';
 import { QuestionsQuizEntity } from '../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { ChallengeAnswersEntity } from '../features/pair-game-quiz/entities/challenge-answers.entity';
-import { PostsImagesFileMetadataEntity } from '../features/posts/entities/posts-images-file-metadata.entity';
-import { ImagesBlogWallpaperFileMetadataEntity } from '../features/blogger-blogs/entities/images-blog-wallpaper-file-metadata.entity';
+import { ImagesPostMetadataEntity } from '../features/posts/entities/images-post-metadata.entity';
+import { ImagesBlogWallpaperMetadataEntity } from '../features/blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -41,8 +41,8 @@ export default new DataSource({
     ChallengeQuestionsEntity,
     QuestionsQuizEntity,
     ChallengeAnswersEntity,
-    PostsImagesFileMetadataEntity,
-    ImagesBlogWallpaperFileMetadataEntity,
+    ImagesPostMetadataEntity,
+    ImagesBlogWallpaperMetadataEntity,
   ],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });
