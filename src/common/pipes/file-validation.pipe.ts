@@ -4,7 +4,6 @@ import {
   ArgumentMetadata,
   HttpException,
   HttpStatus,
-  Inject,
 } from '@nestjs/common';
 import {
   fileNotProvided,
