@@ -19,7 +19,7 @@ class Image {
 }
 
 export class Images {
-  wallpaper: Image = new Image();
+  wallpaper: Image | null = null;
   main: Image[] = [new Image()];
 }
 
