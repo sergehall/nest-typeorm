@@ -88,10 +88,14 @@ export class BloggerBlogsController {
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const fileUpload: FileUploadDtoDto = file;
+    const fileUploadDto: FileUploadDtoDto = file;
 
     return await this.commandBus.execute(
-      new UploadImageBlogWallpaperCommand(params, fileUpload, currentUserDto),
+      new UploadImageBlogWallpaperCommand(
+        params,
+        fileUploadDto,
+        currentUserDto,
+      ),
     );
   }
 
