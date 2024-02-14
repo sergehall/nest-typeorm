@@ -12,12 +12,15 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { FileUploadDtoDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
-import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlEtagDto } from '../../dto/url-etag.dto';
 import { ImagesFileMetadataRepo } from '../../../posts/infrastructure/images-file-metadata.repo';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
+import {
+  Image,
+  ImagesViewModel,
+} from '../../views/blogger-blogs-with-images.view-model';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
@@ -42,7 +45,7 @@ export class UploadImagesBlogWallpaperUseCase
 
   async execute(
     command: UploadImageBlogWallpaperCommand,
-  ): Promise<PostImagesViewModel> {
+  ): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId } = params;
 
@@ -78,14 +81,13 @@ export class UploadImagesBlogWallpaperUseCase
 
     // Return post images view model
     return {
-      main: [
-        {
-          url: urlEtagDto.url,
-          width: metadata.width,
-          height: metadata.height,
-          fileSize: metadata.fileSize,
-        },
-      ],
+      wallpaper: {
+        url: urlEtagDto.url,
+        width: metadata.width,
+        height: metadata.height,
+        fileSize: metadata.fileSize,
+      },
+      main: [new Image()],
     };
   }
 
