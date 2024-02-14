@@ -87,7 +87,7 @@ export class UploadImagesBlogWallpaperUseCase
         height: metadata.height,
         fileSize: metadata.fileSize,
       },
-      main: [new Image()],
+      main: [],
     };
   }
 
