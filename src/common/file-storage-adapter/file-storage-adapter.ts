@@ -6,6 +6,7 @@ import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import { UrlEtagDto } from '../../features/blogger-blogs/dto/url-etag.dto';
 import { BlogIdParams } from '../query/params/blogId.params';
+import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
 
 @Injectable()
 export class FileStorageAdapter {
@@ -64,7 +65,6 @@ export class FileStorageAdapter {
     const { buffer, mimetype } = fileUploadDto;
     const s3Client = await this.s3Service.getS3Client();
     const bucketName = await this.s3Service.getS3BucketName();
-    const endPoint = await this.s3Service.getAWSEndpoint();
 
     const bucketParams = {
       Bucket: bucketName,
@@ -82,10 +82,10 @@ export class FileStorageAdapter {
       throw new InternalServerErrorException('Error uploading file to S3:');
     }
 
-    const unitedUrl = await this.uniteStrings(endPoint, bucketName, key);
+    const unitedUrl: UrlDto = await this.s3Service.uniteStrings(key);
 
     try {
-      return { url: unitedUrl, eTag: eTag };
+      return { url: unitedUrl.url, eTag: eTag };
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw new InternalServerErrorException(
