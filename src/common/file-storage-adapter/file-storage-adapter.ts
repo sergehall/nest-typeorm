@@ -64,6 +64,7 @@ export class FileStorageAdapter {
     const { buffer, mimetype } = fileUploadDto;
     const s3Client = await this.s3Service.getS3Client();
     const bucketName = await this.s3Service.getS3BucketName();
+    const endPoint = await this.s3Service.getAWSEndpoint();
 
     const bucketParams = {
       Bucket: bucketName,
@@ -81,14 +82,32 @@ export class FileStorageAdapter {
       throw new InternalServerErrorException('Error uploading file to S3:');
     }
 
+    const unitedUrl = await this.uniteStrings(endPoint, bucketName, key);
+
     try {
-      return { url: key, eTag: eTag };
+      return { url: unitedUrl, eTag: eTag };
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw new InternalServerErrorException(
         'Error uploading file to S3:' + error.message,
       );
     }
+  }
+
+  private async uniteStrings(
+    baseUrl: string,
+    subDomain: string,
+    key: string,
+  ): Promise<string> {
+    // Splitting baseUrl by protocol separator
+    const parts = baseUrl.split('//');
+
+    // Extracting protocol and domain
+    const protocol = parts[0];
+    const domain = parts[1];
+
+    // Concatenating subDomain in between
+    return `${protocol}//${subDomain}.${domain}/${key}`;
   }
 
   private generateKeyForImagesPost(
