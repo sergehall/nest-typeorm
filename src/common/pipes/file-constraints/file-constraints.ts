@@ -9,8 +9,8 @@ export const getFileConstraints: FileConstraints = {
       AllowedExtensions.JPG,
       AllowedExtensions.PNG,
     ],
-    maxWidth: 1028,
-    maxHeight: 312,
+    width: 1028,
+    height: 312,
   },
   imagePost: {
     maxSize: 100 * 1024, // 100KB
@@ -19,8 +19,8 @@ export const getFileConstraints: FileConstraints = {
       AllowedExtensions.JPG,
       AllowedExtensions.PNG,
     ],
-    maxWidth: 940,
-    maxHeight: 432,
+    width: 940,
+    height: 432,
   },
   imageBlogMain: {
     maxSize: 100 * 1024, // 100KB
@@ -29,7 +29,7 @@ export const getFileConstraints: FileConstraints = {
       AllowedExtensions.JPG,
       AllowedExtensions.PNG,
     ],
-    maxWidth: 156,
-    maxHeight: 156,
+    width: 156,
+    height: 156,
   },
 };

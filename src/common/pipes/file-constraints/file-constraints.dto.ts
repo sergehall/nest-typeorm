@@ -18,10 +18,10 @@ export class FileConstraintsDto {
   ]; // Set default value
 
   @IsNumber()
-  maxWidth: number;
+  width: number;
 
   @IsNumber()
-  maxHeight: number;
+  height: number;
 }
 
 export type FileConstraints = {
