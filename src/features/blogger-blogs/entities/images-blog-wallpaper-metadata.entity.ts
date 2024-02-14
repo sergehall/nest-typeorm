@@ -85,6 +85,7 @@ export class ImagesBlogsWallpaperMetadataEntity {
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
+    user.login = currentUserDto.login;
 
     const imagesBlogsWallpaperMetadataEntity =
       new ImagesBlogsWallpaperMetadataEntity();
