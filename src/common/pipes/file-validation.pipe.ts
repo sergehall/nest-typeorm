@@ -83,19 +83,19 @@ export class FileValidationPipe implements PipeTransform {
 
   private async checkImageDimensions(
     value: any,
-    constraints: any,
+    constraints: FileConstraintsDto,
     errorMessage: CustomErrorsMessagesType[],
   ): Promise<void> {
     try {
       const metadata = await sharp(value.buffer).metadata();
       if (
         !metadata.width ||
-        metadata.width !== constraints.maxWidth ||
+        metadata.width !== constraints.width ||
         !metadata.height ||
-        metadata.height !== constraints.maxHeight
+        metadata.height !== constraints.height
       ) {
         errorMessage.push({
-          message: `Invalid dimensions width: ${constraints.maxWidth} and height: ${constraints.maxHeight}`,
+          message: `Invalid dimensions: width should be within ${constraints.width} and height within ${constraints.height}.`,
           file: 'file.dimensions',
         });
       }
