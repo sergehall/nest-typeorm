@@ -23,7 +23,7 @@ import { SortDirectionEnum } from '../../../common/query/enums/sort-direction.en
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { PostViewModel } from '../views/post.view-model';
 import { LikeStatusPostsRepo } from './like-status-posts.repo';
-import { ImagesPostMetadataEntity } from '../entities/images-post-metadata.entity';
+import { ImagesPostsMetadataEntity } from '../entities/images-post-metadata.entity';
 
 export class PostsRepo {
   constructor(
@@ -244,7 +244,7 @@ export class PostsRepo {
     return this.postsRepository.manager.transaction(async (manager) => {
       try {
         // Delete images associated with the post
-        await manager.delete(ImagesPostMetadataEntity, {
+        await manager.delete(ImagesPostsMetadataEntity, {
           post: { id: postId },
         });
 

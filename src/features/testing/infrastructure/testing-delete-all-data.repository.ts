@@ -12,8 +12,9 @@ export class TestingDeleteAllDataRepository {
 
   async removeAllData(): Promise<void> {
     const tablesToDelete = [
-      'ImagesBlogWallpaperMetadata',
-      'ImagesPostMetadata',
+      'ImagesPostsMetadata',
+      'ImagesBlogsMainMetadata',
+      'ImagesBlogsWallpaperMetadata',
       'ChallengeAnswers',
       'ChallengeQuestions',
       'PairsGame',

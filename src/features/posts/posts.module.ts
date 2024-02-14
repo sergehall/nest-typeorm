@@ -43,9 +43,10 @@ import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-b
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { ImagesFileMetadataRepo } from './infrastructure/images-file-metadata.repo';
-import { ImagesPostMetadataEntity } from './entities/images-post-metadata.entity';
-import { ImagesBlogWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
+import { ImagesPostsMetadataRepo } from './infrastructure/images-posts-metadata.repo';
+import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
+import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
+import { ImagesPostsMetadataEntity } from './entities/images-post-metadata.entity';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -71,8 +72,9 @@ const postsUseCases = [
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      ImagesPostMetadataEntity,
-      ImagesBlogWallpaperMetadataEntity,
+      ImagesPostsMetadataEntity,
+      ImagesBlogsWallpaperMetadataEntity,
+      ImagesBlogsMainMetadataEntity,
     ]),
     CaslModule,
     CqrsModule,
@@ -98,7 +100,7 @@ const postsUseCases = [
     LikeStatusPostsRepo,
     BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,
-    ImagesFileMetadataRepo,
+    ImagesPostsMetadataRepo,
     KeyResolver,
     UuidErrorResolver,
     CalculatorExpirationDate,

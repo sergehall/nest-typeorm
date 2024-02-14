@@ -33,14 +33,15 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { AwsConfig } from '../../config/aws/aws-config';
-import { UploadImagesPostUseCase } from './application/use-cases/upload-images-post-use-case';
+import { UploadImagesPostsUseCase } from './application/use-cases/upload-images-posts-use-case';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { ImagesFileMetadataRepo } from '../posts/infrastructure/images-file-metadata.repo';
-import { ImagesPostMetadataEntity } from '../posts/entities/images-post-metadata.entity';
-import { UploadImagesBlogWallpaperUseCase } from './application/use-cases/upload-images-blog-wallpaper-use-case';
-import { ImagesBlogWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
+import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
+import { UploadImagesBlogsWallpaperUseCase } from './application/use-cases/upload-images-blogs-wallpaper-use-case';
+import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
+import { ImagesBlogsMainMetadataEntity } from './entities/images-blog-main-metadata.entity';
+import { ImagesPostsMetadataEntity } from '../posts/entities/images-post-metadata.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -49,8 +50,8 @@ const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   DeleteBlogByBlogIdUseCase,
-  UploadImagesPostUseCase,
-  UploadImagesBlogWallpaperUseCase,
+  UploadImagesPostsUseCase,
+  UploadImagesBlogsWallpaperUseCase,
 ];
 
 const validators = [BlogExistsValidator];
@@ -68,8 +69,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      ImagesPostMetadataEntity,
-      ImagesBlogWallpaperMetadataEntity,
+      ImagesPostsMetadataEntity,
+      ImagesBlogsWallpaperMetadataEntity,
+      ImagesBlogsMainMetadataEntity,
     ]),
     CqrsModule,
   ],
@@ -91,7 +93,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
-    ImagesFileMetadataRepo,
+    ImagesPostsMetadataRepo,
     ...helpers,
     ...bloggersBlogUseCases,
     ...validators,
