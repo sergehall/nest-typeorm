@@ -85,6 +85,10 @@ export class S3Service {
     return this.s3Client;
   }
 
+  async getAWSEndpoint(): Promise<string> {
+    return await this.awsConfig.getEndpoint('AWS_ENDPOINT');
+  }
+
   async getS3BucketName(): Promise<string> {
     try {
       return await this.awsConfig.getS3BucketName('S3_BUCKET');
