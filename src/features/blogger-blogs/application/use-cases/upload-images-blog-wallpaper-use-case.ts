@@ -17,10 +17,7 @@ import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buff
 import { UrlEtagDto } from '../../dto/url-etag.dto';
 import { ImagesFileMetadataRepo } from '../../../posts/infrastructure/images-file-metadata.repo';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
-import {
-  Image,
-  ImagesViewModel,
-} from '../../views/blogger-blogs-with-images.view-model';
+import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
