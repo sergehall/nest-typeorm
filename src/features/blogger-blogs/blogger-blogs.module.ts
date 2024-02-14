@@ -42,6 +42,7 @@ import { UploadImagesBlogsWallpaperUseCase } from './application/use-cases/uploa
 import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from './entities/images-blog-main-metadata.entity';
 import { ImagesPostsMetadataEntity } from '../posts/entities/images-post-metadata.entity';
+import { UploadImagesBlogsMainUseCase } from './application/use-cases/upload-images-blogs-main-use-case';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -52,6 +53,7 @@ const bloggersBlogUseCases = [
   DeleteBlogByBlogIdUseCase,
   UploadImagesPostsUseCase,
   UploadImagesBlogsWallpaperUseCase,
+  UploadImagesBlogsMainUseCase,
 ];
 
 const validators = [BlogExistsValidator];

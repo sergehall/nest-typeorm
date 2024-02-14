@@ -175,7 +175,7 @@ export class ImagesPostsMetadataRepo {
     }
 
     try {
-      return await this.imagesBlogsWallpaperFileMetadataRepository.save(
+      return await this.imagesBlogsMainMetadataRepository.save(
         imagesBlogMainMetadataEntity,
       );
     } catch (error) {

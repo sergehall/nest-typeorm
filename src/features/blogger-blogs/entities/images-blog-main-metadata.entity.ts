@@ -85,6 +85,7 @@ export class ImagesBlogsMainMetadataEntity {
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
+    user.login = currentUserDto.login;
 
     const imagesBlogsMainMetadataEntity = new ImagesBlogsMainMetadataEntity();
     imagesBlogsMainMetadataEntity.id = uuid4().toString();

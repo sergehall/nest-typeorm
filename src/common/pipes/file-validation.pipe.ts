@@ -18,14 +18,13 @@ import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
-  constructor(private readonly constraints: FileConstraintsDto) {}
+  constructor(private readonly constraintsKey: FileConstraintsDto) {}
 
   async transform(
     value: any,
     metadata: ArgumentMetadata,
   ): Promise<FileUploadDtoDto> {
-    console.log(value, 'value');
-    const constraints: FileConstraintsDto = this.constraints;
+    const constraints: FileConstraintsDto = this.constraintsKey;
     if (!constraints) {
       throw new HttpException(
         { message: 'Constraints not found for the specified key' },
