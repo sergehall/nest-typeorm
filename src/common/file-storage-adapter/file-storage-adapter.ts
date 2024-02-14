@@ -82,7 +82,7 @@ export class FileStorageAdapter {
       throw new InternalServerErrorException('Error uploading file to S3:');
     }
 
-    const unitedUrl: UrlDto = await this.s3Service.uniteStrings(key);
+    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(key);
 
     try {
       return { url: unitedUrl.url, eTag: eTag };
@@ -92,22 +92,6 @@ export class FileStorageAdapter {
         'Error uploading file to S3:' + error.message,
       );
     }
-  }
-
-  private async uniteStrings(
-    baseUrl: string,
-    subDomain: string,
-    key: string,
-  ): Promise<string> {
-    // Splitting baseUrl by protocol separator
-    const parts = baseUrl.split('//');
-
-    // Extracting protocol and domain
-    const protocol = parts[0];
-    const domain = parts[1];
-
-    // Concatenating subDomain in between
-    return `${protocol}//${subDomain}.${domain}/${key}`;
   }
 
   private generateKeyForImagesPost(

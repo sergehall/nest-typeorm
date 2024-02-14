@@ -97,7 +97,7 @@ export class S3Service {
     }
   }
 
-  async uniteStrings(key: string): Promise<UrlDto> {
+  async generateSignedUrl(key: string): Promise<UrlDto> {
     try {
       const baseUrl = await this.awsConfig.getEndpoint('AWS_ENDPOINT');
       const subDomain = await this.awsConfig.getS3BucketName('S3_BUCKET');
