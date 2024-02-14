@@ -91,12 +91,12 @@ export class FileValidationPipe implements PipeTransform {
       const metadata = await sharp(value.buffer).metadata();
       if (
         !metadata.width ||
-        metadata.width > constraints.maxWidth ||
+        metadata.width !== constraints.maxWidth ||
         !metadata.height ||
-        metadata.height > constraints.maxHeight
+        metadata.height !== constraints.maxHeight
       ) {
         errorMessage.push({
-          message: `Invalid dimensions maxWidth: ${constraints.maxWidth} and maxHeight: ${constraints.maxHeight}`,
+          message: `Invalid dimensions width: ${constraints.maxWidth} and height: ${constraints.maxHeight}`,
           file: 'file.dimensions',
         });
       }
