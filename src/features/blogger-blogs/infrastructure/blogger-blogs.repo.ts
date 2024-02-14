@@ -25,7 +25,7 @@ import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import {
   BloggerBlogsWithImagesViewModel,
-  Images,
+  ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
 
 export class BloggerBlogsRepo {
@@ -293,7 +293,7 @@ export class BloggerBlogsRepo {
   private async addImagesToBlogsEntity(
     newBlog: BloggerBlogsViewModel,
   ): Promise<BloggerBlogsWithImagesViewModel> {
-    const images = new Images();
+    const images = new ImagesViewModel();
     return {
       ...newBlog, // Spread properties of newBlog
       images, // Add extended images

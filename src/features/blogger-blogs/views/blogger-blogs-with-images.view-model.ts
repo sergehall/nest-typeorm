@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 import { BloggerBlogsViewModel } from './blogger-blogs.view-model';
 
-class Image {
+export class Image {
   @IsNotEmpty()
   url: string = '';
 
@@ -18,11 +18,11 @@ class Image {
   fileSize: number = 0;
 }
 
-export class Images {
+export class ImagesViewModel {
   wallpaper: Image | null = null;
   main: Image[] = [new Image()];
 }
 
 export class BloggerBlogsWithImagesViewModel extends BloggerBlogsViewModel {
-  images: Images;
+  images: ImagesViewModel;
 }
