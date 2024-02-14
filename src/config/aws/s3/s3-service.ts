@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3Client, CreateBucketCommand } from '@aws-sdk/client-s3';
 import { AwsConfig } from '../aws-config';
+import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
 
 @Injectable()
 export class S3Service {
@@ -85,10 +86,6 @@ export class S3Service {
     return this.s3Client;
   }
 
-  async getAWSEndpoint(): Promise<string> {
-    return await this.awsConfig.getEndpoint('AWS_ENDPOINT');
-  }
-
   async getS3BucketName(): Promise<string> {
     try {
       return await this.awsConfig.getS3BucketName('S3_BUCKET');
@@ -96,6 +93,29 @@ export class S3Service {
       console.error('Error fetching S3 bucket name:', error);
       throw new InternalServerErrorException(
         'Error fetching S3 bucket name:' + error.message,
+      );
+    }
+  }
+
+  async uniteStrings(key: string): Promise<UrlDto> {
+    try {
+      const baseUrl = await this.awsConfig.getEndpoint('AWS_ENDPOINT');
+      const subDomain = await this.awsConfig.getS3BucketName('S3_BUCKET');
+
+      // Splitting baseUrl by protocol separator
+      const parts = baseUrl.split('//');
+
+      // Extracting protocol and domain
+      const protocol = parts[0];
+      const domain = parts[1];
+
+      // Concatenating subDomain in between
+      return { url: `${protocol}//${subDomain}.${domain}/${key}` };
+    } catch (error) {
+      // Handle errors here
+      console.error('Error uniteStrings:', error);
+      throw new InternalServerErrorException(
+        'Error uniteStrings:' + error.message,
       );
     }
   }
