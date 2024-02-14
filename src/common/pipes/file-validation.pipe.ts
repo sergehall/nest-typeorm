@@ -9,7 +9,6 @@ import {
   fileNotProvided,
   fileSizeLimit,
   invalidFileExtension,
-  invalidImageDimensions,
 } from '../filters/custom-errors-messages';
 import * as sharp from 'sharp';
 import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
