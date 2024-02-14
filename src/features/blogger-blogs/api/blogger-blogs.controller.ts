@@ -50,8 +50,8 @@ import { PostImagesViewModel } from '../views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
-import { UploadImagesPostCommand } from '../application/use-cases/upload-images-post-use-case';
-import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-images-blog-wallpaper-use-case';
+import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-images-blogs-wallpaper-use-case';
+import { UploadImagesPostsCommand } from '../application/use-cases/upload-images-posts-use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -73,7 +73,7 @@ export class BloggerBlogsController {
     const fileUpload: FileUploadDtoDto = file;
 
     return await this.commandBus.execute(
-      new UploadImagesPostCommand(params, fileUpload, currentUserDto),
+      new UploadImagesPostsCommand(params, fileUpload, currentUserDto),
     );
   }
 
@@ -84,6 +84,23 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogWallpaper))
+    file: Express.Multer.File,
+  ): Promise<PostImagesViewModel> {
+    const currentUserDto: CurrentUserDto = req.user;
+    const fileUpload: FileUploadDtoDto = file;
+
+    return await this.commandBus.execute(
+      new UploadImageBlogWallpaperCommand(params, fileUpload, currentUserDto),
+    );
+  }
+
+  @Post('blogs/:blogId/images/main')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImageBlogMain(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+    @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogMain))
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;

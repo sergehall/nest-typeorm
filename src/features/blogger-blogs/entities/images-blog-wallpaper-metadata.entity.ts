@@ -4,11 +4,10 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
 import { UrlEtagDto } from '../dto/url-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { ImagesPostMetadataEntity } from '../../posts/entities/images-post-metadata.entity';
 import * as uuid4 from 'uuid4';
 
-@Entity('ImagesBlogWallpaperMetadata')
-export class ImagesBlogWallpaperMetadataEntity {
+@Entity('ImagesBlogsWallpaperMetadata')
+export class ImagesBlogsWallpaperMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
@@ -65,42 +64,46 @@ export class ImagesBlogWallpaperMetadataEntity {
   ])
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+  @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs, {
     nullable: false,
     eager: true,
   })
-  @JoinColumn({ name: 'blogOwnerId', referencedColumnName: 'userId' })
-  postOwner: UsersEntity;
+  @JoinColumn([
+    { name: 'blogOwnerId', referencedColumnName: 'userId' },
+    { name: 'blogOwnerLogin', referencedColumnName: 'login' },
+  ])
+  blogOwner: UsersEntity;
 
   static createImagesBlogWallpaperFileMetadataEntity(
     blog: BloggerBlogsEntity,
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): ImagesBlogWallpaperMetadataEntity {
+  ): ImagesBlogsWallpaperMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
       fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
 
-    const postsImagesFileMetadataEntity = new ImagesPostMetadataEntity();
-    postsImagesFileMetadataEntity.id = uuid4().toString();
-    postsImagesFileMetadataEntity.url = urlEtagDto.url;
-    postsImagesFileMetadataEntity.eTag = urlEtagDto.eTag;
-    postsImagesFileMetadataEntity.fieldName = fieldname;
-    postsImagesFileMetadataEntity.originalName = originalname;
-    postsImagesFileMetadataEntity.encoding = encoding;
-    postsImagesFileMetadataEntity.mimetype = mimetype;
-    postsImagesFileMetadataEntity.buffer = buffer;
-    postsImagesFileMetadataEntity.size = size;
-    postsImagesFileMetadataEntity.createdAt = new Date().toISOString();
-    postsImagesFileMetadataEntity.dependencyIsBanned = false;
-    postsImagesFileMetadataEntity.isBanned = false;
-    postsImagesFileMetadataEntity.banDate = null;
-    postsImagesFileMetadataEntity.banReason = null;
-    postsImagesFileMetadataEntity.blog = blog;
-    postsImagesFileMetadataEntity.postOwner = user;
-    return postsImagesFileMetadataEntity;
+    const imagesBlogsWallpaperMetadataEntity =
+      new ImagesBlogsWallpaperMetadataEntity();
+    imagesBlogsWallpaperMetadataEntity.id = uuid4().toString();
+    imagesBlogsWallpaperMetadataEntity.url = urlEtagDto.url;
+    imagesBlogsWallpaperMetadataEntity.eTag = urlEtagDto.eTag;
+    imagesBlogsWallpaperMetadataEntity.fieldName = fieldname;
+    imagesBlogsWallpaperMetadataEntity.originalName = originalname;
+    imagesBlogsWallpaperMetadataEntity.encoding = encoding;
+    imagesBlogsWallpaperMetadataEntity.mimetype = mimetype;
+    imagesBlogsWallpaperMetadataEntity.buffer = buffer;
+    imagesBlogsWallpaperMetadataEntity.size = size;
+    imagesBlogsWallpaperMetadataEntity.createdAt = new Date().toISOString();
+    imagesBlogsWallpaperMetadataEntity.dependencyIsBanned = false;
+    imagesBlogsWallpaperMetadataEntity.isBanned = false;
+    imagesBlogsWallpaperMetadataEntity.banDate = null;
+    imagesBlogsWallpaperMetadataEntity.banReason = null;
+    imagesBlogsWallpaperMetadataEntity.blog = blog;
+    imagesBlogsWallpaperMetadataEntity.blogOwner = user;
+    return imagesBlogsWallpaperMetadataEntity;
   }
 }

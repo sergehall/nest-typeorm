@@ -22,4 +22,14 @@ export const getFileConstraints: FileConstraints = {
     maxWidth: 940,
     maxHeight: 432,
   },
+  imageBlogMain: {
+    maxSize: 100 * 1024, // 100KB
+    allowedExtensions: [
+      AllowedExtensions.JPEG,
+      AllowedExtensions.JPG,
+      AllowedExtensions.PNG,
+    ],
+    maxWidth: 156,
+    maxHeight: 156,
+  },
 };

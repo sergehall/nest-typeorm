@@ -25,6 +25,7 @@ export class FileConstraintsDto {
 }
 
 export type FileConstraints = {
-  imageBlogWallpaper: FileConstraintsDto;
   imagePost: FileConstraintsDto;
+  imageBlogWallpaper: FileConstraintsDto;
+  imageBlogMain: FileConstraintsDto;
 };

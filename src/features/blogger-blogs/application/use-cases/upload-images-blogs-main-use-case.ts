@@ -1,71 +1,56 @@
-import { BlogIdPostIdParams } from '../../../../common/query/params/blogId-postId.params';
+import { BlogIdParams } from '../../../../common/query/params/blogId.params';
+import { FileUploadDtoDto } from '../../dto/file-upload.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
+import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
+import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
+import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
+import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import {
   ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ForbiddenError } from '@casl/ability';
-import { Action } from '../../../../ability/roles/action.enum';
-import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
-import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
-import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
-import { PostsEntity } from '../../../posts/entities/posts.entity';
-import { FileUploadDtoDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
-import { PostImagesViewModel } from '../../views/post-images.view-model';
-import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlEtagDto } from '../../dto/url-etag.dto';
-import { ImagesFileMetadataRepo } from '../../../posts/infrastructure/images-file-metadata.repo';
+import { ForbiddenError } from '@casl/ability';
+import { Action } from '../../../../ability/roles/action.enum';
+import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
 
-export class UploadImagesPostCommand {
+export class UploadImagesBlogMainCommand {
   constructor(
-    public params: BlogIdPostIdParams,
+    public params: BlogIdParams,
     public fileUploadDto: FileUploadDtoDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
 
-/** Command handler for the UploadImageForPostCommand. */
-@CommandHandler(UploadImagesPostCommand)
-export class UploadImagesPostUseCase
-  implements ICommandHandler<UploadImagesPostCommand>
+@CommandHandler(UploadImagesBlogMainCommand)
+export class UploadImagesBlogsMainUseCase
+  implements ICommandHandler<UploadImagesBlogMainCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
     protected fileMetadataService: FileMetadataService,
-    protected postsImagesFileMetadataRepo: ImagesFileMetadataRepo,
+    protected postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
   ) {}
 
-  /**
-   * Execute method to handle the command.
-   * @param command The UploadImageForPostCommand.
-   * @returns A promise that resolves to the post images view model.
-   */
   async execute(
-    command: UploadImagesPostCommand,
-  ): Promise<PostImagesViewModel> {
+    command: UploadImageBlogWallpaperCommand,
+  ): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
-    const { blogId, postId } = params;
+    const { blogId } = params;
 
     // Check if the blog exists
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
-    }
-
-    // Check if the post exists
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
-    if (!post) {
-      throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
     // Check user permission
@@ -77,16 +62,15 @@ export class UploadImagesPostUseCase
 
     // Upload file for the post to s3
     const urlEtagDto: UrlEtagDto =
-      await this.fileStorageAdapter.uploadFileImagePost(
+      await this.fileStorageAdapter.uploadFileImageBlogMain(
         params,
         fileUploadDto,
         currentUserDto,
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createPostsImagesFileMetadata(
+    await this.postsImagesFileMetadataRepo.createImagesBlogMain(
       blog,
-      post,
       fileUploadDto,
       urlEtagDto,
       currentUserDto,
@@ -94,6 +78,7 @@ export class UploadImagesPostUseCase
 
     // Return post images view model
     return {
+      wallpaper: null,
       main: [
         {
           url: urlEtagDto.url,
@@ -105,13 +90,6 @@ export class UploadImagesPostUseCase
     };
   }
 
-  /**
-   * Check user permission to upload file.
-   * @param blogOwnerUserId The ID of the blog owner user.
-   * @param currentUserDto The current user DTO.
-   * @throws ForbiddenException if user does not have permission.
-   * @throws InternalServerErrorException on internal errors.
-   */
   private async userPermission(
     blogOwnerUserId: string,
     currentUserDto: CurrentUserDto,

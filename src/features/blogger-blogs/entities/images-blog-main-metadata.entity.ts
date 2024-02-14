@@ -1,14 +1,13 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { BloggerBlogsEntity } from './blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { PostsEntity } from './posts.entity';
+import { FileUploadDtoDto } from '../dto/file-upload.dto';
+import { UrlEtagDto } from '../dto/url-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
-import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
-import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
 
-@Entity('ImagesPostsMetadata')
-export class ImagesPostsMetadataEntity {
+@Entity('ImagesBlogsMainMetadata')
+export class ImagesBlogsMainMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
@@ -65,54 +64,45 @@ export class ImagesPostsMetadataEntity {
   ])
   blog: BloggerBlogsEntity;
 
-  @ManyToOne(() => PostsEntity, (post) => post.comments, {
+  @ManyToOne(() => UsersEntity, (user) => user.bloggerBlogs, {
     nullable: false,
     eager: true,
   })
   @JoinColumn([
-    { name: 'postId', referencedColumnName: 'id' },
-    { name: 'postTitle', referencedColumnName: 'title' },
+    { name: 'blogOwnerId', referencedColumnName: 'userId' },
+    { name: 'blogOwnerLogin', referencedColumnName: 'login' },
   ])
-  post: PostsEntity;
+  blogOwner: UsersEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.userId, {
-    nullable: false,
-    eager: true,
-  })
-  @JoinColumn({ name: 'postOwnerId', referencedColumnName: 'userId' })
-  postOwner: UsersEntity;
-
-  static createPostsImagesFileMetadataEntity(
+  static createImagesBlogsMainFileMetadataEntity(
     blog: BloggerBlogsEntity,
-    post: PostsEntity,
     fileUploadDto: FileUploadDtoDto,
     urlEtagDto: UrlEtagDto,
     currentUserDto: CurrentUserDto,
-  ): ImagesPostsMetadataEntity {
+  ): ImagesBlogsMainMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
       fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
 
-    const imagesPostsMetadataEntity = new ImagesPostsMetadataEntity();
-    imagesPostsMetadataEntity.id = uuid4().toString();
-    imagesPostsMetadataEntity.url = urlEtagDto.url;
-    imagesPostsMetadataEntity.eTag = urlEtagDto.eTag;
-    imagesPostsMetadataEntity.fieldName = fieldname;
-    imagesPostsMetadataEntity.originalName = originalname;
-    imagesPostsMetadataEntity.encoding = encoding;
-    imagesPostsMetadataEntity.mimetype = mimetype;
-    imagesPostsMetadataEntity.buffer = buffer;
-    imagesPostsMetadataEntity.size = size;
-    imagesPostsMetadataEntity.createdAt = new Date().toISOString();
-    imagesPostsMetadataEntity.dependencyIsBanned = false;
-    imagesPostsMetadataEntity.isBanned = false;
-    imagesPostsMetadataEntity.banDate = null;
-    imagesPostsMetadataEntity.banReason = null;
-    imagesPostsMetadataEntity.blog = blog;
-    imagesPostsMetadataEntity.post = post;
-    imagesPostsMetadataEntity.postOwner = user;
-    return imagesPostsMetadataEntity;
+    const imagesBlogsMainMetadataEntity = new ImagesBlogsMainMetadataEntity();
+    imagesBlogsMainMetadataEntity.id = uuid4().toString();
+    imagesBlogsMainMetadataEntity.url = urlEtagDto.url;
+    imagesBlogsMainMetadataEntity.eTag = urlEtagDto.eTag;
+    imagesBlogsMainMetadataEntity.fieldName = fieldname;
+    imagesBlogsMainMetadataEntity.originalName = originalname;
+    imagesBlogsMainMetadataEntity.encoding = encoding;
+    imagesBlogsMainMetadataEntity.mimetype = mimetype;
+    imagesBlogsMainMetadataEntity.buffer = buffer;
+    imagesBlogsMainMetadataEntity.size = size;
+    imagesBlogsMainMetadataEntity.createdAt = new Date().toISOString();
+    imagesBlogsMainMetadataEntity.dependencyIsBanned = false;
+    imagesBlogsMainMetadataEntity.isBanned = false;
+    imagesBlogsMainMetadataEntity.banDate = null;
+    imagesBlogsMainMetadataEntity.banReason = null;
+    imagesBlogsMainMetadataEntity.blog = blog;
+    imagesBlogsMainMetadataEntity.blogOwner = user;
+    return imagesBlogsMainMetadataEntity;
   }
 }

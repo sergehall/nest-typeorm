@@ -18,13 +18,14 @@ import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
-  constructor(private readonly key: FileConstraintsDto) {}
+  constructor(private readonly constraints: FileConstraintsDto) {}
 
   async transform(
     value: any,
     metadata: ArgumentMetadata,
   ): Promise<FileUploadDtoDto> {
-    const constraints: FileConstraintsDto = this.key;
+    console.log(value, 'value');
+    const constraints: FileConstraintsDto = this.constraints;
     if (!constraints) {
       throw new HttpException(
         { message: 'Constraints not found for the specified key' },
@@ -32,8 +33,7 @@ export class FileValidationPipe implements PipeTransform {
       );
     }
     const errorMessage: CustomErrorsMessagesType[] = [];
-
-    await this.checkFileNotProvided(value, errorMessage);
+    await this.checkFileNotProvided(value);
     await this.checkFileSize(value, constraints, errorMessage);
     await this.checkFileExtension(value, constraints, errorMessage);
     await this.checkImageDimensions(value, constraints, errorMessage);
@@ -48,12 +48,12 @@ export class FileValidationPipe implements PipeTransform {
     return value;
   }
 
-  private async checkFileNotProvided(
-    value: any,
-    errorMessage: CustomErrorsMessagesType[],
-  ): Promise<void> {
+  private async checkFileNotProvided(value: any): Promise<void> {
     if (!value) {
-      errorMessage.push(fileNotProvided);
+      throw new HttpException(
+        { message: fileNotProvided },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -96,7 +96,10 @@ export class FileValidationPipe implements PipeTransform {
         !metadata.height ||
         metadata.height > constraints.maxHeight
       ) {
-        errorMessage.push(invalidImageDimensions);
+        errorMessage.push({
+          message: `Invalid dimensions maxWidth: ${constraints.maxWidth} and maxHeight: ${constraints.maxHeight}`,
+          file: 'file.dimensions',
+        });
       }
     } catch (error) {
       throw new HttpException(

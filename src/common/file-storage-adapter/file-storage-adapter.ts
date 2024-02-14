@@ -18,7 +18,7 @@ export class FileStorageAdapter {
   ): Promise<UrlEtagDto> {
     const { blogId, postId } = params;
     const { mimetype } = fileUploadDto;
-    const key = this.generateKeyForPostFile(
+    const key = this.generateKeyForImagesPost(
       currentUserDto.userId,
       blogId,
       postId,
@@ -34,7 +34,22 @@ export class FileStorageAdapter {
   ): Promise<UrlEtagDto> {
     const { blogId } = params;
     const { mimetype } = fileUploadDto;
-    const key = this.generateKeyForWallpaperFile(
+    const key = this.generateKeyForImagesBlogWallpaper(
+      currentUserDto.userId,
+      blogId,
+      mimetype,
+    );
+    return this.uploadFile(key, fileUploadDto);
+  }
+
+  async uploadFileImageBlogMain(
+    params: BlogIdParams,
+    fileUploadDto: FileUploadDtoDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<UrlEtagDto> {
+    const { blogId } = params;
+    const { mimetype } = fileUploadDto;
+    const key = this.generateKeyForImagesBlogMain(
       currentUserDto.userId,
       blogId,
       mimetype,
@@ -76,7 +91,7 @@ export class FileStorageAdapter {
     }
   }
 
-  private generateKeyForPostFile(
+  private generateKeyForImagesPost(
     userId: string,
     blogId: string,
     postId: string,
@@ -87,12 +102,22 @@ export class FileStorageAdapter {
     )}`;
   }
 
-  private generateKeyForWallpaperFile(
+  private generateKeyForImagesBlogWallpaper(
     userId: string,
     blogId: string,
     mimetype: string,
   ): string {
     return `content/users/${userId}/blogs/${blogId}_wallpaper.${this.getFileExtension(
+      mimetype,
+    )}`;
+  }
+
+  private generateKeyForImagesBlogMain(
+    userId: string,
+    blogId: string,
+    mimetype: string,
+  ): string {
+    return `content/users/${userId}/blogs/${blogId}_main.${this.getFileExtension(
       mimetype,
     )}`;
   }
