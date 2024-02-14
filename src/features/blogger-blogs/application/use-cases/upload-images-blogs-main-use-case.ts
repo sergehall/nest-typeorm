@@ -20,7 +20,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
 
-export class UploadImagesBlogMainCommand {
+export class UploadImagesBlogsMainCommand {
   constructor(
     public params: BlogIdParams,
     public fileUploadDto: FileUploadDtoDto,
@@ -28,9 +28,9 @@ export class UploadImagesBlogMainCommand {
   ) {}
 }
 
-@CommandHandler(UploadImagesBlogMainCommand)
+@CommandHandler(UploadImagesBlogsMainCommand)
 export class UploadImagesBlogsMainUseCase
-  implements ICommandHandler<UploadImagesBlogMainCommand>
+  implements ICommandHandler<UploadImagesBlogsMainCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
