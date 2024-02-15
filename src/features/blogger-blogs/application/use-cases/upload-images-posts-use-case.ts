@@ -84,7 +84,7 @@ export class UploadImagesPostsUseCase
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createPostsImagesFileMetadata(
+    await this.postsImagesFileMetadataRepo.createImagesPostsMetadata(
       blog,
       post,
       fileUploadDto,

@@ -1,8 +1,16 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
-import { BloggerBlogsViewModel } from '../../../blogger-blogs/views/blogger-blogs.view-model';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
+import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
+import {
+  BloggerBlogsWithImagesViewModel,
+  Image,
+} from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
+import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
+import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { S3Service } from '../../../../config/aws/s3/s3-service';
+import { UrlDto } from '../../../blogger-blogs/dto/url.dto';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -12,9 +20,14 @@ export class GetBlogByIdCommand {
 export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
   constructor(
     protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected imagesPostsMetadataRepo: ImagesPostsMetadataRepo,
+    protected fileMetadataService: FileMetadataService,
+    protected s3Service: S3Service,
     protected commandBus: CommandBus,
   ) {}
-  async execute(command: GetBlogByIdCommand): Promise<BloggerBlogsViewModel> {
+  async execute(
+    command: GetBlogByIdCommand,
+  ): Promise<BloggerBlogsWithImagesViewModel> {
     const { blogId } = command;
 
     const blog: BloggerBlogsEntity | null =
@@ -24,6 +37,53 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       throw new NotFoundException(`Blog with id: ${blogId} not found`);
     }
 
+    const imagesBlogsWallpaper =
+      await this.imagesPostsMetadataRepo.findImagesBlogsWallpaperById(blog.id);
+
+    const imagesBlogsMain =
+      await this.imagesPostsMetadataRepo.findImagesBlogsMainById(blog.id);
+
+    let wallpaper: Image | null = null;
+    const main: Image[] = [];
+
+    if (imagesBlogsWallpaper) {
+      // Extract file metadata
+      const metadata: FileMetadata =
+        await this.fileMetadataService.extractFromBuffer(
+          imagesBlogsWallpaper.buffer,
+        );
+
+      const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
+        imagesBlogsWallpaper.url,
+      );
+
+      wallpaper = {
+        url: unitedUrl.url,
+        height: metadata.height,
+        width: metadata.width,
+        fileSize: metadata.fileSize,
+      };
+    }
+
+    if (imagesBlogsMain) {
+      // Extract file metadata
+      const metadata: FileMetadata =
+        await this.fileMetadataService.extractFromBuffer(
+          imagesBlogsMain.buffer,
+        );
+
+      const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
+        imagesBlogsMain.url,
+      );
+
+      main.push({
+        url: unitedUrl.url,
+        height: metadata.height,
+        width: metadata.width,
+        fileSize: metadata.fileSize,
+      });
+    }
+
     return {
       id: blog.id,
       name: blog.name,
@@ -31,6 +91,10 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       websiteUrl: blog.websiteUrl,
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
+      images: {
+        wallpaper: wallpaper,
+        main: main,
+      },
     };
   }
 }
