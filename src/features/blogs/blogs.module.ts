@@ -27,6 +27,13 @@ import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-qui
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
+import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsMetadataEntity } from '../posts/entities/images-post-metadata.entity';
+import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
+import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
+import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { S3Service } from '../../config/aws/s3/s3-service';
+import { AwsConfig } from '../../config/aws/aws-config';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -42,16 +49,22 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
+      ImagesPostsMetadataEntity,
+      ImagesBlogsMainMetadataEntity,
+      ImagesBlogsWallpaperMetadataEntity,
     ]),
     CaslModule,
     CqrsModule,
   ],
   controllers: [BlogsController],
   providers: [
+    AwsConfig,
     AuthService,
+    S3Service,
     UsersService,
     BlogsService,
     PostsService,
+    FileMetadataService,
     ParseQueriesService,
     BloggerBlogsService,
     UsersRepo,
@@ -61,6 +74,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     GameQuestionsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
+    ImagesPostsMetadataRepo,
     ...helpers,
     ...blogsUseCases,
   ],

@@ -5,12 +5,16 @@ import { Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { PostsEntity } from '../entities/posts.entity';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesPostsMetadataEntity } from '../entities/images-post-metadata.entity';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 export class ImagesPostsMetadataRepo {
   constructor(
@@ -21,9 +25,68 @@ export class ImagesPostsMetadataRepo {
     @InjectRepository(ImagesBlogsMainMetadataEntity)
     protected imagesBlogsMainMetadataRepository: Repository<ImagesBlogsMainMetadataEntity>,
     protected keyResolver: KeyResolver,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async createPostsImagesFileMetadata(
+  async findImagesBlogsWallpaperById(
+    blogId: string,
+  ): Promise<ImagesBlogsWallpaperMetadataEntity | null> {
+    const isBanned = false;
+    const dependencyIsBanned = false;
+    const queryBuilder = this.imagesBlogsWallpaperFileMetadataRepository
+      .createQueryBuilder('blogsWallpaper') // Start building a query
+      .leftJoinAndSelect('blogsWallpaper.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
+      .where('blogsWallpaper.blogId = :blogId', { blogId })
+      .andWhere({ isBanned })
+      .andWhere({ dependencyIsBanned });
+
+    try {
+      const blogsWallpaper = await queryBuilder.getOne(); // Execute the query and get a single result
+
+      return blogsWallpaper || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(
+          `Blog Wallpaper with ID ${userId} not found`,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findImagesBlogsMainById(
+    blogId: string,
+  ): Promise<ImagesBlogsMainMetadataEntity | null> {
+    const isBanned = false;
+    const dependencyIsBanned = false;
+    const queryBuilder = this.imagesBlogsMainMetadataRepository
+      .createQueryBuilder('blogsMain') // Start building a query
+      .leftJoinAndSelect('blogsMain.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
+      .where('blogsMain.blogId = :blogId', { blogId })
+      .andWhere({ isBanned })
+      .andWhere({ dependencyIsBanned });
+
+    try {
+      const blogsMain = await queryBuilder.getOne(); // Execute the query and get a single result
+
+      return blogsMain || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(
+          `Blog Wallpaper with ID ${userId} not found`,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async createImagesPostsMetadata(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
     fileUploadDto: FileUploadDtoDto,

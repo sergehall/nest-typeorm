@@ -21,6 +21,7 @@ import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-
 import { IdParams } from '../../../common/query/params/id.params';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.view-model';
+import { BloggerBlogsWithImagesViewModel } from '../../blogger-blogs/views/blogger-blogs-with-images.view-model';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -43,7 +44,7 @@ export class BlogsController {
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openGetBlogById(
     @Param() params: IdParams,
-  ): Promise<BloggerBlogsViewModel> {
+  ): Promise<BloggerBlogsWithImagesViewModel> {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
