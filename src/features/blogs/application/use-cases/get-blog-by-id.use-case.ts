@@ -54,7 +54,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         );
 
       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-        imagesBlogsWallpaper.url,
+        imagesBlogsWallpaper.pathKey,
       );
 
       wallpaper = {
@@ -73,7 +73,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         );
 
       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-        imagesBlogsMain.url,
+        imagesBlogsMain.pathKey,
       );
 
       main.push({

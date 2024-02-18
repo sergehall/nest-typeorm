@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BloggerBlogsEntity } from './blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
-import { UrlEtagDto } from '../dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
 
@@ -12,7 +12,7 @@ export class ImagesBlogsWallpaperMetadataEntity {
   id: string;
 
   @Column({ type: 'character varying', nullable: false })
-  url: string;
+  pathKey: string;
 
   @Column({ type: 'character varying', nullable: false })
   eTag: string;
@@ -77,7 +77,7 @@ export class ImagesBlogsWallpaperMetadataEntity {
   static createImagesBlogWallpaperFileMetadataEntity(
     blog: BloggerBlogsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesBlogsWallpaperMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
@@ -90,8 +90,8 @@ export class ImagesBlogsWallpaperMetadataEntity {
     const imagesBlogsWallpaperMetadataEntity =
       new ImagesBlogsWallpaperMetadataEntity();
     imagesBlogsWallpaperMetadataEntity.id = uuid4().toString();
-    imagesBlogsWallpaperMetadataEntity.url = urlEtagDto.url;
-    imagesBlogsWallpaperMetadataEntity.eTag = urlEtagDto.eTag;
+    imagesBlogsWallpaperMetadataEntity.pathKey = urlPathKeyEtagDto.pathKey;
+    imagesBlogsWallpaperMetadataEntity.eTag = urlPathKeyEtagDto.eTag;
     imagesBlogsWallpaperMetadataEntity.fieldName = fieldname;
     imagesBlogsWallpaperMetadataEntity.originalName = originalname;
     imagesBlogsWallpaperMetadataEntity.encoding = encoding;

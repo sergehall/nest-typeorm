@@ -5,7 +5,7 @@ import { PostsEntity } from './posts.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
-import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 
 @Entity('ImagesPostsMetadata')
 export class ImagesPostsMetadataEntity {
@@ -13,7 +13,7 @@ export class ImagesPostsMetadataEntity {
   id: string;
 
   @Column({ type: 'character varying', nullable: false })
-  url: string;
+  pathKey: string;
 
   @Column({ type: 'character varying', nullable: false })
   eTag: string;
@@ -86,7 +86,7 @@ export class ImagesPostsMetadataEntity {
     blog: BloggerBlogsEntity,
     post: PostsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesPostsMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
@@ -97,8 +97,8 @@ export class ImagesPostsMetadataEntity {
 
     const imagesPostsMetadataEntity = new ImagesPostsMetadataEntity();
     imagesPostsMetadataEntity.id = uuid4().toString();
-    imagesPostsMetadataEntity.url = urlEtagDto.url;
-    imagesPostsMetadataEntity.eTag = urlEtagDto.eTag;
+    imagesPostsMetadataEntity.pathKey = urlPathKeyEtagDto.pathKey;
+    imagesPostsMetadataEntity.eTag = urlPathKeyEtagDto.eTag;
     imagesPostsMetadataEntity.fieldName = fieldname;
     imagesPostsMetadataEntity.originalName = originalname;
     imagesPostsMetadataEntity.encoding = encoding;

@@ -18,7 +18,7 @@ import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file
 import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
-import { UrlEtagDto } from '../../dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
 
 export class UploadImagesPostsCommand {
@@ -76,7 +76,7 @@ export class UploadImagesPostsUseCase
       await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
 
     // Upload file for the post to s3
-    const urlEtagDto: UrlEtagDto =
+    const urlEtagDto: UrlPathKeyEtagDto =
       await this.fileStorageAdapter.uploadFileImagePost(
         params,
         fileUploadDto,

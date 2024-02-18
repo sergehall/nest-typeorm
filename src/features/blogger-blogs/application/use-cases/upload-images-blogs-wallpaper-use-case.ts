@@ -14,7 +14,7 @@ import { FileUploadDtoDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
-import { UrlEtagDto } from '../../dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
@@ -61,7 +61,7 @@ export class UploadImagesBlogsWallpaperUseCase
       await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
 
     // Upload file for the post to s3
-    const urlEtagDto: UrlEtagDto =
+    const urlPathKeyEtagDto: UrlPathKeyEtagDto =
       await this.fileStorageAdapter.uploadFileImageBlogWallpaper(
         params,
         fileUploadDto,
@@ -72,14 +72,14 @@ export class UploadImagesBlogsWallpaperUseCase
     await this.postsImagesFileMetadataRepo.createImagesBlogWallpaper(
       blog,
       fileUploadDto,
-      urlEtagDto,
+      urlPathKeyEtagDto,
       currentUserDto,
     );
 
     // Return post images view model
     return {
       wallpaper: {
-        url: urlEtagDto.url,
+        url: urlPathKeyEtagDto.url,
         width: metadata.width,
         height: metadata.height,
         fileSize: metadata.fileSize,
