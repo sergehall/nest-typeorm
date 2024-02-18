@@ -74,6 +74,7 @@ export const validationSchemaConfiguration = Joi.object({
   S3_BUCKET: Joi.string().min(8).max(8).required(),
   AWS_ENDPOINT: Joi.string().min(34).max(34).required(),
   S3_REGION: Joi.string().min(9).max(9).required(),
+  S3_PUBLIC_BUCKET: Joi.string().min(23).max(23).required(),
 }).options({
   abortEarly: false,
   messages: {
