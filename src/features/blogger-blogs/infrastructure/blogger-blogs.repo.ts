@@ -25,13 +25,22 @@ import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import {
   BloggerBlogsWithImagesViewModel,
+  Image,
   ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
+import { ImagesPostsMetadataRepo } from '../../posts/infrastructure/images-posts-metadata.repo';
+import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
+import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { UrlDto } from '../dto/url.dto';
+import { S3Service } from '../../../config/aws/s3/s3-service';
 
 export class BloggerBlogsRepo {
   constructor(
     @InjectRepository(BloggerBlogsEntity)
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
+    private readonly imagesPostsMetadataRepo: ImagesPostsMetadataRepo,
+    private readonly fileMetadataService: FileMetadataService,
+    private readonly s3Service: S3Service,
     private readonly keyResolver: KeyResolver,
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}

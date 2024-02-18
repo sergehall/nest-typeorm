@@ -28,7 +28,7 @@ export class ImagesPostsMetadataRepo {
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async findImagesBlogsWallpaperById(
+  async findImageBlogWallpaperById(
     blogId: string,
   ): Promise<ImagesBlogsWallpaperMetadataEntity | null> {
     const isBanned = false;
@@ -57,7 +57,43 @@ export class ImagesPostsMetadataRepo {
     }
   }
 
-  async findImagesBlogsMainById(
+  async findImagesBlogsWallpaperByIds(
+    blogIds: string[],
+  ): Promise<{ [id: string]: ImagesBlogsWallpaperMetadataEntity }> {
+    const isBanned = false;
+    const dependencyIsBanned = false;
+    const queryBuilder = this.imagesBlogsWallpaperFileMetadataRepository
+      .createQueryBuilder('blogsWallpaper') // Start building a query
+      .leftJoinAndSelect('blogsWallpaper.blogOwner', 'blogOwner')
+      .leftJoinAndSelect('blogsWallpaper.blog', 'blog')
+      .where('blogsWallpaper.blogId IN (:...blogIds)', { blogIds })
+      .andWhere({ isBanned })
+      .andWhere({ dependencyIsBanned });
+
+    try {
+      const blogsWallpapers = await queryBuilder.getMany(); // Execute the query and get multiple results
+
+      const resultMap: { [id: string]: ImagesBlogsWallpaperMetadataEntity } =
+        {};
+      blogsWallpapers.forEach((blogWallpaper) => {
+        resultMap[blogWallpaper.blog.id] = blogWallpaper;
+      });
+
+      return resultMap;
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(
+          `Blog Wallpaper with ID ${userId} not found`,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findImageBlogMainById(
     blogId: string,
   ): Promise<ImagesBlogsMainMetadataEntity | null> {
     const isBanned = false;
@@ -73,6 +109,44 @@ export class ImagesPostsMetadataRepo {
       const blogsMain = await queryBuilder.getOne(); // Execute the query and get a single result
 
       return blogsMain || null; // Return the retrieved blog with its associated blogOwner
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+          error,
+        );
+        throw new NotFoundException(
+          `Blog Wallpaper with ID ${userId} not found`,
+        );
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async findImagesBlogsMainByIds(
+    blogIds: string[],
+  ): Promise<{ [id: string]: ImagesBlogsMainMetadataEntity[] }> {
+    const isBanned = false;
+    const dependencyIsBanned = false;
+    const queryBuilder = this.imagesBlogsMainMetadataRepository
+      .createQueryBuilder('blogsMain') // Start building a query
+      .leftJoinAndSelect('blogsMain.blogOwner', 'blogOwner')
+      .leftJoinAndSelect('blogsMain.blog', 'blog')
+      .where('blogsMain.blogId IN (:...blogIds)', { blogIds })
+      .andWhere({ isBanned })
+      .andWhere({ dependencyIsBanned });
+
+    try {
+      const blogsMain = await queryBuilder.getMany(); // Execute the query and get multiple results
+
+      const resultMap: { [id: string]: ImagesBlogsMainMetadataEntity[] } = {};
+      blogsMain.forEach((blogMain) => {
+        if (!resultMap[blogMain.blog.id]) {
+          resultMap[blogMain.blog.id] = []; // Initialize the array if not exists
+        }
+        resultMap[blogMain.blog.id].push(blogMain);
+      });
+
+      return resultMap; // Return the retrieved blogs main metadata with their associated blogOwners as an object with IDs as keys
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const userId = await this.uuidErrorResolver.extractUserIdFromError(
@@ -203,39 +277,45 @@ export class ImagesPostsMetadataRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
-    let imagesBlogMainMetadataEntity: ImagesBlogsMainMetadataEntity;
-
-    const queryBuilder = this.imagesBlogsMainMetadataRepository
-      .createQueryBuilder('image') // Start building a query
-      .leftJoinAndSelect('image.blog', 'blog')
-      .where('blog.id = :blogId', { blogId: blog.id })
-      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
-      .andWhere({ isBanned: bannedFlags.isBanned });
+    // let imagesBlogMainMetadataEntity: ImagesBlogsMainMetadataEntity;
+    //
+    // const queryBuilder = this.imagesBlogsMainMetadataRepository
+    //   .createQueryBuilder('image') // Start building a query
+    //   .leftJoinAndSelect('image.blog', 'blog')
+    //   .where('blog.id = :blogId', { blogId: blog.id })
+    //   .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+    //   .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesBlogsMainMetadataEntity | null =
-      await queryBuilder.getOne();
+    const imagesBlogMainMetadataEntity: ImagesBlogsMainMetadataEntity =
+      ImagesBlogsMainMetadataEntity.createImagesBlogsMainFileMetadataEntity(
+        blog,
+        fileUploadDto,
+        urlPathKeyEtagDto,
+        currentUserDto,
+      );
+    // await queryBuilder.getOne();
 
-    // If entity exists, update it; otherwise, create a new one
-    if (existingEntity) {
-      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
-      existingEntity.eTag = urlPathKeyEtagDto.eTag;
-      existingEntity.originalName = fileUploadDto.originalname;
-      existingEntity.encoding = fileUploadDto.encoding;
-      existingEntity.mimetype = fileUploadDto.mimetype;
-      existingEntity.buffer = fileUploadDto.buffer;
-      existingEntity.size = fileUploadDto.size;
-      existingEntity.createdAt = new Date().toISOString();
-      imagesBlogMainMetadataEntity = existingEntity;
-    } else {
-      imagesBlogMainMetadataEntity =
-        ImagesBlogsMainMetadataEntity.createImagesBlogsMainFileMetadataEntity(
-          blog,
-          fileUploadDto,
-          urlPathKeyEtagDto,
-          currentUserDto,
-        );
-    }
+    // // If entity exists, update it; otherwise, create a new one
+    // if (existingEntity) {
+    //   existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+    //   existingEntity.eTag = urlPathKeyEtagDto.eTag;
+    //   existingEntity.originalName = fileUploadDto.originalname;
+    //   existingEntity.encoding = fileUploadDto.encoding;
+    //   existingEntity.mimetype = fileUploadDto.mimetype;
+    //   existingEntity.buffer = fileUploadDto.buffer;
+    //   existingEntity.size = fileUploadDto.size;
+    //   existingEntity.createdAt = new Date().toISOString();
+    //   imagesBlogMainMetadataEntity = existingEntity;
+    // } else {
+    //   imagesBlogMainMetadataEntity =
+    //     ImagesBlogsMainMetadataEntity.createImagesBlogsMainFileMetadataEntity(
+    //       blog,
+    //       fileUploadDto,
+    //       urlPathKeyEtagDto,
+    //       currentUserDto,
+    //     );
+    // }
 
     try {
       return await this.imagesBlogsMainMetadataRepository.save(

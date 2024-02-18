@@ -3,6 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
+import { BloggerBlogsWithImagesViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
 
 export class SearchBlogsCommand {
   constructor(public queryData: ParseQueriesDto) {}
@@ -33,10 +34,12 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       };
     }
 
+    const blogsWithImages: BloggerBlogsWithImagesViewModel[] =
+      await this.bloggerBlogsService.blogsImagesAggregation(
+        blogsCountBlogsDto.blogs,
+      );
+
     const totalCount = blogsCountBlogsDto.countBlogs;
-    const transformedBlogs = await this.bloggerBlogsService.transformedBlogs(
-      blogsCountBlogsDto.blogs,
-    );
 
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 
@@ -45,7 +48,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: transformedBlogs,
+      items: blogsWithImages,
     };
   }
 }
