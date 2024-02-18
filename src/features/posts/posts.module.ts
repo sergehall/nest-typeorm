@@ -47,6 +47,9 @@ import { ImagesPostsMetadataRepo } from './infrastructure/images-posts-metadata.
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesPostsMetadataEntity } from './entities/images-post-metadata.entity';
+import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { S3Service } from '../../config/aws/s3/s3-service';
+import { AwsConfig } from '../../config/aws/aws-config';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -84,13 +87,16 @@ const postsUseCases = [
     SaCreateSuperAdmin,
     EncryptConfig,
     JwtConfig,
+    AwsConfig,
     AuthService,
     JwtService,
+    S3Service,
     PostsService,
     UsersService,
     CommentsService,
     ParseQueriesService,
     BloggerBlogsService,
+    FileMetadataService,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

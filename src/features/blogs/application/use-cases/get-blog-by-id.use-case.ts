@@ -38,10 +38,10 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     }
 
     const imagesBlogsWallpaper =
-      await this.imagesPostsMetadataRepo.findImagesBlogsWallpaperById(blog.id);
+      await this.imagesPostsMetadataRepo.findImageBlogWallpaperById(blog.id);
 
-    const imagesBlogsMain =
-      await this.imagesPostsMetadataRepo.findImagesBlogsMainById(blog.id);
+    const imageBlogMain =
+      await this.imagesPostsMetadataRepo.findImageBlogMainById(blog.id);
 
     let wallpaper: Image | null = null;
     const main: Image[] = [];
@@ -65,15 +65,13 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       };
     }
 
-    if (imagesBlogsMain) {
+    if (imageBlogMain) {
       // Extract file metadata
       const metadata: FileMetadata =
-        await this.fileMetadataService.extractFromBuffer(
-          imagesBlogsMain.buffer,
-        );
+        await this.fileMetadataService.extractFromBuffer(imageBlogMain.buffer);
 
       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-        imagesBlogsMain.pathKey,
+        imageBlogMain.pathKey,
       );
 
       main.push({

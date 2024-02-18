@@ -8,6 +8,7 @@ import { GamesStatisticsViewModel } from '../../../features/pair-game-quiz/views
 import { BloggerBlogsViewModel } from '../../../features/blogger-blogs/views/blogger-blogs.view-model';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { SaUserViewModel } from '../../../features/sa/views/sa-user-view-model';
+import { BloggerBlogsWithImagesViewModel } from '../../../features/blogger-blogs/views/blogger-blogs-with-images.view-model';
 
 export class PaginatorDto {
   @IsNumber()
@@ -34,5 +35,6 @@ export class PaginatorDto {
     | QuestionsViewModel
     | GameViewModel
     | GamesStatisticsViewModel
+    | BloggerBlogsWithImagesViewModel
   )[];
 }
