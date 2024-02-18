@@ -165,6 +165,13 @@ class Configuration {
     return this.readEnvVariableWithDefault('S3_BUCKET', 'S3_BUCKET');
   }
 
+  private static getS3PublicBucket(): string {
+    return this.readEnvVariableWithDefault(
+      'S3_PUBLIC_BUCKET',
+      'S3_PUBLIC_BUCKET',
+    );
+  }
+
   private static getEndpointNameAws(): string {
     return this.readEnvVariableWithDefault('AWS_ENDPOINT', 'AWS_ENDPOINT');
   }
@@ -226,6 +233,7 @@ class Configuration {
           },
           buckets: {
             S3_BUCKET: Configuration.getS3Bucket(),
+            S3_PUBLIC_BUCKET: Configuration.getS3PublicBucket(),
           },
           region: {
             S3_REGION: Configuration.getS3Region(),

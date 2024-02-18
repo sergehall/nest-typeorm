@@ -97,10 +97,24 @@ export class S3Service {
     }
   }
 
+  async getS3PublicBucketName(): Promise<string> {
+    try {
+      return await this.awsConfig.getS3PublicBucketName('S3_PUBLIC_BUCKET');
+    } catch (error) {
+      console.error('Error fetching S3 bucket name:', error);
+      throw new InternalServerErrorException(
+        'Error fetching S3 bucket name:' + error.message,
+      );
+    }
+  }
+
   async generateSignedUrl(key: string): Promise<UrlDto> {
     try {
       const baseUrl = await this.awsConfig.getEndpoint('AWS_ENDPOINT');
-      const subDomain = await this.awsConfig.getS3BucketName('S3_BUCKET');
+      // const subDomain = await this.awsConfig.getS3BucketName('S3_BUCKET');
+      const subDomain = await this.awsConfig.getS3PublicBucketName(
+        'S3_PUBLIC_BUCKET',
+      );
 
       // Splitting baseUrl by protocol separator
       const parts = baseUrl.split('//');

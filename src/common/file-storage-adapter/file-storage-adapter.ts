@@ -65,7 +65,8 @@ export class FileStorageAdapter {
   ): Promise<UrlPathKeyEtagDto> {
     const { buffer, mimetype } = fileUploadDto;
     const s3Client = await this.s3Service.getS3Client();
-    const bucketName = await this.s3Service.getS3BucketName();
+    // const bucketName = await this.s3Service.getS3BucketName();
+    const bucketName = await this.s3Service.getS3PublicBucketName();
 
     const bucketParams = {
       Bucket: bucketName,
