@@ -15,7 +15,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
-import { UrlEtagDto } from '../../dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
@@ -61,7 +61,7 @@ export class UploadImagesBlogsMainUseCase
       await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
 
     // Upload file for the post to s3
-    const urlEtagDto: UrlEtagDto =
+    const urlEtagDto: UrlPathKeyEtagDto =
       await this.fileStorageAdapter.uploadFileImageBlogMain(
         params,
         fileUploadDto,

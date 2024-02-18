@@ -9,7 +9,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UrlEtagDto } from '../../blogger-blogs/dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
@@ -90,7 +90,7 @@ export class ImagesPostsMetadataRepo {
     blog: BloggerBlogsEntity,
     post: PostsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesPostsMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
@@ -111,8 +111,8 @@ export class ImagesPostsMetadataRepo {
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {
-      existingEntity.url = urlEtagDto.url;
-      existingEntity.eTag = urlEtagDto.eTag;
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
       existingEntity.originalName = fileUploadDto.originalname;
       existingEntity.encoding = fileUploadDto.encoding;
       existingEntity.mimetype = fileUploadDto.mimetype;
@@ -126,7 +126,7 @@ export class ImagesPostsMetadataRepo {
           blog,
           post,
           fileUploadDto,
-          urlEtagDto,
+          urlPathKeyEtagDto,
           currentUserDto,
         );
     }
@@ -146,7 +146,7 @@ export class ImagesPostsMetadataRepo {
   async createImagesBlogWallpaper(
     blog: BloggerBlogsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
@@ -165,8 +165,8 @@ export class ImagesPostsMetadataRepo {
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {
-      existingEntity.url = urlEtagDto.url;
-      existingEntity.eTag = urlEtagDto.eTag;
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
       existingEntity.originalName = fileUploadDto.originalname;
       existingEntity.encoding = fileUploadDto.encoding;
       existingEntity.mimetype = fileUploadDto.mimetype;
@@ -179,7 +179,7 @@ export class ImagesPostsMetadataRepo {
         ImagesBlogsWallpaperMetadataEntity.createImagesBlogWallpaperFileMetadataEntity(
           blog,
           fileUploadDto,
-          urlEtagDto,
+          urlPathKeyEtagDto,
           currentUserDto,
         );
     }
@@ -199,7 +199,7 @@ export class ImagesPostsMetadataRepo {
   async createImagesBlogMain(
     blog: BloggerBlogsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
@@ -218,8 +218,8 @@ export class ImagesPostsMetadataRepo {
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {
-      existingEntity.url = urlEtagDto.url;
-      existingEntity.eTag = urlEtagDto.eTag;
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
       existingEntity.originalName = fileUploadDto.originalname;
       existingEntity.encoding = fileUploadDto.encoding;
       existingEntity.mimetype = fileUploadDto.mimetype;
@@ -232,7 +232,7 @@ export class ImagesPostsMetadataRepo {
         ImagesBlogsMainMetadataEntity.createImagesBlogsMainFileMetadataEntity(
           blog,
           fileUploadDto,
-          urlEtagDto,
+          urlPathKeyEtagDto,
           currentUserDto,
         );
     }

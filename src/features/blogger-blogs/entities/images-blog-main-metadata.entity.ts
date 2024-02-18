@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BloggerBlogsEntity } from './blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
-import { UrlEtagDto } from '../dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
 
@@ -12,7 +12,7 @@ export class ImagesBlogsMainMetadataEntity {
   id: string;
 
   @Column({ type: 'character varying', nullable: false })
-  url: string;
+  pathKey: string;
 
   @Column({ type: 'character varying', nullable: false })
   eTag: string;
@@ -77,7 +77,7 @@ export class ImagesBlogsMainMetadataEntity {
   static createImagesBlogsMainFileMetadataEntity(
     blog: BloggerBlogsEntity,
     fileUploadDto: FileUploadDtoDto,
-    urlEtagDto: UrlEtagDto,
+    urlKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesBlogsMainMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
@@ -89,8 +89,8 @@ export class ImagesBlogsMainMetadataEntity {
 
     const imagesBlogsMainMetadataEntity = new ImagesBlogsMainMetadataEntity();
     imagesBlogsMainMetadataEntity.id = uuid4().toString();
-    imagesBlogsMainMetadataEntity.url = urlEtagDto.url;
-    imagesBlogsMainMetadataEntity.eTag = urlEtagDto.eTag;
+    imagesBlogsMainMetadataEntity.pathKey = urlKeyEtagDto.pathKey;
+    imagesBlogsMainMetadataEntity.eTag = urlKeyEtagDto.eTag;
     imagesBlogsMainMetadataEntity.fieldName = fieldname;
     imagesBlogsMainMetadataEntity.originalName = originalname;
     imagesBlogsMainMetadataEntity.encoding = encoding;

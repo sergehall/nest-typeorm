@@ -4,7 +4,7 @@ import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.d
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
-import { UrlEtagDto } from '../../features/blogger-blogs/dto/url-etag.dto';
+import { UrlPathKeyEtagDto } from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../query/params/blogId.params';
 import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
 
@@ -16,59 +16,60 @@ export class FileStorageAdapter {
     params: BlogIdPostIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UrlEtagDto> {
+  ): Promise<UrlPathKeyEtagDto> {
     const { blogId, postId } = params;
     const { mimetype } = fileUploadDto;
-    const key = this.generateKeyForImagesPost(
+    const pathKey = this.generateKeyForImagesPost(
       currentUserDto.userId,
       blogId,
       postId,
       mimetype,
     );
-    return this.uploadFile(key, fileUploadDto);
+    return this.uploadFile(pathKey, fileUploadDto);
   }
 
   async uploadFileImageBlogWallpaper(
     params: BlogIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UrlEtagDto> {
+  ): Promise<UrlPathKeyEtagDto> {
     const { blogId } = params;
     const { mimetype } = fileUploadDto;
-    const key = this.generateKeyForImagesBlogWallpaper(
+    const pathKey = this.generateKeyForImagesBlogWallpaper(
       currentUserDto.userId,
       blogId,
       mimetype,
     );
-    return this.uploadFile(key, fileUploadDto);
+
+    return this.uploadFile(pathKey, fileUploadDto);
   }
 
   async uploadFileImageBlogMain(
     params: BlogIdParams,
     fileUploadDto: FileUploadDtoDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UrlEtagDto> {
+  ): Promise<UrlPathKeyEtagDto> {
     const { blogId } = params;
     const { mimetype } = fileUploadDto;
-    const key = this.generateKeyForImagesBlogMain(
+    const pathKey = this.generateKeyForImagesBlogMain(
       currentUserDto.userId,
       blogId,
       mimetype,
     );
-    return this.uploadFile(key, fileUploadDto);
+    return this.uploadFile(pathKey, fileUploadDto);
   }
 
   private async uploadFile(
-    key: string,
+    pathKey: string,
     fileUploadDto: FileUploadDtoDto,
-  ): Promise<UrlEtagDto> {
+  ): Promise<UrlPathKeyEtagDto> {
     const { buffer, mimetype } = fileUploadDto;
     const s3Client = await this.s3Service.getS3Client();
     const bucketName = await this.s3Service.getS3BucketName();
 
     const bucketParams = {
       Bucket: bucketName,
-      Key: key,
+      Key: pathKey,
       Body: buffer,
       ContentType: mimetype,
     };
@@ -82,10 +83,10 @@ export class FileStorageAdapter {
       throw new InternalServerErrorException('Error uploading file to S3:');
     }
 
-    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(key);
+    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(pathKey);
 
     try {
-      return { url: unitedUrl.url, eTag: eTag };
+      return { url: unitedUrl.url, pathKey: pathKey, eTag: eTag };
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw new InternalServerErrorException(
