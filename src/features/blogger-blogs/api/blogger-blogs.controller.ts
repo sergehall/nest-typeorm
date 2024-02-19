@@ -32,7 +32,6 @@ import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PostWithLikesInfoViewModel } from '../../posts/views/post-with-likes-info.view-model';
 import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
