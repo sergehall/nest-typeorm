@@ -40,7 +40,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     command: CreatePostCommand,
   ): Promise<PostWithLikesImagesInfoViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
-    //
+
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
@@ -49,11 +49,12 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    const postViewModel: PostViewModel = await this.postsRepo.createPosts2(
+    const postViewModel: PostViewModel = await this.postsRepo.createPosts(
       blog,
       createPostDto,
       currentUserDto,
     );
+
     const postWithLikes: PostWithLikesInfoViewModel =
       await this.postsService.addExtendedLikesInfoToPostsEntity(postViewModel);
 

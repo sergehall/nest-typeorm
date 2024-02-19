@@ -38,6 +38,9 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
+import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { S3Service } from '../../config/aws/s3/s3-service';
+import { AwsConfig } from '../../config/aws/aws-config';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -70,7 +73,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [CommentsController],
   providers: [
+    AwsConfig,
+    S3Service,
     CommentsService,
+    FileMetadataService,
     JwtConfig,
     JwtService,
     PostsService,
