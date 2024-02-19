@@ -166,8 +166,7 @@ export class ImagesPostsMetadataRepo {
   ): Promise<ImagesPostsMetadataEntity[]> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
-    console.log(postId, 'postId');
-    console.log(blogId, 'blogId');
+
     // Query posts and countPosts with pagination conditions
     const queryBuilder = this.imagesPostsMetadataRepository
       .createQueryBuilder('imagesPostsMain')

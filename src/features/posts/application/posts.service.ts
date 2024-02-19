@@ -42,6 +42,9 @@ export class PostsService {
   async imagesMetadataProcessor(
     imagesMetadata: ImagesPostsMetadataEntity[],
   ): Promise<PostImagesViewModel> {
+    if (imagesMetadata.length === 0) {
+      return { main: [] };
+    }
     const processedMetadataPromises = imagesMetadata.map(async (metadata) => {
       // Extract file metadata
       const imageMetadata: FileMetadata =
