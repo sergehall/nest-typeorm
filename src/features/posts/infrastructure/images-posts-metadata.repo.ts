@@ -174,7 +174,7 @@ export class ImagesPostsMetadataRepo {
       .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
       .where({ dependencyIsBanned })
       .andWhere({ isBanned })
-      .andWhere('post.id = :postId', { postId })
+      // .andWhere('post.id = :postId', { postId })
       .andWhere('blog.id = :blogId', { blogId });
 
     return await queryBuilder.getMany();

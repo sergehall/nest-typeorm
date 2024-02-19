@@ -94,7 +94,6 @@ export class UploadImagesPostsUseCase
         blog.id,
       );
 
-    // Return post images view model
     return await this.postsService.imagesMetadataProcessor(imagesPost);
   }
 
