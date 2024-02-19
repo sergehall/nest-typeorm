@@ -43,6 +43,7 @@ import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases
 import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-case';
 import { GetPostsCommand } from '../application/use-cases/get-posts.use-case';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post-by-post-id.use-case';
+import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 
 @SkipThrottle()
 @Controller('posts')
@@ -74,7 +75,7 @@ export class PostsController {
   async openFindPostById(
     @Request() req: any,
     @Param('id', PostExistValidationPipe) id: string,
-  ): Promise<PostWithLikesInfoViewModel> {
+  ): Promise<PostWithLikesImagesInfoViewModel> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
     return await this.commandBus.execute(

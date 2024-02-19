@@ -6,6 +6,7 @@ import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.vie
 import { ImagesPostsMetadataRepo } from '../../infrastructure/images-posts-metadata.repo';
 import { ImagesPostsMetadataEntity } from '../../entities/images-post-metadata.entity';
 import { PostsService } from '../posts.service';
+import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
 
 export class GetPostByIdCommand {
@@ -22,7 +23,9 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     private readonly postsService: PostsService,
     private readonly postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
   ) {}
-  async execute(command: GetPostByIdCommand): Promise<PostImagesViewModel> {
+  async execute(
+    command: GetPostByIdCommand,
+  ): Promise<PostWithLikesImagesInfoViewModel> {
     const { postId, currentUserDto } = command;
 
     const post: PostWithLikesInfoViewModel[] | null =
@@ -36,7 +39,12 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
         post[0].blogId,
       );
 
-    // Return post images view model
-    return await this.postsService.imagesMetadataProcessor(imagesPost);
+    const imagesMetadata: PostImagesViewModel =
+      await this.postsService.imagesMetadataProcessor(imagesPost);
+
+    return {
+      ...post[0],
+      images: imagesMetadata,
+    };
   }
 }
