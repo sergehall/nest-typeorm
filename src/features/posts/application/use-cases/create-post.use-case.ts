@@ -15,6 +15,9 @@ import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blog
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { PostViewModel } from '../../views/post.view-model';
 import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-users-for-blogs.repo';
+import { PostsService } from '../posts.service';
+import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
+import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 
 export class CreatePostCommand {
   constructor(
@@ -29,10 +32,13 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
+    private readonly postsService: PostsService,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
-  async execute(command: CreatePostCommand): Promise<PostViewModel> {
+  async execute(
+    command: CreatePostCommand,
+  ): Promise<PostWithLikesImagesInfoViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
     //
     const blog: BloggerBlogsEntity | null =
@@ -43,11 +49,15 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    return await this.postsRepo.createPosts(
+    const postViewModel: PostViewModel = await this.postsRepo.createPosts2(
       blog,
       createPostDto,
       currentUserDto,
     );
+    const postWithLikes: PostWithLikesInfoViewModel =
+      await this.postsService.addExtendedLikesInfoToPostsEntity(postViewModel);
+
+    return await this.postsService.addPostImages(postWithLikes);
   }
 
   private async checkUserPermission(

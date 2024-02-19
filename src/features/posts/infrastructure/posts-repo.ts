@@ -125,6 +125,38 @@ export class PostsRepo {
     }
   }
 
+  async createPosts2(
+    blog: BloggerBlogsEntity,
+    createPostDto: CreatePostDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<PostViewModel> {
+    const postEntity: PostsEntity = PostsEntity.createPostEntity(
+      blog,
+      createPostDto,
+      currentUserDto,
+    );
+
+    try {
+      const queryBuilder = this.postsRepository
+        .createQueryBuilder()
+        .insert()
+        .into(PostsEntity)
+        .values(postEntity)
+        .returning(
+          `"id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt"`,
+        );
+
+      const result: InsertResult = await queryBuilder.execute();
+
+      return result.raw[0];
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating a new post.',
+      );
+    }
+  }
+
   /**
    * Retrieves paginated posts within a specific blog and includes information about likes for each post.
    *

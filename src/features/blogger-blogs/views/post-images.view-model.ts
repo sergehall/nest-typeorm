@@ -19,5 +19,5 @@ class PostImages {
 }
 
 export class PostImagesViewModel {
-  main: PostImages[];
+  main: PostImages[] = []; // Set default value
 }

@@ -53,6 +53,7 @@ import { getFileConstraints } from '../../../common/pipes/file-constraints/file-
 import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-images-blogs-wallpaper-use-case';
 import { UploadImagesPostsCommand } from '../application/use-cases/upload-images-posts-use-case';
 import { UploadImagesBlogsMainCommand } from '../application/use-cases/upload-images-blogs-main-use-case';
+import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-likes-images-info.view-model';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -198,7 +199,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @Body() createPostDto: CreatePostDto,
-  ): Promise<PostWithLikesInfoViewModel> {
+  ): Promise<PostWithLikesImagesInfoViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
