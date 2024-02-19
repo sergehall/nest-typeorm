@@ -45,7 +45,7 @@ import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comment
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 import { Express } from 'express';
 import { FileUploadDtoDto } from '../dto/file-upload.dto';
-import { PostImagesViewModel } from '../views/post-images.view-model';
+import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';

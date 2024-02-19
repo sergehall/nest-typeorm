@@ -7,6 +7,7 @@ import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import { UrlPathKeyEtagDto } from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../query/params/blogId.params';
 import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
+import * as uuid4 from 'uuid4';
 
 @Injectable()
 export class FileStorageAdapter {
@@ -102,7 +103,8 @@ export class FileStorageAdapter {
     postId: string,
     mimetype: string,
   ): string {
-    return `content/users/${userId}/blogs/${blogId}/posts/${postId}_post.${this.getFileExtension(
+    const imageKey = uuid4().toString();
+    return `content/users/${userId}/blogs/${blogId}/posts/${postId}_post_${imageKey}.${this.getFileExtension(
       mimetype,
     )}`;
   }

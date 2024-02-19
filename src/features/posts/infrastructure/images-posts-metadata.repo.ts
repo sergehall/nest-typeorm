@@ -19,7 +19,7 @@ import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 export class ImagesPostsMetadataRepo {
   constructor(
     @InjectRepository(ImagesPostsMetadataEntity)
-    protected imagesPostsFileMetadataRepository: Repository<ImagesPostsMetadataEntity>,
+    protected imagesPostsMetadataRepository: Repository<ImagesPostsMetadataEntity>,
     @InjectRepository(ImagesBlogsWallpaperMetadataEntity)
     protected imagesBlogsWallpaperFileMetadataRepository: Repository<ImagesBlogsWallpaperMetadataEntity>,
     @InjectRepository(ImagesBlogsMainMetadataEntity)
@@ -160,6 +160,27 @@ export class ImagesPostsMetadataRepo {
     }
   }
 
+  async findImagesPostMain(
+    postId: string,
+    blogId: string,
+  ): Promise<ImagesPostsMetadataEntity[]> {
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+    console.log(postId, 'postId');
+    console.log(blogId, 'blogId');
+    // Query posts and countPosts with pagination conditions
+    const queryBuilder = this.imagesPostsMetadataRepository
+      .createQueryBuilder('imagesPostsMain')
+      .leftJoinAndSelect('imagesPostsMain.post', 'post')
+      .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
+      .where({ dependencyIsBanned })
+      .andWhere({ isBanned })
+      .andWhere('post.id = :postId', { postId })
+      .andWhere('blog.id = :blogId', { blogId });
+
+    return await queryBuilder.getMany();
+  }
+
   async createImagesPostsMetadata(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
@@ -167,46 +188,54 @@ export class ImagesPostsMetadataRepo {
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesPostsMetadataEntity> {
-    const bannedFlags = await this.getBannedFlags();
-    let postsImagesFileMetadataEntity: ImagesPostsMetadataEntity;
+    // const bannedFlags = await this.getBannedFlags();
 
-    const queryBuilder = this.imagesPostsFileMetadataRepository
-      .createQueryBuilder('image') // Start building a query
-      .leftJoinAndSelect('image.blog', 'blog')
-      .leftJoinAndSelect('image.post', 'post')
-      .where('blog.id = :blogId', { blogId: blog.id })
-      .andWhere('post.id = :postId', { postId: post.id })
-      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
-      .andWhere({ isBanned: bannedFlags.isBanned });
-
-    // Check if entity already exists
-    const existingEntity: ImagesPostsMetadataEntity | null =
-      await queryBuilder.getOne();
-
-    // If entity exists, update it; otherwise, create a new one
-    if (existingEntity) {
-      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
-      existingEntity.eTag = urlPathKeyEtagDto.eTag;
-      existingEntity.originalName = fileUploadDto.originalname;
-      existingEntity.encoding = fileUploadDto.encoding;
-      existingEntity.mimetype = fileUploadDto.mimetype;
-      existingEntity.buffer = fileUploadDto.buffer;
-      existingEntity.size = fileUploadDto.size;
-      existingEntity.createdAt = new Date().toISOString();
-      postsImagesFileMetadataEntity = existingEntity;
-    } else {
-      postsImagesFileMetadataEntity =
-        ImagesPostsMetadataEntity.createPostsImagesFileMetadataEntity(
-          blog,
-          post,
-          fileUploadDto,
-          urlPathKeyEtagDto,
-          currentUserDto,
-        );
-    }
+    const postsImagesFileMetadataEntity: ImagesPostsMetadataEntity =
+      ImagesPostsMetadataEntity.createPostsImagesFileMetadataEntity(
+        blog,
+        post,
+        fileUploadDto,
+        urlPathKeyEtagDto,
+        currentUserDto,
+      );
+    //
+    // const queryBuilder = this.imagesPostsFileMetadataRepository
+    //   .createQueryBuilder('image') // Start building a query
+    //   .leftJoinAndSelect('image.blog', 'blog')
+    //   .leftJoinAndSelect('image.post', 'post')
+    //   .where('blog.id = :blogId', { blogId: blog.id })
+    //   .andWhere('post.id = :postId', { postId: post.id })
+    //   .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+    //   .andWhere({ isBanned: bannedFlags.isBanned });
+    //
+    // // Check if entity already exists
+    // const existingEntity: ImagesPostsMetadataEntity | null =
+    //   await queryBuilder.getOne();
+    //
+    // // If entity exists, update it; otherwise, create a new one
+    // if (existingEntity) {
+    //   existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+    //   existingEntity.eTag = urlPathKeyEtagDto.eTag;
+    //   existingEntity.originalName = fileUploadDto.originalname;
+    //   existingEntity.encoding = fileUploadDto.encoding;
+    //   existingEntity.mimetype = fileUploadDto.mimetype;
+    //   existingEntity.buffer = fileUploadDto.buffer;
+    //   existingEntity.size = fileUploadDto.size;
+    //   existingEntity.createdAt = new Date().toISOString();
+    //   postsImagesFileMetadataEntity = existingEntity;
+    // } else {
+    //   postsImagesFileMetadataEntity =
+    //     ImagesPostsMetadataEntity.createPostsImagesFileMetadataEntity(
+    //       blog,
+    //       post,
+    //       fileUploadDto,
+    //       urlPathKeyEtagDto,
+    //       currentUserDto,
+    //     );
+    // }
 
     try {
-      return await this.imagesPostsFileMetadataRepository.save(
+      return await this.imagesPostsMetadataRepository.save(
         postsImagesFileMetadataEntity,
       );
     } catch (error) {
