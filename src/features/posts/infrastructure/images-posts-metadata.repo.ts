@@ -305,7 +305,7 @@ export class ImagesPostsMetadataRepo {
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {
-    const bannedFlags = await this.getBannedFlags();
+    // const bannedFlags = await this.getBannedFlags();
     // let imagesBlogMainMetadataEntity: ImagesBlogsMainMetadataEntity;
     //
     // const queryBuilder = this.imagesBlogsMainMetadataRepository
