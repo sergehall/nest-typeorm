@@ -17,6 +17,8 @@ import { ChallengeAnswersEntity } from '../features/pair-game-quiz/entities/chal
 import { ImagesBlogsWallpaperMetadataEntity } from '../features/blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../features/blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesPostsOriginalMetadataEntity } from '../features/posts/entities/images-post-original-metadata.entity';
+import { ImagesPostSmallMetadataEntity } from '../features/posts/entities/images-post-small-metadata.entity';
+import { ImagesPostMiddleMetadataEntity } from '../features/posts/entities/images-post-middle-metadata.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -43,8 +45,10 @@ export default new DataSource({
     QuestionsQuizEntity,
     ChallengeAnswersEntity,
     ImagesBlogsMainMetadataEntity,
-    ImagesPostsOriginalMetadataEntity,
     ImagesBlogsWallpaperMetadataEntity,
+    ImagesPostsOriginalMetadataEntity,
+    ImagesPostMiddleMetadataEntity,
+    ImagesPostSmallMetadataEntity,
   ],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });

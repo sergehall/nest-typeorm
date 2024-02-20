@@ -15,15 +15,21 @@ import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
+import { ImagesPostMiddleMetadataEntity } from '../entities/images-post-middle-metadata.entity';
+import { ImagesPostSmallMetadataEntity } from '../entities/images-post-small-metadata.entity';
 
 export class ImagesPostsMetadataRepo {
   constructor(
-    @InjectRepository(ImagesPostsOriginalMetadataEntity)
-    protected imagesPostsMetadataRepository: Repository<ImagesPostsOriginalMetadataEntity>,
     @InjectRepository(ImagesBlogsWallpaperMetadataEntity)
     protected imagesBlogsWallpaperFileMetadataRepository: Repository<ImagesBlogsWallpaperMetadataEntity>,
     @InjectRepository(ImagesBlogsMainMetadataEntity)
     protected imagesBlogsMainMetadataRepository: Repository<ImagesBlogsMainMetadataEntity>,
+    @InjectRepository(ImagesPostsOriginalMetadataEntity)
+    protected imagesPostsOriginalMetadataRepository: Repository<ImagesPostsOriginalMetadataEntity>,
+    @InjectRepository(ImagesPostMiddleMetadataEntity)
+    protected imagesPostMiddleMetadataRepository: Repository<ImagesPostMiddleMetadataEntity>,
+    @InjectRepository(ImagesPostSmallMetadataEntity)
+    protected imagesPostSmallMetadataRepository: Repository<ImagesPostSmallMetadataEntity>,
     protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
@@ -168,7 +174,7 @@ export class ImagesPostsMetadataRepo {
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Query posts and countPosts with pagination conditions
-    const queryBuilder = this.imagesPostsMetadataRepository
+    const queryBuilder = this.imagesPostsOriginalMetadataRepository
       .createQueryBuilder('imagesPostsMain')
       .leftJoinAndSelect('imagesPostsMain.post', 'post')
       .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
@@ -234,7 +240,7 @@ export class ImagesPostsMetadataRepo {
     // }
 
     try {
-      return await this.imagesPostsMetadataRepository.save(
+      return await this.imagesPostsOriginalMetadataRepository.save(
         postsImagesFileMetadataEntity,
       );
     } catch (error) {

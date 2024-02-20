@@ -43,6 +43,8 @@ import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallp
 import { ImagesBlogsMainMetadataEntity } from './entities/images-blog-main-metadata.entity';
 import { UploadImagesBlogsMainUseCase } from './application/use-cases/upload-images-blogs-main-use-case';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
+import { ImagesPostSmallMetadataEntity } from '../posts/entities/images-post-small-metadata.entity';
+import { ImagesPostMiddleMetadataEntity } from '../posts/entities/images-post-middle-metadata.entity';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -72,8 +74,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
       ImagesBlogsMainMetadataEntity,
-      ImagesPostsOriginalMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
+      ImagesPostsOriginalMetadataEntity,
+      ImagesPostMiddleMetadataEntity,
+      ImagesPostSmallMetadataEntity,
     ]),
     CqrsModule,
   ],

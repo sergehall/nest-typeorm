@@ -21,7 +21,7 @@ export class FileStorageAdapter {
     params: BlogIdPostIdParams,
     fileUploadDto: FileUploadDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<UrlPathKeyEtagDto> {
+  ): Promise<UrlPathKeyEtagDto[]> {
     const { blogId, postId } = params;
     const { mimetype } = fileUploadDto;
 
@@ -36,20 +36,10 @@ export class FileStorageAdapter {
       mimetype,
     );
 
-    const pathKey = await this.generateKeyForImagesPost(
-      currentUserDto.userId,
-      blogId,
-      postId,
-      mimetype,
-    );
-
     const files: PathKeyFileUploadDto[] =
       await this.createPathKeyFileUploadDtoArray(resizedImages, pathsKeys);
 
-    const uploadFiles = await this.uploadFiles(files);
-    console.log(uploadFiles, 'uploadFiles');
-
-    return this.uploadFile(pathKey, fileUploadDto);
+    return this.uploadFiles(files);
   }
 
   private async createPathKeyFileUploadDtoArray(

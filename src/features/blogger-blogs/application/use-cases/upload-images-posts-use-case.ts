@@ -72,7 +72,7 @@ export class UploadImagesPostsUseCase
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
     // Upload file for the post to s3
-    const urlEtagDto: UrlPathKeyEtagDto =
+    const urlPathKeyEtagArr: UrlPathKeyEtagDto[] =
       await this.fileStorageAdapter.uploadFileImagePost(
         params,
         fileUploadDto,
@@ -80,21 +80,22 @@ export class UploadImagesPostsUseCase
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createImagesPostsMetadata(
-      blog,
-      post,
-      fileUploadDto,
-      urlEtagDto,
-      currentUserDto,
-    );
-
-    const imagesPost: ImagesPostsOriginalMetadataEntity[] =
-      await this.postsImagesFileMetadataRepo.findImagesPostMain(
-        post.id,
-        blog.id,
+    const images =
+      await this.postsImagesFileMetadataRepo.createImagesPostsMetadata(
+        blog,
+        post,
+        fileUploadDto,
+        urlPathKeyEtagArr[0],
+        currentUserDto,
       );
 
-    return await this.postsService.imagesMetadataProcessor(imagesPost);
+    // const imagesPost: ImagesPostsOriginalMetadataEntity[] =
+    //   await this.postsImagesFileMetadataRepo.findImagesPostMain(
+    //     post.id,
+    //     blog.id,
+    //   );
+
+    return await this.postsService.imagesMetadataProcessor([images]);
   }
 
   /**
