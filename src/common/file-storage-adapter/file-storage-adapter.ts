@@ -9,7 +9,6 @@ import {
 } from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../query/params/blogId.params';
 import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
-import * as uuid4 from 'uuid4';
 import * as sharp from 'sharp';
 import { ResizedImageDetailsDto } from '../../features/posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../features/posts/dto/keys-path.dto';
@@ -146,52 +145,6 @@ export class FileStorageAdapter {
       );
     }
   }
-
-  // private async uploadFiles(
-  //   files: PathsKeysFileUploadDto,
-  // ): Promise<UrlsPathKeysEtagsDto> {
-  //   try {
-  //     const s3Client = await this.s3Service.getS3Client();
-  //     const bucketName = await this.s3Service.getS3PublicBucketName();
-  //     const uploadPromises: UrlPathKeyEtagDto[] = [];
-  //
-  //     for (const { pathKey, fileUploadDto } of files) {
-  //       const { buffer, mimetype } = fileUploadDto;
-  //       const bucketParams = {
-  //         Bucket: bucketName,
-  //         Key: pathKey,
-  //         Body: buffer,
-  //         ContentType: mimetype,
-  //       };
-  //       const command: PutObjectCommand = new PutObjectCommand(bucketParams);
-  //       const resultUploaded: PutObjectCommandOutput = await s3Client.send(
-  //         command,
-  //       );
-  //       const eTag = resultUploaded.ETag;
-  //
-  //       if (!eTag) {
-  //         console.error('Error uploading file to S3:');
-  //         throw new InternalServerErrorException('Error uploading file to S3:');
-  //       }
-  //
-  //       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-  //         pathKey,
-  //       );
-  //       uploadPromises.push({
-  //         url: unitedUrl.url,
-  //         pathKey: pathKey,
-  //         eTag: eTag,
-  //       });
-  //     }
-  //
-  //     return await Promise.all(uploadPromises);
-  //   } catch (error) {
-  //     console.error('Error uploading files to S3:', error);
-  //     throw new InternalServerErrorException(
-  //       'Error uploading files to S3:' + error.message,
-  //     );
-  //   }
-  // }
 
   async uploadFileImageBlogWallpaper(
     params: BlogIdParams,
