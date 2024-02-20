@@ -19,7 +19,6 @@ import { PostImagesViewModel } from '../../../posts/views/post-images.view-model
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
 import { PostsService } from '../../../posts/application/posts.service';
-import { ImagesPostsOriginalMetadataEntity } from '../../../posts/entities/images-post-original-metadata.entity';
 
 export class UploadImagesPostsCommand {
   constructor(
