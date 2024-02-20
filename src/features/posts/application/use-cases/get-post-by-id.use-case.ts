@@ -4,10 +4,10 @@ import { PostsRepo } from '../../infrastructure/posts-repo';
 import { NotFoundException } from '@nestjs/common';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { ImagesPostsMetadataRepo } from '../../infrastructure/images-posts-metadata.repo';
-import { ImagesPostsMetadataEntity } from '../../entities/images-post-metadata.entity';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
+import { ImagesPostsOriginalMetadataEntity } from '../../entities/images-post-original-metadata.entity';
 
 export class GetPostByIdCommand {
   constructor(
@@ -31,9 +31,10 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     const post: PostWithLikesInfoViewModel[] | null =
       await this.postsRepo.getPostByIdWithLikes(postId, currentUserDto);
 
-    if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
+    if (!post || post.length === 0)
+      throw new NotFoundException(`Post with ID ${postId} not found`);
 
-    const imagesPost: ImagesPostsMetadataEntity[] =
+    const imagesPost: ImagesPostsOriginalMetadataEntity[] =
       await this.postsImagesFileMetadataRepo.findImagesPostMain(
         post[0].id,
         post[0].blogId,

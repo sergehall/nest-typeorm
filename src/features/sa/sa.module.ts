@@ -43,13 +43,13 @@ import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-fo
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { ImagesPostsMetadataEntity } from '../posts/entities/images-post-metadata.entity';
 import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -82,7 +82,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      ImagesPostsMetadataEntity,
+      ImagesPostsOriginalMetadataEntity,
       ImagesBlogsMainMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
     ]),

@@ -44,7 +44,7 @@ import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-pos
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
 import { Express } from 'express';
-import { FileUploadDtoDto } from '../dto/file-upload.dto';
+import { FileUploadDto } from '../dto/file-upload.dto';
 import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
@@ -71,7 +71,7 @@ export class BloggerBlogsController {
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const fileUpload: FileUploadDtoDto = file;
+    const fileUpload: FileUploadDto = file;
 
     return await this.commandBus.execute(
       new UploadImagesPostsCommand(params, fileUpload, currentUserDto),
@@ -88,7 +88,7 @@ export class BloggerBlogsController {
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const fileUploadDto: FileUploadDtoDto = file;
+    const fileUploadDto: FileUploadDto = file;
 
     return await this.commandBus.execute(
       new UploadImageBlogWallpaperCommand(
@@ -109,7 +109,7 @@ export class BloggerBlogsController {
     file: Express.Multer.File,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const fileUploadDto: FileUploadDtoDto = file;
+    const fileUploadDto: FileUploadDto = file;
 
     return await this.commandBus.execute(
       new UploadImagesBlogsMainCommand(params, fileUploadDto, currentUserDto),

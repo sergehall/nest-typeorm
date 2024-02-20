@@ -1,5 +1,5 @@
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
-import { FileUploadDtoDto } from '../../dto/file-upload.dto';
+import { FileUploadDto } from '../../dto/file-upload.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -23,7 +23,7 @@ import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper
 export class UploadImagesBlogsMainCommand {
   constructor(
     public params: BlogIdParams,
-    public fileUploadDto: FileUploadDtoDto,
+    public fileUploadDto: FileUploadDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }

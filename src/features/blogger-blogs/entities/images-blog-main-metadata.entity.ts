@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BloggerBlogsEntity } from './blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { FileUploadDtoDto } from '../dto/file-upload.dto';
+import { FileUploadDto } from '../dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
@@ -76,7 +76,7 @@ export class ImagesBlogsMainMetadataEntity {
 
   static createImagesBlogsMainFileMetadataEntity(
     blog: BloggerBlogsEntity,
-    fileUploadDto: FileUploadDtoDto,
+    fileUploadDto: FileUploadDto,
     urlKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesBlogsMainMetadataEntity {

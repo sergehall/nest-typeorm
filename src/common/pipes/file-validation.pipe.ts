@@ -11,7 +11,7 @@ import {
   invalidFileExtension,
 } from '../filters/custom-errors-messages';
 import * as sharp from 'sharp';
-import { FileUploadDtoDto } from '../../features/blogger-blogs/dto/file-upload.dto';
+import { FileUploadDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CustomErrorsMessagesType } from '../filters/types/custom-errors-messages.types';
 import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 
@@ -22,7 +22,7 @@ export class FileValidationPipe implements PipeTransform {
   async transform(
     value: any,
     metadata: ArgumentMetadata,
-  ): Promise<FileUploadDtoDto> {
+  ): Promise<FileUploadDto> {
     const constraints: FileConstraintsDto = this.constraintsKey;
     if (!constraints) {
       throw new HttpException(

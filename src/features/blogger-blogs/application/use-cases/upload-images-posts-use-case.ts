@@ -13,18 +13,18 @@ import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
-import { FileUploadDtoDto } from '../../dto/file-upload.dto';
+import { FileUploadDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
-import { ImagesPostsMetadataEntity } from '../../../posts/entities/images-post-metadata.entity';
 import { PostsService } from '../../../posts/application/posts.service';
+import { ImagesPostsOriginalMetadataEntity } from '../../../posts/entities/images-post-original-metadata.entity';
 
 export class UploadImagesPostsCommand {
   constructor(
     public params: BlogIdPostIdParams,
-    public fileUploadDto: FileUploadDtoDto,
+    public fileUploadDto: FileUploadDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }
@@ -88,7 +88,7 @@ export class UploadImagesPostsUseCase
       currentUserDto,
     );
 
-    const imagesPost: ImagesPostsMetadataEntity[] =
+    const imagesPost: ImagesPostsOriginalMetadataEntity[] =
       await this.postsImagesFileMetadataRepo.findImagesPostMain(
         post.id,
         blog.id,

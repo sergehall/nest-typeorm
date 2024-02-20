@@ -15,9 +15,9 @@ import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entitie
 import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
 import { ChallengeAnswersEntity } from '../../../features/pair-game-quiz/entities/challenge-answers.entity';
 import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs-game.entity';
-import { ImagesPostsMetadataEntity } from '../../../features/posts/entities/images-post-metadata.entity';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-main-metadata.entity';
+import { ImagesPostsOriginalMetadataEntity } from '../../../features/posts/entities/images-post-original-metadata.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -55,9 +55,9 @@ export class TypeOrmPostgresOptions
         PairsGameEntity,
         ChallengeQuestionsEntity,
         ChallengeAnswersEntity,
-        ImagesPostsMetadataEntity,
-        ImagesBlogsWallpaperMetadataEntity,
         ImagesBlogsMainMetadataEntity,
+        ImagesPostsOriginalMetadataEntity,
+        ImagesBlogsWallpaperMetadataEntity,
       ],
       synchronize: true,
       logging: false,
