@@ -4,69 +4,107 @@ import { FileUploadDto } from '../../features/blogger-blogs/dto/file-upload.dto'
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
-import { UrlPathKeyEtagDto } from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
+import {
+  UrlPathKeyEtagDto,
+  UrlsPathKeysEtagsDto,
+} from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../query/params/blogId.params';
 import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
 import * as uuid4 from 'uuid4';
 import * as sharp from 'sharp';
 import { ResizedImageDetailsDto } from '../../features/posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../features/posts/dto/keys-path.dto';
-import { PathKeyFileUploadDto } from '../../features/posts/dto/path-key-file-upload.dto';
+import { PathsKeysFileUploadDto } from '../../features/posts/dto/path-key-file-upload.dto';
 
 @Injectable()
 export class FileStorageAdapter {
   constructor(private s3Service: S3Service) {}
 
   async uploadFileImagePost(
-    params: BlogIdPostIdParams,
-    fileUploadDto: FileUploadDto,
-    currentUserDto: CurrentUserDto,
-  ): Promise<UrlPathKeyEtagDto[]> {
-    const { blogId, postId } = params;
-    const { mimetype } = fileUploadDto;
-
-    const resizedImages: ResizedImageDetailsDto = await this.resizeImages(
-      fileUploadDto,
-    );
-
-    const pathsKeys: KeysPathDto = await this.generatePathsKeysForPost(
-      currentUserDto.userId,
-      blogId,
-      postId,
-      mimetype,
-    );
-
-    const files: PathKeyFileUploadDto[] =
+    resizedImages: ResizedImageDetailsDto,
+    pathsKeys: KeysPathDto,
+  ): Promise<UrlsPathKeysEtagsDto> {
+    const files: PathsKeysFileUploadDto =
       await this.createPathKeyFileUploadDtoArray(resizedImages, pathsKeys);
 
     return this.uploadFiles(files);
   }
 
+  // async uploadFileImagePost(
+  //   params: BlogIdPostIdParams,
+  //   fileUploadDto: FileUploadDto,
+  //   currentUserDto: CurrentUserDto,
+  // ): Promise<UrlsPathKeysEtagsDto> {
+  //   const { blogId, postId } = params;
+  //   const { mimetype } = fileUploadDto;
+  //
+  //   const resizedImages: ResizedImageDetailsDto = await this.resizeImages(
+  //     fileUploadDto,
+  //   );
+  //
+  //   const pathsKeys: KeysPathDto = await this.generatePathsKeysForPost(
+  //     currentUserDto.userId,
+  //     blogId,
+  //     postId,
+  //     mimetype,
+  //   );
+  //
+  //   const files: PathsKeysFileUploadDto =
+  //     await this.createPathKeyFileUploadDtoArray(resizedImages, pathsKeys);
+  //
+  //   return this.uploadFiles(files);
+  // }
+
+  //
+  // private async createPathKeyFileUploadDtoArray(
+  //   resizedImages: ResizedImageDetailsDto,
+  //   pathsKeys: KeysPathDto,
+  // ): Promise<PathKeyFileUploadDto[]> {
+  //   const pathKeyFileUploadDtoArray: PathKeyFileUploadDto[] = [];
+  //
+  //   for (const key of ['original', 'middle', 'small'] as const) {
+  //     pathKeyFileUploadDtoArray.push({
+  //       pathKey: pathsKeys[key],
+  //       fileUploadDto: resizedImages[key],
+  //     });
+  //   }
+  //
+  //   return pathKeyFileUploadDtoArray;
+  // }
+
   private async createPathKeyFileUploadDtoArray(
     resizedImages: ResizedImageDetailsDto,
     pathsKeys: KeysPathDto,
-  ): Promise<PathKeyFileUploadDto[]> {
-    const pathKeyFileUploadDtoArray: PathKeyFileUploadDto[] = [];
+  ): Promise<PathsKeysFileUploadDto> {
+    const pathKeyFileUploadDtoObj: PathsKeysFileUploadDto =
+      new PathsKeysFileUploadDto();
 
     for (const key of ['original', 'middle', 'small'] as const) {
-      pathKeyFileUploadDtoArray.push({
-        pathKey: pathsKeys[key],
-        fileUploadDto: resizedImages[key],
-      });
+      const pathKey = pathsKeys[key];
+      const fileUploadDto = resizedImages[key];
+
+      // Assign the PathKeyFileUploadDto object to the corresponding property in PathsKeysFileUploadDto
+      pathKeyFileUploadDtoObj[key] = {
+        pathKey,
+        fileUploadDto,
+      };
     }
 
-    return pathKeyFileUploadDtoArray;
+    return pathKeyFileUploadDtoObj;
   }
 
   private async uploadFiles(
-    files: { pathKey: string; fileUploadDto: FileUploadDto }[],
-  ): Promise<UrlPathKeyEtagDto[]> {
+    files: PathsKeysFileUploadDto,
+  ): Promise<UrlsPathKeysEtagsDto> {
     try {
       const s3Client = await this.s3Service.getS3Client();
       const bucketName = await this.s3Service.getS3PublicBucketName();
-      const uploadPromises: UrlPathKeyEtagDto[] = [];
 
-      for (const { pathKey, fileUploadDto } of files) {
+      const uploadPromises: Promise<UrlPathKeyEtagDto>[] = Object.keys(
+        files,
+      ).map(async (size: 'original' | 'middle' | 'small') => {
+        const { pathKey, fileUploadDto } = files[size];
+
         const { buffer, mimetype } = fileUploadDto;
         const bucketParams = {
           Bucket: bucketName,
@@ -88,14 +126,20 @@ export class FileStorageAdapter {
         const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
           pathKey,
         );
-        uploadPromises.push({
+        return {
           url: unitedUrl.url,
           pathKey: pathKey,
           eTag: eTag,
-        });
-      }
+        };
+      });
 
-      return await Promise.all(uploadPromises);
+      const uploadedFiles = await Promise.all(uploadPromises);
+
+      return {
+        original: uploadedFiles[0],
+        middle: uploadedFiles[1],
+        small: uploadedFiles[2],
+      };
     } catch (error) {
       console.error('Error uploading files to S3:', error);
       throw new InternalServerErrorException(
@@ -103,6 +147,52 @@ export class FileStorageAdapter {
       );
     }
   }
+
+  // private async uploadFiles(
+  //   files: PathsKeysFileUploadDto,
+  // ): Promise<UrlsPathKeysEtagsDto> {
+  //   try {
+  //     const s3Client = await this.s3Service.getS3Client();
+  //     const bucketName = await this.s3Service.getS3PublicBucketName();
+  //     const uploadPromises: UrlPathKeyEtagDto[] = [];
+  //
+  //     for (const { pathKey, fileUploadDto } of files) {
+  //       const { buffer, mimetype } = fileUploadDto;
+  //       const bucketParams = {
+  //         Bucket: bucketName,
+  //         Key: pathKey,
+  //         Body: buffer,
+  //         ContentType: mimetype,
+  //       };
+  //       const command: PutObjectCommand = new PutObjectCommand(bucketParams);
+  //       const resultUploaded: PutObjectCommandOutput = await s3Client.send(
+  //         command,
+  //       );
+  //       const eTag = resultUploaded.ETag;
+  //
+  //       if (!eTag) {
+  //         console.error('Error uploading file to S3:');
+  //         throw new InternalServerErrorException('Error uploading file to S3:');
+  //       }
+  //
+  //       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
+  //         pathKey,
+  //       );
+  //       uploadPromises.push({
+  //         url: unitedUrl.url,
+  //         pathKey: pathKey,
+  //         eTag: eTag,
+  //       });
+  //     }
+  //
+  //     return await Promise.all(uploadPromises);
+  //   } catch (error) {
+  //     console.error('Error uploading files to S3:', error);
+  //     throw new InternalServerErrorException(
+  //       'Error uploading files to S3:' + error.message,
+  //     );
+  //   }
+  // }
 
   async uploadFileImageBlogWallpaper(
     params: BlogIdParams,
@@ -184,7 +274,7 @@ export class FileStorageAdapter {
     )}`;
   }
 
-  private async generatePathsKeysForPost(
+  async generatePathsKeysForPost(
     userId: string,
     blogId: string,
     postId: string,
@@ -218,9 +308,7 @@ export class FileStorageAdapter {
     )}`;
   }
 
-  private async resizeImages(
-    dto: FileUploadDto,
-  ): Promise<ResizedImageDetailsDto> {
+  async resizeImages(dto: FileUploadDto): Promise<ResizedImageDetailsDto> {
     // Resize original image to middle size (300x180)
     const middleResizedImageBuffer = await sharp(dto.buffer)
       .resize(300, 180)

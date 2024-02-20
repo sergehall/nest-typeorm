@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsDefined, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class UrlPathKeyEtagDto {
   @IsNotEmpty({ message: 'URL must not be empty' })
@@ -13,4 +13,13 @@ export class UrlPathKeyEtagDto {
   @IsNotEmpty({ message: 'eTag must not be empty' })
   @IsString({ message: 'eTag must be a string' })
   eTag: string;
+}
+
+export class UrlsPathKeysEtagsDto {
+  @IsDefined({ message: 'Fieldname is required' })
+  original: UrlPathKeyEtagDto;
+  @IsDefined({ message: 'Fieldname is required' })
+  middle: UrlPathKeyEtagDto;
+  @IsDefined({ message: 'Fieldname is required' })
+  small: UrlPathKeyEtagDto;
 }

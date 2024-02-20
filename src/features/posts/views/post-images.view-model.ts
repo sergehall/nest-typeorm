@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-class PostImages {
+export class PostImages {
   @IsNotEmpty()
   @IsString()
   url: string;
