@@ -1,5 +1,4 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { BlogIdPostIdParams } from '../query/params/blogId-postId.params';
 import { FileUploadDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
 import { S3Service } from '../../config/aws/s3/s3-service';
@@ -260,18 +259,6 @@ export class FileStorageAdapter {
         'Error uploading file to S3:' + error.message,
       );
     }
-  }
-
-  private async generateKeyForImagesPost(
-    userId: string,
-    blogId: string,
-    postId: string,
-    mimetype: string,
-  ): Promise<string> {
-    const imageKey = uuid4().toString();
-    return `content/users/${userId}/blogs/${blogId}/posts/${postId}_post_${imageKey}.${this.getFileExtension(
-      mimetype,
-    )}`;
   }
 
   async generatePathsKeysForPost(
