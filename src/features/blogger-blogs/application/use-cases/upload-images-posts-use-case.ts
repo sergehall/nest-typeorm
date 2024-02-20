@@ -16,9 +16,12 @@ import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
-import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
+import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
 import { PostsService } from '../../../posts/application/posts.service';
+import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
+import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
+import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/OriginalMiddleSmallEntities.dto';
 
 export class UploadImagesPostsCommand {
   constructor(
@@ -52,6 +55,7 @@ export class UploadImagesPostsUseCase
   ): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId, postId } = params;
+    const { mimetype } = fileUploadDto;
 
     // Check if the blog exists
     const blog: BloggerBlogsEntity | null =
@@ -70,31 +74,35 @@ export class UploadImagesPostsUseCase
     // Check user permission
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
+    const resizedImages: ResizedImageDetailsDto =
+      await this.fileStorageAdapter.resizeImages(fileUploadDto);
+
+    const pathsKeys: KeysPathDto =
+      await this.fileStorageAdapter.generatePathsKeysForPost(
+        currentUserDto.userId,
+        blogId,
+        postId,
+        mimetype,
+      );
+
     // Upload file for the post to s3
-    const urlPathKeyEtagArr: UrlPathKeyEtagDto[] =
+    const urlsPathKeysEtagsDto: UrlsPathKeysEtagsDto =
       await this.fileStorageAdapter.uploadFileImagePost(
-        params,
-        fileUploadDto,
-        currentUserDto,
+        resizedImages,
+        pathsKeys,
       );
 
     // Create post images file metadata into postgresSql
-    const images =
-      await this.postsImagesFileMetadataRepo.createImagesPostsMetadata(
+    const images: OriginalMiddleSmallEntitiesDto =
+      await this.postsImagesFileMetadataRepo.createImagePostMetadata(
         blog,
         post,
-        fileUploadDto,
-        urlPathKeyEtagArr[0],
+        resizedImages,
+        urlsPathKeysEtagsDto,
         currentUserDto,
       );
 
-    // const imagesPost: ImagesPostsOriginalMetadataEntity[] =
-    //   await this.postsImagesFileMetadataRepo.findImagesPostMain(
-    //     post.id,
-    //     blog.id,
-    //   );
-
-    return await this.postsService.imagesMetadataProcessor([images]);
+    return await this.postsService.imagesMetadataProcessorNew(images);
   }
 
   /**

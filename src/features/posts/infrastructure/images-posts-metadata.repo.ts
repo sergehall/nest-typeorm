@@ -9,7 +9,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
+import {
+  UrlPathKeyEtagDto,
+  UrlsPathKeysEtagsDto,
+} from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 import { FileUploadDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
@@ -17,6 +20,8 @@ import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
 import { ImagesPostMiddleMetadataEntity } from '../entities/images-post-middle-metadata.entity';
 import { ImagesPostSmallMetadataEntity } from '../entities/images-post-small-metadata.entity';
+import { ResizedImageDetailsDto } from '../dto/resized-image-details.dto';
+import { OriginalMiddleSmallEntitiesDto } from '../dto/OriginalMiddleSmallEntities.dto';
 
 export class ImagesPostsMetadataRepo {
   constructor(
@@ -186,61 +191,213 @@ export class ImagesPostsMetadataRepo {
     return await queryBuilder.getMany();
   }
 
-  async createImagesPostsMetadata(
+  async createImagePostMetadata(
+    blog: BloggerBlogsEntity,
+    post: PostsEntity,
+    resizedImages: ResizedImageDetailsDto,
+    urlsPathKeysEtagsDto: UrlsPathKeysEtagsDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<OriginalMiddleSmallEntitiesDto> {
+    try {
+      const [originalMetadata, middleMetadata, smallMetadata] =
+        await Promise.all([
+          this.createImagePostOriginalMetadata(
+            blog,
+            post,
+            resizedImages.original,
+            urlsPathKeysEtagsDto.original,
+            currentUserDto,
+          ),
+          this.createImagePostMiddleMetadata(
+            blog,
+            post,
+            resizedImages.middle,
+            urlsPathKeysEtagsDto.middle,
+            currentUserDto,
+          ),
+          this.createImagePostSmallMetadata(
+            blog,
+            post,
+            resizedImages.small,
+            urlsPathKeysEtagsDto.small,
+            currentUserDto,
+          ),
+        ]);
+
+      return {
+        original: originalMetadata,
+        middle: middleMetadata,
+        small: smallMetadata,
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating or updating the post image file metadata.',
+      );
+    }
+  }
+
+  async createImagePostOriginalMetadata(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
     fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesPostsOriginalMetadataEntity> {
-    // const bannedFlags = await this.getBannedFlags();
+    const bannedFlags = await this.getBannedFlags();
+    let postsImagesFileMetadataEntity: ImagesPostsOriginalMetadataEntity;
 
-    const postsImagesFileMetadataEntity: ImagesPostsOriginalMetadataEntity =
-      ImagesPostsOriginalMetadataEntity.createPostsImagesFileMetadataEntity(
-        blog,
-        post,
-        fileUploadDto,
-        urlPathKeyEtagDto,
-        currentUserDto,
-      );
-    //
-    // const queryBuilder = this.imagesPostsFileMetadataRepository
-    //   .createQueryBuilder('image') // Start building a query
-    //   .leftJoinAndSelect('image.blog', 'blog')
-    //   .leftJoinAndSelect('image.post', 'post')
-    //   .where('blog.id = :blogId', { blogId: blog.id })
-    //   .andWhere('post.id = :postId', { postId: post.id })
-    //   .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
-    //   .andWhere({ isBanned: bannedFlags.isBanned });
-    //
-    // // Check if entity already exists
-    // const existingEntity: ImagesPostsMetadataEntity | null =
-    //   await queryBuilder.getOne();
-    //
-    // // If entity exists, update it; otherwise, create a new one
-    // if (existingEntity) {
-    //   existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
-    //   existingEntity.eTag = urlPathKeyEtagDto.eTag;
-    //   existingEntity.originalName = fileUploadDto.originalname;
-    //   existingEntity.encoding = fileUploadDto.encoding;
-    //   existingEntity.mimetype = fileUploadDto.mimetype;
-    //   existingEntity.buffer = fileUploadDto.buffer;
-    //   existingEntity.size = fileUploadDto.size;
-    //   existingEntity.createdAt = new Date().toISOString();
-    //   postsImagesFileMetadataEntity = existingEntity;
-    // } else {
-    //   postsImagesFileMetadataEntity =
-    //     ImagesPostsMetadataEntity.createPostsImagesFileMetadataEntity(
-    //       blog,
-    //       post,
-    //       fileUploadDto,
-    //       urlPathKeyEtagDto,
-    //       currentUserDto,
-    //     );
-    // }
+    const queryBuilder = this.imagesPostsOriginalMetadataRepository
+      .createQueryBuilder('image') // Start building a query
+      .leftJoinAndSelect('image.blog', 'blog')
+      .leftJoinAndSelect('image.post', 'post')
+      .where('blog.id = :blogId', { blogId: blog.id })
+      .andWhere('post.id = :postId', { postId: post.id })
+      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+      .andWhere({ isBanned: bannedFlags.isBanned });
+
+    // Check if entity already exists
+    const existingEntity: ImagesPostsOriginalMetadataEntity | null =
+      await queryBuilder.getOne();
+
+    // If entity exists, update it; otherwise, create a new one
+    if (existingEntity) {
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
+      existingEntity.originalName = fileUploadDto.originalname;
+      existingEntity.encoding = fileUploadDto.encoding;
+      existingEntity.mimetype = fileUploadDto.mimetype;
+      existingEntity.buffer = fileUploadDto.buffer;
+      existingEntity.size = fileUploadDto.size;
+      existingEntity.createdAt = new Date().toISOString();
+      postsImagesFileMetadataEntity = existingEntity;
+    } else {
+      postsImagesFileMetadataEntity =
+        ImagesPostsOriginalMetadataEntity.createPostsImagesFileMetadataEntity(
+          blog,
+          post,
+          fileUploadDto,
+          urlPathKeyEtagDto,
+          currentUserDto,
+        );
+    }
 
     try {
       return await this.imagesPostsOriginalMetadataRepository.save(
+        postsImagesFileMetadataEntity,
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating or updating the post image file metadata.',
+      );
+    }
+  }
+
+  async createImagePostMiddleMetadata(
+    blog: BloggerBlogsEntity,
+    post: PostsEntity,
+    fileUploadDto: FileUploadDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ImagesPostMiddleMetadataEntity> {
+    const bannedFlags = await this.getBannedFlags();
+    let postsImagesFileMetadataEntity: ImagesPostMiddleMetadataEntity;
+
+    const queryBuilder = this.imagesPostMiddleMetadataRepository
+      .createQueryBuilder('image') // Start building a query
+      .leftJoinAndSelect('image.blog', 'blog')
+      .leftJoinAndSelect('image.post', 'post')
+      .where('blog.id = :blogId', { blogId: blog.id })
+      .andWhere('post.id = :postId', { postId: post.id })
+      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+      .andWhere({ isBanned: bannedFlags.isBanned });
+
+    // Check if entity already exists
+    const existingEntity: ImagesPostMiddleMetadataEntity | null =
+      await queryBuilder.getOne();
+
+    // If entity exists, update it; otherwise, create a new one
+    if (existingEntity) {
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
+      existingEntity.originalName = fileUploadDto.originalname;
+      existingEntity.encoding = fileUploadDto.encoding;
+      existingEntity.mimetype = fileUploadDto.mimetype;
+      existingEntity.buffer = fileUploadDto.buffer;
+      existingEntity.size = fileUploadDto.size;
+      existingEntity.createdAt = new Date().toISOString();
+      postsImagesFileMetadataEntity = existingEntity;
+    } else {
+      postsImagesFileMetadataEntity =
+        ImagesPostMiddleMetadataEntity.createPostsImagesMiddleMetadataEntity(
+          blog,
+          post,
+          fileUploadDto,
+          urlPathKeyEtagDto,
+          currentUserDto,
+        );
+    }
+
+    try {
+      return await this.imagesPostMiddleMetadataRepository.save(
+        postsImagesFileMetadataEntity,
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while creating or updating the post image file metadata.',
+      );
+    }
+  }
+
+  async createImagePostSmallMetadata(
+    blog: BloggerBlogsEntity,
+    post: PostsEntity,
+    fileUploadDto: FileUploadDto,
+    urlPathKeyEtagDto: UrlPathKeyEtagDto,
+    currentUserDto: CurrentUserDto,
+  ): Promise<ImagesPostSmallMetadataEntity> {
+    const bannedFlags = await this.getBannedFlags();
+    let postsImagesFileMetadataEntity: ImagesPostSmallMetadataEntity;
+
+    const queryBuilder = this.imagesPostSmallMetadataRepository
+      .createQueryBuilder('image') // Start building a query
+      .leftJoinAndSelect('image.blog', 'blog')
+      .leftJoinAndSelect('image.post', 'post')
+      .where('blog.id = :blogId', { blogId: blog.id })
+      .andWhere('post.id = :postId', { postId: post.id })
+      .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
+      .andWhere({ isBanned: bannedFlags.isBanned });
+
+    // Check if entity already exists
+    const existingEntity: ImagesPostSmallMetadataEntity | null =
+      await queryBuilder.getOne();
+
+    // If entity exists, update it; otherwise, create a new one
+    if (existingEntity) {
+      existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
+      existingEntity.eTag = urlPathKeyEtagDto.eTag;
+      existingEntity.originalName = fileUploadDto.originalname;
+      existingEntity.encoding = fileUploadDto.encoding;
+      existingEntity.mimetype = fileUploadDto.mimetype;
+      existingEntity.buffer = fileUploadDto.buffer;
+      existingEntity.size = fileUploadDto.size;
+      existingEntity.createdAt = new Date().toISOString();
+      postsImagesFileMetadataEntity = existingEntity;
+    } else {
+      postsImagesFileMetadataEntity =
+        ImagesPostSmallMetadataEntity.createPostsImagesSmallMetadataEntity(
+          blog,
+          post,
+          fileUploadDto,
+          urlPathKeyEtagDto,
+          currentUserDto,
+        );
+    }
+
+    try {
+      return await this.imagesPostSmallMetadataRepository.save(
         postsImagesFileMetadataEntity,
       );
     } catch (error) {
