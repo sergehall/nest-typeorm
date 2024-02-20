@@ -10,7 +10,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
-import { FileUploadDtoDto } from '../../dto/file-upload.dto';
+import { FileUploadDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
@@ -22,7 +22,7 @@ import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-mode
 export class UploadImageBlogWallpaperCommand {
   constructor(
     public params: BlogIdParams,
-    public fileUploadDto: FileUploadDtoDto,
+    public fileUploadDto: FileUploadDto,
     public currentUserDto: CurrentUserDto,
   ) {}
 }

@@ -4,11 +4,11 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from './posts.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import * as uuid4 from 'uuid4';
-import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
+import { FileUploadDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 
-@Entity('ImagesPostsMetadata')
-export class ImagesPostsMetadataEntity {
+@Entity('ImagesPostsOriginalMetadata')
+export class ImagesPostsOriginalMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
@@ -85,17 +85,17 @@ export class ImagesPostsMetadataEntity {
   static createPostsImagesFileMetadataEntity(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
-    fileUploadDto: FileUploadDtoDto,
+    fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
-  ): ImagesPostsMetadataEntity {
+  ): ImagesPostsOriginalMetadataEntity {
     const { fieldname, buffer, mimetype, encoding, size, originalname } =
       fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;
 
-    const imagesPostsMetadataEntity = new ImagesPostsMetadataEntity();
+    const imagesPostsMetadataEntity = new ImagesPostsOriginalMetadataEntity();
     imagesPostsMetadataEntity.id = uuid4().toString();
     imagesPostsMetadataEntity.pathKey = urlPathKeyEtagDto.pathKey;
     imagesPostsMetadataEntity.eTag = urlPathKeyEtagDto.eTag;

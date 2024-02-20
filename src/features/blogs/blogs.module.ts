@@ -28,12 +28,12 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
-import { ImagesPostsMetadataEntity } from '../posts/entities/images-post-metadata.entity';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
+import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -49,8 +49,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      ImagesPostsMetadataEntity,
       ImagesBlogsMainMetadataEntity,
+      ImagesPostsOriginalMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
     ]),
     CaslModule,

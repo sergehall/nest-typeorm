@@ -4,6 +4,7 @@ import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import {
   BloggerBlogsWithImagesViewModel,
   Image,
+  ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
 import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlDto } from '../dto/url.dto';
@@ -19,6 +20,15 @@ export class BloggerBlogsService {
     private readonly s3Service: S3Service,
   ) {}
 
+  async addImagesToBlogsEntity(
+    newBlog: BloggerBlogsViewModel,
+  ): Promise<BloggerBlogsWithImagesViewModel> {
+    const images = new ImagesViewModel();
+    return {
+      ...newBlog, // Spread properties of newBlog
+      images, // Add extended images
+    };
+  }
   async blogsImagesAggregation(
     blogs: BloggerBlogsEntity[],
   ): Promise<BloggerBlogsWithImagesViewModel[]> {

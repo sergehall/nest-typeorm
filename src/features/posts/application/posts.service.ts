@@ -6,11 +6,11 @@ import {
 } from '../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../views/post-images.view-model';
-import { ImagesPostsMetadataEntity } from '../entities/images-post-metadata.entity';
 import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { UrlDto } from '../../blogger-blogs/dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
+import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
 
 @Injectable()
 export class PostsService {
@@ -40,7 +40,7 @@ export class PostsService {
   }
 
   async imagesMetadataProcessor(
-    imagesMetadata: ImagesPostsMetadataEntity[],
+    imagesMetadata: ImagesPostsOriginalMetadataEntity[],
   ): Promise<PostImagesViewModel> {
     if (imagesMetadata.length === 0) {
       return { main: [] };

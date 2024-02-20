@@ -1,10 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  EntityManager,
-  InsertQueryBuilder,
-  InsertResult,
-  Repository,
-} from 'typeorm';
+import { EntityManager, InsertQueryBuilder, Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import {
   InternalServerErrorException,
@@ -23,15 +18,8 @@ import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
-import {
-  BloggerBlogsWithImagesViewModel,
-  Image,
-  ImagesViewModel,
-} from '../views/blogger-blogs-with-images.view-model';
 import { ImagesPostsMetadataRepo } from '../../posts/infrastructure/images-posts-metadata.repo';
-import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { UrlDto } from '../dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
 
 export class BloggerBlogsRepo {
@@ -271,7 +259,7 @@ export class BloggerBlogsRepo {
   async createBlogs(
     createBloggerBlogsDto: CreateBlogsDto,
     currentUser: CurrentUserDto,
-  ): Promise<BloggerBlogsWithImagesViewModel> {
+  ): Promise<BloggerBlogsViewModel> {
     const blogEntity: BloggerBlogsEntity = BloggerBlogsEntity.createBlogEntity(
       createBloggerBlogsDto,
       currentUser,
@@ -288,9 +276,8 @@ export class BloggerBlogsRepo {
         );
 
     try {
-      const result: InsertResult = await queryBuilder.execute();
-
-      return await this.addImagesToBlogsEntity(result.raw[0]);
+      const result = await queryBuilder.execute();
+      return result.raw[0];
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
@@ -299,15 +286,15 @@ export class BloggerBlogsRepo {
     }
   }
 
-  private async addImagesToBlogsEntity(
-    newBlog: BloggerBlogsViewModel,
-  ): Promise<BloggerBlogsWithImagesViewModel> {
-    const images = new ImagesViewModel();
-    return {
-      ...newBlog, // Spread properties of newBlog
-      images, // Add extended images
-    };
-  }
+  // private async addImagesToBlogsEntity(
+  //   newBlog: BloggerBlogsViewModel,
+  // ): Promise<BloggerBlogsWithImagesViewModel> {
+  //   const images = new ImagesViewModel();
+  //   return {
+  //     ...newBlog, // Spread properties of newBlog
+  //     images, // Add extended images
+  //   };
+  // }
 
   async updateBlogById(
     id: string,

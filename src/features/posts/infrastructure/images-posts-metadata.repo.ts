@@ -10,16 +10,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
-import { FileUploadDtoDto } from '../../blogger-blogs/dto/file-upload.dto';
+import { FileUploadDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
-import { ImagesPostsMetadataEntity } from '../entities/images-post-metadata.entity';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
 
 export class ImagesPostsMetadataRepo {
   constructor(
-    @InjectRepository(ImagesPostsMetadataEntity)
-    protected imagesPostsMetadataRepository: Repository<ImagesPostsMetadataEntity>,
+    @InjectRepository(ImagesPostsOriginalMetadataEntity)
+    protected imagesPostsMetadataRepository: Repository<ImagesPostsOriginalMetadataEntity>,
     @InjectRepository(ImagesBlogsWallpaperMetadataEntity)
     protected imagesBlogsWallpaperFileMetadataRepository: Repository<ImagesBlogsWallpaperMetadataEntity>,
     @InjectRepository(ImagesBlogsMainMetadataEntity)
@@ -163,7 +163,7 @@ export class ImagesPostsMetadataRepo {
   async findImagesPostMain(
     postId: string,
     blogId: string,
-  ): Promise<ImagesPostsMetadataEntity[]> {
+  ): Promise<ImagesPostsOriginalMetadataEntity[]> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
@@ -174,7 +174,7 @@ export class ImagesPostsMetadataRepo {
       .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
       .where({ dependencyIsBanned })
       .andWhere({ isBanned })
-      // .andWhere('post.id = :postId', { postId })
+      .andWhere('post.id = :postId', { postId })
       .andWhere('blog.id = :blogId', { blogId });
 
     return await queryBuilder.getMany();
@@ -183,14 +183,14 @@ export class ImagesPostsMetadataRepo {
   async createImagesPostsMetadata(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
-    fileUploadDto: FileUploadDtoDto,
+    fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ImagesPostsMetadataEntity> {
+  ): Promise<ImagesPostsOriginalMetadataEntity> {
     // const bannedFlags = await this.getBannedFlags();
 
-    const postsImagesFileMetadataEntity: ImagesPostsMetadataEntity =
-      ImagesPostsMetadataEntity.createPostsImagesFileMetadataEntity(
+    const postsImagesFileMetadataEntity: ImagesPostsOriginalMetadataEntity =
+      ImagesPostsOriginalMetadataEntity.createPostsImagesFileMetadataEntity(
         blog,
         post,
         fileUploadDto,
@@ -247,7 +247,7 @@ export class ImagesPostsMetadataRepo {
 
   async createImagesBlogWallpaper(
     blog: BloggerBlogsEntity,
-    fileUploadDto: FileUploadDtoDto,
+    fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {
@@ -300,7 +300,7 @@ export class ImagesPostsMetadataRepo {
 
   async createImagesBlogMain(
     blog: BloggerBlogsEntity,
-    fileUploadDto: FileUploadDtoDto,
+    fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): Promise<ImagesBlogsWallpaperMetadataEntity> {

@@ -46,10 +46,10 @@ import { CalculatorExpirationDate } from '../../common/helpers/calculator-expira
 import { ImagesPostsMetadataRepo } from './infrastructure/images-posts-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
-import { ImagesPostsMetadataEntity } from './entities/images-post-metadata.entity';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
+import { ImagesPostsOriginalMetadataEntity } from './entities/images-post-original-metadata.entity';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -75,7 +75,7 @@ const postsUseCases = [
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
-      ImagesPostsMetadataEntity,
+      ImagesPostsOriginalMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
       ImagesBlogsMainMetadataEntity,
     ]),

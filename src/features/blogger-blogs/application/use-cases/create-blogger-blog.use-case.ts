@@ -10,6 +10,8 @@ import {
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { CreateBlogsDto } from '../../dto/create-blogs.dto';
 import { BloggerBlogsWithImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
+import { BloggerBlogsViewModel } from '../../views/blogger-blogs.view-model';
+import { BloggerBlogsService } from '../blogger-blogs.service';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -24,6 +26,7 @@ export class CreateBloggerBlogUseCase
 {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly bloggerBlogsService: BloggerBlogsService,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
   async execute(
@@ -33,9 +36,14 @@ export class CreateBloggerBlogUseCase
 
     await this.checkPermission(command.currentUser);
 
-    return await this.bloggerBlogsRepo.createBlogs(
-      createBloggerBlogsDto,
-      currentUser,
+    const bloggerBlogsViewModel: BloggerBlogsViewModel =
+      await this.bloggerBlogsRepo.createBlogs(
+        createBloggerBlogsDto,
+        currentUser,
+      );
+
+    return await this.bloggerBlogsService.addImagesToBlogsEntity(
+      bloggerBlogsViewModel,
     );
   }
 

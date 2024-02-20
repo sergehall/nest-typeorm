@@ -25,7 +25,7 @@ export class Image {
 
 export class ImagesViewModel {
   wallpaper: Image | null = null;
-  main: Image[] = [new Image()];
+  main: Image[] = [];
 }
 
 export class BloggerBlogsWithImagesViewModel {
