@@ -23,8 +23,9 @@ export class ImagesBlogsMainMetadataRepo {
   async findImageBlogMainById(
     blogId: string,
   ): Promise<ImagesBlogsMainMetadataEntity | null> {
-    const isBanned = false;
-    const dependencyIsBanned = false;
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
     const queryBuilder = this.imagesBlogsMainMetadataRepository
       .createQueryBuilder('blogsMain') // Start building a query
       .leftJoinAndSelect('blogsMain.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
@@ -52,8 +53,9 @@ export class ImagesBlogsMainMetadataRepo {
   async findImagesBlogsMainByIds(
     blogIds: string[],
   ): Promise<{ [id: string]: ImagesBlogsMainMetadataEntity[] }> {
-    const isBanned = false;
-    const dependencyIsBanned = false;
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
     const queryBuilder = this.imagesBlogsMainMetadataRepository
       .createQueryBuilder('blogsMain') // Start building a query
       .leftJoinAndSelect('blogsMain.blogOwner', 'blogOwner')
