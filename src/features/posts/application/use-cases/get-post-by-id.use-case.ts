@@ -7,7 +7,6 @@ import { ImagesPostsMetadataRepo } from '../../infrastructure/images-posts-metad
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
-import { ImagesPostsOriginalMetadataEntity } from '../../entities/images-post-original-metadata.entity';
 import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buffer.dto';
 
 export class GetPostByIdCommand {
