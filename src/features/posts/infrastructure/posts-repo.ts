@@ -35,10 +35,10 @@ export class PostsRepo {
   ) {}
 
   async getPostByIdWithoutLikes(id: string): Promise<PostsEntity | null> {
-    try {
-      const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-      const { dependencyIsBanned, isBanned } = bannedFlags;
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
 
+    try {
       const post: PostsEntity[] = await this.postsRepository.findBy({
         id,
         dependencyIsBanned,
