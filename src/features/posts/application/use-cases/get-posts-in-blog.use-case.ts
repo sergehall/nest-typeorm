@@ -8,10 +8,7 @@ import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buf
 import { ImagesPostsOriginalMetadataRepo } from '../../infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import {
-  PostImages,
-  PostImagesViewModel,
-} from '../../views/post-images.view-model';
+import { PostImagesViewModel } from '../../views/post-images.view-model';
 
 export class GetPostsInBlogCommand {
   constructor(
@@ -70,6 +67,7 @@ export class GetPostsInBlogUseCase
     ): Promise<PostWithLikesImagesInfoViewModel[]> {
       const resultPromises = posts.map(async (post) => {
         const postId = post.id;
+
         const images =
           imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
         const metadata: PostImagesViewModel =
