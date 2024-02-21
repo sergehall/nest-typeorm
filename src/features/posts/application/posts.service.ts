@@ -34,6 +34,10 @@ export class PostsService {
     };
   }
 
+  async postsImagesAggregation() {
+    return true;
+  }
+
   async addPostImages(
     newPost: PostWithLikesInfoViewModel,
   ): Promise<PostWithLikesImagesInfoViewModel> {
