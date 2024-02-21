@@ -20,7 +20,6 @@ import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-ent
 import { ImagesPostsPathKeyBufferDto } from '../dto/images-posts-path-key-buffer.dto';
 import { ImagesPostsSmallMetadataRepo } from './images-posts-small-metadata.repo';
 import { ImagesPostsMiddleMetadataRepo } from './images-posts-middle-metadata.repo';
-import * as process from 'process';
 
 export class ImagesPostsOriginalMetadataRepo {
   constructor(
@@ -651,29 +650,11 @@ export class ImagesPostsOriginalMetadataRepo {
       return result;
     }
 
-    const postId = entities[0].post.id;
-
-    const convertedEntities: ImagesPostsPathKeyBufferDto[] = entities.map(
-      (entity) => ({
+    return entities.map((entity) => ({
+      [entity.post.id]: {
         pathKey: entity.pathKey,
         buffer: entity.buffer,
-      }),
-    );
-
-    result.push({ [postId]: convertedEntities[0] });
-
-    return result;
+      },
+    }));
   }
-
-  // private convertEntityToDTOMany(
-  //   entities:
-  //     | ImagesPostsOriginalMetadataEntity[]
-  //     | ImagesPostsMiddleMetadataEntity[]
-  //     | ImagesPostsSmallMetadataEntity[],
-  // ): ImagesPostsPathKeyBufferDto[] {
-  //   return entities.map((entity) => ({
-  //     pathKey: entity.pathKey,
-  //     buffer: entity.buffer,
-  //   }));
-  // }
 }
