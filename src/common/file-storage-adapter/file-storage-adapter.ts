@@ -28,48 +28,6 @@ export class FileStorageAdapter {
     return this.uploadFiles(files);
   }
 
-  // async uploadFileImagePost(
-  //   params: BlogIdPostIdParams,
-  //   fileUploadDto: FileUploadDto,
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<UrlsPathKeysEtagsDto> {
-  //   const { blogId, postId } = params;
-  //   const { mimetype } = fileUploadDto;
-  //
-  //   const resizedImages: ResizedImageDetailsDto = await this.resizeImages(
-  //     fileUploadDto,
-  //   );
-  //
-  //   const pathsKeys: KeysPathDto = await this.generatePathsKeysForPost(
-  //     currentUserDto.userId,
-  //     blogId,
-  //     postId,
-  //     mimetype,
-  //   );
-  //
-  //   const files: PathsKeysFileUploadDto =
-  //     await this.createPathKeyFileUploadDtoArray(resizedImages, pathsKeys);
-  //
-  //   return this.uploadFiles(files);
-  // }
-
-  //
-  // private async createPathKeyFileUploadDtoArray(
-  //   resizedImages: ResizedImageDetailsDto,
-  //   pathsKeys: KeysPathDto,
-  // ): Promise<PathKeyFileUploadDto[]> {
-  //   const pathKeyFileUploadDtoArray: PathKeyFileUploadDto[] = [];
-  //
-  //   for (const key of ['original', 'middle', 'small'] as const) {
-  //     pathKeyFileUploadDtoArray.push({
-  //       pathKey: pathsKeys[key],
-  //       fileUploadDto: resizedImages[key],
-  //     });
-  //   }
-  //
-  //   return pathKeyFileUploadDtoArray;
-  // }
-
   private async createPathKeyFileUploadDtoArray(
     resizedImages: ResizedImageDetailsDto,
     pathsKeys: KeysPathDto,
