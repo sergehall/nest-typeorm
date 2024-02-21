@@ -8,6 +8,7 @@ import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
 import { ImagesPostsOriginalMetadataEntity } from '../../entities/images-post-original-metadata.entity';
+import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buffer.dto';
 
 export class GetPostByIdCommand {
   constructor(
@@ -34,14 +35,14 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     if (!post || post.length === 0)
       throw new NotFoundException(`Post with ID ${postId} not found`);
 
-    const imagesPost: ImagesPostsOriginalMetadataEntity[] =
-      await this.postsImagesFileMetadataRepo.findImagesPostMain(
+    const pathKeyBufferDto: ImagesPostsPathKeyBufferDto[] =
+      await this.postsImagesFileMetadataRepo.findAllImagesPostMetadata(
         post[0].id,
         post[0].blogId,
       );
 
     const imagesMetadata: PostImagesViewModel =
-      await this.postsService.imagesMetadataProcessor(imagesPost);
+      await this.postsService.imagesMetadataProcessor(pathKeyBufferDto);
 
     return {
       ...post[0],
