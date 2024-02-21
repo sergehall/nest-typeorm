@@ -18,10 +18,10 @@ import { ImagesBlogsWallpaperMetadataEntity } from '../../blogger-blogs/entities
 import { ImagesBlogsMainMetadataEntity } from '../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
-import { ImagesPostMiddleMetadataEntity } from '../entities/images-post-middle-metadata.entity';
-import { ImagesPostSmallMetadataEntity } from '../entities/images-post-small-metadata.entity';
+import { ImagesPostsMiddleMetadataEntity } from '../entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataEntity } from '../entities/images-posts-small-metadata.entity';
 import { ResizedImageDetailsDto } from '../dto/resized-image-details.dto';
-import { OriginalMiddleSmallEntitiesDto } from '../dto/OriginalMiddleSmallEntities.dto';
+import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-entities.dto';
 
 export class ImagesPostsMetadataRepo {
   constructor(
@@ -31,10 +31,10 @@ export class ImagesPostsMetadataRepo {
     protected imagesBlogsMainMetadataRepository: Repository<ImagesBlogsMainMetadataEntity>,
     @InjectRepository(ImagesPostsOriginalMetadataEntity)
     protected imagesPostsOriginalMetadataRepository: Repository<ImagesPostsOriginalMetadataEntity>,
-    @InjectRepository(ImagesPostMiddleMetadataEntity)
-    protected imagesPostMiddleMetadataRepository: Repository<ImagesPostMiddleMetadataEntity>,
-    @InjectRepository(ImagesPostSmallMetadataEntity)
-    protected imagesPostSmallMetadataRepository: Repository<ImagesPostSmallMetadataEntity>,
+    @InjectRepository(ImagesPostsMiddleMetadataEntity)
+    protected imagesPostMiddleMetadataRepository: Repository<ImagesPostsMiddleMetadataEntity>,
+    @InjectRepository(ImagesPostsSmallMetadataEntity)
+    protected imagesPostSmallMetadataRepository: Repository<ImagesPostsSmallMetadataEntity>,
     protected keyResolver: KeyResolver,
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
@@ -300,9 +300,9 @@ export class ImagesPostsMetadataRepo {
     fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ImagesPostMiddleMetadataEntity> {
+  ): Promise<ImagesPostsMiddleMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
-    let postsImagesFileMetadataEntity: ImagesPostMiddleMetadataEntity;
+    let postsImagesFileMetadataEntity: ImagesPostsMiddleMetadataEntity;
 
     const queryBuilder = this.imagesPostMiddleMetadataRepository
       .createQueryBuilder('image') // Start building a query
@@ -314,7 +314,7 @@ export class ImagesPostsMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesPostMiddleMetadataEntity | null =
+    const existingEntity: ImagesPostsMiddleMetadataEntity | null =
       await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
@@ -330,7 +330,7 @@ export class ImagesPostsMetadataRepo {
       postsImagesFileMetadataEntity = existingEntity;
     } else {
       postsImagesFileMetadataEntity =
-        ImagesPostMiddleMetadataEntity.createPostsImagesMiddleMetadataEntity(
+        ImagesPostsMiddleMetadataEntity.createPostsImagesMiddleMetadataEntity(
           blog,
           post,
           fileUploadDto,
@@ -357,9 +357,9 @@ export class ImagesPostsMetadataRepo {
     fileUploadDto: FileUploadDto,
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<ImagesPostSmallMetadataEntity> {
+  ): Promise<ImagesPostsSmallMetadataEntity> {
     const bannedFlags = await this.getBannedFlags();
-    let postsImagesFileMetadataEntity: ImagesPostSmallMetadataEntity;
+    let postsImagesFileMetadataEntity: ImagesPostsSmallMetadataEntity;
 
     const queryBuilder = this.imagesPostSmallMetadataRepository
       .createQueryBuilder('image') // Start building a query
@@ -371,7 +371,7 @@ export class ImagesPostsMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesPostSmallMetadataEntity | null =
+    const existingEntity: ImagesPostsSmallMetadataEntity | null =
       await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
@@ -387,7 +387,7 @@ export class ImagesPostsMetadataRepo {
       postsImagesFileMetadataEntity = existingEntity;
     } else {
       postsImagesFileMetadataEntity =
-        ImagesPostSmallMetadataEntity.createPostsImagesSmallMetadataEntity(
+        ImagesPostsSmallMetadataEntity.createPostsImagesSmallMetadataEntity(
           blog,
           post,
           fileUploadDto,

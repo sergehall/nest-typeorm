@@ -50,8 +50,8 @@ import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
-import { ImagesPostMiddleMetadataEntity } from '../posts/entities/images-post-middle-metadata.entity';
-import { ImagesPostSmallMetadataEntity } from '../posts/entities/images-post-small-metadata.entity';
+import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -87,8 +87,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
       ImagesBlogsMainMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
       ImagesPostsOriginalMetadataEntity,
-      ImagesPostMiddleMetadataEntity,
-      ImagesPostSmallMetadataEntity,
+      ImagesPostsMiddleMetadataEntity,
+      ImagesPostsSmallMetadataEntity,
     ]),
     CaslModule,
     CqrsModule,
