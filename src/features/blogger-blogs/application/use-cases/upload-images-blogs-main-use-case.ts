@@ -6,7 +6,7 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import {
@@ -19,6 +19,7 @@ import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
+import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
 
 export class UploadImagesBlogsMainCommand {
   constructor(
@@ -37,7 +38,8 @@ export class UploadImagesBlogsMainUseCase
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
     protected fileMetadataService: FileMetadataService,
-    protected postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
+    protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
+    protected postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
 
   async execute(
@@ -69,7 +71,7 @@ export class UploadImagesBlogsMainUseCase
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createImagesBlogMain(
+    await this.imagesBlogsMainMetadataRepo.createImagesBlogMain(
       blog,
       fileUploadDto,
       urlEtagDto,

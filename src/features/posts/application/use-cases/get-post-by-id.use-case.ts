@@ -3,7 +3,7 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { NotFoundException } from '@nestjs/common';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
-import { ImagesPostsMetadataRepo } from '../../infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../../infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../../views/post-images.view-model';
@@ -21,7 +21,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
   constructor(
     private readonly postsRepo: PostsRepo,
     private readonly postsService: PostsService,
-    private readonly postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
+    private readonly postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
   async execute(
     command: GetPostByIdCommand,

@@ -15,9 +15,9 @@ import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
-import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
+import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
@@ -37,7 +37,7 @@ export class UploadImagesBlogsWallpaperUseCase
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
     protected fileMetadataService: FileMetadataService,
-    protected postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
+    protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
   async execute(
@@ -69,7 +69,7 @@ export class UploadImagesBlogsWallpaperUseCase
       );
 
     // Create post images file metadata into postgresSql
-    await this.postsImagesFileMetadataRepo.createImagesBlogWallpaper(
+    await this.imagesBlogsWallpaperMetadataRepo.createImagesBlogWallpaper(
       blog,
       fileUploadDto,
       urlPathKeyEtagDto,

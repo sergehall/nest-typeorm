@@ -37,7 +37,7 @@ import { UploadImagesPostsUseCase } from './application/use-cases/upload-images-
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { UploadImagesBlogsWallpaperUseCase } from './application/use-cases/upload-images-blogs-wallpaper-use-case';
 import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from './entities/images-blog-main-metadata.entity';
@@ -45,6 +45,10 @@ import { UploadImagesBlogsMainUseCase } from './application/use-cases/upload-ima
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-posts-small-metadata.repo';
+import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
+import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -99,7 +103,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
     LikeStatusPostsRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
-    ImagesPostsMetadataRepo,
+    ImagesPostsOriginalMetadataRepo,
+    ImagesPostsSmallMetadataRepo,
+    ImagesBlogsMainMetadataRepo,
+    ImagesPostsMiddleMetadataRepo,
+    ImagesBlogsWallpaperMetadataRepo,
     ...helpers,
     ...bloggersBlogUseCases,
     ...validators,

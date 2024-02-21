@@ -43,7 +43,7 @@ import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-fo
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { ImagesPostsMetadataRepo } from '../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { S3Service } from '../../config/aws/s3/s3-service';
@@ -52,6 +52,10 @@ import { FileMetadataService } from '../../common/helpers/file-metadata-from-buf
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';
+import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-posts-small-metadata.repo';
+import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
+import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -113,7 +117,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
     CalculatorExpirationDate,
-    ImagesPostsMetadataRepo,
+    ImagesPostsOriginalMetadataRepo,
+    ImagesBlogsMainMetadataRepo,
+    ImagesPostsSmallMetadataRepo,
+    ImagesPostsMiddleMetadataRepo,
+    ImagesBlogsWallpaperMetadataRepo,
     ...helpers,
     ...saUseCases,
   ],

@@ -43,7 +43,7 @@ import { UpdatePostByPostIdUseCase } from './application/use-cases/update-post-b
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { ImagesPostsMetadataRepo } from './infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from './infrastructure/images-posts-original-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
@@ -52,6 +52,10 @@ import { AwsConfig } from '../../config/aws/aws-config';
 import { ImagesPostsOriginalMetadataEntity } from './entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from './entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from './entities/images-posts-small-metadata.entity';
+import { ImagesPostsSmallMetadataRepo } from './infrastructure/images-posts-small-metadata.repo';
+import { ImagesPostsMiddleMetadataRepo } from './infrastructure/images-posts-middle-metadata.repo';
+import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -63,6 +67,8 @@ const postsUseCases = [
   DeletePostByPostIdAndBlogIdUseCase,
   DeletePostByIdUseCase,
 ];
+
+const helpers = [KeyResolver, UuidErrorResolver, CalculatorExpirationDate];
 
 @Module({
   imports: [
@@ -110,11 +116,13 @@ const postsUseCases = [
     LikeStatusPostsRepo,
     BannedUsersForBlogsRepo,
     ChallengesQuestionsRepo,
-    ImagesPostsMetadataRepo,
-    KeyResolver,
-    UuidErrorResolver,
-    CalculatorExpirationDate,
+    ImagesPostsOriginalMetadataRepo,
+    ImagesBlogsMainMetadataRepo,
+    ImagesPostsSmallMetadataRepo,
+    ImagesPostsMiddleMetadataRepo,
+    ImagesBlogsWallpaperMetadataRepo,
     ...postsUseCases,
+    ...helpers,
   ],
 })
 export class PostsModule {}
