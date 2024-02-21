@@ -18,8 +18,8 @@ import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs
 import { ImagesBlogsWallpaperMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesPostsOriginalMetadataEntity } from '../../../features/posts/entities/images-post-original-metadata.entity';
-import { ImagesPostMiddleMetadataEntity } from '../../../features/posts/entities/images-post-middle-metadata.entity';
-import { ImagesPostSmallMetadataEntity } from '../../../features/posts/entities/images-post-small-metadata.entity';
+import { ImagesPostsMiddleMetadataEntity } from '../../../features/posts/entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataEntity } from '../../../features/posts/entities/images-posts-small-metadata.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -60,8 +60,8 @@ export class TypeOrmPostgresOptions
         ImagesBlogsMainMetadataEntity,
         ImagesBlogsWallpaperMetadataEntity,
         ImagesPostsOriginalMetadataEntity,
-        ImagesPostMiddleMetadataEntity,
-        ImagesPostSmallMetadataEntity,
+        ImagesPostsMiddleMetadataEntity,
+        ImagesPostsSmallMetadataEntity,
       ],
       synchronize: true,
       logging: false,

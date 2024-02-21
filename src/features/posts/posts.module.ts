@@ -50,8 +50,8 @@ import { FileMetadataService } from '../../common/helpers/file-metadata-from-buf
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
 import { ImagesPostsOriginalMetadataEntity } from './entities/images-post-original-metadata.entity';
-import { ImagesPostMiddleMetadataEntity } from './entities/images-post-middle-metadata.entity';
-import { ImagesPostSmallMetadataEntity } from './entities/images-post-small-metadata.entity';
+import { ImagesPostsMiddleMetadataEntity } from './entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataEntity } from './entities/images-posts-small-metadata.entity';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -80,8 +80,8 @@ const postsUseCases = [
       ImagesBlogsMainMetadataEntity,
       ImagesBlogsWallpaperMetadataEntity,
       ImagesPostsOriginalMetadataEntity,
-      ImagesPostMiddleMetadataEntity,
-      ImagesPostSmallMetadataEntity,
+      ImagesPostsMiddleMetadataEntity,
+      ImagesPostsSmallMetadataEntity,
     ]),
     CaslModule,
     CqrsModule,

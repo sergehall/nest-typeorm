@@ -14,7 +14,7 @@ import { FileMetadataService } from '../../../common/helpers/file-metadata-from-
 import { UrlDto } from '../../blogger-blogs/dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
-import { OriginalMiddleSmallEntitiesDto } from '../dto/OriginalMiddleSmallEntities.dto';
+import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-entities.dto';
 
 @Injectable()
 export class PostsService {
