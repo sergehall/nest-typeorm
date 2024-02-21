@@ -22,8 +22,9 @@ export class ImagesBlogsWallpaperMetadataRepo {
   async findImageBlogWallpaperById(
     blogId: string,
   ): Promise<ImagesBlogsWallpaperMetadataEntity | null> {
-    const isBanned = false;
-    const dependencyIsBanned = false;
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
     const queryBuilder = this.imagesBlogsWallpaperFileMetadataRepository
       .createQueryBuilder('blogsWallpaper') // Start building a query
       .leftJoinAndSelect('blogsWallpaper.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
@@ -51,8 +52,9 @@ export class ImagesBlogsWallpaperMetadataRepo {
   async findImagesBlogsWallpaperByIds(
     blogIds: string[],
   ): Promise<{ [id: string]: ImagesBlogsWallpaperMetadataEntity }> {
-    const isBanned = false;
-    const dependencyIsBanned = false;
+    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+    const { dependencyIsBanned, isBanned } = bannedFlags;
+
     const queryBuilder = this.imagesBlogsWallpaperFileMetadataRepository
       .createQueryBuilder('blogsWallpaper') // Start building a query
       .leftJoinAndSelect('blogsWallpaper.blogOwner', 'blogOwner')
