@@ -17,7 +17,7 @@ import { FileUploadDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
-import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../../../posts/application/posts.service';
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
@@ -42,7 +42,7 @@ export class UploadImagesPostsUseCase
     protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
-    protected postsImagesFileMetadataRepo: ImagesPostsMetadataRepo,
+    protected postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
 
   /**

@@ -8,16 +8,18 @@ import {
 } from '../views/blogger-blogs-with-images.view-model';
 import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlDto } from '../dto/url.dto';
-import { ImagesPostsMetadataRepo } from '../../posts/infrastructure/images-posts-metadata.repo';
 import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../../config/aws/s3/s3-service';
+import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
 
 @Injectable()
 export class BloggerBlogsService {
   constructor(
-    private readonly imagesPostsMetadataRepo: ImagesPostsMetadataRepo,
-    private readonly fileMetadataService: FileMetadataService,
     private readonly s3Service: S3Service,
+    private readonly fileMetadataService: FileMetadataService,
+    private readonly imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
+    private readonly imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
   async addImagesToBlogsEntity(
@@ -39,8 +41,10 @@ export class BloggerBlogsService {
 
     // Fetching image metadata for wallpapers and main images in parallel
     const [imagesBlogsWallpaper, imagesBlogsMain] = await Promise.all([
-      this.imagesPostsMetadataRepo.findImagesBlogsWallpaperByIds(blogsIds),
-      this.imagesPostsMetadataRepo.findImagesBlogsMainByIds(blogsIds),
+      this.imagesBlogsWallpaperMetadataRepo.findImagesBlogsWallpaperByIds(
+        blogsIds,
+      ),
+      this.imagesBlogsMainMetadataRepo.findImagesBlogsMainByIds(blogsIds),
     ]);
 
     // Iterating over each blog to aggregate image data

@@ -2,7 +2,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
-import { ImagesPostsMetadataRepo } from '../../../posts/infrastructure/images-posts-metadata.repo';
+import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import {
   BloggerBlogsWithImagesViewModel,
   Image,
@@ -11,6 +11,10 @@ import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buff
 import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../../../config/aws/s3/s3-service';
 import { UrlDto } from '../../../blogger-blogs/dto/url.dto';
+import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
+import { ImagesBlogsMainMetadataEntity } from '../../../blogger-blogs/entities/images-blog-main-metadata.entity';
+import { ImagesBlogsWallpaperMetadataEntity } from '../../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -19,11 +23,13 @@ export class GetBlogByIdCommand {
 @CommandHandler(GetBlogByIdCommand)
 export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
   constructor(
-    protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected imagesPostsMetadataRepo: ImagesPostsMetadataRepo,
-    protected fileMetadataService: FileMetadataService,
     protected s3Service: S3Service,
     protected commandBus: CommandBus,
+    protected bloggerBlogsRepo: BloggerBlogsRepo,
+    protected imagesPostsMetadataRepo: ImagesPostsOriginalMetadataRepo,
+    protected fileMetadataService: FileMetadataService,
+    protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
+    protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
   async execute(
     command: GetBlogByIdCommand,
@@ -37,11 +43,13 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       throw new NotFoundException(`Blog with id: ${blogId} not found`);
     }
 
-    const imagesBlogsWallpaper =
-      await this.imagesPostsMetadataRepo.findImageBlogWallpaperById(blog.id);
+    const imagesBlogsWallpaper: ImagesBlogsWallpaperMetadataEntity | null =
+      await this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(
+        blog.id,
+      );
 
-    const imageBlogMain =
-      await this.imagesPostsMetadataRepo.findImageBlogMainById(blog.id);
+    const imageBlogMain: ImagesBlogsMainMetadataEntity | null =
+      await this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id);
 
     let wallpaper: Image | null = null;
     const main: Image[] = [];
