@@ -1,78 +1,80 @@
-import {
-  IsUUID,
-  IsNotEmpty,
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsInt,
-} from 'class-validator';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { PostsEntity } from '../entities/posts.entity';
 
-export class ImagesPostsOriginalMetadataDTO {
-  @IsUUID()
+@Entity('ImagesPostsMetadataEntity')
+export class ImagesPostsMetadataEntity {
+  @PrimaryColumn('uuid', { nullable: false })
   id: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   pathKey: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   eTag: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   fieldName: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   originalName: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   encoding: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({ type: 'character varying', nullable: false })
   mimetype: string;
 
+  @Column({ type: 'bytea', nullable: false }) // Assuming 'bytea' is used for storing binary data in your database
   buffer: Buffer;
 
-  @IsNotEmpty()
-  @IsInt()
+  @Column({ type: 'int', nullable: false })
   size: number;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column({
+    type: 'character varying',
+    length: 50,
+    nullable: false,
+  })
   createdAt: string;
 
-  @IsBoolean()
-  @IsOptional()
-  dependencyIsBanned?: boolean;
+  @Column({ default: false, nullable: false })
+  dependencyIsBanned: boolean;
 
-  @IsBoolean()
-  @IsOptional()
-  isBanned?: boolean;
+  @Column({ nullable: false, default: false })
+  isBanned: boolean;
 
-  @IsString()
-  @IsOptional()
-  banDate?: string | null;
+  @Column({ type: 'character varying', nullable: true })
+  banDate: string | null = null;
 
-  @IsString()
-  @IsOptional()
-  banReason?: string | null;
+  @Column({ type: 'character varying', nullable: true })
+  banReason: string | null = null;
 
-  @IsUUID()
-  blogId: string;
+  @ManyToOne(() => BloggerBlogsEntity, (bloggerBlog) => bloggerBlog.posts, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn([
+    { name: 'blogId', referencedColumnName: 'id' },
+    { name: 'blogName', referencedColumnName: 'name' },
+  ])
+  blog: BloggerBlogsEntity;
 
-  @IsString()
-  blogName: string;
+  @ManyToOne(() => PostsEntity, (post) => post.comments, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn([
+    { name: 'postId', referencedColumnName: 'id' },
+    { name: 'postTitle', referencedColumnName: 'title' },
+  ])
+  post: PostsEntity;
 
-  @IsUUID()
-  postId: string;
-
-  @IsString()
-  postTitle: string;
-
-  @IsUUID()
-  postOwnerId: string;
+  @ManyToOne(() => UsersEntity, (user) => user.userId, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'postOwnerId', referencedColumnName: 'userId' })
+  postOwner: UsersEntity;
 }

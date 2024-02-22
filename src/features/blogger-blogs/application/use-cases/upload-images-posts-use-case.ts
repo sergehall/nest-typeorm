@@ -93,7 +93,7 @@ export class UploadImagesPostsUseCase
       );
 
     // Create post images file metadata into postgresSql
-    const images: OriginalMiddleSmallEntitiesDto =
+    const imagesMetadataEntity: OriginalMiddleSmallEntitiesDto =
       await this.postsImagesFileMetadataRepo.createImagePostMetadata(
         blog,
         post,
@@ -102,7 +102,7 @@ export class UploadImagesPostsUseCase
         currentUserDto,
       );
 
-    return await this.postsService.imagesMetadataProcessorNew(images);
+    return await this.postsService.processImageMetadata(imagesMetadataEntity);
   }
 
   /**
