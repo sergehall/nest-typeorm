@@ -24,6 +24,7 @@ import { CustomConfigModule } from './config/custom.config-module';
 import { SaQuizQuestionsModule } from './features/sa-quiz-questions/sa-quiz-questions.module';
 import { PairGameQuizModule } from './features/pair-game-quiz/pair-game-quiz.module';
 import { TypeOrmPostgresOptions } from './db/type-orm/options/type-orm-postgres.options';
+import { TelegramModule } from './features/telegram/telegram.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { TypeOrmPostgresOptions } from './db/type-orm/options/type-orm-postgres.
     DataCleanupModule,
     SaQuizQuestionsModule,
     PairGameQuizModule,
+    TelegramModule,
   ],
   controllers: [AppController],
   providers: [AppService, ...appProviders],

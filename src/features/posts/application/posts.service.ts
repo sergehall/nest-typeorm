@@ -13,9 +13,9 @@ import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.
 import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { UrlDto } from '../../blogger-blogs/dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
-import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
 import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-entities.dto';
 import { PathKeyBufferDto } from '../dto/path-key-buffer.dto';
+import { ImagesPostsMetadataEntity } from '../dto/images-posts-metadata.dto';
 
 @Injectable()
 export class PostsService {
@@ -23,80 +23,6 @@ export class PostsService {
     protected fileMetadataService: FileMetadataService,
     protected s3Service: S3Service,
   ) {}
-
-  async addExtendedLikesInfoToPostsEntity(
-    newPost: PostViewModel,
-  ): Promise<PostWithLikesInfoViewModel> {
-    const extendedLikesInfo = new ExtendedLikesInfo();
-    return {
-      ...newPost, // Spread properties of newPost
-      extendedLikesInfo, // Add extendedLikesInfo property
-    };
-  }
-
-  async postsImagesAggregation() {
-    return true;
-  }
-
-  async addPostImages(
-    newPost: PostWithLikesInfoViewModel,
-  ): Promise<PostWithLikesImagesInfoViewModel> {
-    const images = new PostImagesViewModel();
-    return {
-      ...newPost, // Spread properties of newPost
-      images: images, // Add images property
-    };
-  }
-
-  async imagesMetadataProcessorNew(
-    imagesMetadata: OriginalMiddleSmallEntitiesDto,
-  ): Promise<PostImagesViewModel> {
-    if (!imagesMetadata) {
-      return { main: [] };
-    }
-
-    // Destructure the object to access original, middle, and small metadata
-    const { original, middle, small } = imagesMetadata;
-
-    // Process all types of metadata concurrently
-    const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all(
-      [
-        this.processMetadata(original),
-        this.processMetadata(middle),
-        this.processMetadata(small),
-      ],
-    );
-
-    // Combine all processed metadata into an array
-    // Construct the main property of PostImagesViewModel
-    const main: ImageMetadata[] = [
-      { ...originalMetadata[0] },
-      { ...middleMetadata[0] },
-      { ...smallMetadata[0] },
-    ];
-
-    return { main };
-  }
-
-  async processMetadata(
-    metadata: ImagesPostsOriginalMetadataEntity,
-  ): Promise<ImageMetadata[]> {
-    const imageMetadata: FileMetadata =
-      await this.fileMetadataService.extractFromBuffer(metadata.buffer);
-
-    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-      metadata.pathKey,
-    );
-
-    return [
-      {
-        url: unitedUrl.url,
-        width: imageMetadata.width,
-        height: imageMetadata.height,
-        fileSize: imageMetadata.fileSize,
-      },
-    ];
-  }
 
   async mapToPostsWithLikesImagesInfoViewModel(
     posts: PostWithLikesInfoViewModel[],
@@ -139,6 +65,56 @@ export class PostsService {
     );
   }
 
+  async processImageMetadata(
+    imagesMetadata: OriginalMiddleSmallEntitiesDto,
+  ): Promise<PostImagesViewModel> {
+    if (!imagesMetadata) {
+      return { main: [] };
+    }
+
+    // Destructure the object to access original, middle, and small metadata
+    const { original, middle, small } = imagesMetadata;
+
+    // Process all types of metadata concurrently
+    const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all(
+      [
+        this.imageMetadataProcessor(original),
+        this.imageMetadataProcessor(middle),
+        this.imageMetadataProcessor(small),
+      ],
+    );
+
+    // Combine all processed metadata into an array
+    // Construct the main property of PostImagesViewModel
+    const main: ImageMetadata[] = [
+      { ...originalMetadata[0] },
+      { ...middleMetadata[0] },
+      { ...smallMetadata[0] },
+    ];
+
+    return { main };
+  }
+
+  async imageMetadataProcessor(
+    metadata: ImagesPostsMetadataEntity,
+  ): Promise<ImageMetadata[]> {
+    const imageMetadata: FileMetadata =
+      await this.fileMetadataService.extractFromBuffer(metadata.buffer);
+
+    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
+      metadata.pathKey,
+    );
+
+    return [
+      {
+        url: unitedUrl.url,
+        width: imageMetadata.width,
+        height: imageMetadata.height,
+        fileSize: imageMetadata.fileSize,
+      },
+    ];
+  }
+
   async imagesMetadataProcessor(
     imagesMetadata: PathKeyBufferDto[],
   ): Promise<PostImagesViewModel> {
@@ -165,5 +141,25 @@ export class PostsService {
     const processedMetadata = await Promise.all(processedMetadataPromises);
 
     return { main: processedMetadata };
+  }
+
+  async addExtendedLikesInfoToPostsEntity(
+    newPost: PostViewModel,
+  ): Promise<PostWithLikesInfoViewModel> {
+    const extendedLikesInfo = new ExtendedLikesInfo();
+    return {
+      ...newPost, // Spread properties of newPost
+      extendedLikesInfo, // Add extendedLikesInfo property
+    };
+  }
+
+  async addPostImages(
+    newPost: PostWithLikesInfoViewModel,
+  ): Promise<PostWithLikesImagesInfoViewModel> {
+    const images = new PostImagesViewModel();
+    return {
+      ...newPost, // Spread properties of newPost
+      images: images, // Add images property
+    };
   }
 }
