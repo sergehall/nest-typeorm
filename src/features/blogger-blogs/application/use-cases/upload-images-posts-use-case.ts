@@ -18,10 +18,10 @@ import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
-import { PostsService } from '../../../posts/application/posts.service';
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
+import { ImagesMetadataService } from '../images-metadata.service';
 
 export class UploadImagesPostsCommand {
   constructor(
@@ -38,7 +38,7 @@ export class UploadImagesPostsUseCase
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected postsService: PostsService,
+    protected imagesMetadataService: ImagesMetadataService,
     protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
@@ -102,7 +102,9 @@ export class UploadImagesPostsUseCase
         currentUserDto,
       );
 
-    return await this.postsService.processImageMetadata(imagesMetadataEntity);
+    return await this.imagesMetadataService.processImageMetadata(
+      imagesMetadataEntity,
+    );
   }
 
   /**

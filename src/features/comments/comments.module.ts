@@ -41,6 +41,7 @@ import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.r
 import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
+import { ImagesMetadataService } from '../blogger-blogs/application/images-metadata.service';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -76,12 +77,13 @@ const helpers = [KeyResolver, UuidErrorResolver];
     AwsConfig,
     S3Service,
     CommentsService,
-    FileMetadataService,
     JwtConfig,
     JwtService,
     PostsService,
     AuthService,
     UsersService,
+    FileMetadataService,
+    ImagesMetadataService,
     CommentsRepo,
     UsersRepo,
     PostsRepo,

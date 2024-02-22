@@ -44,7 +44,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
       );
 
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
-      await this.postsService.mapToPostsWithLikesImagesInfoViewModel(
+      await this.postsService.mapPostsWithLikesAndImagesMetadata(
         [post],
         pathKeyBufferArr,
       );

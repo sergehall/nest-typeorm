@@ -49,6 +49,7 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
+import { ImagesMetadataService } from './application/images-metadata.service';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -91,10 +92,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
     CaslAbilityFactory,
     S3Service,
     FileStorageAdapter,
+    PostsService,
     FileMetadataService,
     ParseQueriesService,
     BloggerBlogsService,
-    PostsService,
+    ImagesMetadataService,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

@@ -47,6 +47,14 @@ export class BlogsController {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
+  @Get(':blogId/subscription')
+  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  async blogSubscription(
+    @Param() params: IdParams,
+  ): Promise<BloggerBlogsWithImagesViewModel> {
+    return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
+  }
+
   @Get(':blogId/posts')
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })

@@ -66,7 +66,7 @@ export class GetPostsInBlogUseCase
 
     // Map posts to their respective view models with image metadata
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
-      await this.postsService.mapToPostsWithLikesImagesInfoViewModel(
+      await this.postsService.mapPostsWithLikesAndImagesMetadata(
         posts,
         imagesMetadataForPosts,
       );
