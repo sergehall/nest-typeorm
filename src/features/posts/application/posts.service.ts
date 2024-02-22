@@ -124,32 +124,4 @@ export class PostsService {
 
     return { main: processedMetadata };
   }
-
-  // async imagesMetadataProcessor(
-  //   imagesMetadata: ImagesPostsOriginalMetadataEntity[],
-  // ): Promise<PostImagesViewModel> {
-  //   if (imagesMetadata.length === 0) {
-  //     return { main: [] };
-  //   }
-  //   const processedMetadataPromises = imagesMetadata.map(async (metadata) => {
-  //     // Extract file metadata
-  //     const imageMetadata: FileMetadata =
-  //       await this.fileMetadataService.extractFromBuffer(metadata.buffer);
-  //
-  //     const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-  //       metadata.pathKey,
-  //     );
-  //
-  //     return {
-  //       url: unitedUrl.url, // Assuming pathKey contains the URL of the image
-  //       width: imageMetadata.width, // Assuming width is a property of the metadata
-  //       height: imageMetadata.height, // Assuming height is a property of the metadata
-  //       fileSize: imageMetadata.fileSize, // Assuming size represents the file size of the image
-  //     };
-  //   });
-  //
-  //   const processedMetadata = await Promise.all(processedMetadataPromises);
-  //
-  //   return { main: processedMetadata };
-  // }
 }

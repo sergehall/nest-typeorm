@@ -17,6 +17,7 @@ export class GetPostsInBlogCommand {
     public currentUserDto: CurrentUserDto | null,
   ) {}
 }
+
 @CommandHandler(GetPostsInBlogCommand)
 export class GetPostsInBlogUseCase
   implements ICommandHandler<GetPostsInBlogCommand>
@@ -26,20 +27,22 @@ export class GetPostsInBlogUseCase
     private readonly postsService: PostsService,
     private readonly imagesPostsOriginalMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
+
   async execute(command: GetPostsInBlogCommand) {
     const { blogId, queryData, currentUserDto } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
+    // Retrieve posts and their count
     const postsAndNumberOfPosts: PostsAndCountDto =
       await this.postsRepo.getPostsInBlogWithPagination(
         blogId,
         queryData,
         currentUserDto,
       );
-
     const totalCount = postsAndNumberOfPosts.countPosts;
 
-    if (postsAndNumberOfPosts.countPosts === 0) {
+    // If no posts found, return empty result
+    if (totalCount === 0) {
       return {
         pagesCount: pageNumber,
         page: pageNumber,
@@ -48,10 +51,12 @@ export class GetPostsInBlogUseCase
         items: postsAndNumberOfPosts.posts,
       };
     }
-    const posts: PostWithLikesInfoViewModel[] = postsAndNumberOfPosts.posts;
 
+    // Extract posts and their IDs
+    const posts: PostWithLikesInfoViewModel[] = postsAndNumberOfPosts.posts;
     const postIds = posts.map((post) => post.id);
 
+    // Retrieve metadata for images associated with posts
     const pathsKeysBufferDto: {
       [postId: string]: ImagesPostsPathKeyBufferDto[];
     }[] =
@@ -60,20 +65,48 @@ export class GetPostsInBlogUseCase
         posts[0].blogId,
       );
 
-    async function mapToPostWithLikesImagesInfoViewModel(
-      posts: PostWithLikesInfoViewModel[],
-      imagesMetadata: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[],
-      postsService: PostsService,
-    ): Promise<PostWithLikesImagesInfoViewModel[]> {
-      const resultPromises = posts.map(async (post) => {
+    // Map posts to their respective view models with image metadata
+    const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
+      await this.mapToPostsWithLikesImagesInfoViewModel(
+        posts,
+        pathsKeysBufferDto,
+      );
+    const pagesCount: number = Math.ceil(totalCount / pageSize);
+
+    return {
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: totalCount,
+      items: postWithLikesImages,
+    };
+  }
+
+  private async mapToPostsWithLikesImagesInfoViewModel(
+    posts: PostWithLikesInfoViewModel[],
+    imagesMetadata: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[],
+  ): Promise<PostWithLikesImagesInfoViewModel[]> {
+    // Map posts to promises of their respective view models with image metadata
+    const resultPromises = posts.map(
+      async (post: PostWithLikesInfoViewModel) => {
         const postId = post.id;
-
-        const images =
+        const images: ImagesPostsPathKeyBufferDto[] =
           imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
-        const metadata: PostImagesViewModel =
-          await postsService.imagesMetadataProcessor(images); // Use the variable
 
-        const postWithImages: PostWithLikesImagesInfoViewModel = {
+        // Retrieve metadata for images
+        const metadataPromise: PostImagesViewModel =
+          await this.postsService.imagesMetadataProcessor(images);
+        return { post, metadataPromise };
+      },
+    );
+
+    // Wait for all promises to resolve
+    const results = await Promise.all(resultPromises);
+
+    // Map results to post view models with image metadata
+    return Promise.all(
+      results.map(async ({ post, metadataPromise }) => {
+        return {
           id: post.id,
           title: post.title,
           shortDescription: post.shortDescription,
@@ -83,29 +116,10 @@ export class GetPostsInBlogUseCase
           createdAt: post.createdAt,
           extendedLikesInfo: post.extendedLikesInfo,
           images: {
-            main: metadata.main,
+            main: metadataPromise.main,
           },
         };
-        return postWithImages;
-      });
-
-      return Promise.all(resultPromises);
-    }
-
-    const postsArr = await mapToPostWithLikesImagesInfoViewModel(
-      posts,
-      pathsKeysBufferDto,
-      this.postsService,
+      }),
     );
-
-    const pagesCount: number = Math.ceil(totalCount / pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: postsArr,
-    };
   }
 }
