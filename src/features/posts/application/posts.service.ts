@@ -15,7 +15,7 @@ import { UrlDto } from '../../blogger-blogs/dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
 import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-entities.dto';
-import { ImagesPostsPathKeyBufferDto } from '../dto/images-posts-path-key-buffer.dto';
+import { PathKeyBufferDto } from '../dto/path-key-buffer.dto';
 
 @Injectable()
 export class PostsService {
@@ -100,13 +100,13 @@ export class PostsService {
 
   async mapToPostsWithLikesImagesInfoViewModel(
     posts: PostWithLikesInfoViewModel[],
-    imagesMetadata: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[],
+    imagesMetadata: { [postId: string]: PathKeyBufferDto[] }[],
   ): Promise<PostWithLikesImagesInfoViewModel[]> {
     // Map posts to promises of their respective view models with image metadata
     const resultPromises = posts.map(
       async (post: PostWithLikesInfoViewModel) => {
         const postId = post.id;
-        const images: ImagesPostsPathKeyBufferDto[] =
+        const images: PathKeyBufferDto[] =
           imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
 
         // Retrieve metadata for images
@@ -140,7 +140,7 @@ export class PostsService {
   }
 
   async imagesMetadataProcessor(
-    imagesMetadata: ImagesPostsPathKeyBufferDto[],
+    imagesMetadata: PathKeyBufferDto[],
   ): Promise<PostImagesViewModel> {
     if (imagesMetadata.length === 0) {
       return { main: [] };
