@@ -3,15 +3,15 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class ImageMetadata {
   @IsNotEmpty()
   @IsString()
-  url: string;
+  url: string = '';
 
   @IsNotEmpty()
   @IsNumber()
-  width: number;
+  width: number = 0;
 
   @IsNotEmpty()
   @IsNumber()
-  height: number;
+  height: number = 0;
 
   @IsNotEmpty()
   @IsNumber()

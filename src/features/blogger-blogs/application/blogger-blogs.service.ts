@@ -3,7 +3,6 @@ import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
 import {
   BloggerBlogsWithImagesViewModel,
-  Image,
   ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
 import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
@@ -12,6 +11,7 @@ import { FileMetadataService } from '../../../common/helpers/file-metadata-from-
 import { S3Service } from '../../../config/aws/s3/s3-service';
 import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
+import { ImageMetadata } from '../../posts/views/post-images.view-model';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -54,8 +54,8 @@ export class BloggerBlogsService {
       // Retrieving main image metadata for the current blog
       const mainMetadata = imagesBlogsMain[blog.id];
       // Initializing variables to store image data
-      let imageBlogWallpaper: Image | null = null;
-      const imagesBlogMain: Image[] = [];
+      let imageBlogWallpaper: ImageMetadata | null = null;
+      const imagesBlogMain: ImageMetadata[] = [];
 
       // Processing wallpaper image if metadata exists
       if (wallpaperMetadata) {

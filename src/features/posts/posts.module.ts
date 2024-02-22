@@ -56,6 +56,7 @@ import { ImagesPostsSmallMetadataRepo } from './infrastructure/images-posts-smal
 import { ImagesPostsMiddleMetadataRepo } from './infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
+import { ImagesMetadataService } from '../blogger-blogs/application/images-metadata.service';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -107,6 +108,7 @@ const helpers = [KeyResolver, UuidErrorResolver, CalculatorExpirationDate];
     ParseQueriesService,
     BloggerBlogsService,
     FileMetadataService,
+    ImagesMetadataService,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

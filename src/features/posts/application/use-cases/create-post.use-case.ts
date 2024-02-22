@@ -18,6 +18,7 @@ import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-us
 import { PostsService } from '../posts.service';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
+import { ImagesMetadataService } from '../../../blogger-blogs/application/images-metadata.service';
 
 export class CreatePostCommand {
   constructor(
@@ -33,6 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
     private readonly postsService: PostsService,
+    private readonly imagesMetadataService: ImagesMetadataService,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
@@ -58,7 +60,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     const postWithLikes: PostWithLikesInfoViewModel =
       await this.postsService.addExtendedLikesInfoToPostsEntity(postViewModel);
 
-    return await this.postsService.addPostImages(postWithLikes);
+    return await this.imagesMetadataService.addImagesToPostModel(postWithLikes);
   }
 
   private async checkUserPermission(

@@ -1,31 +1,9 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  Length,
-  Matches,
-} from 'class-validator';
-
-export class Image {
-  @IsNotEmpty()
-  url: string = '';
-
-  @IsNotEmpty()
-  @IsNumber()
-  width: number = 0;
-
-  @IsNotEmpty()
-  @IsNumber()
-  height: number = 0;
-
-  @IsNotEmpty()
-  @IsNumber()
-  fileSize: number = 0;
-}
+import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
+import { ImageMetadata } from '../../posts/views/post-images.view-model';
 
 export class ImagesViewModel {
-  wallpaper: Image | null = null;
-  main: Image[] = [];
+  wallpaper: ImageMetadata | null = null;
+  main: ImageMetadata[] = [];
 }
 
 export class BloggerBlogsWithImagesViewModel {

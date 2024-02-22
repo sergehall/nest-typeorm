@@ -6,3 +6,8 @@ export class PathKeyBufferDto {
   pathKey: string;
   buffer: Buffer;
 }
+
+// const pathKeyBuffer = {
+//   pathKey: imageBlogMainMetadataEntity.pathKey,
+//   buffer: imageBlogMainMetadataEntity.buffer,
+// };
