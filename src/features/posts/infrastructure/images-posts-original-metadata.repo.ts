@@ -184,105 +184,6 @@ export class ImagesPostsOriginalMetadataRepo {
     };
   }
 
-  // async findImagesPostOriginalMetadata(
-  //   postId: string,
-  //   blogId: string,
-  // ): Promise<ImagesPostsOriginalMetadataEntity | null> {
-  //   const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-  //   const { dependencyIsBanned, isBanned } = bannedFlags;
-  //
-  //   // Query posts and countPosts with pagination conditions
-  //   const queryBuilder = this.imagesPostsOriginalMetadataRepository
-  //     .createQueryBuilder('imagesPostsMain')
-  //     .leftJoinAndSelect('imagesPostsMain.post', 'post')
-  //     .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-  //     .where({ dependencyIsBanned })
-  //     .andWhere({ isBanned })
-  //     .andWhere('post.id = :postId', { postId })
-  //     .andWhere('blog.id = :blogId', { blogId });
-  //
-  //   try {
-  //     const originalMetadata = await queryBuilder.getOne();
-  //     return originalMetadata ? originalMetadata : null;
-  //   } catch (error) {
-  //     if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-  //       const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-  //         error,
-  //       );
-  //       throw new NotFoundException(
-  //         `OriginalMetadata with ID ${blogId} not found`,
-  //       );
-  //     }
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
-
-  // async findImagesPostMiddleMetadata(
-  //   postId: string,
-  //   blogId: string,
-  // ): Promise<ImagesPostsMiddleMetadataEntity | null> {
-  //   const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-  //   const { dependencyIsBanned, isBanned } = bannedFlags;
-  //
-  //   // Query posts and countPosts with pagination conditions
-  //   const queryBuilder = this.imagesPostMiddleMetadataRepository
-  //     .createQueryBuilder('imagesPostsMain')
-  //     .leftJoinAndSelect('imagesPostsMain.post', 'post')
-  //     .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-  //     .where({ dependencyIsBanned })
-  //     .andWhere({ isBanned })
-  //     .andWhere('post.id = :postId', { postId })
-  //     .andWhere('blog.id = :blogId', { blogId });
-  //
-  //   try {
-  //     const middleMetadata = await queryBuilder.getOne();
-  //     return middleMetadata ? middleMetadata : null;
-  //   } catch (error) {
-  //     if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-  //       const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-  //         error,
-  //       );
-  //       throw new NotFoundException(
-  //         `OriginalMetadata with ID ${blogId} not found`,
-  //       );
-  //     }
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
-
-  // async findImagesPostSmallMetadata(
-  //   postId: string,
-  //   blogId: string,
-  // ): Promise<ImagesPostsSmallMetadataEntity | null> {
-  //   const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-  //   const { dependencyIsBanned, isBanned } = bannedFlags;
-  //
-  //   // Query posts and countPosts with pagination conditions
-  //   const queryBuilder = this.imagesPostSmallMetadataRepository
-  //     .createQueryBuilder('imagesPostsMain')
-  //     .leftJoinAndSelect('imagesPostsMain.post', 'post')
-  //     .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-  //     .where({ dependencyIsBanned })
-  //     .andWhere({ isBanned })
-  //     .andWhere('post.id = :postId', { postId })
-  //     .andWhere('blog.id = :blogId', { blogId });
-  //
-  //   try {
-  //     const middleMetadata = await queryBuilder.getOne();
-  //     return middleMetadata ? middleMetadata : null;
-  //   } catch (error) {
-  //     if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-  //       const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-  //         error,
-  //       );
-  //       throw new NotFoundException(
-  //         `OriginalMetadata with ID ${blogId} not found`,
-  //       );
-  //     }
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
-
   async createImagePostMetadata(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
@@ -386,63 +287,6 @@ export class ImagesPostsOriginalMetadataRepo {
     }
   }
 
-  // async createImagePostMiddleMetadata(
-  //   blog: BloggerBlogsEntity,
-  //   post: PostsEntity,
-  //   fileUploadDto: FileUploadDto,
-  //   urlPathKeyEtagDto: UrlPathKeyEtagDto,
-  //   currentUserDto: CurrentUserDto,
-  // ): Promise<ImagesPostsMiddleMetadataEntity> {
-  //   const bannedFlags = await this.getBannedFlags();
-  //   let postsImagesFileMetadataEntity: ImagesPostsMiddleMetadataEntity;
-  //
-  //   const queryBuilder = this.imagesPostMiddleMetadataRepository
-  //     .createQueryBuilder('image') // Start building a query
-  //     .leftJoinAndSelect('image.blog', 'blog')
-  //     .leftJoinAndSelect('image.post', 'post')
-  //     .where('blog.id = :blogId', { blogId: blog.id })
-  //     .andWhere('post.id = :postId', { postId: post.id })
-  //     .andWhere({ dependencyIsBanned: bannedFlags.dependencyIsBanned })
-  //     .andWhere({ isBanned: bannedFlags.isBanned });
-  //
-  //   // Check if entity already exists
-  //   const existingEntity: ImagesPostsMiddleMetadataEntity | null =
-  //     await queryBuilder.getOne();
-  //
-  //   // If entity exists, update it; otherwise, create a new one
-  //   if (existingEntity) {
-  //     existingEntity.pathKey = urlPathKeyEtagDto.pathKey;
-  //     existingEntity.eTag = urlPathKeyEtagDto.eTag;
-  //     existingEntity.originalName = fileUploadDto.originalname;
-  //     existingEntity.encoding = fileUploadDto.encoding;
-  //     existingEntity.mimetype = fileUploadDto.mimetype;
-  //     existingEntity.buffer = fileUploadDto.buffer;
-  //     existingEntity.size = fileUploadDto.size;
-  //     existingEntity.createdAt = new Date().toISOString();
-  //     postsImagesFileMetadataEntity = existingEntity;
-  //   } else {
-  //     postsImagesFileMetadataEntity =
-  //       ImagesPostsMiddleMetadataEntity.createPostsImagesMiddleMetadataEntity(
-  //         blog,
-  //         post,
-  //         fileUploadDto,
-  //         urlPathKeyEtagDto,
-  //         currentUserDto,
-  //       );
-  //   }
-  //
-  //   try {
-  //     return await this.imagesPostMiddleMetadataRepository.save(
-  //       postsImagesFileMetadataEntity,
-  //     );
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     throw new InternalServerErrorException(
-  //       'An error occurred while creating or updating the post image file metadata.',
-  //     );
-  //   }
-  // }
-
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
@@ -469,94 +313,156 @@ export class ImagesPostsOriginalMetadataRepo {
     );
   }
 
-  async findAllImagesPostMetadataMany(
+  async findAndMergeImagesMetadataForPosts(
     postIds: string[],
     blogId: string,
   ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto[] }[]> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
+    // Wrap the database queries within a transaction
     return this.imagesPostsOriginalMetadataRepository.manager.transaction(
-      async (manager) => {
-        const originalMetadataPromise: {
-          [postId: string]: ImagesPostsPathKeyBufferDto;
-        }[] = await this.findImagesPostOriginalMetadataMany(
-          postIds,
-          blogId,
-          dependencyIsBanned,
-          isBanned,
-          manager,
-        );
-
-        const middleMetadataPromise: {
-          [postId: string]: ImagesPostsPathKeyBufferDto;
-        }[] = await this.findImagesPostMiddleMetadataMany(
-          postIds,
-          blogId,
-          dependencyIsBanned,
-          isBanned,
-          manager,
-        );
-
-        const smallMetadataPromise: {
-          [postId: string]: ImagesPostsPathKeyBufferDto;
-        }[] = await this.findImagesPostSmallMetadataMany(
-          postIds,
-          blogId,
-          dependencyIsBanned,
-          isBanned,
-          manager,
-        );
-
+      async (transactionManager) => {
+        // Parallelize the retrieval of metadata for different sizes of images
         const [
-          originalMetadataResults,
-          middleMetadataResults,
-          smallMetadataResults,
-        ] = await Promise.all([
           originalMetadataPromise,
           middleMetadataPromise,
           smallMetadataPromise,
+        ] = await Promise.all([
+          this.findImagesPostOriginalMetadataMany(
+            postIds,
+            blogId,
+            dependencyIsBanned,
+            isBanned,
+            transactionManager,
+          ),
+          this.findImagesPostMiddleMetadataMany(
+            postIds,
+            blogId,
+            dependencyIsBanned,
+            isBanned,
+            transactionManager,
+          ),
+          this.findImagesPostSmallMetadataMany(
+            postIds,
+            blogId,
+            dependencyIsBanned,
+            isBanned,
+            transactionManager,
+          ),
         ]);
 
-        const mergeMetadata = (
-          originalMetadataResults: {
-            [postId: string]: ImagesPostsPathKeyBufferDto;
-          }[],
-          middleMetadataResults: {
-            [postId: string]: ImagesPostsPathKeyBufferDto;
-          }[],
-          smallMetadataResults: {
-            [postId: string]: ImagesPostsPathKeyBufferDto;
-          }[],
-        ): { [postId: string]: ImagesPostsPathKeyBufferDto[] }[] => {
-          const mergedMetadata: {
-            [postId: string]: ImagesPostsPathKeyBufferDto[];
-          }[] = [];
+        // Merge the results into a single array
+        const mergedMetadata: {
+          [postId: string]: ImagesPostsPathKeyBufferDto[];
+        }[] = [];
 
-          originalMetadataResults.forEach((original, index) => {
-            const merged: { [postId: string]: ImagesPostsPathKeyBufferDto[] } =
-              {};
-            Object.keys(original).forEach((postId) => {
-              merged[postId] = [
-                original[postId],
-                middleMetadataResults[index][postId],
-                smallMetadataResults[index][postId],
-              ];
-            });
-            mergedMetadata.push(merged);
+        originalMetadataPromise.forEach((original, index) => {
+          const merged: { [postId: string]: ImagesPostsPathKeyBufferDto[] } =
+            {};
+          Object.keys(original).forEach((postId) => {
+            merged[postId] = [
+              original[postId],
+              middleMetadataPromise[index][postId],
+              smallMetadataPromise[index][postId],
+            ];
           });
+          mergedMetadata.push(merged);
+        });
 
-          return mergedMetadata;
-        };
-
-        return mergeMetadata(
-          originalMetadataResults,
-          middleMetadataResults,
-          smallMetadataResults,
-        );
+        return mergedMetadata;
       },
     );
   }
+
+  // async findAllImagesPostMetadataMany(
+  //   postIds: string[],
+  //   blogId: string,
+  // ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto[] }[]> {
+  //   const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
+  //   const { dependencyIsBanned, isBanned } = bannedFlags;
+  //
+  //   return this.imagesPostsOriginalMetadataRepository.manager.transaction(
+  //     async (manager) => {
+  //       const originalMetadataPromise: {
+  //         [postId: string]: ImagesPostsPathKeyBufferDto;
+  //       }[] = await this.findImagesPostOriginalMetadataMany(
+  //         postIds,
+  //         blogId,
+  //         dependencyIsBanned,
+  //         isBanned,
+  //         manager,
+  //       );
+  //
+  //       const middleMetadataPromise: {
+  //         [postId: string]: ImagesPostsPathKeyBufferDto;
+  //       }[] = await this.findImagesPostMiddleMetadataMany(
+  //         postIds,
+  //         blogId,
+  //         dependencyIsBanned,
+  //         isBanned,
+  //         manager,
+  //       );
+  //
+  //       const smallMetadataPromise: {
+  //         [postId: string]: ImagesPostsPathKeyBufferDto;
+  //       }[] = await this.findImagesPostSmallMetadataMany(
+  //         postIds,
+  //         blogId,
+  //         dependencyIsBanned,
+  //         isBanned,
+  //         manager,
+  //       );
+  //
+  //       const [
+  //         originalMetadataResults,
+  //         middleMetadataResults,
+  //         smallMetadataResults,
+  //       ] = await Promise.all([
+  //         originalMetadataPromise,
+  //         middleMetadataPromise,
+  //         smallMetadataPromise,
+  //       ]);
+  //
+  //       const mergeMetadata = (
+  //         originalMetadataResults: {
+  //           [postId: string]: ImagesPostsPathKeyBufferDto;
+  //         }[],
+  //         middleMetadataResults: {
+  //           [postId: string]: ImagesPostsPathKeyBufferDto;
+  //         }[],
+  //         smallMetadataResults: {
+  //           [postId: string]: ImagesPostsPathKeyBufferDto;
+  //         }[],
+  //       ): { [postId: string]: ImagesPostsPathKeyBufferDto[] }[] => {
+  //         const mergedMetadata: {
+  //           [postId: string]: ImagesPostsPathKeyBufferDto[];
+  //         }[] = [];
+  //
+  //         originalMetadataResults.forEach((original, index) => {
+  //           const merged: { [postId: string]: ImagesPostsPathKeyBufferDto[] } =
+  //             {};
+  //           Object.keys(original).forEach((postId) => {
+  //             merged[postId] = [
+  //               original[postId],
+  //               middleMetadataResults[index][postId],
+  //               smallMetadataResults[index][postId],
+  //             ];
+  //           });
+  //           mergedMetadata.push(merged);
+  //         });
+  //
+  //         return mergedMetadata;
+  //       };
+  //
+  //       return mergeMetadata(
+  //         originalMetadataResults,
+  //         middleMetadataResults,
+  //         smallMetadataResults,
+  //       );
+  //     },
+  //   );
+  // }
 
   private async findImagesPostOriginalMetadataMany(
     postIds: string[],
@@ -578,7 +484,7 @@ export class ImagesPostsOriginalMetadataRepo {
       const originalMetadata: ImagesPostsOriginalMetadataEntity[] =
         await queryBuilder.getMany();
 
-      return await this.convertEntityToDTOMany(originalMetadata);
+      return await this.mapEntitiesToDTOs(originalMetadata);
     } catch (error) {
       console.error(error);
       return [];
@@ -604,7 +510,7 @@ export class ImagesPostsOriginalMetadataRepo {
     try {
       const middleMetadata = await queryBuilder.getMany();
 
-      return await this.convertEntityToDTOMany(middleMetadata);
+      return await this.mapEntitiesToDTOs(middleMetadata);
     } catch (error) {
       console.error(error);
       return [];
@@ -630,14 +536,14 @@ export class ImagesPostsOriginalMetadataRepo {
     try {
       const smallMetadata: ImagesPostsSmallMetadataEntity[] =
         await queryBuilder.getMany();
-      return await this.convertEntityToDTOMany(smallMetadata);
+      return await this.mapEntitiesToDTOs(smallMetadata);
     } catch (error) {
       console.error(error);
       return [];
     }
   }
 
-  private async convertEntityToDTOMany(
+  private async mapEntitiesToDTOs(
     entities: (
       | ImagesPostsOriginalMetadataEntity
       | ImagesPostsMiddleMetadataEntity

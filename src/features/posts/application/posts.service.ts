@@ -6,7 +6,7 @@ import {
 } from '../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 import {
-  PostImages,
+  ImageMetadata,
   PostImagesViewModel,
 } from '../views/post-images.view-model';
 import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
@@ -69,7 +69,7 @@ export class PostsService {
 
     // Combine all processed metadata into an array
     // Construct the main property of PostImagesViewModel
-    const main: PostImages[] = [
+    const main: ImageMetadata[] = [
       { ...originalMetadata[0] },
       { ...middleMetadata[0] },
       { ...smallMetadata[0] },
@@ -80,7 +80,7 @@ export class PostsService {
 
   async processMetadata(
     metadata: ImagesPostsOriginalMetadataEntity,
-  ): Promise<PostImages[]> {
+  ): Promise<ImageMetadata[]> {
     const imageMetadata: FileMetadata =
       await this.fileMetadataService.extractFromBuffer(metadata.buffer);
 
@@ -97,6 +97,48 @@ export class PostsService {
       },
     ];
   }
+
+  async mapToPostsWithLikesImagesInfoViewModel(
+    posts: PostWithLikesInfoViewModel[],
+    imagesMetadata: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[],
+  ): Promise<PostWithLikesImagesInfoViewModel[]> {
+    // Map posts to promises of their respective view models with image metadata
+    const resultPromises = posts.map(
+      async (post: PostWithLikesInfoViewModel) => {
+        const postId = post.id;
+        const images: ImagesPostsPathKeyBufferDto[] =
+          imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
+
+        // Retrieve metadata for images
+        const metadataPromise: PostImagesViewModel =
+          await this.imagesMetadataProcessor(images);
+        return { post, metadataPromise };
+      },
+    );
+
+    // Wait for all promises to resolve
+    const results = await Promise.all(resultPromises);
+
+    // Map results to post view models with image metadata
+    return Promise.all(
+      results.map(async ({ post, metadataPromise }) => {
+        return {
+          id: post.id,
+          title: post.title,
+          shortDescription: post.shortDescription,
+          content: post.content,
+          blogId: post.blogId,
+          blogName: post.blogName,
+          createdAt: post.createdAt,
+          extendedLikesInfo: post.extendedLikesInfo,
+          images: {
+            main: metadataPromise.main,
+          },
+        };
+      }),
+    );
+  }
+
   async imagesMetadataProcessor(
     imagesMetadata: ImagesPostsPathKeyBufferDto[],
   ): Promise<PostImagesViewModel> {

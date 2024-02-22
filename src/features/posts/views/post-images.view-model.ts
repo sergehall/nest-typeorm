@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class PostImages {
+export class ImageMetadata {
   @IsNotEmpty()
   @IsString()
   url: string;
@@ -19,5 +19,5 @@ export class PostImages {
 }
 
 export class PostImagesViewModel {
-  main: PostImages[] = []; // Set default value
+  main: ImageMetadata[] = []; // Set default value
 }

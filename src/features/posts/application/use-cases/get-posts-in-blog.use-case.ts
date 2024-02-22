@@ -8,7 +8,6 @@ import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buf
 import { ImagesPostsOriginalMetadataRepo } from '../../infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import { PostImagesViewModel } from '../../views/post-images.view-model';
 
 export class GetPostsInBlogCommand {
   constructor(
@@ -57,19 +56,19 @@ export class GetPostsInBlogUseCase
     const postIds = posts.map((post) => post.id);
 
     // Retrieve metadata for images associated with posts
-    const pathsKeysBufferDto: {
+    const imagesMetadataForPosts: {
       [postId: string]: ImagesPostsPathKeyBufferDto[];
     }[] =
-      await this.imagesPostsOriginalMetadataRepo.findAllImagesPostMetadataMany(
+      await this.imagesPostsOriginalMetadataRepo.findAndMergeImagesMetadataForPosts(
         postIds,
         posts[0].blogId,
       );
 
     // Map posts to their respective view models with image metadata
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
-      await this.mapToPostsWithLikesImagesInfoViewModel(
+      await this.postsService.mapToPostsWithLikesImagesInfoViewModel(
         posts,
-        pathsKeysBufferDto,
+        imagesMetadataForPosts,
       );
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 
@@ -80,46 +79,5 @@ export class GetPostsInBlogUseCase
       totalCount: totalCount,
       items: postWithLikesImages,
     };
-  }
-
-  private async mapToPostsWithLikesImagesInfoViewModel(
-    posts: PostWithLikesInfoViewModel[],
-    imagesMetadata: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[],
-  ): Promise<PostWithLikesImagesInfoViewModel[]> {
-    // Map posts to promises of their respective view models with image metadata
-    const resultPromises = posts.map(
-      async (post: PostWithLikesInfoViewModel) => {
-        const postId = post.id;
-        const images: ImagesPostsPathKeyBufferDto[] =
-          imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
-
-        // Retrieve metadata for images
-        const metadataPromise: PostImagesViewModel =
-          await this.postsService.imagesMetadataProcessor(images);
-        return { post, metadataPromise };
-      },
-    );
-
-    // Wait for all promises to resolve
-    const results = await Promise.all(resultPromises);
-
-    // Map results to post view models with image metadata
-    return Promise.all(
-      results.map(async ({ post, metadataPromise }) => {
-        return {
-          id: post.id,
-          title: post.title,
-          shortDescription: post.shortDescription,
-          content: post.content,
-          blogId: post.blogId,
-          blogName: post.blogName,
-          createdAt: post.createdAt,
-          extendedLikesInfo: post.extendedLikesInfo,
-          images: {
-            main: metadataPromise.main,
-          },
-        };
-      }),
-    );
   }
 }
