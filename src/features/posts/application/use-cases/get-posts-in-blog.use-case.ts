@@ -4,10 +4,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 import { PostsAndCountDto } from '../../dto/posts-and-count.dto';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
-import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buffer.dto';
 import { ImagesPostsOriginalMetadataRepo } from '../../infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
+import { PathKeyBufferDto } from '../../dto/path-key-buffer.dto';
 
 export class GetPostsInBlogCommand {
   constructor(
@@ -57,7 +57,7 @@ export class GetPostsInBlogUseCase
 
     // Retrieve metadata for images associated with posts
     const imagesMetadataForPosts: {
-      [postId: string]: ImagesPostsPathKeyBufferDto[];
+      [postId: string]: PathKeyBufferDto[];
     }[] =
       await this.imagesPostsOriginalMetadataRepo.findAndMergeImagesMetadataForPosts(
         postIds,

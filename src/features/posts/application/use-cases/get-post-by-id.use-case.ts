@@ -6,7 +6,7 @@ import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.vie
 import { ImagesPostsOriginalMetadataRepo } from '../../infrastructure/images-posts-original-metadata.repo';
 import { PostsService } from '../posts.service';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import { ImagesPostsPathKeyBufferDto } from '../../dto/images-posts-path-key-buffer.dto';
+import { PathKeyBufferDto } from '../../dto/path-key-buffer.dto';
 
 export class GetPostByIdCommand {
   constructor(
@@ -35,7 +35,9 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
 
     const post: PostWithLikesInfoViewModel = postWithLikesArr[0];
 
-    const pathKeyBuffer: { [postId: string]: ImagesPostsPathKeyBufferDto[] }[] =
+    const pathKeyBufferArr: {
+      [postId: string]: PathKeyBufferDto[];
+    }[] =
       await this.postsImagesFileMetadataRepo.findAndMergeImagesMetadataForPosts(
         [post.id],
         post.blogId,
@@ -44,7 +46,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
       await this.postsService.mapToPostsWithLikesImagesInfoViewModel(
         [post],
-        pathKeyBuffer,
+        pathKeyBufferArr,
       );
 
     return postWithLikesImages[0];

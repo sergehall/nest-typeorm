@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class ImagesPostsPathKeyBufferDto {
+export class PathKeyBufferDto {
   @IsNotEmpty()
   @IsString()
   pathKey: string;

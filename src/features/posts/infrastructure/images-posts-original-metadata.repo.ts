@@ -17,9 +17,9 @@ import { ImagesPostsMiddleMetadataEntity } from '../entities/images-posts-middle
 import { ImagesPostsSmallMetadataEntity } from '../entities/images-posts-small-metadata.entity';
 import { ResizedImageDetailsDto } from '../dto/resized-image-details.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../dto/original-middle-small-entities.dto';
-import { ImagesPostsPathKeyBufferDto } from '../dto/images-posts-path-key-buffer.dto';
 import { ImagesPostsSmallMetadataRepo } from './images-posts-small-metadata.repo';
 import { ImagesPostsMiddleMetadataRepo } from './images-posts-middle-metadata.repo';
+import { PathKeyBufferDto } from '../dto/path-key-buffer.dto';
 
 export class ImagesPostsOriginalMetadataRepo {
   constructor(
@@ -30,159 +30,6 @@ export class ImagesPostsOriginalMetadataRepo {
     protected uuidErrorResolver: UuidErrorResolver,
     protected keyResolver: KeyResolver,
   ) {}
-
-  async findImagesPostOriginalMetadata1(
-    postId: string,
-    blogId: string,
-  ): Promise<ImagesPostsOriginalMetadataEntity[]> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    // Query posts and countPosts with pagination conditions
-    const queryBuilder = this.imagesPostsOriginalMetadataRepository
-      .createQueryBuilder('imagesPostsMain')
-      .leftJoinAndSelect('imagesPostsMain.post', 'post')
-      .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
-      .andWhere('post.id = :postId', { postId })
-      .andWhere('blog.id = :blogId', { blogId });
-
-    return await queryBuilder.getMany();
-  }
-
-  async findAllImagesPostMetadata(
-    postId: string,
-    blogId: string,
-  ): Promise<ImagesPostsPathKeyBufferDto[]> {
-    const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
-    const { dependencyIsBanned, isBanned } = bannedFlags;
-
-    return this.imagesPostsOriginalMetadataRepository.manager.transaction(
-      async (manager) => {
-        const promises = [
-          this.findImagesPostOriginalMetadata(
-            postId,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            manager,
-          ),
-          this.findImagesPostMiddleMetadata(
-            postId,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            manager,
-          ),
-          this.findImagesPostSmallMetadata(
-            postId,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            manager,
-          ),
-        ];
-
-        const results = await Promise.all(promises);
-        const filteredResults = results.filter(
-          (result): result is ImagesPostsPathKeyBufferDto => result !== null,
-        );
-
-        if (filteredResults.length === 0) {
-          throw new InternalServerErrorException('No metadata found');
-        }
-
-        return filteredResults;
-      },
-    );
-  }
-
-  private async findImagesPostOriginalMetadata(
-    postId: string,
-    blogId: string,
-    dependencyIsBanned: boolean,
-    isBanned: boolean,
-    manager: EntityManager,
-  ): Promise<ImagesPostsPathKeyBufferDto | null> {
-    const queryBuilder = manager
-      .createQueryBuilder(ImagesPostsOriginalMetadataEntity, 'imagesPostsMain')
-      .leftJoinAndSelect('imagesPostsMain.post', 'post')
-      .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
-      .andWhere('post.id = :postId', { postId })
-      .andWhere('blog.id = :blogId', { blogId });
-
-    try {
-      const originalMetadata = await queryBuilder.getOne();
-      return originalMetadata
-        ? this.convertEntityToDTO(originalMetadata)
-        : null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
-
-  private async findImagesPostMiddleMetadata(
-    postId: string,
-    blogId: string,
-    dependencyIsBanned: boolean,
-    isBanned: boolean,
-    manager: EntityManager,
-  ): Promise<ImagesPostsPathKeyBufferDto | null> {
-    const queryBuilder = manager
-      .createQueryBuilder(ImagesPostsMiddleMetadataEntity, 'imagesPostsMain')
-      .leftJoinAndSelect('imagesPostsMain.post', 'post')
-      .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
-      .andWhere('post.id = :postId', { postId })
-      .andWhere('blog.id = :blogId', { blogId });
-
-    try {
-      const middleMetadata = await queryBuilder.getOne();
-      return middleMetadata ? this.convertEntityToDTO(middleMetadata) : null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
-
-  private async findImagesPostSmallMetadata(
-    postId: string,
-    blogId: string,
-    dependencyIsBanned: boolean,
-    isBanned: boolean,
-    manager: EntityManager,
-  ): Promise<ImagesPostsPathKeyBufferDto | null> {
-    const queryBuilder = manager
-      .createQueryBuilder(ImagesPostsSmallMetadataEntity, 'imagesPostsMain')
-      .leftJoinAndSelect('imagesPostsMain.post', 'post')
-      .leftJoinAndSelect('imagesPostsMain.blog', 'blog')
-      .where({ dependencyIsBanned })
-      .andWhere({ isBanned })
-      .andWhere('post.id = :postId', { postId })
-      .andWhere('blog.id = :blogId', { blogId });
-
-    try {
-      const smallMetadata = await queryBuilder.getOne();
-      return smallMetadata ? this.convertEntityToDTO(smallMetadata) : null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
-
-  private convertEntityToDTO(
-    entity: ImagesPostsOriginalMetadataEntity,
-  ): ImagesPostsPathKeyBufferDto {
-    return {
-      pathKey: entity.pathKey,
-      buffer: entity.buffer,
-    };
-  }
 
   async createImagePostMetadata(
     blog: BloggerBlogsEntity,
@@ -287,36 +134,10 @@ export class ImagesPostsOriginalMetadataRepo {
     }
   }
 
-  private async getBannedFlags(): Promise<BannedFlagsDto> {
-    return {
-      commentatorInfoIsBanned: false,
-      dependencyIsBanned: false,
-      banInfoIsBanned: false,
-      isBanned: false,
-    };
-  }
-
-  private async getSortByField(sortBy: string): Promise<string> {
-    return await this.keyResolver.resolveKey(
-      sortBy,
-      [
-        'title',
-        'shortDescription',
-        'content',
-        'blogName',
-        'dependencyIsBanned',
-        'isBanned',
-        'banDate',
-        'banReason',
-      ],
-      'createdAt',
-    );
-  }
-
   async findAndMergeImagesMetadataForPosts(
     postIds: string[],
     blogId: string,
-  ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto[] }[]> {
+  ): Promise<{ [postId: string]: PathKeyBufferDto[] }[]> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
@@ -354,12 +175,11 @@ export class ImagesPostsOriginalMetadataRepo {
 
         // Merge the results into a single array
         const mergedMetadata: {
-          [postId: string]: ImagesPostsPathKeyBufferDto[];
+          [postId: string]: PathKeyBufferDto[];
         }[] = [];
 
         originalMetadataPromise.forEach((original, index) => {
-          const merged: { [postId: string]: ImagesPostsPathKeyBufferDto[] } =
-            {};
+          const merged: { [postId: string]: PathKeyBufferDto[] } = {};
           Object.keys(original).forEach((postId) => {
             merged[postId] = [
               original[postId],
@@ -470,7 +290,7 @@ export class ImagesPostsOriginalMetadataRepo {
     dependencyIsBanned: boolean,
     isBanned: boolean,
     manager: EntityManager,
-  ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto }[]> {
+  ): Promise<{ [postId: string]: PathKeyBufferDto }[]> {
     const queryBuilder = manager
       .createQueryBuilder(ImagesPostsOriginalMetadataEntity, 'imagesPostsMain')
       .leftJoinAndSelect('imagesPostsMain.post', 'post')
@@ -497,7 +317,7 @@ export class ImagesPostsOriginalMetadataRepo {
     dependencyIsBanned: boolean,
     isBanned: boolean,
     manager: EntityManager,
-  ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto }[]> {
+  ): Promise<{ [postId: string]: PathKeyBufferDto }[]> {
     const queryBuilder = manager
       .createQueryBuilder(ImagesPostsMiddleMetadataEntity, 'imagesPostsMain')
       .leftJoinAndSelect('imagesPostsMain.post', 'post')
@@ -523,7 +343,7 @@ export class ImagesPostsOriginalMetadataRepo {
     dependencyIsBanned: boolean,
     isBanned: boolean,
     manager: EntityManager,
-  ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto }[]> {
+  ): Promise<{ [postId: string]: PathKeyBufferDto }[]> {
     const queryBuilder = manager
       .createQueryBuilder(ImagesPostsSmallMetadataEntity, 'imagesPostsMain')
       .leftJoinAndSelect('imagesPostsMain.post', 'post')
@@ -549,8 +369,8 @@ export class ImagesPostsOriginalMetadataRepo {
       | ImagesPostsMiddleMetadataEntity
       | ImagesPostsSmallMetadataEntity
     )[],
-  ): Promise<{ [postId: string]: ImagesPostsPathKeyBufferDto }[]> {
-    const result: { [postId: string]: ImagesPostsPathKeyBufferDto }[] = [];
+  ): Promise<{ [postId: string]: PathKeyBufferDto }[]> {
+    const result: { [postId: string]: PathKeyBufferDto }[] = [];
 
     if (entities.length === 0) {
       return result;
@@ -562,5 +382,31 @@ export class ImagesPostsOriginalMetadataRepo {
         buffer: entity.buffer,
       },
     }));
+  }
+
+  private async getBannedFlags(): Promise<BannedFlagsDto> {
+    return {
+      commentatorInfoIsBanned: false,
+      dependencyIsBanned: false,
+      banInfoIsBanned: false,
+      isBanned: false,
+    };
+  }
+
+  private async getSortByField(sortBy: string): Promise<string> {
+    return await this.keyResolver.resolveKey(
+      sortBy,
+      [
+        'title',
+        'shortDescription',
+        'content',
+        'blogName',
+        'dependencyIsBanned',
+        'isBanned',
+        'banDate',
+        'banReason',
+      ],
+      'createdAt',
+    );
   }
 }
