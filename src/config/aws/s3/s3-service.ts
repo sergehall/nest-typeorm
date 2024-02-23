@@ -16,9 +16,13 @@ export class S3Service {
    */
   private async initializeS3Client(): Promise<void> {
     try {
-      const bucketName = await this.getS3BucketName();
-      if (!(await this.bucketExists(bucketName))) {
-        await this.createBucket(bucketName);
+      const privateBucketName = await this.getS3PrivateBucketName();
+      const publicBucketName = await this.getS3PublicBucketName();
+      if (!(await this.bucketExists(privateBucketName))) {
+        await this.createBucket(privateBucketName);
+      }
+      if (!(await this.bucketExists(publicBucketName))) {
+        await this.createBucket(publicBucketName);
       }
 
       const accessKeyId = await this.awsConfig.getAccessKeyId('ACCESS_KEY_ID');
@@ -86,9 +90,9 @@ export class S3Service {
     return this.s3Client;
   }
 
-  async getS3BucketName(): Promise<string> {
+  async getS3PrivateBucketName(): Promise<string> {
     try {
-      return await this.awsConfig.getS3BucketName('S3_BUCKET');
+      return await this.awsConfig.getS3PrivateBucketName('S3_PRIVATE_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
       throw new InternalServerErrorException(
