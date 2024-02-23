@@ -1,6 +1,6 @@
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersService } from '../../../users/application/users.service';
 import { SaUserViewModel } from '../../views/sa-user-view-model';

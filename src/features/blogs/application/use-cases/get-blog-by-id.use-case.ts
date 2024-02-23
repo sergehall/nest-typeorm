@@ -7,8 +7,8 @@ import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrast
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { ImagesBlogsMainMetadataEntity } from '../../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
-import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
-import { ImageMetadata } from '../../../../common/helpers/images-metadata.service/dto/image-metadata';
+import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
+import { ImageMetadata } from '../../../../common/media-services/images-metadata.service/dto/image-metadata';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}

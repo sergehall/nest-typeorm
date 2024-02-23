@@ -11,13 +11,13 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
+import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/helpers/images-metadata.service/dto/image-width-height-size';
+import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/media-services/images-metadata.service/dto/image-width-height-size';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(

@@ -25,7 +25,7 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
 import { AnswerViewModel } from '../views/answer.view-model';
-import { PaginatorDto } from '../../../common/helpers/dto/paginator.dto';
+import { PaginatorDto } from '../../../common/helpers/paginator.dto';
 import { MyGamesStatisticCommand } from '../application/use-cases/my-games-statistic.use-case';
 import { GameSummaryViewModel } from '../views/game-summary.view-model';
 import { GamesStatisticCommand } from '../application/use-cases/games-statistic.use-case';
