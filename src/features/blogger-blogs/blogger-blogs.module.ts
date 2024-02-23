@@ -48,7 +48,7 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../common/media-services/images-metadata.service/images-metadata.service';
+import { ImagesMetadataService } from '../../common/media-services/images/images-metadata.service';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,

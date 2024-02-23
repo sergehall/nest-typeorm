@@ -16,8 +16,8 @@ import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/media-services/images-metadata.service/dto/image-width-height-size';
+import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/media-services/images/dto/image-width-height-size';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
