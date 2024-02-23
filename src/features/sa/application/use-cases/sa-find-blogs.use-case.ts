@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BlogsCountBlogsDto } from '../../../blogger-blogs/dto/blogs-count-blogs.dto';
-import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { SaService } from '../sa.service';
 import { SaBloggerBlogsViewModel } from '../../views/sa-blogger-blogs.view-model';
 

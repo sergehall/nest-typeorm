@@ -2,7 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { PostsRepo } from '../../../posts/infrastructure/posts-repo';
 import { CommentsRepo } from '../../infrastructure/comments.repo';
 import { CommentsAndCountDto } from '../../dto/comments-and-count.dto';

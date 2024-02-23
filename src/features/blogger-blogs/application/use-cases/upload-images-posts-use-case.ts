@@ -14,14 +14,14 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
+import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
-import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
+import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
 
 export class UploadImagesPostsCommand {
   constructor(

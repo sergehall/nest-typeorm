@@ -4,7 +4,7 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
-import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
+import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import {
@@ -17,8 +17,8 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
 import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/helpers/images-metadata.service/dto/image-width-height-size';
+import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/media-services/images-metadata.service/dto/image-width-height-size';
 
 export class UploadImagesBlogsMainCommand {
   constructor(

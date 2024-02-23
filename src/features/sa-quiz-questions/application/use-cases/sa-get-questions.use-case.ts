@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseQueriesDto } from '../../../../common/query/dto/parse-queries.dto';
-import { PaginatorDto } from '../../../../common/helpers/dto/paginator.dto';
+import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { QuestionsAndCountDto } from '../../dto/questions-and-count.dto';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 import { SaQuizQuestionsService } from '../sa-quiz-questions.service';
