@@ -12,12 +12,12 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
-import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
+import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/helpers/images-metadata.service/dto/image-width-height-size';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
@@ -36,7 +36,7 @@ export class UploadImagesBlogsWallpaperUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
-    protected fileMetadataService: FileMetadataService,
+    protected imagesMetadataService: ImagesMetadataService,
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
@@ -57,8 +57,10 @@ export class UploadImagesBlogsWallpaperUseCase
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
     // Extract file metadata
-    const metadata: FileMetadata =
-      await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
+    const metadata: ImageWidthHeightSize =
+      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
+        fileUploadDto.buffer,
+      );
 
     // Upload file for the post to s3
     const urlPathKeyEtagDto: UrlPathKeyEtagDto =

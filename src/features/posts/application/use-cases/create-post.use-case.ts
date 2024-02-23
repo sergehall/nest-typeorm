@@ -18,7 +18,7 @@ import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-us
 import { PostsService } from '../posts.service';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import { ImagesMetadataService } from '../../../blogger-blogs/application/images-metadata.service';
+import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
 
 export class CreatePostCommand {
   constructor(

@@ -36,7 +36,6 @@ import { AwsConfig } from '../../config/aws/aws-config';
 import { UploadImagesPostsUseCase } from './application/use-cases/upload-images-posts-use-case';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { FileStorageAdapter } from '../../common/file-storage-adapter/file-storage-adapter';
-import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { UploadImagesBlogsWallpaperUseCase } from './application/use-cases/upload-images-blogs-wallpaper-use-case';
 import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
@@ -49,7 +48,7 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from './application/images-metadata.service';
+import { ImagesMetadataService } from '../../common/helpers/images-metadata.service/images-metadata.service';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -93,7 +92,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     S3Service,
     FileStorageAdapter,
     PostsService,
-    FileMetadataService,
     ParseQueriesService,
     BloggerBlogsService,
     ImagesMetadataService,

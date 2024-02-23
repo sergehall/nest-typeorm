@@ -18,17 +18,11 @@ import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { SaBanBlogDto } from '../../sa/dto/sa-ban-blog.dto';
 import { BloggerBlogsViewModel } from '../views/blogger-blogs.view-model';
-import { ImagesPostsOriginalMetadataRepo } from '../../posts/infrastructure/images-posts-original-metadata.repo';
-import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { S3Service } from '../../../config/aws/s3/s3-service';
 
 export class BloggerBlogsRepo {
   constructor(
     @InjectRepository(BloggerBlogsEntity)
     private readonly bloggerBlogsRepository: Repository<BloggerBlogsEntity>,
-    private readonly imagesPostsMetadataRepo: ImagesPostsOriginalMetadataRepo,
-    private readonly fileMetadataService: FileMetadataService,
-    private readonly s3Service: S3Service,
     private readonly keyResolver: KeyResolver,
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
@@ -285,16 +279,6 @@ export class BloggerBlogsRepo {
       );
     }
   }
-
-  // private async addImagesToBlogsEntity(
-  //   newBlog: BloggerBlogsViewModel,
-  // ): Promise<BloggerBlogsWithImagesViewModel> {
-  //   const images = new ImagesViewModel();
-  //   return {
-  //     ...newBlog, // Spread properties of newBlog
-  //     images, // Add extended images
-  //   };
-  // }
 
   async updateBlogById(
     id: string,

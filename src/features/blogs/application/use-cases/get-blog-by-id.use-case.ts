@@ -2,13 +2,13 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsWithImagesViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
-import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../../../config/aws/s3/s3-service';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { ImagesBlogsMainMetadataEntity } from '../../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
-import { ImageMetadata } from '../../../posts/views/post-images.view-model';
+import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
+import { ImageMetadata } from '../../../../common/helpers/images-metadata.service/dto/image-metadata';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -20,7 +20,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     protected s3Service: S3Service,
     protected commandBus: CommandBus,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected fileMetadataService: FileMetadataService,
+    protected imagesMetadataService: ImagesMetadataService,
     protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
@@ -72,7 +72,8 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       | ImagesBlogsMainMetadataEntity,
   ): Promise<ImageMetadata> {
     const { buffer, pathKey } = metadataEntity;
-    const metadata = await this.fileMetadataService.extractFromBuffer(buffer);
+    const metadata =
+      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(buffer);
     const unitedUrl = await this.s3Service.generateSignedUrl(pathKey);
 
     return {

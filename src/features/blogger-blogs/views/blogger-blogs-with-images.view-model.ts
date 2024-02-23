@@ -1,5 +1,5 @@
 import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
-import { ImageMetadata } from '../../posts/views/post-images.view-model';
+import { ImageMetadata } from '../../../common/helpers/images-metadata.service/dto/image-metadata';
 
 export class ImagesViewModel {
   wallpaper: ImageMetadata | null = null;

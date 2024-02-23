@@ -5,8 +5,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { FileStorageAdapter } from '../../../../common/file-storage-adapter/file-storage-adapter';
-import { FileMetadataService } from '../../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
-import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import {
@@ -14,12 +12,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { FileMetadata } from '../../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
 import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
+import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/helpers/images-metadata.service/dto/image-width-height-size';
 
 export class UploadImagesBlogsMainCommand {
   constructor(
@@ -37,9 +36,8 @@ export class UploadImagesBlogsMainUseCase
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected fileStorageAdapter: FileStorageAdapter,
-    protected fileMetadataService: FileMetadataService,
+    protected imagesMetadataService: ImagesMetadataService,
     protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
-    protected postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
 
   async execute(
@@ -59,8 +57,10 @@ export class UploadImagesBlogsMainUseCase
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
     // Extract file metadata
-    const metadata: FileMetadata =
-      await this.fileMetadataService.extractFromBuffer(fileUploadDto.buffer);
+    const metadata: ImageWidthHeightSize =
+      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
+        fileUploadDto.buffer,
+      );
 
     // Upload file for the post to s3
     const urlEtagDto: UrlPathKeyEtagDto =

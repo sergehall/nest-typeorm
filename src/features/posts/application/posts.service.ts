@@ -7,7 +7,7 @@ import {
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../views/post-images.view-model';
 import { PathKeyBufferDto } from '../dto/path-key-buffer.dto';
-import { ImagesMetadataService } from '../../blogger-blogs/application/images-metadata.service';
+import { ImagesMetadataService } from '../../../common/helpers/images-metadata.service/images-metadata.service';
 
 @Injectable()
 export class PostsService {

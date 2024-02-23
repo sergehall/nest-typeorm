@@ -191,7 +191,7 @@ export class FileStorageAdapter {
     blogId: string,
     mimetype: string,
   ): Promise<string> {
-    return `content/users/${userId}/blogs/${blogId}_wallpaper.${this.getFileExtension(
+    return `content/users/${userId}/blogs/${blogId}_wallpaper.${await this.getFileExtension(
       mimetype,
     )}`;
   }
@@ -201,7 +201,7 @@ export class FileStorageAdapter {
     blogId: string,
     mimetype: string,
   ): Promise<string> {
-    return `content/users/${userId}/blogs/${blogId}_main.${this.getFileExtension(
+    return `content/users/${userId}/blogs/${blogId}_main.${await this.getFileExtension(
       mimetype,
     )}`;
   }
