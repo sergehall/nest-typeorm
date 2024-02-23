@@ -4,7 +4,7 @@ import { BaseConfig } from '../base/base-config';
 import { AwsEndpointType } from './types/aws-endpoint.type';
 import {
   S3BPublicBucketNameType,
-  S3BucketNameType,
+  S3PrivateBucketNameType,
 } from './types/s3-bucket-name.type';
 import { S3RegionNameType } from './types/s3-region-name.type';
 
@@ -21,8 +21,8 @@ export class AwsConfig extends BaseConfig {
     return await this.getEndpointName(key);
   }
 
-  async getS3BucketName(key: S3BucketNameType): Promise<string> {
-    return await this.getValueBucketName(key);
+  async getS3PrivateBucketName(key: S3PrivateBucketNameType): Promise<string> {
+    return await this.getValuePrivateBucketName(key);
   }
 
   async getS3PublicBucketName(key: S3BPublicBucketNameType): Promise<string> {

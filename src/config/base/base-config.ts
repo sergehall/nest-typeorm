@@ -17,7 +17,7 @@ import { BasicAuthTypes } from '../sa/types/basic-auth.types';
 import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
 import {
   S3BPublicBucketNameType,
-  S3BucketNameType,
+  S3PrivateBucketNameType,
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
@@ -47,7 +47,9 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getValueBucketName(key: S3BucketNameType): Promise<string> {
+  protected async getValuePrivateBucketName(
+    key: S3PrivateBucketNameType,
+  ): Promise<string> {
     return this.configService.get('db.aws.buckets', {
       infer: true,
     })[key];
