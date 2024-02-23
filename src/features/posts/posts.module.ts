@@ -46,7 +46,6 @@ import { CalculatorExpirationDate } from '../../common/helpers/calculator-expira
 import { ImagesPostsOriginalMetadataRepo } from './infrastructure/images-posts-original-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
-import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
 import { ImagesPostsOriginalMetadataEntity } from './entities/images-post-original-metadata.entity';
@@ -56,7 +55,7 @@ import { ImagesPostsSmallMetadataRepo } from './infrastructure/images-posts-smal
 import { ImagesPostsMiddleMetadataRepo } from './infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../blogger-blogs/application/images-metadata.service';
+import { ImagesMetadataService } from '../../common/helpers/images-metadata.service/images-metadata.service';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -107,7 +106,6 @@ const helpers = [KeyResolver, UuidErrorResolver, CalculatorExpirationDate];
     CommentsService,
     ParseQueriesService,
     BloggerBlogsService,
-    FileMetadataService,
     ImagesMetadataService,
     UsersRepo,
     PostsRepo,

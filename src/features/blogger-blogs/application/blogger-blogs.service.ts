@@ -5,19 +5,19 @@ import {
   BloggerBlogsWithImagesViewModel,
   ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
-import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
 import { UrlDto } from '../dto/url.dto';
-import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { S3Service } from '../../../config/aws/s3/s3-service';
 import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
-import { ImageMetadata } from '../../posts/views/post-images.view-model';
+import { ImagesMetadataService } from '../../../common/helpers/images-metadata.service/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../common/helpers/images-metadata.service/dto/image-width-height-size';
+import { ImageMetadata } from '../../../common/helpers/images-metadata.service/dto/image-metadata';
 
 @Injectable()
 export class BloggerBlogsService {
   constructor(
     private readonly s3Service: S3Service,
-    private readonly fileMetadataService: FileMetadataService,
+    private readonly imagesMetadataService: ImagesMetadataService,
     private readonly imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     private readonly imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
@@ -60,8 +60,8 @@ export class BloggerBlogsService {
       // Processing wallpaper image if metadata exists
       if (wallpaperMetadata) {
         // Extracting metadata for wallpaper image
-        const metadata: FileMetadata =
-          await this.fileMetadataService.extractFromBuffer(
+        const metadata: ImageWidthHeightSize =
+          await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
             wallpaperMetadata.buffer,
           );
         // Generating signed URL for wallpaper image
@@ -83,8 +83,10 @@ export class BloggerBlogsService {
         await Promise.all(
           mainMetadata.map(async (metadata) => {
             // Extracting metadata for main image
-            const fileMetadata: FileMetadata =
-              await this.fileMetadataService.extractFromBuffer(metadata.buffer);
+            const fileMetadata: ImageWidthHeightSize =
+              await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
+                metadata.buffer,
+              );
             // Generating signed URL for main image
             const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
               metadata.pathKey,

@@ -21,7 +21,7 @@ import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/i
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
-import { ImagesMetadataService } from '../images-metadata.service';
+import { ImagesMetadataService } from '../../../../common/helpers/images-metadata.service/images-metadata.service';
 
 export class UploadImagesPostsCommand {
   constructor(

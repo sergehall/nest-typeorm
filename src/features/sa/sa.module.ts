@@ -48,7 +48,6 @@ import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/im
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
-import { FileMetadataService } from '../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';
@@ -56,6 +55,7 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
+import { ImagesMetadataService } from '../../common/helpers/images-metadata.service/images-metadata.service';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -103,11 +103,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
     AwsConfig,
     EncryptConfig,
     S3Service,
-    ParseQueriesService,
-    FileMetadataService,
     SaService,
     UsersService,
     BloggerBlogsService,
+    ParseQueriesService,
+    ImagesMetadataService,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

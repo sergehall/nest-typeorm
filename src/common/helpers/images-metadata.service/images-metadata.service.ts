@@ -1,24 +1,37 @@
-import { Injectable } from '@nestjs/common';
-import { PostWithLikesInfoViewModel } from '../../posts/views/post-with-likes-info.view-model';
-import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-likes-images-info.view-model';
-import {
-  ImageMetadata,
-  PostImagesViewModel,
-} from '../../posts/views/post-images.view-model';
-import { OriginalMiddleSmallEntitiesDto } from '../../posts/dto/original-middle-small-entities.dto';
-import { ImagesPostsMetadataEntity } from '../../posts/dto/images-posts-metadata.dto';
-import { FileMetadata } from '../../../common/helpers/file-metadata-from-buffer.service/dto/file-metadata';
-import { UrlDto } from '../dto/url.dto';
-import { PathKeyBufferDto } from '../../posts/dto/path-key-buffer.dto';
-import { FileMetadataService } from '../../../common/helpers/file-metadata-from-buffer.service/file-metadata-service';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { PostWithLikesInfoViewModel } from '../../../features/posts/views/post-with-likes-info.view-model';
+import { PostWithLikesImagesInfoViewModel } from '../../../features/posts/views/post-with-likes-images-info.view-model';
+import { PostImagesViewModel } from '../../../features/posts/views/post-images.view-model';
+import { OriginalMiddleSmallEntitiesDto } from '../../../features/posts/dto/original-middle-small-entities.dto';
+import { ImagesPostsMetadataEntity } from '../../../features/posts/dto/images-posts-metadata.dto';
+import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
+import { PathKeyBufferDto } from '../../../features/posts/dto/path-key-buffer.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
+import * as sharp from 'sharp';
+import { ImageWidthHeightSize } from './dto/image-width-height-size';
+import { ImageMetadata } from './dto/image-metadata';
 
 @Injectable()
 export class ImagesMetadataService {
-  constructor(
-    protected fileMetadataService: FileMetadataService,
-    protected s3Service: S3Service,
-  ) {}
+  constructor(protected s3Service: S3Service) {}
+
+  async extractWidthHeightSizeFromBuffer(
+    buffer: Buffer,
+  ): Promise<ImageWidthHeightSize> {
+    try {
+      const metadata = await sharp(buffer).metadata();
+      const width = metadata.width || 0;
+      const height = metadata.height || 0;
+      const fileSize = metadata.size || 0;
+
+      return { width, height, fileSize };
+    } catch (error) {
+      console.error('Error extracting file metadata:', error);
+      throw new InternalServerErrorException(
+        'Error extracting file metadata:' + error.message,
+      );
+    }
+  }
 
   async processImageMetadata(
     imagesMetadata: OriginalMiddleSmallEntitiesDto,
@@ -53,8 +66,8 @@ export class ImagesMetadataService {
   async imageMetadataProcessor(
     metadata: ImagesPostsMetadataEntity,
   ): Promise<ImageMetadata[]> {
-    const imageMetadata: FileMetadata =
-      await this.fileMetadataService.extractFromBuffer(metadata.buffer);
+    const imageMetadata: ImageWidthHeightSize =
+      await this.extractWidthHeightSizeFromBuffer(metadata.buffer);
 
     const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
       metadata.pathKey,
@@ -78,8 +91,8 @@ export class ImagesMetadataService {
     }
     const processedMetadataPromises = imagesMetadata.map(async (metadata) => {
       // Extract file metadata
-      const imageMetadata: FileMetadata =
-        await this.fileMetadataService.extractFromBuffer(metadata.buffer);
+      const imageMetadata: ImageWidthHeightSize =
+        await this.extractWidthHeightSizeFromBuffer(metadata.buffer);
 
       const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
         metadata.pathKey,

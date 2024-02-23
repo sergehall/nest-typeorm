@@ -5,6 +5,7 @@ import {
   Query,
   UseGuards,
   Request,
+  Delete,
 } from '@nestjs/common';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -49,10 +50,16 @@ export class BlogsController {
 
   @Get(':blogId/subscription')
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async blogSubscription(
+  async subscribeToBlog(
     @Param() params: IdParams,
   ): Promise<BloggerBlogsWithImagesViewModel> {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
+  }
+
+  @Delete(':blogId/subscription')
+  @CheckAbilities({ action: Action.DELETE, subject: CurrentUserDto })
+  async unsubscribeFromBlog(@Param() params: IdParams) {
+    return true;
   }
 
   @Get(':blogId/posts')
