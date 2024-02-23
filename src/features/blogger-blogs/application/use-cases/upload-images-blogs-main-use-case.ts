@@ -17,8 +17,8 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
 import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/media-services/images-metadata.service/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/media-services/images-metadata.service/dto/image-width-height-size';
+import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
+import { ImageWidthHeightSize } from '../../../../common/media-services/images/dto/image-width-height-size';
 
 export class UploadImagesBlogsMainCommand {
   constructor(
