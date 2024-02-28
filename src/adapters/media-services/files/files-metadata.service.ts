@@ -10,10 +10,48 @@ import { S3Service } from '../../../config/aws/s3/s3-service';
 import * as sharp from 'sharp';
 import { ImageWidthHeightSize } from './dto/image-width-height-size';
 import { ImageMetadata } from './dto/image-metadata';
+import { FileUploadDto } from '../../../features/blogger-blogs/dto/file-upload.dto';
+import { ResizedImageDetailsDto } from '../../../features/posts/dto/resized-image-details.dto';
 
 @Injectable()
-export class ImagesMetadataService {
+export class FilesMetadataService {
   constructor(protected s3Service: S3Service) {}
+
+  async resizeImages(dto: FileUploadDto): Promise<ResizedImageDetailsDto> {
+    const [middleResizedImage, smallResizedImage] = await Promise.all([
+      this.resizeImage(dto.buffer, 300, 180),
+      this.resizeImage(dto.buffer, 149, 96),
+    ]);
+
+    return {
+      original: { ...dto, size: dto.buffer.length },
+      middle: {
+        ...dto,
+        buffer: middleResizedImage.buffer,
+        size: middleResizedImage.size,
+      },
+      small: {
+        ...dto,
+        buffer: smallResizedImage.buffer,
+        size: smallResizedImage.size,
+      },
+    };
+  }
+
+  private async resizeImage(
+    buffer: Buffer,
+    width: number,
+    height: number,
+  ): Promise<{ buffer: Buffer; size: number }> {
+    const resizedImageBuffer = await sharp(buffer)
+      .resize(width, height)
+      .toBuffer();
+
+    return {
+      buffer: resizedImageBuffer,
+      size: resizedImageBuffer.length,
+    };
+  }
 
   async extractWidthHeightSizeFromBuffer(
     buffer: Buffer,
@@ -116,7 +154,7 @@ export class ImagesMetadataService {
     const images = new PostImagesViewModel();
     return {
       ...newPost, // Spread properties of newPost
-      images: images, // Add images property
+      images: images, // Add files property
     };
   }
 }

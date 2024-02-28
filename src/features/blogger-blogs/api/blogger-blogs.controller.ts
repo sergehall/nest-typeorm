@@ -49,10 +49,10 @@ import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
-import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-images-blogs-wallpaper-use-case';
-import { UploadImagesPostsCommand } from '../application/use-cases/upload-images-posts-use-case';
-import { UploadImagesBlogsMainCommand } from '../application/use-cases/upload-images-blogs-main-use-case';
+import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
+import { UploadImagesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
 import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-likes-images-info.view-model';
+import { UploadFilesBlogsMainCommand } from '../application/use-cases/upload-files-blogs-main-use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -61,7 +61,7 @@ export class BloggerBlogsController {
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
-  @Post('blogs/:blogId/posts/:postId/images/main')
+  @Post('blogs/:blogId/posts/:postId/files/main')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageForPost(
@@ -78,7 +78,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs/:blogId/images/wallpaper')
+  @Post('blogs/:blogId/files/wallpaper')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageBlogWallpaper(
@@ -99,10 +99,10 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs/:blogId/images/main')
+  @Post('blogs/:blogId/files/main')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImageBlogMain(
+  async uploadFilesBlogMain(
     @Request() req: any,
     @Param() params: BlogIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogMain))
@@ -112,7 +112,7 @@ export class BloggerBlogsController {
     const fileUploadDto: FileUploadDto = file;
 
     return await this.commandBus.execute(
-      new UploadImagesBlogsMainCommand(params, fileUploadDto, currentUserDto),
+      new UploadFilesBlogsMainCommand(params, fileUploadDto, currentUserDto),
     );
   }
 

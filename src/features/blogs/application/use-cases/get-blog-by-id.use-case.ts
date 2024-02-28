@@ -7,8 +7,8 @@ import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrast
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { ImagesBlogsMainMetadataEntity } from '../../../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { ImagesBlogsWallpaperMetadataEntity } from '../../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
-import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
-import { ImageMetadata } from '../../../../common/media-services/images/dto/image-metadata';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
+import { ImageMetadata } from '../../../../adapters/media-services/files/dto/image-metadata';
 
 export class GetBlogByIdCommand {
   constructor(public blogId: string) {}
@@ -20,7 +20,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     protected s3Service: S3Service,
     protected commandBus: CommandBus,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected imagesMetadataService: ImagesMetadataService,
+    protected imagesMetadataService: FilesMetadataService,
     protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
