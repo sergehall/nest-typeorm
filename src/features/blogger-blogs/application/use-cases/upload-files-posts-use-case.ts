@@ -23,7 +23,7 @@ import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
-export class UploadImagesPostsCommand {
+export class UploadFilesPostsCommand {
   constructor(
     public params: BlogIdPostIdParams,
     public fileUploadDto: FileUploadDto,
@@ -32,9 +32,9 @@ export class UploadImagesPostsCommand {
 }
 
 /** Command handler for the UploadImageForPostCommand. */
-@CommandHandler(UploadImagesPostsCommand)
+@CommandHandler(UploadFilesPostsCommand)
 export class UploadFilesPostsUseCase
-  implements ICommandHandler<UploadImagesPostsCommand>
+  implements ICommandHandler<UploadFilesPostsCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
@@ -51,7 +51,7 @@ export class UploadFilesPostsUseCase
    * @returns A promise that resolves to the post files view model.
    */
   async execute(
-    command: UploadImagesPostsCommand,
+    command: UploadFilesPostsCommand,
   ): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId, postId } = params;

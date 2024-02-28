@@ -19,7 +19,7 @@ import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-bl
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { ImageWidthHeightSize } from '../../../../adapters/media-services/files/dto/image-width-height-size';
 
-export class UploadImageBlogWallpaperCommand {
+export class UploadFilesBlogWallpaperCommand {
   constructor(
     public params: BlogIdParams,
     public fileUploadDto: FileUploadDto,
@@ -28,9 +28,9 @@ export class UploadImageBlogWallpaperCommand {
 }
 
 /** Command handler for the UploadImageBlogWallpaperCommand. */
-@CommandHandler(UploadImageBlogWallpaperCommand)
+@CommandHandler(UploadFilesBlogWallpaperCommand)
 export class UploadFilesBlogsWallpaperUseCase
-  implements ICommandHandler<UploadImageBlogWallpaperCommand>
+  implements ICommandHandler<UploadFilesBlogWallpaperCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
@@ -41,7 +41,7 @@ export class UploadFilesBlogsWallpaperUseCase
   ) {}
 
   async execute(
-    command: UploadImageBlogWallpaperCommand,
+    command: UploadFilesBlogWallpaperCommand,
   ): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId } = params;
