@@ -333,16 +333,6 @@ export class PostsRepo {
     }
   }
 
-  private async addExtendedLikesInfoToPostsEntity(
-    newPost: PostViewModel,
-  ): Promise<PostWithLikesInfoViewModel> {
-    const extendedLikesInfo = new ExtendedLikesInfo();
-    return {
-      ...newPost, // Spread properties of newPost
-      extendedLikesInfo, // Add extendedLikesInfo property
-    };
-  }
-
   private async getBannedFlags(): Promise<BannedFlagsDto> {
     return {
       commentatorInfoIsBanned: false,
