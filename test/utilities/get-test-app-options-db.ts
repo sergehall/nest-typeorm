@@ -5,7 +5,7 @@ import { AppModule } from '../../src/app.module';
 import { createApp } from '../../src/create-app';
 import { DataSource } from 'typeorm';
 import Configuration from '../../src/config/configuration';
-import { AppTypeOrmModuleOptions } from '../../src/db/type-orm/options/type-orm-postgres.options';
+import { TypeOrmPostgresOptions } from '../../src/db/type-orm/options/type-orm-postgres.options';
 
 const ownerNameDb =
   Configuration.getConfiguration().db.pg.authConfig.PG_HEROKU_USER_NAME;
@@ -16,7 +16,7 @@ export const getTestAppOptions = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [
       TypeOrmModule.forRootAsync({
-        useClass: AppTypeOrmModuleOptions,
+        useClass: TypeOrmPostgresOptions,
       }),
       AppModule,
     ],
