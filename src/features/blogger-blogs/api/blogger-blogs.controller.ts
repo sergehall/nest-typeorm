@@ -49,10 +49,10 @@ import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
 import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
-import { UploadImageBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
-import { UploadImagesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
 import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-likes-images-info.view-model';
 import { UploadFilesBlogsMainCommand } from '../application/use-cases/upload-files-blogs-main-use-case';
+import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
+import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
 
 @SkipThrottle()
 @Controller('blogger')
@@ -74,7 +74,7 @@ export class BloggerBlogsController {
     const fileUpload: FileUploadDto = file;
 
     return await this.commandBus.execute(
-      new UploadImagesPostsCommand(params, fileUpload, currentUserDto),
+      new UploadFilesPostsCommand(params, fileUpload, currentUserDto),
     );
   }
 
@@ -91,7 +91,7 @@ export class BloggerBlogsController {
     const fileUploadDto: FileUploadDto = file;
 
     return await this.commandBus.execute(
-      new UploadImageBlogWallpaperCommand(
+      new UploadFilesBlogWallpaperCommand(
         params,
         fileUploadDto,
         currentUserDto,

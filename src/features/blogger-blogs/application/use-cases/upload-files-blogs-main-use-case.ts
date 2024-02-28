@@ -15,10 +15,10 @@ import {
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { UploadImageBlogWallpaperCommand } from './upload-files-blogs-wallpaper-use-case';
 import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { ImageWidthHeightSize } from '../../../../adapters/media-services/files/dto/image-width-height-size';
+import { UploadFilesBlogWallpaperCommand } from './upload-files-blogs-wallpaper-use-case';
 
 export class UploadFilesBlogsMainCommand {
   constructor(
@@ -41,7 +41,7 @@ export class UploadFilesBlogsMainUseCase
   ) {}
 
   async execute(
-    command: UploadImageBlogWallpaperCommand,
+    command: UploadFilesBlogWallpaperCommand,
   ): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId } = params;
