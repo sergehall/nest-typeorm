@@ -11,13 +11,13 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
+import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/media-services/images/dto/image-width-height-size';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
+import { ImageWidthHeightSize } from '../../../../adapters/media-services/files/dto/image-width-height-size';
 
 export class UploadImageBlogWallpaperCommand {
   constructor(
@@ -29,14 +29,14 @@ export class UploadImageBlogWallpaperCommand {
 
 /** Command handler for the UploadImageBlogWallpaperCommand. */
 @CommandHandler(UploadImageBlogWallpaperCommand)
-export class UploadImagesBlogsWallpaperUseCase
+export class UploadFilesBlogsWallpaperUseCase
   implements ICommandHandler<UploadImageBlogWallpaperCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected fileStorageAdapter: FileStorageAdapter,
-    protected imagesMetadataService: ImagesMetadataService,
+    protected filesStorageAdapter: FilesStorageAdapter,
+    protected filesMetadataService: FilesMetadataService,
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
@@ -58,19 +58,19 @@ export class UploadImagesBlogsWallpaperUseCase
 
     // Extract file metadata
     const metadata: ImageWidthHeightSize =
-      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
+      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(
         fileUploadDto.buffer,
       );
 
     // Upload file for the post to s3
     const urlPathKeyEtagDto: UrlPathKeyEtagDto =
-      await this.fileStorageAdapter.uploadFileImageBlogWallpaper(
+      await this.filesStorageAdapter.uploadFileImageBlogWallpaper(
         params,
         fileUploadDto,
         currentUserDto,
       );
 
-    // Create post images file metadata into postgresSql
+    // Create post files file metadata into postgresSql
     await this.imagesBlogsWallpaperMetadataRepo.createImagesBlogWallpaper(
       blog,
       fileUploadDto,
@@ -78,7 +78,7 @@ export class UploadImagesBlogsWallpaperUseCase
       currentUserDto,
     );
 
-    // Return post images view model
+    // Return post files view model
     return {
       wallpaper: {
         url: urlPathKeyEtagDto.url,

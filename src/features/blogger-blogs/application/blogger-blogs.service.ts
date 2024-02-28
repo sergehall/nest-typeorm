@@ -9,15 +9,15 @@ import { UrlDto } from '../dto/url.dto';
 import { S3Service } from '../../../config/aws/s3/s3-service';
 import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../../common/media-services/images/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../common/media-services/images/dto/image-width-height-size';
-import { ImageMetadata } from '../../../common/media-services/images/dto/image-metadata';
+import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
+import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto/image-width-height-size';
+import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 
 @Injectable()
 export class BloggerBlogsService {
   constructor(
     private readonly s3Service: S3Service,
-    private readonly imagesMetadataService: ImagesMetadataService,
+    private readonly imagesMetadataService: FilesMetadataService,
     private readonly imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     private readonly imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
@@ -28,7 +28,7 @@ export class BloggerBlogsService {
     const images = new ImagesViewModel();
     return {
       ...newBlog, // Spread properties of newBlog
-      images, // Add extended images
+      images, // Add extended files
     };
   }
   async blogsImagesAggregation(
@@ -39,7 +39,7 @@ export class BloggerBlogsService {
     // Array to store aggregated results
     const resultMap: BloggerBlogsWithImagesViewModel[] = [];
 
-    // Fetching image metadata for wallpapers and main images in parallel
+    // Fetching image metadata for wallpapers and main files in parallel
     const [imagesBlogsWallpaper, imagesBlogsMain] = await Promise.all([
       this.imagesBlogsWallpaperMetadataRepo.findImagesBlogsWallpaperByIds(
         blogsIds,
@@ -77,9 +77,9 @@ export class BloggerBlogsService {
         };
       }
 
-      // Processing main images if metadata exists
+      // Processing main files if metadata exists
       if (mainMetadata && mainMetadata.length > 0) {
-        // Fetching metadata for main images in parallel
+        // Fetching metadata for main files in parallel
         await Promise.all(
           mainMetadata.map(async (metadata) => {
             // Extracting metadata for main image

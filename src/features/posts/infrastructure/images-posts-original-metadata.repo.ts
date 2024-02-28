@@ -31,7 +31,7 @@ export class ImagesPostsOriginalMetadataRepo {
     protected keyResolver: KeyResolver,
   ) {}
 
-  async createImagePostMetadata(
+  async createImagePostOriginalMiddleSmallSizes(
     blog: BloggerBlogsEntity,
     post: PostsEntity,
     resizedImages: ResizedImageDetailsDto,
@@ -144,7 +144,7 @@ export class ImagesPostsOriginalMetadataRepo {
     // Wrap the database queries within a transaction
     return this.imagesPostsOriginalMetadataRepository.manager.transaction(
       async (transactionManager) => {
-        // Parallelize the retrieval of metadata for different sizes of images
+        // Parallelize the retrieval of metadata for different sizes of files
         const [
           originalMetadataPromise,
           middleMetadataPromise,

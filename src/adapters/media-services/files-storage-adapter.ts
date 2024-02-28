@@ -7,15 +7,14 @@ import {
   UrlPathKeyEtagDto,
   UrlsPathKeysEtagsDto,
 } from '../../features/blogger-blogs/dto/url-pathKey-etag.dto';
-import { BlogIdParams } from '../query/params/blogId.params';
+import { BlogIdParams } from '../../common/query/params/blogId.params';
 import { UrlDto } from '../../features/blogger-blogs/dto/url.dto';
-import * as sharp from 'sharp';
 import { ResizedImageDetailsDto } from '../../features/posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../features/posts/dto/keys-path.dto';
 import { PathsKeysFileUploadDto } from '../../features/posts/dto/path-key-file-upload.dto';
 
 @Injectable()
-export class FileStorageAdapter {
+export class FilesStorageAdapter {
   constructor(private s3Service: S3Service) {}
 
   async uploadFileImagePost(
@@ -204,45 +203,6 @@ export class FileStorageAdapter {
     return `content/users/${userId}/blogs/${blogId}_main.${await this.getFileExtension(
       mimetype,
     )}`;
-  }
-
-  async resizeImages(dto: FileUploadDto): Promise<ResizedImageDetailsDto> {
-    // Resize original image to middle size (300x180)
-    const middleResizedImageBuffer = await sharp(dto.buffer)
-      .resize(300, 180)
-      .toBuffer();
-
-    // Resize original image to small size (149x96)
-    const smallResizedImageBuffer = await sharp(dto.buffer)
-      .resize(149, 96)
-      .toBuffer();
-
-    return {
-      original: {
-        fieldname: dto.fieldname,
-        originalname: dto.originalname,
-        encoding: dto.encoding,
-        mimetype: dto.mimetype,
-        buffer: dto.buffer,
-        size: dto.size,
-      },
-      middle: {
-        fieldname: dto.fieldname,
-        originalname: dto.originalname,
-        encoding: dto.encoding,
-        mimetype: dto.mimetype,
-        buffer: middleResizedImageBuffer,
-        size: middleResizedImageBuffer.length,
-      },
-      small: {
-        fieldname: dto.fieldname,
-        originalname: dto.originalname,
-        encoding: dto.encoding,
-        mimetype: dto.mimetype,
-        buffer: smallResizedImageBuffer,
-        size: smallResizedImageBuffer.length,
-      },
-    };
   }
 
   private async getFileExtension(mimetype: string): Promise<string> {

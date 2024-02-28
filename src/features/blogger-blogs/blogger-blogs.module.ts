@@ -33,14 +33,14 @@ import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { AwsConfig } from '../../config/aws/aws-config';
-import { UploadImagesPostsUseCase } from './application/use-cases/upload-images-posts-use-case';
+import { UploadFilesPostsUseCase } from './application/use-cases/upload-files-posts-use-case';
 import { S3Service } from '../../config/aws/s3/s3-service';
-import { FileStorageAdapter } from '../../common/media-services/file-storage-adapter';
+import { FilesStorageAdapter } from '../../adapters/media-services/files-storage-adapter';
 import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
-import { UploadImagesBlogsWallpaperUseCase } from './application/use-cases/upload-images-blogs-wallpaper-use-case';
+import { UploadFilesBlogsWallpaperUseCase } from './application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from './entities/images-blog-main-metadata.entity';
-import { UploadImagesBlogsMainUseCase } from './application/use-cases/upload-images-blogs-main-use-case';
+import { UploadFilesBlogsMainUseCase } from './application/use-cases/upload-files-blogs-main-use-case';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
@@ -48,7 +48,7 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../common/media-services/images/images-metadata.service';
+import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -57,11 +57,18 @@ const bloggersBlogUseCases = [
   CreateBloggerBlogUseCase,
   UpdateBlogByIdUseCase,
   DeleteBlogByBlogIdUseCase,
-  UploadImagesPostsUseCase,
-  UploadImagesBlogsWallpaperUseCase,
-  UploadImagesBlogsMainUseCase,
+  UploadFilesPostsUseCase,
+  UploadFilesBlogsWallpaperUseCase,
+  UploadFilesBlogsMainUseCase,
 ];
 
+const services = [
+  S3Service,
+  PostsService,
+  ParseQueriesService,
+  BloggerBlogsService,
+  FilesMetadataService,
+];
 const validators = [BlogExistsValidator];
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -89,12 +96,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   providers: [
     AwsConfig,
     CaslAbilityFactory,
-    S3Service,
-    FileStorageAdapter,
-    PostsService,
-    ParseQueriesService,
-    BloggerBlogsService,
-    ImagesMetadataService,
+    FilesStorageAdapter,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,
@@ -109,8 +111,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ImagesPostsMiddleMetadataRepo,
     ImagesBlogsWallpaperMetadataRepo,
     ...helpers,
-    ...bloggersBlogUseCases,
+    ...services,
     ...validators,
+    ...bloggersBlogUseCases,
   ],
 })
 export class BloggerBlogsModule {}

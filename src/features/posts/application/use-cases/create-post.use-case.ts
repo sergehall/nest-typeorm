@@ -18,7 +18,7 @@ import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-us
 import { PostsService } from '../posts.service';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
 export class CreatePostCommand {
   constructor(
@@ -34,7 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
     private readonly postsService: PostsService,
-    private readonly imagesMetadataService: ImagesMetadataService,
+    private readonly imagesMetadataService: FilesMetadataService,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}

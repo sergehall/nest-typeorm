@@ -40,7 +40,7 @@ import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-bl
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { AwsConfig } from '../../config/aws/aws-config';
-import { ImagesMetadataService } from '../../common/media-services/images/images-metadata.service';
+import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 
 const commentsUseCases = [
   GetCommentsByUserIdUseCase,
@@ -81,7 +81,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PostsService,
     AuthService,
     UsersService,
-    ImagesMetadataService,
+    FilesMetadataService,
     CommentsRepo,
     UsersRepo,
     PostsRepo,

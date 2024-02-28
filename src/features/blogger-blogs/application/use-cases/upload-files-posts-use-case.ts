@@ -14,14 +14,14 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
+import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
-import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
 export class UploadImagesPostsCommand {
   constructor(
@@ -33,22 +33,22 @@ export class UploadImagesPostsCommand {
 
 /** Command handler for the UploadImageForPostCommand. */
 @CommandHandler(UploadImagesPostsCommand)
-export class UploadImagesPostsUseCase
+export class UploadFilesPostsUseCase
   implements ICommandHandler<UploadImagesPostsCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
-    protected imagesMetadataService: ImagesMetadataService,
     protected postsRepo: PostsRepo,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected fileStorageAdapter: FileStorageAdapter,
-    protected postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
+    protected filesStorageAdapter: FilesStorageAdapter,
+    protected filesMetadataService: FilesMetadataService,
+    protected imagesPostsOriginalMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
 
   /**
    * Execute method to handle the command.
    * @param command The UploadImageForPostCommand.
-   * @returns A promise that resolves to the post images view model.
+   * @returns A promise that resolves to the post files view model.
    */
   async execute(
     command: UploadImagesPostsCommand,
@@ -75,10 +75,10 @@ export class UploadImagesPostsUseCase
     await this.userPermission(blog.blogOwner.userId, currentUserDto);
 
     const resizedImages: ResizedImageDetailsDto =
-      await this.fileStorageAdapter.resizeImages(fileUploadDto);
+      await this.filesMetadataService.resizeImages(fileUploadDto);
 
     const pathsKeys: KeysPathDto =
-      await this.fileStorageAdapter.generatePathsKeysForPost(
+      await this.filesStorageAdapter.generatePathsKeysForPost(
         currentUserDto.userId,
         blogId,
         postId,
@@ -87,14 +87,14 @@ export class UploadImagesPostsUseCase
 
     // Upload file for the post to s3
     const urlsPathKeysEtagsDto: UrlsPathKeysEtagsDto =
-      await this.fileStorageAdapter.uploadFileImagePost(
+      await this.filesStorageAdapter.uploadFileImagePost(
         resizedImages,
         pathsKeys,
       );
 
-    // Create post images file metadata into postgresSql
+    // Create post file Original Middle Small sizes metadata into postgresSql
     const imagesMetadataEntity: OriginalMiddleSmallEntitiesDto =
-      await this.postsImagesFileMetadataRepo.createImagePostMetadata(
+      await this.imagesPostsOriginalMetadataRepo.createImagePostOriginalMiddleSmallSizes(
         blog,
         post,
         resizedImages,
@@ -102,7 +102,7 @@ export class UploadImagesPostsUseCase
         currentUserDto,
       );
 
-    return await this.imagesMetadataService.processImageMetadata(
+    return await this.filesMetadataService.processImageMetadata(
       imagesMetadataEntity,
     );
   }

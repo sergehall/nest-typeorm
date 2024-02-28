@@ -4,7 +4,7 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
-import { FileStorageAdapter } from '../../../../common/media-services/file-storage-adapter';
+import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import {
@@ -15,12 +15,12 @@ import {
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import { UploadImageBlogWallpaperCommand } from './upload-images-blogs-wallpaper-use-case';
+import { UploadImageBlogWallpaperCommand } from './upload-files-blogs-wallpaper-use-case';
 import { ImagesBlogsMainMetadataRepo } from '../../infrastructure/images-blogs-main-metadata.repo';
-import { ImagesMetadataService } from '../../../../common/media-services/images/images-metadata.service';
-import { ImageWidthHeightSize } from '../../../../common/media-services/images/dto/image-width-height-size';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
+import { ImageWidthHeightSize } from '../../../../adapters/media-services/files/dto/image-width-height-size';
 
-export class UploadImagesBlogsMainCommand {
+export class UploadFilesBlogsMainCommand {
   constructor(
     public params: BlogIdParams,
     public fileUploadDto: FileUploadDto,
@@ -28,15 +28,15 @@ export class UploadImagesBlogsMainCommand {
   ) {}
 }
 
-@CommandHandler(UploadImagesBlogsMainCommand)
-export class UploadImagesBlogsMainUseCase
-  implements ICommandHandler<UploadImagesBlogsMainCommand>
+@CommandHandler(UploadFilesBlogsMainCommand)
+export class UploadFilesBlogsMainUseCase
+  implements ICommandHandler<UploadFilesBlogsMainCommand>
 {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
-    protected fileStorageAdapter: FileStorageAdapter,
-    protected imagesMetadataService: ImagesMetadataService,
+    protected fileStorageAdapter: FilesStorageAdapter,
+    protected filesMetadataService: FilesMetadataService,
     protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
   ) {}
 
@@ -58,7 +58,7 @@ export class UploadImagesBlogsMainUseCase
 
     // Extract file metadata
     const metadata: ImageWidthHeightSize =
-      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
+      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(
         fileUploadDto.buffer,
       );
 
@@ -70,7 +70,7 @@ export class UploadImagesBlogsMainUseCase
         currentUserDto,
       );
 
-    // Create post images file metadata into postgresSql
+    // Create post files file metadata into postgresSql
     await this.imagesBlogsMainMetadataRepo.createImagesBlogMain(
       blog,
       fileUploadDto,
@@ -78,7 +78,7 @@ export class UploadImagesBlogsMainUseCase
       currentUserDto,
     );
 
-    // Return post images view model
+    // Return post files view model
     return {
       wallpaper: null,
       main: [

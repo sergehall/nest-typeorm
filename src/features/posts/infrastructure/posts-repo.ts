@@ -275,7 +275,7 @@ export class PostsRepo {
   async deletePostByPostId(postId: string): Promise<boolean> {
     return this.postsRepository.manager.transaction(async (manager) => {
       try {
-        // Delete images associated with the post
+        // Delete files associated with the post
         await manager.delete(ImagesPostsOriginalMetadataEntity, {
           post: { id: postId },
         });

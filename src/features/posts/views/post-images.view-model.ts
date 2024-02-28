@@ -1,4 +1,4 @@
-import { ImageMetadata } from '../../../common/media-services/images/dto/image-metadata';
+import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 
 export class PostImagesViewModel {
   main: ImageMetadata[] = []; // Set default value

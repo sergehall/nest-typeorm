@@ -55,7 +55,7 @@ export class GetPostsInBlogUseCase
     const posts: PostWithLikesInfoViewModel[] = postsAndNumberOfPosts.posts;
     const postIds = posts.map((post) => post.id);
 
-    // Retrieve metadata for images associated with posts
+    // Retrieve metadata for files associated with posts
     const imagesMetadataForPosts: {
       [postId: string]: PathKeyBufferDto[];
     }[] =

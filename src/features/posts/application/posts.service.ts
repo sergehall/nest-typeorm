@@ -7,11 +7,11 @@ import {
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 import { PostImagesViewModel } from '../views/post-images.view-model';
 import { PathKeyBufferDto } from '../dto/path-key-buffer.dto';
-import { ImagesMetadataService } from '../../../common/media-services/images/images-metadata.service';
+import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
 
 @Injectable()
 export class PostsService {
-  constructor(protected imagesMetadataService: ImagesMetadataService) {}
+  constructor(protected imagesMetadataService: FilesMetadataService) {}
 
   async mapPostsWithLikesAndImagesMetadata(
     posts: PostWithLikesInfoViewModel[],
@@ -24,7 +24,7 @@ export class PostsService {
         const images: PathKeyBufferDto[] =
           imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
 
-        // Retrieve metadata for images
+        // Retrieve metadata for files
         const metadataPromise: PostImagesViewModel =
           await this.imagesMetadataService.imagesMetadataProcessor(images);
         return { post, metadataPromise };
