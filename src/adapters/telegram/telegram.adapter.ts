@@ -9,7 +9,8 @@ export class TelegramAdapter {
     private readonly postgresConfig: PostgresConfig,
     private readonly telegramConfig: TelegramConfig,
   ) {}
-  async sendMessage(text: string, recipientId: number) {
+
+  async sendMessageToRecipient(text: string, recipientId: number) {
     const tokenTelegramBot = await this.telegramConfig.getTokenIncubator(
       'TOKEN_INCUBATOR_TEST_34',
     );
@@ -33,9 +34,7 @@ export class TelegramAdapter {
 
     await axios.post(
       `https://api.telegram.org/bot${tokenTelegramBot}/setWebhook`,
-      {
-        url: url,
-      },
+      { url: url }, // Send url as an object
     );
   }
 }
