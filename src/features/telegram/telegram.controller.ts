@@ -7,18 +7,18 @@ export class TelegramController {
   constructor(private readonly telegramService: TelegramService) {}
 
   @Post('notification')
-  getWebhook(@Body() payload: any) {
+  async getWebhook(@Body() payload: any) {
     console.log(payload, 'payload');
     return this.telegramService.getWebhook();
   }
 
   @Post('webhook')
-  createWebhook(@Body() createTelegramDto: CreateTelegramDto) {
+  async createWebhook(@Body() createTelegramDto: CreateTelegramDto) {
     return this.telegramService.createWebhook(createTelegramDto);
   }
 
   @Get('auth-bot-link')
-  getAuthBotLink() {
+  async getAuthBotLink() {
     return this.telegramService.getAuthBotLink();
   }
 }

@@ -14,9 +14,6 @@ export class TelegramAdapter {
       'TOKEN_INCUBATOR_TEST_34',
     );
 
-    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const url = baseUrl + "/integrations/telegram/notification'";
-
     await axios.post(
       `https://api.telegram.org/bot${tokenTelegramBot}/sendMessage`,
       {
