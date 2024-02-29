@@ -7,7 +7,7 @@ export class TelegramService {
     return `This action createWebhook a new telegram ${createTelegramDto}`;
   }
 
-  getHook() {
+  getWebhook() {
     return { status: 'success' };
   }
 

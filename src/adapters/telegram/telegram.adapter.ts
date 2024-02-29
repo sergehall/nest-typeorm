@@ -9,6 +9,22 @@ export class TelegramAdapter {
     private readonly postgresConfig: PostgresConfig,
     private readonly telegramConfig: TelegramConfig,
   ) {}
+  async sendMessage(text: string, recipientId: number) {
+    const tokenTelegramBot = await this.telegramConfig.getTokenIncubator(
+      'TOKEN_INCUBATOR_TEST_34',
+    );
+
+    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+    const url = baseUrl + "/integrations/telegram/notification'";
+
+    await axios.post(
+      `https://api.telegram.org/bot${tokenTelegramBot}/sendMessage`,
+      {
+        chat_id: recipientId,
+        text: text,
+      },
+    );
+  }
 
   async setWebhook() {
     const tokenTelegramBot = await this.telegramConfig.getTokenIncubator(
@@ -16,7 +32,7 @@ export class TelegramAdapter {
     );
 
     const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const url = baseUrl + "/integrations/telegram/notification'";
+    const url = baseUrl + '/integrations/telegram/notification';
 
     await axios.post(
       `https://api.telegram.org/bot${tokenTelegramBot}/setWebhook`,

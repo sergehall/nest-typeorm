@@ -6,10 +6,10 @@ import { CreateTelegramDto } from './dto/create-telegram.dto';
 export class TelegramController {
   constructor(private readonly telegramService: TelegramService) {}
 
-  @Get('notification')
+  @Post('notification')
   getWebhook(@Body() payload: any) {
     console.log(payload, 'payload');
-    return this.telegramService.getHook();
+    return this.telegramService.getWebhook();
   }
 
   @Post('webhook')
