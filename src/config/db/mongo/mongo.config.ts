@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BaseConfig } from '../../base/base-config';
+import { BaseConfig } from '../../base/base.config';
 import { MongoDatabaseConfigTypes } from './types/mongo-db-config.types';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { RegistrationUserCommand } from '../../../auth/application/use-cases/registration-user.use-case';
-import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../../../config/encrypt/encrypt.config';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../dto/data-for-create-user.dto';
 import { UsersEntity } from '../../entities/users.entity';

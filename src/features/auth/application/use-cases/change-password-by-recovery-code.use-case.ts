@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NewPasswordRecoveryDto } from '../../dto/new-password-recovery.dto';
-import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../../../config/encrypt/encrypt.config';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 
 export class ChangePasswordByRecoveryCodeCommand {

@@ -7,7 +7,7 @@ import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { SecurityDevicesService } from '../security-devices/application/security-devices.service';
-import { JwtConfig } from '../../config/jwt/jwt-config';
+import { JwtConfig } from '../../config/jwt/jwt.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
@@ -21,7 +21,7 @@ import { ValidAccessJwtUseCase } from './application/use-cases/valid-access-jwt.
 import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jwt.use-case';
 import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
-import { EncryptConfig } from '../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../config/encrypt/encrypt.config';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';

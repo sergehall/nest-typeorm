@@ -8,10 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
-import {
-  ExtendedLikesInfo,
-  PostWithLikesInfoViewModel,
-} from '../views/post-with-likes-info.view-model';
+import { PostWithLikesInfoViewModel } from '../views/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';

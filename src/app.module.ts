@@ -25,6 +25,9 @@ import { SaQuizQuestionsModule } from './features/sa-quiz-questions/sa-quiz-ques
 import { PairGameQuizModule } from './features/pair-game-quiz/pair-game-quiz.module';
 import { TypeOrmPostgresOptions } from './db/type-orm/options/type-orm-postgres.options';
 import { TelegramModule } from './features/telegram/telegram.module';
+import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
+import { TelegramConfig } from './config/telegram/telegram.config';
+import { PostgresConfig } from './config/db/postgres/postgres.config';
 
 @Module({
   imports: [
@@ -54,7 +57,13 @@ import { TelegramModule } from './features/telegram/telegram.module';
     TelegramModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ...appProviders],
+  providers: [
+    AppService,
+    TelegramAdapter,
+    TelegramConfig,
+    PostgresConfig,
+    ...appProviders,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,6 +1,6 @@
 import { PayloadDto } from '../../dto/payload.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtConfig } from '../../../../config/jwt/jwt-config';
+import { JwtConfig } from '../../../../config/jwt/jwt.config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class ValidAccessJwtCommand {

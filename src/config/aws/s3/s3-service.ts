@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3Client, CreateBucketCommand } from '@aws-sdk/client-s3';
-import { AwsConfig } from '../aws-config';
+import { AwsConfig } from '../aws.config';
 import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
 
 @Injectable()

@@ -7,7 +7,7 @@ import { SaService } from './application/sa.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { SaDeleteUserByUserIdUseCase } from './application/use-cases/sa-delete-user-by-user-id.use-case';
-import { EncryptConfig } from '../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../config/encrypt/encrypt.config';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { SaBanUnbanUserUseCase } from './application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserUseCase } from './application/use-cases/sa-bind-blog-with-user.use-case';
@@ -47,7 +47,7 @@ import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { S3Service } from '../../config/aws/s3/s3-service';
-import { AwsConfig } from '../../config/aws/aws-config';
+import { AwsConfig } from '../../config/aws/aws.config';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';

@@ -4,7 +4,7 @@ import { SecurityDevicesController } from './api/security-devices.controller';
 import { UsersService } from '../users/application/users.service';
 import { CaslAbilityFactory } from '../../ability/casl-ability.factory';
 import { JwtService } from '@nestjs/jwt';
-import { JwtConfig } from '../../config/jwt/jwt-config';
+import { JwtConfig } from '../../config/jwt/jwt.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
 import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';

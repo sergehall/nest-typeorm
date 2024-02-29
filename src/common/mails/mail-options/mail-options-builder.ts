@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MailerConfig } from '../../../config/mailer/mailer-config';
+import { MailerConfig } from '../../../config/mailer/mailer.config';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { ConfirmationCodeEmailOptions } from '../application/dto/confirmation-code-email-options';
 

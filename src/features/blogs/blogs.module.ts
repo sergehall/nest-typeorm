@@ -31,7 +31,7 @@ import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
 import { S3Service } from '../../config/aws/s3/s3-service';
-import { AwsConfig } from '../../config/aws/aws-config';
+import { AwsConfig } from '../../config/aws/aws.config';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../posts/entities/images-posts-small-metadata.entity';

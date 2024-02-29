@@ -2,7 +2,7 @@ import { PayloadDto } from '../../dto/payload.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { JwtConfig } from '../../../../config/jwt/jwt-config';
+import { JwtConfig } from '../../../../config/jwt/jwt.config';
 import { AccessTokenDto } from '../../dto/access-token.dto';
 
 export class UpdateAccessJwtCommand {

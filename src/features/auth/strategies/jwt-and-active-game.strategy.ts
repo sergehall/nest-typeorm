@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
-import { JwtConfig } from '../../../config/jwt/jwt-config';
+import { JwtConfig } from '../../../config/jwt/jwt.config';
 import { PayloadDto } from '../dto/payload.dto';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';

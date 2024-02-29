@@ -7,7 +7,7 @@ import { KeyResolver } from '../../common/helpers/key-resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from '../users/entities/users.entity';
 import { CqrsModule } from '@nestjs/cqrs';
-import { EncryptConfig } from '../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../config/encrypt/encrypt.config';
 import { SaCreateQuestionsAndAnswerUseCase } from './application/use-cases/sa-create-questions-and-answer.use-case';
 import { QuestionsQuizEntity } from './entities/questions-quiz.entity';
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';

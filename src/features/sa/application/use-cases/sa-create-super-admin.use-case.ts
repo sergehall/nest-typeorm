@@ -1,4 +1,4 @@
-import { EncryptConfig } from '../../../../config/encrypt/encrypt-config';
+import { EncryptConfig } from '../../../../config/encrypt/encrypt.config';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dto';
 import { Injectable } from '@nestjs/common';
