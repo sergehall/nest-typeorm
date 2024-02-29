@@ -32,9 +32,11 @@ export class TelegramAdapter {
     const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const url = baseUrl + '/integrations/telegram/notification';
 
-    await axios.post(
+    const tel = await axios.post(
       `https://api.telegram.org/bot${tokenTelegramBot}/setWebhook`,
       { url: url }, // Send url as an object
     );
+    console.log(tel, 'tel');
+    console.log(url, 'url');
   }
 }
