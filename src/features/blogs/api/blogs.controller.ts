@@ -58,7 +58,10 @@ export class BlogsController {
 
   @Delete(':blogId/subscription')
   @CheckAbilities({ action: Action.DELETE, subject: CurrentUserDto })
-  async unsubscribeFromBlog(@Param() params: IdParams) {
+  async unsubscribeFromBlog(
+    @Param('blogId', BlogExistValidationPipe) blogId: string,
+  ) {
+    console.log(blogId, 'blogId');
     return true;
   }
 
