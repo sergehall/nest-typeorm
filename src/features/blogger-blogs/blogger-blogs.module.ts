@@ -32,7 +32,7 @@ import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-bl
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
-import { AwsConfig } from '../../config/aws/aws-config';
+import { AwsConfig } from '../../config/aws/aws.config';
 import { UploadFilesPostsUseCase } from './application/use-cases/upload-files-posts-use-case';
 import { S3Service } from '../../config/aws/s3/s3-service';
 import { FilesStorageAdapter } from '../../adapters/media-services/files-storage-adapter';

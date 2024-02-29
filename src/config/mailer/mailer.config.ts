@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailerPortTypes, MailerTypes } from './types/mailer.types';
-import { BaseConfig } from '../base/base-config';
+import { BaseConfig } from '../base/base.config';
 
 @Injectable()
 export class MailerConfig extends BaseConfig {

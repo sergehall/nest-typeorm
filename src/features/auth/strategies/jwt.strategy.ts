@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { PayloadDto } from '../dto/payload.dto';
-import { JwtConfig } from '../../../config/jwt/jwt-config';
+import { JwtConfig } from '../../../config/jwt/jwt.config';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../users/entities/users.entity';

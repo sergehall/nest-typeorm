@@ -6,7 +6,7 @@ import { PostsService } from '../posts/application/posts.service';
 import { AuthService } from '../auth/application/auth.service';
 import { UsersService } from '../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { JwtConfig } from '../../config/jwt/jwt-config';
+import { JwtConfig } from '../../config/jwt/jwt.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChangeLikeStatusCommentUseCase } from './application/use-cases/change-likeStatus-comment.use-case';
 import { CreateCommentUseCase } from './application/use-cases/create-comment.use-case';
@@ -39,7 +39,7 @@ import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-fo
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { S3Service } from '../../config/aws/s3/s3-service';
-import { AwsConfig } from '../../config/aws/aws-config';
+import { AwsConfig } from '../../config/aws/aws.config';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 
 const commentsUseCases = [

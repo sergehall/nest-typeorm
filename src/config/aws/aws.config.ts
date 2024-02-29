@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AwsAccessKeyType } from './types/aws-access-key.type';
-import { BaseConfig } from '../base/base-config';
+import { BaseConfig } from '../base/base.config';
 import { AwsEndpointType } from './types/aws-endpoint.type';
 import {
   S3BPublicBucketNameType,

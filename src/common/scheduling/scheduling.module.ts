@@ -4,7 +4,7 @@ import { MailsModule } from '../mails/mails.module';
 import { UsersService } from '../../features/users/application/users.service';
 import { CaslModule } from '../../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
-import { MailerConfig } from '../../config/mailer/mailer-config';
+import { MailerConfig } from '../../config/mailer/mailer.config';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';

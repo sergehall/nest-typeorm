@@ -75,6 +75,7 @@ export const validationSchemaConfiguration = Joi.object({
   S3_REGION: Joi.string().min(9).max(9).required(),
   S3_PRIVATE_BUCKET: Joi.string().min(8).max(8).required(),
   S3_PUBLIC_BUCKET: Joi.string().min(23).max(23).required(),
+  TOKEN_INCUBATOR_TEST_34: Joi.string().min(46).max(46).required(),
 }).options({
   abortEarly: false,
   messages: {

@@ -180,6 +180,13 @@ class Configuration {
     return this.readEnvVariableWithDefault('S3_REGION', 'S3_REGION');
   }
 
+  private static getIncubatorTest34Token(): string {
+    return this.readEnvVariableWithDefault(
+      'TOKEN_INCUBATOR_TEST_34',
+      'TOKEN_INCUBATOR_TEST_34',
+    );
+  }
+
   static getConfiguration() {
     const ENV = Configuration.getEnvName();
     return {
@@ -261,6 +268,9 @@ class Configuration {
       },
       bcrypt: {
         SALT_FACTOR: Configuration.getSaltFactor(),
+      },
+      telegram: {
+        TOKEN_INCUBATOR_TEST_34: Configuration.getIncubatorTest34Token(),
       },
     };
   }

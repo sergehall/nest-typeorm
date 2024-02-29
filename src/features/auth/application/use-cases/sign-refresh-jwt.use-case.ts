@@ -3,7 +3,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { JwtConfig } from '../../../../config/jwt/jwt-config';
+import { JwtConfig } from '../../../../config/jwt/jwt.config';
 
 export class SignRefreshJwtCommand {
   constructor(public currentUserDto: CurrentUserDto) {}

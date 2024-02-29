@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BaseConfig } from '../../base/base-config';
+import { BaseConfig } from '../../base/base.config';
 import { PgDomainNameTypes } from './types/pg-domain-name.types';
 import { PgHostTypes } from './types/pg-host.types';
 import { PgPortTypes } from './types/pg-port.types';

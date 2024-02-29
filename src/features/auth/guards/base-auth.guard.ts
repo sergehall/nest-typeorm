@@ -6,7 +6,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { SaConfig } from '../../../config/sa/sa-config';
+import { SaConfig } from '../../../config/sa/sa.config';
 import {
   loginOrPassInvalid,
   noAuthHeadersError,
