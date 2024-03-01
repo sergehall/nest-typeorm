@@ -4,9 +4,12 @@ import { DialogsSets } from './dialogs-sets';
 export class DialogTrieInitializer {
   static initializeTrie(dialogSets: DialogsSets): Trie<string> {
     const trie = new Trie<string>();
+    // Наполняем Trie фразами из dialogSets
     for (const [responses, response] of dialogSets) {
-      const phrase = responses.join(' ').toLowerCase(); // Putting words together
-      trie.insert(phrase, response); // Insert the phrase into Trie
+      for (const phrase of responses) {
+        const key = phrase.toLowerCase();
+        trie.insert(key, response);
+      }
     }
     return trie;
   }
