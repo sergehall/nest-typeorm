@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 
 export class TelegramTextParserCommand {
-  constructor(public text: string) {}
+  constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
 }
 
 @CommandHandler(TelegramTextParserCommand)
@@ -11,9 +12,9 @@ export class TelegramTextParserUseCase
   constructor() {}
 
   async execute(command: TelegramTextParserCommand): Promise<string> {
-    const { text } = command;
+    const { payloadTelegramMessage } = command;
     const commonWords = ['how', 'is', 'the', 'and', 'what'];
-    const words = text
+    const words = payloadTelegramMessage.message.text
       .toLowerCase()
       .split(' ')
       .filter((word) => !commonWords.includes(word));

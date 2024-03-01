@@ -21,8 +21,6 @@ export class SendMessageToRecipientUseCase
   async execute(command: SendMessageToRecipientCommand) {
     const { payloadTelegramMessage } = command;
 
-    const text = payloadTelegramMessage.message.text;
-
     const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
@@ -31,7 +29,7 @@ export class SendMessageToRecipientUseCase
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
 
     const answerToRecipient = await this.commandBus.execute(
-      new TelegramTextParserCommand(text),
+      new TelegramTextParserCommand(payloadTelegramMessage),
     );
 
     const data = {
