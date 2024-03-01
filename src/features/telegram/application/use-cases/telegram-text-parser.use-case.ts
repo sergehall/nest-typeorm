@@ -14,6 +14,10 @@ export class TelegramTextParserUseCase
   async execute(command: TelegramTextParserCommand): Promise<string> {
     const { payloadTelegramMessage } = command;
     const commonWords = ['how', 'is', 'the', 'and', 'what'];
+    const nameRecipient =
+      payloadTelegramMessage.message.from.first_name ||
+      payloadTelegramMessage.message.from.username;
+
     const words = payloadTelegramMessage.message.text
       .toLowerCase()
       .split(' ')
@@ -21,7 +25,7 @@ export class TelegramTextParserUseCase
 
     // Check if the input contains the word "hello"
     if (words.includes('hello')) {
-      return 'Hello! How are you today?';
+      return `Hello ${nameRecipient}! How are you today?`;
     }
 
     // Analyze the other words and create a response
@@ -29,7 +33,7 @@ export class TelegramTextParserUseCase
     for (const word of words) {
       switch (word) {
         case 'goodbye':
-          response += 'Goodbye! Have a great day! ';
+          response += `Goodbye ${nameRecipient}! Have a great day! `;
           break;
         case 'help':
           response += "Sure, I'm here to assist you! ";
@@ -45,7 +49,7 @@ export class TelegramTextParserUseCase
           response += "I'm feeling great today, thank you for asking! ";
           break;
         default:
-          response += 'I\'m not sure what you mean by "' + word + '". ';
+          response += `I\'m not sure  ${nameRecipient} what you mean by "' + ${word} + '". `;
           break;
       }
     }
