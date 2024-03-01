@@ -13,44 +13,50 @@ export class TelegramTextParserUseCase
 
   async execute(command: TelegramTextParserCommand): Promise<string> {
     const { payloadTelegramMessage } = command;
-    const commonWords = ['how', 'is', 'the', 'and', 'what'];
+
     const nameRecipient =
       payloadTelegramMessage.message.from.first_name ||
       payloadTelegramMessage.message.from.username;
 
-    const words = payloadTelegramMessage.message.text
-      .toLowerCase()
-      .split(' ')
-      .filter((word) => !commonWords.includes(word));
+    const text = payloadTelegramMessage.message.text;
+
+    const commonWords = ['how', 'is', 'the', 'and', 'what'];
+    // Split the input string into words, including punctuation marks as separate entities
+    const words: string[] = text.toLowerCase().match(/\w+|[^\w\s]/g) || [];
 
     // Check if the input contains the word "hello"
-    if (words.includes('hello')) {
-      return `Hello ${nameRecipient}! How are you today?`;
+    if (words.length != 0 && words.includes('hello')) {
+      return `Hello, ${nameRecipient}! How are you today?`;
     }
 
     // Analyze the other words and create a response
     let response = '';
     for (const word of words) {
-      switch (word) {
-        case 'goodbye':
-          response += `Goodbye ${nameRecipient}! Have a great day! `;
-          break;
-        case 'help':
-          response += "Sure, I'm here to assist you! ";
-          break;
-        case 'weather':
-          response += 'The weather is sunny and warm today. ';
-          break;
-        case 'time':
-          const time = new Date().toISOString();
-          response += `The current ${time}. `;
-          break;
-        case 'mood':
-          response += "I'm feeling great today, thank you for asking! ";
-          break;
-        default:
-          response += `I\'m not sure  ${nameRecipient} what you mean by "' + ${word} + '". `;
-          break;
+      if (!commonWords.includes(word)) {
+        switch (word) {
+          case 'goodbye':
+            response += `Goodbye ${nameRecipient}! Have a great day! `;
+            break;
+          case 'help':
+            response += "Sure, I'm here to assist you! ";
+            break;
+          case 'weather':
+            response += 'The weather is sunny and warm today. ';
+            break;
+          case 'time':
+            const time = new Date().toISOString();
+            response += `The current ${time}. `;
+            break;
+          case 'mood':
+            response += "I'm feeling great today, thank you for asking! ";
+            break;
+          default:
+            // Check if the word is not punctuation
+            if (word.match(/\w/)) {
+              response += `I'm not sure what you mean by "${word}", ${nameRecipient}. `;
+            }
+            break;
+        }
       }
     }
 
