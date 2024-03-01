@@ -55,17 +55,23 @@ export class TelegramTextParserUseCase
           default:
             // Check if the word is not punctuation
             if (word.match(/\w/)) {
-              response += `I'm not sure what you mean by "${incomprehensibleWords}", ${nameRecipient}. `;
+              response += `I'm not sure what you mean by "${word}", ${nameRecipient}. `;
             }
             break;
         }
       }
     }
-    return await this.generateResponse(
-      response,
-      incomprehensibleWords,
-      nameRecipient,
-    );
+
+    // Generate response for incomprehensible words only if there are any
+    if (incomprehensibleWords.length > 0) {
+      response = await this.generateResponse(
+        response,
+        incomprehensibleWords,
+        nameRecipient,
+      );
+    }
+
+    return response.trim();
   }
 
   private async generateResponse(
