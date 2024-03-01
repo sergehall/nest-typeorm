@@ -1,8 +1,8 @@
-import { DialogSets } from '../dialog/sets';
 import { Trie } from './self-trie';
+import { DialogsSets } from './dialogs-sets';
 
 export class DialogTrieInitializer {
-  static initializeTrie(dialogSets: DialogSets): Trie<string> {
+  static initializeTrie(dialogSets: DialogsSets): Trie<string> {
     const trie = new Trie<string>();
     for (const [responses, response] of dialogSets) {
       const phrase = responses.join(' ').toLowerCase(); // Putting words together

@@ -1,6 +1,6 @@
-export type DialogSets = Array<[string[], string]>;
+export type DialogsSets = Array<[string[], string]>;
 
-export const dialogSets: DialogSets = [
+export const dialogsSets: DialogsSets = [
   [
     [
       'hello',
