@@ -11,7 +11,7 @@ export class TelegramTextParserCommand {
 export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
-  private similarityThreshold = 0.9; // Adjust similarity threshold as needed
+  private similarityThreshold = 0.7; // Adjust similarity threshold as needed
 
   constructor(private readonly levenshteinDistance: LevenshteinDistance) {}
 
@@ -53,6 +53,10 @@ export class TelegramTextParserUseCase
         }
       }
     }
+
+    console.log(maxSimilarity, 'maxSimilarity');
+    console.log(this.similarityThreshold, 'this.similarityThreshold');
+    console.log(bestResponse, 'bestResponse');
 
     if (maxSimilarity >= this.similarityThreshold && bestResponse) {
       return bestResponse;
