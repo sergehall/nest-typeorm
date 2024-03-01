@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { Trie } from '../../helpers/self-trie';
 import { dialogsSets } from '../../helpers/dialogs-sets';
+import { DialogTrieInitializer } from '../../helpers/dialog-trie-initializer';
 
 export class TelegramTextParserCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -15,14 +16,7 @@ export class TelegramTextParserUseCase
   private similarityThreshold = 0.7; // Порог сходства
 
   constructor() {
-    this.trie = new Trie<string>();
-    // Наполняем Trie фразами из dialogSets
-    for (const [responses, response] of dialogsSets) {
-      for (const phrase of responses) {
-        const key = phrase.toLowerCase();
-        this.trie.insert(key, response);
-      }
-    }
+    this.trie = DialogTrieInitializer.initializeTrie(dialogsSets);
   }
 
   async execute({
