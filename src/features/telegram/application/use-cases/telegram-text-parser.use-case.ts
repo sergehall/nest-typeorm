@@ -61,13 +61,11 @@ export class TelegramTextParserUseCase
         }
       }
     }
-    const answer = await this.generateResponse(
+    return await this.generateResponse(
       response,
       incomprehensibleWords,
       nameRecipient,
     );
-
-    return answer;
   }
 
   private async generateResponse(
