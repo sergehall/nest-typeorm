@@ -11,8 +11,8 @@ export class TelegramAdapter {
   ) {}
 
   async sendMessageToRecipient(text: string, recipientId: number) {
-    const tokenTelegramBot = await this.telegramConfig.getTokenIncubator(
-      'TOKEN_INCUBATOR_TEST_34',
+    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
 
     await axios.post(
@@ -25,18 +25,16 @@ export class TelegramAdapter {
   }
 
   async setWebhook() {
-    const tokenTelegramBot = await this.telegramConfig.getTokenIncubator(
-      'TOKEN_INCUBATOR_TEST_34',
+    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
 
     const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const url = baseUrl + '/integrations/telegram/notification';
 
-    const tel = await axios.post(
+    await axios.post(
       `https://api.telegram.org/bot${tokenTelegramBot}/setWebhook`,
       { url: url }, // Send url as an object
     );
-    console.log(tel, 'tel');
-    console.log(url, 'url');
   }
 }

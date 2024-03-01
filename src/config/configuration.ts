@@ -180,10 +180,10 @@ class Configuration {
     return this.readEnvVariableWithDefault('S3_REGION', 'S3_REGION');
   }
 
-  private static getIncubatorTest34Token(): string {
+  private static getTokenTelegramItIncubator(): string {
     return this.readEnvVariableWithDefault(
-      'TOKEN_INCUBATOR_TEST_34',
-      'TOKEN_INCUBATOR_TEST_34',
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
   }
 
@@ -270,7 +270,8 @@ class Configuration {
         SALT_FACTOR: Configuration.getSaltFactor(),
       },
       telegram: {
-        TOKEN_INCUBATOR_TEST_34: Configuration.getIncubatorTest34Token(),
+        TOKEN_TELEGRAM_IT_INCUBATOR:
+          Configuration.getTokenTelegramItIncubator(),
       },
     };
   }
