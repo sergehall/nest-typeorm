@@ -1,6 +1,7 @@
 export type DialogResponse = string;
+export type DialogSets = Array<[string[], string]>;
 
-export const dialogSets = [
+export const dialogSets: DialogSets = [
   [
     [
       'hello',
