@@ -12,7 +12,7 @@ export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
   private trie: Trie<string>;
-  private similarityThreshold = 0.8; // Adjust similarity threshold as needed
+  private similarityThreshold = 0.5; // Adjust similarity threshold as needed
 
   constructor() {
     this.trie = DialogTrieInitializer.initializeTrie();
