@@ -1,6 +1,6 @@
-export type DialogSets = Array<[string[], number]>;
+export type DialogResponse = string;
 
-export const dialogSets: DialogSets = [
+export const dialogSets = [
   [
     [
       'hello',
@@ -12,7 +12,7 @@ export const dialogSets: DialogSets = [
       'how are you today',
       'how are you',
     ],
-    0.6,
+    'Hello, {nameRecipient}! How are you today?',
   ],
   [
     [
@@ -22,7 +22,7 @@ export const dialogSets: DialogSets = [
       "what's the time",
       'current hour',
     ],
-    0.6,
+    `The current ${new Date().toTimeString()}.`,
   ],
   [
     [
@@ -32,7 +32,7 @@ export const dialogSets: DialogSets = [
       'feeling today',
       'emotional state',
     ],
-    0.6,
+    `I'm feeling great today, thank you for asking!`,
   ],
   [
     [
@@ -42,7 +42,7 @@ export const dialogSets: DialogSets = [
       "what's the weather like",
       'weather report',
     ],
-    0.6,
+    `The weather is currently sunny.`,
   ],
   [
     [
@@ -52,7 +52,7 @@ export const dialogSets: DialogSets = [
       'morning greeting',
       'rise and shine',
     ],
-    0.6,
+    `Good morning, {nameRecipient}!`,
   ],
   [
     [
@@ -62,7 +62,7 @@ export const dialogSets: DialogSets = [
       'greeting at night',
       'night greeting',
     ],
-    0.6,
+    `Good evening, {nameRecipient}!`,
   ],
   [
     [
@@ -72,10 +72,16 @@ export const dialogSets: DialogSets = [
       "what's happening",
       "how's life",
     ],
-    0.6,
+    `I'm doing well, thank you for asking, {nameRecipient}.`,
   ],
-  [['thank you', 'thanks', 'appreciate it', 'thanks a lot', 'thankful'], 0.6],
-  [['goodbye', 'bye', 'farewell', 'see you later', 'take care'], 0.6],
+  [
+    ['thank you', 'thanks', 'appreciate it', 'thanks a lot', 'thankful'],
+    `You're welcome, {nameRecipient}!`,
+  ],
+  [
+    ['goodbye', 'bye', 'farewell', 'see you later', 'take care'],
+    `Goodbye, {nameRecipient}! Take care.`,
+  ],
   [
     [
       "what's new",
@@ -84,7 +90,7 @@ export const dialogSets: DialogSets = [
       'latest updates',
       "what's going on",
     ],
-    0.6,
+    `Nothing much is new, {nameRecipient}.`,
   ],
   [
     [
@@ -94,7 +100,7 @@ export const dialogSets: DialogSets = [
       'job going well',
       'work update',
     ],
-    0.6,
+    `Work is going fine, {nameRecipient}.`,
   ],
   [
     [
@@ -104,7 +110,7 @@ export const dialogSets: DialogSets = [
       'family update',
       'family news',
     ],
-    0.6,
+    `Family is doing well, {nameRecipient}.`,
   ],
   [
     [
@@ -114,7 +120,7 @@ export const dialogSets: DialogSets = [
       'meal planning',
       'dinner time',
     ],
-    0.6,
+    `I'm not sure yet, {nameRecipient}.`,
   ],
   [
     [
@@ -124,7 +130,7 @@ export const dialogSets: DialogSets = [
       'daily check-in',
       "how's your day been",
     ],
-    0.6,
+    `My day is going well, {nameRecipient}.`,
   ],
   [
     [
@@ -134,7 +140,7 @@ export const dialogSets: DialogSets = [
       'school update',
       'learning going well',
     ],
-    0.6,
+    `School is going well, {nameRecipient}.`,
   ],
-  // Add more dialog sets as needed
+  // Добавьте еще диалоговые наборы при необходимости
 ];

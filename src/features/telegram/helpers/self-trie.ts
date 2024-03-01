@@ -4,6 +4,7 @@ class TrieNode<T> {
 
   constructor() {
     this.children = new Map();
+    this.value = undefined; // Изменяем значение по умолчанию на undefined
   }
 }
 
@@ -36,34 +37,8 @@ export class Trie<T> {
     return node.value;
   }
 
-  delete(key: string): boolean {
-    let node = this.root;
-    const stack: Array<[TrieNode<T>, string]> = [[node, key]];
-    let last: [TrieNode<T>, string] | undefined;
-    for (const char of key) {
-      if (!node.children.has(char)) {
-        return false;
-      }
-      node = node.children.get(char)!;
-      stack.push([node, char]);
-    }
-    if (node.value === undefined) {
-      return false;
-    }
-    node.value = undefined;
-    while (stack.length > 0) {
-      last = stack.pop();
-      if (last && last[0].children.size === 0 && last[0].value === undefined) {
-        last[0].children.delete(last[1]);
-      } else {
-        break;
-      }
-    }
-    return true;
-  }
-
-  // Implement searchPrefix method to search for prefixes
-  searchPrefix(prefix: string): TrieNode<T> | undefined {
+  // Новый метод для поиска префикса
+  searchPrefix(prefix: string): T | undefined {
     let node = this.root;
     for (const char of prefix) {
       if (!node.children.has(char)) {
@@ -71,6 +46,6 @@ export class Trie<T> {
       }
       node = node.children.get(char)!;
     }
-    return node;
+    return node.value;
   }
 }
