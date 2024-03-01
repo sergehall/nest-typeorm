@@ -11,7 +11,7 @@ export class TelegramTextParserCommand {
 export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
-  private similarityThreshold = 0.5; // Adjust similarity threshold as needed
+  private similarityThreshold = 0.9; // Adjust similarity threshold as needed
 
   constructor(private readonly levenshteinDistance: LevenshteinDistance) {}
 
