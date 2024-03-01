@@ -1,10 +1,10 @@
-class TrieNode<T> {
+export class TrieNode<T> {
   children: Map<string, TrieNode<T>>;
   value?: T;
 
   constructor() {
     this.children = new Map();
-    this.value = undefined; // Изменяем значение по умолчанию на undefined
+    this.value = undefined;
   }
 }
 
@@ -37,7 +37,6 @@ export class Trie<T> {
     return node.value;
   }
 
-  // Новый метод для поиска префикса
   searchPrefix(prefix: string): T | undefined {
     let node = this.root;
     for (const char of prefix) {

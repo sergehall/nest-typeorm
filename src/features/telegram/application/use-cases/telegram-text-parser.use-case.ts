@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { Trie } from '../../helpers/self-trie';
-import { dialogsSets } from '../../helpers/dialogs-sets';
 import { DialogTrieInitializer } from '../../helpers/dialog-trie-initializer';
 
 export class TelegramTextParserCommand {
@@ -13,10 +12,10 @@ export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
   private trie: Trie<string>;
-  private similarityThreshold = 0.8; // Similarity threshold
+  private similarityThreshold = 0.5; // Adjust similarity threshold as needed
 
   constructor() {
-    this.trie = DialogTrieInitializer.initializeTrie(dialogsSets);
+    this.trie = DialogTrieInitializer.initializeTrie();
   }
 
   async execute({
@@ -41,16 +40,15 @@ export class TelegramTextParserUseCase
     let bestResponse: string | undefined;
 
     for (const word of words) {
-      const node = this.trie.searchPrefix(word.toLowerCase());
-      if (node !== undefined) {
-        // Проверяем, что node не undefined и имеет тип string
+      const response = this.trie.searchPrefix(word.toLowerCase());
+      if (response) {
         const similarity = this.calculateJaccardSimilarity(
           words,
-          node.toLowerCase().split(/[ ,]+/),
+          response.split(/[ ,]+/),
         );
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
-          bestResponse = node;
+          bestResponse = response;
         }
       }
     }
