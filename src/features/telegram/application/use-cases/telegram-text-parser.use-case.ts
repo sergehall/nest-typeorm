@@ -41,15 +41,17 @@ export class TelegramTextParserUseCase
     let bestResponse: string | undefined;
 
     for (const [responses] of dialogSets) {
-      for (const response of responses) {
-        const phrase = response.toLowerCase();
+      for (let i = 0; i < responses.length; i++) {
+        const phrase = responses[i].toLowerCase();
         const similarity = this.calculateJaccardSimilarity(
           words,
           phrase.split(/[ ,]+/),
         );
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
-          bestResponse = response;
+          if (typeof dialogSets[i + 1]?.[0] !== 'undefined') {
+            bestResponse = dialogSets[i + 1]?.[0].toString(); // Преобразуем массив строк в строку
+          }
         }
       }
     }
