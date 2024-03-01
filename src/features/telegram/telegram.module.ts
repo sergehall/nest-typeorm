@@ -7,10 +7,12 @@ import { TelegramConfig } from '../../config/telegram/telegram.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SendOurWebhookToTelegramUseCase } from './application/use-cases/send-our-webhook-to-telegram.use-case';
 import { SendMessageToRecipientUseCase } from './application/use-cases/send-message-to-recipient.use-case';
+import { TelegramTextParserUseCase } from './application/use-cases/telegram-text-parser.use-case';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
   SendMessageToRecipientUseCase,
+  TelegramTextParserUseCase,
 ];
 
 @Module({
