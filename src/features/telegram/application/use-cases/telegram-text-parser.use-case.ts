@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
-import { Trie } from '../../helpers/self-trie';
-import { DialogTrieInitializer } from '../../helpers/dialog-trie-initializer';
+import { dialogsSets } from '../../helpers/dialogs-sets';
+import { LevenshteinDistance } from '../../helpers/levenshtein-distance';
 
 export class TelegramTextParserCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -11,12 +11,9 @@ export class TelegramTextParserCommand {
 export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
-  private trie: Trie<string>;
-  private similarityThreshold = 0.8; // Adjust similarity threshold as needed
+  private similarityThreshold = 0.5; // Adjust similarity threshold as needed
 
-  constructor() {
-    this.trie = DialogTrieInitializer.initializeTrie();
-  }
+  constructor(private readonly levenshteinDistance: LevenshteinDistance) {}
 
   async execute({
     payloadTelegramMessage,
@@ -35,16 +32,14 @@ export class TelegramTextParserUseCase
   }
 
   private async processString(text: string): Promise<string | undefined> {
-    const words = text.split(/[ ,]+/);
     let maxSimilarity = 0;
     let bestResponse: string | undefined;
 
-    for (const word of words) {
-      const response = this.trie.searchPrefix(word.toLowerCase());
-      if (response) {
-        const similarity = await this.calculateJaccardSimilarity(
-          words,
-          response.split(/[ ,]+/),
+    for (const [phrases, response] of dialogsSets) {
+      for (const phrase of phrases) {
+        const similarity = await this.levenshteinDistance.calculate(
+          text,
+          phrase.toLowerCase(),
         );
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
@@ -58,17 +53,6 @@ export class TelegramTextParserUseCase
     }
 
     return undefined;
-  }
-
-  private async calculateJaccardSimilarity(
-    words1: string[],
-    words2: string[],
-  ): Promise<number> {
-    const set1 = new Set(words1);
-    const set2 = new Set(words2);
-    const intersection = new Set([...set1].filter((x) => set2.has(x)));
-    const union = new Set([...set1, ...set2]);
-    return intersection.size / union.size;
   }
 }
 
