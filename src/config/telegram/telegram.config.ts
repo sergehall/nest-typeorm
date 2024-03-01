@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-import { TokenIncubatorTest34 } from './types/tokens.types';
+import { TokenTelegramItIncubator } from './types/token-telegram-it-incubator.types';
 
 @Injectable()
 export class TelegramConfig extends BaseConfig {
-  async getTokenIncubator(
-    tokenIncubatorTest34: TokenIncubatorTest34,
+  async getTokenTelegram(
+    tokenTelegramItIncubator: TokenTelegramItIncubator,
   ): Promise<string> {
-    return await this.getIncubatorTest34Token(tokenIncubatorTest34);
+    return await this.getTokenTelegramItIncubator(tokenTelegramItIncubator);
   }
 }

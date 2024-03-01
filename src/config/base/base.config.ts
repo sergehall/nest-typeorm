@@ -21,7 +21,7 @@ import {
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
-import { TokenIncubatorTest34 } from '../telegram/types/tokens.types';
+import { TokenTelegramItIncubator } from '../telegram/types/token-telegram-it-incubator.types';
 
 @Injectable()
 export class BaseConfig {
@@ -78,8 +78,8 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getIncubatorTest34Token(
-    key: TokenIncubatorTest34,
+  protected async getTokenTelegramItIncubator(
+    key: TokenTelegramItIncubator,
   ): Promise<string> {
     return this.configService.get('telegram', {
       infer: true,
