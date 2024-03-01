@@ -13,6 +13,7 @@ export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
   private trie: Trie<string>;
+  private similarityThreshold = 0.7; // Similarity threshold
 
   constructor() {
     this.trie = DialogTrieInitializer.initializeTrie(dialogSets);
@@ -35,6 +36,39 @@ export class TelegramTextParserUseCase
   }
 
   private processString(text: string): string | undefined {
-    return this.trie.search(text);
+    const words = text.split(/[ ,]+/);
+    let maxSimilarity = 0;
+    let bestResponse: string | undefined;
+
+    for (const [responses] of dialogSets) {
+      for (const response of responses) {
+        const phrase = response.toLowerCase();
+        const similarity = this.calculateJaccardSimilarity(
+          words,
+          phrase.split(/[ ,]+/),
+        );
+        if (similarity > maxSimilarity) {
+          maxSimilarity = similarity;
+          bestResponse = response;
+        }
+      }
+    }
+
+    if (maxSimilarity >= this.similarityThreshold && bestResponse) {
+      return bestResponse;
+    }
+
+    return undefined;
+  }
+
+  private calculateJaccardSimilarity(
+    words1: string[],
+    words2: string[],
+  ): number {
+    const set1 = new Set(words1);
+    const set2 = new Set(words2);
+    const intersection = new Set([...set1].filter((x) => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+    return intersection.size / union.size;
   }
 }
