@@ -12,7 +12,11 @@ export class TelegramTextParserUseCase
 
   async execute(command: TelegramTextParserCommand): Promise<string> {
     const { text } = command;
-    const words = text.toLowerCase().split(' ');
+    const commonWords = ['how', 'is', 'the', 'and', 'what'];
+    const words = text
+      .toLowerCase()
+      .split(' ')
+      .filter((word) => !commonWords.includes(word));
 
     // Check if the input contains the word "hello"
     if (words.includes('hello')) {
