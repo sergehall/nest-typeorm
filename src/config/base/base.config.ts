@@ -21,7 +21,7 @@ import {
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
-import { TokenTelegramItIncubator } from '../telegram/types/token-telegram-it-incubator.types';
+import { TokenTelegramItIncubator } from '../telegram/types/token-telegram-it-incubator.type';
 
 @Injectable()
 export class BaseConfig {

@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { TelegramConfig } from '../../config/telegram/telegram.config';
-import { PostgresConfig } from '../../config/db/postgres/postgres.config';
+import { CommandBus } from '@nestjs/cqrs';
+import { SendOurHookToTelegramCommand } from '../../features/telegram/application/use-cases/send-our-hook-to-telegram.use-case';
 
 @Injectable()
 export class TelegramAdapter {
   constructor(
-    private readonly postgresConfig: PostgresConfig,
+    private readonly commandBus: CommandBus,
     private readonly telegramConfig: TelegramConfig,
   ) {}
+
+  async setWebhook() {
+    await this.commandBus.execute(new SendOurHookToTelegramCommand());
+  }
 
   async sendMessageToRecipient(text: string, recipientId: number) {
     const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
@@ -21,20 +26,6 @@ export class TelegramAdapter {
         chat_id: recipientId,
         text: text,
       },
-    );
-  }
-
-  async setWebhook() {
-    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
-      'TOKEN_TELEGRAM_IT_INCUBATOR',
-    );
-
-    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const url = baseUrl + '/integrations/telegram/notification';
-
-    await axios.post(
-      `https://api.telegram.org/bot${tokenTelegramBot}/setWebhook`,
-      { url: url }, // Send url as an object
     );
   }
 }
