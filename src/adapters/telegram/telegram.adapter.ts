@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { TelegramConfig } from '../../config/telegram/telegram.config';
 import { CommandBus } from '@nestjs/cqrs';
-import { SendOurHookToTelegramCommand } from '../../features/telegram/application/use-cases/send-our-hook-to-telegram.use-case';
+import { SendOurWebhookToTelegramCommand } from '../../features/telegram/application/use-cases/send-our-webhook-to-telegram.use-case';
 
 @Injectable()
 export class TelegramAdapter {
@@ -12,7 +12,7 @@ export class TelegramAdapter {
   ) {}
 
   async setWebhook() {
-    await this.commandBus.execute(new SendOurHookToTelegramCommand());
+    await this.commandBus.execute(new SendOurWebhookToTelegramCommand());
   }
 
   async sendMessageToRecipient(text: string, recipientId: number) {

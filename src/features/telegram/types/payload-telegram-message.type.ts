@@ -19,7 +19,7 @@ type Message = {
   text: string;
 };
 
-export type TelegramUpdateMessageType = {
+export type PayloadTelegramMessageType = {
   update_id: number;
   message: Message;
 };
