@@ -49,9 +49,7 @@ export class TelegramTextParserUseCase
         );
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
-          if (typeof response === 'string') {
-            bestResponse = response; // Берем ответ из того же массива, где нашли фразу
-          }
+          bestResponse = response;
         }
       }
     }
