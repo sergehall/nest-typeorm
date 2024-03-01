@@ -15,7 +15,7 @@ export class SendOurHookToTelegramUseCase
     private readonly postgresConfig: PostgresConfig,
     private readonly telegramConfig: TelegramConfig,
   ) {}
-  async execute(comand: SendOurHookToTelegramCommand) {
+  async execute() {
     const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
