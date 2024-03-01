@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
 export class LevenshteinDistance {
   async calculate(s1: string, s2: string): Promise<number> {
     const m = s1.length;
