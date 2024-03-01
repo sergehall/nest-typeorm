@@ -12,7 +12,7 @@ export class TelegramTextParserUseCase
   implements ICommandHandler<TelegramTextParserCommand>
 {
   private trie: Trie<string>;
-  private similarityThreshold = 0.5; // Adjust similarity threshold as needed
+  private similarityThreshold = 0.8; // Adjust similarity threshold as needed
 
   constructor() {
     this.trie = DialogTrieInitializer.initializeTrie();
@@ -26,7 +26,7 @@ export class TelegramTextParserUseCase
       payloadTelegramMessage.message.from.first_name ||
       payloadTelegramMessage.message.from.username;
 
-    const response = this.processString(text);
+    const response = await this.processString(text);
     if (response) {
       return response.replace('{nameRecipient}', nameRecipient);
     } else {
@@ -34,7 +34,7 @@ export class TelegramTextParserUseCase
     }
   }
 
-  private processString(text: string): string | undefined {
+  private async processString(text: string): Promise<string | undefined> {
     const words = text.split(/[ ,]+/);
     let maxSimilarity = 0;
     let bestResponse: string | undefined;
@@ -42,7 +42,7 @@ export class TelegramTextParserUseCase
     for (const word of words) {
       const response = this.trie.searchPrefix(word.toLowerCase());
       if (response) {
-        const similarity = this.calculateJaccardSimilarity(
+        const similarity = await this.calculateJaccardSimilarity(
           words,
           response.split(/[ ,]+/),
         );
@@ -60,10 +60,10 @@ export class TelegramTextParserUseCase
     return undefined;
   }
 
-  private calculateJaccardSimilarity(
+  private async calculateJaccardSimilarity(
     words1: string[],
     words2: string[],
-  ): number {
+  ): Promise<number> {
     const set1 = new Set(words1);
     const set2 = new Set(words2);
     const intersection = new Set([...set1].filter((x) => set2.has(x)));
