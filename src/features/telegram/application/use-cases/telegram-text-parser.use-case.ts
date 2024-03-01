@@ -37,13 +37,15 @@ export class TelegramTextParserUseCase
 
     for (const [phrases, response] of dialogsSets) {
       for (const phrase of phrases) {
-        const similarity = await this.levenshteinDistance.calculate(
-          text,
-          phrase.toLowerCase(),
-        );
-        if (similarity > maxSimilarity) {
-          maxSimilarity = similarity;
-          bestResponse = response;
+        if (text.includes(phrase.toLowerCase())) {
+          const similarity = await this.levenshteinDistance.calculate(
+            text,
+            phrase.toLowerCase(),
+          );
+          if (similarity > maxSimilarity) {
+            maxSimilarity = similarity;
+            bestResponse = response;
+          }
         }
       }
     }
