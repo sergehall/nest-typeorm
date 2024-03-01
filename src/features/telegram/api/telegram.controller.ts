@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { TelegramService } from '../application/telegram.service';
 import { CreateTelegramDto } from '../dto/create-telegram.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
 import { SendMessageToRecipientCommand } from '../application/use-cases/send-message-to-recipient.use-case';
 import { PayloadTelegramMessageType } from '../types/payload-telegram-message.type';
 
