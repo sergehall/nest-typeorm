@@ -5,9 +5,8 @@ export class DialogTrieInitializer {
   static initializeTrie(dialogSets: DialogSets): Trie<string> {
     const trie = new Trie<string>();
     for (const [responses, response] of dialogSets) {
-      for (const word of responses) {
-        trie.insert(word.toLowerCase(), response);
-      }
+      const phrase = responses.join(' ').toLowerCase(); // Соединяем слова в фразу
+      trie.insert(phrase, response);
     }
     return trie;
   }

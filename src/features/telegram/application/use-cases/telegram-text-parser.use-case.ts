@@ -35,13 +35,6 @@ export class TelegramTextParserUseCase
   }
 
   private processString(text: string): string | undefined {
-    const words = text.split(/[ ,]+/);
-    for (const word of words) {
-      const response = this.trie.search(word);
-      if (response) {
-        return response; // Возвращаем ответ, соответствующий найденному ключу
-      }
-    }
-    return undefined;
+    return this.trie.search(text);
   }
 }
