@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
-import { dialogSets } from '../../dialog/sets';
+import { DialogResponse, dialogSets } from '../../dialog/sets';
 import { Trie } from '../../helpers/self-trie';
 
 export class TelegramTextParserCommand {
@@ -15,9 +15,12 @@ export class TelegramTextParserUseCase
 
   constructor() {
     this.trie = new Trie<string>();
-    for (const [responses] of dialogSets) {
-      for (const response of responses) {
-        this.trie.insert(response.toLowerCase(), response);
+    // Наполняем Trie ключами и ответами из dialogSets
+    for (const [responses, response] of dialogSets) {
+      for (const word of responses) {
+        if (typeof response === 'string') {
+          this.trie.insert(word.toLowerCase(), response);
+        }
       }
     }
   }
@@ -43,7 +46,7 @@ export class TelegramTextParserUseCase
     for (const word of words) {
       const response = this.trie.search(word);
       if (response) {
-        return response;
+        return response; // Возвращаем ответ, соответствующий найденному ключу
       }
     }
     return undefined;
