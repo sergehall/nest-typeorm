@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
-import { DialogResponse, dialogSets } from '../../dialog/sets';
+import { dialogSets } from '../../dialog/sets';
 import { Trie } from '../../helpers/self-trie';
 
 export class TelegramTextParserCommand {
