@@ -1,14 +1,19 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
-import { TelegramService } from './telegram.service';
-import { CreateTelegramDto } from './dto/create-telegram.dto';
+import { TelegramService } from '../application/telegram.service';
+import { CreateTelegramDto } from '../dto/create-telegram.dto';
+import { TelegramAdapter } from '../../../adapters/telegram/telegram.adapter';
 
 @Controller('integrations/telegram')
 export class TelegramController {
-  constructor(private readonly telegramService: TelegramService) {}
+  constructor(
+    private readonly telegramService: TelegramService,
+    private readonly telegramAdapter: TelegramAdapter,
+  ) {}
 
   @Post('notification')
   async getWebhook(@Body() payload: any) {
     console.log(payload, 'payload');
+
     return this.telegramService.getWebhook();
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-import { TokenTelegramItIncubator } from './types/token-telegram-it-incubator.types';
+import { TokenTelegramItIncubator } from './types/token-telegram-it-incubator.type';
 
 @Injectable()
 export class TelegramConfig extends BaseConfig {
