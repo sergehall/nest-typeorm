@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
-import similarity from 'similarity';
 import { dialogsSets, DialogTemplate } from '../../helpers/dialogs-sets';
+import { stringSimilarity } from 'string-similarity-js';
 
 export class TelegramTextParserCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -24,7 +24,7 @@ export class TelegramTextParserUseCase
 
     dialogsSets.forEach((template) => {
       template.variations.forEach((variation) => {
-        const similarityScore = similarity(variation, inputPhrase);
+        const similarityScore = stringSimilarity(variation, inputPhrase);
         if (similarityScore > highestSimilarity) {
           bestMatch = template;
           highestSimilarity = similarityScore;
