@@ -17,7 +17,6 @@ export class BlogsSubscribersRepo {
     blog: BloggerBlogsEntity,
     currentUserDto: CurrentUserDto,
   ): Promise<BlogsSubscribersEntity> {
-    console.log(blog.id, 'subscriberId');
     try {
       // Find if there's an existing entry in BlogsSubscribersEntity
       const existingSubscriber: BlogsSubscribersEntity | null =

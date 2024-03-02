@@ -7,6 +7,8 @@ import {
   Request,
   Delete,
   Post,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -53,6 +55,7 @@ export class BlogsController {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post(':blogId/subscription')
   @UseGuards(LocalAuthGuard)
   async subscribeToBlog(
@@ -71,13 +74,25 @@ export class BlogsController {
     );
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':blogId/subscription')
-  @CheckAbilities({ action: Action.DELETE, subject: CurrentUserDto })
-  async unsubscribeFromBlog(
-    @Param('blogId', BlogExistValidationPipe) blogId: string,
-  ) {
-    console.log(blogId, 'blogId');
-    return true;
+  @UseGuards(LocalAuthGuard)
+  async unsubscribeToBlog(
+    @Request() req: any,
+    @Param() params: BlogIdParams,
+  ): Promise<BloggerBlogsWithImagesViewModel> {
+    const currentUserDto: CurrentUserDto = req.user;
+
+    const subscriptionStatus: SubscriptionStatus =
+      SubscriptionStatus.Unsubscribed;
+
+    return await this.commandBus.execute(
+      new ManageBlogsSubscribeCommand(
+        params,
+        subscriptionStatus,
+        currentUserDto,
+      ),
+    );
   }
 
   @Get(':blogId/posts')
