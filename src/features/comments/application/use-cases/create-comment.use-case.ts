@@ -16,6 +16,7 @@ export class CreateCommentCommand {
     public currentUserDto: CurrentUserDto,
   ) {}
 }
+
 @CommandHandler(CreateCommentCommand)
 export class CreateCommentUseCase
   implements ICommandHandler<CreateCommentCommand>
