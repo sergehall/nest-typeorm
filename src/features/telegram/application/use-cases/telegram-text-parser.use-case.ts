@@ -33,8 +33,10 @@ export class TelegramTextParserUseCase
     });
 
     if (bestMatch && highestSimilarity >= 0.9) {
-      console.log({ id: bestMatch.id, response: bestMatch.response });
-      return bestMatch.response;
+      // Check if {nameRecipient} exists in the response
+      return bestMatch.response.includes('{nameRecipient}')
+        ? bestMatch.response.replace('{nameRecipient}', nameRecipient)
+        : bestMatch.response;
     } else {
       // Handle the case where no match is found
       return `I'm not sure what you mean, ${nameRecipient}.`;
