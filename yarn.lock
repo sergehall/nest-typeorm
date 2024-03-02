@@ -1900,7 +1900,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs-modules/mailer@npm:^1.9.1":
+"@nestjs-modules/mailer@npm:^1.11.2":
   version: 1.11.2
   resolution: "@nestjs-modules/mailer@npm:1.11.2"
   dependencies:
@@ -3515,7 +3515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:^6.4.7":
+"@types/nodemailer@npm:^6.4.14":
   version: 6.4.14
   resolution: "@types/nodemailer@npm:6.4.14"
   dependencies:
@@ -10086,7 +10086,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.451.0"
     "@casl/ability": "npm:^6.5.0"
-    "@nestjs-modules/mailer": "npm:^1.9.1"
+    "@nestjs-modules/mailer": "npm:^1.11.2"
     "@nestjs/axios": "npm:^3.0.2"
     "@nestjs/cli": "npm:^10.1.12"
     "@nestjs/common": "npm:^10.2.10"
@@ -10113,7 +10113,7 @@ __metadata:
     "@types/md5": "npm:^2.3.2"
     "@types/multer": "npm:^1.4.11"
     "@types/node": "npm:^20.10.0"
-    "@types/nodemailer": "npm:^6.4.7"
+    "@types/nodemailer": "npm:^6.4.14"
     "@types/passport-jwt": "npm:^3.0.7"
     "@types/passport-local": "npm:^1.0.34"
     "@types/pg": "npm:^8.10.2"
@@ -10139,7 +10139,7 @@ __metadata:
     md5: "npm:^2.3.0"
     mongodb-memory-server: "npm:^8.12.2"
     mongoose: "npm:^6.8.0"
-    nodemailer: "npm:^6.9.10"
+    nodemailer: "npm:^6.9.11"
     npm: "npm:^10.2.4"
     passport: "npm:^0.6.0"
     passport-jwt: "npm:^4.0.0"
@@ -10280,7 +10280,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:6.9.11, nodemailer@npm:^6.9.10, nodemailer@npm:^6.9.2":
+"nodemailer@npm:6.9.11, nodemailer@npm:^6.9.11, nodemailer@npm:^6.9.2":
   version: 6.9.11
   resolution: "nodemailer@npm:6.9.11"
   checksum: 10c0/ca45d4676758dc9878c3aff19cbfd97921d9d4a34b306e8088c1ada96fe60badf14bdb1b4c70abe5ea3393d281ee12b0d5b75e474e21e8dfb5974f2dc4710db1
