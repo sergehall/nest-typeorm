@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { dialogsSets, DialogTemplate } from '../../helpers/dialogs-sets';
-import { stringSimilarity } from 'string-similarity-js';
+import similarity from 'string-similarity-js';
 
 export class TelegramTextParserCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -14,6 +14,7 @@ export class TelegramTextParserUseCase
   async execute({
     payloadTelegramMessage,
   }: TelegramTextParserCommand): Promise<string> {
+    // Extract message text and recipient's name from the payload
     const inputPhrase = payloadTelegramMessage.message.text.toLowerCase();
     const nameRecipient =
       payloadTelegramMessage.message.from.first_name ||
@@ -22,18 +23,27 @@ export class TelegramTextParserUseCase
     let bestMatch: DialogTemplate | undefined;
     let highestSimilarity = -1; // Initialize to a lower value
 
-    dialogsSets.forEach((template) => {
-      template.variations.forEach((variation) => {
-        const similarityScore = stringSimilarity(variation, inputPhrase);
-        if (similarityScore > highestSimilarity) {
+    // Perform parallel processing for each template
+    await Promise.all(
+      dialogsSets.map(async (template) => {
+        // Compute similarity scores concurrently for each variation
+        const similarityPromises = template.variations.map((variation) =>
+          similarity(variation, inputPhrase),
+        );
+        const similarityScores = await Promise.all(similarityPromises);
+
+        // Find the maximum similarity score and corresponding template
+        const maxSimilarity = Math.max(...similarityScores);
+        if (maxSimilarity > highestSimilarity) {
+          // Update the best match if the current template has higher similarity
           bestMatch = template;
-          highestSimilarity = similarityScore;
+          highestSimilarity = maxSimilarity;
         }
-      });
-    });
+      }),
+    );
 
     if (bestMatch && highestSimilarity >= 0.9) {
-      // Check if {nameRecipient} exists in the response
+      // Check if {nameRecipient} exists in the response and replace if necessary
       return bestMatch.response.includes('{nameRecipient}')
         ? bestMatch.response.replace('{nameRecipient}', nameRecipient)
         : bestMatch.response;
