@@ -17,6 +17,7 @@ export class TestingDeleteAllDataRepository {
       'ImagesPostsOriginalMetadata',
       'ImagesBlogsMainMetadata',
       'ImagesBlogsWallpaperMetadata',
+      'BlogsSubscribers',
       'ChallengeAnswers',
       'ChallengeQuestions',
       'PairsGame',

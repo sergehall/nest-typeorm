@@ -20,6 +20,7 @@ import { ImagesBlogsMainMetadataEntity } from '../../../features/blogger-blogs/e
 import { ImagesPostsOriginalMetadataEntity } from '../../../features/posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../../../features/posts/entities/images-posts-middle-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../../../features/posts/entities/images-posts-small-metadata.entity';
+import { BlogsSubscribersEntity } from '../../../features/blogger-blogs/entities/blogs-subscribers.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -46,6 +47,7 @@ export class TypeOrmPostgresOptions
         UsersEntity,
         SecurityDevicesEntity,
         BloggerBlogsEntity,
+        BlogsSubscribersEntity,
         PostsEntity,
         CommentsEntity,
         BannedUsersForBlogsEntity,
