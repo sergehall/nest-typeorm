@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Delete,
+  Post,
 } from '@nestjs/common';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
@@ -22,6 +23,10 @@ import { GetBlogByIdCommand } from '../application/use-cases/get-blog-by-id.use-
 import { IdParams } from '../../../common/query/params/id.params';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { BloggerBlogsWithImagesViewModel } from '../../blogger-blogs/views/blogger-blogs-with-images.view-model';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { BlogIdParams } from '../../../common/query/params/blogId.params';
+import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use-cases/manage-blogs-subscribe.use-case';
+import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -48,12 +53,22 @@ export class BlogsController {
     return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
   }
 
-  @Get(':blogId/subscription')
-  @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @Post(':blogId/subscription')
+  @UseGuards(LocalAuthGuard)
   async subscribeToBlog(
-    @Param() params: IdParams,
+    @Request() req: any,
+    @Param() params: BlogIdParams,
   ): Promise<BloggerBlogsWithImagesViewModel> {
-    return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
+    const currentUserDto: CurrentUserDto = req.user;
+    const subscriptionStatus = SubscriptionStatus.Subscribed;
+
+    return await this.commandBus.execute(
+      new ManageBlogsSubscribeCommand(
+        params,
+        subscriptionStatus,
+        currentUserDto,
+      ),
+    );
   }
 
   @Delete(':blogId/subscription')

@@ -49,6 +49,9 @@ import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-po
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
+import { ManageBlogsSubscribeUseCase } from './application/use-cases/manage-blogs-subscribe.use-case';
+import { BlogsSubscribersEntity } from './entities/blogs-subscribers.entity';
+import { BlogsSubscribersRepo } from './infrastructure/blogs-subscribers.repo';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -60,6 +63,7 @@ const bloggersBlogUseCases = [
   UploadFilesPostsUseCase,
   UploadFilesBlogsWallpaperUseCase,
   UploadFilesBlogsMainUseCase,
+  ManageBlogsSubscribeUseCase,
 ];
 
 const services = [
@@ -79,6 +83,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PostsEntity,
       CommentsEntity,
       BloggerBlogsEntity,
+      BlogsSubscribersEntity,
       LikeStatusPostsEntity,
       PairsGameEntity,
       QuestionsQuizEntity,
@@ -103,6 +108,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BloggerBlogsRepo,
     GameQuestionsRepo,
     LikeStatusPostsRepo,
+    BlogsSubscribersRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
     ImagesPostsOriginalMetadataRepo,
