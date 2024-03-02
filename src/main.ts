@@ -4,7 +4,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from './config/configuration';
 import { createApp } from './create-app';
-import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -26,9 +25,9 @@ async function bootstrap() {
   const baseUrl = await app.getUrl();
   console.log(`Application is running on url: ${baseUrl}`);
 
-  const telegramAdapter = await app.resolve(TelegramAdapter);
-
-  await telegramAdapter.setWebhook();
+  // const telegramAdapter = await app.resolve(TelegramAdapter);
+  //
+  // await telegramAdapter.setWebhook();
 }
 
 // Call the bootstrap function to start the application
