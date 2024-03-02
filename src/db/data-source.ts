@@ -19,6 +19,7 @@ import { ImagesBlogsMainMetadataEntity } from '../features/blogger-blogs/entitie
 import { ImagesPostsOriginalMetadataEntity } from '../features/posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsSmallMetadataEntity } from '../features/posts/entities/images-posts-small-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../features/posts/entities/images-posts-middle-metadata.entity';
+import { BlogsSubscribersEntity } from '../features/blogger-blogs/entities/blogs-subscribers.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -33,6 +34,7 @@ export default new DataSource({
     UsersEntity,
     SecurityDevicesEntity,
     BloggerBlogsEntity,
+    BlogsSubscribersEntity,
     PostsEntity,
     CommentsEntity,
     BannedUsersForBlogsEntity,
