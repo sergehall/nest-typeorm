@@ -3480,6 +3480,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/similarity@npm:^1":
+  version: 1.2.3
+  resolution: "@types/similarity@npm:1.2.3"
+  checksum: c3a0af7e4bf5a240d442dff689b6e5f9b15189c2b7b63ae30b3b27a6a6ba1e56265f3175c958bf380aa561f18f539b1d484eb650c965d4277506028acb8f9852
+  languageName: node
+  linkType: hard
+
 "@types/stack-utils@npm:^2.0.0":
   version: 2.0.3
   resolution: "@types/stack-utils@npm:2.0.3"
@@ -8652,6 +8659,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"levenshtein-edit-distance@npm:^2.0.0":
+  version: 2.0.5
+  resolution: "levenshtein-edit-distance@npm:2.0.5"
+  bin:
+    levenshtein-edit-distance: cli.js
+  checksum: 810b12ad8f21a0ddc3c26c4c88c297f873e2c65c17cabcbdd0d08e905a0b14defc1829c8e602bab5ca031182b9d2d9d7151c72eb011fd3899c07103f50f6dbf1
+  languageName: node
+  linkType: hard
+
 "levn@npm:^0.4.1":
   version: 0.4.1
   resolution: "levn@npm:0.4.1"
@@ -10112,6 +10128,7 @@ __metadata:
     "@types/passport-local": "npm:^1.0.34"
     "@types/pg": "npm:^8.10.2"
     "@types/reflect-metadata": "npm:^0.1.0"
+    "@types/similarity": "npm:^1"
     "@types/supertest": "npm:^2.0.12"
     "@types/uuid4": "npm:^2.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.4.0"
@@ -10143,6 +10160,7 @@ __metadata:
     rimraf: "npm:^3.0.2"
     rxjs: "npm:^7.2.0"
     sharp: "npm:^0.32.6"
+    similarity: "npm:^1.2.1"
     source-map-support: "npm:^0.5.20"
     supertest: "npm:^6.3.3"
     ts-jest: "npm:^29.1.1"
@@ -12436,6 +12454,17 @@ __metadata:
     "@sigstore/sign": "npm:^2.1.0"
     "@sigstore/tuf": "npm:^2.1.0"
   checksum: 44e9ed0ea337f5bb37cf54b065789be4fba4c2f45aa5c1cd19c33eee7bc5683a24df67e45b46698c6192bdf13e85052251ea994c4873c6d86d21392e0cd45618
+  languageName: node
+  linkType: hard
+
+"similarity@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "similarity@npm:1.2.1"
+  dependencies:
+    levenshtein-edit-distance: "npm:^2.0.0"
+  bin:
+    similarity: cli.js
+  checksum: 5196741b903a79398c932c7b499a192b1490c38626015955070381c9a13c2f066d5a9da7d020d7d983f6f70213af2305f055b416930b302e87f916577570af5c
   languageName: node
   linkType: hard
 
