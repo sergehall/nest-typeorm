@@ -3480,7 +3480,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/similarity@npm:^1":
+"@types/similarity@npm:^1.2.3":
   version: 1.2.3
   resolution: "@types/similarity@npm:1.2.3"
   checksum: c3a0af7e4bf5a240d442dff689b6e5f9b15189c2b7b63ae30b3b27a6a6ba1e56265f3175c958bf380aa561f18f539b1d484eb650c965d4277506028acb8f9852
@@ -10128,7 +10128,7 @@ __metadata:
     "@types/passport-local": "npm:^1.0.34"
     "@types/pg": "npm:^8.10.2"
     "@types/reflect-metadata": "npm:^0.1.0"
-    "@types/similarity": "npm:^1"
+    "@types/similarity": "npm:^1.2.3"
     "@types/supertest": "npm:^2.0.12"
     "@types/uuid4": "npm:^2.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.4.0"
