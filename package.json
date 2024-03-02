@@ -79,6 +79,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "sharp": "^0.32.6",
+    "string-similarity-js": "^2.1.4",
     "typeorm": "^0.3.17",
     "uuid4": "^2.0.3"
   },
@@ -100,7 +101,6 @@
     "mongodb-memory-server": "^8.12.2",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
-    "string-similarity-js": "^2.1.4",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.5.1",
