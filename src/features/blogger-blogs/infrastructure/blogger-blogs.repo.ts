@@ -192,10 +192,10 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
+        const blogId = await this.uuidErrorResolver.extractUserIdFromError(
           error,
         );
-        throw new NotFoundException(`Post with ID ${userId} not found`);
+        throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
