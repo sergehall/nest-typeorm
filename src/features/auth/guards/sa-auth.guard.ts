@@ -16,7 +16,7 @@ import { ConfigType } from '../../../config/configuration';
 import { SaCreateSuperAdmin } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
 
 @Injectable()
-export class BaseAuthGuard extends SaConfig implements CanActivate {
+export class SaAuthGuard extends SaConfig implements CanActivate {
   private readonly saCreateSuperAdmin: SaCreateSuperAdmin; // Declare a private property to store the CommandBus instance
   constructor(
     saCreateSuperAdmin: SaCreateSuperAdmin,

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateQuizQuestionDto } from '../dto/create-quiz-question.dto';
 import { UpdateQuizQuestionDto } from '../dto/update-quiz-question.dto';
-import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
+import { SaAuthGuard } from '../../auth/guards/sa-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { SaCreateQuestionsAndAnswerCommand } from '../application/use-cases/sa-create-questions-and-answer.use-case';
 import { QuestionsViewModel } from '../views/questions.view-model';
@@ -34,7 +34,7 @@ export class SaQuizQuestionsController {
   ) {}
 
   @Get()
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   async saGetQuestions(@Query() query: any) {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
@@ -44,7 +44,7 @@ export class SaQuizQuestionsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   async saCreateQuestion(
     @Body() createQuizQuestionDto: CreateQuizQuestionDto,
   ): Promise<QuestionsViewModel> {
@@ -55,7 +55,7 @@ export class SaQuizQuestionsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   async saUpdateQuestionsAndAnswer(
     @Param() params: IdParams,
     @Body() updateQuizQuestionDto: UpdateQuizQuestionDto,
@@ -67,7 +67,7 @@ export class SaQuizQuestionsController {
 
   @Put(':id/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   async updatePublish(
     @Param() params: IdParams,
     @Body() updatePublishDto: UpdatePublishDto,
@@ -79,7 +79,7 @@ export class SaQuizQuestionsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   async deleteById(@Param() params: IdParams): Promise<boolean> {
     return await this.commandBus.execute(
       new SaDeleteQuestionByIdCommand(params.id),
