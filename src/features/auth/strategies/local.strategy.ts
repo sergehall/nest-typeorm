@@ -4,17 +4,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
 
-import {
-  invalidLoginOrEmailLengthError,
-  passwordInvalid,
-  validatePasswordFailed,
-} from '../../../common/filters/custom-errors-messages';
+import { validatePasswordFailed } from '../../../common/filters/custom-errors-messages';
 import { CustomErrorsMessagesType } from '../../../common/filters/types/custom-errors-messages.types';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { LoginPasswordValidatorSizes } from '../../../common/helpers/login-password.validator-sizes';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(protected commandBus: CommandBus) {
+  constructor(
+    protected commandBus: CommandBus,
+    protected loginPasswordValidatorSizes: LoginPasswordValidatorSizes,
+  ) {
     super({
       usernameField: 'loginOrEmail',
     });
@@ -26,36 +27,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   ): Promise<CurrentUserDto | null> {
     console.log(loginOrEmail, 'loginOrEmail');
     console.log(password, 'password');
-    const messages: CustomErrorsMessagesType[] = [];
 
-    this.validateLength(
-      loginOrEmail.toString(),
-      3,
-      50,
-      invalidLoginOrEmailLengthError,
-      messages,
-    );
-    this.validateLength(password.toString(), 6, 20, passwordInvalid, messages);
+    await this.loginPasswordValidatorSizes.validate(loginOrEmail, password);
 
-    if (messages.length !== 0) {
-      throw new HttpException(
-        {
-          message: messages,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const user = await this.commandBus.execute(
+    const user: UsersEntity = await this.commandBus.execute(
       new ValidatePasswordCommand(loginOrEmail, password),
     );
-    if (!user) {
-      throw new HttpException(
-        {
-          message: [validatePasswordFailed],
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
 
     return {
       userId: user.userId,
@@ -65,17 +42,5 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       roles: user.roles,
       isBanned: user.isBanned,
     };
-  }
-
-  private validateLength(
-    value: string,
-    min: number,
-    max: number,
-    errorMessage: CustomErrorsMessagesType,
-    messages: CustomErrorsMessagesType[],
-  ): void {
-    if (value.length < min || value.length > max) {
-      messages.push(errorMessage);
-    }
   }
 }
