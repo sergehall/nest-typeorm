@@ -13,22 +13,21 @@ export class ValidatePasswordCommand {
 export class ValidatePasswordUseCase
   implements ICommandHandler<ValidatePasswordCommand>
 {
-  constructor(protected usersRepo: UsersRepo) {}
+  constructor(private readonly usersRepo: UsersRepo) {}
+
   async execute(command: ValidatePasswordCommand): Promise<UsersEntity> {
     const { loginOrEmail, password } = command;
+
     const user: UsersEntity | null =
       await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
 
-    const isValidPassword =
-      user &&
-      !user.isBanned &&
-      (await bcrypt.compare(password, user.passwordHash));
-
-    if (!user || !isValidPassword) {
+    if (
+      !user ||
+      user.isBanned ||
+      !(await bcrypt.compare(password, user.passwordHash))
+    ) {
       throw new HttpException(
-        {
-          message: [validatePasswordFailed],
-        },
+        { message: [validatePasswordFailed] },
         HttpStatus.UNAUTHORIZED,
       );
     }
