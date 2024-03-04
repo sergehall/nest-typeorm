@@ -42,10 +42,13 @@ import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/ima
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
+import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
+import { EncryptConfig } from '../../config/encrypt/encrypt.config';
+import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
-const helpers = [KeyResolver, UuidErrorResolver];
+const helpers = [KeyResolver, UuidErrorResolver, CalculatorExpirationDate];
 
 @Module({
   imports: [
@@ -69,6 +72,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [BlogsController],
   providers: [
+    SaCreateSuperAdmin,
+    EncryptConfig,
     AwsConfig,
     AuthService,
     S3Service,
