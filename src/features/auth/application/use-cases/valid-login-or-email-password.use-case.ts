@@ -24,7 +24,7 @@ export class ValidLoginOrEmailPasswordUseCase
 
     const user: UsersEntity | null =
       await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
-    console.log(user, 'user3');
+    console.log(user?.login, 'user?.login 3');
 
     if (
       !user ||

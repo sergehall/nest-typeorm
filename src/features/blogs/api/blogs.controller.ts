@@ -29,6 +29,7 @@ import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use-cases/manage-blogs-subscribe.use-case';
 import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -63,7 +64,8 @@ export class BlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post(':blogId/subscription')
-  @UseGuards(BaseAuthGuard)
+  // @UseGuards(BaseAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async subscribeToBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
@@ -83,7 +85,8 @@ export class BlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':blogId/subscription')
-  @UseGuards(BaseAuthGuard)
+  // @UseGuards(BaseAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async unsubscribeToBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
