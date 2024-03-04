@@ -31,10 +31,13 @@ export class FileValidationPipe implements PipeTransform {
       );
     }
     const errorMessage: CustomErrorsMessagesType[] = [];
-    await this.checkFileNotProvided(value);
-    await this.checkFileSize(value, constraints, errorMessage);
-    await this.checkFileExtension(value, constraints, errorMessage);
-    await this.checkImageDimensions(value, constraints, errorMessage);
+
+    await Promise.all([
+      this.checkFileNotProvided(value),
+      this.checkFileSize(value, constraints, errorMessage),
+      this.checkFileExtension(value, constraints, errorMessage),
+      this.checkImageDimensions(value, constraints, errorMessage),
+    ]);
 
     if (errorMessage.length > 0) {
       throw new HttpException(

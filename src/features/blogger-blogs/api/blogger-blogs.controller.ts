@@ -61,7 +61,7 @@ export class BloggerBlogsController {
     protected parseQueriesService: ParseQueriesService,
     protected commandBus: CommandBus,
   ) {}
-  @Post('blogs/:blogId/posts/:postId/files/main')
+  @Post('blogs/:blogId/posts/:postId/images/main')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageForPost(
@@ -78,7 +78,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs/:blogId/files/wallpaper')
+  @Post('blogs/:blogId/images/wallpaper')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageBlogWallpaper(
@@ -99,7 +99,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs/:blogId/files/main')
+  @Post('blogs/:blogId/images/main')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFilesBlogMain(
