@@ -1,11 +1,8 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
-
-import { validatePasswordFailed } from '../../../common/filters/custom-errors-messages';
-import { CustomErrorsMessagesType } from '../../../common/filters/types/custom-errors-messages.types';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { LoginPasswordValidatorSizes } from '../../../common/helpers/login-password.validator-sizes';
 import { UsersEntity } from '../../users/entities/users.entity';
