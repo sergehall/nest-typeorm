@@ -18,7 +18,7 @@ import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { Action } from '../../../ability/roles/action.enum';
 import { LikeStatusDto } from '../dto/like-status.dto';
-import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
+import { SaAuthGuard } from '../../auth/guards/sa-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { NoneStatusGuard } from '../../auth/guards/none-status.guard';
 import { CreateCommentCommand } from '../../comments/application/use-cases/create-comment.use-case';
@@ -130,7 +130,7 @@ export class PostsController {
     );
   }
   @Put(':id')
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePostByPostId(
     @Request() req: any,
@@ -154,7 +154,7 @@ export class PostsController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BaseAuthGuard)
+  @UseGuards(SaAuthGuard)
   @Delete(':id')
   async removePost(
     @Request() req: any,
