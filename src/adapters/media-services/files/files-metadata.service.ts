@@ -12,10 +12,29 @@ import { ImageWidthHeightSize } from './dto/image-width-height-size';
 import { ImageMetadata } from './dto/image-metadata';
 import { FileUploadDto } from '../../../features/blogger-blogs/dto/file-upload.dto';
 import { ResizedImageDetailsDto } from '../../../features/posts/dto/resized-image-details.dto';
+import { ImagesBlogsWallpaperMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
+import { ImagesBlogsMainMetadataEntity } from '../../../features/blogger-blogs/entities/images-blog-main-metadata.entity';
 
 @Injectable()
 export class FilesMetadataService {
   constructor(protected s3Service: S3Service) {}
+
+  async processImageBlogsWallpaperOrMain(
+    metadataEntity:
+      | ImagesBlogsWallpaperMetadataEntity
+      | ImagesBlogsMainMetadataEntity,
+  ): Promise<ImageMetadata> {
+    const { buffer, pathKey } = metadataEntity;
+    const metadata = await this.extractWidthHeightSizeFromBuffer(buffer);
+    const unitedUrl = await this.s3Service.generateSignedUrl(pathKey);
+
+    return {
+      url: unitedUrl.url,
+      height: metadata.height,
+      width: metadata.width,
+      fileSize: metadata.fileSize,
+    };
+  }
 
   async resizeImages(dto: FileUploadDto): Promise<ResizedImageDetailsDto> {
     const [middleResizedImage, smallResizedImage] = await Promise.all([
@@ -71,7 +90,7 @@ export class FilesMetadataService {
     }
   }
 
-  async processImageMetadata(
+  async processImagePostsMetadata(
     imagesMetadata: OriginalMiddleSmallEntitiesDto,
   ): Promise<PostImagesViewModel> {
     if (!imagesMetadata) {
@@ -84,9 +103,9 @@ export class FilesMetadataService {
     // Process all types of metadata concurrently
     const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all(
       [
-        this.imageMetadataProcessor(original),
-        this.imageMetadataProcessor(middle),
-        this.imageMetadataProcessor(small),
+        this.imageMetadataPostsProcessor(original),
+        this.imageMetadataPostsProcessor(middle),
+        this.imageMetadataPostsProcessor(small),
       ],
     );
 
@@ -100,8 +119,7 @@ export class FilesMetadataService {
 
     return { main };
   }
-
-  async imageMetadataProcessor(
+  async imageMetadataPostsProcessor(
     metadata: ImagesPostsMetadataEntity,
   ): Promise<ImageMetadata[]> {
     const imageMetadata: ImageWidthHeightSize =
@@ -121,7 +139,7 @@ export class FilesMetadataService {
     ];
   }
 
-  async imagesMetadataProcessor(
+  async imagesPostsMetadataProcessor(
     imagesMetadata: PathKeyBufferDto[],
   ): Promise<PostImagesViewModel> {
     if (imagesMetadata.length === 0) {

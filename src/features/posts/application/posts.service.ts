@@ -26,7 +26,7 @@ export class PostsService {
 
         // Retrieve metadata for files
         const metadataPromise: PostImagesViewModel =
-          await this.imagesMetadataService.imagesMetadataProcessor(images);
+          await this.imagesMetadataService.imagesPostsMetadataProcessor(images);
         return { post, metadataPromise };
       },
     );

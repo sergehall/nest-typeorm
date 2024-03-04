@@ -2,11 +2,8 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsWithImagesViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
-import { S3Service } from '../../../../config/aws/s3/s3-service';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
-import { ImagesBlogsMainMetadataEntity } from '../../../blogger-blogs/entities/images-blog-main-metadata.entity';
-import { ImagesBlogsWallpaperMetadataEntity } from '../../../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { ImageMetadata } from '../../../../adapters/media-services/files/dto/image-metadata';
 
@@ -17,7 +14,6 @@ export class GetBlogByIdCommand {
 @CommandHandler(GetBlogByIdCommand)
 export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
   constructor(
-    protected s3Service: S3Service,
     protected commandBus: CommandBus,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected imagesMetadataService: FilesMetadataService,
@@ -46,10 +42,17 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     const main: ImageMetadata[] = [];
 
     if (imageWallpaperMetadataEntity) {
-      wallpaper = await this.processImageMetadata(imageWallpaperMetadataEntity);
+      wallpaper =
+        await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
+          imageWallpaperMetadataEntity,
+        );
     }
     if (imageMainMetadataEntity) {
-      main.push(await this.processImageMetadata(imageMainMetadataEntity));
+      main.push(
+        await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
+          imageMainMetadataEntity,
+        ),
+      );
     }
 
     return {
@@ -63,24 +66,6 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         wallpaper,
         main,
       },
-    };
-  }
-
-  private async processImageMetadata(
-    metadataEntity:
-      | ImagesBlogsWallpaperMetadataEntity
-      | ImagesBlogsMainMetadataEntity,
-  ): Promise<ImageMetadata> {
-    const { buffer, pathKey } = metadataEntity;
-    const metadata =
-      await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(buffer);
-    const unitedUrl = await this.s3Service.generateSignedUrl(pathKey);
-
-    return {
-      url: unitedUrl.url,
-      height: metadata.height,
-      width: metadata.width,
-      fileSize: metadata.fileSize,
     };
   }
 }
