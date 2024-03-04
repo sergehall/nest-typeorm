@@ -31,6 +31,7 @@ export class BaseAuthGuard implements CanActivate {
     const credentials = Buffer.from(base64Credentials, 'base64').toString(
       'utf-8',
     );
+    console.log(credentials, 'credentials');
     const [username, password] = credentials.split(':');
 
     console.log(username, 'username1');
