@@ -49,6 +49,7 @@ export class UploadFilesBlogsWallpaperUseCase
     // Check if the blog exists
     const blog: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findNotBannedBlogById(blogId);
+
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }

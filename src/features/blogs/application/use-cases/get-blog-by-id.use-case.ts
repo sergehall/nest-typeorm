@@ -38,15 +38,13 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
       ]);
 
-    let wallpaper: ImageMetadata | null = null;
-    const main: ImageMetadata[] = [];
+    const wallpaper: ImageMetadata | null =
+      imageWallpaperMetadataEntity &&
+      (await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
+        imageWallpaperMetadataEntity,
+      ));
 
-    if (imageWallpaperMetadataEntity) {
-      wallpaper =
-        await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
-          imageWallpaperMetadataEntity,
-        );
-    }
+    const main: ImageMetadata[] = [];
     if (imageMainMetadataEntity) {
       main.push(
         await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
