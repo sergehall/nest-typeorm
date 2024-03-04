@@ -3,47 +3,72 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
-import { SaConfig } from '../../../config/sa/sa.config';
-import {
-  loginOrPassInvalid,
-  noAuthHeadersError,
-} from '../../../common/filters/custom-errors-messages';
-import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../../../config/configuration';
-import { SaCreateSuperAdmin } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
+import { noAuthHeadersError } from '../../../common/filters/custom-errors-messages';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
+import { CommandBus } from '@nestjs/cqrs';
+import { LoginPasswordSizesValidatorCommand } from '../application/use-cases/login-password-sizes.validator.use-case';
 
 @Injectable()
-export class SaAuthGuard extends SaConfig implements CanActivate {
-  private readonly saCreateSuperAdmin: SaCreateSuperAdmin; // Declare a private property to store the CommandBus instance
-  constructor(
-    saCreateSuperAdmin: SaCreateSuperAdmin,
-    configService: ConfigService<ConfigType, true>,
-  ) {
-    super(configService);
-    this.saCreateSuperAdmin = saCreateSuperAdmin; // Store the CommandBus instance
-  }
+export class BaseAuthGuard implements CanActivate {
+  constructor(private readonly commandBus: CommandBus) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const basicAuth: string = await this.getBasicAuth('BASIC_AUTH');
-    const exceptedAuthInput = 'Basic ' + basicAuth;
 
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
-    } else {
-      if (request.headers.authorization !== exceptedAuthInput) {
-        throw new HttpException(
-          {
-            message: [loginOrPassInvalid],
-          },
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      request.user = await this.saCreateSuperAdmin.createUserSa();
-      return true;
     }
+
+    const authorizationHeader = request.headers.authorization;
+    const [, base64Credentials] = authorizationHeader.split(' ');
+
+    if (!base64Credentials) {
+      throw new UnauthorizedException([noAuthHeadersError]);
+    }
+
+    const credentials = Buffer.from(base64Credentials, 'base64').toString(
+      'utf-8',
+    );
+    const [username, password] = credentials.split(':');
+
+    await this.commandBus.execute(
+      new LoginPasswordSizesValidatorCommand(username, password),
+    );
+
+    const user: UsersEntity = await this.commandBus.execute(
+      new ValidatePasswordCommand(username, password),
+    );
+
+    request.user = {
+      userId: user.userId,
+      login: user.login,
+      email: user.email,
+      orgId: user.orgId,
+      roles: user.roles,
+      isBanned: user.isBanned,
+    };
+
+    return true; // Return true if authentication succeeds
   }
 }
+
+// @Injectable()
+// export class BaseAuthGuard implements CanActivate {
+//   private readonly saCreateSuperAdmin: SaCreateSuperAdmin; // Declare a private property to store the CommandBus instance
+//   constructor(
+//     protected loginPasswordValidatorSizes: LoginPasswordValidatorSizes,
+//   ) {}
+//   async canActivate(context: ExecutionContext): Promise<boolean> {
+//     const request = context.switchToHttp().getRequest();
+//
+//     if (!request.headers || !request.headers.authorization) {
+//       throw new UnauthorizedException([noAuthHeadersError]);
+//     } else {
+//       const authorization = request.headers.authorization.split(' ')[1];
+//       console.log(authorization, 'authorization ');
+//       return authorization;
+//     }
+//   }
+// }
