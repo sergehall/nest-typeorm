@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { noAuthHeadersError } from '../../../common/filters/custom-errors-messages';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { ValidatePasswordCommand } from '../application/use-cases/validate-password.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginPasswordSizesValidatorCommand } from '../application/use-cases/login-password-sizes.validator.use-case';
+import { LoginOrEmailPasswordValidatorCommand } from '../application/use-cases/login-or-email-password.validator.use-case';
 
 @Injectable()
 export class BaseAuthGuard implements CanActivate {
@@ -38,7 +38,7 @@ export class BaseAuthGuard implements CanActivate {
     );
 
     const user: UsersEntity = await this.commandBus.execute(
-      new ValidatePasswordCommand(username, password),
+      new LoginOrEmailPasswordValidatorCommand(username, password),
     );
 
     request.user = {

@@ -12,7 +12,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UpdateSentConfirmationCodeUseCase } from '../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { ValidatePasswordUseCase } from './application/use-cases/validate-password.use-case';
+import { LoginOrEmailPasswordValidatorUseCase } from './application/use-cases/login-or-email-password.validator.use-case';
 import { SignAccessJwtUseCase } from './application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtUseCase } from './application/use-cases/update-access-jwt.use-case';
 import { SignRefreshJwtUseCase } from './application/use-cases/sign-refresh-jwt.use-case';
@@ -55,7 +55,7 @@ const authUseCases = [
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,
-  ValidatePasswordUseCase,
+  LoginOrEmailPasswordValidatorUseCase,
   SignAccessJwtUseCase,
   UpdateAccessJwtUseCase,
   SignRefreshJwtUseCase,
