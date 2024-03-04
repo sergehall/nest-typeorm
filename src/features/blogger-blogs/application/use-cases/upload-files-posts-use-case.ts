@@ -102,7 +102,7 @@ export class UploadFilesPostsUseCase
         currentUserDto,
       );
 
-    return await this.filesMetadataService.processImageMetadata(
+    return await this.filesMetadataService.processImagePostsMetadata(
       imagesMetadataEntity,
     );
   }

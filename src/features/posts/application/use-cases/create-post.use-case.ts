@@ -51,7 +51,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    const postViewModel: PostViewModel = await this.postsRepo.createPosts(
+    const postViewModel: PostViewModel = await this.postsRepo.createPost(
       blog,
       createPostDto,
       currentUserDto,
