@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { LoginPasswordSizesValidatorCommand } from '../application/use-cases/login-password-sizes.validator.use-case';
-import { LoginOrEmailPasswordValidatorCommand } from '../application/use-cases/login-or-email-password.validator.use-case';
+import { ValidLoginOrEmailPasswordCommand } from '../application/use-cases/valid-login-or-email-password.use-case';
+import { ValidLoginPasswordSizesCommand } from '../application/use-cases/valid-login-password-sizes.use-case';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -20,11 +20,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     password: string,
   ): Promise<CurrentUserDto | null> {
     await this.commandBus.execute(
-      new LoginPasswordSizesValidatorCommand(loginOrEmail, password),
+      new ValidLoginPasswordSizesCommand(loginOrEmail, password),
     );
 
     const user: UsersEntity = await this.commandBus.execute(
-      new LoginOrEmailPasswordValidatorCommand(loginOrEmail, password),
+      new ValidLoginOrEmailPasswordCommand(loginOrEmail, password),
     );
 
     return {

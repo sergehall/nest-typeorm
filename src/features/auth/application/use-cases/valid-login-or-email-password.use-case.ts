@@ -5,18 +5,18 @@ import { UsersEntity } from '../../../users/entities/users.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { validatePasswordFailed } from '../../../../common/filters/custom-errors-messages';
 
-export class LoginOrEmailPasswordValidatorCommand {
+export class ValidLoginOrEmailPasswordCommand {
   constructor(public loginOrEmail: string, public password: string) {}
 }
 
-@CommandHandler(LoginOrEmailPasswordValidatorCommand)
-export class LoginOrEmailPasswordValidatorUseCase
-  implements ICommandHandler<LoginOrEmailPasswordValidatorCommand>
+@CommandHandler(ValidLoginOrEmailPasswordCommand)
+export class ValidLoginOrEmailPasswordUseCase
+  implements ICommandHandler<ValidLoginOrEmailPasswordCommand>
 {
   constructor(private readonly usersRepo: UsersRepo) {}
 
   async execute(
-    command: LoginOrEmailPasswordValidatorCommand,
+    command: ValidLoginOrEmailPasswordCommand,
   ): Promise<UsersEntity> {
     const { loginOrEmail, password } = command;
 
