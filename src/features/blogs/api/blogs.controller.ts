@@ -48,11 +48,17 @@ export class BlogsController {
   }
 
   @Get(':id')
+  @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async openGetBlogById(
+    @Request() req: any,
     @Param() params: IdParams,
   ): Promise<BloggerBlogsWithImagesViewModel> {
-    return await this.commandBus.execute(new GetBlogByIdCommand(params.id));
+    const currentUserDto: CurrentUserDto | null = req.user;
+
+    return await this.commandBus.execute(
+      new GetBlogByIdCommand(params.id, currentUserDto),
+    );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
