@@ -24,6 +24,7 @@ export class FileValidationPipe implements PipeTransform {
     metadata: ArgumentMetadata,
   ): Promise<FileUploadDto> {
     const constraints: FileConstraintsDto = this.constraintsKey;
+
     if (!constraints) {
       throw new HttpException(
         { message: 'Constraints not found for the specified key' },
