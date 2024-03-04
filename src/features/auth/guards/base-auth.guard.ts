@@ -20,8 +20,9 @@ export class BaseAuthGuard implements CanActivate {
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
     }
-
+    console.log(request.headers, 'request.headers');
     const authorizationHeader = request.headers.authorization;
+    console.log(authorizationHeader, 'authorizationHeader');
     const [, base64Credentials] = authorizationHeader.split(' ');
 
     if (!base64Credentials) {
