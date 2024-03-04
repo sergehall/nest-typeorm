@@ -12,7 +12,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationUserUseCase } from './application/use-cases/registration-user.use-case';
 import { CreateUserUseCase } from '../users/application/use-cases/create-user.use-case';
 import { UpdateSentConfirmationCodeUseCase } from '../users/application/use-cases/update-sent-confirmation-code.use-case';
-import { LoginOrEmailPasswordValidatorUseCase } from './application/use-cases/login-or-email-password.validator.use-case';
+import { ValidLoginOrEmailPasswordUseCase } from './application/use-cases/valid-login-or-email-password.use-case';
 import { SignAccessJwtUseCase } from './application/use-cases/sign-access-jwt.use-case';
 import { UpdateAccessJwtUseCase } from './application/use-cases/update-access-jwt.use-case';
 import { SignRefreshJwtUseCase } from './application/use-cases/sign-refresh-jwt.use-case';
@@ -45,7 +45,7 @@ import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-qui
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { JwtAndActiveGameStrategy } from './strategies/jwt-and-active-game.strategy';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { LoginPasswordSizesValidatorUseCase } from './application/use-cases/login-password-sizes.validator.use-case';
+import { ValidLoginPasswordSizesUseCase } from './application/use-cases/valid-login-password-sizes.use-case';
 
 const authUseCases = [
   LoginUseCase,
@@ -55,7 +55,7 @@ const authUseCases = [
   RegistrationUserUseCase,
   ConfirmUserByCodeUseCase,
   UpdateSentConfirmationCodeUseCase,
-  LoginOrEmailPasswordValidatorUseCase,
+  ValidLoginOrEmailPasswordUseCase,
   SignAccessJwtUseCase,
   UpdateAccessJwtUseCase,
   SignRefreshJwtUseCase,
@@ -64,7 +64,7 @@ const authUseCases = [
   ValidRefreshJwtUseCase,
   PasswordRecoveryUseCase,
   AddInvalidJwtToBlacklistUseCase,
-  LoginPasswordSizesValidatorUseCase,
+  ValidLoginPasswordSizesUseCase,
   ChangePasswordByRecoveryCodeUseCase,
 ];
 

@@ -6,15 +6,15 @@ import {
 } from '../../../../common/filters/custom-errors-messages';
 import { CustomErrorsMessagesType } from '../../../../common/filters/types/custom-errors-messages.types';
 
-export class LoginPasswordSizesValidatorCommand {
+export class ValidLoginPasswordSizesCommand {
   constructor(public loginOrEmail: string, public password: string) {}
 }
 
-@CommandHandler(LoginPasswordSizesValidatorCommand)
-export class LoginPasswordSizesValidatorUseCase
-  implements ICommandHandler<LoginPasswordSizesValidatorCommand>
+@CommandHandler(ValidLoginPasswordSizesCommand)
+export class ValidLoginPasswordSizesUseCase
+  implements ICommandHandler<ValidLoginPasswordSizesCommand>
 {
-  async execute(command: LoginPasswordSizesValidatorCommand): Promise<void> {
+  async execute(command: ValidLoginPasswordSizesCommand): Promise<void> {
     const { loginOrEmail, password } = command;
 
     const messages: CustomErrorsMessagesType[] = [];
