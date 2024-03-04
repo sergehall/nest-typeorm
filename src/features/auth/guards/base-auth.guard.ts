@@ -33,6 +33,9 @@ export class BaseAuthGuard implements CanActivate {
     );
     const [username, password] = credentials.split(':');
 
+    console.log(username, 'username1');
+    console.log(password, 'password1');
+
     await this.commandBus.execute(
       new ValidLoginPasswordSizesCommand(username, password),
     );
@@ -53,22 +56,3 @@ export class BaseAuthGuard implements CanActivate {
     return true; // Return true if authentication succeeds
   }
 }
-
-// @Injectable()
-// export class BaseAuthGuard implements CanActivate {
-//   private readonly saCreateSuperAdmin: SaCreateSuperAdmin; // Declare a private property to store the CommandBus instance
-//   constructor(
-//     protected loginPasswordValidatorSizes: LoginPasswordValidatorSizes,
-//   ) {}
-//   async canActivate(context: ExecutionContext): Promise<boolean> {
-//     const request = context.switchToHttp().getRequest();
-//
-//     if (!request.headers || !request.headers.authorization) {
-//       throw new UnauthorizedException([noAuthHeadersError]);
-//     } else {
-//       const authorization = request.headers.authorization.split(' ')[1];
-//       console.log(authorization, 'authorization ');
-//       return authorization;
-//     }
-//   }
-// }
