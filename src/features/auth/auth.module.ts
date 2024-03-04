@@ -45,7 +45,7 @@ import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-qui
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { JwtAndActiveGameStrategy } from './strategies/jwt-and-active-game.strategy';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
-import { LoginPasswordValidatorSizes } from '../../common/helpers/login-password.validator-sizes';
+import { LoginPasswordSizesValidatorUseCase } from './application/use-cases/login-password-sizes.validator.use-case';
 
 const authUseCases = [
   LoginUseCase,
@@ -64,6 +64,7 @@ const authUseCases = [
   ValidRefreshJwtUseCase,
   PasswordRecoveryUseCase,
   AddInvalidJwtToBlacklistUseCase,
+  LoginPasswordSizesValidatorUseCase,
   ChangePasswordByRecoveryCodeUseCase,
 ];
 
@@ -90,7 +91,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     JwtAndActiveGameStrategy,
     JwtConfig,
     EncryptConfig,
-    LoginPasswordValidatorSizes,
     ParseQueriesService,
     AuthService,
     MailsService,

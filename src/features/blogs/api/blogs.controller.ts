@@ -29,6 +29,7 @@ import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use-cases/manage-blogs-subscribe.use-case';
 import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { BaseAuthGuard } from '../../auth/guards/base-auth.guard';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -63,13 +64,14 @@ export class BlogsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post(':blogId/subscription')
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(BaseAuthGuard)
   async subscribeToBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
   ): Promise<BloggerBlogsWithImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const subscriptionStatus = SubscriptionStatus.Subscribed;
+    const subscriptionStatus: SubscriptionStatus =
+      SubscriptionStatus.Subscribed;
 
     return await this.commandBus.execute(
       new ManageBlogsSubscribeCommand(
