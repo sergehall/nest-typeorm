@@ -27,17 +27,17 @@ export class SendMessageToRecipientUseCase
 
     const method = TelegramMethodsEnum.SEND_MESSAGE;
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
-    console.log(payloadTelegramMessage, 'payloadTelegramMessage');
 
-    const answerToRecipient = await this.commandBus.execute(
-      new TelegramTextParserCommand(payloadTelegramMessage),
-    );
+    if (payloadTelegramMessage.message.text) {
+      const answerToRecipient = await this.commandBus.execute(
+        new TelegramTextParserCommand(payloadTelegramMessage),
+      );
+      const data = {
+        chat_id: payloadTelegramMessage.message.from.id,
+        text: answerToRecipient,
+      };
 
-    const data = {
-      chat_id: payloadTelegramMessage.message.from.id,
-      text: answerToRecipient,
-    };
-
-    await axios.post(telegramUrl, data);
+      await axios.post(telegramUrl, data);
+    }
   }
 }
