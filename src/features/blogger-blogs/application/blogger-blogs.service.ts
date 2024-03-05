@@ -54,13 +54,18 @@ export class BloggerBlogsService {
     });
   }
 
-  async addImagesToBlogsEntity(
+  async addImagesSubscriberToBlogsEntity(
     newBlog: BloggerBlogsViewModel,
-  ): Promise<BloggerBlogsWithImagesViewModel> {
+  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
     const images = new ImagesViewModel();
+    const blogsWithImagesSubscribersViewMode =
+      new BloggerBlogsWithImagesSubscribersViewModel();
     return {
-      ...newBlog, // Spread properties of newBlog
-      images, // Add extended files
+      ...newBlog,
+      images: images,
+      currentUserSubscriptionStatus:
+        blogsWithImagesSubscribersViewMode.currentUserSubscriptionStatus,
+      subscribersCount: blogsWithImagesSubscribersViewMode.subscribersCount,
     };
   }
 
