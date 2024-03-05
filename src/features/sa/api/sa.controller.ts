@@ -13,7 +13,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
-import { SaAuthGuard } from '../../auth/guards/sa-auth.guard';
+import { SaBasicAuthGuard } from '../../auth/guards/sa-basic-auth.guard';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { Action } from '../../../ability/roles/action.enum';
@@ -63,7 +63,7 @@ export class SaController {
   ) {}
 
   @Get('users')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindUsers(@Query() query: any): Promise<PaginatorDto> {
@@ -73,7 +73,7 @@ export class SaController {
   }
 
   @Get('blogs')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saFindBlogs(@Query() query: any): Promise<PaginatorDto> {
@@ -83,7 +83,7 @@ export class SaController {
   }
 
   @Get('blogs/:blogId/posts')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async saGetPostsInBlog(
     @Request() req: any,
@@ -100,7 +100,7 @@ export class SaController {
   }
 
   @Post('users')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateUser(
@@ -117,7 +117,7 @@ export class SaController {
   }
 
   @Post('blogs')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async saCreateBlog(
@@ -133,7 +133,7 @@ export class SaController {
 
   @Put('blogs/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saBanBlog(
     @Request() req: any,
     @Param() params: IdParams,
@@ -147,7 +147,7 @@ export class SaController {
   }
 
   @Post('blogs/:blogId/posts')
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saCreatePostInBlog(
     @Request() req: any,
     @Param() params: BlogIdParams,
@@ -162,7 +162,7 @@ export class SaController {
 
   @Put('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saUpdateBlogById(
     @Request() req: any,
     @Param('id', BlogExistValidationPipe) id: string,
@@ -177,7 +177,7 @@ export class SaController {
 
   @Put('blogs/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saUpdatePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
@@ -192,7 +192,7 @@ export class SaController {
 
   @Put('users/:id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saBanUnbanUser(
     @Request() req: any,
     @Param() params: IdParams,
@@ -207,7 +207,7 @@ export class SaController {
 
   @Put('blogs/:id/bind-with-user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async bindBlogWithUser(
     @Request() req: any,
     @Param() params: IdUserIdParams,
@@ -221,7 +221,7 @@ export class SaController {
 
   @Put('blogs/:id/ban-with-user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async banBlogWithUser(
     @Request() req: any,
     @Param() params: IdUserIdParams,
@@ -235,7 +235,7 @@ export class SaController {
 
   @Delete('blogs/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saDeletePostByPostId(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
@@ -249,7 +249,7 @@ export class SaController {
 
   @Delete('users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async deleteUserById(
     @Request() req: any,
     @Param() params: IdParams,
@@ -263,7 +263,7 @@ export class SaController {
 
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   async saDeleteBlogById(
     @Request() req: any,
     @Param() params: IdParams,

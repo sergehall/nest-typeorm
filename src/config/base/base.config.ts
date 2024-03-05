@@ -13,7 +13,7 @@ import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
 import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
-import { BasicAuthTypes } from '../sa/types/basic-auth.types';
+import { BasicAuthType } from '../sa/types/basic-auth.type';
 import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
 import {
   S3BPublicBucketNameType,
@@ -22,6 +22,10 @@ import {
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
 import { TokenTelegramItIncubator } from '../telegram/types/token-telegram-it-incubator.type';
+import { SaLoginType } from '../sa/types/sa-login.type';
+import { SaEmailType } from '../sa/types/sa-email.type';
+import { SaKeyType } from '../sa/types/sa-key.type';
+import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
 
 @Injectable()
 export class BaseConfig {
@@ -88,9 +92,35 @@ export class BaseConfig {
 
   /**
    * Retrieves the value of the 'basicAuth' environment variable and returns it as a Promise of `string`.
-   * @returns {Promise<BasicAuthTypes>} The value of the 'string' environment variable.
+   * @returns {Promise<BasicAuthType>} The value of the 'string' environment variable.
    */
-  protected async getValueBasicAuth(key: BasicAuthTypes): Promise<string> {
+  protected async getValueBasicAuth(key: BasicAuthType): Promise<string> {
+    return this.configService.get('basicAuth', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueSaLogin(key: SaLoginType): Promise<string> {
+    return this.configService.get('basicAuth', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueSaEmail(key: SaEmailType): Promise<string> {
+    return this.configService.get('basicAuth', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueSaSaKey(key: SaKeyType): Promise<string> {
+    return this.configService.get('basicAuth', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueSaPasswordHash(
+    key: SaPasswordHashType,
+  ): Promise<string> {
     return this.configService.get('basicAuth', {
       infer: true,
     })[key];
@@ -225,6 +255,7 @@ export class BaseConfig {
     const basicAuth = this.configService.get('basicAuth', {
       infer: true,
     }).BASIC_AUTH;
+    console.log(basicAuth, 'basicAuth');
     const decodedPassword = Buffer.from(basicAuth, 'base64')
       .toString('utf8')
       .split(':')[1];

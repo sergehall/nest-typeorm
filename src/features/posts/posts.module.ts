@@ -27,7 +27,6 @@ import { InvalidJwtEntity } from '../auth/entities/invalid-jwt.entity';
 import { LikeStatusPostsEntity } from './entities/like-status-posts.entity';
 import { LikeStatusPostsRepo } from './infrastructure/like-status-posts.repo';
 import { CommentsEntity } from '../comments/entities/comments.entity';
-import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 import { EncryptConfig } from '../../config/encrypt/encrypt.config';
 import { GetPostByIdUseCase } from './application/use-cases/get-post-by-id.use-case';
 import { GetPostsUseCase } from './application/use-cases/get-posts.use-case';
@@ -56,6 +55,7 @@ import { ImagesPostsMiddleMetadataRepo } from './infrastructure/images-posts-mid
 import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
+import { SaConfig } from '../../config/sa/sa.config';
 
 const postsUseCases = [
   GetPostsUseCase,
@@ -94,10 +94,10 @@ const helpers = [KeyResolver, UuidErrorResolver, CalculatorExpirationDate];
   ],
   controllers: [PostsController],
   providers: [
-    SaCreateSuperAdmin,
-    EncryptConfig,
+    SaConfig,
     JwtConfig,
     AwsConfig,
+    EncryptConfig,
     AuthService,
     JwtService,
     S3Service,

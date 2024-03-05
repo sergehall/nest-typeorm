@@ -1,47 +1,41 @@
-import { EncryptConfig } from '../../../../config/encrypt/encrypt.config';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { DataForCreateUserDto } from '../../../users/dto/data-for-create-user.dto';
-import { Injectable } from '@nestjs/common';
-import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { ExpirationDateDto } from '../../../../common/helpers/calculator-expiration-date/dto/expiration-date.dto';
 import { CalculatorExpirationDate } from '../../../../common/helpers/calculator-expiration-date/calculator-expiration-date';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SaConfig } from '../../../../config/sa/sa.config';
 
-@Injectable()
-export class SaCreateSuperAdmin {
+export class CreateSaUserCommand {}
+
+@CommandHandler(CreateSaUserCommand)
+export class CreateSaUserUseCase
+  implements ICommandHandler<CreateSaUserCommand>
+{
   constructor(
+    private readonly saConfig: SaConfig,
     private readonly usersRepo: UsersRepo,
-    private readonly encryptConfig: EncryptConfig,
     private readonly expirationDateCalculator: CalculatorExpirationDate,
   ) {}
-  async createUserSa(): Promise<CurrentUserDto> {
-    const login = 'admin';
-    const email = 'admin@gmail.com';
 
-    // Hash the user's password
-    const passwordHash = await this.encryptConfig.getSaPasswordHash();
+  async execute(): Promise<UsersEntity> {
+    const saLogin = await this.saConfig.getSaLogin('SA_LOGIN');
+    const saEmail = await this.saConfig.getSaEmail('SA_EMAIL');
+    const saPasswordHash = await this.saConfig.getSaPasswordHash(
+      'SA_PASSWORD_HASH',
+    );
 
     // Return the expirationDate in ISO format for user registration.
     const expirationDateDto: ExpirationDateDto =
-      await this.expirationDateCalculator.createExpDate(0, 3, 0);
+      await this.expirationDateCalculator.createExpDate(5, 0, 0);
 
     const dataForCreateUserDto: DataForCreateUserDto = {
-      login,
-      email,
-      passwordHash,
+      login: saLogin,
+      email: saEmail,
+      passwordHash: saPasswordHash,
       expirationDate: expirationDateDto.expirationDate,
     };
 
-    const sa: UsersEntity = await this.usersRepo.createSaUser(
-      dataForCreateUserDto,
-    );
-    return {
-      userId: sa.userId,
-      login: sa.login,
-      email: sa.email,
-      orgId: sa.orgId,
-      roles: sa.roles,
-      isBanned: sa.isBanned,
-    };
+    return await this.usersRepo.createSaUser(dataForCreateUserDto);
   }
 }

@@ -19,12 +19,9 @@ export class ValidLoginOrEmailPasswordUseCase
     command: ValidLoginOrEmailPasswordCommand,
   ): Promise<UsersEntity> {
     const { loginOrEmail, password } = command;
-    console.log(loginOrEmail, 'loginOrEmail2');
-    console.log(password, 'password2');
 
     const user: UsersEntity | null =
       await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
-    console.log(user?.login, 'user?.login 3');
 
     if (
       !user ||

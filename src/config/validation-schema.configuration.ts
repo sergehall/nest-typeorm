@@ -40,6 +40,10 @@ export const validationSchemaConfiguration = Joi.object({
     .pattern(new RegExp('^[a-zA-Z0-9]{1,10}$'))
     .required(),
   BASIC_AUTH: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{16}$')).required(),
+  SA_LOGIN: Joi.string().min(5).max(5).required(),
+  SA_EMAIL: Joi.string().min(15).max(15).email().required(),
+  SA_KEY: Joi.string().min(44).max(44).required(),
+  SA_PASSWORD_HASH: Joi.string().min(100).max(100).required(),
   THROTTLE_TTL: Joi.number().required(),
   THROTTLE_LIMIT: Joi.number().required(),
   PORT: Joi.number().default(5000),

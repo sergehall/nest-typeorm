@@ -17,7 +17,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { Action } from '../../../ability/roles/action.enum';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
-import { SaAuthGuard } from '../../auth/guards/sa-auth.guard';
+import { SaBasicAuthGuard } from '../../auth/guards/sa-basic-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
@@ -43,7 +43,7 @@ export class UsersController {
   ) {}
 
   @Get()
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUsers(@Query() query: any): Promise<PaginatorDto> {
@@ -62,7 +62,7 @@ export class UsersController {
   }
 
   @Post()
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
   async createUser(
@@ -94,7 +94,7 @@ export class UsersController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(SaAuthGuard)
+  @UseGuards(SaBasicAuthGuard)
   @Delete(':id')
   async removeUserById(
     @Request() req: any,

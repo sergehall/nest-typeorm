@@ -4,20 +4,29 @@ import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
 import { BloggerBlogsWithImagesViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
+import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blogs-subscribers.repo';
+import { BlogIdSubscriptionStatusAndCountType } from '../../../blogger-blogs/types/blogId-subscription-status-and-count.type';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
+import { BlogsService } from '../blogs.service';
 
 export class SearchBlogsCommand {
-  constructor(public queryData: ParseQueriesDto) {}
+  constructor(
+    public queryData: ParseQueriesDto,
+    public currentUserDto: CurrentUserDto | null,
+  ) {}
 }
 
 @CommandHandler(SearchBlogsCommand)
 export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
   constructor(
     protected commandBus: CommandBus,
+    protected blogsService: BlogsService,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected bloggerBlogsService: BloggerBlogsService,
+    protected blogsSubscribersRepo: BlogsSubscribersRepo,
   ) {}
   async execute(command: SearchBlogsCommand): Promise<PaginatorDto> {
-    const { queryData } = command;
+    const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
     const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsPublic(
@@ -34,10 +43,22 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       };
     }
 
+    const blogIds = blogsCountBlogsDto.blogs.map((blog) => blog.id);
+
     const blogsWithImages: BloggerBlogsWithImagesViewModel[] =
       await this.bloggerBlogsService.blogsImagesAggregation(
         blogsCountBlogsDto.blogs,
       );
+
+    const subsStatusAndCountSubsBlogs: BlogIdSubscriptionStatusAndCountType[] =
+      await this.blogsSubscribersRepo.subscriptionStatusAndCountSubscribersBlogs(
+        blogIds,
+        currentUserDto,
+      );
+    const blogs = await this.blogsService.mapBlogsWithImagesAndSubscription(
+      blogsWithImages,
+      subsStatusAndCountSubsBlogs,
+    );
 
     const totalCount = blogsCountBlogsDto.countBlogs;
 
@@ -48,7 +69,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: totalCount,
-      items: blogsWithImages,
+      items: blogs,
     };
   }
 }

@@ -23,7 +23,6 @@ import { SaChangeRoleUseCase } from './application/use-cases/sa-change-role.use-
 import { SaCreateBlogUseCase } from './application/use-cases/sa-create-blog.use-case';
 import { BloggerBlogsRepo } from '../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../blogger-blogs/entities/blogger-blogs.entity';
-import { SaCreateSuperAdmin } from './application/use-cases/sa-create-super-admin.use-case';
 import { SaUpdateBlogByIdUseCase } from './application/use-cases/sa-update-blog-by-id.use-case';
 import { SaDeleteBlogByBlogIdUseCase } from './application/use-cases/sa-delete-blog-by-id.use-case';
 import { SaUpdatePostsByPostIdUseCase } from './application/use-cases/sa-update-post.use-case';
@@ -56,6 +55,8 @@ import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-po
 import { ImagesBlogsWallpaperMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
+import { SaConfig } from '../../config/sa/sa.config';
+import { CreateSaUserUseCase } from './application/use-cases/sa-create-super-admin.use-case';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -72,6 +73,7 @@ const saUseCases = [
   SaDeleteBlogByBlogIdUseCase,
   SaUpdatePostsByPostIdUseCase,
   SaDeletePostByPostIdUseCase,
+  CreateSaUserUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
@@ -99,7 +101,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [SaController],
   providers: [
-    SaCreateSuperAdmin,
+    SaConfig,
     AwsConfig,
     EncryptConfig,
     S3Service,

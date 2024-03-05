@@ -11,7 +11,7 @@ import { ValidLoginOrEmailPasswordCommand } from '../application/use-cases/valid
 import { ValidLoginPasswordSizesCommand } from '../application/use-cases/valid-login-password-sizes.use-case';
 
 @Injectable()
-export class BaseAuthGuard implements CanActivate {
+export class BasicAuthGuard implements CanActivate {
   constructor(private readonly commandBus: CommandBus) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -20,9 +20,9 @@ export class BaseAuthGuard implements CanActivate {
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
     }
-    console.log(request.headers, 'request.headers');
+
     const authorizationHeader = request.headers.authorization;
-    console.log(authorizationHeader, 'authorizationHeader');
+
     const [, base64Credentials] = authorizationHeader.split(' ');
 
     if (!base64Credentials) {
@@ -32,11 +32,8 @@ export class BaseAuthGuard implements CanActivate {
     const credentials = Buffer.from(base64Credentials, 'base64').toString(
       'utf-8',
     );
-    console.log(credentials, 'credentials');
-    const [username, password] = credentials.split(':');
 
-    console.log(username, 'username1');
-    console.log(password, 'password1');
+    const [username, password] = credentials.split(':');
 
     await this.commandBus.execute(
       new ValidLoginPasswordSizesCommand(username, password),
