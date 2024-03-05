@@ -8,6 +8,7 @@ import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blog
 import { BlogIdSubscriptionStatusAndCountType } from '../../../blogger-blogs/types/blogId-subscription-status-and-count.type';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { BlogsService } from '../blogs.service';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 
 export class SearchBlogsCommand {
   constructor(
@@ -20,7 +21,6 @@ export class SearchBlogsCommand {
 export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
   constructor(
     protected commandBus: CommandBus,
-    protected blogsService: BlogsService,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected bloggerBlogsService: BloggerBlogsService,
     protected blogsSubscribersRepo: BlogsSubscribersRepo,
@@ -50,15 +50,14 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
         blogsCountBlogsDto.blogs,
       );
 
-    const subsStatusAndCountSubsBlogs: BlogIdSubscriptionStatusAndCountType[] =
-      await this.blogsSubscribersRepo.subscriptionStatusAndCountSubscribersBlogs(
-        blogIds,
-        currentUserDto,
+    const blogsSubscribers: BlogIdSubscriptionStatusAndCountType[] =
+      await this.blogsSubscribersRepo.blogsSubscribers(blogIds, currentUserDto);
+
+    const blogs: BloggerBlogsWithImagesSubscribersViewModel[] =
+      await this.bloggerBlogsService.mapBlogsWithImagesAndSubscription(
+        blogsWithImages,
+        blogsSubscribers,
       );
-    const blogs = await this.blogsService.mapBlogsWithImagesAndSubscription(
-      blogsWithImages,
-      subsStatusAndCountSubsBlogs,
-    );
 
     const totalCount = blogsCountBlogsDto.countBlogs;
 
