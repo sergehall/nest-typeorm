@@ -19,7 +19,7 @@ export class BlogsSubscribersRepo {
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async currentUserSubscriptionStatusAndSubscribersCount(
+  async blogSubscribersAndCount(
     blogId: string,
     currentUserDto: CurrentUserDto | null,
   ): Promise<SubscriptionStatusAndCountType> {
@@ -113,9 +113,7 @@ export class BlogsSubscribersRepo {
         result.push({
           blogId: subscriber.blog.id,
           currentUserSubscriptionStatus:
-            subscriber.subscriber.userId === subscriberId
-              ? SubscriptionStatus.Subscribed
-              : SubscriptionStatus.None,
+            subscriber?.subscriptionStatus || SubscriptionStatus.None,
           subscribersCount: subscribersCountMap[subscriber.blog.id] || 0,
         });
       }

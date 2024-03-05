@@ -45,7 +45,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     ] = await Promise.all([
       this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(blog.id),
       this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
-      this.blogsSubscribersRepo.currentUserSubscriptionStatusAndSubscribersCount(
+      this.blogsSubscribersRepo.blogSubscribersAndCount(
         blog.id,
         currentUserDto,
       ),
