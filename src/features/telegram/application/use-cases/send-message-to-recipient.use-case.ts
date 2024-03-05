@@ -27,6 +27,7 @@ export class SendMessageToRecipientUseCase
 
     const method = TelegramMethodsEnum.SEND_MESSAGE;
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
+    console.log(payloadTelegramMessage, 'payloadTelegramMessage');
 
     const answerToRecipient = await this.commandBus.execute(
       new TelegramTextParserCommand(payloadTelegramMessage),
