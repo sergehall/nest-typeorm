@@ -42,7 +42,7 @@ export class CreateBloggerBlogUseCase
         currentUser,
       );
 
-    return await this.bloggerBlogsService.addImagesToBlogsEntity(
+    return await this.bloggerBlogsService.addImagesSubscriberToBlogsEntity(
       bloggerBlogsViewModel,
     );
   }
