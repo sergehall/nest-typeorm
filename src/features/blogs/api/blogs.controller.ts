@@ -39,6 +39,7 @@ export class BlogsController {
   ) {}
 
   @Get()
+  @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async searchBlogs(
     @Request() req: any,

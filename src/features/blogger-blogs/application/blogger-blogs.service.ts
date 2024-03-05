@@ -14,6 +14,7 @@ import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto
 import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 import { BlogIdSubscriptionStatusAndCountType } from '../types/blogId-subscription-status-and-count.type';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -23,6 +24,35 @@ export class BloggerBlogsService {
     private readonly imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     private readonly imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
+
+  async mapBlogsWithImagesAndSubscription(
+    blogsWithImages: BloggerBlogsWithImagesViewModel[],
+    blogsSubscription: BlogIdSubscriptionStatusAndCountType[],
+  ): Promise<BloggerBlogsWithImagesSubscribersViewModel[]> {
+    return blogsWithImages.map((bloggerBlog) => {
+      // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
+      const blogIdSubscription = blogsSubscription.find(
+        (subscription) => subscription.blogId === bloggerBlog.id,
+      );
+
+      // Construct the desired object
+      return {
+        id: bloggerBlog.id,
+        name: bloggerBlog.name,
+        description: bloggerBlog.description,
+        websiteUrl: bloggerBlog.websiteUrl,
+        createdAt: bloggerBlog.createdAt,
+        isMembership: bloggerBlog.isMembership,
+        images: bloggerBlog.images,
+        currentUserSubscriptionStatus: blogIdSubscription
+          ? blogIdSubscription.currentUserSubscriptionStatus
+          : SubscriptionStatus.None,
+        subscribersCount: blogIdSubscription
+          ? blogIdSubscription.subscribersCount
+          : 0,
+      };
+    });
+  }
 
   async addImagesToBlogsEntity(
     newBlog: BloggerBlogsViewModel,

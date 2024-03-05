@@ -66,7 +66,7 @@ export class BlogsSubscribersRepo {
     }
   }
 
-  async subscriptionStatusAndCountSubscribersBlogs(
+  async blogsSubscribers(
     blogIds: string[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<BlogIdSubscriptionStatusAndCountType[]> {
@@ -76,35 +76,51 @@ export class BlogsSubscribersRepo {
       const subscriptionStatus = SubscriptionStatus.Subscribed;
       const subscriberId = currentUserDto?.userId;
 
-      const [subscriber, subscribersCount] = await Promise.all([
+      // Execute both queries concurrently
+      const [subscribers, subscribersCounts] = await Promise.all([
         this.blogsSubscribersRepository
           .createQueryBuilder('subscribers')
           .leftJoinAndSelect('subscribers.blog', 'blog')
           .leftJoinAndSelect('subscribers.subscriber', 'subscriber')
-          .where('subscriber.userId = :subscriberId', { subscriberId })
-          .andWhereInIds(blogIds)
-          .andWhere({ isBanned })
+          .where({ isBanned })
           .andWhere({ dependencyIsBanned })
-          .getOne(),
+          .andWhere('blog.id IN (:...blogIds)', { blogIds })
+          .getMany(),
         this.blogsSubscribersRepository
           .createQueryBuilder('subscribers')
+          .select('blog.id', 'blogId')
+          .addSelect('COUNT(subscribers.id)', 'subscribersCount')
           .leftJoin('subscribers.blog', 'blog')
-          .whereInIds(blogIds)
+          .where({ isBanned })
+          .andWhere({ dependencyIsBanned })
+          .andWhere('blog.id IN (:...blogIds)', { blogIds })
           .andWhere('subscribers.subscriptionStatus = :subscriptionStatus', {
             subscriptionStatus,
           })
-          .andWhere({ isBanned })
-          .andWhere({ dependencyIsBanned })
-          .getCount(),
+          .groupBy('blog.id')
+          .getRawMany(),
       ]);
 
-      return blogIds.map((blogId) => ({
-        blogId,
-        currentUserSubscriptionStatus: subscriber
-          ? SubscriptionStatus.Subscribed
-          : SubscriptionStatus.None,
-        subscribersCount,
-      }));
+      // Create subscribers count map
+      const subscribersCountMap: { [blogId: string]: number } = {};
+      for (const { blogId, subscribersCount } of subscribersCounts) {
+        subscribersCountMap[blogId] = +subscribersCount; // Convert to number if necessary
+      }
+
+      // Create result array
+      const result: BlogIdSubscriptionStatusAndCountType[] = [];
+      for (const subscriber of subscribers) {
+        result.push({
+          blogId: subscriber.blog.id,
+          currentUserSubscriptionStatus:
+            subscriber.subscriber.userId === subscriberId
+              ? SubscriptionStatus.Subscribed
+              : SubscriptionStatus.None,
+          subscribersCount: subscribersCountMap[subscriber.blog.id] || 0,
+        });
+      }
+
+      return result;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const blogId = await this.uuidErrorResolver.extractUserIdFromError(
