@@ -146,6 +146,19 @@ export class UsersRepo {
     }
   }
 
+  async findSaUserByLoginOrEmail(login: string): Promise<UsersEntity | null> {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: { login: login },
+      });
+
+      return user ? user : null;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async findUserByConfirmationCode(confirmationCode: string): Promise<boolean> {
     try {
       const currentTime = new Date().toISOString();

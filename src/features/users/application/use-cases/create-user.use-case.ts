@@ -25,7 +25,7 @@ export class CreateUserUseCase
     const { login, email, password } = command.createUserDto;
 
     // Hash the user's password
-    const passwordHash = await this.encryptConfig.getPasswordHash(password);
+    const passwordHash = await this.encryptConfig.encryptPassword(password);
 
     // Return the expirationDate in ISO format for user registration.
     const expirationDateDto: ExpirationDateDto =

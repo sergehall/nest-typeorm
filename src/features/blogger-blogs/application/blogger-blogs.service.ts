@@ -12,6 +12,8 @@ import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main
 import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
 import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto/image-width-height-size';
 import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
+import { BlogIdSubscriptionStatusAndCountType } from '../types/blogId-subscription-status-and-count.type';
+import { SubscriptionStatus } from '../enums/subscription-status.enums';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -31,6 +33,7 @@ export class BloggerBlogsService {
       images, // Add extended files
     };
   }
+
   async blogsImagesAggregation(
     blogs: BloggerBlogsEntity[],
   ): Promise<BloggerBlogsWithImagesViewModel[]> {

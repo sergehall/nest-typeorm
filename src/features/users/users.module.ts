@@ -20,7 +20,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from './entities/users.entity';
 import { FindUsersUseCase } from './application/use-cases/find-users.use-case';
 import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
-import { SaCreateSuperAdmin } from '../sa/application/use-cases/sa-create-super-admin.use-case';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from '../pair-game-quiz/infrastructure/game-pairs.repo';
 import { PairsGameEntity } from '../pair-game-quiz/entities/pairs-game.entity';
@@ -29,6 +28,7 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
+import { SaConfig } from '../../config/sa/sa.config';
 
 const usersUseCases = [
   CreateUserUseCase,
@@ -59,10 +59,10 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [UsersController],
   providers: [
+    SaConfig,
     JwtConfig,
     EncryptConfig,
     ParseQueriesService,
-    SaCreateSuperAdmin,
     UsersService,
     UsersRepo,
     AuthService,

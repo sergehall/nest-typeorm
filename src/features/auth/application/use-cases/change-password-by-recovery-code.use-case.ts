@@ -20,7 +20,7 @@ export class ChangePasswordByRecoveryCodeUseCase
   ): Promise<boolean> {
     const { newPassword, recoveryCode } = command.newPasswordRecoveryDto;
 
-    const passwordHash = await this.encryptConfig.getPasswordHash(newPassword);
+    const passwordHash = await this.encryptConfig.encryptPassword(newPassword);
 
     return await this.usersRepo.updateUserPasswordHashByRecoveryCode(
       recoveryCode,

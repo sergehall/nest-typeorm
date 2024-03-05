@@ -118,6 +118,25 @@ class Configuration {
     return this.readEnvVariableWithDefault('BASIC_AUTH', 'BASIC_SECRET');
   }
 
+  private static getSaLogin(): string {
+    return this.readEnvVariableWithDefault('SA_LOGIN', 'SA_LOGIN');
+  }
+
+  private static getSaKey(): string {
+    return this.readEnvVariableWithDefault('SA_KEY', 'SA_KEY');
+  }
+
+  private static getPasswordHash(): string {
+    return this.readEnvVariableWithDefault(
+      'SA_PASSWORD_HASH',
+      'SA_PASSWORD_HASH',
+    );
+  }
+
+  private static getSaEmail(): string {
+    return this.readEnvVariableWithDefault('SA_EMAIL', 'SA_EMAIL');
+  }
+
   private static getPgLocalUserName(): string {
     return this.readEnvVariableWithDefault('PG_LOCAL_USER_NAME', 'postgres');
   }
@@ -261,6 +280,10 @@ class Configuration {
       },
       basicAuth: {
         BASIC_AUTH: Configuration.getBasicAuth(),
+        SA_LOGIN: Configuration.getSaLogin(),
+        SA_EMAIL: Configuration.getSaEmail(),
+        SA_KEY: Configuration.getSaKey(),
+        SA_PASSWORD_HASH: Configuration.getPasswordHash(),
       },
       throttle: {
         THROTTLE_TTL: Configuration.getThrottleTTL(),

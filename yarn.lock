@@ -6658,6 +6658,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fernet-nodejs@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "fernet-nodejs@npm:1.0.6"
+  checksum: 10c0/aca4e0fb8b1b14ac4670d27942fbb1f2fff12acf9b96720a3dfd0adfa913337b9dcaa13610f3ad29e8a1f1b4842faa28ecbe67247972af54aec614c52ee88955
+  languageName: node
+  linkType: hard
+
 "figures@npm:^3.0.0":
   version: 3.2.0
   resolution: "figures@npm:3.2.0"
@@ -10116,6 +10123,7 @@ __metadata:
     eslint: "npm:^8.47.0"
     eslint-config-prettier: "npm:^9.0.0"
     eslint-plugin-prettier: "npm:^4.0.0"
+    fernet-nodejs: "npm:^1.0.6"
     handlebars: "npm:^4.7.7"
     jest: "npm:^29.6.2"
     joi: "npm:^17.7.0"

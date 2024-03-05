@@ -9,6 +9,7 @@ import { BloggerBlogsViewModel } from '../../features/blogger-blogs/views/blogge
 import { UsersEntity } from '../../features/users/entities/users.entity';
 import { SaUserViewModel } from '../../features/sa/views/sa-user-view-model';
 import { BloggerBlogsWithImagesViewModel } from '../../features/blogger-blogs/views/blogger-blogs-with-images.view-model';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../../features/blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 
 export class PaginatorDto {
   @IsNumber()
@@ -36,5 +37,6 @@ export class PaginatorDto {
     | GameViewModel
     | GamesStatisticsViewModel
     | BloggerBlogsWithImagesViewModel
+    | BloggerBlogsWithImagesSubscribersViewModel
   )[];
 }
