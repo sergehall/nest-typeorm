@@ -66,7 +66,7 @@ export class BlogsSubscribersRepo {
     }
   }
 
-  async blogsSubscribers(
+  async blogsSubscribersAndCount(
     blogIds: string[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<BlogIdSubscriptionStatusAndCountType[]> {

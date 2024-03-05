@@ -50,13 +50,16 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
         blogsCountBlogsDto.blogs,
       );
 
-    const blogsSubscribers: BlogIdSubscriptionStatusAndCountType[] =
-      await this.blogsSubscribersRepo.blogsSubscribers(blogIds, currentUserDto);
+    const blogsSubscribersAndCount: BlogIdSubscriptionStatusAndCountType[] =
+      await this.blogsSubscribersRepo.blogsSubscribersAndCount(
+        blogIds,
+        currentUserDto,
+      );
 
     const blogs: BloggerBlogsWithImagesSubscribersViewModel[] =
       await this.bloggerBlogsService.mapBlogsWithImagesAndSubscription(
         blogsWithImages,
-        blogsSubscribers,
+        blogsSubscribersAndCount,
       );
 
     const totalCount = blogsCountBlogsDto.countBlogs;
