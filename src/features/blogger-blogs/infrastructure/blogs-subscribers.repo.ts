@@ -80,7 +80,7 @@ export class BlogsSubscribersRepo {
         .createQueryBuilder('subscribers')
         .select([
           'blog.id AS "blogId"',
-          `(SELECT COALESCE(COUNT(subscribers.id), 0) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriptionStatus = :subscriptionStatus) AS "subscribersCount"`,
+          `(SELECT COALESCE(COUNT(subscribers.id)::int, 0) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriptionStatus = :subscriptionStatus) AS "subscribersCount"`,
           `(SELECT COALESCE(MAX(subscribers.subscriptionStatus), :defaultStatus) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriber.userId = :subscriberId) AS "currentUserSubscriptionStatus"`,
         ])
         .leftJoin('subscribers.blog', 'blog')
