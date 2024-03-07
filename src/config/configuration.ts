@@ -126,7 +126,7 @@ class Configuration {
     return this.readEnvVariableWithDefault('SA_KEY', 'SA_KEY');
   }
 
-  private static getPasswordHash(): string {
+  private static getSaPasswordHash(): string {
     return this.readEnvVariableWithDefault(
       'SA_PASSWORD_HASH',
       'SA_PASSWORD_HASH',
@@ -283,7 +283,7 @@ class Configuration {
         SA_LOGIN: Configuration.getSaLogin(),
         SA_EMAIL: Configuration.getSaEmail(),
         SA_KEY: Configuration.getSaKey(),
-        SA_PASSWORD_HASH: Configuration.getPasswordHash(),
+        SA_PASSWORD_HASH: Configuration.getSaPasswordHash(),
       },
       throttle: {
         THROTTLE_TTL: Configuration.getThrottleTTL(),
