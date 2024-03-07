@@ -14,7 +14,6 @@ import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto
 import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
-import { SubscriptionStatusAndCountType } from '../types/subscription-status-and-count.type';
 import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
 
 @Injectable()
