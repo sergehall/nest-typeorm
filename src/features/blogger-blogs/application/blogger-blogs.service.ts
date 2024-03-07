@@ -12,7 +12,6 @@ import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main
 import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
 import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto/image-width-height-size';
 import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
-import { BlogIdSubscriptionStatusAndCountType } from '../types/blogId-subscription-status-and-count.type';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
