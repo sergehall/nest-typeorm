@@ -15,6 +15,8 @@ import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-
 import { BlogIdSubscriptionStatusAndCountType } from '../types/blogId-subscription-status-and-count.type';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { SubscriptionStatusAndCountType } from '../types/subscription-status-and-count.type';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -27,32 +29,99 @@ export class BloggerBlogsService {
 
   async mapBlogsWithImagesAndSubscription(
     blogsWithImages: BloggerBlogsWithImagesViewModel[],
-    blogsSubscription: BlogIdSubscriptionStatusAndCountType[],
+    blogsSubscription: SubscriptionStatusAndCountType[],
+    currentUserDto: CurrentUserDto | null,
   ): Promise<BloggerBlogsWithImagesSubscribersViewModel[]> {
-    return blogsWithImages.map((bloggerBlog) => {
-      // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
-      const blogIdSubscription = blogsSubscription.find(
-        (subscription) => subscription.blogId === bloggerBlog.id,
-      );
+    const currSubscriberId = currentUserDto?.userId;
+    console.log(blogsSubscription, 'blogsSubscription');
+    const mappedBlogs = await Promise.all(
+      blogsWithImages.map(async (bloggerBlog) => {
+        // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
+        const blogIdSubscription = blogsSubscription.find(
+          (subscription) => bloggerBlog.id === subscription.blogId,
+        );
 
-      // Construct the desired object
-      return {
-        id: bloggerBlog.id,
-        name: bloggerBlog.name,
-        description: bloggerBlog.description,
-        websiteUrl: bloggerBlog.websiteUrl,
-        createdAt: bloggerBlog.createdAt,
-        isMembership: bloggerBlog.isMembership,
-        images: bloggerBlog.images,
-        currentUserSubscriptionStatus: blogIdSubscription
-          ? blogIdSubscription.currentUserSubscriptionStatus
-          : SubscriptionStatus.None,
-        subscribersCount: blogIdSubscription
-          ? blogIdSubscription.subscribersCount
-          : 0,
-      };
-    });
+        let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
+
+        if (
+          blogIdSubscription &&
+          blogIdSubscription.subscriberId === currSubscriberId
+        ) {
+          subscriptionStatus = blogIdSubscription.currentUserSubscriptionStatus;
+        }
+
+        // Construct the desired object
+        return {
+          id: bloggerBlog.id,
+          name: bloggerBlog.name,
+          description: bloggerBlog.description,
+          websiteUrl: bloggerBlog.websiteUrl,
+          createdAt: bloggerBlog.createdAt,
+          isMembership: bloggerBlog.isMembership,
+          images: bloggerBlog.images,
+          currentUserSubscriptionStatus: subscriptionStatus,
+          subscribersCount: blogIdSubscription
+            ? blogIdSubscription.subscribersCount
+            : 0,
+        };
+      }),
+    );
+
+    return mappedBlogs.reduce(
+      (acc: BloggerBlogsWithImagesSubscribersViewModel[], curr) => {
+        acc.push(curr);
+        return acc;
+      },
+      [],
+    );
   }
+
+  // async mapBlogsWithImagesAndSubscription(
+  //   blogsWithImages: BloggerBlogsWithImagesViewModel[],
+  //   blogsSubscription: BlogIdSubscriptionStatusAndCountType[],
+  // ): Promise<BloggerBlogsWithImagesSubscribersViewModel[]> {
+  //   console.log(blogsSubscription, 'blogsSubscription');
+  //   return blogsWithImages.map((bloggerBlog) => {
+  //     // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
+  //     const blogIdSubscription = blogsSubscription.find(
+  //       (subscription) => bloggerBlog.id === subscription.blogId,
+  //     );
+  //
+  //     let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
+  //     console.log(bloggerBlog.id, 'bloggerBlog.id');
+  //     console.log(blogIdSubscription?.blogId, 'blogIdSubscription?.blogI');
+  //     console.log(
+  //       blogIdSubscription?.currentUserSubscriptionStatus,
+  //       'currentUserSubscriptionStatus',
+  //     );
+  //     console.log(blogIdSubscription?.subscribersCount, 'subscribersCount');
+  //     if (
+  //       blogIdSubscription &&
+  //       (blogIdSubscription.currentUserSubscriptionStatus ===
+  //         SubscriptionStatus.Unsubscribed ||
+  //         blogIdSubscription.currentUserSubscriptionStatus ===
+  //           SubscriptionStatus.Subscribed)
+  //     ) {
+  //       subscriptionStatus = blogIdSubscription.currentUserSubscriptionStatus;
+  //     }
+  //     console.log('----------------------------------------------------');
+  //
+  //     // Construct the desired object
+  //     return {
+  //       id: bloggerBlog.id,
+  //       name: bloggerBlog.name,
+  //       description: bloggerBlog.description,
+  //       websiteUrl: bloggerBlog.websiteUrl,
+  //       createdAt: bloggerBlog.createdAt,
+  //       isMembership: bloggerBlog.isMembership,
+  //       images: bloggerBlog.images,
+  //       currentUserSubscriptionStatus: subscriptionStatus,
+  //       subscribersCount: blogIdSubscription
+  //         ? blogIdSubscription.subscribersCount
+  //         : 0,
+  //     };
+  //   });
+  // }
 
   async addImagesSubscriberToBlogsEntity(
     newBlog: BloggerBlogsViewModel,

@@ -3,11 +3,8 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaginatorDto } from '../../../../common/helpers/paginator.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsService } from '../../../blogger-blogs/application/blogger-blogs.service';
-import { BloggerBlogsWithImagesViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images.view-model';
 import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blogs-subscribers.repo';
-import { BlogIdSubscriptionStatusAndCountType } from '../../../blogger-blogs/types/blogId-subscription-status-and-count.type';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { BlogsService } from '../blogs.service';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 
 export class SearchBlogsCommand {
@@ -29,9 +26,8 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsPublic(
-      queryData,
-    );
+    const blogsCountBlogsDto =
+      await this.bloggerBlogsRepo.getBlogsPublic(queryData);
 
     if (blogsCountBlogsDto.countBlogs === 0) {
       return {
@@ -45,21 +41,19 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
 
     const blogIds = blogsCountBlogsDto.blogs.map((blog) => blog.id);
 
-    const blogsWithImages: BloggerBlogsWithImagesViewModel[] =
-      await this.bloggerBlogsService.blogsImagesAggregation(
-        blogsCountBlogsDto.blogs,
-      );
-
-    const blogsSubscribersAndCount: BlogIdSubscriptionStatusAndCountType[] =
-      await this.blogsSubscribersRepo.blogsSubscribersAndCount(
+    const [blogsWithImages, blogsSubscribersAndCount] = await Promise.all([
+      this.bloggerBlogsService.blogsImagesAggregation(blogsCountBlogsDto.blogs),
+      this.blogsSubscribersRepo.blogsSubscribersAndCount(
         blogIds,
         currentUserDto,
-      );
+      ),
+    ]);
 
     const blogs: BloggerBlogsWithImagesSubscribersViewModel[] =
       await this.bloggerBlogsService.mapBlogsWithImagesAndSubscription(
         blogsWithImages,
         blogsSubscribersAndCount,
+        currentUserDto,
       );
 
     const totalCount = blogsCountBlogsDto.countBlogs;

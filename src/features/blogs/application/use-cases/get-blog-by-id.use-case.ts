@@ -8,6 +8,7 @@ import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blog
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
+import { SubscriptionStatus } from '../../../blogger-blogs/enums/subscription-status.enums';
 
 export class GetBlogByIdCommand {
   constructor(
@@ -45,8 +46,8 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     ] = await Promise.all([
       this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(blog.id),
       this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
-      this.blogsSubscribersRepo.blogSubscribersAndCount(
-        blog.id,
+      this.blogsSubscribersRepo.blogsSubscribersAndCount(
+        [blog.id],
         currentUserDto,
       ),
     ]);
@@ -66,6 +67,14 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       );
     }
 
+    let currentUserSubscriptionStatus = SubscriptionStatus.None;
+    let subscribersCount = 0;
+    if (subscriptionStatusAndCount && subscriptionStatusAndCount.length > 0) {
+      currentUserSubscriptionStatus =
+        subscriptionStatusAndCount[0].currentUserSubscriptionStatus;
+      subscribersCount = subscriptionStatusAndCount[0].subscribersCount;
+    }
+
     return {
       id: blog.id,
       name: blog.name,
@@ -77,9 +86,8 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         wallpaper,
         main,
       },
-      currentUserSubscriptionStatus:
-        subscriptionStatusAndCount.currentUserSubscriptionStatus,
-      subscribersCount: subscriptionStatusAndCount.subscribersCount,
+      currentUserSubscriptionStatus: currentUserSubscriptionStatus,
+      subscribersCount: subscribersCount,
     };
   }
 }
