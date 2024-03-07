@@ -43,7 +43,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
 
     const [blogsWithImages, blogsSubscribersAndCount] = await Promise.all([
       this.bloggerBlogsService.blogsImagesAggregation(blogsCountBlogsDto.blogs),
-      this.blogsSubscribersRepo.blogsSubscribersAndCount(
+      this.blogsSubscribersRepo.blogsSubscribersStatusCount(
         blogIds,
         currentUserDto,
       ),
@@ -53,7 +53,6 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
       await this.bloggerBlogsService.mapBlogsWithImagesAndSubscription(
         blogsWithImages,
         blogsSubscribersAndCount,
-        currentUserDto,
       );
 
     const totalCount = blogsCountBlogsDto.countBlogs;

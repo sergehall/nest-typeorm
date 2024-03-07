@@ -3,7 +3,6 @@ import { NotFoundException } from '@nestjs/common';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
-import { ImageMetadata } from '../../../../adapters/media-services/files/dto/image-metadata';
 import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
@@ -42,38 +41,37 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     const [
       imageWallpaperMetadataEntity,
       imageMainMetadataEntity,
-      subscriptionStatusAndCount,
+      blogsSubscriptionStatusCount,
     ] = await Promise.all([
       this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(blog.id),
       this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
-      this.blogsSubscribersRepo.blogsSubscribersAndCount(
+      this.blogsSubscribersRepo.blogsSubscribersStatusCount(
         [blog.id],
         currentUserDto,
       ),
     ]);
 
-    const wallpaper: ImageMetadata | null =
-      imageWallpaperMetadataEntity &&
-      (await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
-        imageWallpaperMetadataEntity,
-      ));
+    const wallpaper = imageWallpaperMetadataEntity
+      ? await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
+          imageWallpaperMetadataEntity,
+        )
+      : null;
 
-    const main: ImageMetadata[] = [];
-    if (imageMainMetadataEntity) {
-      main.push(
-        await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
-          imageMainMetadataEntity,
-        ),
-      );
-    }
+    const main = imageMainMetadataEntity
+      ? [
+          await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
+            imageMainMetadataEntity,
+          ),
+        ]
+      : [];
 
-    let currentUserSubscriptionStatus = SubscriptionStatus.None;
-    let subscribersCount = 0;
-    if (subscriptionStatusAndCount && subscriptionStatusAndCount.length > 0) {
-      currentUserSubscriptionStatus =
-        subscriptionStatusAndCount[0].currentUserSubscriptionStatus;
-      subscribersCount = subscriptionStatusAndCount[0].subscribersCount;
-    }
+    const firstBlogSubscriptionStatus = blogsSubscriptionStatusCount[0];
+    const subscriptionStatus = firstBlogSubscriptionStatus
+      ? firstBlogSubscriptionStatus.currentUserSubscriptionStatus
+      : SubscriptionStatus.None;
+    const subscribersCount = firstBlogSubscriptionStatus
+      ? firstBlogSubscriptionStatus.subscribersCount
+      : 0;
 
     return {
       id: blog.id,
@@ -86,8 +84,8 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
         wallpaper,
         main,
       },
-      currentUserSubscriptionStatus: currentUserSubscriptionStatus,
-      subscribersCount: subscribersCount,
+      currentUserSubscriptionStatus: subscriptionStatus,
+      subscribersCount,
     };
   }
 }

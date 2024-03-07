@@ -14,8 +14,8 @@ import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto
 import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
-import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { SubscriptionStatusAndCountType } from '../types/subscription-status-and-count.type';
+import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
 
 @Injectable()
 export class BloggerBlogsService {
@@ -28,52 +28,89 @@ export class BloggerBlogsService {
 
   async mapBlogsWithImagesAndSubscription(
     blogsWithImages: BloggerBlogsWithImagesViewModel[],
-    blogsSubscription: SubscriptionStatusAndCountType[],
-    currentUserDto: CurrentUserDto | null,
+    subscriptionStatusAndCountType: BlogsSubscriptionStatusCountType[],
   ): Promise<BloggerBlogsWithImagesSubscribersViewModel[]> {
-    const currSubscriberId = currentUserDto?.userId;
-    console.log(blogsSubscription, 'blogsSubscription');
-    const mappedBlogs = await Promise.all(
-      blogsWithImages.map(async (bloggerBlog) => {
-        // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
-        const blogIdSubscription = blogsSubscription.find(
-          (subscription) => bloggerBlog.id === subscription.blogId,
-        );
+    return blogsWithImages.map((bloggerBlog) => {
+      const blogIdSubscription = subscriptionStatusAndCountType.find(
+        (subscription) => bloggerBlog.id === subscription.blogId,
+      );
+      const subscriptionStatus: SubscriptionStatus = blogIdSubscription
+        ? blogIdSubscription.currentUserSubscriptionStatus
+        : SubscriptionStatus.None;
 
-        let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
+      const subscribersCount = blogIdSubscription
+        ? blogIdSubscription.subscribersCount
+        : 0;
 
-        if (
-          blogIdSubscription &&
-          blogIdSubscription.subscriberId === currSubscriberId
-        ) {
-          subscriptionStatus = blogIdSubscription.currentUserSubscriptionStatus;
-        }
-
-        // Construct the desired object
-        return {
-          id: bloggerBlog.id,
-          name: bloggerBlog.name,
-          description: bloggerBlog.description,
-          websiteUrl: bloggerBlog.websiteUrl,
-          createdAt: bloggerBlog.createdAt,
-          isMembership: bloggerBlog.isMembership,
-          images: bloggerBlog.images,
-          currentUserSubscriptionStatus: subscriptionStatus,
-          subscribersCount: blogIdSubscription
-            ? blogIdSubscription.subscribersCount
-            : 0,
-        };
-      }),
-    );
-
-    return mappedBlogs.reduce(
-      (acc: BloggerBlogsWithImagesSubscribersViewModel[], curr) => {
-        acc.push(curr);
-        return acc;
-      },
-      [],
-    );
+      return {
+        id: bloggerBlog.id,
+        name: bloggerBlog.name,
+        description: bloggerBlog.description,
+        websiteUrl: bloggerBlog.websiteUrl,
+        createdAt: bloggerBlog.createdAt,
+        isMembership: bloggerBlog.isMembership,
+        images: bloggerBlog.images,
+        currentUserSubscriptionStatus: subscriptionStatus,
+        subscribersCount: Number(subscribersCount),
+      };
+    });
   }
+
+  // async mapBlogsWithImagesAndSubscription(
+  //   blogsWithImages: BloggerBlogsWithImagesViewModel[],
+  //   subscriptionStatusAndCountType: SubscriptionStatusAndCountType[],
+  //   currentUserDto: CurrentUserDto | null,
+  // ): Promise<BloggerBlogsWithImagesSubscribersViewModel[]> {
+  //   const mappedBlogs = await Promise.all(
+  //     blogsWithImages.map(async (bloggerBlog) => {
+  //       // Find the corresponding BlogIdSubscriptionStatusAndCountType object by blogId
+  //       const blogIdSubscription = subscriptionStatusAndCountType.find(
+  //         (subscription) => bloggerBlog.id === subscription.blogId,
+  //       );
+  //
+  //       let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
+  //       let subscribersCount: number = 0;
+  //
+  //       console.log(blogIdSubscription, 'blogIdSubscription');
+  //       if (!blogIdSubscription) {
+  //         return {
+  //           id: bloggerBlog.id,
+  //           name: bloggerBlog.name,
+  //           description: bloggerBlog.description,
+  //           websiteUrl: bloggerBlog.websiteUrl,
+  //           createdAt: bloggerBlog.createdAt,
+  //           isMembership: bloggerBlog.isMembership,
+  //           images: bloggerBlog.images,
+  //           currentUserSubscriptionStatus: subscriptionStatus,
+  //           subscribersCount: subscribersCount,
+  //         };
+  //       }
+  //
+  //       subscriptionStatus = blogIdSubscription.currentUserSubscriptionStatus;
+  //       subscribersCount = blogIdSubscription.subscribersCount;
+  //
+  //       return {
+  //         id: bloggerBlog.id,
+  //         name: bloggerBlog.name,
+  //         description: bloggerBlog.description,
+  //         websiteUrl: bloggerBlog.websiteUrl,
+  //         createdAt: bloggerBlog.createdAt,
+  //         isMembership: bloggerBlog.isMembership,
+  //         images: bloggerBlog.images,
+  //         currentUserSubscriptionStatus: subscriptionStatus,
+  //         subscribersCount: subscribersCount,
+  //       };
+  //     }),
+  //   );
+  //
+  //   return mappedBlogs.reduce(
+  //     (acc: BloggerBlogsWithImagesSubscribersViewModel[], curr) => {
+  //       acc.push(curr);
+  //       return acc;
+  //     },
+  //     [],
+  //   );
+  // }
 
   // async mapBlogsWithImagesAndSubscription(
   //   blogsWithImages: BloggerBlogsWithImagesViewModel[],
