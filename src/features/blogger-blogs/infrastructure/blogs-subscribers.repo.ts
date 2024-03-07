@@ -3,7 +3,10 @@ import { Repository } from 'typeorm';
 import { BlogsSubscribersEntity } from '../entities/blogs-subscribers.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
@@ -72,23 +75,31 @@ export class BlogsSubscribersRepo {
     const isBanned = false;
     const dependencyIsBanned = false;
     const subscriberId = currentUserDto?.userId;
-
-    return await this.blogsSubscribersRepository
-      .createQueryBuilder('subscribers')
-      .select([
-        'blog.id AS "blogId"',
-        `(SELECT COALESCE(COUNT(subscribers.id), 0) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriptionStatus = :subscriptionStatus) AS "subscribersCount"`,
-        `(SELECT COALESCE(MAX(subscribers.subscriptionStatus), :defaultStatus) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriber.userId = :subscriberId) AS "currentUserSubscriptionStatus"`,
-      ])
-      .leftJoin('subscribers.blog', 'blog')
-      .leftJoin('subscribers.subscriber', 'subscriber')
-      .where({ isBanned, dependencyIsBanned })
-      .andWhere('blog.id IN (:...blogIds)', { blogIds })
-      .groupBy('blog.id') // Group only by blog.id
-      .setParameter('subscriptionStatus', subscriptionStatus)
-      .setParameter('defaultStatus', SubscriptionStatus.None)
-      .setParameter('subscriberId', subscriberId)
-      .getRawMany();
+    try {
+      return await this.blogsSubscribersRepository
+        .createQueryBuilder('subscribers')
+        .select([
+          'blog.id AS "blogId"',
+          `(SELECT COALESCE(COUNT(subscribers.id), 0) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriptionStatus = :subscriptionStatus) AS "subscribersCount"`,
+          `(SELECT COALESCE(MAX(subscribers.subscriptionStatus), :defaultStatus) FROM "BlogsSubscribers" subscribers WHERE subscribers.blogId = blog.id AND subscribers.subscriber.userId = :subscriberId) AS "currentUserSubscriptionStatus"`,
+        ])
+        .leftJoin('subscribers.blog', 'blog')
+        .leftJoin('subscribers.subscriber', 'subscriber')
+        .where({ isBanned, dependencyIsBanned })
+        .andWhere('blog.id IN (:...blogIds)', { blogIds })
+        .groupBy('blog.id') // Group only by blog.id
+        .setParameter('subscriptionStatus', subscriptionStatus)
+        .setParameter('defaultStatus', SubscriptionStatus.None)
+        .setParameter('subscriberId', subscriberId)
+        .getRawMany();
+    } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const blogId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Blog with ID ${blogId} not found`);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   // async blogsSubscribersAndCountOld(
