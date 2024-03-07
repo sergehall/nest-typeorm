@@ -10,7 +10,6 @@ import {
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { SubscriptionStatusAndCountType } from '../types/subscription-status-and-count.type';
-import { BlogIdSubscriptionStatusAndCountType } from '../types/blogId-subscription-status-and-count.type';
 
 export class BlogsSubscribersRepo {
   constructor(
@@ -19,43 +18,34 @@ export class BlogsSubscribersRepo {
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async blogSubscribersAndCount(
-    blogId: string,
+  async blogsSubscribersAndCount(
+    blogIds: string[],
     currentUserDto: CurrentUserDto | null,
-  ): Promise<SubscriptionStatusAndCountType> {
-    const isBanned = false;
-    const dependencyIsBanned = false;
-    const subscriptionStatus = SubscriptionStatus.Subscribed;
-    const subscriberId = currentUserDto?.userId;
-
+  ): Promise<SubscriptionStatusAndCountType[]> {
     try {
-      const [subscriber, subscribersCount] = await Promise.all([
-        this.blogsSubscribersRepository
-          .createQueryBuilder('subscribers')
-          .leftJoinAndSelect('subscribers.blog', 'blog')
-          .leftJoinAndSelect('subscribers.subscriber', 'subscriber')
-          .where('subscriber.userId = :subscriberId', { subscriberId })
-          .andWhere('blog.id = :blogId', { blogId })
-          .andWhere({ isBanned })
-          .andWhere({ dependencyIsBanned })
-          .getOne(),
-        this.blogsSubscribersRepository
-          .createQueryBuilder('subscribers')
-          .leftJoin('subscribers.blog', 'blog')
-          .where('blog.id = :blogId', { blogId })
-          .andWhere('subscribers.subscriptionStatus = :subscriptionStatus', {
-            subscriptionStatus,
-          })
-          .andWhere({ isBanned })
-          .andWhere({ dependencyIsBanned })
-          .getCount(),
+      const isBanned = false;
+      const dependencyIsBanned = false;
+      const subscriptionStatus = SubscriptionStatus.Subscribed;
+      const currSubscriberId = currentUserDto?.userId;
+
+      const [subscribers, subscribersCounts] = await Promise.all([
+        this.querySubscribers(isBanned, dependencyIsBanned, blogIds),
+        this.querySubscriberCounts(
+          isBanned,
+          dependencyIsBanned,
+          blogIds,
+          subscriptionStatus,
+        ),
       ]);
 
-      return {
-        currentUserSubscriptionStatus:
-          subscriber?.subscriptionStatus || SubscriptionStatus.None,
-        subscribersCount: subscribersCount || 0,
-      };
+      const subscribersCountMap =
+        await this.createSubscribersCountMap(subscribersCounts);
+
+      return await this.createResultArray(
+        subscribers,
+        subscribersCountMap,
+        currSubscriberId,
+      );
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
         const blogId =
@@ -66,71 +56,93 @@ export class BlogsSubscribersRepo {
     }
   }
 
-  async blogsSubscribersAndCount(
+  async querySubscribers(
+    isBanned: boolean,
+    dependencyIsBanned: boolean,
     blogIds: string[],
-    currentUserDto: CurrentUserDto | null,
-  ): Promise<BlogIdSubscriptionStatusAndCountType[]> {
-    try {
-      const isBanned = false;
-      const dependencyIsBanned = false;
-      const subscriptionStatus = SubscriptionStatus.Subscribed;
-      const subscriberId = currentUserDto?.userId;
+  ): Promise<BlogsSubscribersEntity[]> {
+    return this.blogsSubscribersRepository
+      .createQueryBuilder('subscribers')
+      .leftJoinAndSelect('subscribers.blog', 'blog')
+      .leftJoinAndSelect('subscribers.subscriber', 'subscriber')
+      .where({ isBanned })
+      .andWhere({ dependencyIsBanned })
+      .andWhere('blog.id IN (:...blogIds)', { blogIds })
+      .getMany();
+  }
 
-      // Execute both queries concurrently
-      const [subscribers, subscribersCounts] = await Promise.all([
-        this.blogsSubscribersRepository
-          .createQueryBuilder('subscribers')
-          .leftJoinAndSelect('subscribers.blog', 'blog')
-          .leftJoinAndSelect('subscribers.subscriber', 'subscriber')
-          .where({ isBanned })
-          .andWhere({ dependencyIsBanned })
-          .andWhere('blog.id IN (:...blogIds)', { blogIds })
-          .getMany(),
-        this.blogsSubscribersRepository
-          .createQueryBuilder('subscribers')
-          .select('blog.id', 'blogId')
-          .addSelect('COUNT(subscribers.id)', 'subscribersCount')
-          .leftJoin('subscribers.blog', 'blog')
-          .where({ isBanned })
-          .andWhere({ dependencyIsBanned })
-          .andWhere('blog.id IN (:...blogIds)', { blogIds })
-          .andWhere('subscribers.subscriptionStatus = :subscriptionStatus', {
-            subscriptionStatus,
-          })
-          .groupBy('blog.id')
-          .getRawMany(),
-      ]);
+  async querySubscriberCounts(
+    isBanned: boolean,
+    dependencyIsBanned: boolean,
+    blogIds: string[],
+    subscriptionStatus: SubscriptionStatus,
+  ): Promise<
+    {
+      blogId: string;
+      subscribersCount: string;
+    }[]
+  > {
+    return this.blogsSubscribersRepository
+      .createQueryBuilder('subscribers')
+      .select('blog.id', 'blogId')
+      .addSelect('COUNT(subscribers.id)', 'subscribersCount')
+      .leftJoin('subscribers.blog', 'blog')
+      .where({ isBanned })
+      .andWhere({ dependencyIsBanned })
+      .andWhere('blog.id IN (:...blogIds)', { blogIds })
+      .andWhere('subscribers.subscriptionStatus = :subscriptionStatus', {
+        subscriptionStatus,
+      })
+      .groupBy('blog.id')
+      .getRawMany();
+  }
 
-      // Create subscribers count map
-      const subscribersCountMap: { [blogId: string]: number } = {};
-      for (const { blogId, subscribersCount } of subscribersCounts) {
-        subscribersCountMap[blogId] = +subscribersCount; // Convert to number if necessary
-      }
-
-      // Create result array
-      const result: BlogIdSubscriptionStatusAndCountType[] = [];
-      for (const subscriber of subscribers) {
-        let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
-        if (subscriber.subscriber.userId === subscriberId) {
-          subscriptionStatus = subscriber.subscriptionStatus;
-        }
-
-        result.push({
-          blogId: subscriber.blog.id,
-          currentUserSubscriptionStatus: subscriptionStatus,
-          subscribersCount: subscribersCountMap[subscriber.blog.id] || 0,
-        });
-      }
-
-      return result;
-    } catch (error) {
-      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(`Blog with ID ${blogId} not found`);
-      }
-      throw new InternalServerErrorException(error.message);
+  async createSubscribersCountMap(
+    subscribersCounts: any[],
+  ): Promise<{ [blogId: string]: number }> {
+    const subscribersCountMap: { [blogId: string]: number } = {};
+    for (const { blogId, subscribersCount } of subscribersCounts) {
+      subscribersCountMap[blogId] = +subscribersCount;
     }
+    return subscribersCountMap;
+  }
+
+  async createResultArray(
+    subscribers: any[],
+    subscribersCountMap: { [blogId: string]: number },
+    currSubscriberId: string | undefined,
+  ): Promise<SubscriptionStatusAndCountType[]> {
+    const result: {
+      blogId: string;
+      subscriberId: string;
+      currentUserSubscriptionStatus: SubscriptionStatus;
+      subscribersCount: number;
+    }[] = [];
+
+    for (const subscriber of subscribers) {
+      const existingSubscriberIndex = result.findIndex(
+        (item) => item.blogId === subscriber.blog.id,
+      );
+
+      if (existingSubscriberIndex !== -1) {
+        const existingSubscriber = result[existingSubscriberIndex];
+        if (existingSubscriber.subscriberId !== currSubscriberId) {
+          existingSubscriber.subscriberId = subscriber.subscriber.userId;
+          existingSubscriber.currentUserSubscriptionStatus =
+            subscriber.subscriptionStatus;
+        }
+        continue;
+      }
+
+      result.push({
+        blogId: subscriber.blog.id,
+        subscriberId: subscriber.subscriber.userId,
+        currentUserSubscriptionStatus: subscriber.subscriptionStatus,
+        subscribersCount: subscribersCountMap[subscriber.blog.id] || 0,
+      });
+    }
+
+    return result;
   }
 
   async manageBlogsSubscribe(

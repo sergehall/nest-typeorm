@@ -179,6 +179,7 @@ export class BloggerBlogsRepo {
   async findBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const isBanned = false;
     const dependencyIsBanned = false;
+
     const queryBuilder = this.bloggerBlogsRepository
       .createQueryBuilder('blog') // Start building a query
       .leftJoinAndSelect('blog.blogOwner', 'blogOwner') // Eager load the blogOwner relationship
@@ -192,9 +193,8 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const blogId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -213,9 +213,8 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -241,9 +240,8 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
