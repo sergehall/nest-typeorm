@@ -50,6 +50,7 @@ export class BlogsSubscribersRepo {
           .andWhere({ dependencyIsBanned })
           .getCount(),
       ]);
+
       return {
         currentUserSubscriptionStatus:
           subscriber?.subscriptionStatus || SubscriptionStatus.None,
@@ -109,10 +110,14 @@ export class BlogsSubscribersRepo {
       // Create result array
       const result: BlogIdSubscriptionStatusAndCountType[] = [];
       for (const subscriber of subscribers) {
+        let subscriptionStatus: SubscriptionStatus = SubscriptionStatus.None;
+        if (subscriber.subscriber.userId === subscriberId) {
+          subscriptionStatus = subscriber.subscriptionStatus;
+        }
+
         result.push({
           blogId: subscriber.blog.id,
-          currentUserSubscriptionStatus:
-            subscriber?.subscriptionStatus || SubscriptionStatus.None,
+          currentUserSubscriptionStatus: subscriptionStatus,
           subscribersCount: subscribersCountMap[subscriber.blog.id] || 0,
         });
       }
