@@ -19,11 +19,11 @@ export class CreateSaUserUseCase
   ) {}
 
   async execute(): Promise<UsersEntity> {
-    const saLogin = await this.saConfig.getSaLogin('SA_LOGIN');
-    const saEmail = await this.saConfig.getSaEmail('SA_EMAIL');
-    const saPasswordHash = await this.saConfig.getSaPasswordHash(
-      'SA_PASSWORD_HASH',
-    );
+    const [saLogin, saEmail, saPasswordHash] = await Promise.all([
+      this.saConfig.getSaLogin('SA_LOGIN'),
+      this.saConfig.getSaEmail('SA_EMAIL'),
+      this.saConfig.getSaPasswordHash('SA_PASSWORD_HASH'),
+    ]);
 
     // Return the expirationDate in ISO format for user registration.
     const expirationDateDto: ExpirationDateDto =

@@ -102,9 +102,8 @@ export class UsersRepo {
       return user || null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -122,9 +121,8 @@ export class UsersRepo {
       return user || null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -476,6 +474,9 @@ export class UsersRepo {
           .from('ChallengeAnswers')
           .where('answerOwnerId = :userId', { userId })
           .execute(),
+        transactionalEntityManager.delete('BlogsSubscribers', {
+          subscriber: userId,
+        }),
         transactionalEntityManager.delete('SecurityDevices', { user: userId }),
         transactionalEntityManager.delete('BannedUsersForBlogs', {
           bannedUserForBlogs: userId,

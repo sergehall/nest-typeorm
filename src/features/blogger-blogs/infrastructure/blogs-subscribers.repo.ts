@@ -57,9 +57,8 @@ export class BlogsSubscribersRepo {
       };
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const blogId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -121,9 +120,8 @@ export class BlogsSubscribersRepo {
       return result;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const blogId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
