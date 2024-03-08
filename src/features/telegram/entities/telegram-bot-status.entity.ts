@@ -48,9 +48,9 @@ export class TelegramBotStatusEntity {
   ): TelegramBotStatusEntity {
     const telegramBotStatusEntity = new TelegramBotStatusEntity();
     telegramBotStatusEntity.id = uuid4();
-    telegramBotStatusEntity.botStatus = botStatus;
     telegramBotStatusEntity.telegramId = telegramId;
     telegramBotStatusEntity.user = user;
+    telegramBotStatusEntity.botStatus = botStatus;
     telegramBotStatusEntity.createdAt = new Date().toISOString();
     telegramBotStatusEntity.dependencyIsBanned = false;
     telegramBotStatusEntity.isBanned = false;

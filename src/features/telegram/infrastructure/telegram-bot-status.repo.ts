@@ -26,8 +26,17 @@ export class TelegramBotStatusRepo {
     botStatus: BotStatus,
   ): Promise<TelegramBotStatusEntity> {
     const telegramBotStatusEntity: TelegramBotStatusEntity | null =
+      //
+      // const queryBuilder = this.telegramBotStatusRepository
+      //   .createQueryBuilder('posts')
+      //   .where({ dependencyIsBanned: false })
+      //   .andWhere({ isBanned: false })
+      //   .innerJoinAndSelect('posts.blog', 'blog')
+      //   .innerJoinAndSelect('posts.postOwner', 'postOwner')
+      //   .andWhere('blog.id = :blogId', { blogId });
+
       await this.telegramBotStatusRepository.findOne({
-        where: { telegramId, user },
+        where: { telegramId, user: { userId: user.userId } },
       });
 
     if (telegramBotStatusEntity) {
