@@ -3,17 +3,17 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { BotActivationLink } from '../../types/bot-activation-link.type';
 
-export class GenerateActivationLinkCommand {
+export class GenerateTelegramActivationLinkCommand {
   constructor(public currentUserDto: CurrentUserDto) {}
 }
 
-@CommandHandler(GenerateActivationLinkCommand)
-export class GenerateActivationLinkUseCase
-  implements ICommandHandler<GenerateActivationLinkCommand>
+@CommandHandler(GenerateTelegramActivationLinkCommand)
+export class GenerateTelegramActivationLinkUseCase
+  implements ICommandHandler<GenerateTelegramActivationLinkCommand>
 {
   constructor(private readonly postgresConfig: PostgresConfig) {}
   async execute(
-    command: GenerateActivationLinkCommand,
+    command: GenerateTelegramActivationLinkCommand,
   ): Promise<BotActivationLink> {
     const { currentUserDto } = command;
 
