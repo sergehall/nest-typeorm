@@ -26,7 +26,7 @@ export class SendOurWebhookToTelegramUseCase
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
 
     const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const url = baseUrl + '/integrations/telegram/notification';
+    const url = baseUrl + '/integrations/telegram/webhook';
 
     await axios.post(telegramUrl, { url: url });
   }
