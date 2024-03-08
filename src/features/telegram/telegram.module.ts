@@ -11,7 +11,7 @@ import { TelegramTextParserUseCase } from './application/use-cases/telegram-text
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelegramBotStatusEntity } from './entities/telegram-bot-status.entity';
 import { GenerateTelegramActivationLinkUseCase } from './application/use-cases/generate-telegram-activation-code.use-case';
-import { ActivateTelegramBotUseCase } from './application/use-cases/activate-telegram-bot.use-case';
+import { ManageTelegramBotUseCase } from './application/use-cases/manage-telegram-bot.use-case';
 import { UsersRepo } from '../users/infrastructure/users-repo';
 import { UsersEntity } from '../users/entities/users.entity';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -22,13 +22,14 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challenges-questions.repo';
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
+import { TelegramBotStatusRepo } from './infrastructure/telegram-bot-status.repo';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
   SendMessagesUseCase,
   TelegramTextParserUseCase,
   GenerateTelegramActivationLinkUseCase,
-  ActivateTelegramBotUseCase,
+  ManageTelegramBotUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
@@ -54,6 +55,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRepo,
     GamePairsRepo,
     GameQuestionsRepo,
+    TelegramBotStatusRepo,
     ChallengesQuestionsRepo,
     ...telegramUseCases,
     ...helpers,
