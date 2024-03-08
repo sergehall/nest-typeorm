@@ -14,11 +14,7 @@ import { PayloadTelegramMessageType } from '../types/payload-telegram-message.ty
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BotActivationLink } from '../types/bot-activation-link.type';
-import {
-  GenerateTelegramActivationLinkCommand,
-  GenerateTelegramActivationLinkUseCase,
-} from '../application/use-cases/generate-telegram-activation-code.use-case';
-import { ActivateTelegramBotCommand } from '../application/use-cases/activate-telegram-bot.use-case';
+import { GenerateTelegramActivationLinkCommand } from '../application/use-cases/generate-telegram-activation-code.use-case';
 
 @Controller('integrations/telegram')
 export class TelegramController {
