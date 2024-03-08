@@ -45,16 +45,4 @@ export class TelegramController {
       new GenerateTelegramActivationLinkCommand(currentUserDto),
     );
   }
-
-  @Get('activate-bot')
-  async activateBot(@Query('code') activationCode: string): Promise<string> {
-    // const success = await this.commandBus.execute(
-    //   new ActivateTelegramBotCommand(activationCode),
-    // );
-    if (activationCode === '123') {
-      return 'Bot activation successful!';
-    } else {
-      return 'Bot activation failed. Invalid activation code.';
-    }
-  }
 }

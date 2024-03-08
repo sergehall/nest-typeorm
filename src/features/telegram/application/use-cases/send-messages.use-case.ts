@@ -34,6 +34,7 @@ export class SendMessagesUseCase
       const answerToRecipient: string = await this.commandBus.execute(
         new ManageTelegramBotCommand(payloadTelegramMessage),
       );
+      console.log(answerToRecipient, 'answerToRecipient');
       const data = {
         chat_id: payloadTelegramMessage.message.from.id,
         text: answerToRecipient,
