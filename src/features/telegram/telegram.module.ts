@@ -6,19 +6,22 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../config/telegram/telegram.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SendOurWebhookToTelegramUseCase } from './application/use-cases/send-our-webhook-to-telegram.use-case';
-import { SendMessageToRecipientUseCase } from './application/use-cases/send-message-to-recipient.use-case';
+import { SendMessagesUseCase } from './application/use-cases/send-messages.use-case';
 import { TelegramTextParserUseCase } from './application/use-cases/telegram-text-parser.use-case';
-import { GenerateActivationLinkUseCase } from './application/use-cases/generate-activation-code.use-case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TelegramBotStatusEntity } from './entities/telegram-bot-status.entity';
+import { GenerateTelegramActivationLinkUseCase } from './application/use-cases/generate-telegram-activation-code.use-case';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
-  SendMessageToRecipientUseCase,
+  SendMessagesUseCase,
   TelegramTextParserUseCase,
-  GenerateActivationLinkUseCase,
+  GenerateTelegramActivationLinkUseCase,
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [TypeOrmModule.forFeature([TelegramBotStatusEntity]), CqrsModule],
+
   controllers: [TelegramController],
   providers: [
     PostgresConfig,

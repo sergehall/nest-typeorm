@@ -20,6 +20,7 @@ import { ImagesPostsOriginalMetadataEntity } from '../features/posts/entities/im
 import { ImagesPostsSmallMetadataEntity } from '../features/posts/entities/images-posts-small-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../features/posts/entities/images-posts-middle-metadata.entity';
 import { BlogsSubscribersEntity } from '../features/blogger-blogs/entities/blogs-subscribers.entity';
+import { TelegramBotStatusEntity } from '../features/telegram/entities/telegram-bot-status.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -46,6 +47,7 @@ export default new DataSource({
     ChallengeQuestionsEntity,
     QuestionsQuizEntity,
     ChallengeAnswersEntity,
+    TelegramBotStatusEntity,
     ImagesBlogsMainMetadataEntity,
     ImagesBlogsWallpaperMetadataEntity,
     ImagesPostsOriginalMetadataEntity,
