@@ -40,12 +40,13 @@ export class SendMessagesUseCase
         text: answerToRecipient,
       };
 
-      return await axios.post(telegramUrl, data);
+      await axios.post(telegramUrl, data);
+    } else {
+      await axios.post(telegramUrl, {
+        chat_id: payloadTelegramMessage.message.from.id,
+        text: 'not understand you, please try again!',
+      });
     }
-    await axios.post(telegramUrl, {
-      chat_id: payloadTelegramMessage.message.from.id,
-      text: 'not understand you, please try again!',
-    });
     // if (payloadTelegramMessage.message.text) {
     //   const answerToRecipient = await this.commandBus.execute(
     //     new TelegramTextParserCommand(payloadTelegramMessage),
