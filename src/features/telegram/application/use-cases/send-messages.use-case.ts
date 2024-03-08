@@ -30,7 +30,7 @@ export class SendMessagesUseCase
 
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
-    if (payloadTelegramMessage.message.text.includes('code=')) {
+    if (payloadTelegramMessage.message.text.includes('start code=')) {
       const answerToRecipient: string = await this.commandBus.execute(
         new ManageTelegramBotCommand(payloadTelegramMessage),
       );
