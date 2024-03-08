@@ -128,8 +128,6 @@ export class UsersEntity {
   @OneToMany(() => ChallengeAnswersEntity, (answer) => answer.answerOwner)
   answerOwner: ChallengeAnswersEntity[];
 
-  events: any[] = [];
-
   static createUserEntity(dto: DataForCreateUserDto): UsersEntity {
     const { login, email, passwordHash, expirationDate } = dto;
 
