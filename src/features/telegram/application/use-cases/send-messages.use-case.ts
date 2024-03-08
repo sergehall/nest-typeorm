@@ -5,7 +5,7 @@ import { PayloadTelegramMessageType } from '../../types/payload-telegram-message
 import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
-import { ActivateTelegramBotCommand } from './activate-telegram-bot.use-case';
+import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 
 export class SendMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -31,8 +31,8 @@ export class SendMessagesUseCase
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     if (payloadTelegramMessage.message.text.includes('start code=')) {
-      const answerToRecipient = await this.commandBus.execute(
-        new ActivateTelegramBotCommand(payloadTelegramMessage),
+      const answerToRecipient: string = await this.commandBus.execute(
+        new ManageTelegramBotCommand(payloadTelegramMessage),
       );
       const data = {
         chat_id: payloadTelegramMessage.message.from.id,

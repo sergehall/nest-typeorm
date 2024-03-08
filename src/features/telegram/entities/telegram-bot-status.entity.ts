@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BotStatus } from '../enums/bot-status.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
+import * as uuid4 from 'uuid4';
 
 @Entity('TelegramBotStatus')
 export class TelegramBotStatusEntity {
@@ -15,8 +16,8 @@ export class TelegramBotStatusEntity {
   })
   botStatus: BotStatus;
 
-  @Column('uuid', { nullable: false })
-  telegramId: string;
+  @Column('numeric', { nullable: false })
+  telegramId: number;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId, {
     nullable: false,
@@ -39,4 +40,22 @@ export class TelegramBotStatusEntity {
 
   @Column({ type: 'character varying', nullable: true })
   banReason: string | null = null;
+
+  static createTelegramBotStatusEntity(
+    telegramId: number,
+    user: UsersEntity,
+    botStatus: BotStatus,
+  ): TelegramBotStatusEntity {
+    const telegramBotStatusEntity = new TelegramBotStatusEntity();
+    telegramBotStatusEntity.id = uuid4();
+    telegramBotStatusEntity.botStatus = botStatus;
+    telegramBotStatusEntity.telegramId = telegramId;
+    telegramBotStatusEntity.user = user;
+    telegramBotStatusEntity.createdAt = new Date().toISOString();
+    telegramBotStatusEntity.dependencyIsBanned = false;
+    telegramBotStatusEntity.isBanned = false;
+    telegramBotStatusEntity.banDate = null;
+    telegramBotStatusEntity.banReason = null;
+    return telegramBotStatusEntity;
+  }
 }
