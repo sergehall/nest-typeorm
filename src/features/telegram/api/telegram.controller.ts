@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { TelegramService } from '../application/telegram.service';
 import { CommandBus } from '@nestjs/cqrs';
-import { SendMessagesCommand } from '../application/use-cases/send-messages.use-case';
 import { PayloadTelegramMessageType } from '../types/payload-telegram-message.type';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BotActivationLink } from '../types/bot-activation-link.type';
 import { GenerateTelegramActivationLinkCommand } from '../application/use-cases/generate-telegram-activation-code.use-case';
+import { SendMessagesCommand } from '../application/use-cases/send-messages.use-case';
 
 @Controller('integrations/telegram')
 export class TelegramController {
