@@ -23,6 +23,7 @@ export class ManageTelegramBotUseCase
     const inputString = payloadTelegramMessage.message.text;
     const telegramId = payloadTelegramMessage.message.from.id;
 
+    console.log(inputString, 'inputString');
     // Extract the substring after '='
     const userId: string = inputString.substring(inputString.indexOf('=') + 1);
     console.log(userId, 'userId');
