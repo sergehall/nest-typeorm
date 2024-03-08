@@ -43,16 +43,16 @@ export class SendMessagesUseCase
 
       await axios.post(telegramUrl, data);
     }
-    if (payloadTelegramMessage.message.text) {
-      const answerToRecipient = await this.commandBus.execute(
-        new TelegramTextParserCommand(payloadTelegramMessage),
-      );
-      const data = {
-        chat_id: payloadTelegramMessage.message.from.id,
-        text: answerToRecipient,
-      };
-
-      await axios.post(telegramUrl, data);
-    }
+    // if (payloadTelegramMessage.message.text) {
+    //   const answerToRecipient = await this.commandBus.execute(
+    //     new TelegramTextParserCommand(payloadTelegramMessage),
+    //   );
+    //   const data = {
+    //     chat_id: payloadTelegramMessage.message.from.id,
+    //     text: answerToRecipient,
+    //   };
+    //
+    //   await axios.post(telegramUrl, data);
+    // }
   }
 }
