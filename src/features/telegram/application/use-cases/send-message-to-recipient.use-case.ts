@@ -25,8 +25,8 @@ export class SendMessageToRecipientUseCase
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
 
-    const method = TelegramMethodsEnum.SEND_MESSAGE;
-    const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
+    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
+    const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     if (payloadTelegramMessage.message.text) {
       const answerToRecipient = await this.commandBus.execute(
