@@ -30,23 +30,30 @@ export class SendMessagesUseCase
 
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
-    if (payloadTelegramMessage.message.text.includes('start code=')) {
-      const answerToRecipient: string = await this.commandBus.execute(
-        new ManageTelegramBotCommand(payloadTelegramMessage),
-      );
-      console.log(answerToRecipient, 'answerToRecipient');
-      const data = {
-        chat_id: payloadTelegramMessage.message.from.id,
-        text: answerToRecipient,
-      };
+    const data = {
+      chat_id: payloadTelegramMessage.message.from.id,
+      text: 'not understand you, please try again!',
+    };
 
-      await axios.post(telegramUrl, data);
-    } else {
-      await axios.post(telegramUrl, {
-        chat_id: payloadTelegramMessage.message.from.id,
-        text: 'not understand you, please try again!',
-      });
-    }
+    await axios.post(telegramUrl, data);
+    // if (payloadTelegramMessage.message.text.includes('start code=')) {
+    //   const answerToRecipient: string = await this.commandBus.execute(
+    //     new ManageTelegramBotCommand(payloadTelegramMessage),
+    //   );
+    //   console.log(answerToRecipient, 'answerToRecipient');
+    //   const data = {
+    //     chat_id: payloadTelegramMessage.message.from.id,
+    //     text: answerToRecipient,
+    //   };
+    //
+    //   await axios.post(telegramUrl, data);
+    // } else {
+    //   await axios.post(telegramUrl, {
+    //     chat_id: payloadTelegramMessage.message.from.id,
+    //     text: 'not understand you, please try again!',
+    //   });
+    // }
+
     // if (payloadTelegramMessage.message.text) {
     //   const answerToRecipient = await this.commandBus.execute(
     //     new TelegramTextParserCommand(payloadTelegramMessage),
