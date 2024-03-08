@@ -1,8 +1,20 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { TelegramService } from '../application/telegram.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { SendMessageToRecipientCommand } from '../application/use-cases/send-message-to-recipient.use-case';
 import { PayloadTelegramMessageType } from '../types/payload-telegram-message.type';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { GenerateActivationLinkCommand } from '../application/use-cases/generate-activation-code.use-case';
+import { BotActivationLink } from '../types/bot-activation-link.type';
 
 @Controller('integrations/telegram')
 export class TelegramController {
@@ -26,9 +38,12 @@ export class TelegramController {
   }
 
   @Get('auth-bot-link')
-  async getAuthBotLink(): Promise<string> {
-    const activationCode = await this.telegramService.generateActivationCode();
-    return `https://t.me/blogger_platform_bot?code=${activationCode}`;
+  @UseGuards(JwtAuthGuard)
+  async getAuthBotLink(@Request() req: any): Promise<BotActivationLink> {
+    const currentUserDto: CurrentUserDto = req.user;
+    return await this.commandBus.execute(
+      new GenerateActivationLinkCommand(currentUserDto),
+    );
   }
 
   @Get('activate-bot')

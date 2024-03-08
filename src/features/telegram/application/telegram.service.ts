@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import * as uuid4 from 'uuid4';
 import axios from 'axios';
 import { BlogsSubscribersEntity } from '../../blogger-blogs/entities/blogs-subscribers.entity';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { TelegramApiEndpointsEnum } from '../enums/telegram-api-endpoints.enum';
 
 @Injectable()
 export class TelegramService {
@@ -63,9 +64,10 @@ export class TelegramService {
     if (!botToken) {
       throw new Error('Telegram bot token not provided');
     }
+    const urlApiTelegram = TelegramApiEndpointsEnum.Bot;
 
     // Construct the Telegram API URL for sending messages
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const url = `${urlApiTelegram}${botToken}/sendMessage`;
 
     // Send the notification message to the bot
     await axios.post(url, {
@@ -74,9 +76,11 @@ export class TelegramService {
     });
   }
 
-  async generateActivationCode(): Promise<string> {
+  async generateActivationCode(currentUserDto: CurrentUserDto) {
     // Generate a unique activation code using UUID
-    return uuid4();
+    return {
+      link: `https://t.me/activate-bot?code=${currentUserDto.userId}`,
+    };
   }
 
   async activateBot(activationCode: string): Promise<boolean> {

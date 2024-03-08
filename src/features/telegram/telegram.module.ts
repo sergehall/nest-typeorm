@@ -8,11 +8,13 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { SendOurWebhookToTelegramUseCase } from './application/use-cases/send-our-webhook-to-telegram.use-case';
 import { SendMessageToRecipientUseCase } from './application/use-cases/send-message-to-recipient.use-case';
 import { TelegramTextParserUseCase } from './application/use-cases/telegram-text-parser.use-case';
+import { GenerateActivationLinkUseCase } from './application/use-cases/generate-activation-code.use-case';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
   SendMessageToRecipientUseCase,
   TelegramTextParserUseCase,
+  GenerateActivationLinkUseCase,
 ];
 
 @Module({
