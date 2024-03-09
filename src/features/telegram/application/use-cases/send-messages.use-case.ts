@@ -11,7 +11,7 @@ export class SendMessagesCommand {
 }
 
 @CommandHandler(SendMessagesCommand)
-export class ProcessTelegramMessagesHandler
+export class SendMessagesUseCase
   implements ICommandHandler<SendMessagesCommand>
 {
   constructor(
