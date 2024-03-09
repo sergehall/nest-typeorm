@@ -25,13 +25,13 @@ export class ManageTelegramBotUseCase
 
     console.log(inputString, 'inputString');
     // Extract the substring after '='
-    const userId: string = inputString.substring(inputString.indexOf('=') + 1);
-    console.log(userId, 'userId');
+    const code: string = inputString.substring(inputString.indexOf('=') + 1);
+    console.log(code, 'code');
     const user: UsersEntity | null =
-      await this.usersRepo.findNotBannedUserById(userId);
+      await this.usersRepo.findNotBannedUserById(code);
     console.log(user, 'user');
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      throw new NotFoundException(`User with ID ${code} not found`);
     }
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.enableTelegramBotStatus(
