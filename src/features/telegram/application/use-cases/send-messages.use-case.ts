@@ -57,12 +57,10 @@ export class SendMessagesUseCase
 
   // Helper function to extract the deep link parameter from the message
   private extractDeepLinkParameter(message: string): string | null {
-    const startIndex = message.indexOf(
-      'https://t.me/blogger_platform_bot?code=',
-    );
+    const startIndex = message.indexOf('https://t.me/ItIncubatorBot?code=');
     if (startIndex !== -1) {
       return message.substring(
-        startIndex + 'https://t.me/blogger_platform_bot?code='.length,
+        startIndex + 'https://t.me/ItIncubatorBot?code='.length,
       );
     }
     return null;
