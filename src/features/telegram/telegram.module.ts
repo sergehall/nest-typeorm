@@ -6,7 +6,6 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../config/telegram/telegram.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SendOurWebhookToTelegramUseCase } from './application/use-cases/send-our-webhook-to-telegram.use-case';
-import { SendMessagesUseCase } from './application/use-cases/send-messages.use-case';
 import { TelegramTextParserUseCase } from './application/use-cases/telegram-text-parser.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelegramBotStatusEntity } from './entities/telegram-bot-status.entity';
@@ -23,6 +22,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { TelegramBotStatusRepo } from './infrastructure/telegram-bot-status.repo';
+import { SendMessagesUseCase } from './application/use-cases/send-messages.use-case';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
