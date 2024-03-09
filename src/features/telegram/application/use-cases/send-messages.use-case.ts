@@ -2,7 +2,6 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
-import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import axios from 'axios';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 
@@ -30,7 +29,9 @@ export class SendMessagesUseCase
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     const data = {
-      chat_id: payloadTelegram.message.from.id,
+      chat_id:
+        payloadTelegram.message.from.id |
+        payloadTelegram.my_chat_member.from.id,
       text: 'answer to recipient',
     };
 
