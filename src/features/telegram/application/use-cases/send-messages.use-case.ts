@@ -35,10 +35,12 @@ export class SendMessagesUseCase
 
     if (payloadTelegram.message) {
       data.chat_id = payloadTelegram.message.from.id;
+      data.text = 'answer message to recipient';
     }
 
     if (payloadTelegram.my_chat_member) {
       data.chat_id = payloadTelegram.my_chat_member.from.id;
+      data.text = 'answer my_chat_member to recipient';
     }
 
     // Send a message back to the user
