@@ -11,7 +11,7 @@ export class SendMessagesCommand {
 }
 
 @CommandHandler(SendMessagesCommand)
-export class SendMessagesUseCase
+export class ProcessTelegramMessagesHandler
   implements ICommandHandler<SendMessagesCommand>
 {
   constructor(
@@ -21,20 +21,25 @@ export class SendMessagesUseCase
 
   async execute(command: SendMessagesCommand) {
     const { payloadTelegram } = command;
+
+    const text = payloadTelegram.message.text;
     const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
-    // Check if the message contains a deep link parameter
-    const deepLinkParam = this.extractDeepLinkParameter(
-      payloadTelegram.message.text,
+    const usernameBot = await this.telegramConfig.getUsernameBotTelegram(
+      'TELEGRAM_USERNAME_BOT',
     );
+    const telegramBaseURL = `https://t.me/${usernameBot}`;
 
-    if (deepLinkParam) {
+    // Check if the message contains a deep link parameter
+    const deepLinkParam = this.extractParameters(telegramBaseURL, text);
+
+    if (deepLinkParam && deepLinkParam['code']) {
       // Process the activation code from the deep link parameter
-      const activationCode = this.extractActivationCode(deepLinkParam);
+      const activationCode = deepLinkParam['code'];
 
       // Execute the command to manage the Telegram bot with the activation code
       const answerToRecipient: string = await this.commandBus.execute(
@@ -48,7 +53,7 @@ export class SendMessagesUseCase
       // Send a message back to the user
       await axios.post(telegramUrl, data);
     } else {
-      // If the deep link parameter is not present, reply with a default message
+      // If the deep link parameter is not present or if activation code is not found, reply with a default message
       await axios.post(telegramUrl, {
         chat_id: payloadTelegram.message.from.id,
         text: 'Invalid activation link. Please try again!',
@@ -56,15 +61,36 @@ export class SendMessagesUseCase
     }
   }
 
-  // Helper function to extract the deep link parameter from the message
-  private extractDeepLinkParameter(message: string): string | null {
-    const startIndex = message.indexOf('https://t.me/ItIncubatorBot?code=');
-    if (startIndex !== -1) {
-      return message.substring(
-        startIndex + 'https://t.me/ItIncubatorBot?code='.length,
-      );
+  // Helper function to extract all parameters and their values from the URL string
+  private extractParameters(
+    botLink: string,
+    text: string,
+  ): { [key: string]: string } {
+    const parameters: { [key: string]: string } = {};
+
+    // Check if the text contains the bot link
+    if (text.includes(botLink)) {
+      // Find the index of the parameters start after the '?' symbol
+      const paramsStartIndex = text.indexOf('?');
+      if (paramsStartIndex !== -1) {
+        // Extract the substring containing parameters
+        const paramsString = text.substring(paramsStartIndex + 1);
+
+        // Split the parameters string by '&' to separate individual parameters
+        const parameterPairs = paramsString.split('&');
+
+        // Iterate over each parameter pair
+        parameterPairs.forEach((pair) => {
+          // Split the parameter pair by '=' to separate parameter name and value
+          const [name, value] = pair.split('=');
+
+          // Store the parameter name and value in the parameters object
+          parameters[name] = value;
+        });
+      }
     }
-    return null;
+
+    return parameters;
   }
 
   // Helper function to extract the activation code from the deep link parameter

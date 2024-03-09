@@ -21,11 +21,12 @@ import {
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
-import { TokenTelegramItIncubator } from '../telegram/types/token-telegram-it-incubator.type';
+import { TokenTelegramItIncubatorType } from '../telegram/types/token-telegram-it-incubator.type';
 import { SaLoginType } from '../sa/types/sa-login.type';
 import { SaEmailType } from '../sa/types/sa-email.type';
 import { SaKeyType } from '../sa/types/sa-key.type';
 import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
+import { TelegramUsernameBotType } from '../telegram/types/telegram-username-bot.type';
 
 @Injectable()
 export class BaseConfig {
@@ -83,7 +84,15 @@ export class BaseConfig {
   }
 
   protected async getTokenTelegramItIncubator(
-    key: TokenTelegramItIncubator,
+    key: TokenTelegramItIncubatorType,
+  ): Promise<string> {
+    return this.configService.get('telegram', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getTelegramUsernameBot(
+    key: TelegramUsernameBotType,
   ): Promise<string> {
     return this.configService.get('telegram', {
       infer: true,
