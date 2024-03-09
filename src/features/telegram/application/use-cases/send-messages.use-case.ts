@@ -1,4 +1,4 @@
-import { CommandBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
@@ -10,6 +10,7 @@ export class SendMessagesCommand {
   constructor(public payloadTelegram: PayloadTelegramMessageType) {}
 }
 
+@CommandHandler(SendMessagesCommand)
 export class SendMessagesUseCase
   implements ICommandHandler<SendMessagesCommand>
 {

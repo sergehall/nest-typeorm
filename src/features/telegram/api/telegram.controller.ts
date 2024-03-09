@@ -24,7 +24,7 @@ export class TelegramController {
 
   @Post('webhook')
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {
-    console.log(payload, 'payload telegramBotWebhook');
+    console.log(payload, 'payload Webhook');
     await this.commandBus.execute(new SendMessagesCommand(payload));
     return this.telegramService.getWebhook();
   }
