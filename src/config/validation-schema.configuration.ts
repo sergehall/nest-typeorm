@@ -80,6 +80,7 @@ export const validationSchemaConfiguration = Joi.object({
   S3_PRIVATE_BUCKET: Joi.string().min(8).max(8).required(),
   S3_PUBLIC_BUCKET: Joi.string().min(23).max(23).required(),
   TOKEN_TELEGRAM_IT_INCUBATOR: Joi.string().min(46).max(46).required(),
+  TELEGRAM_USERNAME_BOT: Joi.string().min(14).max(14).required(),
 }).options({
   abortEarly: false,
   messages: {
