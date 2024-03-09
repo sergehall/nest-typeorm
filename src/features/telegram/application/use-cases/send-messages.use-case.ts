@@ -4,7 +4,6 @@ import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
-import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 
 export class SendMessagesCommand {
