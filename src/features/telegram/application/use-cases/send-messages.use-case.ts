@@ -29,11 +29,17 @@ export class SendMessagesUseCase
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     const data = {
-      chat_id:
-        payloadTelegram.message.from.id |
-        payloadTelegram.my_chat_member.from.id,
+      chat_id: 923690856,
       text: 'answer to recipient',
     };
+
+    if (payloadTelegram.message) {
+      data.chat_id = payloadTelegram.message.from.id;
+    }
+
+    if (payloadTelegram.my_chat_member) {
+      data.chat_id = payloadTelegram.my_chat_member.from.id;
+    }
 
     // Send a message back to the user
     await axios.post(telegramUrl, data);
