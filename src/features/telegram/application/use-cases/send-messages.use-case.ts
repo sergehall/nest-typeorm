@@ -22,7 +22,7 @@ export class SendMessagesUseCase
   async execute(command: SendMessagesCommand) {
     const { payloadTelegram } = command;
 
-    const text = payloadTelegram.message.text;
+    // const text = payloadTelegram.message.text;
     const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
@@ -36,7 +36,7 @@ export class SendMessagesUseCase
 
     // Send a message back to the user
     await axios.post(telegramUrl, data);
-    //
+
     //   const usernameBot = await this.telegramConfig.getUsernameBotTelegram(
     //     'TELEGRAM_USERNAME_BOT',
     //   );
