@@ -11,6 +11,12 @@ export class TelegramConfig extends BaseConfig {
     return await this.getTokenTelegramItIncubator(tokenTelegramItIncubator);
   }
 
+  getTokenTelegram2(
+    tokenTelegramItIncubator: TokenTelegramItIncubatorType,
+  ): string {
+    return this.getTokenTelegramItIncubator2(tokenTelegramItIncubator);
+  }
+
   async getUsernameBotTelegram(
     telegramUsernameBot: TelegramUsernameBotType,
   ): Promise<string> {

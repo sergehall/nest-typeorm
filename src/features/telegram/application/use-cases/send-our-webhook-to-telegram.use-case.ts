@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import axios from 'axios';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
+import axios from 'axios';
 
 export class SendOurWebhookToTelegramCommand {
   constructor() {}
