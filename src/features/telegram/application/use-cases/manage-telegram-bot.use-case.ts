@@ -34,10 +34,7 @@ export class ManageTelegramBotUseCase
       throw new NotFoundException(`User with ID ${code} not found`);
     }
     const enableTelegramBotStatus: TelegramBotStatusEntity =
-      await this.telegramBotStatusRepo.enableTelegramBotStatus(
-        telegramId,
-        user,
-      );
+      await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
     return `Thank you, you are ${enableTelegramBotStatus.botStatus} up for updates`;
   }
