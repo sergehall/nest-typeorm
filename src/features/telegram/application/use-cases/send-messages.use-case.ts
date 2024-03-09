@@ -92,15 +92,6 @@ export class ProcessTelegramMessagesHandler
 
     return parameters;
   }
-
-  // Helper function to extract the activation code from the deep link parameter
-  private extractActivationCode(deepLinkParam: string): string {
-    const codeIndex = deepLinkParam.indexOf('code=');
-    if (codeIndex !== -1) {
-      return deepLinkParam.substring(codeIndex + 'code='.length);
-    }
-    return '';
-  }
 }
 
 // import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
