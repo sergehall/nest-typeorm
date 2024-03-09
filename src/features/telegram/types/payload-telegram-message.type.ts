@@ -19,7 +19,46 @@ type Message = {
   text: string;
 };
 
+type MyChatMember = {
+  chat: {
+    id: number;
+    first_name: string;
+    username: string;
+    type: 'private' | 'group' | 'supergroup' | 'channel'; // Adjust the types as needed
+  };
+  from: {
+    id: number;
+    is_bot: boolean;
+    first_name: string;
+    username: string;
+    language_code: string;
+  };
+  date: number;
+  old_chat_member: {
+    user: any; // Replace `any` with a more specific type if available
+    status:
+      | 'member'
+      | 'administrator'
+      | 'creator'
+      | 'restricted'
+      | 'left'
+      | 'kicked'; // Adjust the types as needed
+  };
+  new_chat_member: {
+    user: any; // Replace `any` with a more specific type if available
+    status:
+      | 'member'
+      | 'administrator'
+      | 'creator'
+      | 'restricted'
+      | 'left'
+      | 'kicked'; // Adjust the types as needed
+    until_date?: number;
+  };
+};
+
 export type PayloadTelegramMessageType = {
   update_id: number;
   message: Message;
+  my_chat_member: MyChatMember;
 };
