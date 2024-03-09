@@ -29,68 +29,76 @@ export class SendMessagesUseCase
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
     const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
-    const usernameBot = await this.telegramConfig.getUsernameBotTelegram(
-      'TELEGRAM_USERNAME_BOT',
-    );
-    const telegramBaseURL = `https://t.me/${usernameBot}`;
+    const data = {
+      chat_id: payloadTelegram.message.from.id,
+      text: 'answer to recipient',
+    };
 
-    // Check if the message contains a deep link parameter
-    const deepLinkParam = this.extractParameters(telegramBaseURL, text);
-
-    if (deepLinkParam && deepLinkParam['code']) {
-      // Process the activation code from the deep link parameter
-      const activationCode = deepLinkParam['code'];
-
-      // Execute the command to manage the Telegram bot with the activation code
-      const answerToRecipient: string = await this.commandBus.execute(
-        new ManageTelegramBotCommand(payloadTelegram, activationCode),
-      );
-      const data = {
-        chat_id: payloadTelegram.message.from.id,
-        text: answerToRecipient,
-      };
-
-      // Send a message back to the user
-      await axios.post(telegramUrl, data);
-    } else {
-      // If the deep link parameter is not present or if activation code is not found, reply with a default message
-      await axios.post(telegramUrl, {
-        chat_id: payloadTelegram.message.from.id,
-        text: 'Invalid activation link. Please try again!',
-      });
-    }
-  }
-
-  // Helper function to extract all parameters and their values from the URL string
-  private extractParameters(
-    botLink: string,
-    text: string,
-  ): { [key: string]: string } {
-    const parameters: { [key: string]: string } = {};
-
-    // Check if the text contains the bot link
-    if (text.includes(botLink)) {
-      // Find the index of the parameters start after the '?' symbol
-      const paramsStartIndex = text.indexOf('?');
-      if (paramsStartIndex !== -1) {
-        // Extract the substring containing parameters
-        const paramsString = text.substring(paramsStartIndex + 1);
-
-        // Split the parameters string by '&' to separate individual parameters
-        const parameterPairs = paramsString.split('&');
-
-        // Iterate over each parameter pair
-        parameterPairs.forEach((pair) => {
-          // Split the parameter pair by '=' to separate parameter name and value
-          const [name, value] = pair.split('=');
-
-          // Store the parameter name and value in the parameters object
-          parameters[name] = value;
-        });
-      }
-    }
-
-    return parameters;
+    // Send a message back to the user
+    await axios.post(telegramUrl, data);
+    //
+    //   const usernameBot = await this.telegramConfig.getUsernameBotTelegram(
+    //     'TELEGRAM_USERNAME_BOT',
+    //   );
+    //   const telegramBaseURL = `https://t.me/${usernameBot}`;
+    //
+    //   // Check if the message contains a deep link parameter
+    //   const deepLinkParam = this.extractParameters(telegramBaseURL, text);
+    //
+    //   if (deepLinkParam && deepLinkParam['code']) {
+    //     // Process the activation code from the deep link parameter
+    //     const activationCode = deepLinkParam['code'];
+    //
+    //     // Execute the command to manage the Telegram bot with the activation code
+    //     const answerToRecipient: string = await this.commandBus.execute(
+    //       new ManageTelegramBotCommand(payloadTelegram, activationCode),
+    //     );
+    //     const data = {
+    //       chat_id: payloadTelegram.message.from.id,
+    //       text: answerToRecipient,
+    //     };
+    //
+    //     // Send a message back to the user
+    //     await axios.post(telegramUrl, data);
+    //   } else {
+    //     // If the deep link parameter is not present or if activation code is not found, reply with a default message
+    //     await axios.post(telegramUrl, {
+    //       chat_id: payloadTelegram.message.from.id,
+    //       text: 'Invalid activation link. Please try again!',
+    //     });
+    //   }
+    // }
+    //
+    // // Helper function to extract all parameters and their values from the URL string
+    // private extractParameters(
+    //   botLink: string,
+    //   text: string,
+    // ): { [key: string]: string } {
+    //   const parameters: { [key: string]: string } = {};
+    //
+    //   // Check if the text contains the bot link
+    //   if (text.includes(botLink)) {
+    //     // Find the index of the parameters start after the '?' symbol
+    //     const paramsStartIndex = text.indexOf('?');
+    //     if (paramsStartIndex !== -1) {
+    //       // Extract the substring containing parameters
+    //       const paramsString = text.substring(paramsStartIndex + 1);
+    //
+    //       // Split the parameters string by '&' to separate individual parameters
+    //       const parameterPairs = paramsString.split('&');
+    //
+    //       // Iterate over each parameter pair
+    //       parameterPairs.forEach((pair) => {
+    //         // Split the parameter pair by '=' to separate parameter name and value
+    //         const [name, value] = pair.split('=');
+    //
+    //         // Store the parameter name and value in the parameters object
+    //         parameters[name] = value;
+    //       });
+    //     }
+    //   }
+    //
+    //   return parameters;
   }
 }
 
