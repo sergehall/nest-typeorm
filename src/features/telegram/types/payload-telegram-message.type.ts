@@ -61,4 +61,5 @@ export type PayloadTelegramMessageType = {
   update_id: number;
   message: Message;
   my_chat_member: MyChatMember;
+  link_preview_options: { url: string; domain: string };
 };
