@@ -10,12 +10,12 @@ export class TelegramBotStatusRepo {
     protected telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
   ) {}
 
-  async enableTelegramBotStatus(telegramId: number, user: UsersEntity) {
+  async activateTelegramBot(telegramId: number, user: UsersEntity) {
     const botStatus = BotStatus.ENABLED;
     return await this.manageTelegramBotStatus(telegramId, user, botStatus);
   }
 
-  async disabledTelegramBotStatus(telegramId: number, user: UsersEntity) {
+  async deactivateTelegramBot(telegramId: number, user: UsersEntity) {
     const botStatus = BotStatus.DISABLED;
     return await this.manageTelegramBotStatus(telegramId, user, botStatus);
   }
