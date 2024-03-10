@@ -91,14 +91,6 @@ export class BaseConfig {
     })[key];
   }
 
-  protected getTokenTelegramItIncubator2(
-    key: TokenTelegramItIncubatorType,
-  ): string {
-    return this.configService.get('telegram', {
-      infer: true,
-    })[key];
-  }
-
   protected async getTelegramUsernameBot(
     key: TelegramUsernameBotType,
   ): Promise<string> {

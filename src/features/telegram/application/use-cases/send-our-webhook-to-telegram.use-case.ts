@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
-import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enum';
+import { TelegramEndpointsEnum } from '../../enums/telegram-endpoints.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import axios from 'axios';
 
@@ -23,7 +23,7 @@ export class SendOurWebhookToTelegramUseCase
     );
 
     const method = TelegramMethodsEnum.SET_WEBHOOK;
-    const telegramUrl = `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
+    const telegramUrl = `${TelegramEndpointsEnum.Bot}${tokenTelegramBot}/${method}`;
 
     const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
 
