@@ -38,7 +38,7 @@ export class ProcessTelegramMessagesUseCase
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
       const parts = text.split(' ')[1];
       console.log(parts, 'parts');
-      if (parts && !parts.startsWith('code')) {
+      if (!parts || (parts && !parts.startsWith('code'))) {
         await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
         return;
       }
@@ -58,7 +58,7 @@ export class ProcessTelegramMessagesUseCase
       } else {
         await this.sendTelegramMessage(
           payloadTelegramMessage.message.from.id,
-          `Do not understand ${parts}! Please try again!`,
+          `Do not understand parts=${parts}! Please try again!`,
         );
         return;
       }
