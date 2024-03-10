@@ -18,7 +18,7 @@ export class GenerateTelegramActivationLinkUseCase
   ): Promise<BotActivationLink> {
     const { currentUserDto } = command;
 
-    const telegramBaseUrl = TelegramEndpointsEnum.BaseUrl;
+    const telegramBaseShortUrl = TelegramEndpointsEnum.BaseShortUrl;
 
     const pathBotName = await this.telegramConfig.getUsernameBotTelegram(
       'TELEGRAM_USERNAME_BOT',
@@ -26,7 +26,7 @@ export class GenerateTelegramActivationLinkUseCase
 
     const query = `?start=code${currentUserDto.userId}`;
 
-    const completeURL = `${telegramBaseUrl}${pathBotName}${query}`;
+    const completeURL = `${telegramBaseShortUrl}/${pathBotName}${query}`;
 
     return { link: completeURL };
   }
