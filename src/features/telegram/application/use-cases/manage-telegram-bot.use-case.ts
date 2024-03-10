@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersEntity } from '../../../users/entities/users.entity';
-import { NotFoundException } from '@nestjs/common';
 import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { TelegramBotStatusRepo } from '../../infrastructure/telegram-bot-status.repo';
