@@ -34,45 +34,40 @@ export class ProcessTelegramMessagesUseCase
     const text: string = payloadTelegramMessage.message.text;
     console.log(text, 'text');
 
-    if (text && (text.startsWith('start') || text.startsWith('/start'))) {
-      // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
-      const parts = text.split(' ')[1];
-      console.log(parts, 'parts');
-      if (!parts || (parts && !parts.startsWith('code'))) {
-        await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
-        return;
-      }
+    if (text) {
+      if (text.startsWith('start') || text.startsWith('/start')) {
+        // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
+        const parts = text.split(' ')[1];
+        console.log(parts, 'parts');
+        if (!parts || (parts && !parts.startsWith('code'))) {
+          await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
+          return;
+        }
 
-      // If the text starts with '/start' and contains 'code=', proceed with code extraction and activation
-      const code = await this.extractActivationCode(parts);
+        // If the text starts with '/start' and contains 'code=', proceed with code extraction and activation
+        const code = await this.extractActivationCode(parts);
 
-      if (code) {
-        console.log(code, 'code');
-        const answerToRecipient: string = await this.commandBus.execute(
-          new ManageTelegramBotCommand(payloadTelegramMessage, code),
-        );
-        await this.sendTelegramMessage(
-          payloadTelegramMessage.message.from.id,
-          answerToRecipient,
-        );
-        return;
-      } else {
-        await this.sendTelegramMessage(
-          payloadTelegramMessage.message.from.id,
-          `Do not understand parts=${parts}! Please try again!`,
-        );
-        return;
+        if (code) {
+          console.log(code, 'code');
+          const answerToRecipient: string = await this.commandBus.execute(
+            new ManageTelegramBotCommand(payloadTelegramMessage, code),
+          );
+          await this.sendTelegramMessage(
+            payloadTelegramMessage.message.from.id,
+            answerToRecipient,
+          );
+          return;
+        }
       }
+      // If the text does not start with '/start', or does not contain 'code='  'code', execute TelegramTextParserCommand
+      const answerToRecipient = await this.commandBus.execute(
+        new TelegramTextParserCommand(payloadTelegramMessage),
+      );
+      await this.sendTelegramMessage(
+        payloadTelegramMessage.message.from.id,
+        answerToRecipient,
+      );
     }
-
-    // If the text does not start with '/start', or does not contain 'code='  'code', execute TelegramTextParserCommand
-    const answerToRecipient = await this.commandBus.execute(
-      new TelegramTextParserCommand(payloadTelegramMessage),
-    );
-    await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
-      answerToRecipient,
-    );
   }
 
   // Helper function to send a message via Telegram
