@@ -51,7 +51,7 @@ export class SendMessagesUseCase
       const code = await this.extractActivationCode(text);
       if (code) {
         const answerToRecipient: string = await this.commandBus.execute(
-          new ManageTelegramBotCommand(payloadTelegramMessage),
+          new ManageTelegramBotCommand(payloadTelegramMessage, code),
         );
         await this.sendTelegramMessage(
           payloadTelegramMessage.message.from.id,

@@ -7,7 +7,10 @@ import { TelegramBotStatusRepo } from '../../infrastructure/telegram-bot-status.
 import { TelegramBotStatusEntity } from '../../entities/telegram-bot-status.entity';
 
 export class ManageTelegramBotCommand {
-  constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
+  constructor(
+    public payloadTelegramMessage: PayloadTelegramMessageType,
+    public code: string,
+  ) {}
 }
 
 @CommandHandler(ManageTelegramBotCommand)
@@ -19,14 +22,14 @@ export class ManageTelegramBotUseCase
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
   ) {}
   async execute(command: ManageTelegramBotCommand): Promise<string> {
-    const { payloadTelegramMessage } = command;
+    const { payloadTelegramMessage, code } = command;
     const inputString = payloadTelegramMessage.message.text;
     const telegramId = payloadTelegramMessage.message.from.id;
 
     console.log(inputString, 'inputString');
     // Extract the substring after '='
-    const code: string = inputString.substring(inputString.indexOf('=') + 1);
-    console.log(code, 'code');
+    // const code: string = inputString.substring(inputString.indexOf('=') + 1);
+    // console.log(code, 'code');
     const user: UsersEntity | null =
       await this.usersRepo.findNotBannedUserById(code);
     console.log(user, 'user');
