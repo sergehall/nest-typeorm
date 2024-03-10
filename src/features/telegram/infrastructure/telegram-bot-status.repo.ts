@@ -15,7 +15,13 @@ export class TelegramBotStatusRepo {
     user: UsersEntity,
   ): Promise<TelegramBotStatusEntity> {
     const botStatus = BotStatus.ENABLED;
-    return await this.manageTelegramBotStatus(telegramId, user, botStatus);
+    const result = await this.manageTelegramBotStatus(
+      telegramId,
+      user,
+      botStatus,
+    );
+    console.log(result, 'result activateTelegramBot');
+    return result;
   }
 
   async deactivateTelegramBot(
