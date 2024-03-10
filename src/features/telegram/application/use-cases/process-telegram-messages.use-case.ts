@@ -37,11 +37,11 @@ export class ProcessTelegramMessagesUseCase
     const patternStart = /\/start\s+(.+)/;
     // Execute the regular expression pattern on the text
     const match = text.match(patternStart);
-
+    console.log(match, 'match');
+    console.log(patternStart, 'patternStart');
     if (match) {
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
       const partAfterStart = match[1];
-      console.log(match, 'match');
       console.log(partAfterStart, 'partAfterStart');
 
       if (!partAfterStart.startsWith('code')) {
