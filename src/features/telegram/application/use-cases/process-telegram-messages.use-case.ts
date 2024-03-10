@@ -6,6 +6,7 @@ import { TelegramEndpointsEnum } from '../../enums/telegram-endpoints.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class ProcessTelegramMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -20,50 +21,55 @@ export class ProcessTelegramMessagesUseCase
   ) {}
 
   async execute(command: ProcessTelegramMessagesCommand) {
-    const { payloadTelegramMessage } = command;
+    try {
+      const { payloadTelegramMessage } = command;
 
-    if (!payloadTelegramMessage.message?.text) {
-      await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
-      return;
+      if (!payloadTelegramMessage.message?.text) {
+        await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
+        return;
+      }
+
+      const { text } = payloadTelegramMessage.message;
+
+      if (text.startsWith('/start')) {
+        const parts = text.split(' ')[1];
+
+        if (!parts) {
+          await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
+          return;
+        }
+
+        if (!parts.startsWith('code')) {
+          await this.sendUnknownCommandMessage(payloadTelegramMessage, parts);
+          return;
+        }
+
+        const code = await this.extractActivationCode(parts);
+
+        if (code) {
+          const feedbackMessage: string = await this.commandBus.execute(
+            new ManageTelegramBotCommand(payloadTelegramMessage, code),
+          );
+
+          await this.sendTelegramMessage(
+            payloadTelegramMessage.message.from.id,
+            feedbackMessage,
+          );
+          return;
+        }
+      }
+
+      const feedbackMessage = await this.commandBus.execute(
+        new TelegramTextParserCommand(payloadTelegramMessage),
+      );
+      await this.sendTelegramMessage(
+        payloadTelegramMessage.message.from.id,
+        feedbackMessage,
+      );
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
     }
-
-    const { text } = payloadTelegramMessage.message;
-
-    if (text.startsWith('/start')) {
-      const parts = text.split(' ')[1];
-
-      if (!parts) {
-        await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
-        return;
-      }
-
-      if (!parts.startsWith('code')) {
-        await this.sendUnknownCommandMessage(payloadTelegramMessage, parts);
-        return;
-      }
-
-      const code = await this.extractActivationCode(parts);
-
-      if (code) {
-        const feedbackMessage: string = await this.commandBus.execute(
-          new ManageTelegramBotCommand(payloadTelegramMessage, code),
-        );
-
-        await this.sendTelegramMessage(
-          payloadTelegramMessage.message.from.id,
-          feedbackMessage,
-        );
-        return;
-      }
-    }
-
-    const feedbackMessage = await this.commandBus.execute(
-      new TelegramTextParserCommand(payloadTelegramMessage),
-    );
-    await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
-      feedbackMessage,
-    );
   }
 
   private async sendTelegramMessage(
