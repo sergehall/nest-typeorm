@@ -21,15 +21,11 @@ export class ManageTelegramBotUseCase
     protected usersRepo: UsersRepo,
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
   ) {}
+
   async execute(command: ManageTelegramBotCommand): Promise<string> {
     const { payloadTelegramMessage, code } = command;
-    const inputString = payloadTelegramMessage.message.text;
     const telegramId = payloadTelegramMessage.message.from.id;
 
-    console.log(inputString, 'inputString');
-    // Extract the substring after '='
-    // const code: string = inputString.substring(inputString.indexOf('=') + 1);
-    // console.log(code, 'code');
     const user: UsersEntity | null =
       await this.usersRepo.findNotBannedUserById(code);
     console.log(user, 'user');
@@ -39,6 +35,6 @@ export class ManageTelegramBotUseCase
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
-    return `Thank you, you are ${enableTelegramBotStatus.botStatus} up for updates.`;
+    return `${enableTelegramBotStatus.botStatus}.`;
   }
 }
