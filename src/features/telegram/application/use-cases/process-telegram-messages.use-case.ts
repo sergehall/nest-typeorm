@@ -47,9 +47,16 @@ export class ProcessTelegramMessagesUseCase
         const code = await this.extractActivationCode(parts);
 
         if (code) {
-          const feedbackMessage: string = await this.commandBus.execute(
+          const feedbackMessage: string | null = await this.commandBus.execute(
             new ManageTelegramBotCommand(payloadTelegramMessage, code),
           );
+          if (!feedbackMessage) {
+            await this.sendTelegramMessage(
+              payloadTelegramMessage.message.from.id,
+              `User with ID ${code} not found`,
+            );
+            return;
+          }
 
           await this.sendTelegramMessage(
             payloadTelegramMessage.message.from.id,
