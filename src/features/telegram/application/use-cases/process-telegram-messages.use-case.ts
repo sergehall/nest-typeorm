@@ -23,6 +23,11 @@ export class ProcessTelegramMessagesUseCase
   async execute(command: ProcessTelegramMessagesCommand) {
     const { payloadTelegramMessage } = command;
 
+    await this.sendTelegramMessage(
+      payloadTelegramMessage.message.from.id,
+      'Do not understand you, please try again!',
+    );
+
     if (!payloadTelegramMessage.message.text) {
       await this.sendTelegramMessage(
         payloadTelegramMessage.message.from.id,
