@@ -22,7 +22,7 @@ export class ManageTelegramBotUseCase
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
   ) {}
 
-  async execute(command: ManageTelegramBotCommand): Promise<string> {
+  async execute(command: ManageTelegramBotCommand): Promise<string | null> {
     const { payloadTelegramMessage, code } = command;
     const telegramId = payloadTelegramMessage.message.from.id;
     const name: string =
@@ -34,8 +34,10 @@ export class ManageTelegramBotUseCase
       await this.usersRepo.findNotBannedUserById(code);
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${code} not found`);
+      // throw new NotFoundException(`User with ID ${code} not found`);
+      return null;
     }
+
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
