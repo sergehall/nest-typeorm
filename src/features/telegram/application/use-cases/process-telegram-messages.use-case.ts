@@ -112,16 +112,21 @@ export class ProcessTelegramMessagesUseCase
       'payload',
       'sendDoNotUnderstandYouMessage',
     );
+    console.log(
+      payloadTelegramMessage?.message?.from?.id ||
+        payloadTelegramMessage?.my_chat_member?.from?.id,
+    );
     const first_name =
       payloadTelegramMessage?.message?.from?.first_name ||
       payloadTelegramMessage?.message?.from?.username ||
       payloadTelegramMessage?.my_chat_member?.from?.first_name ||
       payloadTelegramMessage?.my_chat_member?.from?.username ||
       'new user';
+
     const unknownCommandMessage = `Welcome, ${first_name || 'new user'}! But I do not understand you!`;
     await this.sendTelegramMessage(
-      payloadTelegramMessage?.message.from.id ||
-        payloadTelegramMessage?.my_chat_member.from.id,
+      payloadTelegramMessage?.message?.from?.id ||
+        payloadTelegramMessage?.my_chat_member?.from?.id,
       unknownCommandMessage,
     );
   }
