@@ -10,12 +10,18 @@ export class TelegramBotStatusRepo {
     protected telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
   ) {}
 
-  async activateTelegramBot(telegramId: number, user: UsersEntity) {
+  async activateTelegramBot(
+    telegramId: number,
+    user: UsersEntity,
+  ): Promise<TelegramBotStatusEntity> {
     const botStatus = BotStatus.ENABLED;
     return await this.manageTelegramBotStatus(telegramId, user, botStatus);
   }
 
-  async deactivateTelegramBot(telegramId: number, user: UsersEntity) {
+  async deactivateTelegramBot(
+    telegramId: number,
+    user: UsersEntity,
+  ): Promise<TelegramBotStatusEntity> {
     const botStatus = BotStatus.DISABLED;
     return await this.manageTelegramBotStatus(telegramId, user, botStatus);
   }
@@ -26,15 +32,6 @@ export class TelegramBotStatusRepo {
     botStatus: BotStatus,
   ): Promise<TelegramBotStatusEntity> {
     const telegramBotStatusEntity: TelegramBotStatusEntity | null =
-      //
-      // const queryBuilder = this.telegramBotStatusRepository
-      //   .createQueryBuilder('posts')
-      //   .where({ dependencyIsBanned: false })
-      //   .andWhere({ isBanned: false })
-      //   .innerJoinAndSelect('posts.blog', 'blog')
-      //   .innerJoinAndSelect('posts.postOwner', 'postOwner')
-      //   .andWhere('blog.id = :blogId', { blogId });
-
       await this.telegramBotStatusRepository.findOne({
         where: { telegramId, user: { userId: user.userId } },
       });
@@ -46,7 +43,7 @@ export class TelegramBotStatusRepo {
       );
     }
 
-    const newTelegramBotStatusEntity =
+    const newTelegramBotStatusEntity: TelegramBotStatusEntity =
       TelegramBotStatusEntity.createTelegramBotStatusEntity(
         telegramId,
         user,
