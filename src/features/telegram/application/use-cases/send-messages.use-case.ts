@@ -26,7 +26,7 @@ export class SendMessagesUseCase
     if (!payloadTelegramMessage.message.text) {
       await this.sendTelegramMessage(
         payloadTelegramMessage.message.from.id,
-        'do not understand you, please try again!',
+        'Do not understand you, please try again!',
       );
       return;
     }
@@ -61,7 +61,7 @@ export class SendMessagesUseCase
       }
     }
 
-    // If the text does not start with '/start', or does not contain 'code=', execute TelegramTextParserCommand
+    // If the text does not start with '/start', or does not contain 'code='  'code', execute TelegramTextParserCommand
     const answerToRecipient = await this.commandBus.execute(
       new TelegramTextParserCommand(payloadTelegramMessage),
     );
@@ -113,6 +113,15 @@ export class SendMessagesUseCase
     return null; // Return null if neither 'code=' nor 'code' is found in the message
   }
 
+  // Helper function to get the Telegram API URL
+  private async getTelegramUrl(): Promise<string> {
+    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
+    );
+    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
+    return `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
+  }
+
   // private async extractActivationCode(message: string): Promise<string | null> {
   //   // Find the index of the word 'code' in the message
   //   const codeIndex = message.indexOf('code');
@@ -138,13 +147,4 @@ export class SendMessagesUseCase
   //   }
   //   return null;
   // }
-
-  // Helper function to get the Telegram API URL
-  private async getTelegramUrl(): Promise<string> {
-    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
-      'TOKEN_TELEGRAM_IT_INCUBATOR',
-    );
-    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
-    return `${TelegramApiEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
-  }
 }
