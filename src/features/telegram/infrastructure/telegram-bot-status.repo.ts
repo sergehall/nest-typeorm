@@ -36,6 +36,7 @@ export class TelegramBotStatusRepo {
         where: { telegramId, user: { userId: user.userId } },
       });
 
+    console.log(telegramBotStatusEntity, 'telegramBotStatusEntity');
     if (telegramBotStatusEntity) {
       telegramBotStatusEntity.botStatus = botStatus;
       return await this.telegramBotStatusRepository.save(
