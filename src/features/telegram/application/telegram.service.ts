@@ -6,9 +6,6 @@ import { TelegramApiEndpointsEnum } from '../enums/telegram-api-endpoints.enum';
 
 @Injectable()
 export class TelegramService {
-  async getWebhook() {
-    return { status: 'success' };
-  }
   async sendPostNotifications(
     blogId: string,
     postTitle: string,

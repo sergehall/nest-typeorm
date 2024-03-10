@@ -7,20 +7,20 @@ import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 
-export class SendMessagesCommand {
+export class ProcessTelegramMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
 }
 
-@CommandHandler(SendMessagesCommand)
-export class SendMessagesUseCase
-  implements ICommandHandler<SendMessagesCommand>
+@CommandHandler(ProcessTelegramMessagesCommand)
+export class ProcessTelegramMessagesUseCase
+  implements ICommandHandler<ProcessTelegramMessagesCommand>
 {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly telegramConfig: TelegramConfig,
   ) {}
 
-  async execute(command: SendMessagesCommand) {
+  async execute(command: ProcessTelegramMessagesCommand) {
     const { payloadTelegramMessage } = command;
 
     if (!payloadTelegramMessage.message.text) {
@@ -41,6 +41,8 @@ export class SendMessagesUseCase
     if (match) {
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
       const partAfterStart = match[1];
+      console.log(match, 'match');
+      console.log(partAfterStart, 'partAfterStart');
 
       if (!partAfterStart.startsWith('code')) {
         await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
