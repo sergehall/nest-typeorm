@@ -96,17 +96,35 @@ export class SendMessagesUseCase
   }
 
   private async extractActivationCode(message: string): Promise<string | null> {
-    // Find the index of the word 'code' in the message
-    const codeIndex = message.indexOf('code');
+    const codeIndex = message.indexOf('code=');
 
-    // If 'code' is found in the message
+    // If 'code=' is found in the message
     if (codeIndex !== -1) {
-      // Extract the substring starting from 'code' until the end of the message
-      return message.substring(codeIndex);
+      return message.substring(codeIndex + 5);
     }
 
-    return null; // Return null if 'code' is not found in the message
+    const codeWithoutEqualIndex = message.indexOf('code');
+
+    // If 'code' is found in the message
+    if (codeWithoutEqualIndex !== -1) {
+      return message.substring(codeWithoutEqualIndex + 4);
+    }
+
+    return null; // Return null if neither 'code=' nor 'code' is found in the message
   }
+
+  // private async extractActivationCode(message: string): Promise<string | null> {
+  //   // Find the index of the word 'code' in the message
+  //   const codeIndex = message.indexOf('code');
+  //
+  //   // If 'code' is found in the message
+  //   if (codeIndex !== -1) {
+  //     // Extract the substring starting from 'code' until the end of the message
+  //     return message.substring(codeIndex);
+  //   }
+  //
+  //   return null; // Return null if 'code' is not found in the message
+  // }
 
   // // Helper function to extract the activation code
   // private async extractActivationCode(message: string): Promise<string | null> {
