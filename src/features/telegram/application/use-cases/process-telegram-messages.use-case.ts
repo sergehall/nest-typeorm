@@ -112,9 +112,12 @@ export class ProcessTelegramMessagesUseCase
       'payload',
       'sendDoNotUnderstandYouMessage',
     );
-    const { first_name } =
-      payloadTelegramMessage?.message.from ||
-      payloadTelegramMessage?.my_chat_member.from;
+    const first_name =
+      payloadTelegramMessage?.message?.from?.first_name ||
+      payloadTelegramMessage?.message?.from?.username ||
+      payloadTelegramMessage?.my_chat_member?.from?.first_name ||
+      payloadTelegramMessage?.my_chat_member?.from?.username ||
+      'new user';
     const unknownCommandMessage = `Welcome, ${first_name || 'new user'}! But I do not understand you!`;
     await this.sendTelegramMessage(
       payloadTelegramMessage?.message.from.id ||
