@@ -39,8 +39,11 @@ export class ProcessTelegramMessagesUseCase
         // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
         const parts = text.split(' ')[1];
         console.log(parts, 'parts');
-        if (!parts || (parts && !parts.startsWith('code'))) {
+        if (!parts) {
           await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
+          return;
+        } else if (parts && !parts.startsWith('code')) {
+          await this.sendUnknownCommandMessage(payloadTelegramMessage, parts);
           return;
         }
 
@@ -91,6 +94,20 @@ export class ProcessTelegramMessagesUseCase
     await this.sendTelegramMessage(
       payloadTelegramMessage.message.from.id,
       welcomeMessage,
+    );
+  }
+
+  private async sendUnknownCommandMessage(
+    payloadTelegramMessage: PayloadTelegramMessageType,
+    parts: string,
+  ): Promise<void> {
+    const firstName =
+      payloadTelegramMessage.message.from.first_name || 'new user';
+    const unknownCommandMessage = `Welcome, ${firstName}! But I do not understand the command: ${parts}!`;
+
+    await this.sendTelegramMessage(
+      payloadTelegramMessage.message.from.id,
+      unknownCommandMessage,
     );
   }
 
