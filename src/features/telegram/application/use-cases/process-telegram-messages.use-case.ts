@@ -107,28 +107,16 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    console.log(
-      payloadTelegramMessage,
-      'payload',
-      'sendDoNotUnderstandYouMessage',
-    );
-    console.log(
-      payloadTelegramMessage?.message?.from?.id ||
-        payloadTelegramMessage?.my_chat_member?.from?.id,
-    );
-    const first_name =
-      payloadTelegramMessage?.message?.from?.first_name ||
-      payloadTelegramMessage?.message?.from?.username ||
-      payloadTelegramMessage?.my_chat_member?.from?.first_name ||
-      payloadTelegramMessage?.my_chat_member?.from?.username ||
-      'new user';
+    // const first_name =
+    //   payloadTelegramMessage?.message?.from?.first_name ||
+    //   payloadTelegramMessage?.message?.from?.username ||
+    //   payloadTelegramMessage?.my_chat_member?.from?.first_name ||
+    //   payloadTelegramMessage?.my_chat_member?.from?.username ||
+    //   'new user';
+    const my_chatId = 378548569;
 
-    const unknownCommandMessage = `Welcome, ${first_name || 'new user'}! But I do not understand you!`;
-    await this.sendTelegramMessage(
-      payloadTelegramMessage?.message?.from?.id ||
-        payloadTelegramMessage?.my_chat_member?.from?.id,
-      unknownCommandMessage,
-    );
+    const unknownCommandMessage = `Welcome, ${payloadTelegramMessage || 'new user'}! But I do not understand you!`;
+    await this.sendTelegramMessage(my_chatId, unknownCommandMessage);
   }
 
   private async extractActivationCode(message: string): Promise<string | null> {
