@@ -23,12 +23,6 @@ export class ProcessTelegramMessagesUseCase
   async execute(command: ProcessTelegramMessagesCommand) {
     const { payloadTelegramMessage } = command;
 
-    await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
-      'Do not understand you, please try again!',
-    );
-    return;
-
     if (!payloadTelegramMessage.message.text) {
       await this.sendTelegramMessage(
         payloadTelegramMessage.message.from.id,
@@ -43,6 +37,7 @@ export class ProcessTelegramMessagesUseCase
     if (text && (text.startsWith('start') || text.startsWith('/start'))) {
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
       const parts = text.split(' ')[1];
+      console.log(parts, 'parts');
       if (!parts.startsWith('code')) {
         await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
         return;
