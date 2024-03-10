@@ -6,7 +6,6 @@ import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enu
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
-import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class ProcessTelegramMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
