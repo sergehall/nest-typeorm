@@ -6,6 +6,7 @@ import { TelegramApiEndpointsEnum } from '../../enums/telegram-api-endpoints.enu
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
+import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class ProcessTelegramMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -52,12 +53,18 @@ export class ProcessTelegramMessagesUseCase
 
         if (code) {
           console.log(code, 'code');
-          const answerToRecipient: string = await this.commandBus.execute(
+          const manageTelegramBot: string = await this.commandBus.execute(
             new ManageTelegramBotCommand(payloadTelegramMessage, code),
           );
+          const name: string =
+            payloadTelegramMessage.message.from.first_name ||
+            payloadTelegramMessage.message.from.username;
+
+          const answer = `Thank you ${name}, you are ${manageTelegramBot} up for updates.`;
+
           await this.sendTelegramMessage(
             payloadTelegramMessage.message.from.id,
-            answerToRecipient,
+            answer,
           );
           return;
         }
