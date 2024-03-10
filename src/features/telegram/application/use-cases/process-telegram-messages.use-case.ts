@@ -32,6 +32,8 @@ export class ProcessTelegramMessagesUseCase
     }
 
     const text: string = payloadTelegramMessage.message.text;
+    console.log(text, 'text');
+    console.log(text.startsWith('start'), "text.startsWith('start')");
 
     if (text.startsWith('start') || text.startsWith('/start')) {
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
