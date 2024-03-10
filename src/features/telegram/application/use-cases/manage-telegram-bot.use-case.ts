@@ -7,10 +7,7 @@ import { TelegramBotStatusRepo } from '../../infrastructure/telegram-bot-status.
 import { TelegramBotStatusEntity } from '../../entities/telegram-bot-status.entity';
 
 export class ManageTelegramBotCommand {
-  constructor(
-    public payloadTelegramMessage: PayloadTelegramMessageType,
-    public activationCode: string,
-  ) {}
+  constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
 }
 
 @CommandHandler(ManageTelegramBotCommand)
@@ -22,12 +19,11 @@ export class ManageTelegramBotUseCase
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
   ) {}
   async execute(command: ManageTelegramBotCommand): Promise<string> {
-    const { payloadTelegramMessage, activationCode } = command;
+    const { payloadTelegramMessage } = command;
     const inputString = payloadTelegramMessage.message.text;
     const telegramId = payloadTelegramMessage.message.from.id;
 
     console.log(inputString, 'inputString');
-    console.log(activationCode, 'activationCode');
     // Extract the substring after '='
     const code: string = inputString.substring(inputString.indexOf('=') + 1);
     console.log(code, 'code');
