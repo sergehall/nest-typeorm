@@ -79,8 +79,9 @@ export class SendMessagesUseCase
   private async sendNewUserWelcomeMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    const welcomeMessage = 'Welcome, new user!';
-    console.log(welcomeMessage, 'welcomeMessage');
+    const username = payloadTelegramMessage.message.from.username || 'new user';
+    const welcomeMessage = `Welcome, ${username}!`;
+
     await this.sendTelegramMessage(
       payloadTelegramMessage.message.from.id,
       welcomeMessage,
