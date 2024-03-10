@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Post,
   Request,
   UseGuards,
@@ -25,10 +26,14 @@ export class TelegramController {
   @Post('webhook')
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {
     console.log(payload, 'payload Webhook');
-
-    return await this.commandBus.execute(
-      new ProcessTelegramMessagesCommand(payload),
-    );
+    try {
+      return await this.commandBus.execute(
+        new ProcessTelegramMessagesCommand(payload),
+      );
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @Get('auth-bot-link')
