@@ -25,6 +25,9 @@ export class ManageTelegramBotUseCase
   async execute(command: ManageTelegramBotCommand): Promise<string> {
     const { payloadTelegramMessage, code } = command;
     const telegramId = payloadTelegramMessage.message.from.id;
+    const name: string =
+      payloadTelegramMessage.message.from.first_name ||
+      payloadTelegramMessage.message.from.username;
 
     const user: UsersEntity | null =
       await this.usersRepo.findNotBannedUserById(code);
@@ -35,6 +38,6 @@ export class ManageTelegramBotUseCase
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
-    return `${enableTelegramBotStatus.botStatus}.`;
+    return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates.`;
   }
 }

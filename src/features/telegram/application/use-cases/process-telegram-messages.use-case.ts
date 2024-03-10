@@ -52,29 +52,24 @@ export class ProcessTelegramMessagesUseCase
 
         if (code) {
           console.log(code, 'code');
-          const manageTelegramBot: string = await this.commandBus.execute(
+          const feedbackMessage: string = await this.commandBus.execute(
             new ManageTelegramBotCommand(payloadTelegramMessage, code),
           );
-          const name: string =
-            payloadTelegramMessage.message.from.first_name ||
-            payloadTelegramMessage.message.from.username;
-
-          const answer = `Thank you ${name}, you are ${manageTelegramBot} up for updates.`;
 
           await this.sendTelegramMessage(
             payloadTelegramMessage.message.from.id,
-            answer,
+            feedbackMessage,
           );
           return;
         }
       }
       // If the text does not start with '/start', or does not contain 'code='  'code', execute TelegramTextParserCommand
-      const answerToRecipient = await this.commandBus.execute(
+      const feedbackMessage = await this.commandBus.execute(
         new TelegramTextParserCommand(payloadTelegramMessage),
       );
       await this.sendTelegramMessage(
         payloadTelegramMessage.message.from.id,
-        answerToRecipient,
+        feedbackMessage,
       );
     }
   }
