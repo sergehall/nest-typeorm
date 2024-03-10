@@ -36,6 +36,6 @@ export class ManageTelegramBotUseCase
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
-    return `Thank you, you are ${enableTelegramBotStatus.botStatus} up for updates`;
+    return `Thank you, you are ${enableTelegramBotStatus.botStatus} up for updates.`;
   }
 }
