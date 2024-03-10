@@ -107,6 +107,10 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
+    console.log(
+      payloadTelegramMessage,
+      'payload sendDoNotUnderstandYouMessage',
+    );
     const my_chatId = 378548569;
 
     const unknownCommandMessage = `Welcome, ${payloadTelegramMessage || 'new user'}! But I do not understand you!`;
