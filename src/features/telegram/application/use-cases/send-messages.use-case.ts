@@ -70,7 +70,7 @@ export class SendMessagesUseCase
     chatId: number,
     text: string,
   ): Promise<void> {
-    const telegramUrl = this.getTelegramUrl();
+    const telegramUrl = await this.getTelegramUrl();
     const data = { chat_id: chatId, text };
     await axios.post(telegramUrl, data);
   }
@@ -80,6 +80,7 @@ export class SendMessagesUseCase
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
     const welcomeMessage = 'Welcome, new user!';
+    console.log(welcomeMessage, 'welcomeMessage');
     await this.sendTelegramMessage(
       payloadTelegramMessage.message.from.id,
       welcomeMessage,
@@ -100,8 +101,8 @@ export class SendMessagesUseCase
   }
 
   // Helper function to get the Telegram API URL
-  private getTelegramUrl(): string {
-    const tokenTelegramBot = this.telegramConfig.getTokenTelegram(
+  private async getTelegramUrl(): Promise<string> {
+    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
