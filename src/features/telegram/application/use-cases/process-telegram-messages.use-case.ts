@@ -27,6 +27,7 @@ export class ProcessTelegramMessagesUseCase
       payloadTelegramMessage.message.from.id,
       'Do not understand you, please try again!',
     );
+    return;
 
     if (!payloadTelegramMessage.message.text) {
       await this.sendTelegramMessage(
