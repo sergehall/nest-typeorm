@@ -34,7 +34,7 @@ export class ProcessTelegramMessagesUseCase
     const text: string = payloadTelegramMessage.message.text;
 
     // Define a regular expression pattern to match '/start ' followed by any characters
-    const patternStart = /\/start\s+(.+)/;
+    const patternStart = /^\/start/;
     // Execute the regular expression pattern on the text
     const match = text.match(patternStart);
     console.log(match, 'match');
