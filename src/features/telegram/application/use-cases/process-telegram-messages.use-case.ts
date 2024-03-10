@@ -47,6 +47,7 @@ export class ProcessTelegramMessagesUseCase
       const code = await this.extractActivationCode(parts);
 
       if (code) {
+        console.log(code, 'code');
         const answerToRecipient: string = await this.commandBus.execute(
           new ManageTelegramBotCommand(payloadTelegramMessage, code),
         );
