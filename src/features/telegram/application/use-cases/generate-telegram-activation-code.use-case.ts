@@ -20,13 +20,13 @@ export class GenerateTelegramActivationLinkUseCase
 
     const telegramBaseShortUrl = TelegramEndpointsEnum.BaseShortUrl;
 
-    const pathBotName = await this.telegramConfig.getUsernameBotTelegram(
+    const botName = await this.telegramConfig.getUsernameBotTelegram(
       'TELEGRAM_USERNAME_BOT',
     );
 
     const query = `?start=code${currentUserDto.userId}`;
 
-    const completeURL = `${telegramBaseShortUrl}/${pathBotName}${query}`;
+    const completeURL = `${telegramBaseShortUrl}/${botName}${query}`;
 
     return { link: completeURL };
   }

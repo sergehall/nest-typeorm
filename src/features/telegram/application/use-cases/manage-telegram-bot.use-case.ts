@@ -27,11 +27,12 @@ export class ManageTelegramBotUseCase
     const telegramId = payloadTelegramMessage.message.from.id;
     const name: string =
       payloadTelegramMessage.message.from.first_name ||
-      payloadTelegramMessage.message.from.username;
+      payloadTelegramMessage.message.from.username ||
+      'new user';
 
     const user: UsersEntity | null =
       await this.usersRepo.findNotBannedUserById(code);
-    console.log(user, 'user');
+
     if (!user) {
       throw new NotFoundException(`User with ID ${code} not found`);
     }
