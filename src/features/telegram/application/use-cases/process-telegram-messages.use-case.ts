@@ -107,6 +107,11 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
+    console.log(
+      payloadTelegramMessage,
+      'payload',
+      'sendDoNotUnderstandYouMessage',
+    );
     const { first_name } =
       payloadTelegramMessage?.message.from ||
       payloadTelegramMessage?.my_chat_member.from;
