@@ -20,7 +20,7 @@ export class TelegramBotStatusRepo {
       user,
       botStatus,
     );
-    console.log(result, 'result activateTelegramBot');
+    console.log(result.botStatus, 'result result.botStatus');
     return result;
   }
 
@@ -42,7 +42,6 @@ export class TelegramBotStatusRepo {
         where: { telegramId, user: { userId: user.userId } },
       });
 
-    console.log(telegramBotStatusEntity, 'telegramBotStatusEntity');
     if (telegramBotStatusEntity) {
       telegramBotStatusEntity.botStatus = botStatus;
       return await this.telegramBotStatusRepository.save(
