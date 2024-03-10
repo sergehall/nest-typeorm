@@ -7,7 +7,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { TelegramService } from '../application/telegram.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { PayloadTelegramMessageType } from '../types/payload-telegram-message.type';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -18,10 +17,7 @@ import { ProcessTelegramMessagesCommand } from '../application/use-cases/process
 
 @Controller('integrations/telegram')
 export class TelegramController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly telegramService: TelegramService,
-  ) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Post('webhook')
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {

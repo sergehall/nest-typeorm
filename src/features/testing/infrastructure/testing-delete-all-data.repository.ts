@@ -17,7 +17,7 @@ export class TestingDeleteAllDataRepository {
       'ImagesPostsOriginalMetadata',
       'ImagesBlogsMainMetadata',
       'ImagesBlogsWallpaperMetadata',
-      'TelegramBotStatusEntity',
+      'TelegramBotStatus',
       'BlogsSubscribers',
       'ChallengeAnswers',
       'ChallengeQuestions',
