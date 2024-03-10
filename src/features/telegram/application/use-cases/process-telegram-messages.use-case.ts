@@ -33,24 +33,17 @@ export class ProcessTelegramMessagesUseCase
 
     const text: string = payloadTelegramMessage.message.text;
 
-    // Define a regular expression pattern to match '/start ' followed by any characters
-    const patternStart = /^\/start/;
-    // Execute the regular expression pattern on the text
-    const match = text.match(patternStart);
-    console.log(match, 'match');
-    console.log(patternStart, 'patternStart');
-    if (match) {
+    if (text.startsWith('start') || text.startsWith('/start')) {
       // If the text starts with '/start' but does not contain 'code=', send a new user welcome message
-      const partAfterStart = match[1];
-      console.log(partAfterStart, 'partAfterStart');
-
-      if (!partAfterStart.startsWith('code')) {
+      const parts = text.split(' ')[1];
+      if (!parts.startsWith('code')) {
         await this.sendNewUserWelcomeMessage(payloadTelegramMessage);
         return;
       }
 
       // If the text starts with '/start' and contains 'code=', proceed with code extraction and activation
-      const code = await this.extractActivationCode(text);
+      const code = await this.extractActivationCode(parts);
+
       if (code) {
         const answerToRecipient: string = await this.commandBus.execute(
           new ManageTelegramBotCommand(payloadTelegramMessage, code),
@@ -58,6 +51,12 @@ export class ProcessTelegramMessagesUseCase
         await this.sendTelegramMessage(
           payloadTelegramMessage.message.from.id,
           answerToRecipient,
+        );
+        return;
+      } else {
+        await this.sendTelegramMessage(
+          payloadTelegramMessage.message.from.id,
+          `Do not understand ${parts}! Please try again!`,
         );
         return;
       }
