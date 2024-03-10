@@ -21,12 +21,13 @@ export class ProcessTelegramMessagesUseCase
 
   async execute(command: ProcessTelegramMessagesCommand) {
     const { payloadTelegramMessage } = command;
-    const { text } = payloadTelegramMessage.message;
 
-    if (!text) {
+    if (!payloadTelegramMessage.message?.text) {
       await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
       return;
     }
+
+    const { text } = payloadTelegramMessage.message;
 
     if (text.startsWith('/start')) {
       const parts = text.split(' ')[1];
