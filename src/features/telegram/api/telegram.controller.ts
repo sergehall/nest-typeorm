@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BotActivationLink } from '../types/bot-activation-link.type';
 import { GenerateTelegramActivationLinkCommand } from '../application/use-cases/generate-telegram-activation-code.use-case';
-import { SendMessagesCommand } from '../application/use-cases/send-messages.use-case';
+import { ProcessTelegramMessagesCommand } from '../application/use-cases/process-telegram-messages.use-case';
 
 @Controller('integrations/telegram')
 export class TelegramController {
@@ -25,8 +25,10 @@ export class TelegramController {
   @Post('webhook')
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {
     console.log(payload, 'payload Webhook');
-    await this.commandBus.execute(new SendMessagesCommand(payload));
-    return this.telegramService.getWebhook();
+
+    return await this.commandBus.execute(
+      new ProcessTelegramMessagesCommand(payload),
+    );
   }
 
   @Get('auth-bot-link')
