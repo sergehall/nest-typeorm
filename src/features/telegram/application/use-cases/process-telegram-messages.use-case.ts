@@ -101,10 +101,13 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    const { first_name } = payloadTelegramMessage.message.from;
+    const { first_name } =
+      payloadTelegramMessage.message.from ||
+      payloadTelegramMessage.my_chat_member.from;
     const unknownCommandMessage = `Welcome, ${first_name || 'new user'}! But I do not understand you!`;
     await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
+      payloadTelegramMessage.message.from.id ||
+        payloadTelegramMessage.my_chat_member.from.id,
       unknownCommandMessage,
     );
   }
