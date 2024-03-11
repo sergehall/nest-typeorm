@@ -37,7 +37,7 @@ export class BlogsSubscribersRepo {
         })
         .getMany();
 
-    console.log('subscribers', subscribers);
+    console.log('subscribers ', subscribers);
     const subscriberIds: string[] = subscribers.map(
       (subscriber) => subscriber.subscriber.userId,
     );
@@ -55,9 +55,15 @@ export class BlogsSubscribersRepo {
         .where('telegramBotStatus.botStatus = :botStatus', {
           botStatus: BotStatus.ENABLED,
         })
+        .andWhere('telegramBotStatus.botStatus = :botStatus', {
+          botStatus: BotStatus.DISABLED,
+        })
         .getMany();
 
-    console.log('telegramBotStatusEntities', telegramBotStatusENABLEDEntities);
+    console.log(
+      'telegramBotStatusENABLEDEntities',
+      telegramBotStatusENABLEDEntities,
+    );
     // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
     return await this.telegramBotStatusRepository
       .createQueryBuilder('telegramBotStatus')

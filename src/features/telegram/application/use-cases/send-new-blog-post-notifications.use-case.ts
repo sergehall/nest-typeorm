@@ -31,11 +31,10 @@ export class SendNewBlogPostNotificationsUseCase
         blog.id,
       );
 
-    console.log('subscriberIds out', subscribers);
+    console.log('subscribers IDs with ENABLED', subscribers);
     const telegramIds: number[] = subscribers.map(
       (subscriber) => subscriber.telegramId,
     );
-    console.log('telegramIds 2', telegramIds);
 
     const blogPostTitle: string = newPost.title;
     const blogPostName: string = blog.name;
