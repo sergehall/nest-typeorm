@@ -31,7 +31,7 @@ export class SendNewBlogPostNotificationsUseCase
         blog.id,
       );
 
-    console.log('subscribers IDs with ENABLED', subscribers);
+    console.log('subscribers Blog with enabled bot', subscribers);
     const telegramIds: number[] = subscribers.map(
       (subscriber) => subscriber.telegramId,
     );
