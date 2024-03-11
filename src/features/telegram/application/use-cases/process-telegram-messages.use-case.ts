@@ -24,6 +24,11 @@ export class ProcessTelegramMessagesUseCase
     try {
       const { payloadTelegramMessage } = command;
 
+      console.log(
+        payloadTelegramMessage,
+        'execute payloadTelegramMessage' + '',
+      );
+
       if (!payloadTelegramMessage.message?.text) {
         await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
         return;
