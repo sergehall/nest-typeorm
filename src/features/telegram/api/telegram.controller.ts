@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
   Post,
   Request,
   UseGuards,

@@ -26,8 +26,7 @@ export class ManageTelegramBotUseCase
     const telegramId = payloadTelegramMessage.message.from.id;
     const name: string =
       payloadTelegramMessage.message.from.first_name ||
-      payloadTelegramMessage.message.from.username ||
-      'new user';
+      payloadTelegramMessage.message.from.username;
 
     const user: UsersEntity | null =
       await this.usersRepo.findNotBannedUserById(code);

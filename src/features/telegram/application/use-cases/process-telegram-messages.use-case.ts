@@ -2,8 +2,6 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
-import { TelegramEndpointsEnum } from '../../enums/telegram-endpoints.enum';
-import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -23,9 +21,10 @@ export class ProcessTelegramMessagesUseCase
   async execute(command: ProcessTelegramMessagesCommand) {
     try {
       const { payloadTelegramMessage } = command;
+      const { message } = payloadTelegramMessage;
 
-      if (!payloadTelegramMessage.message?.text) {
-        await this.sendWelcomeMessageMessage(payloadTelegramMessage);
+      if (!message) {
+        await this.sendMemberStatusMessage(payloadTelegramMessage);
         return;
       }
 
@@ -83,7 +82,8 @@ export class ProcessTelegramMessagesUseCase
     chatId: number,
     text: string,
   ): Promise<void> {
-    const telegramUrl = await this.getTelegramUrl();
+    const telegramUrl =
+      await this.telegramConfig.getTelegramUrlBotSendMessage();
     const data = { chat_id: chatId, text };
     await axios.post(telegramUrl, data);
   }
@@ -111,7 +111,7 @@ export class ProcessTelegramMessagesUseCase
     );
   }
 
-  private async sendWelcomeMessageMessage(
+  private async sendMemberStatusMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
     const bot_chatId = await this.telegramConfig.getBotChatId(
@@ -120,14 +120,12 @@ export class ProcessTelegramMessagesUseCase
     let name = 'new_user';
     let userName = 'user_name';
     let status = 'status';
-    let user = 'user';
     if (payloadTelegramMessage.my_chat_member) {
       name = payloadTelegramMessage.my_chat_member.from.first_name;
       userName = payloadTelegramMessage.my_chat_member.chat.username;
       status = payloadTelegramMessage.my_chat_member.new_chat_member.status;
-      user = payloadTelegramMessage.my_chat_member.new_chat_member.user;
     }
-    const messageToChat = `Member ${name} ${userName}, status:${status}. User: ${user}`;
+    const messageToChat = `Member ${name} ${userName}, status:${status}.`;
     await this.sendTelegramMessage(Number(bot_chatId), messageToChat);
   }
 
@@ -145,13 +143,5 @@ export class ProcessTelegramMessagesUseCase
     }
 
     return null;
-  }
-
-  private async getTelegramUrl(): Promise<string> {
-    const tokenTelegramBot = await this.telegramConfig.getBotToken(
-      'TOKEN_TELEGRAM_IT_INCUBATOR',
-    );
-    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
-    return `${TelegramEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
   }
 }

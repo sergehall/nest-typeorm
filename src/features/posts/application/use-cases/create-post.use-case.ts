@@ -6,7 +6,7 @@ import {
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CreatePostDto } from '../../dto/create-post.dto';
 import { userNotHavePermissionForPost } from '../../../../common/filters/custom-errors-messages';
@@ -19,6 +19,7 @@ import { PostsService } from '../posts.service';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
+import { SendNewBlogPostNotificationsCommand } from '../../../telegram/application/use-cases/send-new-blog-post-notifications.use-case';
 
 export class CreatePostCommand {
   constructor(
@@ -31,6 +32,7 @@ export class CreatePostCommand {
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
     private readonly postsService: PostsService,
@@ -51,14 +53,18 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     await this.checkUserPermission(blog, currentUserDto);
 
-    const postViewModel: PostViewModel = await this.postsRepo.createPost(
+    const post: PostViewModel = await this.postsRepo.createPost(
       blog,
       createPostDto,
       currentUserDto,
     );
 
+    await this.commandBus.execute(
+      new SendNewBlogPostNotificationsCommand(blog, post),
+    );
+
     const postWithLikes: PostWithLikesInfoViewModel =
-      await this.postsService.addExtendedLikesInfoToPostsEntity(postViewModel);
+      await this.postsService.addExtendedLikesInfoToPostsEntity(post);
 
     return await this.imagesMetadataService.addImagesToPostModel(postWithLikes);
   }
