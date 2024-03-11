@@ -25,54 +25,70 @@ export class BlogsSubscribersRepo {
   async findSubscribersForBlogWithEnabledBot(
     blogId: string,
   ): Promise<TelegramBotStatusEntity[]> {
-    // Find subscribers for the given blog ID with subscriptionStatus Subscribed
-    const subscribers: BlogsSubscribersEntity[] =
-      await this.blogsSubscribersRepository
-        .createQueryBuilder('subscriber')
-        .innerJoinAndSelect('subscriber.blog', 'blog')
-        .innerJoinAndSelect('subscriber.subscriber', 'user')
-        .where('blog.id = :blogId', { blogId })
-        .andWhere('subscriber.subscriptionStatus = :subscriptionStatus', {
-          subscriptionStatus: SubscriptionStatus.Subscribed,
-        })
-        .getMany();
-
-    console.log('subscribers ', subscribers);
-    const subscriberIds: string[] = subscribers.map(
-      (subscriber) => subscriber.subscriber.userId,
-    );
-
-    console.log('subscriberIds in', subscriberIds);
-
-    // const telegramBotStatusEntities =
-    //   await this.telegramBotStatusRepository.findMany({
-    //     where: { user: { userId: subscriberIds } },
-    //   });
-    const telegramBotStatusENABLEDEntities =
-      await this.telegramBotStatusRepository
+    try {
+      const result = await this.telegramBotStatusRepository
         .createQueryBuilder('telegramBotStatus')
         .innerJoinAndSelect('telegramBotStatus.user', 'user')
         .where('telegramBotStatus.botStatus = :botStatus', {
           botStatus: BotStatus.ENABLED,
         })
-        .andWhere('telegramBotStatus.botStatus = :botStatus', {
-          botStatus: BotStatus.DISABLED,
+        .andWhere((qb) => {
+          const subQuery = qb
+            .subQuery()
+            .select('subscriber.subscriber.userId')
+            .from(BlogsSubscribersEntity, 'subscriber')
+            .innerJoin('subscriber.blog', 'blog')
+            .where('blog.id = :blogId', { blogId })
+            .andWhere('subscriber.subscriptionStatus = :subscriptionStatus', {
+              subscriptionStatus: SubscriptionStatus.Subscribed,
+            })
+            .getQuery();
+          return `telegramBotStatus.userId IN (${subQuery})`;
         })
         .getMany();
 
-    console.log(
-      'telegramBotStatusENABLEDEntities',
-      telegramBotStatusENABLEDEntities,
-    );
-    // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
-    return await this.telegramBotStatusRepository
-      .createQueryBuilder('telegramBotStatus')
-      .innerJoinAndSelect('telegramBotStatus.user', 'user')
-      .where('telegramBotStatus.botStatus = :botStatus', {
-        botStatus: BotStatus.ENABLED,
-      })
-      .andWhere('user.userId IN (:...subscriberIds)', { subscriberIds })
-      .getMany();
+      console.log('result', result);
+      return result;
+      // // Find subscribers for the given blog ID with subscriptionStatus Subscribed
+      // const subscribers: BlogsSubscribersEntity[] =
+      //   await this.blogsSubscribersRepository
+      //     .createQueryBuilder('subscriber')
+      //     .innerJoinAndSelect('subscriber.blog', 'blog')
+      //     .innerJoinAndSelect('subscriber.subscriber', 'user')
+      //     .where('blog.id = :blogId', { blogId })
+      //     .andWhere('subscriber.subscriptionStatus = :subscriptionStatus', {
+      //       subscriptionStatus: SubscriptionStatus.Subscribed,
+      //     })
+      //     .getMany();
+      //
+      // console.log('subscribers ', subscribers);
+      // const subscriberIds: string[] = subscribers.map(
+      //   (subscriber) => subscriber.subscriber.userId,
+      // );
+      //
+      // // console.log('subscriberIds in', subscriberIds);
+      // // const subId = 'a2664c57-83cf-485a-b1f0-9c8c2110d054';
+      // // subscriberIds.push(subId);
+      //
+      // // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
+      // const result = await this.telegramBotStatusRepository
+      //   .createQueryBuilder('telegramBotStatus')
+      //   .innerJoinAndSelect('telegramBotStatus.user', 'user')
+      //   .where('telegramBotStatus.botStatus = :botStatus', {
+      //     botStatus: BotStatus.ENABLED,
+      //   })
+      //   .andWhere('telegramBotStatus.userId IN (:...subscriberIds)', {
+      //     subscriberIds,
+      //   })
+      //   .getMany();
+      // console.log('result', result);
+      // return result;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while finding subscribers for blog with enabled bot.',
+      );
+    }
   }
 
   async blogsSubscribersStatusCount(
