@@ -42,11 +42,11 @@ export class BlogsSubscribersRepo {
       (subscriber) => subscriber.subscriber.userId,
     );
 
-    console.log('subscriberIds', subscriberIds);
+    console.log('subscriberIds in', subscriberIds);
     // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
     return await this.telegramBotStatusRepository
       .createQueryBuilder('telegramBotStatus')
-      .innerJoin('telegramBotStatus.user', 'user')
+      .innerJoinAndSelect('telegramBotStatus.user', 'user')
       .where('telegramBotStatus.botStatus = :botStatus', {
         botStatus: BotStatus.ENABLED,
       })
