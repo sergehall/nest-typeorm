@@ -36,7 +36,7 @@ export class SendNewBlogPostNotificationsUseCase
 
     const blogPostTitle: string = newPost.title;
     const blogPostName: string = blog.name;
-    const blogPostDescription: string = blog.description;
+
     const baseUrl: string =
       await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const blogPostLink: string = baseUrl + `/posts/${newPost.id}`;
@@ -44,7 +44,7 @@ export class SendNewBlogPostNotificationsUseCase
     const telegramUrl =
       await this.telegramConfig.getTelegramUrlBotSendMessage();
 
-    const message = `📢 New Blog Post: ${blogPostTitle}\\nRead and name: ${blogPostName}\nRead here: ${blogPostLink}. Description of post ${blogPostDescription}`;
+    const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}"\nRead here: ${blogPostLink}.`;
 
     console.log(`Sending notifications to subscribers: ${telegramIds}`);
     console.log(`Message: ${message}`);
