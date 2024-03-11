@@ -52,6 +52,8 @@ import { FilesMetadataService } from '../../adapters/media-services/files/files-
 import { ManageBlogsSubscribeUseCase } from './application/use-cases/manage-blogs-subscribe.use-case';
 import { BlogsSubscribersEntity } from './entities/blogs-subscribers.entity';
 import { BlogsSubscribersRepo } from './infrastructure/blogs-subscribers.repo';
+import { TelegramBotStatusEntity } from '../telegram/entities/telegram-bot-status.entity';
+import { TelegramBotStatusRepo } from '../telegram/infrastructure/telegram-bot-status.repo';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,
@@ -94,6 +96,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       ImagesPostsOriginalMetadataEntity,
       ImagesPostsMiddleMetadataEntity,
       ImagesPostsSmallMetadataEntity,
+      TelegramBotStatusEntity,
     ]),
     CqrsModule,
   ],
@@ -111,6 +114,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BlogsSubscribersRepo,
     ChallengesQuestionsRepo,
     BannedUsersForBlogsRepo,
+    TelegramBotStatusRepo,
     ImagesPostsOriginalMetadataRepo,
     ImagesPostsSmallMetadataRepo,
     ImagesBlogsMainMetadataRepo,

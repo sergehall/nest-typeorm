@@ -10,13 +10,47 @@ import {
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
+import { BotStatus } from '../../telegram/enums/bot-status.enum';
+import { TelegramBotStatusEntity } from '../../telegram/entities/telegram-bot-status.entity';
 
 export class BlogsSubscribersRepo {
   constructor(
     @InjectRepository(BlogsSubscribersEntity)
     private readonly blogsSubscribersRepository: Repository<BlogsSubscribersEntity>,
+    @InjectRepository(TelegramBotStatusEntity)
+    protected telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
+
+  async findSubscribersForBlogWithEnabledBot(
+    blogId: string,
+  ): Promise<TelegramBotStatusEntity[]> {
+    // Find subscribers for the given blog ID with subscriptionStatus Subscribed
+    const subscribers: BlogsSubscribersEntity[] =
+      await this.blogsSubscribersRepository
+        .createQueryBuilder('subscriber')
+        .innerJoinAndSelect('subscriber.blog', 'blog')
+        .innerJoinAndSelect('subscriber.subscriber', 'user')
+        .where('blog.id = :blogId', { blogId })
+        .andWhere('subscriber.subscriptionStatus = :subscriptionStatus', {
+          subscriptionStatus: SubscriptionStatus.Subscribed,
+        })
+        .getMany();
+
+    const subscriberIds: string[] = subscribers.map(
+      (subscriber) => subscriber.subscriber.userId,
+    );
+
+    // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
+    return await this.telegramBotStatusRepository
+      .createQueryBuilder('telegramBotStatus')
+      .innerJoin('telegramBotStatus.user', 'user')
+      .where('telegramBotStatus.botStatus = :botStatus', {
+        botStatus: BotStatus.ENABLED,
+      })
+      .andWhere('user.userId IN (:...subscriberIds)', { subscriberIds })
+      .getMany();
+  }
 
   async blogsSubscribersStatusCount(
     blogIds: string[],

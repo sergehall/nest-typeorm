@@ -23,6 +23,9 @@ import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questio
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { TelegramBotStatusRepo } from './infrastructure/telegram-bot-status.repo';
 import { ProcessTelegramMessagesUseCase } from './application/use-cases/process-telegram-messages.use-case';
+import { SendNewBlogPostNotificationsUseCase } from './application/use-cases/send-new-blog-post-notifications.use-case';
+import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
+import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
@@ -30,6 +33,7 @@ const telegramUseCases = [
   TelegramTextParserUseCase,
   GenerateTelegramActivationLinkUseCase,
   ManageTelegramBotUseCase,
+  SendNewBlogPostNotificationsUseCase,
 ];
 
 const helpers = [KeyResolver, UuidErrorResolver];
@@ -40,6 +44,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       UsersEntity,
       PairsGameEntity,
       QuestionsQuizEntity,
+      BlogsSubscribersEntity,
       TelegramBotStatusEntity,
       ChallengeQuestionsEntity,
     ]),
@@ -55,6 +60,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     UsersRepo,
     GamePairsRepo,
     GameQuestionsRepo,
+    BlogsSubscribersRepo,
     TelegramBotStatusRepo,
     ChallengesQuestionsRepo,
     ...telegramUseCases,

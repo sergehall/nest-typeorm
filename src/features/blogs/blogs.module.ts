@@ -42,6 +42,7 @@ import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/ima
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
+import { TelegramBotStatusEntity } from '../telegram/entities/telegram-bot-status.entity';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -56,6 +57,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       PairsGameEntity,
       QuestionsQuizEntity,
       BlogsSubscribersEntity,
+      TelegramBotStatusEntity,
       ChallengeQuestionsEntity,
       BannedUsersForBlogsEntity,
       ImagesBlogsMainMetadataEntity,
