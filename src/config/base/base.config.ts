@@ -102,12 +102,10 @@ export class BaseConfig {
 
   protected async getValueTelegramBotChatId(
     key: TelegramBotChatIdType,
-  ): Promise<number> {
-    return Number(
-      this.configService.get('telegram', {
-        infer: true,
-      })[key],
-    );
+  ): Promise<string> {
+    return this.configService.get('telegram', {
+      infer: true,
+    })[key];
   }
 
   /**
