@@ -208,8 +208,8 @@ class Configuration {
 
   private static getTelegramBotUsername(): string {
     return this.readEnvVariableWithDefault(
-      'TELEGRAM_USERNAME_BOT',
-      'TELEGRAM_USERNAME_BOT',
+      'TELEGRAM_BOT_USERNAME',
+      'TELEGRAM_BOT_USERNAME',
     );
   }
 
