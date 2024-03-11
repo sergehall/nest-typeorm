@@ -43,6 +43,21 @@ export class BlogsSubscribersRepo {
     );
 
     console.log('subscriberIds in', subscriberIds);
+
+    // const telegramBotStatusEntities =
+    //   await this.telegramBotStatusRepository.findMany({
+    //     where: { user: { userId: subscriberIds } },
+    //   });
+    const telegramBotStatusENABLEDEntities =
+      await this.telegramBotStatusRepository
+        .createQueryBuilder('telegramBotStatus')
+        .innerJoinAndSelect('telegramBotStatus.user', 'user')
+        .where('telegramBotStatus.botStatus = :botStatus', {
+          botStatus: BotStatus.ENABLED,
+        })
+        .getMany();
+
+    console.log('telegramBotStatusEntities', telegramBotStatusENABLEDEntities);
     // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
     return await this.telegramBotStatusRepository
       .createQueryBuilder('telegramBotStatus')
