@@ -213,6 +213,13 @@ class Configuration {
     );
   }
 
+  private static getTelegramBotChatId(): number {
+    return this.readEnvVariableWithDefault(
+      'TELEGRAM_BOT_CHAT_ID',
+      'TELEGRAM_BOT_CHAT_ID',
+    );
+  }
+
   static getConfiguration() {
     const ENV = Configuration.getEnvName();
     return {
@@ -302,7 +309,8 @@ class Configuration {
       telegram: {
         TOKEN_TELEGRAM_IT_INCUBATOR:
           Configuration.getTokenTelegramItIncubator(),
-        TELEGRAM_USERNAME_BOT: Configuration.getTelegramUsernameBot(),
+        TELEGRAM_BOT_USERNAME: Configuration.getTelegramUsernameBot(),
+        TELEGRAM_BOT_CHAT_ID: Configuration.getTelegramBotChatId(),
       },
     };
   }

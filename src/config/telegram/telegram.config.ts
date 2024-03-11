@@ -1,19 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
 import { TokenTelegramItIncubatorType } from './types/token-telegram-it-incubator.type';
-import { TelegramUsernameBotType } from './types/telegram-username-bot.type';
+import { TelegramBotUsernameType } from './types/telegram-bot-username.type';
+import { TelegramBotChatIdType } from './types/telegram-bot-chat-id.type';
 
 @Injectable()
 export class TelegramConfig extends BaseConfig {
-  async getTokenTelegram(
+  async getBotToken(
     tokenTelegramItIncubator: TokenTelegramItIncubatorType,
   ): Promise<string> {
     return await this.getTokenTelegramItIncubator(tokenTelegramItIncubator);
   }
 
-  async getUsernameBotTelegram(
-    telegramUsernameBot: TelegramUsernameBotType,
+  async getBotUsername(
+    telegramUsernameBot: TelegramBotUsernameType,
   ): Promise<string> {
     return await this.getTelegramUsernameBot(telegramUsernameBot);
+  }
+  async getBotChatId(
+    telegramBotChatId: TelegramBotChatIdType,
+  ): Promise<number> {
+    return await this.getValueTelegramBotChatId(telegramBotChatId);
   }
 }
