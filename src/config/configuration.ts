@@ -206,7 +206,7 @@ class Configuration {
     );
   }
 
-  private static getTelegramUsernameBot(): string {
+  private static getTelegramBotUsername(): string {
     return this.readEnvVariableWithDefault(
       'TELEGRAM_USERNAME_BOT',
       'TELEGRAM_USERNAME_BOT',
@@ -309,7 +309,7 @@ class Configuration {
       telegram: {
         TOKEN_TELEGRAM_IT_INCUBATOR:
           Configuration.getTokenTelegramItIncubator(),
-        TELEGRAM_BOT_USERNAME: Configuration.getTelegramUsernameBot(),
+        TELEGRAM_BOT_USERNAME: Configuration.getTelegramBotUsername(),
         TELEGRAM_BOT_CHAT_ID: Configuration.getTelegramBotChatId(),
       },
     };
