@@ -26,7 +26,7 @@ export class BlogsSubscribersRepo {
     blogId: string,
   ): Promise<TelegramBotStatusEntity[]> {
     try {
-      const result = await this.telegramBotStatusRepository
+      return await this.telegramBotStatusRepository
         .createQueryBuilder('telegramBotStatus')
         .innerJoinAndSelect('telegramBotStatus.user', 'user')
         .where('telegramBotStatus.botStatus = :botStatus', {
@@ -46,43 +46,6 @@ export class BlogsSubscribersRepo {
           return `telegramBotStatus.userId IN (${subQuery})`;
         })
         .getMany();
-
-      console.log('result', result);
-      return result;
-      // // Find subscribers for the given blog ID with subscriptionStatus Subscribed
-      // const subscribers: BlogsSubscribersEntity[] =
-      //   await this.blogsSubscribersRepository
-      //     .createQueryBuilder('subscriber')
-      //     .innerJoinAndSelect('subscriber.blog', 'blog')
-      //     .innerJoinAndSelect('subscriber.subscriber', 'user')
-      //     .where('blog.id = :blogId', { blogId })
-      //     .andWhere('subscriber.subscriptionStatus = :subscriptionStatus', {
-      //       subscriptionStatus: SubscriptionStatus.Subscribed,
-      //     })
-      //     .getMany();
-      //
-      // console.log('subscribers ', subscribers);
-      // const subscriberIds: string[] = subscribers.map(
-      //   (subscriber) => subscriber.subscriber.userId,
-      // );
-      //
-      // // console.log('subscriberIds in', subscriberIds);
-      // // const subId = 'a2664c57-83cf-485a-b1f0-9c8c2110d054';
-      // // subscriberIds.push(subId);
-      //
-      // // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
-      // const result = await this.telegramBotStatusRepository
-      //   .createQueryBuilder('telegramBotStatus')
-      //   .innerJoinAndSelect('telegramBotStatus.user', 'user')
-      //   .where('telegramBotStatus.botStatus = :botStatus', {
-      //     botStatus: BotStatus.ENABLED,
-      //   })
-      //   .andWhere('telegramBotStatus.userId IN (:...subscriberIds)', {
-      //     subscriberIds,
-      //   })
-      //   .getMany();
-      // console.log('result', result);
-      // return result;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
