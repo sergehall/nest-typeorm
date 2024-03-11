@@ -46,6 +46,9 @@ export class SendNewBlogPostNotificationsUseCase
 
     const message = `📢 New Blog Post: ${blogPostTitle}\\nRead and name: ${blogPostName}\nRead here: ${blogPostLink}. Description of post ${blogPostDescription}`;
 
+    console.log(`Sending notifications to subscribers: ${telegramIds}`);
+    console.log(`Message: ${message}`);
+
     for (const telegramId of telegramIds) {
       try {
         await axios.post(telegramUrl, {
