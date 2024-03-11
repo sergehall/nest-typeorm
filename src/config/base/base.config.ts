@@ -26,7 +26,8 @@ import { SaLoginType } from '../sa/types/sa-login.type';
 import { SaEmailType } from '../sa/types/sa-email.type';
 import { SaKeyType } from '../sa/types/sa-key.type';
 import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
-import { TelegramUsernameBotType } from '../telegram/types/telegram-username-bot.type';
+import { TelegramBotUsernameType } from '../telegram/types/telegram-bot-username.type';
+import { TelegramBotChatIdType } from '../telegram/types/telegram-bot-chat-id.type';
 
 @Injectable()
 export class BaseConfig {
@@ -92,11 +93,21 @@ export class BaseConfig {
   }
 
   protected async getTelegramUsernameBot(
-    key: TelegramUsernameBotType,
+    key: TelegramBotUsernameType,
   ): Promise<string> {
     return this.configService.get('telegram', {
       infer: true,
     })[key];
+  }
+
+  protected async getValueTelegramBotChatId(
+    key: TelegramBotChatIdType,
+  ): Promise<number> {
+    return Number(
+      this.configService.get('telegram', {
+        infer: true,
+      })[key],
+    );
   }
 
   /**

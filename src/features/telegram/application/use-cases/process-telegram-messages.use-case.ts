@@ -24,11 +24,6 @@ export class ProcessTelegramMessagesUseCase
     try {
       const { payloadTelegramMessage } = command;
 
-      console.log(
-        payloadTelegramMessage,
-        'execute payloadTelegramMessage' + '',
-      );
-
       if (!payloadTelegramMessage.message?.text) {
         await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
         return;
@@ -119,14 +114,12 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    console.log(
-      payloadTelegramMessage,
-      'payload sendDoNotUnderstandYouMessage',
+    const bot_chatId = await this.telegramConfig.getBotChatId(
+      'TELEGRAM_BOT_CHAT_ID',
     );
-    const my_chatId = 378548569;
 
     const unknownCommandMessage = `Welcome, ${payloadTelegramMessage || 'new user'}! But I do not understand you!`;
-    await this.sendTelegramMessage(my_chatId, unknownCommandMessage);
+    await this.sendTelegramMessage(bot_chatId, unknownCommandMessage);
   }
 
   private async extractActivationCode(message: string): Promise<string | null> {
@@ -146,7 +139,7 @@ export class ProcessTelegramMessagesUseCase
   }
 
   private async getTelegramUrl(): Promise<string> {
-    const tokenTelegramBot = await this.telegramConfig.getTokenTelegram(
+    const tokenTelegramBot = await this.telegramConfig.getBotToken(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
