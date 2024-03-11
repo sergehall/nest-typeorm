@@ -30,9 +30,12 @@ export class SendNewBlogPostNotificationsUseCase
       await this.blogsSubscribersRepo.findSubscribersForBlogWithEnabledBot(
         blog.id,
       );
+
+    console.log('subscriberIds', subscribers);
     const telegramIds: number[] = subscribers.map(
       (subscriber) => subscriber.telegramId,
     );
+    console.log('telegramIds', telegramIds);
 
     const blogPostTitle: string = newPost.title;
     const blogPostName: string = blog.name;
@@ -48,6 +51,11 @@ export class SendNewBlogPostNotificationsUseCase
 
     console.log(`Sending notifications to subscribers: ${telegramIds}`);
     console.log(`Message: ${message}`);
+
+    await axios.post(telegramUrl, {
+      chat_id: 378548569,
+      text: message,
+    });
 
     for (const telegramId of telegramIds) {
       try {
