@@ -51,10 +51,10 @@ export class SendNewBlogPostNotificationsUseCase
     console.log(`Sending notifications to subscribers: ${telegramIds}`);
     console.log(`Message: ${message}`);
 
-    await axios.post(telegramUrl, {
-      chat_id: 378548569,
-      text: message,
-    });
+    // await axios.post(telegramUrl, {
+    //   chat_id: 378548569,
+    //   text: message,
+    // });
 
     for (const telegramId of telegramIds) {
       try {
