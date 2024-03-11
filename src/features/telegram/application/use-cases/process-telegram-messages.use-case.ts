@@ -25,7 +25,7 @@ export class ProcessTelegramMessagesUseCase
       const { payloadTelegramMessage } = command;
 
       if (!payloadTelegramMessage.message?.text) {
-        await this.sendDoNotUnderstandYouMessage(payloadTelegramMessage);
+        await this.sendWelcomeMessageMessage(payloadTelegramMessage);
         return;
       }
 
@@ -111,20 +111,24 @@ export class ProcessTelegramMessagesUseCase
     );
   }
 
-  private async sendDoNotUnderstandYouMessage(
+  private async sendWelcomeMessageMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
     const bot_chatId = await this.telegramConfig.getBotChatId(
       'TELEGRAM_BOT_CHAT_ID',
     );
-    let name = 'new user';
-    let userName = 'username';
+    let name = 'new_user';
+    let userName = 'user_name';
+    let status = 'status';
+    let user = 'user';
     if (payloadTelegramMessage.my_chat_member) {
       name = payloadTelegramMessage.my_chat_member.from.first_name;
       userName = payloadTelegramMessage.my_chat_member.chat.username;
+      status = payloadTelegramMessage.my_chat_member.new_chat_member.status;
+      user = payloadTelegramMessage.my_chat_member.new_chat_member.user;
     }
-    const unknownCommandMessage = `Welcome, ${name} ${userName}! But I do not understand you!`;
-    await this.sendTelegramMessage(Number(bot_chatId), unknownCommandMessage);
+    const messageToChat = `Member ${name} ${userName}, status:${status}. User: ${user}`;
+    await this.sendTelegramMessage(Number(bot_chatId), messageToChat);
   }
 
   private async extractActivationCode(message: string): Promise<string | null> {
