@@ -114,14 +114,16 @@ export class ProcessTelegramMessagesUseCase
   private async sendDoNotUnderstandYouMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    console.log('bot_chatId1');
-    const bot_chatId1 = await this.telegramConfig.getBotChatId(
+    const bot_chatId = await this.telegramConfig.getBotChatId(
       'TELEGRAM_BOT_CHAT_ID',
     );
-    console.log(Number(bot_chatId1), 'Number(bot_chatId1)');
-
-    const bot_chatId = 378548569;
-    const unknownCommandMessage = `Welcome, ${payloadTelegramMessage || 'new user'}! But I do not understand you!`;
+    let name = 'new user';
+    let userName = 'username';
+    if (payloadTelegramMessage.my_chat_member) {
+      name = payloadTelegramMessage.my_chat_member.from.first_name;
+      userName = payloadTelegramMessage.my_chat_member.chat.username;
+    }
+    const unknownCommandMessage = `Welcome, ${name} ${userName}! But I do not understand you!`;
     await this.sendTelegramMessage(Number(bot_chatId), unknownCommandMessage);
   }
 
