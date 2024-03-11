@@ -119,7 +119,7 @@ export class ProcessTelegramMessagesUseCase
     );
 
     const unknownCommandMessage = `Welcome, ${payloadTelegramMessage || 'new user'}! But I do not understand you!`;
-    await this.sendTelegramMessage(bot_chatId, unknownCommandMessage);
+    await this.sendTelegramMessage(Number(bot_chatId), unknownCommandMessage);
   }
 
   private async extractActivationCode(message: string): Promise<string | null> {

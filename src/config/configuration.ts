@@ -213,7 +213,7 @@ class Configuration {
     );
   }
 
-  private static getTelegramBotChatId(): number {
+  private static getTelegramBotChatId(): string {
     return this.readEnvVariableWithDefault(
       'TELEGRAM_BOT_CHAT_ID',
       'TELEGRAM_BOT_CHAT_ID',

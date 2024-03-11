@@ -19,7 +19,7 @@ export class TelegramConfig extends BaseConfig {
   }
   async getBotChatId(
     telegramBotChatId: TelegramBotChatIdType,
-  ): Promise<number> {
+  ): Promise<string> {
     return await this.getValueTelegramBotChatId(telegramBotChatId);
   }
 }
