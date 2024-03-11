@@ -37,10 +37,12 @@ export class BlogsSubscribersRepo {
         })
         .getMany();
 
+    console.log('subscribers', subscribers);
     const subscriberIds: string[] = subscribers.map(
       (subscriber) => subscriber.subscriber.userId,
     );
 
+    console.log('subscriberIds', subscriberIds);
     // Find TelegramBotStatusEntities for the found subscriber IDs with botStatus ENABLED
     return await this.telegramBotStatusRepository
       .createQueryBuilder('telegramBotStatus')
