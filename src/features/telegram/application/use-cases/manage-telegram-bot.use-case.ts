@@ -33,8 +33,8 @@ export class ManageTelegramBotUseCase
 
     if (!user) {
       // throw new NotFoundException(`User with ID ${code} not found`);
-      return null;
-      return null;
+      // return null;
+      return;
     }
 
     const enableTelegramBotStatus: TelegramBotStatusEntity =
