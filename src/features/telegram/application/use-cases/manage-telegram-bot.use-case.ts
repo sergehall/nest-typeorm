@@ -21,7 +21,7 @@ export class ManageTelegramBotUseCase
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
   ) {}
 
-  async execute(command: ManageTelegramBotCommand) {
+  async execute(command: ManageTelegramBotCommand): Promise<string | null> {
     const { payloadTelegramMessage, code } = command;
     const telegramId = payloadTelegramMessage.message.from.id;
     const name: string =
@@ -33,13 +33,13 @@ export class ManageTelegramBotUseCase
 
     if (!user) {
       // throw new NotFoundException(`User with ID ${code} not found`);
-      // return null;
-      return;
+      return null;
     }
 
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
-    //     return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates. New post published for blog "It-inc news"`;
+    // return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates. New post published for blog "It-inc news"`;
+    return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates.`;
   }
 }
