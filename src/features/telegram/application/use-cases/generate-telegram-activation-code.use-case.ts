@@ -24,8 +24,8 @@ export class GenerateTelegramActivationLinkUseCase
       'TELEGRAM_BOT_USERNAME',
     );
 
-    // const query = `?start=code${currentUserDto.userId}`;
-    const query = `?code=${currentUserDto.userId}`;
+    const query = `?start=code${currentUserDto.userId}`;
+    // const query = `?code=${currentUserDto.userId}`;
 
     const completeURL = `${telegramBaseShortUrl}/${botName}${query}`;
     console.log(completeURL, 'link: completeURL');
