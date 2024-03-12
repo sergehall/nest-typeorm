@@ -46,7 +46,8 @@ export class SendNewBlogPostNotificationsUseCase
     const telegramUrl =
       await this.telegramConfig.getTelegramUrlBotSendMessage();
 
-    const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}".\nRead here: ${blogPostLink}`;
+    // const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}".\nRead here: ${blogPostLink}`;
+    const message = `"${blogPostName}"`;
 
     console.log(`Sending notifications to subscribers: ${telegramIds}`);
     console.log(`Message: ${message}`);
