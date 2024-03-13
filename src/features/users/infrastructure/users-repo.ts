@@ -474,6 +474,9 @@ export class UsersRepo {
           .from('ChallengeAnswers')
           .where('answerOwnerId = :userId', { userId })
           .execute(),
+        transactionalEntityManager.delete('TelegramBotStatus', {
+          user: userId,
+        }),
         transactionalEntityManager.delete('BlogsSubscribers', {
           subscriber: userId,
         }),
