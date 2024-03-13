@@ -32,14 +32,13 @@ export class ManageTelegramBotUseCase
       await this.usersRepo.findNotBannedUserById(code);
 
     if (!user) {
-      // throw new NotFoundException(`User with ID ${code} not found`);
       return null;
     }
 
     const enableTelegramBotStatus: TelegramBotStatusEntity =
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
-    // return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates. New post published for blog "It-inc news"`;
-    return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates.`;
+    return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates. New post published for blog "It-inc news"`;
+    // return `Thank you ${name}! You are now ${enableTelegramBotStatus.botStatus} for updates.`;
   }
 }
