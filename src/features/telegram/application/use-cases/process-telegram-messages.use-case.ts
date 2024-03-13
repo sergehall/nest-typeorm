@@ -49,18 +49,18 @@ export class ProcessTelegramMessagesUseCase
           const feedbackMessage: string | null = await this.commandBus.execute(
             new ManageTelegramBotCommand(payloadTelegramMessage, code),
           );
-          // if (!feedbackMessage) {
-          //   await this.sendTelegramMessage(
-          //     payloadTelegramMessage.message.from.id,
-          //     `User with ID ${code} not found`,
-          //   );
-          //   return;
-          // }
-          //
-          // await this.sendTelegramMessage(
-          //   payloadTelegramMessage.message.from.id,
-          //   feedbackMessage,
-          // );
+          if (!feedbackMessage) {
+            await this.sendTelegramMessage(
+              payloadTelegramMessage.message.from.id,
+              `User with ID ${code} not found`,
+            );
+            return;
+          }
+
+          await this.sendTelegramMessage(
+            payloadTelegramMessage.message.from.id,
+            feedbackMessage,
+          );
           return;
         }
       }
