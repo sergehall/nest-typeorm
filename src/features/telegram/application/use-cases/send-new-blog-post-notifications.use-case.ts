@@ -47,15 +47,9 @@ export class SendNewBlogPostNotificationsUseCase
       await this.telegramConfig.getTelegramUrlBotSendMessage();
 
     const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}".\nRead here: ${blogPostLink}`;
-    // const message = `"${blogPostName}"`;
 
     console.log(`Sending notifications to subscribers: ${telegramIds}`);
     console.log(`Message: ${message}`);
-
-    // await axios.post(telegramUrl, {
-    //   chat_id: 378548569,
-    //   text: message,
-    // });
 
     for (const telegramId of telegramIds) {
       try {

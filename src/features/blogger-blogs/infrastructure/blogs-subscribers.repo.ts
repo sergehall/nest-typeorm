@@ -18,7 +18,7 @@ export class BlogsSubscribersRepo {
     @InjectRepository(BlogsSubscribersEntity)
     private readonly blogsSubscribersRepository: Repository<BlogsSubscribersEntity>,
     @InjectRepository(TelegramBotStatusEntity)
-    protected telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
+    private readonly telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 

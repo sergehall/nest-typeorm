@@ -23,7 +23,7 @@ export class GenerateTelegramActivationLinkUseCase
     const botName = await this.telegramConfig.getBotUsername(
       'TELEGRAM_BOT_USERNAME',
     );
-    //
+
     // const query = `?start=code${currentUserDto.userId}`;
     const query = `?code=${currentUserDto.userId}`;
 

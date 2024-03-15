@@ -39,7 +39,5 @@ export class ManageTelegramBotUseCase
       await this.telegramBotStatusRepo.activateTelegramBot(telegramId, user);
 
     return `Thank you ${name}! User with id: ${user.userId} is now ${enableTelegramBotStatus.botStatus} to receive updates from Telegram Bot.`;
-    // for test 34 add New post published for blog "It-inc news"
-    // return `Thank you ${name}! User with id: ${user.userId} is now ${enableTelegramBotStatus.botStatus} to receive updates from Telegram Bot. New post published for blog "It-inc news"`;
   }
 }
