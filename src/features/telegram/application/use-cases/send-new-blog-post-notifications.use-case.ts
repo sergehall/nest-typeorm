@@ -37,15 +37,15 @@ export class SendNewBlogPostNotificationsUseCase
 
     const baseUrl: string =
       await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const blogPostLink: string = baseUrl + `/posts/${newPost.id}`;
+    const postLink: string = baseUrl + `/posts/${newPost.id}`;
 
     const telegramUrl =
       await this.telegramConfig.getTelegramUrlBotSendMessage();
 
-    const blogPostTitle: string = newPost.title;
+    const postTitle: string = newPost.title;
     const blogPostName: string = blog.name;
 
-    const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}".\nRead here: ${blogPostLink}`;
+    const message = `📢 New post: "${postTitle}", blog name: "${blogPostName}".\nRead here: ${postLink}`;
 
     try {
       await Promise.all(
