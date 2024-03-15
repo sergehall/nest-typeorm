@@ -4,7 +4,7 @@ import { TokenTelegramItIncubatorType } from './types/token-telegram-it-incubato
 import { TelegramBotUsernameType } from './types/telegram-bot-username.type';
 import { TelegramBotChatIdType } from './types/telegram-bot-chat-id.type';
 import { TelegramMethodsEnum } from '../../features/telegram/enums/telegram-methods.enum';
-import { TelegramEndpointsEnum } from '../../features/telegram/enums/telegram-endpoints.enum';
+import { TelegramUrlsEnum } from '../../features/telegram/enums/telegram-urls.enum';
 
 @Injectable()
 export class TelegramConfig extends BaseConfig {
@@ -30,6 +30,6 @@ export class TelegramConfig extends BaseConfig {
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
-    return `${TelegramEndpointsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
+    return `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
   }
 }

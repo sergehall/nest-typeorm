@@ -82,6 +82,7 @@ export const validationSchemaConfiguration = Joi.object({
   TOKEN_TELEGRAM_IT_INCUBATOR: Joi.string().min(46).max(46).required(),
   TELEGRAM_BOT_USERNAME: Joi.string().min(14).max(14).required(),
   TELEGRAM_BOT_CHAT_ID: Joi.string().min(9).max(9).required(),
+  GET_TEST_STRIPE_API_KEY: Joi.string().min(11).max(50).required(),
 }).options({
   abortEarly: false,
   messages: {

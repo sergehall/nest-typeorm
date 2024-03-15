@@ -169,6 +169,13 @@ class Configuration {
     return Number(this.readEnvVariableWithDefault('SALT_FACTOR', 10));
   }
 
+  private static getTestStripeApiKey(): string {
+    return this.readEnvVariableWithDefault(
+      'GET_TEST_STRIPE_API_KEY',
+      'GET_TEST_STRIPE_API_KEY',
+    );
+  }
+
   private static getAwsAccessKeyId(): string {
     return this.readEnvVariableWithDefault('ACCESS_KEY_ID', 'ACCESS_KEY_ID');
   }
@@ -311,6 +318,9 @@ class Configuration {
           Configuration.getTokenTelegramItIncubator(),
         TELEGRAM_BOT_USERNAME: Configuration.getTelegramBotUsername(),
         TELEGRAM_BOT_CHAT_ID: Configuration.getTelegramBotChatId(),
+      },
+      stripe: {
+        GET_TEST_STRIPE_API_KEY: Configuration.getTestStripeApiKey(),
       },
     };
   }
