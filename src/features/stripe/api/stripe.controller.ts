@@ -41,7 +41,6 @@ export class StripeController {
       console.error(error);
       throw new InternalServerErrorException(error.message);
     }
-    return true;
   }
 
   @Get('/success')
