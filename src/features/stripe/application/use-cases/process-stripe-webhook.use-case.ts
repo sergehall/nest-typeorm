@@ -26,19 +26,19 @@ export class ProcessStripeWebHookUseCase
     console.log('ProcessStripeWebHookCommand satrted');
 
     try {
-      if (request.headers['stripe-signature']) {
+      if (request.headers['stripe-signature'] && request.rawBody) {
         const stripeWebhookSecret =
           await this.stripeConfig.getStripeWebhookSecret(
             'STRIPE_WEBHOOK_SECRET',
           );
-        const stripeHeader = request.headers['stripe-signature'];
+        const signature = request.headers['stripe-signature'];
 
         const stripeInstance =
           await this.stripeService.createStripeInstance('test');
 
         const event = stripeInstance.webhooks.constructEvent(
-          command.request.body,
-          stripeHeader,
+          request.rawBody,
+          signature,
           stripeWebhookSecret,
         );
         if (event.type === 'checkout.session.completed') {
