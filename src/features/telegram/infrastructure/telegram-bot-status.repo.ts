@@ -7,7 +7,7 @@ import { BotStatus } from '../enums/bot-status.enum';
 export class TelegramBotStatusRepo {
   constructor(
     @InjectRepository(TelegramBotStatusEntity)
-    protected telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
+    private readonly telegramBotStatusRepository: Repository<TelegramBotStatusEntity>,
   ) {}
 
   async activateTelegramBot(
