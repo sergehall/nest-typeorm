@@ -4,7 +4,8 @@ import {
   Get,
   InternalServerErrorException,
   Post,
-  Request,
+  RawBodyRequest,
+  Req,
 } from '@nestjs/common';
 import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -12,6 +13,7 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BuyProductsCommand } from '../application/use-cases/buy-products.use-case';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 import Stripe from 'stripe';
+import { Request } from 'express';
 
 @Controller('stripe')
 export class StripeController {
@@ -21,7 +23,7 @@ export class StripeController {
   // @UseGuards(JwtAuthGuard)
   async buy(
     @Body() buyRequest: BuyRequestDto,
-    @Request() req: any,
+    @Req() req: any,
   ): Promise<string> {
     const currentUserDto: CurrentUserDto = req.user;
     return this.commandBus.execute(
@@ -31,7 +33,7 @@ export class StripeController {
 
   @Post('webhook')
   async stripeWebhook(
-    @Request() req: any,
+    @Req() req: RawBodyRequest<Request>,
     @Body() data: Stripe.Checkout.Session,
   ): Promise<boolean> {
     try {

@@ -7,7 +7,9 @@ import { createApp } from './create-app';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
   // Apply configurations using the createApp function (assuming it configures the app)
   createApp(app);
 
