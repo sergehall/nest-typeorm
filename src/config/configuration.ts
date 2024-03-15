@@ -171,8 +171,22 @@ class Configuration {
 
   private static getTestStripeApiKey(): string {
     return this.readEnvVariableWithDefault(
-      'GET_TEST_STRIPE_API_KEY',
-      'GET_TEST_STRIPE_API_KEY',
+      'STRIPE_TEST_API_KEY',
+      'STRIPE_TEST_API_KEY',
+    );
+  }
+
+  private static getLiveStripeApiKey(): string {
+    return this.readEnvVariableWithDefault(
+      'STRIPE_LIVE_API_KEY',
+      'STRIPE_LIVE_API_KEY',
+    );
+  }
+
+  private static getStripeApiVersion(): string {
+    return this.readEnvVariableWithDefault(
+      'STRIPE_API_VERSION',
+      'STRIPE_API_VERSION',
     );
   }
 
@@ -320,7 +334,9 @@ class Configuration {
         TELEGRAM_BOT_CHAT_ID: Configuration.getTelegramBotChatId(),
       },
       stripe: {
-        GET_TEST_STRIPE_API_KEY: Configuration.getTestStripeApiKey(),
+        STRIPE_TEST_API_KEY: Configuration.getTestStripeApiKey(),
+        STRIPE_LIVE_API_KEY: Configuration.getLiveStripeApiKey(),
+        STRIPE_API_VERSION: Configuration.getStripeApiVersion(),
       },
     };
   }

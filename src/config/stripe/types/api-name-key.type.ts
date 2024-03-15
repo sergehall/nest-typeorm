@@ -1,1 +1,1 @@
-export type ApiNameKeyType = 'GET_TEST_STRIPE_API_KEY';
+export type ApiNameKeyType = 'STRIPE_TEST_API_KEY' | 'STRIPE_LIVE_API_KEY';

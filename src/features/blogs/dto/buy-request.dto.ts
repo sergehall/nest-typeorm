@@ -1,17 +1,24 @@
-import { IsInt, IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { IsNotEmpty, Validate } from 'class-validator';
 
 class ProductDto {
   @IsNotEmpty()
-  @IsString()
   productId: string;
 
   @IsNotEmpty()
-  @IsInt()
   quantity: number;
 }
 
+class IsArrayAndNotEmpty {
+  validate(array: any[]) {
+    return !(!Array.isArray(array) || array.length === 0);
+  }
+
+  defaultMessage() {
+    return 'products must be a non-empty array';
+  }
+}
+
 export class BuyRequestDto {
-  @IsObject()
-  @IsNotEmpty()
+  @Validate(IsArrayAndNotEmpty)
   products: ProductDto[];
 }
