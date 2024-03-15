@@ -21,7 +21,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
 
       // const clientReferenceId: string = currentUserDto.userId ;
 
-      const clientReferenceId: string = 'test-user-id';
+      const clientReferenceId: string = 'test-clientReferenceId';
 
       const stripe = await this.stripeService.createStripeInstance('test');
       const successUrl = await this.stripeService.getStripeUrls('success');
