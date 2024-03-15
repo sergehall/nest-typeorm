@@ -18,6 +18,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
   async execute(command: BuyProductsCommand): Promise<any> {
     try {
       const { buyRequest, currentUserDto } = command;
+      const clientReferenceId = currentUserDto.userId || 'test-user-id';
 
       const stripe = await this.stripeService.createStripeInstance('test');
       const successUrl = await this.stripeService.getStripeUrls('success');
@@ -38,6 +39,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
           quantity: product.quantity,
         })),
         mode: 'payment',
+        client_reference_id: clientReferenceId,
       });
 
       // // Extract productIds and quantities from the request

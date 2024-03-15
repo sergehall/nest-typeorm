@@ -189,6 +189,12 @@ class Configuration {
       'STRIPE_API_VERSION',
     );
   }
+  private static getStripeWebhookSecret(): string {
+    return this.readEnvVariableWithDefault(
+      'STRIPE_WEBHOOK_SECRET',
+      'STRIPE_WEBHOOK_SECRET',
+    );
+  }
 
   private static getAwsAccessKeyId(): string {
     return this.readEnvVariableWithDefault('ACCESS_KEY_ID', 'ACCESS_KEY_ID');
@@ -337,6 +343,7 @@ class Configuration {
         STRIPE_TEST_API_KEY: Configuration.getTestStripeApiKey(),
         STRIPE_LIVE_API_KEY: Configuration.getLiveStripeApiKey(),
         STRIPE_API_VERSION: Configuration.getStripeApiVersion(),
+        STRIPE_WEBHOOK_SECRET: Configuration.getStripeWebhookSecret(),
       },
     };
   }
