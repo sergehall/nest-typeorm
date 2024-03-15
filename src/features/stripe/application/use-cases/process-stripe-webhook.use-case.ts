@@ -43,11 +43,13 @@ export class ProcessStripeWebHookUseCase
         );
         if (event.type === 'checkout.session.completed') {
           const clientReferenceId = data.client_reference_id;
+          const clientReferenceId2 = event.data.object.client_reference_id;
 
           // finish the implementation
           // finishCommand(clientReferenceId, event);
           console.log(event, 'event');
           console.log(clientReferenceId, 'clientReferenceId');
+          console.log(clientReferenceId2, 'clientReferenceId2');
           console.log('Payment was successful');
         }
       }
