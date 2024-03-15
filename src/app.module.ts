@@ -29,6 +29,7 @@ import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
+import { StripeModule } from './features/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     PairGameQuizModule,
     TelegramModule,
     CqrsModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [

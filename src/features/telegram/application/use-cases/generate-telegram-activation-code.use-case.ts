@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { BotActivationLink } from '../../types/bot-activation-link.type';
-import { TelegramEndpointsEnum } from '../../enums/telegram-endpoints.enum';
+import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 
 export class GenerateTelegramActivationLinkCommand {
@@ -18,7 +18,7 @@ export class GenerateTelegramActivationLinkUseCase
   ): Promise<BotActivationLink> {
     const { currentUserDto } = command;
 
-    const telegramBaseShortUrl = TelegramEndpointsEnum.BaseShortUrl;
+    const telegramBaseShortUrl = TelegramUrlsEnum.BaseShortUrl;
 
     const botName = await this.telegramConfig.getBotUsername(
       'TELEGRAM_BOT_USERNAME',
