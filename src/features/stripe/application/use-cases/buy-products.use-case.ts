@@ -19,7 +19,9 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
     try {
       const { buyRequest, currentUserDto } = command;
 
-      const clientReferenceId: string = currentUserDto.userId || 'test-user-id';
+      // const clientReferenceId: string = currentUserDto.userId ;
+
+      const clientReferenceId: string = 'test-user-id';
 
       const stripe = await this.stripeService.createStripeInstance('test');
       const successUrl = await this.stripeService.getStripeUrls('success');
