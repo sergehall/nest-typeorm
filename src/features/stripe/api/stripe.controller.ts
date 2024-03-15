@@ -26,6 +26,7 @@ export class StripeController {
     @Req() req: any,
   ): Promise<string> {
     const currentUserDto: CurrentUserDto = req.user;
+    console.log(currentUserDto, 'currentUserDto buy');
     return this.commandBus.execute(
       new BuyProductsCommand(buyRequest, currentUserDto),
     );

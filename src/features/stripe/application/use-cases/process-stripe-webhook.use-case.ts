@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { StripeConfig } from '../../../../config/stripe/stripe.config';
 import { StripeService } from '../stripe.service';
 import { Request } from 'express';
@@ -7,7 +7,7 @@ import Stripe from 'stripe';
 
 export class ProcessStripeWebHookCommand {
   constructor(
-    public request: Request,
+    public request: RawBodyRequest<Request>,
     public data: Stripe.Checkout.Session,
   ) {}
 }
