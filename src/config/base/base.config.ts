@@ -29,6 +29,7 @@ import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
 import { TelegramBotUsernameType } from '../telegram/types/telegram-bot-username.type';
 import { TelegramBotChatIdType } from '../telegram/types/telegram-bot-chat-id.type';
 import { ApiNameKeyType } from '../stripe/types/api-name-key.type';
+import { SpireVersionKey } from '../stripe/types/spire-version.type';
 
 @Injectable()
 export class BaseConfig {
@@ -119,9 +120,13 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getValueTestStripeApiKey(
-    key: ApiNameKeyType,
-  ): Promise<string> {
+  protected async getValueStripeApiKey(key: ApiNameKeyType): Promise<string> {
+    return this.configService.get('stripe', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueStripeVersion(key: SpireVersionKey): Promise<string> {
     return this.configService.get('stripe', {
       infer: true,
     })[key];

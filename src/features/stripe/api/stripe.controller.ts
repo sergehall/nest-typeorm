@@ -24,6 +24,7 @@ export class StripeController {
   async success(): Promise<string> {
     return 'The purchase was successfully completed';
   }
+
   @Get('cancel')
   async cancel(): Promise<string> {
     return 'The purchase was canceled';

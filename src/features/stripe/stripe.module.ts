@@ -4,10 +4,14 @@ import { StripeController } from './api/stripe.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { StripeFactory } from '../../config/stripe/stripe-factory';
+import { PostgresConfig } from '../../config/db/postgres/postgres.config';
+import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
+
+const stripeUseCases = [BuyProductsUseCase];
 
 @Module({
   imports: [TypeOrmModule.forFeature([]), CqrsModule],
   controllers: [StripeController],
-  providers: [StripeFactory, StripeService],
+  providers: [StripeFactory, PostgresConfig, StripeService, ...stripeUseCases],
 })
 export class StripeModule {}
