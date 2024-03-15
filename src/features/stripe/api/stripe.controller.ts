@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
@@ -22,10 +29,17 @@ export class StripeController {
 
   @Post('webhook')
   async stripeWebhook(@Body() payload: any) {
-    console.log(JSON.stringify(payload), 'stripeWebhook');
-    // return await this.commandBus.execute(
-    //   new ProcessStripeCommand(payload),
-    // );
+    try {
+      console.log(JSON.stringify(payload), 'stripeWebhook');
+      const payloadStripe = JSON.parse(JSON.stringify(payload));
+
+      // return await this.commandBus.execute(
+      //   new ProcessStripeWebHookCommand(payloadStripe),
+      // );
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
     return true;
   }
 

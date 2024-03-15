@@ -30,6 +30,7 @@ import { TelegramBotUsernameType } from '../telegram/types/telegram-bot-username
 import { TelegramBotChatIdType } from '../telegram/types/telegram-bot-chat-id.type';
 import { ApiNameKeyType } from '../stripe/types/api-name-key.type';
 import { SpireVersionKey } from '../stripe/types/spire-version.type';
+import { StripeWebhookSecretKeyType } from '../stripe/types/stripe-webhook-secret-key.type';
 
 @Injectable()
 export class BaseConfig {
@@ -121,6 +122,13 @@ export class BaseConfig {
   }
 
   protected async getValueStripeApiKey(key: ApiNameKeyType): Promise<string> {
+    return this.configService.get('stripe', {
+      infer: true,
+    })[key];
+  }
+  protected async getValueStripeWebhookSecret(
+    key: StripeWebhookSecretKeyType,
+  ): Promise<string> {
     return this.configService.get('stripe', {
       infer: true,
     })[key];

@@ -3,6 +3,7 @@ import { TelegramBotStatusEntity } from '../entities/telegram-bot-status.entity'
 import { Repository } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { BotStatus } from '../enums/bot-status.enum';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class TelegramBotStatusRepo {
   constructor(
@@ -15,7 +16,14 @@ export class TelegramBotStatusRepo {
     user: UsersEntity,
   ): Promise<TelegramBotStatusEntity> {
     const botStatus = BotStatus.ENABLED;
-    return await this.manageTelegramBotStatus(telegramId, user, botStatus);
+    try {
+      return await this.manageTelegramBotStatus(telegramId, user, botStatus);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(
+        'An error occurred while activating the Telegram bot.',
+      );
+    }
   }
 
   async deactivateTelegramBot(

@@ -5,11 +5,18 @@ import {
   SpireVersionDefaultEnum,
   SpireVersionKey,
 } from './types/spire-version.type';
+import { StripeWebhookSecretKeyType } from './types/stripe-webhook-secret-key.type';
 
 @Injectable()
 export class StripeConfig extends BaseConfig {
   async getStripeApiKey(stripeTestApiKey: ApiNameKeyType): Promise<string> {
     return await this.getValueStripeApiKey(stripeTestApiKey);
+  }
+
+  async getStripeWebhookSecret(
+    stripeSecretKey: StripeWebhookSecretKeyType,
+  ): Promise<string> {
+    return await this.getValueStripeWebhookSecret(stripeSecretKey);
   }
 
   async getStripeVersion(
