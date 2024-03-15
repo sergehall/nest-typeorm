@@ -10,6 +10,7 @@ import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BuyProductsCommand } from '../application/use-cases/buy-products.use-case';
+import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 
 @Controller('stripe')
 export class StripeController {
@@ -28,14 +29,14 @@ export class StripeController {
   }
 
   @Post('webhook')
-  async stripeWebhook(@Body() payload: any) {
+  async stripeWebhook(@Request() req: any, @Body() payload: any) {
     try {
       console.log(JSON.stringify(payload), 'stripeWebhook');
       const payloadStripe = JSON.parse(JSON.stringify(payload));
 
-      // return await this.commandBus.execute(
-      //   new ProcessStripeWebHookCommand(payloadStripe),
-      // );
+      return await this.commandBus.execute(
+        new ProcessStripeWebHookCommand(req, payloadStripe),
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
