@@ -18,7 +18,8 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
   async execute(command: BuyProductsCommand): Promise<any> {
     try {
       const { buyRequest, currentUserDto } = command;
-      const clientReferenceId = currentUserDto.userId || 'test-user-id';
+
+      const clientReferenceId: string = currentUserDto.userId || 'test-user-id';
 
       const stripe = await this.stripeService.createStripeInstance('test');
       const successUrl = await this.stripeService.getStripeUrls('success');

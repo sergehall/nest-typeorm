@@ -7,8 +7,9 @@ import { StripeFactory } from '../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
 import { StripeConfig } from '../../config/stripe/stripe.config';
+import { ProcessStripeWebHookUseCase } from './application/use-cases/process-stripe-webhook.use-case';
 
-const stripeUseCases = [BuyProductsUseCase];
+const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
 
 @Module({
   imports: [TypeOrmModule.forFeature([]), CqrsModule],

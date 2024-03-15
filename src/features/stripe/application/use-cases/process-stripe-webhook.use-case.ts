@@ -47,6 +47,8 @@ export class ProcessStripeWebHookUseCase
           // finish the implementation
           // finishCommand(clientReferenceId, event);
           console.log(event, 'event');
+          console.log(session, 'session');
+          console.log(clientReferenceId, 'event');
           console.log('Payment was successful');
         }
       }
