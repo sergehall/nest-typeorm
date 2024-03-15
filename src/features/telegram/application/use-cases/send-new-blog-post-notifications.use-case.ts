@@ -31,13 +31,9 @@ export class SendNewBlogPostNotificationsUseCase
         blog.id,
       );
 
-    console.log('subscribers Blog with enabled bot', subscribers);
     const telegramIds: number[] = subscribers.map(
       (subscriber) => subscriber.telegramId,
     );
-
-    const blogPostTitle: string = newPost.title;
-    const blogPostName: string = blog.name;
 
     const baseUrl: string =
       await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
@@ -46,23 +42,29 @@ export class SendNewBlogPostNotificationsUseCase
     const telegramUrl =
       await this.telegramConfig.getTelegramUrlBotSendMessage();
 
+    const blogPostTitle: string = newPost.title;
+    const blogPostName: string = blog.name;
+
     const message = `📢 New Blog Post: ${blogPostTitle}, "${blogPostName}".\nRead here: ${blogPostLink}`;
 
-    console.log(`Sending notifications to subscribers: ${telegramIds}`);
-    console.log(`Message: ${message}`);
-
-    for (const telegramId of telegramIds) {
-      try {
-        await axios.post(telegramUrl, {
-          chat_id: telegramId,
-          text: message,
-        });
-        console.log(`Notification sent to Telegram ID ${telegramId}`);
-      } catch (error) {
-        console.error(
-          `Failed to send notification to Telegram ID ${telegramId}: ${error.message}`,
-        );
-      }
+    try {
+      await Promise.all(
+        telegramIds.map(async (telegramId) => {
+          try {
+            await axios.post(telegramUrl, {
+              chat_id: telegramId,
+              text: message,
+            });
+            console.log(`Notification sent to Telegram ID ${telegramId}`);
+          } catch (error) {
+            console.error(
+              `Failed to send notification to Telegram ID ${telegramId}: ${error.message}`,
+            );
+          }
+        }),
+      );
+    } catch (error) {
+      console.error(`Failed to send notifications: ${error.message}`);
     }
   }
 }
