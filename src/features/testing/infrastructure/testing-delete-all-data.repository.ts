@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { DatabaseHasBeenClearedEvent } from '../events/database-has-been-cleared.event';
 import { EventBus } from '@nestjs/cqrs';
-import { OrdersEntity } from '../../../common/products/entities/orders.entity';
 
 @Injectable()
 export class TestingDeleteAllDataRepository {

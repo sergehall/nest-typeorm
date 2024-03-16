@@ -59,15 +59,13 @@ export class StripeAdapter {
     });
 
     // Create checkout session
-    const session = await stripeInstance.checkout.sessions.create({
+    return await stripeInstance.checkout.sessions.create({
       success_url: successUrl,
       cancel_url: cancelUrl,
       line_items: lineItems,
       mode: 'payment',
       client_reference_id: currentUserDto?.userId || 'test-clientReferenceId',
     });
-
-    return session;
   }
 
   async getStripeUrls(key: 'success' | 'cancel'): Promise<string> {
