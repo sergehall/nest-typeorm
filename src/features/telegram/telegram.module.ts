@@ -22,14 +22,14 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { TelegramBotStatusRepo } from './infrastructure/telegram-bot-status.repo';
-import { ProcessTelegramMessagesUseCase } from './application/use-cases/process-telegram-messages.use-case';
+import { ProcessTelegramWebhookMessagesUseCase } from './application/use-cases/process-telegram-webhook-messages.use-case';
 import { SendNewBlogPostNotificationsUseCase } from './application/use-cases/send-new-blog-post-notifications.use-case';
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
-  ProcessTelegramMessagesUseCase,
+  ProcessTelegramWebhookMessagesUseCase,
   TelegramTextParserUseCase,
   GenerateTelegramActivationLinkUseCase,
   ManageTelegramBotUseCase,

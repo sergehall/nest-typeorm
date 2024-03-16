@@ -12,8 +12,8 @@ export class StripeService {
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
-  async createStripeInstance(type: SpireApiKeysType): Promise<Stripe> {
-    return this.stripeFactory.createStripeInstance(type);
+  async createStripeInstance(): Promise<Stripe> {
+    return this.stripeFactory.createStripeInstance();
   }
 
   async getStripeUrls(key: StripeUrlsKeyType): Promise<string> {

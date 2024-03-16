@@ -30,6 +30,7 @@ import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { StripeModule } from './features/stripe/stripe.module';
+import { PaymentModule } from './common/payment/payment.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { StripeModule } from './features/stripe/stripe.module';
     TelegramModule,
     CqrsModule,
     StripeModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [

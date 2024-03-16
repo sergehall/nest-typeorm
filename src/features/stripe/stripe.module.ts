@@ -8,6 +8,7 @@ import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
 import { StripeConfig } from '../../config/stripe/stripe.config';
 import { ProcessStripeWebHookUseCase } from './application/use-cases/process-stripe-webhook.use-case';
+import { NodeEnvConfig } from '../../config/node-env/node-env.config';
 
 const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
 
@@ -16,6 +17,7 @@ const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
   controllers: [StripeController],
   providers: [
     StripeFactory,
+    NodeEnvConfig,
     PostgresConfig,
     StripeConfig,
     StripeService,
