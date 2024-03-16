@@ -22,6 +22,8 @@ import { ImagesPostsMiddleMetadataEntity } from '../features/posts/entities/imag
 import { BlogsSubscribersEntity } from '../features/blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramBotStatusEntity } from '../features/telegram/entities/telegram-bot-status.entity';
 import { ProductsDataEntity } from '../common/products/entities/products-data.entity';
+import { PaymentTransactionsEntity } from '../common/products/entities/payment-transaction.entity';
+import { OrdersEntity } from '../common/products/entities/orders.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -39,6 +41,8 @@ export default new DataSource({
     BlogsSubscribersEntity,
     PostsEntity,
     CommentsEntity,
+    OrdersEntity,
+    PaymentTransactionsEntity,
     BannedUsersForBlogsEntity,
     LikeStatusPostsEntity,
     LikeStatusCommentsEntity,

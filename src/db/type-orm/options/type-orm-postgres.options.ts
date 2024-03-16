@@ -23,6 +23,8 @@ import { ImagesPostsSmallMetadataEntity } from '../../../features/posts/entities
 import { BlogsSubscribersEntity } from '../../../features/blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramBotStatusEntity } from '../../../features/telegram/entities/telegram-bot-status.entity';
 import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
+import { OrdersEntity } from '../../../common/products/entities/orders.entity';
+import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -54,6 +56,8 @@ export class TypeOrmPostgresOptions
         CommentsEntity,
         BannedUsersForBlogsEntity,
         LikeStatusPostsEntity,
+        OrdersEntity,
+        PaymentTransactionsEntity,
         LikeStatusCommentsEntity,
         InvalidJwtEntity,
         SentCodesLogEntity,

@@ -11,11 +11,13 @@ import { NodeEnvConfig } from '../../config/node-env/node-env.config';
 import { StripeAdapter } from './adapter/stripe-adapter';
 import { PaymentManager } from '../../common/payment/payment-manager/payment-manager';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { ProductsRepo } from '../../common/products/infrastructure/products.repo';
+import { ProductsDataEntity } from '../../common/products/entities/products-data.entity';
 
 const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([]), CqrsModule],
+  imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
   controllers: [StripeController],
   providers: [
     StripeFactory,
@@ -25,6 +27,7 @@ const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
     PaymentManager,
     StripeAdapter,
     ParseQueriesService,
+    ProductsRepo,
     ...stripeUseCases,
   ],
 })
