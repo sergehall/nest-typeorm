@@ -47,7 +47,6 @@ export class StripeAdapter {
             name: productData?.name || 'Product Name not found',
             description:
               productData?.description || 'Product Description not found',
-            unit_amount: productData?.unit_amount || 0,
           },
           unit_amount: productData?.unit_amount
             ? productData.unit_amount * 100

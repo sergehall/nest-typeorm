@@ -62,8 +62,6 @@ export class PaymentManager {
       currentUserDto,
     );
     console.log('session', session);
-
-    console.log('Processing payment using Stripe:', buyRequest);
   }
 
   private async processPayPalPayment(amount: number): Promise<void> {

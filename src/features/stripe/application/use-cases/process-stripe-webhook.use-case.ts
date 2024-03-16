@@ -19,7 +19,6 @@ export class ProcessStripeWebHookUseCase
 
   async execute(command: ProcessStripeWebHookCommand) {
     const { rawBodyRequest } = command;
-    console.log('ProcessStripeWebHookCommand satrted');
 
     try {
       if (
