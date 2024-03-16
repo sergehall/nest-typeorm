@@ -11,7 +11,13 @@ export class ProductsDataEntity {
   name: string;
 
   @Column({ type: 'character varying', nullable: false })
+  model: string;
+
+  @Column({ type: 'character varying', nullable: false })
   description: string;
+
+  @Column({ type: 'character varying', nullable: false })
+  manufacturer: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   unit_amount: number;
@@ -33,9 +39,6 @@ export class ProductsDataEntity {
   @Column({ nullable: false, default: 0 })
   stockQuantity: number;
 
-  @Column({ type: 'character varying', nullable: true })
-  manufacturer: string | null;
-
   @Column({ type: 'character varying', nullable: false })
   createdAt: string;
 
@@ -45,17 +48,20 @@ export class ProductsDataEntity {
     unit_amount: number,
     currency: Currency,
     stockQuantity: number,
+    manufacturer: string,
+    model: string,
   ): ProductsDataEntity {
     const productDataEntity = new ProductsDataEntity();
     productDataEntity.id = uuid4();
     productDataEntity.name = name;
     productDataEntity.description = description;
+    productDataEntity.model = model;
     productDataEntity.unit_amount = unit_amount;
     productDataEntity.currency = currency;
     productDataEntity.isActive = true; // Set as active by default
     productDataEntity.pathKeyImageUrl = null; // Default to null
     productDataEntity.stockQuantity = stockQuantity | 0; // Default stock quantity 0
-    productDataEntity.manufacturer = null; // Default to null
+    productDataEntity.manufacturer = manufacturer; // Default to null
     productDataEntity.createdAt = new Date().toISOString();
     return productDataEntity;
   }

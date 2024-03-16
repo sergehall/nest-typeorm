@@ -1,10 +1,9 @@
 import { SkipThrottle } from '@nestjs/throttler';
 import { Controller, Get, Query } from '@nestjs/common';
-import { PaginatorDto } from '../../helpers/paginator.dto';
 import { ParseQueriesDto } from '../../query/dto/parse-queries.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { ParseQueriesService } from '../../query/parse-queries.service';
-import { CreateAndSaveTestArrProductsCommand } from '../application/create-and-save-test-arr-products.use-case';
+import { CreateAndSaveCreateRandomProductsCommand } from '../application/create-and-save-create-random-products.use-case';
 
 @SkipThrottle()
 @Controller('products')
@@ -14,14 +13,14 @@ export class ProductsController {
     private readonly commandBus: CommandBus,
   ) {}
   @Get('/test-arr')
-  async getBlogsOwnedByCurrentUser(@Query() query: any): Promise<PaginatorDto> {
+  async getBlogsOwnedByCurrentUser(@Query() query: any): Promise<string> {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
     const countProducts = queryData.countProducts;
 
     return await this.commandBus.execute(
-      new CreateAndSaveTestArrProductsCommand(countProducts),
+      new CreateAndSaveCreateRandomProductsCommand(countProducts),
     );
   }
 }
