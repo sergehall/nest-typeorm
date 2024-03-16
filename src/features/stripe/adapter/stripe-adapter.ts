@@ -34,23 +34,21 @@ export class StripeAdapter {
     ]);
 
     // Prepare line items for checkout session
-    const lineItems = productsData.map((product: any) => {
-      const productData = productsData.find(
-        (data) => data.id === product.productId,
-      );
+    const lineItems = productsData.map((product: ProductsDataEntity) => {
+      // const productData = productsData.find(
+      //   (data) => data.id === product.productId,
+      // );
       return {
         price_data: {
           product_data: {
-            name: productData?.name || 'Product Name not found',
+            name: product?.name || 'Product Name not found',
             description:
-              productData?.description || 'Product Description not found',
+              product?.description || 'Product Description not found',
           },
-          unit_amount: productData?.unit_amount
-            ? productData.unit_amount * 100
-            : 0, // Assuming the price is in USD cents
+          unit_amount: product?.unit_amount ? product.unit_amount * 100 : 0, // Assuming the price is in USD cents
           currency: Currency.USD,
         },
-        quantity: product.quantity,
+        quantity: product.stockQuantity,
       };
     });
 

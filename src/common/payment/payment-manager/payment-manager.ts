@@ -2,6 +2,7 @@ import { PaymentSystem } from '../enums/payment-system.enums';
 import { StripeAdapter } from '../../../features/stripe/adapter/stripe-adapter';
 import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
 import { Injectable } from '@nestjs/common';
+import { ProductsDataEntity } from '../../products/entities/products-data.entity';
 
 @Injectable()
 export class PaymentManager {
@@ -10,7 +11,7 @@ export class PaymentManager {
     // Inject adapters for other payment systems if needed
   ) {}
   async processPayment(
-    payment: any,
+    payment: ProductsDataEntity[],
     paymentSystem: PaymentSystem,
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
@@ -27,17 +28,11 @@ export class PaymentManager {
       case PaymentSystem.GOOGLE_PAY:
         await this.processGooglePayPayment(payment);
         break;
-      case PaymentSystem.AMAZON_PAY:
-        await this.processAmazonPayPayment(payment);
-        break;
       case PaymentSystem.VENMO:
         await this.processVenmoPayment(payment);
         break;
       case PaymentSystem.BITCOIN:
         await this.processBitcoinPayment(payment);
-        break;
-      case PaymentSystem.MASTERPASS:
-        await this.processMasterpassPayment(payment);
         break;
       case PaymentSystem.VISA_CHECKOUT:
         await this.processVisaCheckoutPayment(payment);
@@ -53,7 +48,7 @@ export class PaymentManager {
   }
 
   private async processStripePayment(
-    productsData: any,
+    productsData: ProductsDataEntity[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     // Call the appropriate method from StripeAdapter
@@ -64,48 +59,52 @@ export class PaymentManager {
     console.log('session', session);
   }
 
-  private async processPayPalPayment(amount: number): Promise<void> {
-    console.log(`Processing PayPal payment of $${amount}`);
+  private async processPayPalPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing PayPal payment of $${payment}`);
     // Your PayPal payment processing logic here
   }
 
-  private async processApplePayPayment(amount: number): Promise<void> {
-    console.log(`Processing Apple Pay payment of $${amount}`);
+  private async processApplePayPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing Apple Pay payment of $${payment}`);
     // Your Apple Pay payment processing logic here
   }
 
-  private async processGooglePayPayment(amount: number): Promise<void> {
-    console.log(`Processing Google Pay payment of $${amount}`);
+  private async processGooglePayPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing Google Pay payment of $${payment}`);
     // Your Google Pay payment processing logic here
   }
 
-  private async processAmazonPayPayment(amount: number): Promise<void> {
-    console.log(`Processing Amazon Pay payment of $${amount}`);
-    // Your Amazon Pay payment processing logic here
-  }
-
-  private async processVenmoPayment(amount: number): Promise<void> {
-    console.log(`Processing Venmo payment of $${amount}`);
+  private async processVenmoPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing Venmo payment of $${payment}`);
     // Your Venmo payment processing logic here
   }
 
-  private async processBitcoinPayment(amount: number): Promise<void> {
-    console.log(`Processing Bitcoin payment of $${amount}`);
+  private async processBitcoinPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing Bitcoin payment of $${payment}`);
     // Your Bitcoin payment processing logic here
   }
 
-  private async processMasterpassPayment(amount: number): Promise<void> {
-    console.log(`Processing Masterpass payment of $${amount}`);
-    // Your Masterpass payment processing logic here
-  }
-
-  private async processVisaCheckoutPayment(amount: number): Promise<void> {
-    console.log(`Processing Visa Checkout payment of $${amount}`);
+  private async processVisaCheckoutPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing Visa Checkout payment of $${payment}`);
     // Your Visa Checkout payment processing logic here
   }
 
-  private async processAmexCheckoutPayment(amount: number): Promise<void> {
-    console.log(`Processing American Express Checkout payment of $${amount}`);
+  private async processAmexCheckoutPayment(
+    payment: ProductsDataEntity[],
+  ): Promise<void> {
+    console.log(`Processing American Express Checkout payment of $${payment}`);
     // Your American Express Checkout payment processing logic here
   }
   // Add private async methods for processing other payment systems as needed
