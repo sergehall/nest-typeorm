@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { StripeFactory } from '../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
-import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { Currency } from '../../../common/payment/enums/currency.enums';
 import { ProductsRepo } from '../../../common/products/infrastructure/products.repo';
