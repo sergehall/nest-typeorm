@@ -56,7 +56,7 @@ export class ManageBlogsSubscribeUseCase
   private async checkUserPermission(
     blog: BloggerBlogsEntity,
     currentUserDto: CurrentUserDto,
-  ) {
+  ): Promise<void> {
     try {
       // Check if the user is banned from posting in this blog
       await this.bannedUsersForBlogsRepo.userIsBanned(

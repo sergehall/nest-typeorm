@@ -1,7 +1,9 @@
 import { PaymentSystem } from '../enums/payment-system.enums';
 import { StripeAdapter } from '../../../features/stripe/adapter/stripe-adapter';
 import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PaymentManager {
   constructor(
     private readonly stripeAdapter: StripeAdapter,
@@ -55,7 +57,12 @@ export class PaymentManager {
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     // Call the appropriate method from StripeAdapter
-    await this.stripeAdapter.createCheckoutSession(buyRequest, currentUserDto);
+    const session = await this.stripeAdapter.createCheckoutSession(
+      buyRequest,
+      currentUserDto,
+    );
+    console.log('session', session);
+
     console.log('Processing payment using Stripe:', buyRequest);
   }
 

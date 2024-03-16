@@ -170,6 +170,9 @@ export class ParseQueriesService {
     const productIdArray = query.productId;
     const quantityArray = query.quantity;
 
+    if (!productIdArray || !quantityArray) {
+      return [];
+    }
     // Ensure both arrays have the same length
     if (productIdArray.length !== quantityArray.length) {
       throw new Error(

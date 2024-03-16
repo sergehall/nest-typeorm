@@ -1,6 +1,6 @@
 import { IsNotEmpty, Validate } from 'class-validator';
 
-class ProductDto {
+export class ProductDto {
   @IsNotEmpty()
   productId: string;
 
