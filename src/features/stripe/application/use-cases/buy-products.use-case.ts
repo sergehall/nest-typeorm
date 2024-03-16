@@ -5,6 +5,7 @@ import { BadRequestException } from '@nestjs/common';
 import { PaymentManager } from '../../../../common/payment/payment-manager/payment-manager';
 import { PaymentSystem } from '../../../../common/payment/enums/payment-system.enums';
 import { ProductsRepo } from '../../../../common/products/infrastructure/products.repo';
+import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
 
 export class BuyProductsCommand {
   constructor(
@@ -26,36 +27,22 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
 
     const products = buyRequest.products;
 
-    const productsData = await this.productsRepo.getProductsByIds(products);
-    if (productsData instanceof String) {
-      throw new BadRequestException({
-        message: {
-          message: productsData,
-          field: 'quantity',
-        },
-      });
+    const productsData: string | ProductsDataEntity[] =
+      await this.productsRepo.getProductsByIds(products);
+
+    if (productsData instanceof Array) {
+      await this.paymentManager.processPayment(
+        productsData,
+        paymentSystem,
+        currentUserDto,
+      );
     }
 
-    // await this.verifiedQuantities(products);
-
-    await this.paymentManager.processPayment(
-      productsData,
-      paymentSystem,
-      currentUserDto,
-    );
-  }
-
-  private async verifiedQuantities(productDto: ProductDto[]): Promise<void> {
-    const insufficientProductsMessage: string | null =
-      await this.productsRepo.checkProductQuantities(productDto);
-
-    if (insufficientProductsMessage) {
-      throw new BadRequestException({
-        message: {
-          message: insufficientProductsMessage,
-          field: 'quantity',
-        },
-      });
-    }
+    throw new BadRequestException({
+      message: {
+        message: productsData,
+        field: 'quantity',
+      },
+    });
   }
 }
