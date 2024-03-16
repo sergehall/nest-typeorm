@@ -22,6 +22,7 @@ import { ImagesPostsMiddleMetadataEntity } from '../../../features/posts/entitie
 import { ImagesPostsSmallMetadataEntity } from '../../../features/posts/entities/images-posts-small-metadata.entity';
 import { BlogsSubscribersEntity } from '../../../features/blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramBotStatusEntity } from '../../../features/telegram/entities/telegram-bot-status.entity';
+import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -58,6 +59,7 @@ export class TypeOrmPostgresOptions
         SentCodesLogEntity,
         QuestionsQuizEntity,
         PairsGameEntity,
+        ProductsDataEntity,
         ChallengeQuestionsEntity,
         ChallengeAnswersEntity,
         TelegramBotStatusEntity,

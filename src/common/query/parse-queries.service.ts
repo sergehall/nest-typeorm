@@ -27,6 +27,16 @@ export class ParseQueriesService {
     }
   }
 
+  private async parseCountProducts(query: any): Promise<number> {
+    const parsedPageSize = parseInt(query.countProducts, 10);
+
+    if (!isNaN(parsedPageSize) && parsedPageSize > 0) {
+      return parsedPageSize;
+    } else {
+      return 10; // Default value when parsing fails or the value is not positive.
+    }
+  }
+
   private async parseCode(query: any): Promise<string> {
     return query?.code?.toString() || '';
   }
@@ -163,6 +173,7 @@ export class ParseQueriesService {
         sortBy: await this.parseSortBy(query),
         sortDirection: await this.parseSortDirection(query),
       },
+      countProducts: await this.parseCountProducts(query),
       sort: await this.parseSort(query),
       title: await this.parseTitle(query),
       userName: await this.parseUserName(query),
