@@ -2,48 +2,23 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BuyRequestDto } from '../../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { InternalServerErrorException } from '@nestjs/common';
-import { StripeService } from '../stripe.service';
+import { StripeAdapter } from '../../adapter/stripe-adapter';
+import Stripe from 'stripe';
 
 export class BuyProductsCommand {
   constructor(
     public buyRequest: BuyRequestDto,
-    public currentUserDto: CurrentUserDto,
+    public currentUserDto: CurrentUserDto | null,
   ) {}
 }
 
 @CommandHandler(BuyProductsCommand)
 export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
-  constructor(private readonly stripeService: StripeService) {}
+  constructor(private readonly stripeAdapter: StripeAdapter) {}
 
   async execute(command: BuyProductsCommand): Promise<any> {
     try {
       const { buyRequest, currentUserDto } = command;
-
-      // const clientReferenceId: string = currentUserDto.userId ;
-
-      const clientReferenceId: string = 'test-clientReferenceId';
-
-      const stripeInstance = await this.stripeService.createStripeInstance();
-      const successUrl = await this.stripeService.getStripeUrls('success');
-      const cancelUrl = await this.stripeService.getStripeUrls('cancel');
-
-      const session = await stripeInstance.checkout.sessions.create({
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        line_items: buyRequest.products.map((product) => ({
-          price_data: {
-            product_data: {
-              name: 'Product: ' + product.productId,
-              description: 'Product description',
-            },
-            unit_amount: 10 * 100,
-            currency: 'USD',
-          },
-          quantity: product.quantity,
-        })),
-        mode: 'payment',
-        client_reference_id: clientReferenceId,
-      });
 
       // // Extract productIds and quantities from the request
       // const productIds = buyRequest.products.map(
@@ -68,7 +43,10 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       //
       // // Return response
       // return transferResults;
-      return session;
+      return await this.stripeAdapter.createCheckoutSession(
+        buyRequest,
+        currentUserDto,
+      );
     } catch (error) {
       // Handle errors
       throw new InternalServerErrorException(error.message);

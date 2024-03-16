@@ -1,0 +1,41 @@
+export enum Currency {
+  USD = 'USD', // United States Dollar
+  EUR = 'EUR', // Euro
+  GBP = 'GBP', // British Pound Sterling
+  AUD = 'AUD', // Australian Dollar
+  CAD = 'CAD', // Canadian Dollar
+  JPY = 'JPY', // Japanese Yen
+  CHF = 'CHF', // Swiss Franc
+  CNY = 'CNY', // Chinese Yuan
+  HKD = 'HKD', // Hong Kong Dollar
+  INR = 'INR', // Indian Rupee
+  SGD = 'SGD', // Singapore Dollar
+  NZD = 'NZD', // New Zealand Dollar
+  SEK = 'SEK', // Swedish Krona
+  MXN = 'MXN', // Mexican Peso
+  KRW = 'KRW', // South Korean Won
+  NOK = 'NOK', // Norwegian Krone
+  TRY = 'TRY', // Turkish Lira
+  RUB = 'RUB', // Russian Ruble
+  ZAR = 'ZAR', // South African Rand
+  BRL = 'BRL', // Brazilian Real
+  SAR = 'SAR', // Saudi Riyal
+  AED = 'AED', // United Arab Emirates Dirham
+  DKK = 'DKK', // Danish Krone
+  PLN = 'PLN', // Polish Zloty
+  THB = 'THB', // Thai Baht
+  IDR = 'IDR', // Indonesian Rupiah
+  MYR = 'MYR', // Malaysian Ringgit
+  PHP = 'PHP', // Philippine Peso
+  HUF = 'HUF', // Hungarian Forint
+  CZK = 'CZK', // Czech Koruna
+  ILS = 'ILS', // Israeli New Shekel
+  CLP = 'CLP', // Chilean Peso
+  ARS = 'ARS', // Argentine Peso
+  COP = 'COP', // Colombian Peso
+  VND = 'VND', // Vietnamese Dong
+  PKR = 'PKR', // Pakistani Rupee
+  DZD = 'DZD', // Algerian Dinar
+  EGP = 'EGP', // Egyptian Pound
+  // Add more currency codes as needed
+}

@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { StripeConfig } from '../../../../config/stripe/stripe.config';
-import { StripeService } from '../stripe.service';
 import { Request } from 'express';
+import { StripeAdapter } from '../../adapter/stripe-adapter';
 
 export class ProcessStripeWebHookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -14,7 +14,7 @@ export class ProcessStripeWebHookUseCase
 {
   constructor(
     private readonly stripeConfig: StripeConfig,
-    private readonly stripeService: StripeService,
+    private readonly stripeAdapter: StripeAdapter,
   ) {}
 
   async execute(command: ProcessStripeWebHookCommand) {
@@ -32,7 +32,7 @@ export class ProcessStripeWebHookUseCase
           );
         const signature = rawBodyRequest.headers['stripe-signature'];
 
-        const stripeInstance = await this.stripeService.createStripeInstance();
+        const stripeInstance = await this.stripeAdapter.createStripeInstance();
 
         const event = stripeInstance.webhooks.constructEvent(
           rawBodyRequest.rawBody,

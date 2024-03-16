@@ -20,12 +20,12 @@ export class StripeController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Get('/buy')
-  // @UseGuards(JwtAuthGuard)
+  // @UseGuards(NoneStatusGuard)
   async buy(
     @Body() buyRequest: BuyRequestDto,
     @Req() req: any,
   ): Promise<string> {
-    const currentUserDto: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserDto | null = req.user;
     console.log(currentUserDto, 'currentUserDto buy');
     return this.commandBus.execute(
       new BuyProductsCommand(buyRequest, currentUserDto),

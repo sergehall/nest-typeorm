@@ -1,29 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
-import { StripeFactory } from '../../../config/stripe/stripe-factory';
-import { SpireApiKeysType } from '../../../config/stripe/types/spire-api-keys.type';
-import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
-import { StripeUrlsKeyType } from '../types/stripe-urls-key.type';
 
 @Injectable()
 export class StripeService {
-  constructor(
-    private readonly stripeFactory: StripeFactory,
-    private readonly postgresConfig: PostgresConfig,
-  ) {}
-
-  async createStripeInstance(): Promise<Stripe> {
-    return this.stripeFactory.createStripeInstance();
-  }
-
-  async getStripeUrls(key: StripeUrlsKeyType): Promise<string> {
-    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
-    const urlMap: { [key in StripeUrlsKeyType]: string } = {
-      success: '/stripe/success',
-      cancel: '/stripe/cancel',
-    };
-    return `${baseUrl}${urlMap[key]}`;
-  }
+  constructor() {}
 
   async transferProduct(
     productId: string,
