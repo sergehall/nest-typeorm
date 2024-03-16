@@ -12,7 +12,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BuyProductsCommand } from '../application/use-cases/buy-products.use-case';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
-import Stripe from 'stripe';
 import { Request } from 'express';
 
 @Controller('stripe')
