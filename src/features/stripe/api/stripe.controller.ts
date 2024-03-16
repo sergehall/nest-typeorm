@@ -29,7 +29,7 @@ export class StripeController {
   async buy(
     @Body() products: BuyRequestDto,
     @Req() req: any,
-    @Query() query: any,
+    // @Query() query: any,
   ): Promise<string> {
     const currentUserDto: CurrentUserDto | null = req.user;
     // const queryData: ParseQueriesDto =
