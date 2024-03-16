@@ -4,8 +4,6 @@ import { PublishedStatusEnum } from './enums/published-status.enum';
 import { SortDirectionEnum } from './enums/sort-direction.enum';
 import { BanCondition } from './types/ban-condition.type';
 import { SortType } from './types/sort.type';
-import * as querystring from 'querystring';
-import { validate } from 'class-validator';
 
 @Injectable()
 export class ParseQueriesService {

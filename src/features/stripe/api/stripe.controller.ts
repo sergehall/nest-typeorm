@@ -15,7 +15,6 @@ import { BuyProductsCommand } from '../application/use-cases/buy-products.use-ca
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 import { Request } from 'express';
 import { PaymentSystem } from '../../../common/payment/enums/payment-system.enums';
-import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 
 @Controller('stripe')
@@ -28,24 +27,20 @@ export class StripeController {
   @Get('buy/products')
   // @UseGuards(NoneStatusGuard)
   async buy(
-    @Body() buyRequest: BuyRequestDto,
+    @Body() products: BuyRequestDto,
     @Req() req: any,
     @Query() query: any,
   ): Promise<string> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
-    const products = queryData.products;
-
-    console.log(buyRequest, 'buyRequest');
-    console.log(products, 'queryData.products');
+    // const queryData: ParseQueriesDto =
+    //   await this.parseQueriesService.getQueriesData(query);
+    // const productsQuery = queryData.products;
 
     // // Assuming you want to use Stripe for payment
-    // const paymentSystem = PaymentSystem.STRIPE;
-    // return this.commandBus.execute(
-    //   new BuyProductsCommand(buyRequest, paymentSystem, currentUserDto),
-    // );
-    return 'Good';
+    const paymentSystem = PaymentSystem.STRIPE;
+    return this.commandBus.execute(
+      new BuyProductsCommand(products, paymentSystem, currentUserDto),
+    );
   }
 
   @Post('webhook')
