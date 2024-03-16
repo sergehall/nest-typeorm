@@ -3,7 +3,6 @@ import { BuyRequestDto } from '../../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { StripeAdapter } from '../../adapter/stripe-adapter';
-import Stripe from 'stripe';
 
 export class BuyProductsCommand {
   constructor(
