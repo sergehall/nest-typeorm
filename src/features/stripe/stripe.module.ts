@@ -9,6 +9,7 @@ import { StripeConfig } from '../../config/stripe/stripe.config';
 import { ProcessStripeWebHookUseCase } from './application/use-cases/process-stripe-webhook.use-case';
 import { NodeEnvConfig } from '../../config/node-env/node-env.config';
 import { StripeAdapter } from './adapter/stripe-adapter';
+import { PaymentManager } from '../../common/payment/payment-manager/payment-manager';
 
 const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
 
@@ -20,6 +21,7 @@ const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
     NodeEnvConfig,
     PostgresConfig,
     StripeConfig,
+    PaymentManager,
     StripeAdapter,
     ...stripeUseCases,
   ],
