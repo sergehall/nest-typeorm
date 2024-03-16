@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { ParseQueriesDto } from './dto/parse-queries.dto';
+import { ParseQueriesDto, ProductsDto } from './dto/parse-queries.dto';
 import { PublishedStatusEnum } from './enums/published-status.enum';
 import { SortDirectionEnum } from './enums/sort-direction.enum';
 import { BanCondition } from './types/ban-condition.type';
 import { SortType } from './types/sort.type';
+import * as querystring from 'querystring';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class ParseQueriesService {
@@ -165,6 +167,27 @@ export class ParseQueriesService {
     }
   }
 
+  private async parseProductsString(query: any): Promise<ProductsDto[]> {
+    const products = [];
+    const productIdArray = query.productId;
+    const quantityArray = query.quantity;
+
+    // Ensure both arrays have the same length
+    if (productIdArray.length !== quantityArray.length) {
+      throw new Error(
+        'productId and quantity arrays must have the same length',
+      );
+    }
+
+    for (let i = 0; i < productIdArray.length; i++) {
+      const productId = productIdArray[i];
+      const quantity = quantityArray[i];
+      products.push({ productId, quantity: parseInt(quantity) });
+    }
+
+    return products;
+  }
+
   async getQueriesData(query: any): Promise<ParseQueriesDto> {
     return {
       queryPagination: {
@@ -173,6 +196,7 @@ export class ParseQueriesService {
         sortBy: await this.parseSortBy(query),
         sortDirection: await this.parseSortDirection(query),
       },
+      products: await this.parseProductsString(query),
       countProducts: await this.parseCountProducts(query),
       sort: await this.parseSort(query),
       title: await this.parseTitle(query),

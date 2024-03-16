@@ -10,6 +10,7 @@ import { ProcessStripeWebHookUseCase } from './application/use-cases/process-str
 import { NodeEnvConfig } from '../../config/node-env/node-env.config';
 import { StripeAdapter } from './adapter/stripe-adapter';
 import { PaymentManager } from '../../common/payment/payment-manager/payment-manager';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
 
@@ -23,6 +24,7 @@ const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
     StripeConfig,
     PaymentManager,
     StripeAdapter,
+    ParseQueriesService,
     ...stripeUseCases,
   ],
 })

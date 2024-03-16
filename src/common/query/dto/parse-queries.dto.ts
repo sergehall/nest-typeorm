@@ -17,8 +17,17 @@ export class QueryPagination {
   @IsEnum(SortDirectionEnum)
   sortDirection: SortDirectionEnum;
 }
+export class ProductsDto {
+  @IsString()
+  productId: string;
+
+  @IsNumber()
+  quantity: number;
+}
 
 export class ParseQueriesDto {
+  products: ProductsDto[];
+
   @IsInt()
   countProducts: number;
 
