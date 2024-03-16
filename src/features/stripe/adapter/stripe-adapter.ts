@@ -4,7 +4,6 @@ import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { Currency } from '../../../common/payment/enums/currency.enums';
-import { ProductsRepo } from '../../../common/products/infrastructure/products.repo';
 import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class StripeAdapter {
   constructor(
     private readonly stripeFactory: StripeFactory,
     private readonly postgresConfig: PostgresConfig,
-    private readonly productsRepo: ProductsRepo,
   ) {}
 
   async createCheckoutSession(
