@@ -4,7 +4,6 @@ import {
   Get,
   InternalServerErrorException,
   Post,
-  Query,
   RawBodyRequest,
   Req,
 } from '@nestjs/common';
