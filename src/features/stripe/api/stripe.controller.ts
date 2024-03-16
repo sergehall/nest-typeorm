@@ -33,16 +33,10 @@ export class StripeController {
   }
 
   @Post('webhook')
-  async stripeWebhook(
-    @Req() req: RawBodyRequest<Request>,
-    @Body() data: Stripe.Checkout.Session,
-  ): Promise<boolean> {
+  async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
     try {
-      // console.log(JSON.stringify(data), 'stripeWebhook');
-      // const payloadStripe = JSON.parse(JSON.stringify(payload));
-
       return await this.commandBus.execute(
-        new ProcessStripeWebHookCommand(req, data),
+        new ProcessStripeWebHookCommand(req),
       );
     } catch (error) {
       console.error(error);

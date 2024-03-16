@@ -39,7 +39,7 @@ export class BaseConfig {
    * Retrieves the value of the 'ENV' environment variable and returns it as a Promise of `EnvNamesEnums`.
    * @returns {Promise<EnvNamesEnums>} The value of the 'ENV' environment variable.
    */
-  protected async getValueENV(): Promise<EnvNamesEnums> {
+  async getValueENV(): Promise<EnvNamesEnums> {
     return this.configService.get('ENV', {
       infer: true,
     });

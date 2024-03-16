@@ -7,8 +7,4 @@ export class MongoConfig extends BaseConfig {
   async getMongoLocalAndAtlasValue(): Promise<MongoDatabaseConfigTypes> {
     return await this.getValueMongoDatabase();
   }
-
-  async getENV(): Promise<string> {
-    return await this.getValueENV();
-  }
 }

@@ -23,11 +23,11 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
 
       const clientReferenceId: string = 'test-clientReferenceId';
 
-      const stripe = await this.stripeService.createStripeInstance('test');
+      const stripeInstance = await this.stripeService.createStripeInstance();
       const successUrl = await this.stripeService.getStripeUrls('success');
       const cancelUrl = await this.stripeService.getStripeUrls('cancel');
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await stripeInstance.checkout.sessions.create({
         success_url: successUrl,
         cancel_url: cancelUrl,
         line_items: buyRequest.products.map((product) => ({

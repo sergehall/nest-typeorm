@@ -6,19 +6,19 @@ import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 import { InternalServerErrorException } from '@nestjs/common';
 
-export class ProcessTelegramMessagesCommand {
+export class ProcessTelegramWebhookMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
 }
-@CommandHandler(ProcessTelegramMessagesCommand)
-export class ProcessTelegramMessagesUseCase
-  implements ICommandHandler<ProcessTelegramMessagesCommand>
+@CommandHandler(ProcessTelegramWebhookMessagesCommand)
+export class ProcessTelegramWebhookMessagesUseCase
+  implements ICommandHandler<ProcessTelegramWebhookMessagesCommand>
 {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly telegramConfig: TelegramConfig,
   ) {}
 
-  async execute(command: ProcessTelegramMessagesCommand) {
+  async execute(command: ProcessTelegramWebhookMessagesCommand) {
     try {
       const { payloadTelegramMessage } = command;
       const { message } = payloadTelegramMessage;
