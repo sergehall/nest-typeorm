@@ -5,6 +5,7 @@ import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
 import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { Currency } from '../../../common/payment/enums/currency.enums';
 
 @Injectable()
 export class StripeAdapter {
@@ -17,11 +18,15 @@ export class StripeAdapter {
     buyRequest: BuyRequestDto,
     currentUserDto: CurrentUserDto | null,
   ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
-    const clientReferenceId: string = 'test-clientReferenceId';
+    const clientReferenceId: string =
+      currentUserDto?.userId || 'test-clientReferenceId';
 
     const stripeInstance = await this.stripeFactory.createStripeInstance();
     const successUrl = await this.getStripeUrls('success');
     const cancelUrl = await this.getStripeUrls('cancel');
+
+    const currency = Currency.USD;
+    const mode = 'payment';
 
     return await stripeInstance.checkout.sessions.create({
       success_url: successUrl,
@@ -33,11 +38,11 @@ export class StripeAdapter {
             description: 'Product description',
           },
           unit_amount: 10 * 100, // Assuming the price is in USD cents
-          currency: 'USD',
+          currency: currency,
         },
         quantity: product.quantity,
       })),
-      mode: 'payment',
+      mode: mode,
       client_reference_id: clientReferenceId,
     });
   }

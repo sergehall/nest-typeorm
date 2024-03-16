@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEnum } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsInt } from 'class-validator';
 import { PublishedStatusEnum } from '../enums/published-status.enum';
 import { SortDirectionEnum } from '../enums/sort-direction.enum';
 import { BanCondition } from '../types/ban-condition.type';
@@ -19,6 +19,9 @@ export class QueryPagination {
 }
 
 export class ParseQueriesDto {
+  @IsInt()
+  countProducts: number;
+
   @IsString()
   title: string;
 

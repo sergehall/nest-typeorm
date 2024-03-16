@@ -31,6 +31,7 @@ import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { StripeModule } from './features/stripe/stripe.module';
 import { PaymentModule } from './common/payment/payment.module';
+import { ProductsModule } from './common/products/products.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { PaymentModule } from './common/payment/payment.module';
     CqrsModule,
     StripeModule,
     PaymentModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [
