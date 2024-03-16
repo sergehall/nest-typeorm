@@ -1,84 +1,67 @@
 import { PaymentSystem } from '../enums/payment-system.enums';
+import { StripeAdapter } from '../../../features/stripe/adapter/stripe-adapter';
+import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
 
 export class PaymentManager {
+  constructor(
+    private readonly stripeAdapter: StripeAdapter,
+    // Inject adapters for other payment systems if needed
+  ) {}
   async processPayment(
-    amount: number,
+    payment: any,
     paymentSystem: PaymentSystem,
+    currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     switch (paymentSystem) {
       case PaymentSystem.PAYPAL:
-        await this.processPayPalPayment(amount);
+        await this.processPayPalPayment(payment);
         break;
       case PaymentSystem.STRIPE:
-        await this.processStripePayment(amount);
-        break;
-      case PaymentSystem.SQUARE:
-        await this.processSquarePayment(amount);
+        await this.processStripePayment(payment, currentUserDto);
         break;
       case PaymentSystem.APPLE_PAY:
-        await this.processApplePayPayment(amount);
+        await this.processApplePayPayment(payment);
         break;
       case PaymentSystem.GOOGLE_PAY:
-        await this.processGooglePayPayment(amount);
+        await this.processGooglePayPayment(payment);
         break;
       case PaymentSystem.AMAZON_PAY:
-        await this.processAmazonPayPayment(amount);
+        await this.processAmazonPayPayment(payment);
         break;
       case PaymentSystem.VENMO:
-        await this.processVenmoPayment(amount);
+        await this.processVenmoPayment(payment);
         break;
       case PaymentSystem.BITCOIN:
-        await this.processBitcoinPayment(amount);
+        await this.processBitcoinPayment(payment);
         break;
       case PaymentSystem.MASTERPASS:
-        await this.processMasterpassPayment(amount);
+        await this.processMasterpassPayment(payment);
         break;
       case PaymentSystem.VISA_CHECKOUT:
-        await this.processVisaCheckoutPayment(amount);
+        await this.processVisaCheckoutPayment(payment);
         break;
       case PaymentSystem.AMERICAN_EXPRESS_CHECKOUT:
-        await this.processAmexCheckoutPayment(amount);
-        break;
-      case PaymentSystem.ALIPAY:
-        await this.processAlipayPayment(amount);
-        break;
-      case PaymentSystem.WECHAT_PAY:
-        await this.processWeChatPayPayment(amount);
-        break;
-      case PaymentSystem.KLARNA:
-        await this.processKlarnaPayment(amount);
-        break;
-      case PaymentSystem.AFTERPAY:
-        await this.processAfterpayPayment(amount);
-        break;
-      case PaymentSystem.SEZZLE:
-        await this.processSezzlePayment(amount);
-        break;
-      case PaymentSystem.AFFIRM:
-        await this.processAffirmPayment(amount);
-        break;
-      case PaymentSystem.SHOP_PAY:
-        await this.processShopPayPayment(amount);
+        await this.processAmexCheckoutPayment(payment);
         break;
       // Add cases for other payment systems as needed
       default:
         console.log(`Payment system '${paymentSystem}' is not supported.`);
+        throw new Error(`Payment system '${paymentSystem}' is not supported.`);
     }
+  }
+
+  private async processStripePayment(
+    buyRequest: any,
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<void> {
+    // Call the appropriate method from StripeAdapter
+    await this.stripeAdapter.createCheckoutSession(buyRequest, currentUserDto);
+    console.log('Processing payment using Stripe:', buyRequest);
   }
 
   private async processPayPalPayment(amount: number): Promise<void> {
     console.log(`Processing PayPal payment of $${amount}`);
     // Your PayPal payment processing logic here
-  }
-
-  private async processStripePayment(amount: number): Promise<void> {
-    console.log(`Processing Stripe payment of $${amount}`);
-    // Your Stripe payment processing logic here
-  }
-
-  private async processSquarePayment(amount: number): Promise<void> {
-    console.log(`Processing Square payment of $${amount}`);
-    // Your Square payment processing logic here
   }
 
   private async processApplePayPayment(amount: number): Promise<void> {
@@ -119,41 +102,6 @@ export class PaymentManager {
   private async processAmexCheckoutPayment(amount: number): Promise<void> {
     console.log(`Processing American Express Checkout payment of $${amount}`);
     // Your American Express Checkout payment processing logic here
-  }
-
-  private async processAlipayPayment(amount: number): Promise<void> {
-    console.log(`Processing Alipay payment of $${amount}`);
-    // Your Alipay payment processing logic here
-  }
-
-  private async processWeChatPayPayment(amount: number): Promise<void> {
-    console.log(`Processing WeChat Pay payment of $${amount}`);
-    // Your WeChat Pay payment processing logic here
-  }
-
-  private async processKlarnaPayment(amount: number): Promise<void> {
-    console.log(`Processing Klarna payment of $${amount}`);
-    // Your Klarna payment processing logic here
-  }
-
-  private async processAfterpayPayment(amount: number): Promise<void> {
-    console.log(`Processing Afterpay payment of $${amount}`);
-    // Your Afterpay payment processing logic here
-  }
-
-  private async processSezzlePayment(amount: number): Promise<void> {
-    console.log(`Processing Sezzle payment of $${amount}`);
-    // Your Sezzle payment processing logic here
-  }
-
-  private async processAffirmPayment(amount: number): Promise<void> {
-    console.log(`Processing Affirm payment of $${amount}`);
-    // Your Affirm payment processing logic here
-  }
-
-  private async processShopPayPayment(amount: number): Promise<void> {
-    console.log(`Processing Shop Pay payment of $${amount}`);
-    // Your Shop Pay payment processing logic here
   }
   // Add private async methods for processing other payment systems as needed
 }

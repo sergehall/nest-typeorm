@@ -60,7 +60,7 @@ export class ProductsDataEntity {
     productDataEntity.currency = currency;
     productDataEntity.isActive = true; // Set as active by default
     productDataEntity.pathKeyImageUrl = null; // Default to null
-    productDataEntity.stockQuantity = stockQuantity | 0; // Default stock quantity 0
+    productDataEntity.stockQuantity = stockQuantity; // Default stock quantity 0
     productDataEntity.manufacturer = manufacturer; // Default to null
     productDataEntity.createdAt = new Date().toISOString();
     return productDataEntity;
