@@ -26,10 +26,20 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
 
     const products = buyRequest.products;
 
-    await this.verifiedQuantities(products);
+    const productsData = await this.productsRepo.getProductsByIds(products);
+    if (productsData instanceof String) {
+      throw new BadRequestException({
+        message: {
+          message: productsData,
+          field: 'quantity',
+        },
+      });
+    }
+
+    // await this.verifiedQuantities(products);
 
     await this.paymentManager.processPayment(
-      buyRequest,
+      productsData,
       paymentSystem,
       currentUserDto,
     );

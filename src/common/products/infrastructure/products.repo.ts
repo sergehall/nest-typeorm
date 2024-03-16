@@ -23,6 +23,46 @@ export class ProductsRepo {
     }
   }
 
+  async getProductsByIds(
+    products: ProductDto[],
+  ): Promise<string | ProductsDataEntity[]> {
+    const productsDataEntity = [];
+    const insufficientProducts: string[] = [];
+
+    try {
+      for (const product of products) {
+        const productData = await this.productsRepository.findOne({
+          where: { id: product.productId },
+        });
+
+        if (!productData) {
+          return `Product with ID ${product.productId} not found`;
+        }
+
+        if (productData.stockQuantity < product.quantity) {
+          insufficientProducts.push(`${product.productId}`);
+        } else {
+          // Freeze the quantity
+          productData.stockQuantity -= product.quantity;
+          await this.productsRepository.save(productData);
+          productsDataEntity.push(productData);
+        }
+      }
+
+      if (insufficientProducts.length > 0) {
+        return (
+          `Products with ID [ ` +
+          insufficientProducts.join(', ') +
+          ' ] do not have sufficient quantity'
+        );
+      }
+
+      return productsDataEntity;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async checkProductQuantities(products: ProductDto[]): Promise<string | null> {
     const insufficientProducts: string[] = [];
 

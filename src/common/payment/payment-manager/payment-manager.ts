@@ -53,12 +53,12 @@ export class PaymentManager {
   }
 
   private async processStripePayment(
-    buyRequest: any,
+    productsData: any,
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     // Call the appropriate method from StripeAdapter
     const session = await this.stripeAdapter.createCheckoutSession(
-      buyRequest,
+      productsData,
       currentUserDto,
     );
     console.log('session', session);

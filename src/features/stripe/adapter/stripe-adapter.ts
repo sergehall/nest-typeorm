@@ -17,17 +17,17 @@ export class StripeAdapter {
   ) {}
 
   async createCheckoutSession(
-    buyRequest: BuyRequestDto,
+    productsData: ProductsDataEntity[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
-    // Get product IDs from buyRequest
-    const productIds = buyRequest.products.map(
-      (product: any) => product.productId,
-    );
-
-    // Fetch product data from repository
-    const productsData: ProductsDataEntity[] =
-      await this.productsRepo.getProducts(productIds);
+    // // Get product IDs from buyRequest
+    // const productIds = buyRequest.products.map(
+    //   (product: any) => product.productId,
+    // );
+    //
+    // // Fetch product data from repository
+    // const productsData: ProductsDataEntity[] =
+    //   await this.productsRepo.getProducts(productIds);
 
     // Create Stripe instance and retrieve URLs
     const [stripeInstance, successUrl, cancelUrl] = await Promise.all([
@@ -37,7 +37,7 @@ export class StripeAdapter {
     ]);
 
     // Prepare line items for checkout session
-    const lineItems = buyRequest.products.map((product: any) => {
+    const lineItems = productsData.map((product: any) => {
       const productData = productsData.find(
         (data) => data.id === product.productId,
       );
