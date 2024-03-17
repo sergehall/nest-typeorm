@@ -16,11 +16,11 @@ export class PaymentManager {
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     switch (paymentSystem) {
-      case PaymentSystem.PAYPAL:
-        await this.processPayPalPayment(payment);
-        break;
       case PaymentSystem.STRIPE:
         await this.processStripePayment(payment, currentUserDto);
+        break;
+      case PaymentSystem.PAYPAL:
+        await this.processPayPalPayment(payment);
         break;
       case PaymentSystem.APPLE_PAY:
         await this.processApplePayPayment(payment);

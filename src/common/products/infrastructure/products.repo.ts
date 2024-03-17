@@ -23,45 +23,101 @@ export class ProductsRepo {
     }
   }
 
+  /**
+   * Retrieves products from the database by their IDs and checks their availability.
+   * @param products An array of ProductDto objects containing product IDs and quantities.
+   * @returns Either an array of ProductsDataEntity objects if all products are available,
+   *          or a string indicating products that are not available.
+   */
   async getProductsByIds(
     products: ProductDto[],
   ): Promise<string | ProductsDataEntity[]> {
-    const productsDataEntity = [];
-    const insufficientProducts: string[] = [];
-
     try {
-      for (const product of products) {
+      // Fetch product data for all product IDs concurrently
+      const productPromises = products.map(async (product) => {
         const productData = await this.productsRepository.findOne({
           where: { id: product.productId },
         });
-
         if (!productData) {
-          return `Product with ID ${product.productId} not found`;
+          throw new Error(`Product with ID ${product.productId} not found`);
         }
+        return { productData, product };
+      });
 
+      // Wait for all product data to be fetched
+      const productResults = await Promise.all(productPromises);
+
+      // Check for insufficient quantity and update stock quantity for valid products
+      const updatedProducts: ProductsDataEntity[] = [];
+      const insufficientProducts: string[] = [];
+
+      for (const { productData, product } of productResults) {
         if (productData.stockQuantity < product.quantity) {
-          insufficientProducts.push(`${product.productId}`);
+          insufficientProducts.push(product.productId);
         } else {
-          // Freeze the quantity
           productData.stockQuantity -= product.quantity;
-          await this.productsRepository.save(productData);
-          productsDataEntity.push(productData);
+          updatedProducts.push(productData);
         }
       }
 
+      // If there are insufficient products, return error message
       if (insufficientProducts.length > 0) {
-        return (
-          `Products with ID [ ` +
-          insufficientProducts.join(', ') +
-          ' ] do not have sufficient quantity'
-        );
+        return `Products with ID [${insufficientProducts.join(', ')}] do not have sufficient quantity`;
       }
 
-      return productsDataEntity;
+      // If there are no updated products, return empty array
+      if (updatedProducts.length === 0) {
+        return [];
+      }
+
+      // Save updated product data
+      await this.productsRepository.save(updatedProducts);
+
+      return updatedProducts;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  // async getProductsByIds(
+  //   products: ProductDto[],
+  // ): Promise<string | ProductsDataEntity[]> {
+  //   const productsDataEntity = [];
+  //   const insufficientProducts: string[] = [];
+  //
+  //   try {
+  //     for (const product of products) {
+  //       const productData = await this.productsRepository.findOne({
+  //         where: { id: product.productId },
+  //       });
+  //
+  //       if (!productData) {
+  //         return `Product with ID ${product.productId} not found`;
+  //       }
+  //
+  //       if (productData.stockQuantity < product.quantity) {
+  //         insufficientProducts.push(`${product.productId}`);
+  //       } else {
+  //         // Freeze the quantity
+  //         productData.stockQuantity -= product.quantity;
+  //         await this.productsRepository.save(productData);
+  //         productsDataEntity.push(productData);
+  //       }
+  //     }
+  //
+  //     if (insufficientProducts.length > 0) {
+  //       return (
+  //         `Products with ID [ ` +
+  //         insufficientProducts.join(', ') +
+  //         ' ] do not have sufficient quantity'
+  //       );
+  //     }
+  //
+  //     return productsDataEntity;
+  //   } catch (error) {
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async checkProductQuantities(products: ProductDto[]): Promise<string | null> {
     const insufficientProducts: string[] = [];
