@@ -24,6 +24,7 @@ import { TelegramBotStatusEntity } from '../features/telegram/entities/telegram-
 import { ProductsDataEntity } from '../common/products/entities/products-data.entity';
 import { PaymentTransactionsEntity } from '../common/products/entities/payment-transaction.entity';
 import { OrdersEntity } from '../common/products/entities/orders.entity';
+import { OrderItemsEntity } from '../common/products/entities/order-items.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -42,6 +43,7 @@ export default new DataSource({
     PostsEntity,
     CommentsEntity,
     OrdersEntity,
+    OrderItemsEntity,
     PaymentTransactionsEntity,
     BannedUsersForBlogsEntity,
     LikeStatusPostsEntity,

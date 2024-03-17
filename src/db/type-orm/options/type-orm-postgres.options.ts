@@ -25,6 +25,7 @@ import { TelegramBotStatusEntity } from '../../../features/telegram/entities/tel
 import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
 import { OrdersEntity } from '../../../common/products/entities/orders.entity';
 import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
+import { OrderItemsEntity } from '../../../common/products/entities/order-items.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -57,6 +58,7 @@ export class TypeOrmPostgresOptions
         BannedUsersForBlogsEntity,
         LikeStatusPostsEntity,
         OrdersEntity,
+        OrderItemsEntity,
         PaymentTransactionsEntity,
         LikeStatusCommentsEntity,
         InvalidJwtEntity,
