@@ -11,7 +11,7 @@ export class CreateRandomProductCommand {
 interface ProductData {
   name: string;
   description: string;
-  unitAmount: number;
+  unitAmount: string;
   currency: Currency;
   stockQuantity: number;
   manufacturer: string;
@@ -45,12 +45,12 @@ export class CreateRandomProductsUseCase
 
   private async createRandomProduct(): Promise<ProductsDataEntity> {
     const productData: ProductData = {
-      name: this.getRandomItem(TEST_DATA.PRODUCT_NAMES),
-      description: this.getRandomItem(TEST_DATA.PRODUCT_DESCRIPTIONS),
-      unitAmount: this.getRandomNumber(100, 1000),
-      currency: this.getRandomItem(TEST_DATA.CURRENCIES),
-      stockQuantity: this.getRandomNumber(1, 10),
-      manufacturer: this.getRandomItem(TEST_DATA.MANUFACTURERS),
+      name: await this.getRandomItem(TEST_DATA.PRODUCT_NAMES),
+      description: await this.getRandomItem(TEST_DATA.PRODUCT_DESCRIPTIONS),
+      unitAmount: await this.getRandomPrice(100, 1000),
+      currency: await this.getRandomItem(TEST_DATA.CURRENCIES),
+      stockQuantity: await this.getRandomNumber(1, 10),
+      manufacturer: await this.getRandomItem(TEST_DATA.MANUFACTURERS),
       model: await this.generateRandomString(),
     };
 
@@ -65,12 +65,19 @@ export class CreateRandomProductsUseCase
     );
   }
 
-  private getRandomItem<T>(array: T[]): T {
+  private async getRandomItem<T>(array: T[]): Promise<T> {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  private getRandomNumber(min: number, max: number): number {
+  private async getRandomNumber(min: number, max: number): Promise<number> {
     return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  private async getRandomPrice(min: number, max: number): Promise<string> {
+    const price = (Math.random() * (max - min) + min).toFixed(2); // Generate a random price with two decimal places
+    const [dollars, cents] = price.split('.'); // Split into dollars and cents
+
+    return `${dollars}.${cents}`; // Concatenate dollars and cents with a dot
   }
 
   private async generateRandomString(): Promise<string> {

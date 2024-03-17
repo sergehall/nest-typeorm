@@ -1,11 +1,12 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 import * as uuid4 from 'uuid4';
 import { Currency } from '../../payment/enums/currency.enums';
+import { OrderItemsEntity } from './order-items.entity';
 
 @Entity('ProductsData')
 export class ProductsDataEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
-  id: string;
+  productId: string;
 
   @Column({ type: 'character varying', nullable: false })
   name: string;
@@ -20,7 +21,7 @@ export class ProductsDataEntity {
   manufacturer: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
-  unit_amount: number;
+  unit_amount: string;
 
   @Column({ type: 'character varying', nullable: true })
   pathKeyImageUrl: string | null;
@@ -42,17 +43,23 @@ export class ProductsDataEntity {
   @Column({ type: 'character varying', nullable: false })
   createdAt: string;
 
+  @Column({ type: 'character varying', nullable: true })
+  updatedAt: string | null;
+
+  @OneToMany(() => OrderItemsEntity, (item) => item.product)
+  items: OrderItemsEntity[];
+
   static createProductDataEntity(
     name: string,
     description: string,
-    unit_amount: number,
+    unit_amount: string,
     currency: Currency,
     stockQuantity: number,
     manufacturer: string,
     model: string,
   ): ProductsDataEntity {
     const productDataEntity = new ProductsDataEntity();
-    productDataEntity.id = uuid4();
+    productDataEntity.productId = uuid4();
     productDataEntity.name = name;
     productDataEntity.description = description;
     productDataEntity.model = model;
@@ -63,6 +70,7 @@ export class ProductsDataEntity {
     productDataEntity.stockQuantity = stockQuantity; // Default stock quantity 0
     productDataEntity.manufacturer = manufacturer; // Default to null
     productDataEntity.createdAt = new Date().toISOString();
+    productDataEntity.updatedAt = null; // Default to null
     return productDataEntity;
   }
 }

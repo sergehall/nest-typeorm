@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { PaymentSystem } from '../../payment/enums/payment-system.enums';
 import { OrdersEntity } from './orders.entity';
+import * as uuid4 from 'uuid4';
 
 @Entity('PaymentTransactions')
 export class PaymentTransactionsEntity {
@@ -41,4 +42,29 @@ export class PaymentTransactionsEntity {
 
   @ManyToOne(() => OrdersEntity, (order) => order.payments)
   order: OrdersEntity;
+
+  static createPaymentTransactionEntity(
+    priceInCents: number,
+    paymentSystem: PaymentSystem,
+    status: PaymentsStatusEnum,
+    createdAt: string,
+    updatedAt: string,
+    order: OrdersEntity,
+    paymentProviderInfoJson?: any,
+    anyConfirmPaymentSystemData?: any,
+  ): PaymentTransactionsEntity {
+    const paymentTransactionEntity = new PaymentTransactionsEntity();
+    paymentTransactionEntity.id = uuid4();
+    paymentTransactionEntity.priceInCents = priceInCents;
+    paymentTransactionEntity.paymentSystem = paymentSystem;
+    paymentTransactionEntity.status = status;
+    paymentTransactionEntity.createdAt = createdAt;
+    paymentTransactionEntity.updatedAt = updatedAt;
+    paymentTransactionEntity.order = order;
+    paymentTransactionEntity.paymentProviderInfoJson =
+      paymentProviderInfoJson || null;
+    paymentTransactionEntity.anyConfirmPaymentSystemData =
+      anyConfirmPaymentSystemData || null;
+    return paymentTransactionEntity;
+  }
 }
