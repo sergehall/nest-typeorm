@@ -12,12 +12,12 @@ export class ProductsController {
     private readonly parseQueriesService: ParseQueriesService,
     private readonly commandBus: CommandBus,
   ) {}
-  @Get('/test-arr')
+  @Get('/test-products')
   async getBlogsOwnedByCurrentUser(@Query() query: any): Promise<string> {
     const queryData: ParseQueriesDto =
       await this.parseQueriesService.getQueriesData(query);
 
-    const countProducts = queryData.countProducts;
+    const countProducts: number = queryData.countProducts;
 
     return await this.commandBus.execute(
       new CreateAndSaveCreateRandomProductsCommand(countProducts),
