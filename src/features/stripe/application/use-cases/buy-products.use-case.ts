@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BuyRequestDto, ProductDto } from '../../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import {
-  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
