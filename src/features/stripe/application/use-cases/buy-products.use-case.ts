@@ -122,17 +122,17 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
     });
   }
 
-  private async verifiedQuantities(productDto: ProductDto[]): Promise<void> {
-    const insufficientProductsMessage: string | null =
-      await this.productsRepo.checkProductQuantities(productDto);
-
-    if (insufficientProductsMessage) {
-      throw new BadRequestException({
-        message: {
-          message: insufficientProductsMessage,
-          field: 'quantity',
-        },
-      });
-    }
-  }
+  // private async verifiedQuantities(productDto: ProductDto[]): Promise<void> {
+  //   const insufficientProductsMessage: string | null =
+  //     await this.productsRepo.checkProductQuantities(productDto);
+  //
+  //   if (insufficientProductsMessage) {
+  //     throw new BadRequestException({
+  //       message: {
+  //         message: insufficientProductsMessage,
+  //         field: 'quantity',
+  //       },
+  //     });
+  //   }
+  // }
 }
