@@ -3,7 +3,6 @@ import { StripeFactory } from '../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { ProductsRepo } from '../../../common/products/infrastructure/products.repo';
 import { OrderDto } from '../../../common/products/dto/order.dto';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class StripeAdapter {
   constructor(
     private readonly stripeFactory: StripeFactory,
     private readonly postgresConfig: PostgresConfig,
-    private readonly productsRepo: ProductsRepo,
   ) {}
 
   async createCheckoutSession(
