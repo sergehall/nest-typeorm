@@ -1,7 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BuyRequestDto, ProductDto } from '../../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentManager } from '../../../../common/payment/payment-manager/payment-manager';
 import { PaymentSystem } from '../../../../common/payment/enums/payment-system.enums';
 import { ProductsRepo } from '../../../../common/products/infrastructure/products.repo';
@@ -75,36 +79,46 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       const clientId: string =
         currentUserDto?.userId || 'test-clientReferenceId';
 
-      for (const product of products) {
-        const productData: ProductsDataEntity | undefined = productsData.find(
-          (data) => data.productId === product.productId,
-        );
-
-        if (productData && product.quantity <= productData.stockQuantity) {
-          const totalPrice: string = (
-            product.quantity * Number(productData.unit_amount)
-          ).toFixed(2);
-          const order: OrderDto = {
-            orderId: uuid,
-            productId: product.productId,
-            name: productData.name,
-            description: productData.description,
-            currency: productData.currency,
-            quantity: product.quantity,
-            totalPrice: totalPrice,
-            clientId: clientId,
-            createdAt: new Date().toISOString(),
-            anyConfirmPaymentSystemData: paymentSystem,
-          };
-          orderArr.push(order);
-        } else {
-          console.log(
-            `Product with productId ${product.productId} is out of stock or not found.`,
+      try {
+        for (const product of products) {
+          const productData: ProductsDataEntity | undefined = productsData.find(
+            (data) => data.productId === product.productId,
           );
-        }
-      }
 
-      resolve(orderArr);
+          if (productData && product.quantity <= productData.stockQuantity) {
+            const totalPrice: string = (
+              product.quantity * Number(productData.unit_amount)
+            ).toFixed(2);
+            const order: OrderDto = {
+              orderId: uuid,
+              productId: product.productId,
+              name: productData.name,
+              description: productData.description,
+              currency: productData.currency,
+              quantity: product.quantity,
+              totalPrice: totalPrice,
+              clientId: clientId,
+              createdAt: new Date().toISOString(),
+              anyConfirmPaymentSystemData: paymentSystem,
+            };
+            orderArr.push(order);
+          } else {
+            console.log(
+              `Product with productId ${product.productId} is out of stock or not found.`,
+            );
+          }
+        }
+
+        if (orderArr.length === 0) {
+          reject(
+            new InternalServerErrorException('No valid orders were created.'),
+          );
+        } else {
+          resolve(orderArr);
+        }
+      } catch (error) {
+        reject(error); // Forwarding any unexpected errors
+      }
     });
   }
 
