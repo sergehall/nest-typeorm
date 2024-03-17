@@ -1,11 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BuyRequestDto, ProductDto } from '../../../blogs/dto/buy-request.dto';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { PaymentManager } from '../../../../common/payment/payment-manager/payment-manager';
 import { PaymentSystem } from '../../../../common/payment/enums/payment-system.enums';
 import { ProductsRepo } from '../../../../common/products/infrastructure/products.repo';
 import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
+import { OrderDto } from '../../../../common/products/dto/order.dto';
+import * as uuid4 from 'uuid4';
 
 export class BuyProductsCommand {
   constructor(
@@ -25,11 +27,12 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
   async execute(command: BuyProductsCommand): Promise<void> {
     const { buyRequest, paymentSystem, currentUserDto } = command;
 
-    const products = buyRequest.products;
-
+    const products: ProductDto[] = buyRequest.products;
+    console.log('products', products);
     const productsData: string | ProductsDataEntity[] =
       await this.productsRepo.getProductsByIds(products);
     console.log('productsData', productsData);
+
     // await this.verifiedQuantities(products);
 
     // await this.paymentManager.processPayment(
@@ -37,22 +40,70 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
     //   paymentSystem,
     //   currentUserDto,
     // );
-    return;
-    // if (productsData instanceof Array) {
-    //   await this.paymentManager.processPayment(
-    //     productsData,
-    //     paymentSystem,
-    //     currentUserDto,
-    //   );
-    //   return;
-    // }
-    //
-    // throw new BadRequestException({
-    //   message: {
-    //     message: productsData,
-    //     field: 'quantity',
-    //   },
-    // });
+    // return;
+    if (productsData instanceof Array) {
+      const ordersDto = await this.createOrder(
+        products,
+        productsData,
+        currentUserDto,
+      );
+      console.log('ordersDto', ordersDto);
+
+      // await this.paymentManager.processPayment(
+      //   productsData,
+      //   paymentSystem,
+      //   currentUserDto,
+      // );
+
+      return;
+    }
+
+    throw new NotFoundException(productsData);
+  }
+
+  private async createOrder(
+    products: ProductDto[],
+    productsData: ProductsDataEntity[],
+    currentUserDto: CurrentUserDto | null,
+  ): Promise<OrderDto[]> {
+    return new Promise<OrderDto[]>((resolve, reject) => {
+      const orderArr: OrderDto[] = [];
+      const uuid: string = uuid4();
+      const anyConfirmPaymentSystemData: PaymentSystem = PaymentSystem.STRIPE;
+      const clientId: string =
+        currentUserDto?.userId || 'test-clientReferenceId';
+
+      for (const product of products) {
+        const productData: ProductsDataEntity | undefined = productsData.find(
+          (data) => data.productId === product.productId,
+        );
+
+        if (productData && product.quantity <= productData.stockQuantity) {
+          const totalPrice: string = (
+            product.quantity * Number(productData.unit_amount)
+          ).toFixed(2);
+          const order: OrderDto = {
+            orderId: uuid,
+            productId: product.productId,
+            name: productData.name,
+            description: productData.description,
+            currency: productData.currency,
+            quantity: product.quantity,
+            totalPrice: totalPrice,
+            clientId: clientId,
+            createdAt: new Date().toISOString(),
+            anyConfirmPaymentSystemData: anyConfirmPaymentSystemData,
+          };
+          orderArr.push(order);
+        } else {
+          console.log(
+            `Product with productId ${product.productId} is out of stock or not found.`,
+          );
+        }
+      }
+
+      resolve(orderArr);
+    });
   }
 
   private async verifiedQuantities(productDto: ProductDto[]): Promise<void> {

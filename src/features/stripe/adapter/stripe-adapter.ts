@@ -37,8 +37,9 @@ export class StripeAdapter {
     // Prepare line items for checkout session
     const lineItems = buyRequest.map((product: any) => {
       const productData = productsData.find(
-        (data) => data.id === product.productId,
+        (data) => data.productId === product.productId,
       );
+      console.log(productData?.unit_amount, 'productData.unit_amount');
       return {
         price_data: {
           product_data: {
@@ -47,7 +48,7 @@ export class StripeAdapter {
               productData?.description || 'Product Description not found',
           },
           unit_amount: productData?.unit_amount
-            ? productData.unit_amount * 100
+            ? Number(productData.unit_amount) * 100 //??????????
             : 0, // Assuming the price is in USD cents
           currency: Currency.USD,
         },

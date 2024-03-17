@@ -36,11 +36,8 @@ export class ProductsRepo {
       // Fetch product data for all product IDs concurrently
       const productPromises = products.map(async (product) => {
         const productData = await this.productsRepository.findOne({
-          where: { id: product.productId },
+          where: { productId: product.productId },
         });
-        if (!productData) {
-          throw new Error(`Product with ID ${product.productId} not found`);
-        }
         return { productData, product };
       });
 
@@ -49,20 +46,24 @@ export class ProductsRepo {
 
       // Check for insufficient quantity and update stock quantity for valid products
       const updatedProducts: ProductsDataEntity[] = [];
-      const insufficientProducts: string[] = [];
+      const notFoundProducts: string[] = [];
 
       for (const { productData, product } of productResults) {
-        if (productData.stockQuantity < product.quantity) {
-          insufficientProducts.push(product.productId);
+        if (!productData) {
+          notFoundProducts.push(product.productId);
         } else {
-          productData.stockQuantity -= product.quantity;
-          updatedProducts.push(productData);
+          if (productData.stockQuantity < product.quantity) {
+            notFoundProducts.push(product.productId);
+          } else {
+            productData.stockQuantity -= product.quantity;
+            updatedProducts.push(productData);
+          }
         }
       }
 
-      // If there are insufficient products, return error message
-      if (insufficientProducts.length > 0) {
-        return `Products with ID [${insufficientProducts.join(', ')}] do not have sufficient quantity`;
+      // If there are not found products, return error message
+      if (notFoundProducts.length > 0) {
+        return `Products with ID [${notFoundProducts.join(', ')}] not found or do not have sufficient quantity`;
       }
 
       // If there are no updated products, return empty array
@@ -125,7 +126,7 @@ export class ProductsRepo {
     try {
       for (const product of products) {
         const productData = await this.productsRepository.findOne({
-          where: { id: product.productId },
+          where: { productId: product.productId },
         });
 
         if (!productData) {

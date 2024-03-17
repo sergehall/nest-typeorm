@@ -1,6 +1,6 @@
 export enum PaymentSystem {
-  PAYPAL = 'PayPal',
   STRIPE = 'Stripe',
+  PAYPAL = 'PayPal',
   SQUARE = 'Square',
   APPLE_PAY = 'Apple Pay',
   GOOGLE_PAY = 'Google Pay',
