@@ -3,6 +3,7 @@ import { StripeAdapter } from '../../../features/stripe/adapter/stripe-adapter';
 import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
 import { Injectable } from '@nestjs/common';
 import { ProductDto } from '../../../features/blogs/dto/buy-request.dto';
+import { OrderDto } from '../../products/dto/order.dto';
 
 @Injectable()
 export class PaymentManager {
@@ -11,7 +12,7 @@ export class PaymentManager {
     // Inject adapters for other payment systems if needed
   ) {}
   async processPayment(
-    payment: ProductDto[],
+    payment: OrderDto[],
     paymentSystem: PaymentSystem,
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
@@ -48,7 +49,7 @@ export class PaymentManager {
   }
 
   private async processStripePayment(
-    productsData: ProductDto[],
+    productsData: OrderDto[],
     currentUserDto: CurrentUserDto | null,
   ): Promise<void> {
     // Call the appropriate method from StripeAdapter
