@@ -24,6 +24,9 @@ export class OrderDto {
   quantity: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  unit_amount: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   totalPrice: string;
 
   @IsString()

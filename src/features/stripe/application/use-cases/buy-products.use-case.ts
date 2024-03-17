@@ -31,10 +31,8 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
     const { buyRequest, paymentSystem, currentUserDto } = command;
 
     const products: ProductDto[] = buyRequest.products;
-    console.log('products', products);
     const productsData: string | ProductsDataEntity[] =
       await this.productsRepo.getProductsByIds(products);
-    console.log('productsData', productsData);
 
     // await this.verifiedQuantities(products);
 
@@ -45,19 +43,19 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
     // );
     // return;
     if (productsData instanceof Array) {
-      const ordersDto = await this.createOrder(
+      const ordersDto: OrderDto[] = await this.createOrder(
         products,
         productsData,
         paymentSystem,
         currentUserDto,
       );
-      console.log('ordersDto', ordersDto);
+      console.log(ordersDto, 'ordersDto');
 
-      // await this.paymentManager.processPayment(
-      //   productsData,
-      //   paymentSystem,
-      //   currentUserDto,
-      // );
+      await this.paymentManager.processPayment(
+        ordersDto,
+        paymentSystem,
+        currentUserDto,
+      );
 
       return;
     }
@@ -95,6 +93,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
               description: productData.description,
               currency: productData.currency,
               quantity: product.quantity,
+              unit_amount: productData.unit_amount,
               totalPrice: totalPrice,
               clientId: clientId,
               createdAt: new Date().toISOString(),
