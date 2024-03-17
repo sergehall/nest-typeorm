@@ -45,6 +45,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       const ordersDto = await this.createOrder(
         products,
         productsData,
+        paymentSystem,
         currentUserDto,
       );
       console.log('ordersDto', ordersDto);
@@ -64,12 +65,13 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
   private async createOrder(
     products: ProductDto[],
     productsData: ProductsDataEntity[],
+    paymentSystem: PaymentSystem,
     currentUserDto: CurrentUserDto | null,
   ): Promise<OrderDto[]> {
     return new Promise<OrderDto[]>((resolve, reject) => {
       const orderArr: OrderDto[] = [];
       const uuid: string = uuid4();
-      const anyConfirmPaymentSystemData: PaymentSystem = PaymentSystem.STRIPE;
+
       const clientId: string =
         currentUserDto?.userId || 'test-clientReferenceId';
 
@@ -92,7 +94,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
             totalPrice: totalPrice,
             clientId: clientId,
             createdAt: new Date().toISOString(),
-            anyConfirmPaymentSystemData: anyConfirmPaymentSystemData,
+            anyConfirmPaymentSystemData: paymentSystem,
           };
           orderArr.push(order);
         } else {
