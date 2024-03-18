@@ -1,7 +1,7 @@
 import { IsString, IsNumber, Min, IsEnum } from 'class-validator';
-import { PaymentSystem } from '../../../common/payment/enums/payment-system.enums';
 import { Column } from 'typeorm';
-import { Currency } from '../../../common/payment/enums/currency.enums';
+import { Currency } from '../../../enums/currency.enums';
+import { PaymentSystem } from '../../../enums/payment-system.enums';
 
 export class PaymentStripeDto {
   @IsString()

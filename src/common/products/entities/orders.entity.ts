@@ -57,7 +57,7 @@ export class OrdersEntity {
     orderEntity.items = items;
     orderEntity.anyConfirmPaymentSystemData =
       anyConfirmPaymentSystemData || null;
-    orderEntity.payments = []; // Assuming payments are initially empty
+    orderEntity.payments = []; // Assuming payment are initially empty
     return orderEntity;
   }
 }

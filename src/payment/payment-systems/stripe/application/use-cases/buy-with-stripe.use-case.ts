@@ -1,16 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CurrentUserDto } from '../../../users/dto/current-user.dto';
-import { NotFoundException } from '@nestjs/common';
-import { PaymentManager } from '../../../../common/payment/payment-manager/payment-manager';
-import { PaymentSystem } from '../../../../common/payment/enums/payment-system.enums';
-import { ProductsRepo } from '../../../../common/products/infrastructure/products.repo';
-import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
-import { PaymentStripeDto } from '../../dto/payment-stripe.dto';
-import { StripeService } from '../stripe.service';
 import {
   ProductRequest,
   ProductsRequestDto,
-} from '../../../../common/products/products-request.dto';
+} from '../../../../../common/products/products-request.dto';
+import { CurrentUserDto } from '../../../../../features/users/dto/current-user.dto';
+import { PaymentManager } from '../../../../payment-manager/payment-manager';
+import { StripeService } from '../stripe.service';
+import { ProductsRepo } from '../../../../../common/products/infrastructure/products.repo';
+import { PaymentSystem } from '../../../../enums/payment-system.enums';
+import { ProductsDataEntity } from '../../../../../common/products/entities/products-data.entity';
+import { NotFoundException } from '@nestjs/common';
+import { PaymentStripeDto } from '../../dto/payment-stripe.dto';
 
 export class BuyWithStripeCommand {
   constructor(

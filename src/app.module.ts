@@ -29,9 +29,9 @@ import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { StripeModule } from './features/stripe/stripe.module';
-import { PaymentModule } from './common/payment/payment.module';
 import { ProductsModule } from './common/products/products.module';
+import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [

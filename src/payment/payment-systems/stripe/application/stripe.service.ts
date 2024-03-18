@@ -1,10 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
-import { PaymentSystem } from '../../../common/payment/enums/payment-system.enums';
-import { CurrentUserDto } from '../../users/dto/current-user.dto';
+
 import { PaymentStripeDto } from '../dto/payment-stripe.dto';
 import * as uuid4 from 'uuid4';
-import { ProductRequest } from '../../../common/products/products-request.dto';
+import { ProductRequest } from '../../../../common/products/products-request.dto';
+import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
+import { PaymentSystem } from '../../../enums/payment-system.enums';
+import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 
 @Injectable()
 export class StripeService {
