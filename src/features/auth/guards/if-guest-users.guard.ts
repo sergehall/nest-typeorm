@@ -6,6 +6,7 @@ import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { GuestUsersRepo } from '../../users/infrastructure/guest-users.repo';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
+import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 
 @Injectable()
 export class IfGuestUsersGuard implements CanActivate {
@@ -18,35 +19,43 @@ export class IfGuestUsersGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    if (request.headers && request.headers.authorization) {
+      const accessToken = request.headers.authorization.split(' ')[1];
 
-    if (!request.headers || !request.headers.authorization) {
-      request.user = await this.guestUsersRepo.getInstanceOfGuestUser();
-      return true;
+      const payload: PayloadDto = await this.commandBus.execute(
+        new ValidAccessJwtCommand(accessToken),
+      );
+
+      const jwtExistInBlackList: boolean =
+        await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
+
+      if (payload && !jwtExistInBlackList) {
+        const user: UsersEntity | null =
+          await this.usersRepo.findNotBannedUserById(payload.userId);
+
+        request.user =
+          user && !user.isBanned
+            ? {
+                userId: user.userId,
+                login: user.login,
+                email: user.email,
+                orgId: user.orgId,
+                roles: user.roles,
+                isBanned: user.isBanned,
+              }
+            : null;
+        return true;
+      }
     }
 
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload: PayloadDto = await this.commandBus.execute(
-      new ValidAccessJwtCommand(accessToken),
-    );
-    const jwtExistInBlackList: boolean =
-      await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
-
-    let user: UsersEntity | null = null;
-    if (payload && !jwtExistInBlackList) {
-      user = await this.usersRepo.findNotBannedUserById(payload.userId);
-    }
-
-    request.user = user
-      ? {
-          userId: user.userId,
-          login: user.login,
-          email: user.email,
-          orgId: user.orgId,
-          roles: user.roles,
-          isBanned: user.isBanned,
-        }
-      : await this.guestUsersRepo.getInstanceOfGuestUser();
-
+    const instanceOfGuestUser =
+      await this.guestUsersRepo.getInstanceOfGuestUser();
+    await this.guestUsersRepo.save(instanceOfGuestUser);
+    request.user = {
+      guestUserId: instanceOfGuestUser.guestUserId,
+      roles: instanceOfGuestUser.roles,
+      isBanned: instanceOfGuestUser.isBanned,
+    };
     return true;
   }
 }

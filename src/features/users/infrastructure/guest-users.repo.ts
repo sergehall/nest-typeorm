@@ -11,7 +11,7 @@ export class GuestUsersRepo {
   ) {}
 
   async getInstanceOfGuestUser(): Promise<GuestUsersEntity> {
-    return GuestUsersEntity.createUserEntity();
+    return GuestUsersEntity.createGuestUsersEntity();
   }
 
   async save(guestUsersEntity: GuestUsersEntity): Promise<GuestUsersEntity> {

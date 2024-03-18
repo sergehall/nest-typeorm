@@ -7,6 +7,8 @@ import { ProductsDataEntity } from '../../../../common/products/entities/product
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
+import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
+import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
 
 @Injectable()
 export class StripeService {
@@ -24,24 +26,25 @@ export class StripeService {
     productsRequest: ProductRequest[],
     productsDataEntities: ProductsDataEntity[],
     paymentSystem: PaymentSystem,
-    currentUserDto: CurrentUserDto | null,
+    currentUserDto: CurrentUserDto | GuestUsersDto,
   ): Promise<PaymentStripeDto[]> {
     return new Promise<PaymentStripeDto[]>((resolve, reject) => {
       const orderArr: PaymentStripeDto[] = [];
       const orderId: string = uuid4();
       const createdAt: string = new Date().toISOString();
 
-      let clientId: string;
-
-      if (!currentUserDto) {
-        // Creating an unregistered client as a guest.
-        const unregisteredClient: UsersEntity = new UsersEntity();
-        unregisteredClient.userId = uuid4();
-
-        clientId = unregisteredClient.userId;
-      } else {
-        clientId = currentUserDto.userId;
-      }
+      const client =
+        currentUserDto instanceof CurrentUserDto
+          ? (() => {
+              const user = new UsersEntity();
+              user.userId = currentUserDto.userId;
+              return user;
+            })()
+          : (() => {
+              const guestUser = new GuestUsersEntity();
+              guestUser.guestUserId = currentUserDto.guestUserId;
+              return guestUser;
+            })();
 
       try {
         for (const product of productsRequest) {
@@ -59,7 +62,7 @@ export class StripeService {
               productId: product.productId,
               name: productData.name,
               description: productData.description,
-              clientId: clientId,
+              client: client,
               createdAt: createdAt,
               quantity: product.quantity,
               unit_amount: productData.unit_amount,

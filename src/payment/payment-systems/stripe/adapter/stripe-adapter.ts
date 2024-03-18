@@ -3,6 +3,10 @@ import Stripe from 'stripe';
 import { PaymentStripeDto } from '../dto/payment-stripe.dto';
 import { StripeFactory } from '../../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
+import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
+import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 
 @Injectable()
 export class StripeAdapter {
@@ -20,7 +24,12 @@ export class StripeAdapter {
       this.getStripeUrls('success'),
       this.getStripeUrls('cancel'),
     ]);
-    const client_reference_id = paymentStripeDto[0].clientId;
+
+    const currentClient = paymentStripeDto[0].client;
+    const client_reference_id =
+      currentClient instanceof CurrentUserDto
+        ? currentClient.userId
+        : currentClient.guestUserId;
 
     // Prepare line items for checkout session
     const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {
