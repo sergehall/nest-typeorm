@@ -26,6 +26,7 @@ import { ProductsDataEntity } from '../../../common/products/entities/products-d
 import { OrdersEntity } from '../../../common/products/entities/orders.entity';
 import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
 import { OrderItemsEntity } from '../../../common/products/entities/order-items.entity';
+import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -50,6 +51,7 @@ export class TypeOrmPostgresOptions
       ssl: { rejectUnauthorized: false },
       entities: [
         UsersEntity,
+        GuestUsersEntity,
         SecurityDevicesEntity,
         BloggerBlogsEntity,
         BlogsSubscribersEntity,

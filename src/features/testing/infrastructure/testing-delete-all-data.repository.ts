@@ -36,6 +36,7 @@ export class TestingDeleteAllDataRepository {
       'Comments',
       'Posts',
       'BloggerBlogs',
+      'GuestUsers',
       'Users',
     ];
 

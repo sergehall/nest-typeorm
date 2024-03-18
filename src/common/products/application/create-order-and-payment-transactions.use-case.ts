@@ -64,11 +64,11 @@ export class CreateOrderAndPaymentTransactionsUseCase
         paymentStripeDto,
         order,
       );
+      await this.ordersRepo.save(order);
 
-      // Store paymentTransaction, order, orderItem in the database
+      // Store paymentTransaction, orderItem in the database
       await Promise.all([
         this.paymentTransactionsRepo.save(paymentTransactionEntity),
-        this.ordersRepo.save(order),
         this.orderItemsRepo.save(orderItemsEntities),
       ]);
 

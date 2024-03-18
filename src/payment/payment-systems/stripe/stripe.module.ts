@@ -14,11 +14,37 @@ import { StripeConfig } from '../../../config/stripe/stripe.config';
 import { PaymentManager } from '../../payment-manager/payment-manager';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { ProductsRepo } from '../../../common/products/infrastructure/products.repo';
+import { InvalidJwtRepo } from '../../../features/auth/infrastructure/invalid-jwt-repo';
+import { InvalidJwtEntity } from '../../../features/auth/entities/invalid-jwt.entity';
+import { UsersRepo } from '../../../features/users/infrastructure/users-repo';
+import { UsersEntity } from '../../../features/users/entities/users.entity';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
+import { GamePairsRepo } from '../../../features/pair-game-quiz/infrastructure/game-pairs.repo';
+import { PairsGameEntity } from '../../../features/pair-game-quiz/entities/pairs-game.entity';
+import { ChallengeQuestionsEntity } from '../../../features/pair-game-quiz/entities/challenge-questions.entity';
+import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
+import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
+import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entities/questions-quiz.entity';
+import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-users.repo';
+import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 
 const stripeUseCases = [BuyWithStripeUseCase, ProcessStripeWebHookUseCase];
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      GuestUsersEntity,
+      ProductsDataEntity,
+      InvalidJwtEntity,
+      PairsGameEntity,
+      QuestionsQuizEntity,
+      ChallengeQuestionsEntity,
+    ]),
+    CqrsModule,
+  ],
   controllers: [StripeController],
   providers: [
     StripeFactory,
@@ -29,8 +55,15 @@ const stripeUseCases = [BuyWithStripeUseCase, ProcessStripeWebHookUseCase];
     StripeAdapter,
     StripeService,
     ParseQueriesService,
+    UsersRepo,
+    GuestUsersRepo,
+    InvalidJwtRepo,
     ProductsRepo,
+    GamePairsRepo,
+    GameQuestionsRepo,
+    ChallengesQuestionsRepo,
     ...stripeUseCases,
+    ...helpers,
   ],
 })
 export class StripeModule {}
