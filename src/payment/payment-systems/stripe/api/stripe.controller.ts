@@ -12,7 +12,7 @@ import { ProcessStripeWebHookCommand } from '../application/use-cases/process-st
 import { Request } from 'express';
 import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.use-case';
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
-import { ProductsRequestDto } from '../../../../common/products/products-request.dto';
+import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 
 @Controller('stripe')

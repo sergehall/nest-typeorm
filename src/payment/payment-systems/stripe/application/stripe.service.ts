@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { PaymentStripeDto } from '../dto/payment-stripe.dto';
 import * as uuid4 from 'uuid4';
-import { ProductRequest } from '../../../../common/products/products-request.dto';
+import { ProductRequest } from '../../../../common/products/dto/products-request.dto';
 import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
@@ -27,7 +27,7 @@ export class StripeService {
   ): Promise<PaymentStripeDto[]> {
     return new Promise<PaymentStripeDto[]>((resolve, reject) => {
       const orderArr: PaymentStripeDto[] = [];
-      const uuid: string = uuid4();
+      const orderId: string = uuid4();
       const clientId: string =
         currentUserDto?.userId || 'test-clientReferenceId';
       const createdAt: string = new Date().toISOString();
@@ -44,7 +44,7 @@ export class StripeService {
               product.quantity * Number(productData.unit_amount)
             ).toFixed(2);
             const order: PaymentStripeDto = {
-              orderId: uuid,
+              orderId: orderId,
               productId: product.productId,
               name: productData.name,
               description: productData.description,
@@ -54,7 +54,7 @@ export class StripeService {
               unit_amount: productData.unit_amount,
               totalPrice: totalPrice,
               currency: productData.currency,
-              anyConfirmPaymentSystemData: paymentSystem,
+              paymentSystem: paymentSystem,
             };
             orderArr.push(order);
           } else {

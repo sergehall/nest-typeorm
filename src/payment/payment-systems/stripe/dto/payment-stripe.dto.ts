@@ -36,5 +36,5 @@ export class PaymentStripeDto {
   createdAt: string;
 
   @IsEnum(PaymentSystem)
-  anyConfirmPaymentSystemData: PaymentSystem;
+  paymentSystem: PaymentSystem;
 }
