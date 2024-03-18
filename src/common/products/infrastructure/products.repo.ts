@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsDataEntity } from '../entities/products-data.entity';
-import { ProductDto } from '../../../features/blogs/dto/buy-request.dto';
+import { ProductRequest } from '../products-request.dto';
 
 @Injectable()
 export class ProductsRepo {
@@ -11,18 +11,6 @@ export class ProductsRepo {
     private readonly productsRepository: Repository<ProductsDataEntity>,
   ) {}
 
-  async getProducts(ids: string[]): Promise<ProductsDataEntity[]> {
-    try {
-      // Retrieve products based on the provided IDs using QueryBuilder
-      return await this.productsRepository
-        .createQueryBuilder('product')
-        .where('product.id IN (:...ids)', { ids })
-        .getMany();
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   /**
    * Retrieves products from the database by their IDs and checks their availability.
    * @param products An array of ProductDto objects containing product IDs and quantities.
@@ -30,13 +18,13 @@ export class ProductsRepo {
    *          or a string indicating products that are not available.
    */
   async getProductsByIds(
-    products: ProductDto[],
+    products: ProductRequest[],
   ): Promise<string | ProductsDataEntity[]> {
     try {
       // Fetch product data for all product IDs concurrently
       const productPromises = products.map(async (product) => {
         const productData = await this.productsRepository.findOne({
-          where: { productId: product.productId },
+          where: { productId: product.productId, isActive: true },
         });
         return { productData, product };
       });
@@ -120,7 +108,9 @@ export class ProductsRepo {
   //   }
   // }
 
-  async checkProductQuantities(products: ProductDto[]): Promise<string | null> {
+  async checkProductQuantities(
+    products: ProductRequest[],
+  ): Promise<string | null> {
     const insufficientProducts: string[] = [];
 
     try {

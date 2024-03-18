@@ -1,6 +1,6 @@
 import { IsNotEmpty, Validate } from 'class-validator';
 
-export class ProductDto {
+export class ProductRequest {
   @IsNotEmpty()
   productId: string;
 
@@ -18,7 +18,7 @@ class IsArrayAndNotEmpty {
   }
 }
 
-export class BuyRequestDto {
+export class ProductsRequestDto {
   @Validate(IsArrayAndNotEmpty)
-  products: ProductDto[];
+  products: ProductRequest[];
 }
