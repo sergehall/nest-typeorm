@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { StripeFactory } from '../../../config/stripe/stripe-factory';
-import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
 import { PaymentStripeDto } from '../dto/payment-stripe.dto';
+import { StripeFactory } from '../../../../config/stripe/stripe-factory';
+import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 
 @Injectable()
 export class StripeAdapter {

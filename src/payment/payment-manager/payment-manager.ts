@@ -1,7 +1,7 @@
 import { PaymentSystem } from '../enums/payment-system.enums';
-import { StripeAdapter } from '../../../features/stripe/adapter/stripe-adapter';
 import { Injectable } from '@nestjs/common';
-import { PaymentStripeDto } from '../../../features/stripe/dto/payment-stripe.dto';
+import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
+import { PaymentStripeDto } from '../payment-systems/stripe/dto/payment-stripe.dto';
 
 @Injectable()
 export class PaymentManager {

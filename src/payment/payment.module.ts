@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PaymentManager } from './payment-manager/payment-manager';
-import { StripeAdapter } from '../../features/stripe/adapter/stripe-adapter';
-import { StripeFactory } from '../../config/stripe/stripe-factory';
-import { NodeEnvConfig } from '../../config/node-env/node-env.config';
-import { StripeConfig } from '../../config/stripe/stripe.config';
-import { PostgresConfig } from '../../config/db/postgres/postgres.config';
-import { ProductsRepo } from '../products/infrastructure/products.repo';
-import { ProductsDataEntity } from '../products/entities/products-data.entity';
+import { NodeEnvConfig } from '../config/node-env/node-env.config';
+import { StripeConfig } from '../config/stripe/stripe.config';
+import { PostgresConfig } from '../config/db/postgres/postgres.config';
+import { ProductsDataEntity } from '../common/products/entities/products-data.entity';
+import { StripeFactory } from '../config/stripe/stripe-factory';
+import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
+import { ProductsRepo } from '../common/products/infrastructure/products.repo';
 
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
 
