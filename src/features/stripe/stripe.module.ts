@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { StripeFactory } from '../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
-import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
 import { StripeConfig } from '../../config/stripe/stripe.config';
 import { ProcessStripeWebHookUseCase } from './application/use-cases/process-stripe-webhook.use-case';
 import { NodeEnvConfig } from '../../config/node-env/node-env.config';
@@ -13,8 +12,10 @@ import { PaymentManager } from '../../common/payment/payment-manager/payment-man
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { ProductsRepo } from '../../common/products/infrastructure/products.repo';
 import { ProductsDataEntity } from '../../common/products/entities/products-data.entity';
+import { BuyWithStripeUseCase } from './application/use-cases/buy-with-stripe.use-case';
+import { StripeService } from './application/stripe.service';
 
-const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
+const stripeUseCases = [BuyWithStripeUseCase, ProcessStripeWebHookUseCase];
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
@@ -26,6 +27,7 @@ const stripeUseCases = [BuyProductsUseCase, ProcessStripeWebHookUseCase];
     StripeConfig,
     PaymentManager,
     StripeAdapter,
+    StripeService,
     ParseQueriesService,
     ProductsRepo,
     ...stripeUseCases,

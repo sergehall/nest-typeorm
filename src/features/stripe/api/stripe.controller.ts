@@ -7,14 +7,13 @@ import {
   RawBodyRequest,
   Req,
 } from '@nestjs/common';
-import { BuyRequestDto } from '../../blogs/dto/buy-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { BuyProductsCommand } from '../application/use-cases/buy-products.use-case';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 import { Request } from 'express';
-import { PaymentSystem } from '../../../common/payment/enums/payment-system.enums';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
+import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.use-case';
+import { ProductsRequestDto } from '../../../common/products/products-request.dto';
 
 @Controller('stripe')
 export class StripeController {
@@ -26,7 +25,7 @@ export class StripeController {
   @Get('buy/products')
   // @UseGuards(NoneStatusGuard)
   async buy(
-    @Body() products: BuyRequestDto,
+    @Body() productsRequestDto: ProductsRequestDto,
     @Req() req: any,
     // @Query() query: any,
   ): Promise<string> {
@@ -35,10 +34,8 @@ export class StripeController {
     //   await this.parseQueriesService.getQueriesData(query);
     // const productsQuery = queryData.products;
 
-    // // Assuming you want to use Stripe for payment
-    const paymentSystem = PaymentSystem.STRIPE;
     return this.commandBus.execute(
-      new BuyProductsCommand(products, paymentSystem, currentUserDto),
+      new BuyWithStripeCommand(productsRequestDto, currentUserDto),
     );
   }
 

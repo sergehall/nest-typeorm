@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BuyRequestDto } from '../../features/blogs/dto/buy-request.dto';
+import { ProductsRequestDto } from '../products/products-request.dto';
 
 @Injectable()
 export class JsonUtils {
-  async fromJson(jsonString: string): Promise<BuyRequestDto> {
+  async fromJson(jsonString: string): Promise<ProductsRequestDto> {
     return new Promise((resolve, reject) => {
       try {
         // Parse the JSON string

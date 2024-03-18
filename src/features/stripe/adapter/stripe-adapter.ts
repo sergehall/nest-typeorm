@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { StripeFactory } from '../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import Stripe from 'stripe';
-import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { OrderDto } from '../../../common/products/dto/order.dto';
+import { PaymentStripeDto } from '../dto/payment-stripe.dto';
 
 @Injectable()
 export class StripeAdapter {
@@ -13,8 +12,7 @@ export class StripeAdapter {
   ) {}
 
   async createCheckoutSession(
-    orderDto: OrderDto[],
-    currentUserDto: CurrentUserDto | null,
+    paymentStripeDto: PaymentStripeDto[],
   ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
     // Create Stripe instance and retrieve URLs
     const [stripeInstance, successUrl, cancelUrl] = await Promise.all([
@@ -22,9 +20,10 @@ export class StripeAdapter {
       this.getStripeUrls('success'),
       this.getStripeUrls('cancel'),
     ]);
+    const client_reference_id = paymentStripeDto[0].clientId;
 
     // Prepare line items for checkout session
-    const lineItems = orderDto.map((product: OrderDto) => {
+    const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {
       return {
         price_data: {
           product_data: {
@@ -44,12 +43,12 @@ export class StripeAdapter {
       cancel_url: cancelUrl,
       line_items: lineItems,
       mode: 'payment',
-      client_reference_id: currentUserDto?.userId || 'test-clientReferenceId',
+      client_reference_id: client_reference_id,
     });
   }
 
   // async createCheckoutSession(
-  //   orderDto: OrderDto[],
+  //   orderDto: PaymentStripeDto[],
   //   currentUserDto: CurrentUserDto | null,
   // ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
   //   // Get product IDs from buyRequest
