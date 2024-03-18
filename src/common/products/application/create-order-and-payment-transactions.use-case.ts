@@ -11,6 +11,9 @@ import { OrdersRepo } from '../infrastructure/orders.repo';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { OrderItemsRepo } from '../infrastructure/order-items.repo';
 import { ProductsDataEntity } from '../entities/products-data.entity';
+import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
+import { GuestUsersEntity } from '../entities/unregistered-users.entity';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class CreateOrderAndPaymentTransactionsCommand {
   constructor(public paymentStripeDto: PaymentStripeDto[]) {}
@@ -36,12 +39,21 @@ export class CreateOrderAndPaymentTransactionsUseCase
         .toString();
       const paymentSystem = paymentStripeDto[0].paymentSystem;
       const createdAt = paymentStripeDto[0].createdAt;
-      const clientId = paymentStripeDto[0].clientId;
       const orderId = paymentStripeDto[0].orderId;
 
-      // Create client entity
-      const client = new UsersEntity();
-      client.userId = clientId;
+      const currentClient = paymentStripeDto[0].client;
+      let client: UsersEntity | null = null;
+      let guestClient: GuestUsersEntity | null = null;
+
+      if (currentClient instanceof UsersEntity) {
+        client = currentClient;
+      } else if (currentClient instanceof GuestUsersEntity) {
+        guestClient = currentClient;
+      }
+
+      // // Create client entity
+      // const client = new UsersEntity();
+      // client.userId = clientId;
 
       // Create order entity
       const order = new OrdersEntity();
@@ -49,6 +61,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
       order.totalPrice = totalPrice;
       order.createdAt = createdAt;
       order.client = client;
+      order.guestClient = guestClient;
       order.paymentSystem = paymentSystem;
 
       // Create payment transaction entity

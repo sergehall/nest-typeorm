@@ -15,14 +15,6 @@ export class GuestUsersEntity {
 
   @Column({
     type: 'enum',
-    enum: OrgIdEnums,
-    default: OrgIdEnums.UNREGISTERED,
-    nullable: false,
-  })
-  orgId: OrgIdEnums;
-
-  @Column({
-    type: 'enum',
     enum: UserRolesEnums,
     array: true,
     default: [UserRolesEnums.USER],
@@ -35,9 +27,6 @@ export class GuestUsersEntity {
   @Column({ type: 'character varying', nullable: true, default: null })
   banReason: string | null = null;
 
-  @Column({ nullable: false })
-  expirationDate: string;
-
   @Column({ default: false })
   isBanned: boolean;
 
@@ -49,12 +38,11 @@ export class GuestUsersEntity {
 
   events: any[] = [];
 
-  static createUserEntity(): GuestUsersEntity {
+  static createGuestUsersEntity(): GuestUsersEntity {
     const user: GuestUsersEntity = new GuestUsersEntity();
     user.guestUserId = uuid4();
     user.createdAt = new Date().toISOString();
-    user.orgId = OrgIdEnums.UNREGISTERED;
-    user.roles = [UserRolesEnums.USER];
+    user.roles = [UserRolesEnums.UNREGISTERED];
     user.isBanned = false;
     user.banDate = null;
     user.banReason = null;

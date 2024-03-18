@@ -12,11 +12,12 @@ import { ProductsDataEntity } from '../../../../../common/products/entities/prod
 import { NotFoundException } from '@nestjs/common';
 import { PaymentStripeDto } from '../../dto/payment-stripe.dto';
 import { CreateOrderAndPaymentTransactionsCommand } from '../../../../../common/products/application/create-order-and-payment-transactions.use-case';
+import { GuestUsersDto } from '../../../../../features/users/dto/guest-users.dto';
 
 export class BuyWithStripeCommand {
   constructor(
     public productsRequestDto: ProductsRequestDto,
-    public currentUserDto: CurrentUserDto,
+    public currentUserDto: CurrentUserDto | GuestUsersDto,
   ) {}
 }
 
@@ -53,11 +54,10 @@ export class BuyWithStripeUseCase
         currentUserDto,
       );
     console.log(paymentStripeDto, 'paymentStripeDto');
-    const orderAndPaymentTransactions = await this.commandBus.execute(
+    await this.commandBus.execute(
       new CreateOrderAndPaymentTransactionsCommand(paymentStripeDto),
     );
-    console.log(orderAndPaymentTransactions, 'orderAndPaymentTransactions');
-    // await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
+    await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
   }
 }
 

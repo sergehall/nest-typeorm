@@ -16,6 +16,8 @@ import { ParseQueriesService } from '../../../../common/query/parse-queries.serv
 import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
+import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
+import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 
 @Controller('stripe')
 export class StripeController {
@@ -31,7 +33,7 @@ export class StripeController {
     @Req() req: any,
     // @Query() query: any,
   ): Promise<string> {
-    const currentUserDto: CurrentUserDto = req.user;
+    const currentUserDto: CurrentUserDto | GuestUsersDto = req.user;
 
     // const queryData: ParseQueriesDto =
     //   await this.parseQueriesService.getQueriesData(query);
