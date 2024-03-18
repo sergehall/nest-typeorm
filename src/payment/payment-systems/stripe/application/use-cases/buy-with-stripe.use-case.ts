@@ -13,6 +13,7 @@ import { NotFoundException } from '@nestjs/common';
 import { PaymentStripeDto } from '../../dto/payment-stripe.dto';
 import { CreateOrderAndPaymentTransactionsCommand } from '../../../../../common/products/application/create-order-and-payment-transactions.use-case';
 import { GuestUsersDto } from '../../../../../features/users/dto/guest-users.dto';
+import { PaymentLinkDto } from '../../../../dto/payment-link.dto';
 
 export class BuyWithStripeCommand {
   constructor(
@@ -32,7 +33,7 @@ export class BuyWithStripeUseCase
     private readonly productsRepo: ProductsRepo,
   ) {}
 
-  async execute(command: BuyWithStripeCommand): Promise<void> {
+  async execute(command: BuyWithStripeCommand): Promise<PaymentLinkDto | null> {
     const { productsRequestDto, currentUserDto } = command;
 
     const paymentSystem = PaymentSystem.STRIPE;
@@ -53,11 +54,15 @@ export class BuyWithStripeUseCase
         paymentSystem,
         currentUserDto,
       );
-    console.log(paymentStripeDto, 'paymentStripeDto');
+
     await this.commandBus.execute(
       new CreateOrderAndPaymentTransactionsCommand(paymentStripeDto),
     );
-    await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
+
+    return await this.paymentManager.processPayment(
+      paymentStripeDto,
+      paymentSystem,
+    );
   }
 }
 

@@ -1,7 +1,6 @@
 import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
 import * as uuid4 from 'uuid4';
-import { OrgIdEnums } from '../../../features/users/enums/org-id.enums';
 import { SecurityDevicesEntity } from '../../../features/security-devices/entities/session-devices.entity';
 
 @Unique(['guestUserId', 'isBanned'])

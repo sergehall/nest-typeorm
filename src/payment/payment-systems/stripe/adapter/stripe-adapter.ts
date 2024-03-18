@@ -39,7 +39,7 @@ export class StripeAdapter {
             name: product.name,
             description: product.description,
           },
-          unit_amount: Number(product.unit_amount) * 100, // Assuming the price is in USD cents
+          unit_amount: Math.round(parseFloat(product.unit_amount) * 100), // Assuming the price is in USD cents
           currency: product.currency,
         },
         quantity: product.quantity,
