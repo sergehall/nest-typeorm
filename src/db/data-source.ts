@@ -25,6 +25,7 @@ import { ProductsDataEntity } from '../common/products/entities/products-data.en
 import { PaymentTransactionsEntity } from '../common/products/entities/payment-transaction.entity';
 import { OrdersEntity } from '../common/products/entities/orders.entity';
 import { OrderItemsEntity } from '../common/products/entities/order-items.entity';
+import { GuestUsersEntity } from '../common/products/entities/unregistered-users.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -37,6 +38,7 @@ export default new DataSource({
   migrationsTableName: 'migrationsNest',
   entities: [
     UsersEntity,
+    GuestUsersEntity,
     SecurityDevicesEntity,
     BloggerBlogsEntity,
     BlogsSubscribersEntity,

@@ -6,6 +6,7 @@ import {
   Post,
   RawBodyRequest,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
@@ -14,22 +15,25 @@ import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.u
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
 import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
+import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 
 @Controller('stripe')
 export class StripeController {
   constructor(
     private readonly commandBus: CommandBus,
-    protected parseQueriesService: ParseQueriesService,
+    private readonly parseQueriesService: ParseQueriesService,
   ) {}
 
   @Get('buy/products')
-  // @UseGuards(NoneStatusGuard)
+  @UseGuards(IfGuestUsersGuard)
   async buy(
     @Body() productsRequestDto: ProductsRequestDto,
     @Req() req: any,
     // @Query() query: any,
   ): Promise<string> {
-    const currentUserDto: CurrentUserDto | null = req.user;
+    const currentUserDto: CurrentUserDto = req.user;
+
     // const queryData: ParseQueriesDto =
     //   await this.parseQueriesService.getQueriesData(query);
     // const productsQuery = queryData.products;

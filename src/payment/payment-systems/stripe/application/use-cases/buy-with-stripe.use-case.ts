@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import {
   ProductRequest,
   ProductsRequestDto,
@@ -11,11 +11,12 @@ import { PaymentSystem } from '../../../../enums/payment-system.enums';
 import { ProductsDataEntity } from '../../../../../common/products/entities/products-data.entity';
 import { NotFoundException } from '@nestjs/common';
 import { PaymentStripeDto } from '../../dto/payment-stripe.dto';
+import { CreateOrderAndPaymentTransactionsCommand } from '../../../../../common/products/application/create-order-and-payment-transactions.use-case';
 
 export class BuyWithStripeCommand {
   constructor(
     public productsRequestDto: ProductsRequestDto,
-    public currentUserDto: CurrentUserDto | null,
+    public currentUserDto: CurrentUserDto,
   ) {}
 }
 
@@ -24,6 +25,7 @@ export class BuyWithStripeUseCase
   implements ICommandHandler<BuyWithStripeCommand>
 {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly paymentManager: PaymentManager,
     private readonly stripeService: StripeService,
     private readonly productsRepo: ProductsRepo,
@@ -50,8 +52,11 @@ export class BuyWithStripeUseCase
         paymentSystem,
         currentUserDto,
       );
-
     console.log(paymentStripeDto, 'paymentStripeDto');
+    const orderAndPaymentTransactions = await this.commandBus.execute(
+      new CreateOrderAndPaymentTransactionsCommand(paymentStripeDto),
+    );
+    console.log(orderAndPaymentTransactions, 'orderAndPaymentTransactions');
     // await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
   }
 }

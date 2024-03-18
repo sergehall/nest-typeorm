@@ -6,6 +6,7 @@ import { ProductRequest } from '../../../../common/products/dto/products-request
 import { ProductsDataEntity } from '../../../../common/products/entities/products-data.entity';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
 
 @Injectable()
 export class StripeService {
@@ -28,9 +29,19 @@ export class StripeService {
     return new Promise<PaymentStripeDto[]>((resolve, reject) => {
       const orderArr: PaymentStripeDto[] = [];
       const orderId: string = uuid4();
-      const clientId: string =
-        currentUserDto?.userId || 'test-clientReferenceId';
       const createdAt: string = new Date().toISOString();
+
+      let clientId: string;
+
+      if (!currentUserDto) {
+        // Creating an unregistered client as a guest.
+        const unregisteredClient: UsersEntity = new UsersEntity();
+        unregisteredClient.userId = uuid4();
+
+        clientId = unregisteredClient.userId;
+      } else {
+        clientId = currentUserDto.userId;
+      }
 
       try {
         for (const product of productsRequest) {

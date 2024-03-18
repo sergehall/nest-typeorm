@@ -39,7 +39,7 @@ export class OrdersEntity {
     eager: true,
   })
   @JoinColumn({ name: 'clientId', referencedColumnName: 'userId' })
-  client: UsersEntity | null;
+  client: UsersEntity;
 
   @OneToMany(() => PaymentTransactionsEntity, (payment) => payment.order)
   payments: PaymentTransactionsEntity[];
@@ -51,7 +51,7 @@ export class OrdersEntity {
     totalPrice: string,
     createdAt: string,
     paymentSystem: PaymentSystem,
-    client: UsersEntity | null,
+    client: UsersEntity,
   ): OrdersEntity {
     const orderEntity = new OrdersEntity();
     orderEntity.orderId = uuid4();
