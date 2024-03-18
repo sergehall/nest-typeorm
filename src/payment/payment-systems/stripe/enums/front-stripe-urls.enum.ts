@@ -1,4 +1,3 @@
-export enum FrontStripeUrlsEnum {
+export enum StripeUrlsEnum {
   BaseUrl = 'https://stripe.com',
-  BaseShortUrl = 'https://stripe.com',
 }
