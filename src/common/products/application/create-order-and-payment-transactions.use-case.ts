@@ -44,16 +44,11 @@ export class CreateOrderAndPaymentTransactionsUseCase
       const currentClient = paymentStripeDto[0].client;
       let client: UsersEntity | null = null;
       let guestClient: GuestUsersEntity | null = null;
-
       if (currentClient instanceof UsersEntity) {
         client = currentClient;
       } else if (currentClient instanceof GuestUsersEntity) {
         guestClient = currentClient;
       }
-
-      // // Create client entity
-      // const client = new UsersEntity();
-      // client.userId = clientId;
 
       // Create order entity
       const order = new OrdersEntity();

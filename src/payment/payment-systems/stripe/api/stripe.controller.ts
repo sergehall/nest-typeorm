@@ -18,6 +18,7 @@ import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto'
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
+import { PaymentLinkDto } from '../../../dto/payment-link.dto';
 
 @Controller('stripe')
 export class StripeController {
@@ -32,7 +33,7 @@ export class StripeController {
     @Body() productsRequestDto: ProductsRequestDto,
     @Req() req: any,
     // @Query() query: any,
-  ): Promise<string> {
+  ): Promise<PaymentLinkDto | null> {
     const currentUserDto: CurrentUserDto | GuestUsersDto = req.user;
 
     // const queryData: ParseQueriesDto =
@@ -57,7 +58,8 @@ export class StripeController {
   }
 
   @Get('/success')
-  async success(): Promise<string> {
+  async success(@Req() req: RawBodyRequest<Request>): Promise<string> {
+    console.log(req, "@Get('/success')");
     return 'The purchase was successfully completed';
   }
 

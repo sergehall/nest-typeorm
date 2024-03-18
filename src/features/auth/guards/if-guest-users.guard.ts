@@ -6,7 +6,6 @@ import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { GuestUsersRepo } from '../../users/infrastructure/guest-users.repo';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
-import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 
 @Injectable()
 export class IfGuestUsersGuard implements CanActivate {
