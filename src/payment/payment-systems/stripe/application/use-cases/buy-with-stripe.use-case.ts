@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import {
   ProductRequest,
   ProductsRequestDto,
-} from '../../../../../common/products/products-request.dto';
+} from '../../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../../features/users/dto/current-user.dto';
 import { PaymentManager } from '../../../../payment-manager/payment-manager';
 import { StripeService } from '../stripe.service';
@@ -51,7 +51,8 @@ export class BuyWithStripeUseCase
         currentUserDto,
       );
 
-    await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
+    console.log(paymentStripeDto, 'paymentStripeDto');
+    // await this.paymentManager.processPayment(paymentStripeDto, paymentSystem);
   }
 }
 

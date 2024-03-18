@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsDataEntity } from '../entities/products-data.entity';
-import { ProductRequest } from '../products-request.dto';
+import { ProductRequest } from '../dto/products-request.dto';
 
 @Injectable()
 export class ProductsRepo {

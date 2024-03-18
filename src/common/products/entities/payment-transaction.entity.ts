@@ -9,8 +9,8 @@ export class PaymentTransactionsEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;
 
-  @Column({ type: 'bigint' }) // Storing price in cents as a bigint to avoid floating-point errors
-  priceInCents: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  totalPrice: string;
 
   @Column({
     type: 'enum',
@@ -31,8 +31,8 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'character varying', length: 50, nullable: false })
   createdAt: string;
 
-  @Column({ type: 'character varying', length: 50, nullable: false })
-  updatedAt: string;
+  @Column({ type: 'character varying', length: 50, nullable: true })
+  updatedAt: string | null;
 
   @Column({ type: 'json', nullable: true })
   paymentProviderInfoJson: any;
@@ -44,22 +44,21 @@ export class PaymentTransactionsEntity {
   order: OrdersEntity;
 
   static createPaymentTransactionEntity(
-    priceInCents: number,
+    totalPrice: string,
+    createdAt: string,
+    order: OrdersEntity,
     paymentSystem: PaymentSystem,
     status: PaymentsStatusEnum,
-    createdAt: string,
-    updatedAt: string,
-    order: OrdersEntity,
     paymentProviderInfoJson?: any,
     anyConfirmPaymentSystemData?: any,
   ): PaymentTransactionsEntity {
     const paymentTransactionEntity = new PaymentTransactionsEntity();
     paymentTransactionEntity.id = uuid4();
-    paymentTransactionEntity.priceInCents = priceInCents;
+    paymentTransactionEntity.totalPrice = totalPrice;
     paymentTransactionEntity.paymentSystem = paymentSystem;
     paymentTransactionEntity.status = status;
     paymentTransactionEntity.createdAt = createdAt;
-    paymentTransactionEntity.updatedAt = updatedAt;
+    paymentTransactionEntity.updatedAt = null;
     paymentTransactionEntity.order = order;
     paymentTransactionEntity.paymentProviderInfoJson =
       paymentProviderInfoJson || null;

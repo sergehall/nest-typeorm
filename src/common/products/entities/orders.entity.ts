@@ -10,6 +10,7 @@ import { PaymentTransactionsEntity } from './payment-transaction.entity';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { OrderItemsEntity } from './order-items.entity';
 import * as uuid4 from 'uuid4';
+import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 
 @Entity('Orders')
 export class OrdersEntity {
@@ -25,15 +26,20 @@ export class OrdersEntity {
   @Column({ type: 'character varying', nullable: true })
   updatedAt: string | null;
 
-  @Column({ type: 'json', nullable: true })
-  anyConfirmPaymentSystemData: any;
+  @Column({
+    type: 'enum',
+    enum: PaymentSystem,
+    default: PaymentSystem.STRIPE,
+    nullable: false,
+  })
+  paymentSystem: PaymentSystem;
 
   @ManyToOne(() => UsersEntity, (user) => user.userId, {
     nullable: false,
     eager: true,
   })
   @JoinColumn({ name: 'clientId', referencedColumnName: 'userId' })
-  client: UsersEntity;
+  client: UsersEntity | null;
 
   @OneToMany(() => PaymentTransactionsEntity, (payment) => payment.order)
   payments: PaymentTransactionsEntity[];
@@ -44,20 +50,16 @@ export class OrdersEntity {
   static createOrderEntity(
     totalPrice: string,
     createdAt: string,
-    client: UsersEntity,
-    items: OrderItemsEntity[],
-    anyConfirmPaymentSystemData?: any,
+    paymentSystem: PaymentSystem,
+    client: UsersEntity | null,
   ): OrdersEntity {
     const orderEntity = new OrdersEntity();
     orderEntity.orderId = uuid4();
     orderEntity.totalPrice = totalPrice;
+    orderEntity.paymentSystem = paymentSystem;
     orderEntity.createdAt = createdAt;
     orderEntity.updatedAt = null;
     orderEntity.client = client;
-    orderEntity.items = items;
-    orderEntity.anyConfirmPaymentSystemData =
-      anyConfirmPaymentSystemData || null;
-    orderEntity.payments = []; // Assuming payment are initially empty
     return orderEntity;
   }
 }

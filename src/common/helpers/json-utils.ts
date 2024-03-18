@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ProductsRequestDto } from '../products/products-request.dto';
+import { ProductsRequestDto } from '../products/dto/products-request.dto';
 
 @Injectable()
 export class JsonUtils {
