@@ -15,7 +15,6 @@ import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.u
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
 import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 
 @Controller('stripe')
