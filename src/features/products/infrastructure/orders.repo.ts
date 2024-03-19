@@ -15,7 +15,7 @@ export class OrdersRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
-  async updatePaymentStatusAndUpdatedAt(
+  async completedPayment(
     orderId: string,
     clientId: string,
     updatedAt: string,
