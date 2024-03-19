@@ -14,6 +14,8 @@ import { PaymentTransactionsRepo } from '../../payment/infrastructure/payment-tr
 import { OrderItemsRepo } from './infrastructure/order-items.repo';
 import { CreateOrderAndPaymentTransactionsUseCase } from './application/create-order-and-payment-transactions.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
+import { KeyResolver } from '../../common/helpers/key-resolver';
+import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 
 const useCases = [
   CreateRandomProductsUseCase,
@@ -21,6 +23,8 @@ const useCases = [
   CreateOrderAndPaymentTransactionsUseCase,
 ];
 const services = [ParseQueriesService];
+
+const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
   imports: [
@@ -40,6 +44,7 @@ const services = [ParseQueriesService];
     PaymentTransactionsRepo,
     ...useCases,
     ...services,
+    ...helpers,
   ],
 })
 export class ProductsModule {}

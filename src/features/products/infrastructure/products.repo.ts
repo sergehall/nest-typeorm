@@ -1,14 +1,22 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsDataEntity } from '../entities/products-data.entity';
 import { ProductRequest } from '../dto/products-request.dto';
+import { KeyResolver } from '../../../common/helpers/key-resolver';
+import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 
 @Injectable()
 export class ProductsRepo {
   constructor(
     @InjectRepository(ProductsDataEntity)
     private readonly productsRepository: Repository<ProductsDataEntity>,
+    protected keyResolver: KeyResolver,
+    protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
   /**
@@ -51,7 +59,7 @@ export class ProductsRepo {
 
       // If there are not found products, return error message
       if (notFoundProducts.length > 0) {
-        return `Products with ID [${notFoundProducts.join(', ')}] not found or do not have sufficient quantity`;
+        return `Products with ID "${notFoundProducts.join(', ')}" not found or do not have sufficient quantity`;
       }
 
       // If there are no updated products, return empty array
@@ -64,6 +72,11 @@ export class ProductsRepo {
 
       return updatedProducts;
     } catch (error) {
+      if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
+        const productId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Products with ID ${productId} not found`);
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
