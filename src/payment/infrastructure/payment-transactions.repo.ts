@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import Stripe from 'stripe';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
+import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -31,6 +32,8 @@ export class PaymentTransactionsRepo {
         .select(['paymentTransaction.id', 'paymentTransaction.status'])
         .getOne();
 
+      console.log(paymentTransaction, 'paymentTransaction1');
+
       if (!paymentTransaction) {
         throw new NotFoundException(
           `Payment transaction with orderId ${orderId} not found`,
@@ -42,6 +45,7 @@ export class PaymentTransactionsRepo {
       paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
         checkoutSessionCompletedObject,
       );
+      console.log(paymentTransaction, 'paymentTransaction2');
 
       const updateResult = await this.paymentTransactionsRepository.update(
         paymentTransaction.id,
