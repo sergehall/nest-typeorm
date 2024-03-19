@@ -4,9 +4,7 @@ import { Request } from 'express';
 import Stripe from 'stripe';
 import { ConstructStripeEventCommand } from './construct-stripe-event.use-case';
 import { ProcessChargeSucceededCommand } from './process-stripe-charge-succeeded.use-case';
-import { StripeAdapter } from '../../adapter/stripe-adapter';
-import { StripeChargeObjectType } from '../../types/stripe-charge-object.type';
-import { StripeCheckoutSessionType } from '../../types/stripe-checkout-session.type';
+import { OrdersRepo } from '../../../../../features/products/infrastructure/orders.repo';
 
 export class ProcessStripeWebHookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -18,7 +16,7 @@ export class ProcessStripeWebHookUseCase
 {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly stripeAdapter: StripeAdapter,
+    private readonly ordersRepo: OrdersRepo,
   ) {}
 
   async execute(command: ProcessStripeWebHookCommand) {
@@ -27,26 +25,24 @@ export class ProcessStripeWebHookUseCase
     const event: Stripe.Event | undefined = await this.commandBus.execute(
       new ConstructStripeEventCommand(rawBodyRequest),
     );
-    console.log(event, 'event0');
     try {
       if (event) {
-        const chargeObject = event.data.object;
-        console.log(chargeObject, 'chargeObject');
-        const stripeChargeObject = chargeObject as StripeCheckoutSessionType;
-        const PAYMENT_INTENT_ID = stripeChargeObject.payment_intent;
-        const stripeInstance: Stripe =
-          await this.stripeAdapter.createStripeInstance();
-        const intent = await stripeInstance.paymentIntents.retrieve(
-          `${PAYMENT_INTENT_ID}`,
-        );
-        const latest_charge = intent.latest_charge;
-        console.log(latest_charge, 'latest_charge');
-
         switch (event.type) {
           case 'checkout.session.completed':
             console.log(event, 'event1');
-            const clientReferenceId = event.data.object.client_reference_id;
-            console.log(clientReferenceId, 'clientReferenceId');
+            const clientIdAndOrderId = event.data.object.client_reference_id;
+            if (clientIdAndOrderId) {
+              const updatedAt = new Date().toISOString();
+              const clientId = clientIdAndOrderId.split('.')[0];
+              const orderId = clientIdAndOrderId.split('.')[1];
+              const updated =
+                await this.ordersRepo.updatePaymentStatusAndUpdatedAt(
+                  orderId,
+                  clientId,
+                  updatedAt,
+                );
+              console.log('updated:', updated);
+            }
             // Do something with clientReferenceId
             break;
           case 'charge.succeeded':
@@ -54,6 +50,13 @@ export class ProcessStripeWebHookUseCase
               new ProcessChargeSucceededCommand(event),
             );
             break;
+          case 'payment_intent.succeeded':
+            console.log(event, 'event payment_intent.succeeded');
+            break;
+          case 'payment_intent.created':
+            console.log(event, 'event payment_intent.created');
+            break;
+
           default:
             // Handle other webhook events
             break;

@@ -19,10 +19,7 @@ export class ProcessStripeChargeSucceededUseCase
 
   async execute(command: ProcessChargeSucceededCommand): Promise<string> {
     const { event } = command;
-    console.log(event, 'event 3');
     try {
-      const chargeObject = event.data.object;
-      console.log(chargeObject, 'chargeObject');
       const stripeChargeObject = event.data.object as StripeChargeObjectType;
       const receiptUrl = stripeChargeObject.receipt_url;
       if (receiptUrl) {
@@ -32,7 +29,6 @@ export class ProcessStripeChargeSucceededUseCase
         // });
       }
 
-      console.log(receiptUrl, 'receiptUrl');
       return 'The purchase was successfully completed';
     } catch (error) {
       console.error(error);

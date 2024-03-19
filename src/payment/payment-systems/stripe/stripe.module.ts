@@ -6,14 +6,12 @@ import { ProcessStripeWebHookUseCase } from './application/use-cases/process-str
 import { StripeAdapter } from './adapter/stripe-adapter';
 import { BuyWithStripeUseCase } from './application/use-cases/buy-with-stripe.use-case';
 import { StripeService } from './application/stripe.service';
-import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
 import { StripeFactory } from '../../../config/stripe/stripe-factory';
 import { NodeEnvConfig } from '../../../config/node-env/node-env.config';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { StripeConfig } from '../../../config/stripe/stripe.config';
 import { PaymentManager } from '../../payment-manager/payment-manager';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { ProductsRepo } from '../../../common/products/infrastructure/products.repo';
 import { InvalidJwtRepo } from '../../../features/auth/infrastructure/invalid-jwt-repo';
 import { InvalidJwtEntity } from '../../../features/auth/entities/invalid-jwt.entity';
 import { UsersRepo } from '../../../features/users/infrastructure/users-repo';
@@ -27,12 +25,16 @@ import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infras
 import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-users.repo';
-import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 import { ConstructStripeEventUseCase } from './application/use-cases/construct-stripe-event.use-case';
 import { ProcessStripeSuccessUseCase } from './application/use-cases/process-stripe-success.use-case';
 import { ProcessStripeChargeSucceededUseCase } from './application/use-cases/process-stripe-charge-succeeded.use-case';
 import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
-import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
+import { GuestUsersEntity } from '../../../features/products/entities/unregistered-users.entity';
+import { PaymentTransactionsEntity } from '../../../features/products/entities/payment-transaction.entity';
+import { ProductsDataEntity } from '../../../features/products/entities/products-data.entity';
+import { ProductsRepo } from '../../../features/products/infrastructure/products.repo';
+import { OrdersRepo } from '../../../features/products/infrastructure/orders.repo';
+import { OrdersEntity } from '../../../features/products/entities/orders.entity';
 
 const stripeUseCases = [
   BuyWithStripeUseCase,
@@ -47,6 +49,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   imports: [
     TypeOrmModule.forFeature([
       UsersEntity,
+      OrdersEntity,
       GuestUsersEntity,
       ProductsDataEntity,
       InvalidJwtEntity,
@@ -67,6 +70,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     StripeAdapter,
     StripeService,
     ParseQueriesService,
+    OrdersRepo,
     UsersRepo,
     GuestUsersRepo,
     InvalidJwtRepo,

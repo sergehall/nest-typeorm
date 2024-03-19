@@ -8,7 +8,10 @@ import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 
 export class SaDeleteBlogByBlogIdCommand {
-  constructor(public blogId: string, public currentUserDto: CurrentUserDto) {}
+  constructor(
+    public blogId: string,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 
 @CommandHandler(SaDeleteBlogByBlogIdCommand)

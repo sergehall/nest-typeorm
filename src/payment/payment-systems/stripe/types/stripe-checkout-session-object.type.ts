@@ -1,4 +1,4 @@
-export type StripeCheckoutSessionType = {
+export type StripeCheckoutSessionObjectType = {
   id: string;
   object: string;
   after_expiration: string | null;

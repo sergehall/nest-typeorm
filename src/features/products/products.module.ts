@@ -4,7 +4,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ProductsController } from './api/products.controller';
 import { ProductsRepo } from './infrastructure/products.repo';
 import { ProductsDataEntity } from './entities/products-data.entity';
-import { ParseQueriesService } from '../query/parse-queries.service';
 import { CreateAndSaveCreateRandomProductsUseCase } from './application/create-and-save-create-random-products.use-case';
 import { CreateRandomProductsUseCase } from './application/create-random-products.use-case';
 import { OrderItemsEntity } from './entities/order-items.entity';
@@ -14,6 +13,7 @@ import { OrdersRepo } from './infrastructure/orders.repo';
 import { PaymentTransactionsRepo } from '../../payment/infrastructure/payment-transactions.repo';
 import { OrderItemsRepo } from './infrastructure/order-items.repo';
 import { CreateOrderAndPaymentTransactionsUseCase } from './application/create-order-and-payment-transactions.use-case';
+import { ParseQueriesService } from '../../common/query/parse-queries.service';
 
 const useCases = [
   CreateRandomProductsUseCase,

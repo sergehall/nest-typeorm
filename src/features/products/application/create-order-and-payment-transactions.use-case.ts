@@ -70,7 +70,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
         paymentStripeDto,
         order,
       );
-      await this.ordersRepo.save(order);
+      await this.ordersRepo.saveOrdersEntity(order);
 
       // Store paymentTransaction, orderItem in the database
       await Promise.all([
