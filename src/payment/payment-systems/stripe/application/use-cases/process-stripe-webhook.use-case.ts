@@ -4,7 +4,6 @@ import { Request } from 'express';
 import Stripe from 'stripe';
 import { ConstructStripeEventCommand } from './construct-stripe-event.use-case';
 import { ProcessChargeSucceededCommand } from './process-stripe-charge-succeeded.use-case';
-import { OrdersRepo } from '../../../../../features/products/infrastructure/orders.repo';
 import { FinalizeOrderPaymentCommand } from './finalize-order-payment.use-case';
 
 export class ProcessStripeWebHookCommand {
@@ -15,10 +14,7 @@ export class ProcessStripeWebHookCommand {
 export class ProcessStripeWebHookUseCase
   implements ICommandHandler<ProcessStripeWebHookCommand>
 {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly ordersRepo: OrdersRepo,
-  ) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   async execute(command: ProcessStripeWebHookCommand) {
     const { rawBodyRequest } = command;
@@ -30,7 +26,7 @@ export class ProcessStripeWebHookUseCase
       if (event) {
         switch (event.type) {
           case 'checkout.session.completed':
-            console.log(event, 'event1');
+            console.log(event, 'checkout.session.completed');
             await this.commandBus.execute(
               new FinalizeOrderPaymentCommand(event.data.object),
             );
