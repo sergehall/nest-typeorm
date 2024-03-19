@@ -17,8 +17,10 @@ export class ProcessStripeChargeSucceededUseCase
     const { event } = command;
     console.log(event, 'event 3');
     try {
-      const stripeObject = event.data as StripeChargeObjectType;
-      const receiptUrl = stripeObject.receipt_url;
+      const stripeChargeObject = event.data.object;
+      console.log(stripeChargeObject, 'stripeChargeObject');
+      const stripeChargeObjectType = event.data as StripeChargeObjectType;
+      const receiptUrl = stripeChargeObjectType.receipt_url;
       // if (hasOwnPropertyReceiptUrl) {
       //   const receiptUrl = event.data.object['receipt_url'];
       // }
