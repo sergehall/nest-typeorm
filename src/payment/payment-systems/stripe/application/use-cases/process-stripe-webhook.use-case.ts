@@ -32,6 +32,7 @@ export class ProcessStripeWebHookUseCase
         case 'checkout.session.completed':
           console.log(event, 'event');
           const clientReferenceId = event.data.object.client_reference_id;
+          console.log(clientReferenceId, 'clientReferenceId');
           // Do something with clientReferenceId
           break;
         default:
