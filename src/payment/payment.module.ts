@@ -9,7 +9,6 @@ import { StripeFactory } from '../config/stripe/stripe-factory';
 import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
 import { ProductsRepo } from '../features/products/infrastructure/products.repo';
-import { KeyResolver } from '../common/helpers/key-resolver';
 import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
 
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
