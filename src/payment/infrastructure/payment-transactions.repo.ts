@@ -29,7 +29,7 @@ export class PaymentTransactionsRepo {
     try {
       return await this.paymentTransactionsRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager): Promise<boolean> => {
-          const promises = [
+          const promises: Promise<boolean>[] = [
             this.updateOrderStatus(
               orderId,
               clientId,
