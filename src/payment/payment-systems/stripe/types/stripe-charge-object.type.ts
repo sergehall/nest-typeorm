@@ -1,0 +1,84 @@
+export type StripeChargeObjectType = {
+  id: string;
+  object: string;
+  amount: number;
+  amount_captured: number;
+  amount_refunded: number;
+  application: string | null;
+  application_fee: string | null;
+  application_fee_amount: number | null;
+  balance_transaction: string;
+  billing_details: {
+    address: {
+      city: string | null;
+      country: string | null;
+      line1: string | null;
+      line2: string | null;
+      postal_code: string | null;
+      state: string | null;
+    };
+    email: string | null;
+    name: string | null;
+    phone: string | null;
+  };
+  calculated_statement_descriptor: string | null;
+  captured: boolean;
+  created: number;
+  currency: string;
+  customer: string | null;
+  description: string | null;
+  disputed: boolean;
+  failure_balance_transaction: string | null;
+  failure_code: string | null;
+  failure_message: string | null;
+  fraud_details: Record<string, any>;
+  invoice: string | null;
+  livemode: boolean;
+  metadata: Record<string, any>;
+  on_behalf_of: string | null;
+  outcome: {
+    network_status: string;
+    reason: string | null;
+    risk_level: string;
+    risk_score: number;
+    seller_message: string;
+    type: string;
+  };
+  paid: boolean;
+  payment_intent: string | null;
+  payment_method: string;
+  payment_method_details: {
+    card: {
+      brand: string;
+      checks: {
+        address_line1_check: string | null;
+        address_postal_code_check: string | null;
+        cvc_check: string | null;
+      };
+      country: string;
+      exp_month: number;
+      exp_year: number;
+      fingerprint: string;
+      funding: string;
+      installments: number | null;
+      last4: string;
+      mandate: string | null;
+      network: string;
+      three_d_secure: string | null;
+      wallet: string | null;
+    };
+    type: string;
+  };
+  receipt_email: string | null;
+  receipt_number: string | null;
+  receipt_url: string;
+  refunded: boolean;
+  review: string | null;
+  shipping: string | null;
+  source_transfer: string | null;
+  statement_descriptor: string | null;
+  statement_descriptor_suffix: string | null;
+  status: string;
+  transfer_data: string | null;
+  transfer_group: string | null;
+};

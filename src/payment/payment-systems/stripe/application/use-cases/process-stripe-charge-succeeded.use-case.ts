@@ -1,6 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import Stripe from 'stripe';
+import { StripeChargeObjectType } from '../../types/stripe-charge-object.type';
 
 export class ProcessChargeSucceededCommand {
   constructor(public event: Stripe.Event) {}
@@ -15,9 +16,14 @@ export class ProcessStripeChargeSucceededUseCase
   async execute(command: ProcessChargeSucceededCommand): Promise<string> {
     const { event } = command;
     console.log(event, 'event 3');
+    const stripeObject = event.data as StripeChargeObjectType;
+    const receiptUrl = stripeObject.receipt_url;
     try {
-      const objectStrie = event.data.object;
-      console.log(objectStrie, 'objectStripe');
+      // if (hasOwnPropertyReceiptUrl) {
+      //   const receiptUrl = event.data.object['receipt_url'];
+      // }
+      //
+      console.log(receiptUrl, 'receiptUrl');
       return 'The purchase was successfully completed';
     } catch (error) {
       console.error(error);
