@@ -4,33 +4,112 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import Stripe from 'stripe';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
+import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
+import { OrdersEntity } from '../../features/products/entities/orders.entity';
 
 @Injectable()
 export class PaymentTransactionsRepo {
   constructor(
     @InjectRepository(PaymentTransactionsEntity)
     private readonly paymentTransactionsRepository: Repository<PaymentTransactionsEntity>,
+    @InjectRepository(OrdersEntity)
+    private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
-  async confirmPayment(
+
+  async completeOrderAndConfirmPayment(
     orderId: string,
+    clientId: string,
     updatedAt: string,
     checkoutSessionCompletedObject: Stripe.Checkout.Session,
   ): Promise<boolean> {
     try {
-      const paymentTransaction = await this.paymentTransactionsRepository
-        .createQueryBuilder('paymentTransaction')
-        .leftJoinAndSelect('paymentTransaction.order', 'order')
-        .where('paymentTransaction.orderId = :orderId', { orderId })
-        .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
-          paymentStatus: PaymentsStatusEnum.PENDING,
+      const result =
+        await this.paymentTransactionsRepository.manager.transaction(
+          async (transactionalEntityManager: EntityManager) => {
+            const promises = [
+              this.updateOrderStatus(
+                orderId,
+                clientId,
+                updatedAt,
+                transactionalEntityManager,
+              ),
+              this.confirmPayment(
+                orderId,
+                updatedAt,
+                checkoutSessionCompletedObject,
+                transactionalEntityManager,
+              ),
+            ];
+            const [orderUpdated, paymentConfirmed] =
+              await Promise.all(promises);
+            return orderUpdated && paymentConfirmed;
+          },
+        );
+      return result;
+    } catch (error) {
+      console.error('Error completing order and confirming payment:', error);
+      throw new InternalServerErrorException(
+        'Failed to complete order and confirm payment',
+      );
+    }
+  }
+
+  private async updateOrderStatus(
+    orderId: string,
+    clientId: string,
+    updatedAt: string,
+    manager: EntityManager,
+  ): Promise<boolean> {
+    try {
+      const order = await this.ordersRepository.manager
+        .createQueryBuilder(OrdersEntity, 'order')
+        .leftJoinAndSelect('order.client', 'client')
+        .leftJoinAndSelect('order.guestClient', 'guestClient')
+        .where('order.orderId = :orderId', { orderId })
+        .andWhere('order.orderStatus = :orderStatus', {
+          orderStatus: OrderStatusEnum.PENDING,
         })
+        .andWhere(
+          '(client.userId = :clientId OR guestClient.guestUserId = :clientId)',
+          { clientId },
+        )
         .getOne();
 
-      console.log(paymentTransaction, 'paymentTransaction1');
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      order.orderStatus = OrderStatusEnum.COMPLETED;
+      order.updatedAt = updatedAt;
+
+      await manager.save(order);
+      return true;
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      throw new InternalServerErrorException('Failed to update order status');
+    }
+  }
+
+  private async confirmPayment(
+    orderId: string,
+    updatedAt: string,
+    checkoutSessionCompletedObject: Stripe.Checkout.Session,
+    manager: EntityManager,
+  ): Promise<boolean> {
+    try {
+      const paymentTransaction =
+        await this.paymentTransactionsRepository.manager
+          .createQueryBuilder(PaymentTransactionsEntity, 'paymentTransaction')
+          .leftJoinAndSelect('paymentTransaction.order', 'order')
+          .where('paymentTransaction.orderId = :orderId', { orderId })
+          .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
+            paymentStatus: PaymentsStatusEnum.PENDING,
+          })
+          .getOne();
 
       if (!paymentTransaction) {
         throw new NotFoundException(
@@ -43,21 +122,57 @@ export class PaymentTransactionsRepo {
       paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
         checkoutSessionCompletedObject,
       );
-      console.log(paymentTransaction, 'paymentTransaction2');
 
-      const updateResult = await this.paymentTransactionsRepository.update(
-        paymentTransaction.id,
-        paymentTransaction,
-      );
-
-      return updateResult.affected === 1;
+      await manager.save(paymentTransaction);
+      return true;
     } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        'Failed to confirm payment and update data',
-      );
+      console.error('Error confirming payment:', error);
+      throw new InternalServerErrorException('Failed to confirm payment');
     }
   }
+  // async confirmPayment(
+  //   orderId: string,
+  //   updatedAt: string,
+  //   checkoutSessionCompletedObject: Stripe.Checkout.Session,
+  // ): Promise<boolean> {
+  //   try {
+  //     const paymentTransaction = await this.paymentTransactionsRepository
+  //       .createQueryBuilder('paymentTransaction')
+  //       .leftJoinAndSelect('paymentTransaction.order', 'order')
+  //       .where('paymentTransaction.orderId = :orderId', { orderId })
+  //       .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
+  //         paymentStatus: PaymentsStatusEnum.PENDING,
+  //       })
+  //       .getOne();
+  //
+  //     console.log(paymentTransaction, 'paymentTransaction1');
+  //
+  //     if (!paymentTransaction) {
+  //       throw new NotFoundException(
+  //         `Payment transaction with orderId ${orderId} not found`,
+  //       );
+  //     }
+  //
+  //     paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
+  //     paymentTransaction.updatedAt = updatedAt;
+  //     paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
+  //       checkoutSessionCompletedObject,
+  //     );
+  //     console.log(paymentTransaction, 'paymentTransaction2');
+  //
+  //     const updateResult = await this.paymentTransactionsRepository.update(
+  //       paymentTransaction.id,
+  //       paymentTransaction,
+  //     );
+  //
+  //     return updateResult.affected === 1;
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new InternalServerErrorException(
+  //       'Failed to confirm payment and update data',
+  //     );
+  //   }
+  // }
 
   async savePaymentTransactionsEntity(
     paymentTransaction: PaymentTransactionsEntity,
