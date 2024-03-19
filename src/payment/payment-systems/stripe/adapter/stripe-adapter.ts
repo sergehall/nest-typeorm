@@ -29,7 +29,7 @@ export class StripeAdapter {
         ? currentClient.userId
         : currentClient.guestUserId;
 
-    client_reference_id += `-${orderId}`;
+    client_reference_id += `.${orderId}`;
 
     // Prepare line items for checkout session
     const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {

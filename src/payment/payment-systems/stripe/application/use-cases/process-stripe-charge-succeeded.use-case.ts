@@ -16,9 +16,9 @@ export class ProcessStripeChargeSucceededUseCase
   async execute(command: ProcessChargeSucceededCommand): Promise<string> {
     const { event } = command;
     console.log(event, 'event 3');
-    const stripeObject = event.data as StripeChargeObjectType;
-    const receiptUrl = stripeObject.receipt_url;
     try {
+      const stripeObject = event.data as StripeChargeObjectType;
+      const receiptUrl = stripeObject.receipt_url;
       // if (hasOwnPropertyReceiptUrl) {
       //   const receiptUrl = event.data.object['receipt_url'];
       // }
