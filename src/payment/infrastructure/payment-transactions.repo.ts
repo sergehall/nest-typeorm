@@ -24,9 +24,9 @@ export class PaymentTransactionsRepo {
       const paymentTransaction = await this.paymentTransactionsRepository
         .createQueryBuilder('paymentTransaction')
         .leftJoinAndSelect('paymentTransaction.order', 'order')
-        .where('order.orderId = :orderId', { orderId })
-        .andWhere('paymentTransaction.status = :status', {
-          status: PaymentsStatusEnum.PENDING,
+        .where('paymentTransaction.orderId = :orderId', { orderId })
+        .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
+          paymentStatus: PaymentsStatusEnum.PENDING,
         })
         .select(['paymentTransaction.id', 'paymentTransaction.status'])
         .getOne();
