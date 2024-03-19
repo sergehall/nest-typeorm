@@ -2,7 +2,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import Stripe from 'stripe';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
-import { OrdersRepo } from '../../../../../features/products/infrastructure/orders.repo';
 
 export class FinalizeOrderPaymentCommand {
   constructor(public checkoutSessionCompletedObject: Stripe.Checkout.Session) {}
@@ -13,7 +12,6 @@ export class FinalizeOrderPaymentUseCase
   implements ICommandHandler<FinalizeOrderPaymentCommand>
 {
   constructor(
-    private readonly ordersRepo: OrdersRepo,
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
 
