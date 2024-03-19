@@ -31,6 +31,8 @@ import { GuestUsersEntity } from '../../../common/products/entities/unregistered
 import { ConstructStripeEventUseCase } from './application/use-cases/construct-stripe-event.use-case';
 import { ProcessStripeSuccessUseCase } from './application/use-cases/process-stripe-success.use-case';
 import { ProcessStripeChargeSucceededUseCase } from './application/use-cases/process-stripe-charge-succeeded.use-case';
+import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
+import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
 
 const stripeUseCases = [
   BuyWithStripeUseCase,
@@ -50,6 +52,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       InvalidJwtEntity,
       PairsGameEntity,
       QuestionsQuizEntity,
+      PaymentTransactionsEntity,
       ChallengeQuestionsEntity,
     ]),
     CqrsModule,
@@ -70,6 +73,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ProductsRepo,
     GamePairsRepo,
     GameQuestionsRepo,
+    PaymentTransactionsRepo,
     ChallengesQuestionsRepo,
     ...stripeUseCases,
     ...helpers,

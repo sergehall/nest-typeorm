@@ -34,6 +34,7 @@ export class StripeAdapter {
     // Prepare line items for checkout session
     const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {
       return {
+        order_id: product.orderId,
         price_data: {
           product_data: {
             name: product.name,

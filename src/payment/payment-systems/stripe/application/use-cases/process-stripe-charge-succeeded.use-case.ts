@@ -2,6 +2,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import Stripe from 'stripe';
 import { StripeChargeObjectType } from '../../types/stripe-charge-object.type';
+import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 
 export class ProcessChargeSucceededCommand {
   constructor(public event: Stripe.Event) {}
@@ -11,21 +12,26 @@ export class ProcessChargeSucceededCommand {
 export class ProcessStripeChargeSucceededUseCase
   implements ICommandHandler<ProcessChargeSucceededCommand>
 {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
+  ) {}
 
   async execute(command: ProcessChargeSucceededCommand): Promise<string> {
     const { event } = command;
     console.log(event, 'event 3');
     try {
-      const stripeChargeObject = event.data.object;
-      console.log(stripeChargeObject, 'stripeChargeObject');
-      const stripeChargeObjectType = event.data
-        .object as StripeChargeObjectType;
-      const receiptUrl = stripeChargeObjectType.receipt_url;
-      // if (hasOwnPropertyReceiptUrl) {
-      //   const receiptUrl = event.data.object['receipt_url'];
-      // }
-      //
+      const chargeObject = event.data.object;
+      console.log(chargeObject, 'chargeObject');
+      const stripeChargeObject = event.data.object as StripeChargeObjectType;
+      const receiptUrl = stripeChargeObject.receipt_url;
+      if (receiptUrl) {
+        // await this.paymentTransactionsRepo.saveReceiptUrl({
+        //   paymentId: stripeChargeObject.id,
+        //   receiptUrl,
+        // });
+      }
+
       console.log(receiptUrl, 'receiptUrl');
       return 'The purchase was successfully completed';
     } catch (error) {
