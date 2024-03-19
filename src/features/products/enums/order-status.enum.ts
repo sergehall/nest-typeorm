@@ -1,7 +1,7 @@
 export enum OrderStatusEnum {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  ON_HOLD = 'ON_HOLD',
+  PENDING = 'Pending',
+  PROCESSING = 'Processing',
+  COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  ON_HOLD = 'On-hold',
 }

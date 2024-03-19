@@ -37,7 +37,7 @@ export class PaymentTransactionsRepo {
         );
       }
 
-      paymentTransaction.status = PaymentsStatusEnum.CONFIRMED;
+      paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
       paymentTransaction.updatedAt = updatedAt;
       paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
         checkoutSessionCompletedObject,

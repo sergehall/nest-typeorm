@@ -32,7 +32,7 @@ export class PaymentTransactionsEntity {
     default: PaymentsStatusEnum.PENDING,
     nullable: false,
   })
-  status: PaymentsStatusEnum;
+  paymentStatus: PaymentsStatusEnum;
 
   @Column({ type: 'character varying', length: 50, nullable: false })
   createdAt: string;
@@ -58,7 +58,7 @@ export class PaymentTransactionsEntity {
     createdAt: string,
     order: OrdersEntity,
     paymentSystem: PaymentSystem,
-    status: PaymentsStatusEnum,
+    paymentStatus: PaymentsStatusEnum,
     paymentProviderInfoJson?: any,
     anyConfirmPaymentSystemData?: any,
   ): PaymentTransactionsEntity {
@@ -67,7 +67,7 @@ export class PaymentTransactionsEntity {
     paymentTransactionEntity.receiptUrl = null;
     paymentTransactionEntity.totalPrice = totalPrice;
     paymentTransactionEntity.paymentSystem = paymentSystem;
-    paymentTransactionEntity.status = status;
+    paymentTransactionEntity.paymentStatus = paymentStatus;
     paymentTransactionEntity.createdAt = createdAt;
     paymentTransactionEntity.updatedAt = null;
     paymentTransactionEntity.order = order;
