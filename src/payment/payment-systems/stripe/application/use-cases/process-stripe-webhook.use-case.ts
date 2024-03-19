@@ -21,9 +21,9 @@ export class ProcessStripeWebHookUseCase
     const event: Stripe.Event | undefined = await this.commandBus.execute(
       new ConstructStripeEventCommand(rawBodyRequest),
     );
+    console.log(event, 'event0');
     try {
       if (event) {
-        console.log(event, 'event0');
         switch (event.type) {
           case 'checkout.session.completed':
             console.log(event, 'event1');
