@@ -16,9 +16,9 @@ import { ParseQueriesService } from '../../../../common/query/parse-queries.serv
 import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
-import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentLinkDto } from '../../../dto/payment-link.dto';
+import { ProcessStripeSuccessCommand } from '../application/use-cases/process-stripe-success.use-case';
 
 @Controller('stripe')
 export class StripeController {
@@ -59,6 +59,10 @@ export class StripeController {
 
   @Get('/success')
   async success(@Req() req: RawBodyRequest<Request>): Promise<string> {
+    const eventSuccess = await this.commandBus.execute(
+      new ProcessStripeSuccessCommand(req),
+    );
+    console.log(eventSuccess, 'eventSuccess');
     return 'The purchase was successfully completed';
   }
 
