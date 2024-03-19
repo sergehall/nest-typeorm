@@ -8,7 +8,6 @@ import { Repository } from 'typeorm';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import Stripe from 'stripe';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
-import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -40,16 +39,15 @@ export class PaymentTransactionsRepo {
 
       paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
       paymentTransaction.updatedAt = updatedAt;
-      // paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
-      //   checkoutSessionCompletedObject,
-      // );
+      paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
+        checkoutSessionCompletedObject,
+      );
 
       const updateResult = await this.paymentTransactionsRepository.update(
         paymentTransaction.id,
         paymentTransaction,
       );
 
-      // Check if the update operation affected exactly one row
       return updateResult.affected === 1;
     } catch (error) {
       console.error(error);
