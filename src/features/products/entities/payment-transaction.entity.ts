@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { OrdersEntity } from './orders.entity';
 import * as uuid4 from 'uuid4';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 import { IsOptional, IsUrl } from 'class-validator';
+import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 
 @Entity('PaymentTransactions')
 export class PaymentTransactionsEntity {
@@ -59,8 +59,6 @@ export class PaymentTransactionsEntity {
     order: OrdersEntity,
     paymentSystem: PaymentSystem,
     paymentStatus: PaymentsStatusEnum,
-    paymentProviderInfoJson?: any,
-    anyConfirmPaymentSystemData?: any,
   ): PaymentTransactionsEntity {
     const paymentTransactionEntity = new PaymentTransactionsEntity();
     paymentTransactionEntity.id = uuid4();
@@ -71,10 +69,8 @@ export class PaymentTransactionsEntity {
     paymentTransactionEntity.createdAt = createdAt;
     paymentTransactionEntity.updatedAt = null;
     paymentTransactionEntity.order = order;
-    paymentTransactionEntity.paymentProviderInfoJson =
-      paymentProviderInfoJson || null;
-    paymentTransactionEntity.anyConfirmPaymentSystemData =
-      anyConfirmPaymentSystemData || null;
+    paymentTransactionEntity.paymentProviderInfoJson = null;
+    paymentTransactionEntity.anyConfirmPaymentSystemData = null;
     return paymentTransactionEntity;
   }
 }

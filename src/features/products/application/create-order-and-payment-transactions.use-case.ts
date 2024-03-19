@@ -93,14 +93,14 @@ export class CreateOrderAndPaymentTransactionsUseCase
     order: OrdersEntity,
     paymentSystem: PaymentSystem,
   ): PaymentTransactionsEntity {
-    const status = PaymentsStatusEnum.PENDING;
+    const paymentStatus = PaymentsStatusEnum.PENDING;
 
     return PaymentTransactionsEntity.createPaymentTransactionEntity(
       totalPrice,
       createdAt,
       order,
       paymentSystem,
-      status,
+      paymentStatus,
     );
   }
 

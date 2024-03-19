@@ -8,7 +8,6 @@ import { Repository } from 'typeorm';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import Stripe from 'stripe';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
-import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -29,7 +28,6 @@ export class PaymentTransactionsRepo {
         .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
           paymentStatus: PaymentsStatusEnum.PENDING,
         })
-        .select(['paymentTransaction.id', 'paymentTransaction.status'])
         .getOne();
 
       console.log(paymentTransaction, 'paymentTransaction1');
