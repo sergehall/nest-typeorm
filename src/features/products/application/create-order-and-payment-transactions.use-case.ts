@@ -74,7 +74,9 @@ export class CreateOrderAndPaymentTransactionsUseCase
 
       // Store paymentTransaction, orderItem in the database
       await Promise.all([
-        this.paymentTransactionsRepo.save(paymentTransactionEntity),
+        this.paymentTransactionsRepo.savePaymentTransactionsEntity(
+          paymentTransactionEntity,
+        ),
         this.orderItemsRepo.save(orderItemsEntities),
       ]);
 
