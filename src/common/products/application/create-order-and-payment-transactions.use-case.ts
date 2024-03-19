@@ -4,7 +4,7 @@ import { PaymentStripeDto } from '../../../payment/payment-systems/stripe/dto/pa
 import { PaymentTransactionsEntity } from '../entities/payment-transaction.entity';
 import { OrdersEntity } from '../entities/orders.entity';
 import { OrderItemsEntity } from '../entities/order-items.entity';
-import { PaymentTransactionsRepo } from '../infrastructure/payment-transactions.repo';
+import { PaymentTransactionsRepo } from '../../../payment/infrastructure/payment-transactions.repo';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 import { OrdersRepo } from '../infrastructure/orders.repo';
