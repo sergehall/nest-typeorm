@@ -15,7 +15,7 @@ export class PaymentTransactionsRepo {
     @InjectRepository(PaymentTransactionsEntity)
     private readonly paymentTransactionsRepository: Repository<PaymentTransactionsEntity>,
   ) {}
-  async confirmPaymentAndUpdateData(
+  async confirmPayment(
     orderId: string,
     updatedAt: string,
     checkoutSessionCompletedObject: Stripe.Checkout.Session,
@@ -24,7 +24,7 @@ export class PaymentTransactionsRepo {
       const paymentTransaction = await this.paymentTransactionsRepository
         .createQueryBuilder('paymentTransaction')
         .leftJoinAndSelect('paymentTransaction.order', 'order')
-        .where('paymentTransaction.orderId = :orderId', { orderId })
+        .where('order.orderId = :orderId', { orderId })
         .andWhere('paymentTransaction.status = :status', {
           status: PaymentsStatusEnum.PENDING,
         })
@@ -48,6 +48,7 @@ export class PaymentTransactionsRepo {
         paymentTransaction,
       );
 
+      // Check if the update operation affected exactly one row
       return updateResult.affected === 1;
     } catch (error) {
       console.error(error);

@@ -30,12 +30,8 @@ export class FinalizeOrderPaymentUseCase
       const updatedAt = new Date().toISOString();
 
       await Promise.all([
-        this.ordersRepo.updatePaymentStatusAndUpdatedAt(
-          orderId,
-          clientId,
-          updatedAt,
-        ),
-        this.paymentTransactionsRepo.confirmPaymentAndUpdateData(
+        this.ordersRepo.completedPayment(orderId, clientId, updatedAt),
+        this.paymentTransactionsRepo.confirmPayment(
           orderId,
           updatedAt,
           checkoutSessionCompletedObject,
