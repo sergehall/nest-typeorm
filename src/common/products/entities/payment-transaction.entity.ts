@@ -1,13 +1,19 @@
-import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { OrdersEntity } from './orders.entity';
 import * as uuid4 from 'uuid4';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
+import { IsOptional, IsUrl } from 'class-validator';
 
 @Entity('PaymentTransactions')
 export class PaymentTransactionsEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;
+
+  @Column({ type: 'text', nullable: true })
+  @IsUrl()
+  @IsOptional()
+  receiptUrl: string | null;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalPrice: string;
@@ -40,7 +46,11 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'json', nullable: true })
   anyConfirmPaymentSystemData: any;
 
-  @ManyToOne(() => OrdersEntity, (order) => order.payments)
+  @ManyToOne(() => OrdersEntity, (order) => order.payments, {
+    nullable: true,
+    eager: true,
+  })
+  @JoinColumn({ name: 'orderId', referencedColumnName: 'orderId' })
   order: OrdersEntity;
 
   static createPaymentTransactionEntity(
@@ -54,6 +64,7 @@ export class PaymentTransactionsEntity {
   ): PaymentTransactionsEntity {
     const paymentTransactionEntity = new PaymentTransactionsEntity();
     paymentTransactionEntity.id = uuid4();
+    paymentTransactionEntity.receiptUrl = null;
     paymentTransactionEntity.totalPrice = totalPrice;
     paymentTransactionEntity.paymentSystem = paymentSystem;
     paymentTransactionEntity.status = status;

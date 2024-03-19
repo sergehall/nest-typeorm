@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PaymentTransactionsEntity } from '../entities/payment-transaction.entity';
+import { PaymentTransactionsEntity } from '../../common/products/entities/payment-transaction.entity';
 
 @Injectable()
 export class PaymentTransactionsRepo {

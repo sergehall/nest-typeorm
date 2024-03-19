@@ -26,10 +26,13 @@ export class StripeAdapter {
     ]);
 
     const currentClient = paymentStripeDto[0].client;
-    const client_reference_id =
+    const orderId = paymentStripeDto[0].orderId;
+    let client_reference_id: string =
       currentClient instanceof CurrentUserDto
         ? currentClient.userId
         : currentClient.guestUserId;
+
+    client_reference_id += `-${orderId}`;
 
     // Prepare line items for checkout session
     const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {

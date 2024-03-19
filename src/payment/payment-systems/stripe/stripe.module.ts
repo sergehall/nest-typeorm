@@ -30,11 +30,13 @@ import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-use
 import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
 import { ConstructStripeEventUseCase } from './application/use-cases/construct-stripe-event.use-case';
 import { ProcessStripeSuccessUseCase } from './application/use-cases/process-stripe-success.use-case';
+import { ProcessStripeChargeSucceededUseCase } from './application/use-cases/process-stripe-charge-succeeded.use-case';
 
 const stripeUseCases = [
+  BuyWithStripeUseCase,
   ConstructStripeEventUseCase,
   ProcessStripeSuccessUseCase,
-  BuyWithStripeUseCase,
+  ProcessStripeChargeSucceededUseCase,
   ProcessStripeWebHookUseCase,
 ];
 const helpers = [KeyResolver, UuidErrorResolver];

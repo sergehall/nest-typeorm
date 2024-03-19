@@ -58,12 +58,8 @@ export class StripeController {
   }
 
   @Get('/success')
-  async success(@Req() req: RawBodyRequest<Request>): Promise<string> {
-    const eventSuccess = await this.commandBus.execute(
-      new ProcessStripeSuccessCommand(req),
-    );
-    console.log(eventSuccess, 'eventSuccess');
-    return 'The purchase was successfully completed';
+  async success(): Promise<string> {
+    return await this.commandBus.execute(new ProcessStripeSuccessCommand());
   }
 
   @Get('cancel')

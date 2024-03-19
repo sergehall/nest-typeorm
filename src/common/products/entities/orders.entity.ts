@@ -12,6 +12,7 @@ import { OrderItemsEntity } from './order-items.entity';
 import * as uuid4 from 'uuid4';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 import { GuestUsersEntity } from './unregistered-users.entity';
+import { OrderStatusEnum } from '../enums/order-status.enum';
 
 @Entity('Orders')
 export class OrdersEntity {
@@ -34,6 +35,14 @@ export class OrdersEntity {
     nullable: false,
   })
   paymentSystem: PaymentSystem;
+
+  @Column({
+    type: 'enum',
+    enum: OrderStatusEnum,
+    default: OrderStatusEnum.PENDING,
+    nullable: false,
+  })
+  orderStatus: OrderStatusEnum;
 
   @ManyToOne(() => UsersEntity, {
     nullable: true,
