@@ -14,7 +14,7 @@ import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
 
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
 
-const helpers = [KeyResolver, UuidErrorResolver];
+const helpers = [UuidErrorResolver];
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
