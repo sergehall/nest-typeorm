@@ -2,7 +2,7 @@ import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
 import * as uuid4 from 'uuid4';
-import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
+import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 @Entity('SecurityDevices')
 export class SecurityDevicesEntity {

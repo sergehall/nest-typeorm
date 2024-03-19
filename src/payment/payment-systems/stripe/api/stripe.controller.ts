@@ -13,12 +13,12 @@ import { ProcessStripeWebHookCommand } from '../application/use-cases/process-st
 import { Request } from 'express';
 import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.use-case';
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
-import { ProductsRequestDto } from '../../../../common/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentLinkDto } from '../../../dto/payment-link.dto';
 import { ProcessStripeSuccessCommand } from '../application/use-cases/process-stripe-success.use-case';
+import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 
 @Controller('stripe')
 export class StripeController {

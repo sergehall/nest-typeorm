@@ -22,11 +22,11 @@ import { ImagesPostsMiddleMetadataEntity } from '../../../features/posts/entitie
 import { ImagesPostsSmallMetadataEntity } from '../../../features/posts/entities/images-posts-small-metadata.entity';
 import { BlogsSubscribersEntity } from '../../../features/blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramBotStatusEntity } from '../../../features/telegram/entities/telegram-bot-status.entity';
-import { ProductsDataEntity } from '../../../common/products/entities/products-data.entity';
-import { OrdersEntity } from '../../../common/products/entities/orders.entity';
-import { PaymentTransactionsEntity } from '../../../common/products/entities/payment-transaction.entity';
-import { OrderItemsEntity } from '../../../common/products/entities/order-items.entity';
-import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
+import { GuestUsersEntity } from '../../../features/products/entities/unregistered-users.entity';
+import { OrdersEntity } from '../../../features/products/entities/orders.entity';
+import { OrderItemsEntity } from '../../../features/products/entities/order-items.entity';
+import { PaymentTransactionsEntity } from '../../../features/products/entities/payment-transaction.entity';
+import { ProductsDataEntity } from '../../../features/products/entities/products-data.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
