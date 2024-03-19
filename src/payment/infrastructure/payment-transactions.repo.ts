@@ -1,37 +1,67 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
+import Stripe from 'stripe';
+import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
 
 @Injectable()
 export class PaymentTransactionsRepo {
   constructor(
     @InjectRepository(PaymentTransactionsEntity)
-    private readonly paymentTransactionsEntityRepository: Repository<PaymentTransactionsEntity>,
+    private readonly paymentTransactionsRepository: Repository<PaymentTransactionsEntity>,
   ) {}
-
-  async saveReceiptUrl(
-    paymentTransaction: PaymentTransactionsEntity,
-  ): Promise<PaymentTransactionsEntity> {
+  async confirmPaymentAndUpdateData(
+    orderId: string,
+    updatedAt: string,
+    checkoutSessionCompletedObject: Stripe.Checkout.Session,
+  ): Promise<boolean> {
     try {
-      return await this.paymentTransactionsEntityRepository.save(
+      const paymentTransaction = await this.paymentTransactionsRepository
+        .createQueryBuilder('paymentTransaction')
+        .leftJoinAndSelect('paymentTransaction.order', 'order')
+        .where('paymentTransaction.orderId = :orderId', { orderId })
+        .andWhere('paymentTransaction.status = :status', {
+          status: PaymentsStatusEnum.PENDING,
+        })
+        .select(['paymentTransaction.id', 'paymentTransaction.status'])
+        .getOne();
+
+      if (!paymentTransaction) {
+        throw new NotFoundException(
+          `Payment transaction with orderId ${orderId} not found`,
+        );
+      }
+
+      paymentTransaction.status = PaymentsStatusEnum.CONFIRMED;
+      paymentTransaction.updatedAt = updatedAt;
+      paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
+        checkoutSessionCompletedObject,
+      );
+
+      const updateResult = await this.paymentTransactionsRepository.update(
+        paymentTransaction.id,
         paymentTransaction,
       );
+
+      return updateResult.affected === 1;
     } catch (error) {
-      console.log('Error saving payment transaction:', error);
+      console.error(error);
       throw new InternalServerErrorException(
-        'Error saving payment transaction' + error.message,
+        'Failed to confirm payment and update data',
       );
     }
   }
 
-  async save(
+  async savePaymentTransactionsEntity(
     paymentTransaction: PaymentTransactionsEntity,
   ): Promise<PaymentTransactionsEntity> {
     try {
-      return await this.paymentTransactionsEntityRepository.save(
-        paymentTransaction,
-      );
+      return await this.paymentTransactionsRepository.save(paymentTransaction);
     } catch (error) {
       console.log('Error saving payment transaction:', error);
       throw new InternalServerErrorException(
@@ -40,7 +70,3 @@ export class PaymentTransactionsRepo {
     }
   }
 }
-// "request": {
-//     "id": "req_AUVpCdKqvnmLLx",
-//     "idempotency_key": "38a40e45-e5ca-499e-9cf1-671bc5554247"
-//   },

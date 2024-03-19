@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { ConstructStripeEventCommand } from './construct-stripe-event.use-case';
 import { ProcessChargeSucceededCommand } from './process-stripe-charge-succeeded.use-case';
 import { OrdersRepo } from '../../../../../features/products/infrastructure/orders.repo';
+import { FinalizeOrderPaymentCommand } from './finalize-order-payment.use-case';
 
 export class ProcessStripeWebHookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -30,20 +31,9 @@ export class ProcessStripeWebHookUseCase
         switch (event.type) {
           case 'checkout.session.completed':
             console.log(event, 'event1');
-            const clientIdAndOrderId = event.data.object.client_reference_id;
-            if (clientIdAndOrderId) {
-              const updatedAt = new Date().toISOString();
-              const clientId = clientIdAndOrderId.split('.')[0];
-              const orderId = clientIdAndOrderId.split('.')[1];
-              const updated =
-                await this.ordersRepo.updatePaymentStatusAndUpdatedAt(
-                  orderId,
-                  clientId,
-                  updatedAt,
-                );
-              console.log('updated:', updated);
-            }
-            // Do something with clientReferenceId
+            await this.commandBus.execute(
+              new FinalizeOrderPaymentCommand(event.data.object),
+            );
             break;
           case 'charge.succeeded':
             await this.commandBus.execute(

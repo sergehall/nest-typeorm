@@ -46,11 +46,8 @@ export class OrdersRepo {
         order.orderId,
         order,
       );
-      updatedOrder.affected === 1;
-      console.log('updatedOrder:', updatedOrder);
-      console.log(' updatedOrder.affected:', updatedOrder.affected);
 
-      return updatedOrder.raw.affectedRows === 1;
+      return updatedOrder.affected === 1;
     } catch (error) {
       console.log('Error updatePaymentStatusAndUpdatedAt:', error);
       throw new InternalServerErrorException(
