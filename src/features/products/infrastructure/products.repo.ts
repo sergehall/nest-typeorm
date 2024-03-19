@@ -59,7 +59,7 @@ export class ProductsRepo {
 
       // If there are not found products, return error message
       if (notFoundProducts.length > 0) {
-        return `Products with ID "${notFoundProducts.join(', ')}" not found or do not have sufficient quantity`;
+        return `Products with ID [${notFoundProducts.join(', ')}] not found or do not have sufficient quantity`;
       }
 
       // If there are no updated products, return empty array
