@@ -59,7 +59,6 @@ export class StripeController {
 
   @Get('/success')
   async success(@Req() req: RawBodyRequest<Request>): Promise<string> {
-    console.log(req, "@Get('/success')");
     return 'The purchase was successfully completed';
   }
 

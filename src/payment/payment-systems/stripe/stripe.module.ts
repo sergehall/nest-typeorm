@@ -28,8 +28,13 @@ import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructu
 import { QuestionsQuizEntity } from '../../../features/sa-quiz-questions/entities/questions-quiz.entity';
 import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-users.repo';
 import { GuestUsersEntity } from '../../../common/products/entities/unregistered-users.entity';
+import { ConstructStripeEventUseCase } from './application/use-cases/construct-stripe-event.use-case';
 
-const stripeUseCases = [BuyWithStripeUseCase, ProcessStripeWebHookUseCase];
+const stripeUseCases = [
+  ConstructStripeEventUseCase,
+  BuyWithStripeUseCase,
+  ProcessStripeWebHookUseCase,
+];
 const helpers = [KeyResolver, UuidErrorResolver];
 
 @Module({
