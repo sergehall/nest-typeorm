@@ -52,7 +52,7 @@ export class StripeService {
               (data) => data.productId === product.productId,
             );
 
-          if (productData && product.quantity <= productData.stockQuantity) {
+          if (productData) {
             const totalPrice: string = (
               product.quantity * Number(productData.unit_amount)
             ).toFixed(2);
