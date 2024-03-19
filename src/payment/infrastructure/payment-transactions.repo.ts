@@ -27,29 +27,26 @@ export class PaymentTransactionsRepo {
     checkoutSessionCompletedObject: Stripe.Checkout.Session,
   ): Promise<boolean> {
     try {
-      const result =
-        await this.paymentTransactionsRepository.manager.transaction(
-          async (transactionalEntityManager: EntityManager) => {
-            const promises = [
-              this.updateOrderStatus(
-                orderId,
-                clientId,
-                updatedAt,
-                transactionalEntityManager,
-              ),
-              this.confirmPayment(
-                orderId,
-                updatedAt,
-                checkoutSessionCompletedObject,
-                transactionalEntityManager,
-              ),
-            ];
-            const [orderUpdated, paymentConfirmed] =
-              await Promise.all(promises);
-            return orderUpdated && paymentConfirmed;
-          },
-        );
-      return result;
+      return await this.paymentTransactionsRepository.manager.transaction(
+        async (transactionalEntityManager: EntityManager): Promise<boolean> => {
+          const promises = [
+            this.updateOrderStatus(
+              orderId,
+              clientId,
+              updatedAt,
+              transactionalEntityManager,
+            ),
+            this.confirmPayment(
+              orderId,
+              updatedAt,
+              checkoutSessionCompletedObject,
+              transactionalEntityManager,
+            ),
+          ];
+          const [orderUpdated, paymentConfirmed] = await Promise.all(promises);
+          return orderUpdated && paymentConfirmed;
+        },
+      );
     } catch (error) {
       console.error('Error completing order and confirming payment:', error);
       throw new InternalServerErrorException(
@@ -130,49 +127,6 @@ export class PaymentTransactionsRepo {
       throw new InternalServerErrorException('Failed to confirm payment');
     }
   }
-  // async confirmPayment(
-  //   orderId: string,
-  //   updatedAt: string,
-  //   checkoutSessionCompletedObject: Stripe.Checkout.Session,
-  // ): Promise<boolean> {
-  //   try {
-  //     const paymentTransaction = await this.paymentTransactionsRepository
-  //       .createQueryBuilder('paymentTransaction')
-  //       .leftJoinAndSelect('paymentTransaction.order', 'order')
-  //       .where('paymentTransaction.orderId = :orderId', { orderId })
-  //       .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
-  //         paymentStatus: PaymentsStatusEnum.PENDING,
-  //       })
-  //       .getOne();
-  //
-  //     console.log(paymentTransaction, 'paymentTransaction1');
-  //
-  //     if (!paymentTransaction) {
-  //       throw new NotFoundException(
-  //         `Payment transaction with orderId ${orderId} not found`,
-  //       );
-  //     }
-  //
-  //     paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
-  //     paymentTransaction.updatedAt = updatedAt;
-  //     paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(
-  //       checkoutSessionCompletedObject,
-  //     );
-  //     console.log(paymentTransaction, 'paymentTransaction2');
-  //
-  //     const updateResult = await this.paymentTransactionsRepository.update(
-  //       paymentTransaction.id,
-  //       paymentTransaction,
-  //     );
-  //
-  //     return updateResult.affected === 1;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(
-  //       'Failed to confirm payment and update data',
-  //     );
-  //   }
-  // }
 
   async savePaymentTransactionsEntity(
     paymentTransaction: PaymentTransactionsEntity,
