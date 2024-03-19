@@ -3,10 +3,7 @@ import Stripe from 'stripe';
 import { PaymentStripeDto } from '../dto/payment-stripe.dto';
 import { StripeFactory } from '../../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
-import { UsersEntity } from '../../../../features/users/entities/users.entity';
-import { GuestUsersEntity } from '../../../../common/products/entities/unregistered-users.entity';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 
 @Injectable()
 export class StripeAdapter {

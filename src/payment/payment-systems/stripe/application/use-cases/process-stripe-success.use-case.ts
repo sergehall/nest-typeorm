@@ -1,4 +1,4 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class ProcessStripeSuccessCommand {
@@ -9,7 +9,7 @@ export class ProcessStripeSuccessCommand {
 export class ProcessStripeSuccessUseCase
   implements ICommandHandler<ProcessStripeSuccessCommand>
 {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor() {}
 
   async execute(command: ProcessStripeSuccessCommand): Promise<string> {
     const {} = command;

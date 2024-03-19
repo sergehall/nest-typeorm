@@ -11,9 +11,7 @@ import { OrdersRepo } from '../infrastructure/orders.repo';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 import { OrderItemsRepo } from '../infrastructure/order-items.repo';
 import { ProductsDataEntity } from '../entities/products-data.entity';
-import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
 import { GuestUsersEntity } from '../entities/unregistered-users.entity';
-import { InternalServerErrorException } from '@nestjs/common';
 
 export class CreateOrderAndPaymentTransactionsCommand {
   constructor(public paymentStripeDto: PaymentStripeDto[]) {}
