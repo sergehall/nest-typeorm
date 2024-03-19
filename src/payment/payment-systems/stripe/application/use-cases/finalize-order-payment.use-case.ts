@@ -29,14 +29,6 @@ export class FinalizeOrderPaymentUseCase
       const [clientId, orderId] = clientIdAndOrderId.split('.');
       const updatedAt = new Date().toISOString();
 
-      // await Promise.all([
-      //   this.ordersRepo.completedPayment(orderId, clientId, updatedAt),
-      //   this.paymentTransactionsRepo.confirmPayment(
-      //     orderId,
-      //     updatedAt,
-      //     checkoutSessionCompletedObject,
-      //   ),
-      // ]);
       await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
         orderId,
         clientId,
