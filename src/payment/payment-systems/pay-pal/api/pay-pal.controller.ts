@@ -8,9 +8,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { Request } from 'express';
-import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
@@ -38,18 +35,15 @@ export class PayPalController {
     // );
     return 'string';
   }
-  //
-  // @Post('webhook')
-  // async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
-  //   try {
-  //     return await this.commandBus.execute(
-  //       new ProcessStripeWebHookCommand(req),
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
+
+  @Post('webhooks')
+  async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
+    console.log(req);
+    // return await this.commandBus.execute(
+    //   new ProcessStripeWebHookCommand(req),
+    // );
+    return true;
+  }
 
   // @Get('/success')
   // async success(): Promise<string> {
