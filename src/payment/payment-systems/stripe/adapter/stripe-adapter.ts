@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
-import { PaymentStripeDto } from '../dto/payment-stripe.dto';
+import { PaymentDto } from '../../../dto/payment.dto';
 import { StripeFactory } from '../../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
@@ -13,7 +13,7 @@ export class StripeAdapter {
   ) {}
 
   async createCheckoutSession(
-    paymentStripeDto: PaymentStripeDto[],
+    paymentStripeDto: PaymentDto[],
   ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
     // Create Stripe instance and retrieve URLs
     const [stripeInstance, successUrl, cancelUrl] = await Promise.all([
@@ -32,14 +32,14 @@ export class StripeAdapter {
     client_reference_id += `.${orderId}`;
 
     // Prepare line items for checkout session
-    const lineItems = paymentStripeDto.map((product: PaymentStripeDto) => {
+    const lineItems = paymentStripeDto.map((product: PaymentDto) => {
       return {
         price_data: {
           product_data: {
             name: product.name,
             description: product.description,
           },
-          unit_amount: Math.round(parseFloat(product.unit_amount) * 100), // Assuming the price is in USD cents
+          unit_amount: Math.round(parseFloat(product.unitAmount) * 100), // Assuming the price is in USD cents
           currency: product.currency,
         },
         quantity: product.quantity,

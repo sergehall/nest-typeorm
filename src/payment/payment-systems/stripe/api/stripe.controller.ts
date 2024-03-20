@@ -11,7 +11,6 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 import { Request } from 'express';
-import { BuyWithStripeCommand } from '../application/use-cases/buy-with-stripe.use-case';
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
@@ -19,6 +18,8 @@ import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentLinkDto } from '../../../dto/payment-link.dto';
 import { ProcessStripeSuccessCommand } from '../application/use-cases/process-stripe-success.use-case';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
+import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
+import { PaymentSystem } from '../../../enums/payment-system.enums';
 
 @Controller('stripe')
 export class StripeController {
@@ -35,13 +36,13 @@ export class StripeController {
     // @Query() query: any,
   ): Promise<PaymentLinkDto | null> {
     const currentUserDto: CurrentUserDto | GuestUsersDto = req.user;
-
+    const paymentSystem = PaymentSystem.STRIPE;
     // const queryData: ParseQueriesDto =
     //   await this.parseQueriesService.getQueriesData(query);
     // const productsQuery = queryData.products;
 
     return this.commandBus.execute(
-      new BuyWithStripeCommand(productsRequestDto, currentUserDto),
+      new BuyProductsCommand(paymentSystem, productsRequestDto, currentUserDto),
     );
   }
 

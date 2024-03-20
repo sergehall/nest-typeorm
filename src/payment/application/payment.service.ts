@@ -1,16 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { PaymentStripeDto } from '../dto/payment-stripe.dto';
+import { PaymentDto } from '../dto/payment.dto';
 import * as uuid4 from 'uuid4';
-import { PaymentSystem } from '../../../enums/payment-system.enums';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { UsersEntity } from '../../../../features/users/entities/users.entity';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
-import { ProductRequest } from '../../../../features/products/dto/products-request.dto';
-import { ProductsDataEntity } from '../../../../features/products/entities/products-data.entity';
-import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
+import { PaymentSystem } from '../enums/payment-system.enums';
+import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
+import { UsersEntity } from '../../features/users/entities/users.entity';
+import { GuestUsersDto } from '../../features/users/dto/guest-users.dto';
+import { ProductRequest } from '../../features/products/dto/products-request.dto';
+import { ProductsDataEntity } from '../../features/products/entities/products-data.entity';
+import { GuestUsersEntity } from '../../features/products/entities/unregistered-users.entity';
 
 @Injectable()
-export class StripeService {
+export class PaymentService {
   constructor() {}
 
   /**
@@ -19,16 +19,16 @@ export class StripeService {
    * @param productsDataEntities The data of products fetched from the repository.
    * @param paymentSystem The payment system to be used.
    * @param currentUserDto The current user's data.
-   * @returns Promise<PaymentStripeDto[]>
+   * @returns Promise<PaymentDto[]>
    */
   async createPaymentStripeDto(
     productsRequest: ProductRequest[],
     productsDataEntities: ProductsDataEntity[],
     paymentSystem: PaymentSystem,
     currentUserDto: CurrentUserDto | GuestUsersDto,
-  ): Promise<PaymentStripeDto[]> {
-    return new Promise<PaymentStripeDto[]>((resolve, reject) => {
-      const orderArr: PaymentStripeDto[] = [];
+  ): Promise<PaymentDto[]> {
+    return new Promise<PaymentDto[]>((resolve, reject) => {
+      const orderArr: PaymentDto[] = [];
       const orderId: string = uuid4();
       const createdAt: string = new Date().toISOString();
 
@@ -54,9 +54,9 @@ export class StripeService {
 
           if (productData) {
             const totalPrice: string = (
-              product.quantity * Number(productData.unit_amount)
+              product.quantity * Number(productData.unitAmount)
             ).toFixed(2);
-            const order: PaymentStripeDto = {
+            const order: PaymentDto = {
               orderId: orderId,
               productId: product.productId,
               name: productData.name,
@@ -64,7 +64,7 @@ export class StripeService {
               client: client,
               createdAt: createdAt,
               quantity: product.quantity,
-              unit_amount: productData.unit_amount,
+              unitAmount: productData.unitAmount,
               totalPrice: totalPrice,
               currency: productData.currency,
               paymentSystem: paymentSystem,

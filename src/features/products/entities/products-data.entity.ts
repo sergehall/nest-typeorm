@@ -21,7 +21,7 @@ export class ProductsDataEntity {
   manufacturer: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
-  unit_amount: string;
+  unitAmount: string;
 
   @Column({ type: 'character varying', nullable: true })
   pathKeyImageUrl: string | null;
@@ -52,7 +52,7 @@ export class ProductsDataEntity {
   static createProductDataEntity(
     name: string,
     description: string,
-    unit_amount: string,
+    unitAmount: string,
     currency: Currency,
     stockQuantity: number,
     manufacturer: string,
@@ -63,7 +63,7 @@ export class ProductsDataEntity {
     productDataEntity.name = name;
     productDataEntity.description = description;
     productDataEntity.model = model;
-    productDataEntity.unit_amount = unit_amount;
+    productDataEntity.unitAmount = unitAmount;
     productDataEntity.currency = currency;
     productDataEntity.isActive = true; // Set as active by default
     productDataEntity.pathKeyImageUrl = null; // Default to null
