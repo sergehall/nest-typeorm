@@ -43,6 +43,7 @@ import { FilesMetadataService } from '../../adapters/media-services/files/files-
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramBotStatusEntity } from '../telegram/entities/telegram-bot-status.entity';
+import { JwtService } from '@nestjs/jwt';
 
 const blogsUseCases = [SearchBlogsUseCase, GetBlogByIdUseCase];
 
@@ -74,6 +75,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     AwsConfig,
     AuthService,
     S3Service,
+    JwtService,
     UsersService,
     BlogsService,
     PostsService,

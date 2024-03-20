@@ -34,11 +34,11 @@ export class TypeOrmPostgresOptions
   implements TypeOrmOptionsFactory
 {
   async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
-    const host = await this.getHost('PG_HOST_HEROKU');
+    const host = await this.getPostgresConfig('PG_HOST_HEROKU');
     const port = await this.getPort('PG_PORT');
-    const username = await this.getAuth('PG_HEROKU_USER_NAME');
-    const password = await this.getAuth('PG_HEROKU_USER_PASSWORD');
-    const database = await this.getNamesDatabase('PG_HEROKU_NAME_DATABASE');
+    const username = await this.getPostgresConfig('PG_HEROKU_USER_NAME');
+    const password = await this.getPostgresConfig('PG_HEROKU_USER_PASSWORD');
+    const database = await this.getPostgresConfig('PG_HEROKU_NAME_DATABASE');
 
     return {
       type: 'postgres',

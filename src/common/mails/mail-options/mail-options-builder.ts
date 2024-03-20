@@ -14,7 +14,8 @@ export class MailOptionsBuilder {
     email: string,
     recoveryCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
-    const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+    const domainName =
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
@@ -46,7 +47,8 @@ export class MailOptionsBuilder {
     confirmationCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
     const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
-    const domainName = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+    const domainName =
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + confirmationCode;
     const fullURL = domainName + path + parameter;
