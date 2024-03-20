@@ -51,12 +51,12 @@ export class SecurityDevicesEntity {
     () => GuestUsersEntity,
     (guestUsersEntity) => guestUsersEntity.securityDevices,
     {
-      nullable: false,
+      nullable: true,
       eager: true,
     },
   )
   @JoinColumn({ name: 'guestUserId', referencedColumnName: 'guestUserId' })
-  guestUser: GuestUsersEntity;
+  guestUser: GuestUsersEntity | null;
 
   static createSecurityDevicesEntity(
     newPayload: PayloadDto,
@@ -74,6 +74,7 @@ export class SecurityDevicesEntity {
     newDevice.lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
     newDevice.expirationDate = new Date(newPayload.exp * 1000).toISOString();
     newDevice.user = user;
+    newDevice.guestUser = null;
 
     return newDevice;
   }

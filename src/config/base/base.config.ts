@@ -83,7 +83,7 @@ export class BaseConfig {
     return value;
   }
 
-  protected async getValueJwtByKey(key: JwtKeysType): Promise<string> {
+  protected getValueJwtByKey(key: JwtKeysType): string {
     return this.configService.get('jwt', {
       infer: true,
     })[key];

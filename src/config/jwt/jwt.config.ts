@@ -11,7 +11,7 @@ export class JwtConfig extends BaseConfig {
     EXP_REF_TIME: 'EXP_REF_TIME',
   };
 
-  private async getJwtValue(key: JwtKeysType): Promise<string> {
+  private getJwtValue(key: JwtKeysType): string {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueJwtByKey(key);
     } else {
@@ -21,7 +21,7 @@ export class JwtConfig extends BaseConfig {
     }
   }
 
-  async getJwtConfigValue(key: JwtKeysType): Promise<string> {
+  getJwtConfigValue(key: JwtKeysType): string {
     return this.getJwtValue(key);
   }
 }
