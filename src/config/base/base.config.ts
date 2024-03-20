@@ -25,11 +25,9 @@ import { SaLoginType } from '../sa/types/sa-login.type';
 import { SaEmailType } from '../sa/types/sa-email.type';
 import { SaKeyType } from '../sa/types/sa-key.type';
 import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
-import { ApiNameKeyType } from '../stripe/types/api-name-key.type';
-import { SpireVersionKey } from '../stripe/types/spire-version.type';
-import { StripeWebhookSecretKeyType } from '../stripe/types/stripe-webhook-secret-key.type';
 import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
 import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
+import { StripeKeysType } from '../stripe/types/stripe-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -108,20 +106,7 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getValueStripeApiKey(key: ApiNameKeyType): Promise<string> {
-    return this.configService.get('stripe', {
-      infer: true,
-    })[key];
-  }
-  protected async getValueStripeWebhookSecret(
-    key: StripeWebhookSecretKeyType,
-  ): Promise<string> {
-    return this.configService.get('stripe', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueStripeVersion(key: SpireVersionKey): Promise<string> {
+  protected async getValueStripe(key: StripeKeysType): Promise<string> {
     return this.configService.get('stripe', {
       infer: true,
     })[key];
