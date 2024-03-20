@@ -24,15 +24,14 @@ export class ConstructStripeEventUseCase
     const { rawBodyRequest } = command;
 
     try {
+      const stripeWebhookSecret =
+        await this.stripeConfig.getStripeWebhookSecret('STRIPE_WEBHOOK_SECRET');
+
       if (
         rawBodyRequest.headers['stripe-signature'] &&
-        rawBodyRequest.rawBody
+        rawBodyRequest.rawBody &&
+        stripeWebhookSecret
       ) {
-        const stripeWebhookSecret =
-          await this.stripeConfig.getStripeWebhookSecret(
-            'STRIPE_WEBHOOK_SECRET',
-          );
-
         const signature = rawBodyRequest.headers['stripe-signature'];
 
         const stripeInstance: Stripe =
