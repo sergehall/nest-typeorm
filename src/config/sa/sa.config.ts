@@ -1,43 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-import { BasicAuthType } from './types/basic-auth.type';
-import { SaLoginType } from './types/sa-login.type';
-import { SaEmailType } from './types/sa-email.type';
-import { SaKeyType } from './types/sa-key.type';
-import { SaPasswordHashType } from './types/sa-password-hash.type';
-import { Fernet } from 'fernet-nodejs';
+import { SaKeysType } from './types/sa-keys.type';
 
 @Injectable()
 export class SaConfig extends BaseConfig {
-  async getBasicAuth(basicAuth: BasicAuthType): Promise<string> {
-    return await this.getValueBasicAuth(basicAuth);
-  }
+  private config: Record<string, string> = {
+    SA_KEY: 'SA_KEY',
+    SA_PASSWORD_HASH: 'SA_PASSWORD_HASH',
+    SA_EMAIL: 'SA_EMAIL',
+    SA_LOGIN: 'SA_LOGIN',
+    BASIC_AUTH: 'BASIC_AUTH',
+  };
 
-  async getSaLogin(saLogin: SaLoginType): Promise<string> {
-    return await this.getValueSaLogin(saLogin);
-  }
-
-  async getSaEmail(basicAuth: SaEmailType): Promise<string> {
-    return await this.getValueSaEmail(basicAuth);
-  }
-
-  async getSaKey(saKey: SaKeyType): Promise<string> {
-    return await this.getValueSaSaKey(saKey);
-  }
-
-  async getSaPasswordHash(saPasswordHash: SaPasswordHashType): Promise<string> {
-    return await this.getValueSaPasswordHash(saPasswordHash);
-  }
-
-  async decryptingSaPassword(saPasswordHash: string): Promise<string> {
-    try {
-      const saKey = await this.getSaKey('SA_KEY');
-      const f = new Fernet(saKey);
-
-      return f.decrypt(saPasswordHash);
-    } catch (error) {
-      console.error('Error decrypting SA password:', error);
-      throw error; // Re-throwing the error for the caller to handle
+  private async getSaValueByKey(key: SaKeysType): Promise<string> {
+    if (this.config.hasOwnProperty(key)) {
+      return this.getValueSa(key);
+    } else {
+      throw new BadRequestException(
+        `Key ${key} not found in PayPal configuration`,
+      );
     }
+  }
+
+  async getSaValue(key: SaKeysType): Promise<string> {
+    return this.getSaValueByKey(key);
+  }
+
+  async getSaHash(): Promise<string> {
+    return this.getSaValueHash();
   }
 }
