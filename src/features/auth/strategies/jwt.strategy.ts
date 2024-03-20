@@ -38,9 +38,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtConfig.getAccSecretKey(),
+      secretOrKey: jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY'),
       signOptions: {
-        expiresIn: jwtConfig.getExpAccTime(),
+        expiresIn: jwtConfig.getJwtConfigValue('EXP_ACC_TIME'),
       },
     };
   }

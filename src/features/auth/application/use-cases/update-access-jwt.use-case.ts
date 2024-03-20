@@ -25,8 +25,10 @@ export class UpdateAccessJwtUseCase
     };
 
     try {
-      const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-      const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+      const ACCESS_SECRET_KEY =
+        await this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
+      const EXP_ACC_TIME =
+        await this.jwtConfig.getJwtConfigValue('EXP_ACC_TIME');
 
       return {
         accessToken: this.jwtService.sign(payload, {

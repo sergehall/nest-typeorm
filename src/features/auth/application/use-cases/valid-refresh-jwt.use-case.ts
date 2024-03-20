@@ -13,11 +13,15 @@ export class ValidRefreshJwtCommand {
 export class ValidRefreshJwtUseCase
   implements ICommandHandler<ValidRefreshJwtCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(
+    private jwtService: JwtService,
+    private jwtConfig: JwtConfig,
+  ) {}
   async execute(command: ValidRefreshJwtCommand): Promise<PayloadDto | null> {
     const { refreshToken } = command;
 
-    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
+    const REFRESH_SECRET_KEY =
+      await this.jwtConfig.getJwtConfigValue('REFRESH_SECRET_KEY');
 
     try {
       const result = await this.jwtService.verify(refreshToken, {

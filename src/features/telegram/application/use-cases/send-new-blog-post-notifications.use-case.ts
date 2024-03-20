@@ -41,10 +41,9 @@ export class SendNewBlogPostNotificationsUseCase
       await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const postLink: string = baseUrl + `/posts/${newPost.id}`;
 
-    const tokenTelegramBot =
-      await this.telegramConfig.getTokenTelegramItIncubator(
-        'TOKEN_TELEGRAM_IT_INCUBATOR',
-      );
+    const tokenTelegramBot = await this.telegramConfig.getTelegramValue(
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
+    );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
 
     const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;

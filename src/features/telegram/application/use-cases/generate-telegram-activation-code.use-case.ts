@@ -20,7 +20,7 @@ export class GenerateTelegramActivationLinkUseCase
 
     const telegramBaseShortUrl = TelegramUrlsEnum.BaseShortUrl;
 
-    const botName = await this.telegramConfig.getBotUsername(
+    const botName = await this.telegramConfig.getTelegramValue(
       'TELEGRAM_BOT_USERNAME',
     );
 
