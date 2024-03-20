@@ -21,16 +21,15 @@ import {
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
-import { TokenTelegramItIncubatorType } from '../telegram/types/token-telegram-it-incubator.type';
 import { SaLoginType } from '../sa/types/sa-login.type';
 import { SaEmailType } from '../sa/types/sa-email.type';
 import { SaKeyType } from '../sa/types/sa-key.type';
 import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
-import { TelegramBotUsernameType } from '../telegram/types/telegram-bot-username.type';
-import { TelegramBotChatIdType } from '../telegram/types/telegram-bot-chat-id.type';
 import { ApiNameKeyType } from '../stripe/types/api-name-key.type';
 import { SpireVersionKey } from '../stripe/types/spire-version.type';
 import { StripeWebhookSecretKeyType } from '../stripe/types/stripe-webhook-secret-key.type';
+import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
+import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -87,25 +86,13 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getTokenTelegramItIncubator(
-    key: TokenTelegramItIncubatorType,
-  ): Promise<string> {
-    return this.configService.get('telegram', {
+  protected async getValuePayPal(key: PayPalKeysType): Promise<string> {
+    return this.configService.get('paypal', {
       infer: true,
     })[key];
   }
 
-  protected async getTelegramUsernameBot(
-    key: TelegramBotUsernameType,
-  ): Promise<string> {
-    return this.configService.get('telegram', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueTelegramBotChatId(
-    key: TelegramBotChatIdType,
-  ): Promise<string> {
+  protected async getValueTelegram(key: TelegramKeysType): Promise<string> {
     return this.configService.get('telegram', {
       infer: true,
     })[key];

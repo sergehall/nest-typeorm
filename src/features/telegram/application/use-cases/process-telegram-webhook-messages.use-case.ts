@@ -5,6 +5,8 @@ import { PayloadTelegramMessageType } from '../../types/payload-telegram-message
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
 import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 import { InternalServerErrorException } from '@nestjs/common';
+import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
+import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
 
 export class ProcessTelegramWebhookMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -82,8 +84,14 @@ export class ProcessTelegramWebhookMessagesUseCase
     chatId: number,
     text: string,
   ): Promise<void> {
-    const telegramUrl =
-      await this.telegramConfig.getTelegramUrlBotSendMessage();
+    const tokenTelegramBot =
+      await this.telegramConfig.getTokenTelegramItIncubator(
+        'TOKEN_TELEGRAM_IT_INCUBATOR',
+      );
+    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
+
+    const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
+
     const data = { chat_id: chatId, text };
     await axios.post(telegramUrl, data);
   }

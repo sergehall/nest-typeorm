@@ -1,35 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-import { TokenTelegramItIncubatorType } from './types/token-telegram-it-incubator.type';
-import { TelegramBotUsernameType } from './types/telegram-bot-username.type';
-import { TelegramBotChatIdType } from './types/telegram-bot-chat-id.type';
-import { TelegramMethodsEnum } from '../../features/telegram/enums/telegram-methods.enum';
-import { TelegramUrlsEnum } from '../../features/telegram/enums/telegram-urls.enum';
+import { TelegramKeysType } from './types/telegram-keys.type';
 
 @Injectable()
 export class TelegramConfig extends BaseConfig {
-  async getBotToken(
-    tokenTelegramItIncubator: TokenTelegramItIncubatorType,
-  ): Promise<string> {
-    return await this.getTokenTelegramItIncubator(tokenTelegramItIncubator);
+  private config: Record<string, string> = {
+    TOKEN_TELEGRAM_IT_INCUBATOR: 'TOKEN_TELEGRAM_IT_INCUBATOR',
+    TELEGRAM_BOT_USERNAME: 'TELEGRAM_BOT_USERNAME',
+    TELEGRAM_BOT_CHAT_ID: 'TELEGRAM_BOT_CHAT_ID',
+  };
+
+  async getPayPalValueByKey(key: TelegramKeysType): Promise<string> {
+    if (this.config.hasOwnProperty(key)) {
+      return this.getValueTelegram(key);
+    } else {
+      throw new BadRequestException(
+        `Key ${key} not found in PayPal configuration`,
+      );
+    }
   }
 
-  async getBotUsername(
-    telegramUsernameBot: TelegramBotUsernameType,
-  ): Promise<string> {
-    return await this.getTelegramUsernameBot(telegramUsernameBot);
-  }
-  async getBotChatId(
-    telegramBotChatId: TelegramBotChatIdType,
-  ): Promise<string> {
-    return await this.getValueTelegramBotChatId(telegramBotChatId);
+  async getBotToken(key: TelegramKeysType): Promise<string> {
+    return await this.getPayPalValueByKey(key);
   }
 
-  async getTelegramUrlBotSendMessage(): Promise<string> {
-    const tokenTelegramBot = await this.getBotToken(
-      'TOKEN_TELEGRAM_IT_INCUBATOR',
-    );
-    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
-    return `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
+  async getBotUsername(key: TelegramKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
+  }
+
+  async getBotChatId(key: TelegramKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
+  }
+
+  async getTokenTelegramItIncubator(key: TelegramKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
   }
 }

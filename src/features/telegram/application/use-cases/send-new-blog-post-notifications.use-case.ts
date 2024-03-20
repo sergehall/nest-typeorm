@@ -6,6 +6,8 @@ import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blog
 import { TelegramBotStatusEntity } from '../../entities/telegram-bot-status.entity';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
+import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
+import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
 
 export class SendNewBlogPostNotificationsCommand {
   constructor(
@@ -39,8 +41,13 @@ export class SendNewBlogPostNotificationsUseCase
       await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
     const postLink: string = baseUrl + `/posts/${newPost.id}`;
 
-    const telegramUrl =
-      await this.telegramConfig.getTelegramUrlBotSendMessage();
+    const tokenTelegramBot =
+      await this.telegramConfig.getTokenTelegramItIncubator(
+        'TOKEN_TELEGRAM_IT_INCUBATOR',
+      );
+    const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
+
+    const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     const postTitle: string = newPost.title;
     const blogPostName: string = blog.name;

@@ -176,6 +176,25 @@ class Configuration {
     );
   }
 
+  private static getPayPalWebHookId(): string {
+    return this.readEnvVariableWithDefault(
+      'PAYPAL_WEBHOOK_ID',
+      'PAYPAL_WEBHOOK_ID',
+    );
+  }
+  private static getPayPalClientSecret(): string {
+    return this.readEnvVariableWithDefault(
+      'PAYPAL_CLIENT_SECRET',
+      'PAYPAL_CLIENT_SECRET',
+    );
+  }
+  private static getPayPalClientId(): string {
+    return this.readEnvVariableWithDefault(
+      'PAYPAL_CLIENT_ID',
+      'PAYPAL_CLIENT_ID',
+    );
+  }
+
   private static getLiveStripeApiKey(): string {
     return this.readEnvVariableWithDefault(
       'STRIPE_LIVE_API_KEY',
@@ -344,6 +363,11 @@ class Configuration {
         STRIPE_LIVE_API_KEY: Configuration.getLiveStripeApiKey(),
         STRIPE_API_VERSION: Configuration.getStripeApiVersion(),
         STRIPE_WEBHOOK_SECRET: Configuration.getStripeWebhookSecret(),
+      },
+      paypal: {
+        PAYPAL_WEBHOOK_ID: Configuration.getPayPalWebHookId(),
+        PAYPAL_CLIENT_SECRET: Configuration.getPayPalClientSecret(),
+        PAYPAL_CLIENT_ID: Configuration.getPayPalClientId(),
       },
     };
   }

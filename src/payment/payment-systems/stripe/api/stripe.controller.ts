@@ -47,14 +47,7 @@ export class StripeController {
 
   @Post('webhook')
   async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
-    try {
-      return await this.commandBus.execute(
-        new ProcessStripeWebHookCommand(req),
-      );
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(error.message);
-    }
+    return await this.commandBus.execute(new ProcessStripeWebHookCommand(req));
   }
 
   @Get('/success')
