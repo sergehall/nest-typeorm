@@ -338,7 +338,7 @@ class Configuration {
         EXP_ACC_TIME: Configuration.getAccessExpTime(),
         EXP_REF_TIME: Configuration.getRefreshExpTime(),
       },
-      basicAuth: {
+      sa: {
         BASIC_AUTH: Configuration.getBasicAuth(),
         SA_LOGIN: Configuration.getSaLogin(),
         SA_EMAIL: Configuration.getSaEmail(),

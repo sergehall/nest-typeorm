@@ -28,6 +28,7 @@ import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
 import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
 import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 import { StripeKeysType } from '../stripe/types/stripe-keys.type';
+import { SaKeysType } from '../sa/types/sa-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -96,44 +97,14 @@ export class BaseConfig {
     })[key];
   }
 
-  /**
-   * Retrieves the value of the 'basicAuth' environment variable and returns it as a Promise of `string`.
-   * @returns {Promise<BasicAuthType>} The value of the 'string' environment variable.
-   */
-  protected async getValueBasicAuth(key: BasicAuthType): Promise<string> {
-    return this.configService.get('basicAuth', {
+  protected async getValueSa(key: SaKeysType): Promise<string> {
+    return this.configService.get('sa', {
       infer: true,
     })[key];
   }
 
   protected async getValueStripe(key: StripeKeysType): Promise<string> {
     return this.configService.get('stripe', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueSaLogin(key: SaLoginType): Promise<string> {
-    return this.configService.get('basicAuth', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueSaEmail(key: SaEmailType): Promise<string> {
-    return this.configService.get('basicAuth', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueSaSaKey(key: SaKeyType): Promise<string> {
-    return this.configService.get('basicAuth', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueSaPasswordHash(
-    key: SaPasswordHashType,
-  ): Promise<string> {
-    return this.configService.get('basicAuth', {
       infer: true,
     })[key];
   }
@@ -264,10 +235,10 @@ export class BaseConfig {
    * @returns {Promise<string>} A Promise containing the hashed password.
    */
   protected async getSaValueHash(): Promise<string> {
-    const basicAuth = this.configService.get('basicAuth', {
+    const basicAuth = this.configService.get('sa', {
       infer: true,
     }).BASIC_AUTH;
-    console.log(basicAuth, 'basicAuth');
+
     const decodedPassword = Buffer.from(basicAuth, 'base64')
       .toString('utf8')
       .split(':')[1];

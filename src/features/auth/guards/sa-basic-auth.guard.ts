@@ -34,7 +34,7 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const expectedBasicAuthInput = await this.getBasicAuth('BASIC_AUTH');
+    const expectedBasicAuthInput = await this.getSaValue('BASIC_AUTH');
 
     const expectedInputAuthorization = `Basic ${expectedBasicAuthInput}`;
 
@@ -49,7 +49,7 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
           HttpStatus.UNAUTHORIZED,
         );
       }
-      const saLogin = await this.getSaLogin('SA_LOGIN');
+      const saLogin = await this.getSaValue('SA_LOGIN');
       const saUser = await this.usersRepo.findSaUserByLoginOrEmail(saLogin);
       if (saUser) {
         return true;

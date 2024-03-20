@@ -20,15 +20,15 @@ export class PayPalConfig extends BaseConfig {
     }
   }
 
-  async getPayPalWebhookId(): Promise<string> {
-    return this.getPayPalValueByKey('PAYPAL_WEBHOOK_ID');
+  async getPayPalWebhookId(key: PayPalKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
   }
 
-  async getPayPalClientSecret(): Promise<string> {
-    return this.getPayPalValueByKey('PAYPAL_CLIENT_SECRET');
+  async getPayPalClientSecret(key: PayPalKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
   }
 
-  async getPayPalClientId(): Promise<string> {
-    return this.getPayPalValueByKey('PAYPAL_CLIENT_ID');
+  async getPayPalClientId(key: PayPalKeysType): Promise<string> {
+    return this.getPayPalValueByKey(key);
   }
 }
