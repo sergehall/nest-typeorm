@@ -17,7 +17,6 @@ export class PaymentManager {
     switch (paymentSystem) {
       case PaymentSystem.STRIPE:
         return await this.processStripePayment(paymentDto);
-
       case PaymentSystem.PAYPAL:
         return await this.processPayPalPayment(paymentDto);
       case PaymentSystem.APPLE_PAY:
@@ -41,11 +40,9 @@ export class PaymentManager {
   }
 
   private async processStripePayment(
-    paymentStripeDto: PaymentDto[],
+    paymentDto: PaymentDto[],
   ): Promise<PaymentLinkDto | null> {
-    // Call the appropriate method from StripeAdapter
-    const session =
-      await this.stripeAdapter.createCheckoutSession(paymentStripeDto);
+    const session = await this.stripeAdapter.createCheckoutSession(paymentDto);
     console.log('session', session);
     // write paymentLink to the database orderEntity
     if (!session.url) {
