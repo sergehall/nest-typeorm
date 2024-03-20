@@ -32,6 +32,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductsModule } from './features/products/products.module';
+import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { ProductsModule } from './features/products/products.module';
     StripeModule,
     PaymentModule,
     ProductsModule,
+    PayPalModule,
   ],
   controllers: [AppController],
   providers: [
