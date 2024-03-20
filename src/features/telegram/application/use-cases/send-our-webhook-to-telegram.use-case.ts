@@ -18,7 +18,7 @@ export class SendOurWebhookToTelegramUseCase
     private readonly telegramConfig: TelegramConfig,
   ) {}
   async execute() {
-    const tokenTelegramBot = await this.telegramConfig.getBotToken(
+    const tokenTelegramBot = await this.telegramConfig.getTelegramValue(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
 

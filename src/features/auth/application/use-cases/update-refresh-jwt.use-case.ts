@@ -13,7 +13,10 @@ export class UpdateRefreshJwtCommand {
 export class UpdateRefreshJwtUseCase
   implements ICommandHandler<UpdateRefreshJwtCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(
+    private jwtService: JwtService,
+    private jwtConfig: JwtConfig,
+  ) {}
   async execute(command: UpdateRefreshJwtCommand): Promise<RefreshTokenDto> {
     const { currentPayload } = command;
     const payload = {
@@ -22,8 +25,10 @@ export class UpdateRefreshJwtUseCase
     };
 
     try {
-      const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
-      const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
+      const REFRESH_SECRET_KEY =
+        await this.jwtConfig.getJwtConfigValue('REFRESH_SECRET_KEY');
+      const EXP_REF_TIME =
+        await this.jwtConfig.getJwtConfigValue('EXP_REF_TIME');
 
       return {
         refreshToken: this.jwtService.sign(payload, {

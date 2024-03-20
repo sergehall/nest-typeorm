@@ -10,7 +10,7 @@ export class TelegramConfig extends BaseConfig {
     TELEGRAM_BOT_CHAT_ID: 'TELEGRAM_BOT_CHAT_ID',
   };
 
-  async getTelegramValueByKey(key: TelegramKeysType): Promise<string> {
+  private async getTelegramValueByKey(key: TelegramKeysType): Promise<string> {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueTelegram(key);
     } else {
@@ -20,19 +20,7 @@ export class TelegramConfig extends BaseConfig {
     }
   }
 
-  async getBotToken(key: TelegramKeysType): Promise<string> {
+  async getTelegramValue(key: TelegramKeysType): Promise<string> {
     return await this.getTelegramValueByKey(key);
-  }
-
-  async getBotUsername(key: TelegramKeysType): Promise<string> {
-    return this.getTelegramValueByKey(key);
-  }
-
-  async getBotChatId(key: TelegramKeysType): Promise<string> {
-    return this.getTelegramValueByKey(key);
-  }
-
-  async getTokenTelegramItIncubator(key: TelegramKeysType): Promise<string> {
-    return this.getTelegramValueByKey(key);
   }
 }

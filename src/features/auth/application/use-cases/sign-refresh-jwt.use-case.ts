@@ -13,12 +13,16 @@ export class SignRefreshJwtCommand {
 export class SignRefreshJwtUseCase
   implements ICommandHandler<SignRefreshJwtCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(
+    private jwtService: JwtService,
+    private jwtConfig: JwtConfig,
+  ) {}
   async execute(command: SignRefreshJwtCommand) {
     const { currentUserDto } = command;
 
-    const REFRESH_SECRET_KEY = this.jwtConfig.getRefSecretKey();
-    const EXP_REF_TIME = this.jwtConfig.getExpRefTime();
+    const REFRESH_SECRET_KEY =
+      await this.jwtConfig.getJwtConfigValue('REFRESH_SECRET_KEY');
+    const EXP_REF_TIME = await this.jwtConfig.getJwtConfigValue('EXP_REF_TIME');
 
     const payloadData = {
       userId: currentUserDto.userId,

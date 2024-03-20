@@ -11,11 +11,15 @@ export class ValidAccessJwtCommand {
 export class ValidAccessJwtUseCase
   implements ICommandHandler<ValidAccessJwtCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(
+    private jwtService: JwtService,
+    private jwtConfig: JwtConfig,
+  ) {}
   async execute(command: ValidAccessJwtCommand): Promise<PayloadDto | null> {
     const { accessToken } = command;
 
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
+    const ACCESS_SECRET_KEY =
+      await this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
 
     try {
       const payload: PayloadDto = await this.jwtService.verify(accessToken, {

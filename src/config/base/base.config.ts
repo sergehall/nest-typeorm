@@ -1,5 +1,4 @@
 import { ConfigType } from '../configuration';
-import { JwtConfigType } from '../jwt/types/jwt-config.types';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ThrottleTypes } from '../throttle/types/throttle.types';
@@ -13,7 +12,6 @@ import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
 import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
 import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
 import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
-import { BasicAuthType } from '../sa/types/basic-auth.type';
 import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
 import {
   S3BPublicBucketNameType,
@@ -21,14 +19,11 @@ import {
 } from '../aws/types/s3-bucket-name.type';
 import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
 import { S3RegionNameType } from '../aws/types/s3-region-name.type';
-import { SaLoginType } from '../sa/types/sa-login.type';
-import { SaEmailType } from '../sa/types/sa-email.type';
-import { SaKeyType } from '../sa/types/sa-key.type';
-import { SaPasswordHashType } from '../sa/types/sa-password-hash.type';
 import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
 import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 import { StripeKeysType } from '../stripe/types/stripe-keys.type';
 import { SaKeysType } from '../sa/types/sa-keys.type';
+import { JwtKeysType } from '../jwt/types/jwt-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -193,28 +188,10 @@ export class BaseConfig {
     })[key];
   }
 
-  /**
-   * Retrieves a specific key from the 'jwt' configuration property and returns its value as a string.
-   * If the value is not found or empty, it either returns the provided `defaultValue` or throws an `InternalServerErrorException`.
-   * @param {JwtConfigType} key - The key of the 'jwt' configuration property to retrieve.
-   * @param {string} defaultValue - An optional default value to return if the key is not found or empty.
-   * @returns {string} The value of the specified key from the 'jwt' configuration property.
-   * @throws {InternalServerErrorException} If the value is not found or empty and no `defaultValue` is provided.
-   */
-  protected getValueString(key: JwtConfigType, defaultValue?: string): string {
-    const value = this.configService.get('jwt', {
+  protected async getJwtValueByKey(key: JwtKeysType): Promise<string> {
+    return this.configService.get('jwt', {
       infer: true,
     })[key];
-    if (value.length === 0 || !value) {
-      if (defaultValue) {
-        return defaultValue;
-      } else {
-        throw new InternalServerErrorException({
-          message: `incorrect configuration , cannot be found ${key}`,
-        });
-      }
-    }
-    return value;
   }
 
   /**

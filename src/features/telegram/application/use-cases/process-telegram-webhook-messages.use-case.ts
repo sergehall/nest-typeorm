@@ -84,10 +84,9 @@ export class ProcessTelegramWebhookMessagesUseCase
     chatId: number,
     text: string,
   ): Promise<void> {
-    const tokenTelegramBot =
-      await this.telegramConfig.getTokenTelegramItIncubator(
-        'TOKEN_TELEGRAM_IT_INCUBATOR',
-      );
+    const tokenTelegramBot = await this.telegramConfig.getTelegramValue(
+      'TOKEN_TELEGRAM_IT_INCUBATOR',
+    );
     const sendMessage = TelegramMethodsEnum.SEND_MESSAGE;
 
     const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
@@ -122,7 +121,7 @@ export class ProcessTelegramWebhookMessagesUseCase
   private async sendMemberStatusMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    const bot_chatId = await this.telegramConfig.getBotChatId(
+    const bot_chatId = await this.telegramConfig.getTelegramValue(
       'TELEGRAM_BOT_CHAT_ID',
     );
     let name = 'new_user';

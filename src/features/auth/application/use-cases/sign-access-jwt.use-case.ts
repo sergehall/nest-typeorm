@@ -14,12 +14,16 @@ export class SignAccessJwtUseCommand {
 export class SignAccessJwtUseCase
   implements ICommandHandler<SignAccessJwtUseCommand>
 {
-  constructor(private jwtService: JwtService, private jwtConfig: JwtConfig) {}
+  constructor(
+    private jwtService: JwtService,
+    private jwtConfig: JwtConfig,
+  ) {}
   async execute(command: SignAccessJwtUseCommand): Promise<AccessTokenDto> {
     const { currentUserDto } = command;
 
-    const ACCESS_SECRET_KEY = this.jwtConfig.getAccSecretKey();
-    const EXP_ACC_TIME = this.jwtConfig.getExpAccTime();
+    const ACCESS_SECRET_KEY =
+      await this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
+    const EXP_ACC_TIME = await this.jwtConfig.getJwtConfigValue('EXP_ACC_TIME');
 
     const payloadData = {
       userId: currentUserDto.userId,
