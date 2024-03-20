@@ -5,13 +5,6 @@ import { ThrottleTypes } from '../throttle/types/throttle.types';
 import { MailerPortTypes, MailerTypes } from '../mailer/types/mailer.types';
 import * as bcrypt from 'bcrypt';
 import { EnvNamesEnums } from '../enums/env-names.enums';
-import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
-import {
-  S3BPublicBucketNameType,
-  S3PrivateBucketNameType,
-} from '../aws/types/s3-bucket-name.type';
-import { AwsEndpointType } from '../aws/types/aws-endpoint.type';
-import { S3RegionNameType } from '../aws/types/s3-region-name.type';
 import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
 import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 import { StripeKeysType } from '../stripe/types/stripe-keys.type';
@@ -20,6 +13,7 @@ import { PgKeysType } from '../db/postgres/types/pg-keys.type';
 import { JwtKeysType } from '../jwt/types/jwt-keys.types';
 import { PgPortKeyType } from '../db/postgres/types/pg-port-key.type';
 import { MongoDbKeysType } from '../db/mongo/types/mongo-db-keys.type';
+import { AwsKeysTypes } from '../aws/types/aws-keys.types';
 
 @Injectable()
 export class BaseConfig {
@@ -34,44 +28,13 @@ export class BaseConfig {
     });
   }
 
-  protected async getEndpointName(key: AwsEndpointType): Promise<string> {
-    return this.configService.get('db.aws.endpoint', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueAccessKeyId(key: AwsAccessKeyType): Promise<string> {
-    return this.configService.get('db.aws.accessKeys', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValuePrivateBucketName(
-    key: S3PrivateBucketNameType,
-  ): Promise<string> {
-    return this.configService.get('db.aws.buckets', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValuePublicBucketName(
-    key: S3BPublicBucketNameType,
-  ): Promise<string> {
-    return this.configService.get('db.aws.buckets', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueRegionName(key: S3RegionNameType): Promise<string> {
-    return this.configService.get('db.aws.region', {
-      infer: true,
-    })[key];
-  }
-
-  protected async getValueSecretAccessKey(
-    key: AwsAccessKeyType,
-  ): Promise<string> {
-    return this.configService.get('db.aws.accessKeys', {
+  /**
+   * Retrieves a specific AWS value by key from the configuration.
+   * @param {AwsKeysTypes} key - The key to retrieve the value for.
+   * @returns {Promise<string>} The value associated with the provided key.
+   */
+  protected async getValueAwsByKey(key: AwsKeysTypes): Promise<string> {
+    return this.configService.get('db.aws', {
       infer: true,
     })[key];
   }
@@ -100,13 +63,13 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getMongoValueByKey(key: MongoDbKeysType): Promise<string> {
+  protected async getValueMongoByKey(key: MongoDbKeysType): Promise<string> {
     return this.configService.get('db.mongo', {
       infer: true,
     })[key];
   }
 
-  protected async getPostgresValueByKey(key: PgKeysType): Promise<string> {
+  protected async getValuePostgresByKey(key: PgKeysType): Promise<string> {
     return this.configService.get(`db.postgres`, {
       infer: true,
     })[key];
@@ -120,7 +83,7 @@ export class BaseConfig {
     return value;
   }
 
-  protected async getJwtValueByKey(key: JwtKeysType): Promise<string> {
+  protected async getValueJwtByKey(key: JwtKeysType): Promise<string> {
     return this.configService.get('jwt', {
       infer: true,
     })[key];
@@ -143,7 +106,7 @@ export class BaseConfig {
    * Retrieves the 'SALT_FACTOR' from the 'bcrypt' configuration property and uses it to generate a salt for hashing the provided `password`.
    * @returns {Promise<string>} A Promise containing the hashed password.
    */
-  protected async getSaValueHash(): Promise<string> {
+  protected async getValueSaHash(): Promise<string> {
     const basicAuth = this.configService.get('sa', {
       infer: true,
     }).BASIC_AUTH;

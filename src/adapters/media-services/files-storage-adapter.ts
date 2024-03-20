@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { FileUploadDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
-import { S3Service } from '../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../config/aws/s3/initialize-s3-client';
 import { PutObjectCommand, PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import {
   UrlPathKeyEtagDto,
@@ -15,7 +15,7 @@ import { PathsKeysFileUploadDto } from '../../features/posts/dto/path-key-file-u
 
 @Injectable()
 export class FilesStorageAdapter {
-  constructor(private s3Service: S3Service) {}
+  constructor(private s3Service: InitializeS3Client) {}
 
   async uploadFileImagePost(
     resizedImages: ResizedImageDetailsDto,
@@ -68,9 +68,8 @@ export class FilesStorageAdapter {
           ContentType: mimetype,
         };
         const command: PutObjectCommand = new PutObjectCommand(bucketParams);
-        const resultUploaded: PutObjectCommandOutput = await s3Client.send(
-          command,
-        );
+        const resultUploaded: PutObjectCommandOutput =
+          await s3Client.send(command);
         const eTag = resultUploaded.ETag;
 
         if (!eTag) {
@@ -78,9 +77,8 @@ export class FilesStorageAdapter {
           throw new InternalServerErrorException('Error uploading file to S3:');
         }
 
-        const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-          pathKey,
-        );
+        const unitedUrl: UrlDto =
+          await this.s3Service.generateSignedUrl(pathKey);
         return {
           url: unitedUrl.url,
           pathKey: pathKey,

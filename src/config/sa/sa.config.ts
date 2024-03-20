@@ -27,6 +27,6 @@ export class SaConfig extends BaseConfig {
   }
 
   async getSaHash(): Promise<string> {
-    return this.getSaValueHash();
+    return this.getValueSaHash();
   }
 }

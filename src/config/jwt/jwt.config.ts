@@ -13,7 +13,7 @@ export class JwtConfig extends BaseConfig {
 
   private async getJwtValue(key: JwtKeysType): Promise<string> {
     if (this.config.hasOwnProperty(key)) {
-      return this.getJwtValueByKey(key);
+      return this.getValueJwtByKey(key);
     } else {
       throw new BadRequestException(
         `Key ${key} not found in JWT configuration`,

@@ -6,7 +6,7 @@ import { OriginalMiddleSmallEntitiesDto } from '../../../features/posts/dto/orig
 import { ImagesPostsMetadataEntity } from '../../../features/posts/dto/images-posts-metadata.dto';
 import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
 import { PathKeyBufferDto } from '../../../features/posts/dto/path-key-buffer.dto';
-import { S3Service } from '../../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../../config/aws/s3/initialize-s3-client';
 import * as sharp from 'sharp';
 import { ImageWidthHeightSize } from './dto/image-width-height-size';
 import { ImageMetadata } from './dto/image-metadata';
@@ -17,7 +17,7 @@ import { ImagesBlogsMainMetadataEntity } from '../../../features/blogger-blogs/e
 
 @Injectable()
 export class FilesMetadataService {
-  constructor(protected s3Service: S3Service) {}
+  constructor(protected s3Service: InitializeS3Client) {}
 
   async processImageBlogsWallpaperOrMain(
     metadataEntity:

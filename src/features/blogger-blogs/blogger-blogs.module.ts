@@ -34,7 +34,7 @@ import { UsersEntity } from '../users/entities/users.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
 import { AwsConfig } from '../../config/aws/aws.config';
 import { UploadFilesPostsUseCase } from './application/use-cases/upload-files-posts-use-case';
-import { S3Service } from '../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../config/aws/s3/initialize-s3-client';
 import { FilesStorageAdapter } from '../../adapters/media-services/files-storage-adapter';
 import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { UploadFilesBlogsWallpaperUseCase } from './application/use-cases/upload-files-blogs-wallpaper-use-case';
@@ -69,7 +69,7 @@ const bloggersBlogUseCases = [
 ];
 
 const services = [
-  S3Service,
+  InitializeS3Client,
   PostsService,
   ParseQueriesService,
   BloggerBlogsService,

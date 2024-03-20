@@ -1,35 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { AwsAccessKeyType } from './types/aws-access-key.type';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-import { AwsEndpointType } from './types/aws-endpoint.type';
-import {
-  S3BPublicBucketNameType,
-  S3PrivateBucketNameType,
-} from './types/s3-bucket-name.type';
-import { S3RegionNameType } from './types/s3-region-name.type';
+import { AwsKeysTypes } from './types/aws-keys.types';
 
 @Injectable()
 export class AwsConfig extends BaseConfig {
-  async getAccessKeyId(key: AwsAccessKeyType): Promise<string> {
-    return await this.getValueAccessKeyId(key);
-  }
-  async getSecretAccessKey(key: AwsAccessKeyType): Promise<string> {
-    return await this.getValueSecretAccessKey(key);
+  private config: Record<string, string> = {
+    ACCESS_KEY_ID: 'ACCESS_KEY_ID',
+    SECRET_ACCESS_KEY: 'SECRET_ACCESS_KEY',
+    AWS_ENDPOINT: 'AWS_ENDPOINT',
+    S3_PRIVATE_BUCKET: 'S3_PRIVATE_BUCKET',
+    S3_PUBLIC_BUCKET: 'S3_PUBLIC_BUCKET',
+    S3_REGION: 'S3_REGION',
+  };
+
+  private async getAwsValue(key: AwsKeysTypes): Promise<string> {
+    if (this.config.hasOwnProperty(key)) {
+      return this.getValueAwsByKey(key);
+    } else {
+      throw new BadRequestException(
+        `Key ${key} not found in AWS configuration`,
+      );
+    }
   }
 
-  async getEndpoint(key: AwsEndpointType): Promise<string> {
-    return await this.getEndpointName(key);
-  }
-
-  async getS3PrivateBucketName(key: S3PrivateBucketNameType): Promise<string> {
-    return await this.getValuePrivateBucketName(key);
-  }
-
-  async getS3PublicBucketName(key: S3BPublicBucketNameType): Promise<string> {
-    return await this.getValuePublicBucketName(key);
-  }
-
-  async getS3RegionName(key: S3RegionNameType): Promise<string> {
-    return await this.getValueRegionName(key);
+  async getAwsConfig(key: AwsKeysTypes): Promise<string> {
+    return this.getAwsValue(key);
   }
 }
