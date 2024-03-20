@@ -1,7 +1,7 @@
 import { PaymentSystem } from '../enums/payment-system.enums';
 import { Injectable } from '@nestjs/common';
 import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
-import { PaymentStripeDto } from '../payment-systems/stripe/dto/payment-stripe.dto';
+import { PaymentDto } from '../dto/payment.dto';
 import { PaymentLinkDto } from '../dto/payment-link.dto';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class PaymentManager {
   }
 
   private async processStripePayment(
-    paymentStripeDto: PaymentStripeDto[],
+    paymentStripeDto: PaymentDto[],
   ): Promise<PaymentLinkDto | null> {
     // Call the appropriate method from StripeAdapter
     const session =

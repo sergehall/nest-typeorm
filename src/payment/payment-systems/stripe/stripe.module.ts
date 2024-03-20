@@ -4,8 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ProcessStripeWebHookUseCase } from './application/use-cases/process-stripe-webhook.use-case';
 import { StripeAdapter } from './adapter/stripe-adapter';
-import { BuyWithStripeUseCase } from './application/use-cases/buy-with-stripe.use-case';
-import { StripeService } from './application/stripe.service';
 import { StripeFactory } from '../../../config/stripe/stripe-factory';
 import { NodeEnvConfig } from '../../../config/node-env/node-env.config';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
@@ -38,7 +36,6 @@ import { OrdersEntity } from '../../../features/products/entities/orders.entity'
 import { FinalizeOrderPaymentUseCase } from './application/use-cases/finalize-order-payment.use-case';
 
 const stripeUseCases = [
-  BuyWithStripeUseCase,
   ConstructStripeEventUseCase,
   ProcessStripeSuccessUseCase,
   ProcessStripeChargeSucceededUseCase,
@@ -70,7 +67,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     StripeConfig,
     PaymentManager,
     StripeAdapter,
-    StripeService,
     ParseQueriesService,
     OrdersRepo,
     UsersRepo,

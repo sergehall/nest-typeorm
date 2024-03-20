@@ -10,7 +10,10 @@ import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
 import { ProductsRepo } from '../features/products/infrastructure/products.repo';
 import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
+import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
+import { PaymentService } from './application/payment.service';
 
+const paymentUseCases = [BuyProductsUseCase];
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
 
 const helpers = [UuidErrorResolver];
@@ -19,12 +22,14 @@ const helpers = [UuidErrorResolver];
   imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
   controllers: [],
   providers: [
-    ...paymentConfigs,
+    PaymentService,
     StripeFactory,
     PaymentManager,
     StripeAdapter,
     ProductsRepo,
     ...helpers,
+    ...paymentConfigs,
+    ...paymentUseCases,
   ],
 })
 export class PaymentModule {}

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { PaymentStripeDto } from '../../../payment/payment-systems/stripe/dto/payment-stripe.dto';
+import { PaymentDto } from '../../../payment/dto/payment.dto';
 import { PaymentTransactionsEntity } from '../entities/payment-transaction.entity';
 import { OrdersEntity } from '../entities/orders.entity';
 import { OrderItemsEntity } from '../entities/order-items.entity';
@@ -14,7 +14,7 @@ import { GuestUsersEntity } from '../entities/unregistered-users.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 
 export class CreateOrderAndPaymentTransactionsCommand {
-  constructor(public paymentStripeDto: PaymentStripeDto[]) {}
+  constructor(public paymentStripeDto: PaymentDto[]) {}
 }
 
 @CommandHandler(CreateOrderAndPaymentTransactionsCommand)
@@ -105,7 +105,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
   }
 
   private createOrderItemsEntities(
-    paymentStripeDto: PaymentStripeDto[],
+    paymentStripeDto: PaymentDto[],
     order: OrdersEntity,
   ): OrderItemsEntity[] {
     const orderItemsEntities: OrderItemsEntity[] = [];

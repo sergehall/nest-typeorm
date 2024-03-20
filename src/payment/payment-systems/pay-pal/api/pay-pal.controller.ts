@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
   Post,
   RawBodyRequest,
   Req,
@@ -12,10 +11,11 @@ import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto'
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('pay-pal')
 export class PayPalController {
-  constructor() {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Get('buy/products')
   @UseGuards(IfGuestUsersGuard)
@@ -33,7 +33,10 @@ export class PayPalController {
     // return this.commandBus.execute(
     //   new BuyWithStripeCommand(productsRequestDto, currentUserDto),
     // );
-    return 'string';
+    // return this.commandBus.execute(
+    //   new BuyWithPayPalCommand(productsRequestDto, currentUserDto),
+    // );
+    return 'The purchase was successful';
   }
 
   @Post('webhooks')
