@@ -24,6 +24,7 @@ import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 import { StripeKeysType } from '../stripe/types/stripe-keys.type';
 import { SaKeysType } from '../sa/types/sa-keys.type';
 import { JwtKeysType } from '../jwt/types/jwt-keys.type';
+import { PgKeysType } from '../db/postgres/types/pg-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -114,78 +115,18 @@ export class BaseConfig {
     });
   }
 
-  /**
-   * Retrieves the PostgreSQL database domain name based on the provided key.
-   * @param {PgDomainNameTypes} key - The key to retrieve the domain name.
-   * @returns {Promise<string>} The PostgreSQL database domain name.
-   */
-  protected async getValuePgDomainName(
-    key: PgDomainNameTypes,
-  ): Promise<string> {
-    return this.configService.get(`db.pg.domain`, {
+  protected async getPostgresValueByKey(key: PgKeysType): Promise<string> {
+    return this.configService.get(`db.postgres`, {
       infer: true,
     })[key];
   }
 
-  /**
-   * Retrieves the PostgreSQL database host based on the provided key.
-   * @param {PgDatabaseUrlTypes} key - The key to retrieve the url.
-   * @returns {Promise<string>} The PostgreSQL database url.
-   */
-  protected async getValuePgDatabaseUrl(
-    key: PgDatabaseUrlTypes,
-  ): Promise<string> {
-    return this.configService.get(`db.pg.url`, {
-      infer: true,
-    })[key];
-  }
-
-  /**
-   * Retrieves the PostgreSQL database host based on the provided key.
-   * @param {PgHostTypes} key - The key to retrieve the host.
-   * @returns {Promise<string>} The PostgreSQL database host.
-   */
-  protected async getValuePgHost(key: PgHostTypes): Promise<string> {
-    return this.configService.get(`db.pg.host`, {
-      infer: true,
-    })[key];
-  }
-
-  /**
-   * Retrieves the PostgreSQL database port based on the provided key.
-   * It also validates that the retrieved value is a number.
-   * @param {PgPortTypes} key - The key to retrieve the port.
-   * @returns {Promise<number>} The PostgreSQL database port.
-   * @throws {InternalServerErrorException} If the value is not a valid number.
-   */
   protected async getValuePgPort(key: PgPortTypes): Promise<number> {
-    const value = this.configService.get('db.pg.port', {
+    const value = this.configService.get('db.postgres', {
       infer: true,
     })[key];
     await this.validationNumbersType(value);
     return value;
-  }
-
-  /**
-   * Retrieves the PostgreSQL database name based on the provided key.
-   * @param {PgNamesDbTypes} key - The key to retrieve the database name.
-   * @returns {Promise<string>} The PostgreSQL database name.
-   */
-  protected async getValuePgNameDb(key: PgNamesDbTypes): Promise<string> {
-    return this.configService.get('db.pg.namesDatabase', {
-      infer: true,
-    })[key];
-  }
-
-  /**
-   * Retrieves the PostgreSQL database authentication configuration based on the provided key.
-   * @param {PgAuthTypes} key - The key to retrieve the authentication configuration.
-   * @returns {Promise<string>} The PostgreSQL database authentication configuration.
-   */
-  protected async getValuePgAuth(key: PgAuthTypes): Promise<string> {
-    return this.configService.get('db.pg.authConfig', {
-      infer: true,
-    })[key];
   }
 
   protected async getJwtValueByKey(key: JwtKeysType): Promise<string> {

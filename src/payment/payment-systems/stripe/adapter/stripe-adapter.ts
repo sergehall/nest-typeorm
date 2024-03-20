@@ -57,7 +57,8 @@ export class StripeAdapter {
   }
 
   async getStripeUrls(key: 'success' | 'cancel'): Promise<string> {
-    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+    const baseUrl =
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const urlMap: { [key in 'success' | 'cancel']: string } = {
       success: '/stripe/success',
       cancel: '/stripe/cancel',

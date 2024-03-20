@@ -38,7 +38,7 @@ export class SendNewBlogPostNotificationsUseCase
     );
 
     const baseUrl: string =
-      await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const postLink: string = baseUrl + `/posts/${newPost.id}`;
 
     const tokenTelegramBot = await this.telegramConfig.getTelegramValue(

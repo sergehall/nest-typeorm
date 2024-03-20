@@ -22,7 +22,6 @@ import { ValidRefreshJwtUseCase } from './application/use-cases/valid-refresh-jw
 import { PasswordRecoveryUseCase } from './application/use-cases/password-recovery.use-case';
 import { ChangePasswordByRecoveryCodeUseCase } from './application/use-cases/change-password-by-recovery-code.use-case';
 import { EncryptConfig } from '../../config/encrypt/encrypt.config';
-import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { ConfirmUserByCodeUseCase } from './application/use-cases/confirm-user-by-code.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { MailsService } from '../../common/mails/application/mails.service';
@@ -94,7 +93,6 @@ const helpers = [KeyResolver, UuidErrorResolver];
     ParseQueriesService,
     AuthService,
     MailsService,
-    DecodeTokenService,
     SecurityDevicesService,
     UsersRepo,
     GamePairsRepo,

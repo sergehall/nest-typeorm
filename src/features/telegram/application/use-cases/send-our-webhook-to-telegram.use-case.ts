@@ -25,7 +25,8 @@ export class SendOurWebhookToTelegramUseCase
     const method = TelegramMethodsEnum.SET_WEBHOOK;
     const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${method}`;
 
-    const baseUrl = await this.postgresConfig.getDomain('PG_DOMAIN_HEROKU');
+    const baseUrl =
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
 
     const url = baseUrl + '/integrations/telegram/webhook';
 

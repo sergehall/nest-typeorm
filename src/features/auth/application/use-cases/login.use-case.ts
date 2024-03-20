@@ -1,5 +1,4 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DecodeTokenService } from '../../../../config/jwt/decode.service/decode-token-service';
 import { PayloadDto } from '../../dto/payload.dto';
 import { SignRefreshJwtCommand } from './sign-refresh-jwt.use-case';
 import { CreateDeviceCommand } from '../../../security-devices/application/use-cases/create-device.use-case';
@@ -7,6 +6,7 @@ import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { Response } from 'express';
 import { SignAccessJwtUseCommand } from './sign-access-jwt.use-case';
 import { AccessTokenDto } from '../../dto/access-token.dto';
+import { AuthService } from '../auth.service';
 
 export class LoginCommand {
   constructor(
@@ -20,7 +20,7 @@ export class LoginCommand {
 @CommandHandler(LoginCommand)
 export class LoginUseCase implements ICommandHandler<LoginCommand> {
   constructor(
-    protected decodeTokenService: DecodeTokenService,
+    protected authService: AuthService,
     protected commandBus: CommandBus,
   ) {}
   async execute(command: LoginCommand): Promise<AccessTokenDto> {
@@ -30,7 +30,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
       new SignRefreshJwtCommand(currentUserDto),
     );
 
-    const payload: PayloadDto = await this.decodeTokenService.toExtractPayload(
+    const payload: PayloadDto = await this.authService.toExtractPayload(
       signedToken.refreshToken,
     );
 

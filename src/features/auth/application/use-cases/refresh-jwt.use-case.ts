@@ -1,13 +1,13 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PayloadDto } from '../../dto/payload.dto';
 import { UpdateRefreshJwtCommand } from './update-refresh-jwt.use-case';
-import { DecodeTokenService } from '../../../../config/jwt/decode.service/decode-token-service';
 import { AddInvalidJwtToBlacklistCommand } from './add-refresh-token-to-blacklist.use-case';
 import { UpdateDeviceCommand } from '../../../security-devices/application/use-cases/update-device.use-case';
 import { RefreshTokenDto } from '../../dto/refresh-token.dto';
 import { Response } from 'express';
 import { UpdateAccessJwtCommand } from './update-access-jwt.use-case';
 import { AccessTokenDto } from '../../dto/access-token.dto';
+import { AuthService } from '../auth.service';
 
 export class RefreshJwtCommand {
   constructor(
@@ -21,7 +21,7 @@ export class RefreshJwtCommand {
 @CommandHandler(RefreshJwtCommand)
 export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
   constructor(
-    protected decodeTokenService: DecodeTokenService,
+    protected authService: AuthService,
     protected commandBus: CommandBus,
   ) {}
 
@@ -30,7 +30,7 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
     const { refreshToken } = refreshTokenDto;
 
     const currentPayload: PayloadDto =
-      await this.decodeTokenService.toExtractPayload(refreshToken);
+      await this.authService.toExtractPayload(refreshToken);
 
     const currentTimestamp = new Date().toISOString();
     const expirationTimestamp = new Date(
@@ -52,8 +52,9 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
       secure: true,
     });
 
-    const updatedPayload: PayloadDto =
-      await this.decodeTokenService.toExtractPayload(updatedJwt.refreshToken);
+    const updatedPayload: PayloadDto = await this.authService.toExtractPayload(
+      updatedJwt.refreshToken,
+    );
 
     await this.commandBus.execute(
       new UpdateDeviceCommand(updatedPayload, ip, userAgent),

@@ -272,30 +272,18 @@ class Configuration {
       ENV: ENV,
       PORT: Configuration.getPort(),
       db: {
-        pg: {
-          url: {
-            DATABASE_URL: Configuration.getDatabaseURL(),
-          },
-          host: {
-            PG_URI_LOCAL: Configuration.getUriHostLocal(),
-            PG_HOST_HEROKU: Configuration.getUriHostHeroku(),
-          },
-          port: {
-            PG_PORT: Configuration.getPgPort(),
-          },
-          namesDatabase: {
-            PG_LOCAL_DATABASE: Configuration.getPgLocalNameDB(),
-            PG_HEROKU_NAME_DATABASE: Configuration.getPgHerokuNameDB(),
-          },
-          authConfig: {
-            PG_LOCAL_USER_NAME: Configuration.getPgLocalUserName(),
-            PG_LOCAL_USER_PASSWORD: Configuration.getPgLocalUserPassword(),
-            PG_HEROKU_USER_NAME: Configuration.getPgHerokuUserName(),
-            PG_HEROKU_USER_PASSWORD: Configuration.getPgHerokuUserPassword(),
-          },
-          domain: {
-            PG_DOMAIN_HEROKU: Configuration.getPgHerokuDomain(),
-          },
+        postgres: {
+          PG_PORT: Configuration.getPgPort(),
+          DATABASE_URL: Configuration.getDatabaseURL(),
+          PG_URI_LOCAL: Configuration.getUriHostLocal(),
+          PG_HOST_HEROKU: Configuration.getUriHostHeroku(),
+          PG_LOCAL_DATABASE: Configuration.getPgLocalNameDB(),
+          PG_HEROKU_NAME_DATABASE: Configuration.getPgHerokuNameDB(),
+          PG_LOCAL_USER_NAME: Configuration.getPgLocalUserName(),
+          PG_LOCAL_USER_PASSWORD: Configuration.getPgLocalUserPassword(),
+          PG_HEROKU_USER_NAME: Configuration.getPgHerokuUserName(),
+          PG_HEROKU_USER_PASSWORD: Configuration.getPgHerokuUserPassword(),
+          PG_DOMAIN_HEROKU: Configuration.getPgHerokuDomain(),
         },
         mongo: {
           url: {

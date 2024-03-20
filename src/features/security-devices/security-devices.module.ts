@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from '../../config/jwt/jwt.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateDeviceUseCase } from './application/use-cases/create-device.use-case';
-import { DecodeTokenService } from '../../config/jwt/decode.service/decode-token-service';
 import { RemoveDevicesByDeviceIdUseCase } from './application/use-cases/remove-devices-by-deviceId.use-case';
 import { RemoveDevicesExceptCurrentUseCase } from './application/use-cases/remove-devices-except-current.use-case';
 import { KeyResolver } from '../../common/helpers/key-resolver';
@@ -28,6 +27,7 @@ import { ChallengesQuestionsRepo } from '../pair-game-quiz/infrastructure/challe
 import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-questions.entity';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
+import { AuthService } from '../auth/application/auth.service';
 
 const securityDevicesCases = [
   SearchDevicesUseCase,
@@ -57,8 +57,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
     JwtService,
     JwtConfig,
     CaslAbilityFactory,
+    AuthService,
     UsersService,
-    DecodeTokenService,
     SecurityDevicesService,
     UsersRepo,
     GamePairsRepo,
