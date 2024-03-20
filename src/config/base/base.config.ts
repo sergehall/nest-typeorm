@@ -5,13 +5,6 @@ import { ThrottleTypes } from '../throttle/types/throttle.types';
 import { MailerPortTypes, MailerTypes } from '../mailer/types/mailer.types';
 import * as bcrypt from 'bcrypt';
 import { EnvNamesEnums } from '../enums/env-names.enums';
-import { PgDomainNameTypes } from '../db/postgres/types/pg-domain-name.types';
-import { PgHostTypes } from '../db/postgres/types/pg-host.types';
-import { PgPortTypes } from '../db/postgres/types/pg-port.types';
-import { PgNamesDbTypes } from '../db/postgres/types/pg-names-db.types';
-import { PgAuthTypes } from '../db/postgres/types/pg-auth.types';
-import { MongoDatabaseConfigTypes } from '../db/mongo/types/mongo-db-config.types';
-import { PgDatabaseUrlTypes } from '../db/postgres/types/pg-database-url.types';
 import { AwsAccessKeyType } from '../aws/types/aws-access-key.type';
 import {
   S3BPublicBucketNameType,
@@ -23,8 +16,10 @@ import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
 import { TelegramKeysType } from '../telegram/types/telegram-keys.type';
 import { StripeKeysType } from '../stripe/types/stripe-keys.type';
 import { SaKeysType } from '../sa/types/sa-keys.type';
-import { JwtKeysType } from '../jwt/types/jwt-keys.type';
 import { PgKeysType } from '../db/postgres/types/pg-keys.type';
+import { JwtKeysType } from '../jwt/types/jwt-keys.types';
+import { PgPortKeyType } from '../db/postgres/types/pg-port-key.type';
+import { MongoDbKeysType } from '../db/mongo/types/mongo-db-keys.type';
 
 @Injectable()
 export class BaseConfig {
@@ -105,14 +100,10 @@ export class BaseConfig {
     })[key];
   }
 
-  /**
-   * Retrieves the value of the 'db' configuration property and returns it as a Promise of `MongoDatabaseConfigTypes`.
-   * @returns {Promise<MongoDatabaseConfigTypes>} The value of the 'db' configuration property.
-   */
-  protected async getValueMongoDatabase(): Promise<MongoDatabaseConfigTypes> {
+  protected async getMongoValueByKey(key: MongoDbKeysType): Promise<string> {
     return this.configService.get('db.mongo', {
       infer: true,
-    });
+    })[key];
   }
 
   protected async getPostgresValueByKey(key: PgKeysType): Promise<string> {
@@ -121,7 +112,7 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getValuePgPort(key: PgPortTypes): Promise<number> {
+  protected async getValuePgPort(key: PgPortKeyType): Promise<number> {
     const value = this.configService.get('db.postgres', {
       infer: true,
     })[key];
