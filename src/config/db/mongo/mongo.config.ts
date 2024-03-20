@@ -28,9 +28,3 @@ export class MongoConfig extends BaseConfig {
   }
 }
 
-// @Injectable()
-// export class MongoConfig extends BaseConfig {
-//   async getMongoLocalAndAtlasValue(): Promise<MongoDatabaseConfigTypes> {
-//     return await this.getValueMongoDatabase();
-//   }
-// }
