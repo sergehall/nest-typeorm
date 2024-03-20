@@ -33,14 +33,14 @@ import { ProductsDataEntity } from '../../../features/products/entities/products
 import { ProductsRepo } from '../../../features/products/infrastructure/products.repo';
 import { OrdersRepo } from '../../../features/products/infrastructure/orders.repo';
 import { OrdersEntity } from '../../../features/products/entities/orders.entity';
-import { FinalizeOrderPaymentUseCase } from './application/use-cases/finalize-order-payment.use-case';
+import { FinalizeStripePaymentUseCase } from './application/use-cases/finalize-stripe-payment.use-case';
 
 const stripeUseCases = [
   ConstructStripeEventUseCase,
   ProcessStripeSuccessUseCase,
   ProcessStripeChargeSucceededUseCase,
   ProcessStripeWebHookUseCase,
-  FinalizeOrderPaymentUseCase,
+  FinalizeStripePaymentUseCase,
 ];
 const helpers = [KeyResolver, UuidErrorResolver];
 

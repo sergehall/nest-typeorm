@@ -1,21 +1,21 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import Stripe from 'stripe';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
+import Stripe from 'stripe';
 
-export class FinalizeOrderPaymentCommand {
+export class FinalizeStripePaymentCommand {
   constructor(public checkoutSessionCompletedObject: Stripe.Checkout.Session) {}
 }
 
-@CommandHandler(FinalizeOrderPaymentCommand)
-export class FinalizeOrderPaymentUseCase
-  implements ICommandHandler<FinalizeOrderPaymentCommand>
+@CommandHandler(FinalizeStripePaymentCommand)
+export class FinalizeStripePaymentUseCase
+  implements ICommandHandler<FinalizeStripePaymentCommand>
 {
   constructor(
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
 
-  async execute(command: FinalizeOrderPaymentCommand): Promise<string> {
+  async execute(command: FinalizeStripePaymentCommand): Promise<string> {
     const { checkoutSessionCompletedObject } = command;
 
     try {

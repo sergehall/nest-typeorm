@@ -44,7 +44,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       throw new NotFoundException(productsDataEntities);
     }
 
-    const paymentStripeDto: PaymentDto[] =
+    const paymentDto: PaymentDto[] =
       await this.paymentService.createPaymentStripeDto(
         productsRequest,
         productsDataEntities,
@@ -53,12 +53,9 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       );
 
     await this.commandBus.execute(
-      new CreateOrderAndPaymentTransactionsCommand(paymentStripeDto),
+      new CreateOrderAndPaymentTransactionsCommand(paymentDto),
     );
 
-    return await this.paymentManager.processPayment(
-      paymentStripeDto,
-      paymentSystem,
-    );
+    return await this.paymentManager.processPayment(paymentDto, paymentSystem);
   }
 }

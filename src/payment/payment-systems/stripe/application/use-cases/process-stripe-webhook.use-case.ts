@@ -4,7 +4,7 @@ import { Request } from 'express';
 import Stripe from 'stripe';
 import { ConstructStripeEventCommand } from './construct-stripe-event.use-case';
 import { ProcessChargeSucceededCommand } from './process-stripe-charge-succeeded.use-case';
-import { FinalizeOrderPaymentCommand } from './finalize-order-payment.use-case';
+import { FinalizeStripePaymentCommand } from './finalize-stripe-payment.use-case';
 
 export class ProcessStripeWebHookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -28,7 +28,7 @@ export class ProcessStripeWebHookUseCase
           case 'checkout.session.completed':
             console.log(event, 'checkout.session.completed');
             await this.commandBus.execute(
-              new FinalizeOrderPaymentCommand(event.data.object),
+              new FinalizeStripePaymentCommand(event.data.object),
             );
             break;
           case 'charge.succeeded':
