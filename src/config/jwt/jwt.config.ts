@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseConfig } from '../base/base.config';
-
-import { JwtKeysType } from './types/jwt-keys.type';
+import { JwtKeysType } from './types/jwt-keys.types';
 
 @Injectable()
 export class JwtConfig extends BaseConfig {

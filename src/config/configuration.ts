@@ -286,16 +286,12 @@ class Configuration {
           PG_DOMAIN_HEROKU: Configuration.getPgHerokuDomain(),
         },
         mongo: {
-          url: {
-            MONGO_URI_LOCAL: Configuration.getMongoUriLocal(),
-            ATLAS_URI: Configuration.getMongoUriAtlas(),
-          },
-          namesDatabase: {
-            NEST_DATABASE: Configuration.getNestDB(),
-            TEST_DATABASE: Configuration.geTestDB(),
-            DEV_DATABASE: Configuration.geDevDB(),
-            PROD_NEST_DATABASE: Configuration.getProdDB(),
-          },
+          MONGO_URI_LOCAL: Configuration.getMongoUriLocal(),
+          ATLAS_URI: Configuration.getMongoUriAtlas(),
+          NEST_DATABASE: Configuration.getNestDB(),
+          TEST_DATABASE: Configuration.geTestDB(),
+          DEV_DATABASE: Configuration.geDevDB(),
+          PROD_NEST_DATABASE: Configuration.getProdDB(),
         },
         aws: {
           accessKeys: {
