@@ -10,29 +10,29 @@ export class TelegramConfig extends BaseConfig {
     TELEGRAM_BOT_CHAT_ID: 'TELEGRAM_BOT_CHAT_ID',
   };
 
-  async getPayPalValueByKey(key: TelegramKeysType): Promise<string> {
+  async getTelegramValueByKey(key: TelegramKeysType): Promise<string> {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueTelegram(key);
     } else {
       throw new BadRequestException(
-        `Key ${key} not found in PayPal configuration`,
+        `Key ${key} not found in Telegram configuration`,
       );
     }
   }
 
   async getBotToken(key: TelegramKeysType): Promise<string> {
-    return await this.getPayPalValueByKey(key);
+    return await this.getTelegramValueByKey(key);
   }
 
   async getBotUsername(key: TelegramKeysType): Promise<string> {
-    return this.getPayPalValueByKey(key);
+    return this.getTelegramValueByKey(key);
   }
 
   async getBotChatId(key: TelegramKeysType): Promise<string> {
-    return this.getPayPalValueByKey(key);
+    return this.getTelegramValueByKey(key);
   }
 
   async getTokenTelegramItIncubator(key: TelegramKeysType): Promise<string> {
-    return this.getPayPalValueByKey(key);
+    return this.getTelegramValueByKey(key);
   }
 }

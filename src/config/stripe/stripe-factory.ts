@@ -2,9 +2,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { StripeConfigDto } from './dto/stripe-config.dto';
 import Stripe from 'stripe';
 import { StripeConfig } from './stripe.config';
-import { SpireVersionDefaultEnum } from './types/spire-version.type';
 import { EnvNamesEnums } from '../enums/env-names.enums';
 import { NodeEnvConfig } from '../node-env/node-env.config';
+import { SpireVersionDefaultEnum } from './enums/spire-version-default.enum';
 
 @Injectable()
 export class StripeFactory {

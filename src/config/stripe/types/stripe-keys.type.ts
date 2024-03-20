@@ -1,0 +1,5 @@
+export type StripeKeysType =
+  | 'STRIPE_TEST_API_KEY'
+  | 'STRIPE_LIVE_API_KEY'
+  | 'STRIPE_API_VERSION'
+  | 'STRIPE_WEBHOOK_SECRET';
