@@ -4,7 +4,7 @@ import { AwsConfig } from '../aws.config';
 import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
 
 @Injectable()
-export class S3Service {
+export class InitializeS3Client {
   private s3Client: S3Client;
 
   constructor(private readonly awsConfig: AwsConfig) {
@@ -25,12 +25,11 @@ export class S3Service {
         await this.createBucket(publicBucketName);
       }
 
-      const accessKeyId = await this.awsConfig.getAccessKeyId('ACCESS_KEY_ID');
-      const secretAccessKey = await this.awsConfig.getSecretAccessKey(
-        'SECRET_ACCESS_KEY',
-      );
-      const endpoint = await this.awsConfig.getEndpoint('AWS_ENDPOINT');
-      const region = await this.awsConfig.getS3RegionName('S3_REGION');
+      const accessKeyId = await this.awsConfig.getAwsConfig('ACCESS_KEY_ID');
+      const secretAccessKey =
+        await this.awsConfig.getAwsConfig('SECRET_ACCESS_KEY');
+      const endpoint = await this.awsConfig.getAwsConfig('AWS_ENDPOINT');
+      const region = await this.awsConfig.getAwsConfig('S3_REGION');
 
       this.s3Client = new S3Client({
         endpoint,
@@ -92,7 +91,7 @@ export class S3Service {
 
   async getS3PrivateBucketName(): Promise<string> {
     try {
-      return await this.awsConfig.getS3PrivateBucketName('S3_PRIVATE_BUCKET');
+      return await this.awsConfig.getAwsConfig('S3_PRIVATE_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
       throw new InternalServerErrorException(
@@ -103,7 +102,7 @@ export class S3Service {
 
   async getS3PublicBucketName(): Promise<string> {
     try {
-      return await this.awsConfig.getS3PublicBucketName('S3_PUBLIC_BUCKET');
+      return await this.awsConfig.getAwsConfig('S3_PUBLIC_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
       throw new InternalServerErrorException(
@@ -114,11 +113,9 @@ export class S3Service {
 
   async generateSignedUrl(key: string): Promise<UrlDto> {
     try {
-      const baseUrl = await this.awsConfig.getEndpoint('AWS_ENDPOINT');
+      const baseUrl = await this.awsConfig.getAwsConfig('AWS_ENDPOINT');
       // const subDomain = await this.awsConfig.getS3BucketName('S3_BUCKET');
-      const subDomain = await this.awsConfig.getS3PublicBucketName(
-        'S3_PUBLIC_BUCKET',
-      );
+      const subDomain = await this.awsConfig.getAwsConfig('S3_PUBLIC_BUCKET');
 
       // Splitting baseUrl by protocol separator
       const parts = baseUrl.split('//');

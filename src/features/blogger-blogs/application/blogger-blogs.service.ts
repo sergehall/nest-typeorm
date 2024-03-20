@@ -6,7 +6,7 @@ import {
   ImagesViewModel,
 } from '../views/blogger-blogs-with-images.view-model';
 import { UrlDto } from '../dto/url.dto';
-import { S3Service } from '../../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../../config/aws/s3/initialize-s3-client';
 import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
 import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
@@ -19,7 +19,7 @@ import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-st
 @Injectable()
 export class BloggerBlogsService {
   constructor(
-    private readonly s3Service: S3Service,
+    private readonly s3Service: InitializeS3Client,
     private readonly imagesMetadataService: FilesMetadataService,
     private readonly imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
     private readonly imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,

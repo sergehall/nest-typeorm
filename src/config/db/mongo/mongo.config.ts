@@ -15,7 +15,7 @@ export class MongoConfig extends BaseConfig {
 
   private async getMongoValue(key: MongoDbKeysType): Promise<string> {
     if (this.config.hasOwnProperty(key)) {
-      return this.getMongoValueByKey(key);
+      return this.getValueMongoByKey(key);
     } else {
       throw new BadRequestException(
         `Key ${key} not found in Postgres configuration`,
@@ -27,4 +27,3 @@ export class MongoConfig extends BaseConfig {
     return this.getMongoValue(key);
   }
 }
-

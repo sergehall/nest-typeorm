@@ -38,7 +38,7 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-for-blogs.repo';
 import { BannedUsersForBlogsEntity } from '../users/entities/banned-users-for-blogs.entity';
 import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.repo';
-import { S3Service } from '../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../config/aws/s3/initialize-s3-client';
 import { AwsConfig } from '../../config/aws/aws.config';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 
@@ -74,7 +74,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   controllers: [CommentsController],
   providers: [
     AwsConfig,
-    S3Service,
+    InitializeS3Client,
     CommentsService,
     JwtConfig,
     JwtService,

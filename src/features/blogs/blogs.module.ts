@@ -30,7 +30,7 @@ import { BannedUsersForBlogsRepo } from '../users/infrastructure/banned-users-fo
 import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { ImagesBlogsWallpaperMetadataEntity } from '../blogger-blogs/entities/images-blog-wallpaper-metadata.entity';
 import { ImagesBlogsMainMetadataEntity } from '../blogger-blogs/entities/images-blog-main-metadata.entity';
-import { S3Service } from '../../config/aws/s3/s3-service';
+import { InitializeS3Client } from '../../config/aws/s3/initialize-s3-client';
 import { AwsConfig } from '../../config/aws/aws.config';
 import { ImagesPostsOriginalMetadataEntity } from '../posts/entities/images-post-original-metadata.entity';
 import { ImagesPostsMiddleMetadataEntity } from '../posts/entities/images-posts-middle-metadata.entity';
@@ -74,7 +74,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   providers: [
     AwsConfig,
     AuthService,
-    S3Service,
+    InitializeS3Client,
     JwtService,
     UsersService,
     BlogsService,

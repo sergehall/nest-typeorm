@@ -19,7 +19,7 @@ export class PostgresConfig extends BaseConfig {
 
   private async getPostgresValue(key: PgKeysType): Promise<string> {
     if (this.config.hasOwnProperty(key)) {
-      return this.getPostgresValueByKey(key);
+      return this.getValuePostgresByKey(key);
     } else {
       throw new BadRequestException(
         `Key ${key} not found in Postgres configuration`,

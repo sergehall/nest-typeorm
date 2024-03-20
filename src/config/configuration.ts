@@ -294,20 +294,12 @@ class Configuration {
           PROD_NEST_DATABASE: Configuration.getProdDB(),
         },
         aws: {
-          accessKeys: {
-            ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
-            SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
-          },
-          endpoint: {
-            AWS_ENDPOINT: Configuration.getEndpointNameAws(),
-          },
-          buckets: {
-            S3_PRIVATE_BUCKET: Configuration.getS3PrivateBucket(),
-            S3_PUBLIC_BUCKET: Configuration.getS3PublicBucket(),
-          },
-          region: {
-            S3_REGION: Configuration.getS3Region(),
-          },
+          ACCESS_KEY_ID: Configuration.getAwsAccessKeyId(),
+          SECRET_ACCESS_KEY: Configuration.getAwsAccessSecretKey(),
+          AWS_ENDPOINT: Configuration.getEndpointNameAws(),
+          S3_PRIVATE_BUCKET: Configuration.getS3PrivateBucket(),
+          S3_PUBLIC_BUCKET: Configuration.getS3PublicBucket(),
+          S3_REGION: Configuration.getS3Region(),
         },
       },
       mail: {
