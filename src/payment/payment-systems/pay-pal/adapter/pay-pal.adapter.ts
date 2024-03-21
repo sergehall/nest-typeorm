@@ -4,7 +4,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 import axios from 'axios';
 import { PaymentDto } from '../../../dto/payment.dto';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { IntentsEnums } from '../../../enums/intents.enums';
 
 @Injectable()
