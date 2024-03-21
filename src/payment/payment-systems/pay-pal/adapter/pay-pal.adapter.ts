@@ -73,7 +73,7 @@ export class PayPalAdapter {
       });
 
       const response = await axios.post(url, {
-        method: 'post',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
