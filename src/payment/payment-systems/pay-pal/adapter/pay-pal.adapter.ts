@@ -45,6 +45,7 @@ export class PayPalAdapter {
       // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
         return {
+          reference_id: payPalRequestId,
           amount: {
             currency_code: product.currency,
             value: product.unitAmount,
@@ -55,6 +56,20 @@ export class PayPalAdapter {
       const body = {
         intent: IntentsEnums.CAPTURE,
         purchase_units: lineItems,
+        payment_source: {
+          paypal: {
+            experience_context: {
+              payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+              brand_name: 'EXAMPLE INC',
+              locale: 'en-US',
+              landing_page: 'LOGIN',
+              shipping_preference: 'SET_PROVIDED_ADDRESS',
+              user_action: 'PAY_NOW',
+              return_url: 'https://example.com/returnUrl',
+              cancel_url: 'https://example.com/cancelUrl',
+            },
+          },
+        },
       };
 
       const response = await axios.post(url, {
