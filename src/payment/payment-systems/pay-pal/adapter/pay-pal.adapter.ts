@@ -17,7 +17,7 @@ export class PayPalAdapter {
 
       console.log(accessToken, 'accessToken');
 
-      const baseUrl = PayPalUrlsEnum.BaseApi;
+      const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
       const url = baseUrl + '/v2/checkout/orders';
 
       const currentClient = paymentStripeDto[0].client;
@@ -28,7 +28,6 @@ export class PayPalAdapter {
           : currentClient.guestUserId;
 
       payPalRequestId += `.${orderId}`;
-      console.log(payPalRequestId, 'payPalRequestId');
 
       // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
