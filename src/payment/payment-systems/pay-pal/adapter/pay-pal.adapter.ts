@@ -15,10 +15,8 @@ export class PayPalAdapter {
     try {
       const accessToken = await this.generateAccessToken();
 
-      console.log(accessToken, 'accessToken');
-
       const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
-      const url = `${baseUrl}/v2/checkout/orders`;
+      const url = baseUrl + '/v2/checkout/orders';
 
       const currentClient = paymentStripeDto[0].client;
       const orderId = paymentStripeDto[0].orderId;
@@ -29,42 +27,33 @@ export class PayPalAdapter {
 
       payPalRequestId += `.${orderId}`;
 
-      // Prepare line items for checkout session
+      // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
         return {
           amount: {
             currency_code: product.currency,
             value: product.unitAmount,
           },
+          name: product.name,
+          description: product.description,
+          quantity: product.quantity,
         };
       });
-      // // Prepare line items for checkout session
-      // const lineItems = paymentStripeDto.map((product: PaymentDto) => {
-      //   return {
-      //     amount: {
-      //       currency_code: product.currency,
-      //       value: product.unitAmount,
-      //     },
-      //     name: product.name,
-      //     description: product.description,
-      //     quantity: product.quantity,
-      //   };
-      // });
 
-      const response = await axios.post(
-        url,
-        {
-          intent: IntentsEnums.CAPTURE,
-          purchase_units: lineItems,
+      const body = {
+        intent: IntentsEnums.CAPTURE,
+        purchase_units: lineItems,
+      };
+
+      const response = await axios.post(url, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          'PayPal-Request-Id': payPalRequestId,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-            'PayPal-Request-Id': payPalRequestId,
-          },
-        },
-      );
+        body: JSON.stringify(body),
+      });
 
       console.log(response, 'response');
 
