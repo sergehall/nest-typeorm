@@ -15,6 +15,8 @@ export class PayPalAdapter {
     try {
       const accessToken = await this.generateAccessToken();
 
+      console.log(accessToken, 'accessToken');
+
       const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
       const url = baseUrl + '/v2/checkout/orders';
 
@@ -27,6 +29,19 @@ export class PayPalAdapter {
 
       payPalRequestId += `.${orderId}`;
 
+      // // Prepare line items for checkout
+      // const lineItems = paymentStripeDto.map((product: PaymentDto) => {
+      //   return {
+      //     amount: {
+      //       currency_code: product.currency,
+      //       value: product.unitAmount,
+      //     },
+      //     name: product.name,
+      //     description: product.description,
+      //     quantity: product.quantity,
+      //   };
+      // });
+
       // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
         return {
@@ -34,9 +49,6 @@ export class PayPalAdapter {
             currency_code: product.currency,
             value: product.unitAmount,
           },
-          name: product.name,
-          description: product.description,
-          quantity: product.quantity,
         };
       });
 
@@ -61,8 +73,7 @@ export class PayPalAdapter {
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
-        'Failed to createCheckoutOrder',
-        error.message,
+        'Failed to createCheckoutOrder' + error.message,
       );
     }
   }
