@@ -20,14 +20,14 @@ export class PayPalAdapter {
       const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
       const url = baseUrl + '/v2/checkout/orders';
 
-      const currentClient = paymentStripeDto[0].client;
+      // const currentClient = paymentStripeDto[0].client;
       const orderId = paymentStripeDto[0].orderId;
-      let payPalRequestId: string =
-        currentClient instanceof CurrentUserDto
-          ? currentClient.userId
-          : currentClient.guestUserId;
-
-      payPalRequestId += `.${orderId}`;
+      // let payPalRequestId: string =
+      //   currentClient instanceof CurrentUserDto
+      //     ? currentClient.userId
+      //     : currentClient.guestUserId;
+      //
+      // payPalRequestId += `.${orderId}`;
 
       // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
