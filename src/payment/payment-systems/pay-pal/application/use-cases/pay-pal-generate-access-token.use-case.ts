@@ -27,7 +27,7 @@ export class PayPalGenerateAccessTokenUseCase
 
       const response = await axios({
         url: url,
-        method: 'post',
+        method: 'POST',
         data: 'grant_type=client_credentials',
         auth: {
           username: username,
