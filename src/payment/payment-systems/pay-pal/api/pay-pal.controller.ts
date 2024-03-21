@@ -40,7 +40,7 @@ export class PayPalController {
 
   @Post('webhooks')
   async payPalWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
-    console.log(req.url, '------payPalWebhook--------');
+    console.log(req, '------payPalWebhook--------');
     // return await this.commandBus.execute(
     //   new ProcessStripeWebHookCommand(req),
     // );
