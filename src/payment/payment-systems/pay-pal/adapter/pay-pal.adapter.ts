@@ -17,7 +17,7 @@ export class PayPalAdapter {
 
       console.log(accessToken, 'accessToken');
 
-      const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
+      const baseUrl = PayPalUrlsEnum.BaseApi;
       const url = baseUrl + '/v2/checkout/orders';
 
       const currentClient = paymentStripeDto[0].client;
@@ -53,7 +53,7 @@ export class PayPalAdapter {
         };
       });
 
-      const body = {
+      const body = JSON.stringify({
         intent: IntentsEnums.CAPTURE,
         purchase_units: lineItems,
         payment_source: {
@@ -70,8 +70,8 @@ export class PayPalAdapter {
             },
           },
         },
-      };
-
+      });
+      console.log(body, 'body');
       const response = await axios.post(url, {
         method: 'post',
         headers: {
@@ -79,7 +79,7 @@ export class PayPalAdapter {
           Authorization: `Bearer ${accessToken}`,
           'PayPal-Request-Id': payPalRequestId,
         },
-        body: JSON.stringify(body),
+        body: body,
       });
 
       console.log(response, 'response');
