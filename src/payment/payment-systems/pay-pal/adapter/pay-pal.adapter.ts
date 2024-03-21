@@ -156,9 +156,7 @@ export class PayPalAdapter {
           shipping: {
             address: {
               address_line_1: '123 Shipping Street',
-              address_line_2: 'Apt 1',
               admin_area_2: 'San Jose',
-              admin_area_1: 'CA',
               postal_code: '95131',
               country_code: 'US',
             },
@@ -190,12 +188,13 @@ export class PayPalAdapter {
     };
 
     try {
+      // console.log('Response:', response.data);
       const response = await axios.post(
         'https://api-m.sandbox.paypal.com/v2/checkout/orders',
         data,
         options,
       );
-      console.log('Response:', response.data);
+      return response.data;
     } catch (error) {
       console.error('Error:', error.response.data);
     }
