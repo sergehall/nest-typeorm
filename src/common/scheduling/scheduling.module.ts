@@ -4,7 +4,6 @@ import { MailsModule } from '../mails/mails.module';
 import { UsersService } from '../../features/users/application/users.service';
 import { CaslModule } from '../../ability/casl.module';
 import { CqrsModule } from '@nestjs/cqrs';
-import { MailerConfig } from '../../config/mailer/mailer.config';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { DataCleanupService } from '../data-cleanup/data-cleanup.service';
 import { MailOptionsBuilder } from '../mails/mail-options/mail-options-builder';
@@ -23,6 +22,7 @@ import { ChallengeQuestionsEntity } from '../../features/pair-game-quiz/entities
 import { GamePairsRepo } from '../../features/pair-game-quiz/infrastructure/game-pairs.repo';
 import { GameQuestionsRepo } from '../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
+import { MailsConfig } from '../../config/mails/mails.config';
 
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -42,7 +42,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [],
   providers: [
-    MailerConfig,
+    MailsConfig,
     MailOptionsBuilder,
     PostgresConfig,
     UsersService,

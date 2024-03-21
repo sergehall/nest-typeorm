@@ -7,7 +7,7 @@ import { BannedUsersForBlogsEntity } from '../features/users/entities/banned-use
 import { LikeStatusPostsEntity } from '../features/posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../features/comments/entities/like-status-comments.entity';
 import { InvalidJwtEntity } from '../features/auth/entities/invalid-jwt.entity';
-import { SentCodesLogEntity } from '../common/mails/infrastructure/entities/sent-codes-log.entity';
+import { SentCodesLogEntity } from '../common/mails/entities/sent-codes-log.entity';
 import { DataSource } from 'typeorm';
 import 'dotenv/config';
 import { PairsGameEntity } from '../features/pair-game-quiz/entities/pairs-game.entity';

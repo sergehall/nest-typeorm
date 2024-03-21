@@ -12,6 +12,8 @@ import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-use
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
+import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
+import { PaymentSystem } from '../../../enums/payment-system.enums';
 
 @Controller('pay-pal')
 export class PayPalController {
@@ -25,18 +27,15 @@ export class PayPalController {
     // @Query() query: any,
   ): Promise<string> {
     const currentUserDto: CurrentUserDto | GuestUsersDto = req.user;
+    const paymentSystem: PaymentSystem.PAYPAL = PaymentSystem.PAYPAL;
 
     // const queryData: ParseQueriesDto =
     //   await this.parseQueriesService.getQueriesData(query);
     // const productsQuery = queryData.products;
 
-    // return this.commandBus.execute(
-    //   new BuyWithStripeCommand(productsRequestDto, currentUserDto),
-    // );
-    // return this.commandBus.execute(
-    //   new BuyWithPayPalCommand(productsRequestDto, currentUserDto),
-    // );
-    return 'The purchase was successful';
+    return this.commandBus.execute(
+      new BuyProductsCommand(paymentSystem, productsRequestDto, currentUserDto),
+    );
   }
 
   @Post('webhooks')

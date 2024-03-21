@@ -2,18 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { MailerConfig } from '../../../config/mailer/mailer.config';
+import { MailsConfig } from '../mails/mails.config';
 
 @Injectable()
 export class NodemailerOptions
-  extends MailerConfig
+  extends MailsConfig
   implements MailerOptionsFactory
 {
   async createMailerOptions(): Promise<MailerOptions> {
-    const host = await this.getNodeMailer('MAIL_HOST');
-    const port = await this.getMailerPort('EMAIL_PORT');
-    const user = await this.getNodeMailer('NODEMAILER_EMAIL');
-    const pass = await this.getNodeMailer('NODEMAILER_APP_PASSWORD');
+    const host: string = await this.getMailsConfig('MAIL_HOST');
+    const port: number = await this.getMailsPort('EMAIL_PORT');
+    const user: string = await this.getMailsConfig('NODEMAILER_EMAIL');
+    const pass: string = await this.getMailsConfig('NODEMAILER_APP_PASSWORD');
 
     return {
       transport: {

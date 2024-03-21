@@ -31,7 +31,6 @@ export class PaymentManager {
         return await this.processVisaCheckoutPayment(paymentDto);
       case PaymentSystem.AMERICAN_EXPRESS_CHECKOUT:
         return await this.processAmexCheckoutPayment(paymentDto);
-
       // Add cases for other payment systems as needed
       default:
         console.log(`Payment system '${paymentSystem}' is not supported.`);
