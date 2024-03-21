@@ -71,13 +71,13 @@ export class PayPalAdapter {
           },
         },
       });
-      console.log(body, 'body');
+
       const response = await axios.post(url, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
-          'PayPal-Request-Id': payPalRequestId,
+          'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a',
         },
         body: body,
       });
