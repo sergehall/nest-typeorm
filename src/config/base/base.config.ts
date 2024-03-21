@@ -2,7 +2,6 @@ import { ConfigType } from '../configuration';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ThrottleTypes } from '../throttle/types/throttle.types';
-import { MailerPortTypes, MailerTypes } from '../mailer/types/mailer.types';
 import * as bcrypt from 'bcrypt';
 import { EnvNamesEnums } from '../enums/env-names.enums';
 import { PayPalKeysType } from '../pay-pal/types/pay-pal-keys.type';
@@ -14,6 +13,7 @@ import { JwtKeysType } from '../jwt/types/jwt-keys.types';
 import { PgPortKeyType } from '../db/postgres/types/pg-port-key.type';
 import { MongoDbKeysType } from '../db/mongo/types/mongo-db-keys.type';
 import { AwsKeysTypes } from '../aws/types/aws-keys.types';
+import { MailsKeysTypes, MailsPortKeyType } from '../mails/types/mails.types';
 
 @Injectable()
 export class BaseConfig {
@@ -127,7 +127,7 @@ export class BaseConfig {
    * @param {MailerTypes} key - The key of the 'mail' configuration property to retrieve.
    * @returns {Promise<string>} The value of the specified key from the 'mail' configuration property.
    */
-  protected async getValueMailer(key: MailerTypes): Promise<string> {
+  protected async getValueMailer(key: MailsKeysTypes): Promise<string> {
     return this.configService.get(`mail`, {
       infer: true,
     })[key];
@@ -140,7 +140,7 @@ export class BaseConfig {
    * @returns {Promise<number>} The value of the specified key from the 'mail' configuration property as a number.
    * @throws {InternalServerErrorException} If the value is not a valid number.
    */
-  protected async getValueMailerPort(key: MailerPortTypes): Promise<number> {
+  protected async getValueMailsPort(key: MailsPortKeyType): Promise<number> {
     const value = this.configService.get('mail', {
       infer: true,
     })[key];

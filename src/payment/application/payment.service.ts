@@ -21,7 +21,7 @@ export class PaymentService {
    * @param currentUserDto The current user's data.
    * @returns Promise<PaymentDto[]>
    */
-  async createPaymentStripeDto(
+  async createPaymentDto(
     productsRequest: ProductRequest[],
     productsDataEntities: ProductsDataEntity[],
     paymentSystem: PaymentSystem,

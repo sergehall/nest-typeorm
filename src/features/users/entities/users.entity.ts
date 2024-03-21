@@ -7,7 +7,7 @@ import { PostsEntity } from '../../posts/entities/posts.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { LikeStatusPostsEntity } from '../../posts/entities/like-status-posts.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
-import { SentCodesLogEntity } from '../../../common/mails/infrastructure/entities/sent-codes-log.entity';
+import { SentCodesLogEntity } from '../../../common/mails/entities/sent-codes-log.entity';
 import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';

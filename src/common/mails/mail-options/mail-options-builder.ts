@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { MailerConfig } from '../../../config/mailer/mailer.config';
+
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { ConfirmationCodeEmailOptions } from '../application/dto/confirmation-code-email-options';
+import { MailsConfig } from '../../../config/mails/mails.config';
 
 @Injectable()
 export class MailOptionsBuilder {
   constructor(
-    protected mailerConfig: MailerConfig,
+    protected mailsConfig: MailsConfig,
     protected postgresConfig: PostgresConfig,
   ) {}
 
@@ -14,9 +15,9 @@ export class MailOptionsBuilder {
     email: string,
     recoveryCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
-    const domainName =
+    const domainName: string =
       await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
-    const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
+    const fromEmail = await this.mailsConfig.getMailsConfig('NODEMAILER_EMAIL');
     const path = '/auth/password-recovery';
     const parameter = '?recoveryCode=' + recoveryCode;
     const fullURL = domainName + path + parameter;
@@ -46,8 +47,9 @@ export class MailOptionsBuilder {
     email: string,
     confirmationCode: string,
   ): Promise<ConfirmationCodeEmailOptions> {
-    const fromEmail = await this.mailerConfig.getNodeMailer('NODEMAILER_EMAIL');
-    const domainName =
+    const fromEmail: string =
+      await this.mailsConfig.getMailsConfig('NODEMAILER_EMAIL');
+    const domainName: string =
       await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const path = '/auth/confirm-registration';
     const parameter = '?code=' + confirmationCode;
