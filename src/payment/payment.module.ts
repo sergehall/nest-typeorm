@@ -6,12 +6,13 @@ import { NodeEnvConfig } from '../config/node-env/node-env.config';
 import { StripeConfig } from '../config/stripe/stripe.config';
 import { PostgresConfig } from '../config/db/postgres/postgres.config';
 import { StripeFactory } from '../config/stripe/stripe-factory';
-import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
 import { ProductsRepo } from '../features/products/infrastructure/products.repo';
 import { UuidErrorResolver } from '../common/helpers/uuid-error-resolver';
 import { BuyProductsUseCase } from './application/use-cases/buy-products.use-case';
 import { PaymentService } from './application/payment.service';
+import { PayPalAdapter } from './payment-systems/pay-pal/adapter/pay-pal.adapter';
+import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
 
 const paymentUseCases = [BuyProductsUseCase];
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
@@ -23,9 +24,10 @@ const helpers = [UuidErrorResolver];
   controllers: [],
   providers: [
     PaymentService,
+    PayPalAdapter,
+    StripeAdapter,
     StripeFactory,
     PaymentManager,
-    StripeAdapter,
     ProductsRepo,
     ...helpers,
     ...paymentConfigs,

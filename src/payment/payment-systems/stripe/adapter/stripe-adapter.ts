@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { StripeFactory } from 'config/stripe/stripe-factory';
 import Stripe from 'stripe';
-import { PaymentDto } from '../../../dto/payment.dto';
-import { StripeFactory } from '../../../../config/stripe/stripe-factory';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
+import { PaymentDto } from '../../../dto/payment.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 
 @Injectable()

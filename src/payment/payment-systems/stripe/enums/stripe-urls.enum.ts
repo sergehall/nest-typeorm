@@ -1,4 +1,4 @@
 export class StripeUrlsEnum {
-  BaseApiStripeUrl = 'https://api.stripe.com';
-  BaseStripeUrl = 'https://stripe.com';
+  BaseApiUrl = 'https://api.stripe.com';
+  BaseUrl = 'https://stripe.com';
 }

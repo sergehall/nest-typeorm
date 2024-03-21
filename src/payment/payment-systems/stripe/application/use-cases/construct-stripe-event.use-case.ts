@@ -2,8 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { StripeAdapter } from '../../adapter/stripe-adapter';
-import { StripeConfig } from '../../../../../config/stripe/stripe.config';
 import Stripe from 'stripe';
+import { StripeConfig } from '../../../../../config/stripe/stripe.config';
 
 export class ConstructStripeEventCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}

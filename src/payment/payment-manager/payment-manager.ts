@@ -1,13 +1,15 @@
 import { PaymentSystem } from '../enums/payment-system.enums';
 import { Injectable } from '@nestjs/common';
-import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
 import { PaymentDto } from '../dto/payment.dto';
 import { PaymentLinkDto } from '../dto/payment-link.dto';
+import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
+import { PayPalAdapter } from '../payment-systems/pay-pal/adapter/pay-pal.adapter';
 
 @Injectable()
 export class PaymentManager {
   constructor(
     private readonly stripeAdapter: StripeAdapter,
+    private readonly payPalAdapter: PayPalAdapter,
     // Inject adapters for other payment systems if needed
   ) {}
   async processPayment(
@@ -43,7 +45,6 @@ export class PaymentManager {
   ): Promise<PaymentLinkDto | null> {
     const session = await this.stripeAdapter.createCheckoutSession(paymentDto);
     console.log('session', session);
-    // write paymentLink to the database orderEntity
     if (!session.url) {
       return null;
     }
@@ -52,12 +53,14 @@ export class PaymentManager {
     };
   }
 
-  private async processPayPalPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
-    console.log(`Processing PayPal payment of $${paymentDto}`);
-    // Your PayPal payment processing logic here
-    return null;
+  private async processPayPalPayment(paymentDto: any) {
+    const checkoutOrder =
+      await this.payPalAdapter.createCheckoutOrder(paymentDto);
+    console.log(checkoutOrder, 'checkoutOrder');
+    if (!checkoutOrder) {
+      return null;
+    }
+    return checkoutOrder;
   }
 
   private async processApplePayPayment(

@@ -1,7 +1,7 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 import Stripe from 'stripe';
+import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 
 export class FinalizeStripePaymentCommand {
   constructor(public checkoutSessionCompletedObject: Stripe.Checkout.Session) {}

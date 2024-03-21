@@ -7,13 +7,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
-import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
+import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
+import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
+import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
+import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
 
 @Controller('pay-pal')
 export class PayPalController {
