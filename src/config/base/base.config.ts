@@ -124,7 +124,7 @@ export class BaseConfig {
 
   /**
    * Retrieves a specific key from the 'mail' configuration property and returns its value as a Promise of a string.
-   * @param {MailerTypes} key - The key of the 'mail' configuration property to retrieve.
+   * @param {MailsKeysTypes} key - The key of the 'mail' configuration property to retrieve.
    * @returns {Promise<string>} The value of the specified key from the 'mail' configuration property.
    */
   protected async getValueMailer(key: MailsKeysTypes): Promise<string> {
@@ -136,7 +136,7 @@ export class BaseConfig {
   /**
    * Retrieves a specific key from the 'mail' configuration property and returns its value as a Promise of a number.
    * It also checks whether the value is a valid number by calling the `validationNumbersType` method.
-   * @param {MailerPortTypes} key - The key of the 'mail' configuration property to retrieve.
+   * @param {MailsPortKeyType} key - The key of the 'mail' configuration property to retrieve.
    * @returns {Promise<number>} The value of the specified key from the 'mail' configuration property as a number.
    * @throws {InternalServerErrorException} If the value is not a valid number.
    */
