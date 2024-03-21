@@ -11,7 +11,7 @@ import { IntentsEnums } from '../../../enums/intents.enums';
 export class PayPalAdapter {
   constructor(private readonly commandBus: CommandBus) {}
 
-  async createCheckoutOrder(paymentStripeDto: PaymentDto[]) {
+  async createCheckoutOrder(paymentStripeDto: PaymentDto[]): Promise<any> {
     try {
       const accessToken = await this.generateAccessToken();
 
@@ -28,27 +28,31 @@ export class PayPalAdapter {
           : currentClient.guestUserId;
 
       payPalRequestId += `.${orderId}`;
-
-      // // Prepare line items for checkout
-      // const lineItems = paymentStripeDto.map((product: PaymentDto) => {
-      //   return {
-      //     amount: {
-      //       currency_code: product.currency,
-      //       value: product.unitAmount,
-      //     },
-      //     name: product.name,
-      //     description: product.description,
-      //     quantity: product.quantity,
-      //   };
-      // });
+      console.log(payPalRequestId, 'payPalRequestId');
 
       // Prepare line items for checkout
       const lineItems = paymentStripeDto.map((product: PaymentDto) => {
         return {
-          reference_id: payPalRequestId,
+          items: [
+            {
+              name: product.name,
+              description: product.description,
+              quantity: String(product.quantity),
+              unit_amount: {
+                currency_code: product.currency,
+                value: product.unitAmount,
+              },
+            },
+          ],
           amount: {
             currency_code: product.currency,
             value: product.unitAmount,
+            breakdown: {
+              item_total: {
+                currency_code: product.currency,
+                value: product.unitAmount,
+              },
+            },
           },
         };
       });
@@ -56,35 +60,26 @@ export class PayPalAdapter {
       const body = JSON.stringify({
         intent: IntentsEnums.CAPTURE,
         purchase_units: lineItems,
-        payment_source: {
-          paypal: {
-            experience_context: {
-              payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
-              brand_name: 'EXAMPLE INC',
-              locale: 'en-US',
-              landing_page: 'LOGIN',
-              shipping_preference: 'SET_PROVIDED_ADDRESS',
-              user_action: 'PAY_NOW',
-              return_url: 'https://example.com/returnUrl',
-              cancel_url: 'https://example.com/cancelUrl',
-            },
-          },
+        application_context: {
+          return_url: 'https://example.com/return',
+          cancel_url: 'https://example.com/cancel',
         },
       });
+      // console.log(body, 'body');
 
       const response = await axios.post(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'PayPal-Request-Id': orderId,
           Authorization: `Bearer ${accessToken}`,
-          'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a',
         },
         body: body,
       });
 
       console.log(response, 'response');
 
-      return response.data;
+      return response;
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
