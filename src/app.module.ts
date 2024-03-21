@@ -29,9 +29,9 @@ import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductsModule } from './features/products/products.module';
+import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
 import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
 
 @Module({
@@ -61,9 +61,9 @@ import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
     PairGameQuizModule,
     TelegramModule,
     CqrsModule,
-    StripeModule,
     PaymentModule,
     ProductsModule,
+    StripeModule,
     PayPalModule,
   ],
   controllers: [AppController],

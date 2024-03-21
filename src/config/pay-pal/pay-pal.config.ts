@@ -19,16 +19,7 @@ export class PayPalConfig extends BaseConfig {
       );
     }
   }
-
-  async getPayPalWebhookId(key: PayPalKeysType): Promise<string> {
-    return this.getPayPalValueByKey(key);
-  }
-
-  async getPayPalClientSecret(key: PayPalKeysType): Promise<string> {
-    return this.getPayPalValueByKey(key);
-  }
-
-  async getPayPalClientId(key: PayPalKeysType): Promise<string> {
+  async getPayPalConfig(key: PayPalKeysType): Promise<string> {
     return this.getPayPalValueByKey(key);
   }
 }
