@@ -17,6 +17,7 @@ export class PayPalCapturePaymentUseCase
   async execute(): Promise<string> {
     try {
       const accessToken = await this.payPalAdapter.generateAccessToken();
+      console.log(accessToken, 'accessToken PayPalCapturePayment');
       const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
       const url = baseUrl + '/v1/oauth2/token';
 

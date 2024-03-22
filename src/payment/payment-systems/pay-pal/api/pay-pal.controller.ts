@@ -52,6 +52,11 @@ export class PayPalController {
   //   return await this.commandBus.execute(new ProcessStripeSuccessCommand());
   // }
 
+  @Get('return')
+  async return(): Promise<string> {
+    return 'The purchase was canceled';
+  }
+
   @Get('cancel')
   async cancel(): Promise<string> {
     return 'The purchase was canceled';

@@ -21,6 +21,7 @@ import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-use
 import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
 import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { NodeEnvConfig } from '../../../config/node-env/node-env.config';
+import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
@@ -43,6 +44,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
   controllers: [PayPalController],
   providers: [
     PayPalConfig,
+    PostgresConfig,
     NodeEnvConfig,
     PayPalAdapter,
     UsersRepo,

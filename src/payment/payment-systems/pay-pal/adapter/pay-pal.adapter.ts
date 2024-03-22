@@ -13,23 +13,21 @@ import { EnvNamesEnums } from '../../../../config/enums/env-names.enums';
 import { NodeEnvConfig } from '../../../../config/node-env/node-env.config';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 import * as uuid4 from 'uuid4';
+import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 
 @Injectable()
 export class PayPalAdapter {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly nodeEnvConfig: NodeEnvConfig,
+    private readonly postgresConfig: PostgresConfig,
   ) {}
 
   async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
     try {
       const accessToken = await this.generateAccessToken();
 
-      const response = await this.payPalCreateOrder(paymentDto, accessToken);
-
-      console.log(response, 'response');
-
-      return response;
+      return await this.payPalCreateOrder(paymentDto, accessToken);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
@@ -38,9 +36,6 @@ export class PayPalAdapter {
     }
   }
 
-  async generateAccessToken(): Promise<string> {
-    return this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
-  }
   private async payPalCreateOrder(
     paymentDto: PaymentDto[],
     accessToken: string,
@@ -51,7 +46,6 @@ export class PayPalAdapter {
     const headersOption = await this.getHeadersOptions(accessToken);
 
     const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
-    console.log(mapToPurchaseUnits, 'mapToPurchaseUnits:');
     const paymentSource = await this.getPaymentSource();
 
     const data = {
@@ -60,9 +54,7 @@ export class PayPalAdapter {
       payment_source: paymentSource,
     };
 
-    console.log(url, data, headersOption);
     try {
-      // console.log('Response:', response.data);
       const response = await axios.post(url, data, headersOption);
       return response.data;
     } catch (error) {
@@ -81,8 +73,10 @@ export class PayPalAdapter {
 
     const shipping = {
       address: {
-        address_line_1: '123 Shipping Street',
-        admin_area_2: 'San Francisco',
+        address_line_1: 'Hollywood 123',
+        address_line_2: 'Building 17',
+        admin_area_2: 'Los Angeles',
+        admin_area_1: 'CA',
         postal_code: '95131',
         country_code: 'US',
       },
@@ -132,23 +126,6 @@ export class PayPalAdapter {
     return purchaseUnits;
   }
 
-  private async getPaymentSource(): Promise<any> {
-    return {
-      paypal: {
-        experience_context: {
-          payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
-          brand_name: 'IT-INCUBATOR INC',
-          locale: 'en-US',
-          landing_page: 'LOGIN',
-          shipping_preference: 'SET_PROVIDED_ADDRESS',
-          user_action: 'PAY_NOW',
-          return_url: 'https://example.com/returnUrl',
-          cancel_url: 'https://example.com/cancelUrl',
-        },
-      },
-    };
-  }
-
   private async getHeadersOptions(accessToken: string): Promise<any> {
     return {
       headers: {
@@ -180,5 +157,29 @@ export class PayPalAdapter {
     }
 
     return url;
+  }
+
+  private async getPaymentSource(): Promise<any> {
+    const domain: string =
+      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    return {
+      paypal: {
+        experience_context: {
+          payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+          brand_name: 'IT-INCUBATOR INC',
+          locale: 'en-US',
+          landing_page: 'NO_PREFERENCE',
+          shipping_preference: 'SET_PROVIDED_ADDRESS',
+          payment_method_selected: 'PAYPAL',
+          user_action: 'PAY_NOW',
+          return_url: domain + '/pay-pal/return',
+          cancel_url: domain + '/pay-pal/cancel',
+        },
+      },
+    };
+  }
+
+  async generateAccessToken(): Promise<string> {
+    return this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
   }
 }
