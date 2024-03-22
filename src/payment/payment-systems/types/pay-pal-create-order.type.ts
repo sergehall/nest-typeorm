@@ -31,7 +31,7 @@ export type Shipping = {
   address: Address;
 };
 
-export type PayPalCreateOrderType = {
+export type PayPaPurchaseUnitsType = {
   reference_id: string;
   items: Item[];
   amount: Amount;

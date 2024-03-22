@@ -7,7 +7,7 @@ import { IntentsEnums } from '../../../enums/intents.enums';
 import {
   Amount,
   Item,
-  PayPalCreateOrderType,
+  PayPaPurchaseUnitsType,
 } from '../../types/pay-pal-create-order.type';
 import { EnvNamesEnums } from '../../../../config/enums/env-names.enums';
 import { NodeEnvConfig } from '../../../../config/node-env/node-env.config';
@@ -45,21 +45,22 @@ export class PayPalAdapter {
     paymentDto: PaymentDto[],
     accessToken: string,
   ) {
-    const intent = IntentsEnums.CAPTURE;
-    const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
-    const paymentSource = await this.getPaymentSource();
-    const headersOption = await this.getHeadersOptions(accessToken);
-
     const baseUrl = await this.getPayPalUrlsDependentEnv();
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
+    const headersOption = await this.getHeadersOptions(accessToken);
+
+    const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
+    console.log(mapToPurchaseUnits, 'mapToPurchaseUnits:');
+    const paymentSource = await this.getPaymentSource();
 
     const data = {
-      intent: intent,
+      intent: IntentsEnums.CAPTURE,
       purchase_units: mapToPurchaseUnits,
       payment_source: paymentSource,
     };
 
+    console.log(url, data, headersOption);
     try {
       // console.log('Response:', response.data);
       const response = await axios.post(url, data, headersOption);
@@ -72,10 +73,11 @@ export class PayPalAdapter {
 
   private async mapToPurchaseUnits(
     paymentDto: PaymentDto[],
-  ): Promise<PayPalCreateOrderType | null> {
+  ): Promise<PayPaPurchaseUnitsType[] | null> {
     if (!paymentDto || paymentDto.length === 0) {
       return null;
     }
+    const purchaseUnits: PayPaPurchaseUnitsType[] = [];
 
     const shipping = {
       address: {
@@ -89,7 +91,7 @@ export class PayPalAdapter {
     const referenceId = paymentDto[0].orderId;
     const currencyCode = paymentDto[0].currency;
 
-    const purchaseUnits: Item[] = [];
+    const items: Item[] = [];
     let totalAmount = 0;
 
     for (const payment of paymentDto) {
@@ -102,7 +104,7 @@ export class PayPalAdapter {
           value: payment.unitAmount,
         },
       };
-      purchaseUnits.push(item);
+      items.push(item);
 
       // Accumulate total amount
       totalAmount += parseFloat(payment.unitAmount) * payment.quantity;
@@ -120,12 +122,14 @@ export class PayPalAdapter {
       },
     };
 
-    return {
+    purchaseUnits.push({
       reference_id: referenceId,
-      items: purchaseUnits,
+      items: items,
       amount: amount,
       shipping: shipping,
-    };
+    });
+
+    return purchaseUnits;
   }
 
   private async getPaymentSource(): Promise<any> {
@@ -133,7 +137,7 @@ export class PayPalAdapter {
       paypal: {
         experience_context: {
           payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
-          brand_name: 'EXAMPLE INC',
+          brand_name: 'IT-INCUBATOR INC',
           locale: 'en-US',
           landing_page: 'LOGIN',
           shipping_preference: 'SET_PROVIDED_ADDRESS',
@@ -147,9 +151,11 @@ export class PayPalAdapter {
 
   private async getHeadersOptions(accessToken: string): Promise<any> {
     return {
-      'Content-Type': 'application/json',
-      'PayPal-Request-Id': uuid4(),
-      Authorization: `Bearer ${accessToken}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'PayPal-Request-Id': uuid4(),
+        Authorization: `Bearer ${accessToken}`,
+      },
     };
   }
 
