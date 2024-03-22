@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PayPalCapturePaymentUseCase } from './application/use-cases/pay-pal-capture-payment.use-case';
 import { PayPalGenerateAccessTokenUseCase } from './application/use-cases/pay-pal-generate-access-token.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
-import { PayPalAdapter } from './adapter/pay-pal.adapter';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
@@ -22,6 +21,8 @@ import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infras
 import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { NodeEnvConfig } from '../../../config/node-env/node-env.config';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
+import { PayPalFactory } from '../../../config/pay-pal/pay-pal-factory';
+import { PayPalAdapter } from './adapter/pay-pal.adapter';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
@@ -43,10 +44,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [PayPalController],
   providers: [
+    PayPalAdapter,
+    PayPalFactory,
     PayPalConfig,
     PostgresConfig,
     NodeEnvConfig,
-    PayPalAdapter,
     UsersRepo,
     GamePairsRepo,
     InvalidJwtRepo,

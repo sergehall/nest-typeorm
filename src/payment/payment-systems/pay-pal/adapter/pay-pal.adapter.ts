@@ -9,17 +9,15 @@ import {
   Item,
   PayPaPurchaseUnitsType,
 } from '../../types/pay-pal-create-order.type';
-import { EnvNamesEnums } from '../../../../config/enums/env-names.enums';
-import { NodeEnvConfig } from '../../../../config/node-env/node-env.config';
-import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 import * as uuid4 from 'uuid4';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
+import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 
 @Injectable()
 export class PayPalAdapter {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly nodeEnvConfig: NodeEnvConfig,
+    private readonly payPalFactory: PayPalFactory,
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
@@ -40,7 +38,7 @@ export class PayPalAdapter {
     paymentDto: PaymentDto[],
     accessToken: string,
   ) {
-    const baseUrl = await this.getPayPalUrlsDependentEnv();
+    const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
     const headersOption = await this.getHeadersOptions(accessToken);
@@ -74,7 +72,7 @@ export class PayPalAdapter {
     const shipping = {
       address: {
         address_line_1: 'Hollywood 123',
-        address_line_2: 'Building 17',
+        address_line_2: 'apt. 17',
         admin_area_2: 'Los Angeles',
         admin_area_1: 'CA',
         postal_code: '95131',
@@ -134,29 +132,6 @@ export class PayPalAdapter {
         Authorization: `Bearer ${accessToken}`,
       },
     };
-  }
-
-  async getPayPalUrlsDependentEnv(): Promise<string> {
-    const envNames: EnvNamesEnums = await this.nodeEnvConfig.getValueENV();
-
-    let url: string;
-
-    switch (envNames) {
-      case 'test':
-      case 'development':
-      case 'staging':
-      case 'sandbox':
-        url = PayPalUrlsEnum.BaseSandboxApi;
-        break;
-      case 'production':
-      case 'live':
-        url = PayPalUrlsEnum.BaseApi;
-        break;
-      default:
-        throw new InternalServerErrorException('Invalid API environment');
-    }
-
-    return url;
   }
 
   private async getPaymentSource(): Promise<any> {

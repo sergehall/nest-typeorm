@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PayPalUrlsEnum } from '../../enums/pay-pal-urls.enum';
 import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
-import { PayPalConfig } from '../../../../../config/pay-pal/pay-pal.config';
+import { PayPalFactory } from '../../../../../config/pay-pal/pay-pal-factory';
 
 export class PayPalGenerateAccessTokenCommand {
   constructor() {}
@@ -12,18 +11,15 @@ export class PayPalGenerateAccessTokenCommand {
 export class PayPalGenerateAccessTokenUseCase
   implements ICommandHandler<PayPalGenerateAccessTokenCommand>
 {
-  constructor(private readonly payPalConfig: PayPalConfig) {}
+  constructor(private readonly payPalFactory: PayPalFactory) {}
 
   async execute(): Promise<string> {
     try {
-      const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
+      const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
       const url = baseUrl + '/v1/oauth2/token';
 
-      const username: string =
-        await this.payPalConfig.getPayPalConfig('PAYPAL_CLIENT_ID');
-      const password: string = await this.payPalConfig.getPayPalConfig(
-        'PAYPAL_CLIENT_SECRET',
-      );
+      const { username, password } =
+        await this.payPalFactory.getUsernamePassword();
 
       const response = await axios({
         url: url,
