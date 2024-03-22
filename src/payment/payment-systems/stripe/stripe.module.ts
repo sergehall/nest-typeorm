@@ -36,6 +36,8 @@ import { GamePairsRepo } from '../../../features/pair-game-quiz/infrastructure/g
 import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
 import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
+import { PayPalFactory } from '../../../config/pay-pal/pay-pal-factory';
+import { PayPalConfig } from '../../../config/pay-pal/pay-pal.config';
 
 const stripeUseCases = [
   ConstructStripeEventUseCase,
@@ -63,6 +65,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [StripeController],
   providers: [
+    PayPalFactory,
+    PayPalConfig,
     StripeFactory,
     NodeEnvConfig,
     PostgresConfig,

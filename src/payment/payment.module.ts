@@ -13,6 +13,8 @@ import { BuyProductsUseCase } from './application/use-cases/buy-products.use-cas
 import { PaymentService } from './application/payment.service';
 import { PayPalAdapter } from './payment-systems/pay-pal/adapter/pay-pal.adapter';
 import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
+import { PayPalFactory } from '../config/pay-pal/pay-pal-factory';
+import { PayPalConfig } from '../config/pay-pal/pay-pal.config';
 
 const paymentUseCases = [BuyProductsUseCase];
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
@@ -24,6 +26,8 @@ const helpers = [UuidErrorResolver];
   controllers: [],
   providers: [
     PaymentService,
+    PayPalConfig,
+    PayPalFactory,
     PayPalAdapter,
     StripeAdapter,
     StripeFactory,
