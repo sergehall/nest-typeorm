@@ -32,10 +32,6 @@ export class ProcessPayPalWebhookUseCase
           case 'payment_intent.succeeded':
             console.log(event, 'event payment_intent.succeeded');
             break;
-          case 'payment_intent.created':
-            console.log(event, 'event payment_intent.created');
-            break;
-
           default:
             // Handle other webhook events
             break;
