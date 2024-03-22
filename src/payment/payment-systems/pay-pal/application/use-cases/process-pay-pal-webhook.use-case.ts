@@ -1,7 +1,6 @@
 import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { FinalizeStripePaymentCommand } from '../../../stripe/application/use-cases/finalize-stripe-payment.use-case';
 import { FinalizePayPalPaymentCommand } from './finalize-pay-pal-payment.use-case';
 
 export class ProcessPayPalWebhookCommand {
