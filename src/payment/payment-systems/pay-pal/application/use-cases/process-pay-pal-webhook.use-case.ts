@@ -22,12 +22,8 @@ export class ProcessPayPalWebhookUseCase
         console.log(event, 'event');
         switch (event) {
           case 'CHECKOUT.ORDER.APPROVED':
-            console.log(
-              JSON.stringify(rawBodyRequest.body),
-              'rawBodyRequest.body',
-            );
             await this.commandBus.execute(
-              new FinalizePayPalPaymentCommand(event.data.object),
+              new FinalizePayPalPaymentCommand(event.data),
             );
             break;
           case 'charge.succeeded':
