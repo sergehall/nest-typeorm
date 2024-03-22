@@ -27,10 +27,12 @@ import { FinalizePayPalPaymentUseCase } from './application/use-cases/finalize-p
 import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
 import { PaymentTransactionsEntity } from '../../../features/products/entities/payment-transaction.entity';
 import { OrdersEntity } from '../../../features/products/entities/orders.entity';
+import { ProcessPayPalWebhookUseCase } from './application/use-cases/process-pay-pal-webhook.use-case';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
   PayPalGenerateAccessTokenUseCase,
+  ProcessPayPalWebhookUseCase,
   FinalizePayPalPaymentUseCase,
 ];
 const helpers = [KeyResolver, UuidErrorResolver];
