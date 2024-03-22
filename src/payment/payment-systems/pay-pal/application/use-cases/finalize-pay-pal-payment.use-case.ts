@@ -4,7 +4,7 @@ import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-tran
 import { PayPalEventType } from '../../types/pay-pal-event.type';
 
 export class FinalizePayPalPaymentCommand {
-  constructor(public event: PayPalEventType) {}
+  constructor(public body: PayPalEventType) {}
 }
 
 @CommandHandler(FinalizePayPalPaymentCommand)
@@ -16,10 +16,10 @@ export class FinalizePayPalPaymentUseCase
   ) {}
 
   async execute(command: FinalizePayPalPaymentCommand): Promise<string> {
-    const { event } = command;
+    const { body } = command;
 
     try {
-      console.log(JSON.stringify(event), 'body');
+      console.log(JSON.stringify(body), 'body');
       console.log('FinalizePayPalPaymentUseCase');
       //   const { client_reference_id: clientIdAndOrderId } =
       //     checkoutSessionCompletedObject;

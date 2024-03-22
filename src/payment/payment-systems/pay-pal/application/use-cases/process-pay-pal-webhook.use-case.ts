@@ -18,19 +18,19 @@ export class ProcessPayPalWebhookUseCase
 
     try {
       if (rawBodyRequest.body) {
-        const event = rawBodyRequest.body.event_type;
-        console.log(event, 'event');
-        switch (event) {
+        const eventType = rawBodyRequest.body.event_type;
+        console.log(eventType, 'eventType');
+        switch (eventType) {
           case 'CHECKOUT.ORDER.APPROVED':
             await this.commandBus.execute(
-              new FinalizePayPalPaymentCommand(event.data),
+              new FinalizePayPalPaymentCommand(rawBodyRequest.body),
             );
             break;
           case 'charge.succeeded':
-            console.log(event, 'charge.succeeded');
+            console.log(eventType, 'charge.succeeded');
             break;
           case 'payment_intent.succeeded':
-            console.log(event, 'event payment_intent.succeeded');
+            console.log(eventType, 'event payment_intent.succeeded');
             break;
           default:
             // Handle other webhook events
