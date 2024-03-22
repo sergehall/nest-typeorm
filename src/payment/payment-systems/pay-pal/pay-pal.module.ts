@@ -24,6 +24,9 @@ import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../config/pay-pal/pay-pal-factory';
 import { PayPalAdapter } from './adapter/pay-pal.adapter';
 import { FinalizePayPalPaymentUseCase } from './application/use-cases/finalize-pay-pal-payment.use-case';
+import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
+import { PaymentTransactionsEntity } from '../../../features/products/entities/payment-transaction.entity';
+import { OrdersEntity } from '../../../features/products/entities/orders.entity';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
@@ -41,6 +44,8 @@ const helpers = [KeyResolver, UuidErrorResolver];
       InvalidJwtEntity,
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
+      PaymentTransactionsEntity,
+      OrdersEntity,
     ]),
     CqrsModule,
   ],
@@ -56,6 +61,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     InvalidJwtRepo,
     GuestUsersRepo,
     GameQuestionsRepo,
+    PaymentTransactionsRepo,
     ChallengesQuestionsRepo,
     ...helpers,
     ...payPalUseCases,
