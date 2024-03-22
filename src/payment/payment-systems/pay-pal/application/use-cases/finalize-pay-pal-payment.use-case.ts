@@ -18,7 +18,7 @@ export class FinalizePayPalPaymentUseCase
     const { checkoutObject } = command;
 
     try {
-      console.log(checkoutObject, 'checkoutObject');
+      console.log('FinalizePayPalPaymentUseCase');
       //   const { client_reference_id: clientIdAndOrderId } =
       //     checkoutSessionCompletedObject;
       //   if (!clientIdAndOrderId)

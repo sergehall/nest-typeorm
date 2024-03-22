@@ -19,9 +19,13 @@ export class ProcessPayPalWebhookUseCase
     try {
       if (rawBodyRequest.body) {
         const event = rawBodyRequest.body.event_type;
+        console.log(event, 'event');
         switch (event) {
-          case 'checkout.session.completed':
-            console.log(event, 'checkout.session.completed');
+          case 'CHECKOUT.ORDER.APPROVED':
+            console.log(
+              JSON.stringify(rawBodyRequest.body),
+              'rawBodyRequest.body',
+            );
             await this.commandBus.execute(
               new FinalizePayPalPaymentCommand(event.data.object),
             );
