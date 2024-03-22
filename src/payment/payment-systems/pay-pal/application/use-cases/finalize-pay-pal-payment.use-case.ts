@@ -1,9 +1,10 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
+import { PayPalEventType } from '../../types/pay-pal-event.type';
 
 export class FinalizePayPalPaymentCommand {
-  constructor(public checkoutObject: any) {}
+  constructor(public rawBodyRequest: PayPalEventType) {}
 }
 
 @CommandHandler(FinalizePayPalPaymentCommand)
@@ -18,7 +19,8 @@ export class FinalizePayPalPaymentUseCase
     const { checkoutObject } = command;
 
     try {
-      console.log('FinalizePayPalPaymentUseCase');
+      console.log(JSON.stringify(rawBodyRequest.body), 'rawBodyRequest.body');
+      console.log('FinalizePayPalPaymentUseCase', checkoutObject.body);
       //   const { client_reference_id: clientIdAndOrderId } =
       //     checkoutSessionCompletedObject;
       //   if (!clientIdAndOrderId)

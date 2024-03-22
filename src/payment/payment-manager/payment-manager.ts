@@ -56,7 +56,7 @@ export class PaymentManager {
   private async processPayPalPayment(paymentDto: any) {
     const checkoutOrder =
       await this.payPalAdapter.createCheckoutOrder(paymentDto);
-    console.log(checkoutOrder, 'checkoutOrder');
+
     if (!checkoutOrder) {
       return null;
     }
