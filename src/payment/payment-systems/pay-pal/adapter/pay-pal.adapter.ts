@@ -1,106 +1,31 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PayPalGenerateAccessTokenCommand } from '../application/use-cases/pay-pal-generate-access-token.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 import axios from 'axios';
 import { PaymentDto } from '../../../dto/payment.dto';
 import { IntentsEnums } from '../../../enums/intents.enums';
+import {
+  Amount,
+  Item,
+  PayPalCreateOrderType,
+} from '../../types/pay-pal-create-order.type';
+import { EnvNamesEnums } from '../../../../config/enums/env-names.enums';
+import { NodeEnvConfig } from '../../../../config/node-env/node-env.config';
+import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
+import * as uuid4 from 'uuid4';
 
 @Injectable()
 export class PayPalAdapter {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly nodeEnvConfig: NodeEnvConfig,
+  ) {}
 
-  async createCheckoutOrder(paymentStripeDto: PaymentDto[]): Promise<any> {
+  async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
     try {
       const accessToken = await this.generateAccessToken();
 
-      // console.log(accessToken, 'accessToken');
-      //
-      // const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
-      // const url = baseUrl + '/v2/checkout/orders';
-      //
-      // // const currentClient = paymentStripeDto[0].client;
-      // const orderId = paymentStripeDto[0].orderId;
-      // // let payPalRequestId: string =
-      // //   currentClient instanceof CurrentUserDto
-      // //     ? currentClient.userId
-      // //     : currentClient.guestUserId;
-      // //
-      // // payPalRequestId += `.${orderId}`;
-      //
-      // // // Prepare line items for checkout
-      // // const lineItems = paymentStripeDto.map((product: PaymentDto) => {
-      // //   return {
-      // //     items: [
-      // //       {
-      // //         name: product.name,
-      // //         description: product.description,
-      // //         quantity: String(product.quantity),
-      // //         unit_amount: {
-      // //           currency_code: product.currency,
-      // //           value: product.unitAmount,
-      // //         },
-      // //       },
-      // //     ],
-      // //     amount: {
-      // //       currency_code: product.currency,
-      // //       value: product.unitAmount,
-      // //       breakdown: {
-      // //         item_total: {
-      // //           currency_code: product.currency,
-      // //           value: product.unitAmount,
-      // //         },
-      // //       },
-      // //     },
-      // //   };
-      // // });
-      //
-      // // Prepare line items for checkout
-      // const lineItems = paymentStripeDto.map((product: PaymentDto) => {
-      //   return {
-      //     reference_id: orderId,
-      //     amount: {
-      //       currency_code: product.currency,
-      //       value: product.unitAmount,
-      //     },
-      //   };
-      // });
-      //
-      // const body = JSON.stringify({
-      //   intent: IntentsEnums.CAPTURE,
-      //   purchase_units: lineItems,
-      //   application_context: {
-      //     return_url: 'https://example.com/return',
-      //     cancel_url: 'https://example.com/cancel',
-      //   },
-      // });
-      // // console.log(body, 'body');
-      //
-      // const response = await axios.post(url, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'PayPal-Request-Id': orderId,
-      //     Authorization: `Bearer ${accessToken}`,
-      //   },
-      //   body: body,
-      //   payment_source: {
-      //     paypal: {
-      //       experience_context: {
-      //         payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
-      //         brand_name: 'EXAMPLE INC',
-      //         locale: 'en-US',
-      //         landing_page: 'LOGIN',
-      //         shipping_preference: 'SET_PROVIDED_ADDRESS',
-      //         user_action: 'PAY_NOW',
-      //         return_url: 'https://example.com/returnUrl',
-      //         cancel_url: 'https://example.com/cancelUrl',
-      //       },
-      //     },
-      //   },
-      // });
-
-      const response = await this.makePayPalRequest(accessToken);
+      const response = await this.payPalCreateOrder(paymentDto, accessToken);
 
       console.log(response, 'response');
 
@@ -116,87 +41,138 @@ export class PayPalAdapter {
   async generateAccessToken(): Promise<string> {
     return this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
   }
+  private async payPalCreateOrder(
+    paymentDto: PaymentDto[],
+    accessToken: string,
+  ) {
+    const intent = IntentsEnums.CAPTURE;
+    const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
+    const paymentSource = await this.getPaymentSource();
+    const headersOption = await this.getHeadersOptions(accessToken);
 
-  async makePayPalRequest(accessToken: string) {
+    const baseUrl = await this.getPayPalUrlsDependentEnv();
+    const path = '/v2/checkout/orders';
+    const url = baseUrl + path;
+
     const data = {
-      intent: 'CAPTURE',
-      purchase_units: [
-        {
-          reference_id: 'd9f80740-38f0-11e8-b467-0ed5f89f718b',
-          items: [
-            {
-              name: 'Earbuds',
-              description: 'Durable',
-              quantity: '2',
-              unit_amount: {
-                currency_code: 'USD',
-                value: '100.00',
-              },
-            },
-            {
-              name: 'Earbuds1',
-              description: 'Durable1',
-              quantity: '1',
-              unit_amount: {
-                currency_code: 'USD',
-                value: '100.00',
-              },
-            },
-          ],
-          amount: {
-            currency_code: 'USD',
-            value: '300.00',
-            breakdown: {
-              item_total: {
-                currency_code: 'USD',
-                value: '300.00',
-              },
-            },
-          },
-          shipping: {
-            address: {
-              address_line_1: '123 Shipping Street',
-              admin_area_2: 'San Jose',
-              postal_code: '95131',
-              country_code: 'US',
-            },
-          },
-        },
-      ],
-      payment_source: {
-        paypal: {
-          experience_context: {
-            payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
-            brand_name: 'EXAMPLE INC',
-            locale: 'en-US',
-            landing_page: 'LOGIN',
-            shipping_preference: 'SET_PROVIDED_ADDRESS',
-            user_action: 'PAY_NOW',
-            return_url: 'https://example.com/returnUrl',
-            cancel_url: 'https://example.com/cancelUrl',
-          },
-        },
-      },
-    };
-
-    const options = {
-      headers: {
-        'Content-Type': 'application/json',
-        'PayPal-Request-Id': '7b92603e-77ed-5896-8e78-5dea2050476a',
-        Authorization: `Bearer ${accessToken}`,
-      },
+      intent: intent,
+      purchase_units: mapToPurchaseUnits,
+      payment_source: paymentSource,
     };
 
     try {
       // console.log('Response:', response.data);
-      const response = await axios.post(
-        'https://api-m.sandbox.paypal.com/v2/checkout/orders',
-        data,
-        options,
-      );
+      const response = await axios.post(url, data, headersOption);
       return response.data;
     } catch (error) {
       console.error('Error:', error.response.data);
+      throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async mapToPurchaseUnits(
+    paymentDto: PaymentDto[],
+  ): Promise<PayPalCreateOrderType | null> {
+    if (!paymentDto || paymentDto.length === 0) {
+      return null;
+    }
+
+    const shipping = {
+      address: {
+        address_line_1: '123 Shipping Street',
+        admin_area_2: 'San Francisco',
+        postal_code: '95131',
+        country_code: 'US',
+      },
+    };
+
+    const referenceId = paymentDto[0].orderId;
+    const currencyCode = paymentDto[0].currency;
+
+    const purchaseUnits: Item[] = [];
+    let totalAmount = 0;
+
+    for (const payment of paymentDto) {
+      const item: Item = {
+        name: payment.name,
+        description: payment.description,
+        quantity: payment.quantity.toString(),
+        unit_amount: {
+          currency_code: payment.currency,
+          value: payment.unitAmount,
+        },
+      };
+      purchaseUnits.push(item);
+
+      // Accumulate total amount
+      totalAmount += parseFloat(payment.unitAmount) * payment.quantity;
+    }
+
+    // Set total amount for all items
+    const amount: Amount = {
+      currency_code: currencyCode,
+      value: totalAmount.toFixed(2),
+      breakdown: {
+        item_total: {
+          currency_code: currencyCode,
+          value: totalAmount.toFixed(2),
+        },
+      },
+    };
+
+    return {
+      reference_id: referenceId,
+      items: purchaseUnits,
+      amount: amount,
+      shipping: shipping,
+    };
+  }
+
+  private async getPaymentSource(): Promise<any> {
+    return {
+      paypal: {
+        experience_context: {
+          payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+          brand_name: 'EXAMPLE INC',
+          locale: 'en-US',
+          landing_page: 'LOGIN',
+          shipping_preference: 'SET_PROVIDED_ADDRESS',
+          user_action: 'PAY_NOW',
+          return_url: 'https://example.com/returnUrl',
+          cancel_url: 'https://example.com/cancelUrl',
+        },
+      },
+    };
+  }
+
+  private async getHeadersOptions(accessToken: string): Promise<any> {
+    return {
+      'Content-Type': 'application/json',
+      'PayPal-Request-Id': uuid4(),
+      Authorization: `Bearer ${accessToken}`,
+    };
+  }
+
+  async getPayPalUrlsDependentEnv(): Promise<string> {
+    const envNames: EnvNamesEnums = await this.nodeEnvConfig.getValueENV();
+
+    let url: string;
+
+    switch (envNames) {
+      case 'test':
+      case 'development':
+      case 'staging':
+      case 'sandbox':
+        url = PayPalUrlsEnum.BaseSandboxApi;
+        break;
+      case 'production':
+      case 'live':
+        url = PayPalUrlsEnum.BaseApi;
+        break;
+      default:
+        throw new InternalServerErrorException('Invalid API environment');
+    }
+
+    return url;
   }
 }
