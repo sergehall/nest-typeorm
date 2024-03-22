@@ -13,7 +13,7 @@ export class ProcessPayPalWebhookUseCase
 {
   constructor(private readonly commandBus: CommandBus) {}
 
-  async execute(command: ProcessPayPalWebhookCommand) {
+  async execute(command: ProcessPayPalWebhookCommand): Promise<boolean> {
     const { rawBodyRequest } = command;
 
     try {

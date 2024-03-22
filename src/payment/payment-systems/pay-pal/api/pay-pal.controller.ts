@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { CommandBus } from '@nestjs/cqrs';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
@@ -14,6 +15,7 @@ import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto'
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
+import { ProcessPayPalWebhookCommand } from '../application/use-cases/process-pay-pal-webhook.use-case';
 
 @Controller('pay-pal')
 export class PayPalController {
@@ -41,10 +43,7 @@ export class PayPalController {
   @Post('webhooks')
   async payPalWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
     console.log(req, '------payPalWebhook--------');
-    // return await this.commandBus.execute(
-    //   new ProcessStripeWebHookCommand(req),
-    // );
-    return true;
+    return await this.commandBus.execute(new ProcessPayPalWebhookCommand(req));
   }
 
   // @Get('/success')

@@ -16,7 +16,7 @@ export class ProcessStripeWebHookUseCase
 {
   constructor(private readonly commandBus: CommandBus) {}
 
-  async execute(command: ProcessStripeWebHookCommand) {
+  async execute(command: ProcessStripeWebHookCommand): Promise<boolean> {
     const { rawBodyRequest } = command;
 
     const event: Stripe.Event | undefined = await this.commandBus.execute(
