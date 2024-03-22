@@ -148,6 +148,7 @@ export class PayPalAdapter {
           payment_method_selected: 'PAYPAL',
           user_action: 'PAY_NOW',
           return_url: domain + '/pay-pal/return',
+          success_url: domain + '/pay-pal/success',
           cancel_url: domain + '/pay-pal/cancel',
         },
       },
