@@ -23,10 +23,12 @@ import { NodeEnvConfig } from '../../../config/node-env/node-env.config';
 import { PostgresConfig } from '../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../config/pay-pal/pay-pal-factory';
 import { PayPalAdapter } from './adapter/pay-pal.adapter';
+import { FinalizePayPalPaymentUseCase } from './application/use-cases/finalize-pay-pal-payment.use-case';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
   PayPalGenerateAccessTokenUseCase,
+  FinalizePayPalPaymentUseCase,
 ];
 const helpers = [KeyResolver, UuidErrorResolver];
 

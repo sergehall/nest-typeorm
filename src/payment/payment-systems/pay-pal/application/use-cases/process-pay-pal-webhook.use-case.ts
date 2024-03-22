@@ -1,10 +1,8 @@
 import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import Stripe from 'stripe';
-import { ConstructStripeEventCommand } from '../../../stripe/application/use-cases/construct-stripe-event.use-case';
 import { FinalizeStripePaymentCommand } from '../../../stripe/application/use-cases/finalize-stripe-payment.use-case';
-import { ProcessChargeSucceededCommand } from '../../../stripe/application/use-cases/process-stripe-charge-succeeded.use-case';
+import { FinalizePayPalPaymentCommand } from './finalize-pay-pal-payment.use-case';
 
 export class ProcessPayPalWebhookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -26,7 +24,7 @@ export class ProcessPayPalWebhookUseCase
           case 'checkout.session.completed':
             console.log(event, 'checkout.session.completed');
             await this.commandBus.execute(
-              new FinalizeStripePaymentCommand(event.data.object),
+              new FinalizePayPalPaymentCommand(event.data.object),
             );
             break;
           case 'charge.succeeded':
