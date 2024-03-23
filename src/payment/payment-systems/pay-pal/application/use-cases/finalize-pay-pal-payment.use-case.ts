@@ -36,7 +36,7 @@ export class FinalizePayPalPaymentUseCase
         updatedAt,
         body,
       );
-      console.log(body, 'body');
+      console.log(JSON.stringify(body), 'body');
       const id = body.resource.id;
 
       // const emailPayee = body.resource.payer.email_address;
