@@ -12,10 +12,8 @@ import {
 import * as uuid4 from 'uuid4';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { UsersEntity } from '../../../../features/users/entities/users.entity';
-import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
 import { PaymentService } from '../../../application/payment.service';
+import { ReferenceIdType } from '../../types/reference-id.type';
 
 @Injectable()
 export class PayPalAdapter {
@@ -85,18 +83,10 @@ export class PayPalAdapter {
       },
     };
 
-    // const currentClient = paymentDto[0].client;
-    // const orderId = paymentDto[0].orderId;
-    // let referenceId: string =
-    //   currentClient instanceof UsersEntity
-    //     ? currentClient.userId
-    //     : currentClient.guestUserId;
-    //
-    // referenceId += `.${orderId}`;
-
-    const referenceId =
+    const referenceIdDto: ReferenceIdType =
       await this.paymentService.generateReferenceId(paymentDto);
-    console.log('referenceId:', referenceId);
+    const referenceId: string = referenceIdDto.referenceId;
+
     const currencyCode = paymentDto[0].currency;
 
     const items: Item[] = [];
