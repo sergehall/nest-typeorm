@@ -3,7 +3,6 @@ import { EnvNamesEnums } from '../enums/env-names.enums';
 import { NodeEnvConfig } from '../node-env/node-env.config';
 import { PayPalConfig } from './pay-pal.config';
 import { PayPalUrlsEnum } from '../../payment/payment-systems/pay-pal/enums/pay-pal-urls.enum';
-import { PayPalKeysType } from './types/pay-pal-keys.type';
 
 @Injectable()
 export class PayPalFactory {
