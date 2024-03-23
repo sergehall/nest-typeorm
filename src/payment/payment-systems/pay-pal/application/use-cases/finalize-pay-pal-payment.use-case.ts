@@ -40,15 +40,15 @@ export class FinalizePayPalPaymentUseCase
       );
       console.log(JSON.stringify(body), 'body');
 
-      const captureObj = body.resource.links.find(
-        (link) => link.rel === 'capture',
-      );
-      if (!captureObj)
-        throw new InternalServerErrorException('Invalid capture link');
-
-      await this.commandBus.execute(
-        new PayPalCapturePaymentCommand(captureObj.href, reference_id),
-      );
+      // const captureObj = body.resource.links.find(
+      //   (link) => link.rel === 'capture',
+      // );
+      // if (!captureObj)
+      //   throw new InternalServerErrorException('Invalid capture link');
+      //
+      // await this.commandBus.execute(
+      //   new PayPalCapturePaymentCommand(captureObj.href, reference_id),
+      // );
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
