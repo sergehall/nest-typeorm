@@ -29,27 +29,25 @@ export class PayPalGenerateAccessTokenUseCase
       //     username: username,
       //     password: password,
       //   },
-      //   headers: { 'Content-Type': 'application/x-www-form-urlencoded', "Accept: application/json" }
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Accept-Language': 'en_US',
+      //     'Content-Type': 'application/x-www-form-urlencoded',
+      //   },
       // });
-      const clientId = username;
-      const secret = password;
+
       const data = 'grant_type=client_credentials';
       const config = {
         headers: {
           Accept: 'application/json',
           'Accept-Language': 'en_US',
-          Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       };
-      console.log(url, 'url');
-      console.log(clientId, 'clientId');
-      console.log(secret, 'secret');
-      console.log(config, 'config');
 
-      // https://api-m.sandbox.paypal.com/v1/oauth2/token
       const response = await axios.post(url, data, config);
-      console.log(response.data, 'response');
+
       return response.data.access_token;
     } catch (error) {
       console.log(error.message);

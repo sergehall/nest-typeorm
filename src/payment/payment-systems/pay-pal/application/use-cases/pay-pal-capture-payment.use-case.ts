@@ -28,14 +28,16 @@ export class PayPalCapturePaymentUseCase
 
       console.log(accessToken, 'accessToken ');
 
-      const response = await axios({
-        url: link,
-        method: 'POST',
-        headers: {
-          'PayPal-Request-Id': reference_id,
-          Authorization: `Bearer access_token${accessToken}`,
+      const response = await axios.post(
+        link,
+        {},
+        {
+          headers: {
+            'PayPal-Request-Id': reference_id,
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      });
+      );
       console.log('------------------------------------');
 
       return response;

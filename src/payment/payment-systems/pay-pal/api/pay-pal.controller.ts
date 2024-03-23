@@ -47,21 +47,9 @@ export class PayPalController {
   }
 
   @Get('success')
-  async success(
-    @Query('token') token: string,
-    @Query('PayerID') payerId: string,
-  ): Promise<string> {
-    console.log('token:', token);
-    console.log('PayerID:', payerId);
-    // const url = `https://api.sandbox.paypal.com/v2/checkout/orders/${token}/capture`;
-    // const accessToken = await this.commandBus.execute(
-    //   new PayPalGenerateAccessTokenCommand(),
-    // );
-
-    // const response = await this.commandBus.execute(
-    //   new PayPalCapturePaymentCommand(url, payerId),
-    // );
-
+  async success() // @Query('token') token: string,
+  // @Query('PayerID') payerId: string,
+  : Promise<string> {
     return 'The purchase was successful';
   }
 
