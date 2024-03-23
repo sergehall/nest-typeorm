@@ -19,26 +19,21 @@ export class FinalizePayPalPaymentUseCase
     const { body } = command;
 
     try {
+      const { reference_id } = body.resource.purchase_units[0];
+
+      if (!reference_id)
+        throw new InternalServerErrorException('Invalid reference ID');
+
+      const updatedAt = new Date().toISOString();
       const [clientId, orderId] =
         body.resource.purchase_units[0].reference_id.split('.');
-      console.log(JSON.stringify(body), 'body');
-      console.log('FinalizePayPalPaymentUseCase');
-      console.log(clientId, 'clientId');
-      console.log(orderId, 'orderId');
-      //   const { client_reference_id: clientIdAndOrderId } =
-      //     checkoutSessionCompletedObject;
-      //   if (!clientIdAndOrderId)
-      //     throw new InternalServerErrorException('Invalid client reference ID');
-      //
-      //   const [clientId, orderId] = clientIdAndOrderId.split('.');
-      //   const updatedAt = new Date().toISOString();
-      //
-      //   await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
-      //     orderId,
-      //     clientId,
-      //     updatedAt,
-      //     checkoutSessionCompletedObject,
-      //   );
+
+      await this.paymentTransactionsRepo.completePayPalOrderAndConfirmPayment(
+        orderId,
+        clientId,
+        updatedAt,
+        body,
+      );
 
       return 'The purchase was successfully completed';
     } catch (error) {

@@ -24,10 +24,9 @@ export class FinalizeStripePaymentUseCase
       if (!clientIdAndOrderId)
         throw new InternalServerErrorException('Invalid client reference ID');
 
-      const [clientId, orderId] = clientIdAndOrderId.split('.');
       const updatedAt = new Date().toISOString();
-
-      await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
+      const [clientId, orderId] = clientIdAndOrderId.split('.');
+      await this.paymentTransactionsRepo.completeStripeOrderAndConfirmPayment(
         orderId,
         clientId,
         updatedAt,

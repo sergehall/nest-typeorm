@@ -10,6 +10,7 @@ import Stripe from 'stripe';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
 import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
 import { OrdersEntity } from '../../features/products/entities/orders.entity';
+import { PayPalEventType } from '../payment-systems/pay-pal/types/pay-pal-event.type';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -20,7 +21,7 @@ export class PaymentTransactionsRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
-  async completeOrderAndConfirmPayment(
+  async completeStripeOrderAndConfirmPayment(
     orderId: string,
     clientId: string,
     updatedAt: string,
@@ -36,10 +37,45 @@ export class PaymentTransactionsRepo {
               updatedAt,
               transactionalEntityManager,
             ),
-            this.confirmPayment(
+            this.confirmStripePayment(
               orderId,
               updatedAt,
               checkoutSessionCompletedObject,
+              transactionalEntityManager,
+            ),
+          ];
+          const [orderUpdated, paymentConfirmed] = await Promise.all(promises);
+          return orderUpdated && paymentConfirmed;
+        },
+      );
+    } catch (error) {
+      console.error('Error completing order and confirming payment:', error);
+      throw new InternalServerErrorException(
+        'Failed to complete order and confirm payment',
+      );
+    }
+  }
+
+  async completePayPalOrderAndConfirmPayment(
+    orderId: string,
+    clientId: string,
+    updatedAt: string,
+    body: PayPalEventType,
+  ): Promise<boolean> {
+    try {
+      return await this.paymentTransactionsRepository.manager.transaction(
+        async (transactionalEntityManager: EntityManager): Promise<boolean> => {
+          const promises: Promise<boolean>[] = [
+            this.updateOrderStatus(
+              orderId,
+              clientId,
+              updatedAt,
+              transactionalEntityManager,
+            ),
+            this.confirmPayPalPayment(
+              orderId,
+              updatedAt,
+              body,
               transactionalEntityManager,
             ),
           ];
@@ -91,7 +127,42 @@ export class PaymentTransactionsRepo {
     }
   }
 
-  private async confirmPayment(
+  private async confirmPayPalPayment(
+    orderId: string,
+    updatedAt: string,
+    body: PayPalEventType,
+    manager: EntityManager,
+  ): Promise<boolean> {
+    try {
+      const paymentTransaction =
+        await this.paymentTransactionsRepository.manager
+          .createQueryBuilder(PaymentTransactionsEntity, 'paymentTransaction')
+          .leftJoinAndSelect('paymentTransaction.order', 'order')
+          .where('paymentTransaction.orderId = :orderId', { orderId })
+          .andWhere('paymentTransaction.paymentStatus = :paymentStatus', {
+            paymentStatus: PaymentsStatusEnum.PENDING,
+          })
+          .getOne();
+
+      if (!paymentTransaction) {
+        throw new NotFoundException(
+          `Payment transaction with orderId ${orderId} not found`,
+        );
+      }
+
+      paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
+      paymentTransaction.updatedAt = updatedAt;
+      paymentTransaction.anyConfirmPaymentSystemData = JSON.stringify(body);
+
+      await manager.save(paymentTransaction);
+      return true;
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      throw new InternalServerErrorException('Failed to confirm payment');
+    }
+  }
+
+  private async confirmStripePayment(
     orderId: string,
     updatedAt: string,
     checkoutSessionCompletedObject: Stripe.Checkout.Session,
