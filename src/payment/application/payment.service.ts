@@ -139,6 +139,11 @@ export class PaymentService {
   async extractClientAndOrderId(
     referenceId: string,
   ): Promise<{ clientId: string; orderId: string }> {
+    // Ensure referenceIdValue matches the UUID regex pattern
+    if (!uuidRegexPattern.test(referenceId)) {
+      throw new Error('ReferenceId does not match UUID pattern');
+    }
+
     // Extract clientId and orderId from the referenceId string
     const [clientId, orderId] = referenceId.split('.');
 
