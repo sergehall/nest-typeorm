@@ -26,6 +26,7 @@ export class FinalizeStripePaymentUseCase
 
       const updatedAt = new Date().toISOString();
       const [clientId, orderId] = clientIdAndOrderId.split('.');
+      console.log('clientIdAndOrderId: ', clientIdAndOrderId);
       await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
         orderId,
         clientId,

@@ -20,7 +20,8 @@ export class FinalizePayPalPaymentUseCase
 
     try {
       const { reference_id } = body.resource.purchase_units[0];
-
+      console.log(JSON.stringify(body), 'body: ');
+      console.log(body.resource.purchase_units[0], 'reference_id: ');
       if (!reference_id)
         throw new InternalServerErrorException('Invalid reference ID');
 
