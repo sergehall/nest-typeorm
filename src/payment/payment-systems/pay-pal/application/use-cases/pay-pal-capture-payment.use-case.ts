@@ -16,7 +16,7 @@ export class PayPalCapturePaymentUseCase
 {
   constructor(private readonly commandBus: CommandBus) {}
 
-  async execute(command: PayPalCapturePaymentCommand): Promise<string> {
+  async execute(command: PayPalCapturePaymentCommand): Promise<any> {
     const { link, reference_id } = command;
     try {
       console.log('------------------------------------');
@@ -38,10 +38,7 @@ export class PayPalCapturePaymentUseCase
         },
       });
 
-      const data = response.data;
-      console.log(data, 'data PayPalCapturePayment');
-
-      return response.data;
+      return response;
     } catch (error) {
       throw new InternalServerErrorException(
         'Failed to PayPalCapturePayment',
