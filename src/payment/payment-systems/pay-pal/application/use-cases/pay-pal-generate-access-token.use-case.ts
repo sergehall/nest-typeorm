@@ -48,7 +48,7 @@ export class PayPalGenerateAccessTokenUseCase
       console.log(config, 'config');
 
       const response = await axios.post(url, data, config);
-      console.log(response, 'response');
+      console.log(response.data, 'response');
       return response.data.access_token;
     } catch (error) {
       console.log(error.message);
