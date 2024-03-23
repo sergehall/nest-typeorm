@@ -54,10 +54,6 @@ export class PayPalAdapter {
     const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
 
     const payPalRequestId = mapToPurchaseUnits[0].reference_id;
-    const headersOption = await this.getHeadersOptions(
-      payPalRequestId,
-      accessToken,
-    );
 
     const client: UsersEntity | GuestUsersEntity = paymentDto[0].client;
     const paymentSource = await this.getPaymentSource(client);
@@ -67,6 +63,11 @@ export class PayPalAdapter {
       purchase_units: mapToPurchaseUnits,
       payment_source: paymentSource,
     };
+
+    const headersOption = await this.getHeadersOptions(
+      payPalRequestId,
+      accessToken,
+    );
 
     try {
       const response = await axios.post(url, data, headersOption);
