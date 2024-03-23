@@ -28,7 +28,7 @@ export class FinalizePayPalPaymentUseCase
       const [clientId, orderId] =
         body.resource.purchase_units[0].reference_id.split('.');
 
-      await this.paymentTransactionsRepo.completePayPalOrderAndConfirmPayment(
+      await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
         orderId,
         clientId,
         updatedAt,
