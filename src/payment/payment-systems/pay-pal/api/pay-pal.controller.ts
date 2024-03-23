@@ -45,7 +45,7 @@ export class PayPalController {
     return await this.commandBus.execute(new ProcessPayPalWebhookCommand(req));
   }
 
-  @Get('/success')
+  @Get('success')
   async success(): Promise<string> {
     return 'The purchase was successful';
   }
@@ -57,6 +57,6 @@ export class PayPalController {
 
   @Get('cancel')
   async cancel(): Promise<string> {
-    return 'The purchase was canceled';
+    return 'The purchase was canceled ))))';
   }
 }
