@@ -23,7 +23,7 @@ export class PayPalCapturePaymentUseCase
       console.log(link, 'link');
       console.log(reference_id, 'reference_id');
       const accessToken = await this.commandBus.execute(
-        new PayPalGenerateAccessTokenCommand('PAYPAL_CLIENT_ID'),
+        new PayPalGenerateAccessTokenCommand(),
       );
 
       console.log(accessToken, 'accessToken ');

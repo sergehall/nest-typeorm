@@ -28,7 +28,7 @@ export class PayPalAdapter {
   async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
     try {
       const accessToken = await this.commandBus.execute(
-        new PayPalGenerateAccessTokenCommand('PAYPAL_CLIENT_ID'),
+        new PayPalGenerateAccessTokenCommand(),
       );
 
       return await this.payPalCreateOrder(paymentDto, accessToken);

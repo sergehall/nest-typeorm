@@ -12,7 +12,7 @@ export class PayPalFactory {
     private readonly payPalConfig: PayPalConfig,
   ) {}
 
-  async getUsernamePassword(key: PayPalKeysType): Promise<{
+  async getUsernamePassword(): Promise<{
     username: string;
     password: string;
   }> {
@@ -25,11 +25,11 @@ export class PayPalFactory {
       case 'development':
       case 'staging':
       case 'sandbox':
-        usernamePassword = await this.getSandboxUsernamePassword(key);
+        usernamePassword = await this.getSandboxUsernamePassword();
         break;
       case 'production':
       case 'live':
-        usernamePassword = await this.getLiveUsernamePassword(key);
+        usernamePassword = await this.getLiveUsernamePassword();
         break;
       default:
         throw new InternalServerErrorException('Invalid API environment');
@@ -61,22 +61,24 @@ export class PayPalFactory {
     return url;
   }
 
-  async getSandboxUsernamePassword(key: PayPalKeysType): Promise<{
+  async getSandboxUsernamePassword(): Promise<{
     username: string;
     password: string;
   }> {
-    const username: string = await this.payPalConfig.getPayPalConfig(key);
+    const username: string =
+      await this.payPalConfig.getPayPalConfig('PAYPAL_CLIENT_ID');
     const password: string = await this.payPalConfig.getPayPalConfig(
       'PAYPAL_CLIENT_SECRET',
     );
     return { username, password };
   }
 
-  async getLiveUsernamePassword(key: PayPalKeysType): Promise<{
+  async getLiveUsernamePassword(): Promise<{
     username: string;
     password: string;
   }> {
-    const username: string = await this.payPalConfig.getPayPalConfig(key);
+    const username: string =
+      await this.payPalConfig.getPayPalConfig('PAYPAL_CLIENT_ID');
     const password: string = await this.payPalConfig.getPayPalConfig(
       'PAYPAL_CLIENT_SECRET',
     );
