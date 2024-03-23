@@ -1,7 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
-import { PayPalAdapter } from '../../adapter/pay-pal.adapter';
 import { PayPalGenerateAccessTokenCommand } from './pay-pal-generate-access-token.use-case';
 
 export class PayPalCapturePaymentCommand {
