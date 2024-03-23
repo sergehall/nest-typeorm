@@ -4,10 +4,13 @@ import Stripe from 'stripe';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PaymentDto } from '../../../dto/payment.dto';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
+import { ReferenceIdType } from '../../types/reference-id.type';
+import { PaymentService } from '../../../application/payment.service';
 
 @Injectable()
 export class StripeAdapter {
   constructor(
+    private readonly paymentService: PaymentService,
     private readonly stripeFactory: StripeFactory,
     private readonly postgresConfig: PostgresConfig,
   ) {}
@@ -22,14 +25,9 @@ export class StripeAdapter {
       this.getStripeUrls('cancel'),
     ]);
 
-    const currentClient = paymentDto[0].client;
-    const orderId = paymentDto[0].orderId;
-    let client_reference_id: string =
-      currentClient instanceof UsersEntity
-        ? currentClient.userId
-        : currentClient.guestUserId;
-
-    client_reference_id += `.${orderId}`;
+    const referenceIdDto: ReferenceIdType =
+      await this.paymentService.generateReferenceId(paymentDto);
+    const client_reference_id: string = referenceIdDto.referenceId;
 
     // Prepare line items for checkout session
     const lineItems = paymentDto.map((product: PaymentDto) => {
