@@ -28,6 +28,7 @@ import { PaymentTransactionsEntity } from '../../../features/products/entities/p
 import { OrdersEntity } from '../../../features/products/entities/orders.entity';
 import { ProcessPayPalWebhookUseCase } from './application/use-cases/process-pay-pal-webhook.use-case';
 import { FinalizePayPalPaymentUseCase } from './application/use-cases/finalize-pay-pal-payment.use-case';
+import { PaymentService } from '../../application/payment.service';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
@@ -58,6 +59,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PayPalConfig,
     PostgresConfig,
     NodeEnvConfig,
+    PaymentService,
     UsersRepo,
     GamePairsRepo,
     InvalidJwtRepo,

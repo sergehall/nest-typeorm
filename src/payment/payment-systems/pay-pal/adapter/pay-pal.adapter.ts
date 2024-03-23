@@ -13,11 +13,15 @@ import * as uuid4 from 'uuid4';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
+import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
+import { PaymentService } from '../../../application/payment.service';
 
 @Injectable()
 export class PayPalAdapter {
   constructor(
     private readonly commandBus: CommandBus,
+    private readonly paymentService: PaymentService,
     private readonly payPalFactory: PayPalFactory,
     private readonly postgresConfig: PostgresConfig,
   ) {}
@@ -81,15 +85,18 @@ export class PayPalAdapter {
       },
     };
 
-    const currentClient = paymentDto[0].client;
-    const orderId = paymentDto[0].orderId;
-    let referenceId: string =
-      currentClient instanceof CurrentUserDto
-        ? currentClient.userId
-        : currentClient.guestUserId;
+    // const currentClient = paymentDto[0].client;
+    // const orderId = paymentDto[0].orderId;
+    // let referenceId: string =
+    //   currentClient instanceof UsersEntity
+    //     ? currentClient.userId
+    //     : currentClient.guestUserId;
+    //
+    // referenceId += `.${orderId}`;
 
-    referenceId += `.${orderId}`;
-
+    const referenceId =
+      await this.paymentService.generateReferenceId(paymentDto);
+    console.log('referenceId:', referenceId);
     const currencyCode = paymentDto[0].currency;
 
     const items: Item[] = [];

@@ -38,6 +38,7 @@ import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactio
 import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
 import { PayPalFactory } from '../../../config/pay-pal/pay-pal-factory';
 import { PayPalConfig } from '../../../config/pay-pal/pay-pal.config';
+import { PaymentService } from '../../application/payment.service';
 
 const stripeUseCases = [
   ConstructStripeEventUseCase,
@@ -74,6 +75,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     PaymentManager,
     StripeAdapter,
     PayPalAdapter,
+    PaymentService,
     ParseQueriesService,
     OrdersRepo,
     UsersRepo,
