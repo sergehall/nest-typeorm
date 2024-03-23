@@ -26,11 +26,8 @@ export class ProcessPayPalWebhookUseCase
               new FinalizePayPalPaymentCommand(rawBodyRequest.body),
             );
             break;
-          case 'charge.succeeded':
-            console.log(eventType, 'charge.succeeded');
-            break;
-          case 'payment_intent.succeeded':
-            console.log(eventType, 'event payment_intent.succeeded');
+          case 'CHECKOUT.......':
+            console.log(eventType, 'eventType');
             break;
           default:
             // Handle other webhook events
