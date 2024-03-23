@@ -2,9 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
 import { PayPalFactory } from '../../../../../config/pay-pal/pay-pal-factory';
+import { PayPalKeysType } from '../../../../../config/pay-pal/types/pay-pal-keys.type';
 
 export class PayPalGenerateAccessTokenCommand {
-  constructor() {}
+  constructor(public key: PayPalKeysType) {}
 }
 
 @CommandHandler(PayPalGenerateAccessTokenCommand)
@@ -13,13 +14,14 @@ export class PayPalGenerateAccessTokenUseCase
 {
   constructor(private readonly payPalFactory: PayPalFactory) {}
 
-  async execute(): Promise<string> {
+  async execute(command: PayPalGenerateAccessTokenCommand): Promise<string> {
+    const { key } = command;
     try {
       const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
       const url = baseUrl + '/v1/oauth2/token';
 
       const { username, password } =
-        await this.payPalFactory.getUsernamePassword();
+        await this.payPalFactory.getUsernamePassword(key);
 
       const response = await axios({
         url: url,

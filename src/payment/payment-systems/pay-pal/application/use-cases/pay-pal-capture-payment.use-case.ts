@@ -5,7 +5,7 @@ import { PayPalAdapter } from '../../adapter/pay-pal.adapter';
 import { PayPalFactory } from '../../../../../config/pay-pal/pay-pal-factory';
 
 export class PayPalCapturePaymentCommand {
-  constructor() {}
+  constructor(public id: string) {}
 }
 
 @CommandHandler(PayPalCapturePaymentCommand)
@@ -17,22 +17,26 @@ export class PayPalCapturePaymentUseCase
     private readonly payPalFactory: PayPalFactory,
   ) {}
 
-  async execute(): Promise<string> {
+  async execute(command: PayPalCapturePaymentCommand): Promise<string> {
+    const { id } = command;
     try {
-      const accessToken = await this.payPalAdapter.generateAccessToken();
+      const accessToken =
+        await this.payPalAdapter.generateAccessToken('PAYPAL_CLIENT_ID');
       console.log(accessToken, 'accessToken PayPalCapturePayment');
 
       const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
-      const url = baseUrl + '/v2/checkout/orders';
+      const url = baseUrl + `/v2/checkout/orders/${id}/capture`;
 
-      const response = await axios({
-        url: url,
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      });
+      );
 
       const data = response.data;
       console.log(data, 'data PayPalCapturePayment');
