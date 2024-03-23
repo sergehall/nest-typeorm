@@ -45,12 +45,20 @@ export class PayPalAdapter {
     paymentDto: PaymentDto[],
     accessToken: string,
   ): Promise<any> {
+    if (paymentDto.length === 0)
+      throw new InternalServerErrorException('PaymentDto is empty');
+
     const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
-    const headersOption = await this.getHeadersOptions(accessToken);
 
     const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
+
+    const payPalRequestId = mapToPurchaseUnits[0].reference_id;
+    const headersOption = await this.getHeadersOptions(
+      payPalRequestId,
+      accessToken,
+    );
 
     const client: UsersEntity | GuestUsersEntity = paymentDto[0].client;
     const paymentSource = await this.getPaymentSource(client);
@@ -72,10 +80,7 @@ export class PayPalAdapter {
 
   private async mapToPurchaseUnits(
     paymentDto: PaymentDto[],
-  ): Promise<PayPaPurchaseUnitsType[] | null> {
-    if (!paymentDto || paymentDto.length === 0) {
-      return null;
-    }
+  ): Promise<PayPaPurchaseUnitsType[]> {
     const purchaseUnits: PayPaPurchaseUnitsType[] = [];
 
     const shipping = {
@@ -136,11 +141,14 @@ export class PayPalAdapter {
     return purchaseUnits;
   }
 
-  private async getHeadersOptions(accessToken: string): Promise<any> {
+  private async getHeadersOptions(
+    payPalRequestId: string,
+    accessToken: string,
+  ): Promise<any> {
     return {
       headers: {
         'Content-Type': 'application/json',
-        'PayPal-Request-Id': uuid4(),
+        'PayPal-Request-Id': payPalRequestId,
         Authorization: `Bearer ${accessToken}`,
       },
     };
