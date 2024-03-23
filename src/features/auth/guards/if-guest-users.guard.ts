@@ -6,6 +6,7 @@ import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { GuestUsersRepo } from '../../users/infrastructure/guest-users.repo';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
+import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 @Injectable()
 export class IfGuestUsersGuard implements CanActivate {
@@ -47,7 +48,7 @@ export class IfGuestUsersGuard implements CanActivate {
       }
     }
 
-    const instanceOfGuestUser =
+    const instanceOfGuestUser: GuestUsersEntity =
       await this.guestUsersRepo.getInstanceOfGuestUser();
     await this.guestUsersRepo.save(instanceOfGuestUser);
     request.user = {

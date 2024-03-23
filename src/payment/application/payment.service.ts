@@ -31,19 +31,8 @@ export class PaymentService {
       const orderArr: PaymentDto[] = [];
       const orderId: string = uuid4();
       const createdAt: string = new Date().toISOString();
-
-      const client =
-        currentUserDto instanceof CurrentUserDto
-          ? (() => {
-              const user = new UsersEntity();
-              user.userId = currentUserDto.userId;
-              return user;
-            })()
-          : (() => {
-              const guestUser = new GuestUsersEntity();
-              guestUser.guestUserId = currentUserDto.guestUserId;
-              return guestUser;
-            })();
+      const client: UsersEntity | GuestUsersEntity =
+        this.createClientFromDto(currentUserDto);
 
       try {
         for (const product of productsRequest) {
@@ -88,5 +77,28 @@ export class PaymentService {
         reject(error); // Forwarding any unexpected errors
       }
     });
+  }
+
+  private createClientFromDto(
+    currentUserDto: CurrentUserDto | GuestUsersDto,
+  ): UsersEntity | GuestUsersEntity {
+    if ('userId' in currentUserDto) {
+      const user = new UsersEntity();
+      user.userId = currentUserDto.userId;
+      user.login = currentUserDto.login;
+      user.email = currentUserDto.email;
+      user.roles = currentUserDto.roles;
+      user.isBanned = currentUserDto.isBanned;
+      user.orgId = currentUserDto.orgId;
+      // Additional logic for CurrentUserDto if needed
+      return user;
+    } else {
+      const guestUser = new GuestUsersEntity();
+      guestUser.guestUserId = currentUserDto.guestUserId;
+      guestUser.roles = currentUserDto.roles;
+      guestUser.isBanned = currentUserDto.isBanned;
+      // Additional logic for GuestUsersDto if needed
+      return guestUser;
+    }
   }
 }

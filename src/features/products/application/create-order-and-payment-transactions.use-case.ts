@@ -14,7 +14,7 @@ import { GuestUsersEntity } from '../entities/unregistered-users.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 
 export class CreateOrderAndPaymentTransactionsCommand {
-  constructor(public paymentStripeDto: PaymentDto[]) {}
+  constructor(public paymentDto: PaymentDto[]) {}
 }
 
 @CommandHandler(CreateOrderAndPaymentTransactionsCommand)
@@ -30,16 +30,16 @@ export class CreateOrderAndPaymentTransactionsUseCase
   async execute(
     command: CreateOrderAndPaymentTransactionsCommand,
   ): Promise<void> {
-    const { paymentStripeDto } = command;
+    const { paymentDto } = command;
     try {
-      const totalPrice: string = paymentStripeDto
+      const totalPrice: string = paymentDto
         .reduce((sum, item) => sum + parseFloat(item.totalPrice), 0)
         .toString();
-      const paymentSystem = paymentStripeDto[0].paymentSystem;
-      const createdAt = paymentStripeDto[0].createdAt;
-      const orderId = paymentStripeDto[0].orderId;
+      const paymentSystem = paymentDto[0].paymentSystem;
+      const createdAt = paymentDto[0].createdAt;
+      const orderId = paymentDto[0].orderId;
 
-      const currentClient = paymentStripeDto[0].client;
+      const currentClient = paymentDto[0].client;
       let client: UsersEntity | null = null;
       let guestClient: GuestUsersEntity | null = null;
       if (currentClient instanceof UsersEntity) {
@@ -67,7 +67,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
 
       // Create order items entities
       const orderItemsEntities = this.createOrderItemsEntities(
-        paymentStripeDto,
+        paymentDto,
         order,
       );
       await this.ordersRepo.saveOrdersEntity(order);
@@ -80,7 +80,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
         this.orderItemsRepo.save(orderItemsEntities),
       ]);
 
-      console.log('Payment processed successfully');
+      console.log('Order and payment transactions created successfully.');
     } catch (error) {
       console.error('Error processing payment:', error);
       // Handle error appropriately
