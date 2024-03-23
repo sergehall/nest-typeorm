@@ -20,11 +20,13 @@ export class PayPalCapturePaymentUseCase
     const { link, reference_id } = command;
     try {
       console.log('------------------------------------');
+      console.log(link, 'link');
+      console.log(reference_id, 'reference_id');
       const accessToken = await this.commandBus.execute(
         new PayPalGenerateAccessTokenCommand('PAYPAL_CLIENT_ID'),
       );
 
-      console.log(accessToken, 'accessToken PayPalCapturePayment');
+      console.log(accessToken, 'accessToken ');
       console.log('------------------------------------');
       const response = await axios.post(
         link,
