@@ -14,7 +14,6 @@ import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
-import { PayPalKeysType } from '../../../../config/pay-pal/types/pay-pal-keys.type';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
 import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
 
@@ -29,7 +28,9 @@ export class PayPalAdapter {
 
   async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
     try {
-      const accessToken = await this.generateAccessToken('PAYPAL_CLIENT_ID');
+      const accessToken = await this.commandBus.execute(
+        new PayPalGenerateAccessTokenCommand('PAYPAL_CLIENT_ID'),
+      );
 
       return await this.payPalCreateOrder(paymentDto, accessToken);
     } catch (error) {
@@ -174,7 +175,7 @@ export class PayPalAdapter {
     };
   }
 
-  async generateAccessToken(key: PayPalKeysType): Promise<string> {
-    return this.commandBus.execute(new PayPalGenerateAccessTokenCommand(key));
-  }
+  // async generateAccessToken2(key: PayPalKeysType): Promise<string> {
+  //   return this.commandBus.execute(new PayPalGenerateAccessTokenCommand(key));
+  // }
 }
