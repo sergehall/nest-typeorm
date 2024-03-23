@@ -3,7 +3,6 @@ import { StripeFactory } from 'config/stripe/stripe-factory';
 import Stripe from 'stripe';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PaymentDto } from '../../../dto/payment.dto';
-import { UsersEntity } from '../../../../features/users/entities/users.entity';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { PaymentService } from '../../../application/payment.service';
 
