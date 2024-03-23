@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PayPalController } from './api/pay-pal.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PayPalCapturePaymentUseCase } from './application/use-cases/pay-pal-capture-payment.use-case';
 import { PayPalGenerateAccessTokenUseCase } from './application/use-cases/pay-pal-generate-access-token.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { KeyResolver } from '../../../common/helpers/key-resolver';
@@ -29,6 +28,7 @@ import { OrdersEntity } from '../../../features/products/entities/orders.entity'
 import { ProcessPayPalWebhookUseCase } from './application/use-cases/process-pay-pal-webhook.use-case';
 import { FinalizePayPalPaymentUseCase } from './application/use-cases/finalize-pay-pal-payment.use-case';
 import { PaymentService } from '../../application/payment.service';
+import { PayPalCapturePaymentUseCase } from './application/use-cases/pay-pal-capture-payment.use-case';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
