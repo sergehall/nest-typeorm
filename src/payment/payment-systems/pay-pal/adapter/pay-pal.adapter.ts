@@ -41,7 +41,7 @@ export class PayPalAdapter {
   private async payPalCreateOrder(
     paymentDto: PaymentDto[],
     accessToken: string,
-  ) {
+  ): Promise<any> {
     const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
