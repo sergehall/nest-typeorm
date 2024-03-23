@@ -136,4 +136,13 @@ export class PaymentService {
       );
     }
   }
+  async extractClientAndOrderId(
+    referenceId: string,
+  ): Promise<{ clientId: string; orderId: string }> {
+    // Extract clientId and orderId from the referenceId string
+    const [clientId, orderId] = referenceId.split('.');
+
+    // Return an object containing clientId and orderId
+    return { clientId, orderId };
+  }
 }
