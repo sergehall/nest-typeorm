@@ -19,9 +19,11 @@ export class PayPalCapturePaymentUseCase
   async execute(command: PayPalCapturePaymentCommand): Promise<string> {
     const { link, reference_id } = command;
     try {
+      console.log('------------------------------------');
       const accessToken =
         await this.payPalAdapter.generateAccessToken('PAYPAL_CLIENT_ID');
-
+      console.log(accessToken, 'accessToken PayPalCapturePayment');
+      console.log('------------------------------------');
       const response = await axios.post(
         link,
         {},
