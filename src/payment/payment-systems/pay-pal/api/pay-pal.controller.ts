@@ -50,11 +50,6 @@ export class PayPalController {
     return 'The purchase was successful';
   }
 
-  @Get('return')
-  async return(): Promise<string> {
-    return 'The purchase was canceled';
-  }
-
   @Get('cancel')
   async cancel(): Promise<string> {
     return 'The purchase was canceled';
