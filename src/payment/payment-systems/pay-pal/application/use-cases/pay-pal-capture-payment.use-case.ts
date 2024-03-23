@@ -22,7 +22,6 @@ export class PayPalCapturePaymentUseCase
     try {
       const accessToken =
         await this.payPalAdapter.generateAccessToken('PAYPAL_CLIENT_ID');
-      console.log(accessToken, 'accessToken PayPalCapturePayment');
 
       const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
       const url = baseUrl + `/v2/checkout/orders/${id}/capture`;
