@@ -36,6 +36,7 @@ export class FinalizeStripePaymentUseCase
         session,
       );
       // const emailPayee = session.customer_details?.email;
+      // or?
       // const emailPayee = session.customer_email;
       // Send email to the payee
 
