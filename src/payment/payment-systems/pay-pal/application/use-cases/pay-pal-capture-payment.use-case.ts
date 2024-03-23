@@ -28,7 +28,7 @@ export class PayPalCapturePaymentUseCase
         {
           headers: {
             'PayPal-Request-Id': reference_id,
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer access_token${accessToken}`,
           },
         },
       );
