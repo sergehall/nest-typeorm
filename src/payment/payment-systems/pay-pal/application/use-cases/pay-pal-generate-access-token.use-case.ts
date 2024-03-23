@@ -15,9 +15,9 @@ export class PayPalGenerateAccessTokenUseCase
 
   async execute(): Promise<string> {
     try {
-      const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
-      const url = baseUrl + '/v1/oauth2/token';
-
+      // const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
+      // const url = baseUrl + '/v1/oauth2/token';
+      const url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
       const { username, password } =
         await this.payPalFactory.getUsernamePassword();
 
@@ -47,6 +47,7 @@ export class PayPalGenerateAccessTokenUseCase
       console.log(secret, 'secret');
       console.log(config, 'config');
 
+      // https://api-m.sandbox.paypal.com/v1/oauth2/token
       const response = await axios.post(url, data, config);
       console.log(response.data, 'response');
       return response.data.access_token;
