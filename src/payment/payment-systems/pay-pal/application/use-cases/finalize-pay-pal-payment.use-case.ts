@@ -1,8 +1,11 @@
 import { InternalServerErrorException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 import { PayPalEventType } from '../../types/pay-pal-event.type';
 import { PaymentService } from '../../../../application/payment.service';
+import { link } from 'joi';
+import { PayPalGenerateAccessTokenCommand } from './pay-pal-generate-access-token.use-case';
+import { PayPalCapturePaymentCommand } from './pay-pal-capture-payment.use-case';
 
 export class FinalizePayPalPaymentCommand {
   constructor(public body: PayPalEventType) {}
@@ -13,6 +16,7 @@ export class FinalizePayPalPaymentUseCase
   implements ICommandHandler<FinalizePayPalPaymentCommand>
 {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly paymentService: PaymentService,
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
@@ -37,7 +41,16 @@ export class FinalizePayPalPaymentUseCase
         body,
       );
       console.log(JSON.stringify(body), 'body');
-      const id = body.resource.id;
+
+      const captureObj = body.resource.links.find(
+        (link) => link.rel === 'capture',
+      );
+      if (!captureObj)
+        throw new InternalServerErrorException('Invalid capture link');
+
+      await this.commandBus.execute(
+        new PayPalCapturePaymentCommand(captureObj.href, reference_id),
+      );
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
