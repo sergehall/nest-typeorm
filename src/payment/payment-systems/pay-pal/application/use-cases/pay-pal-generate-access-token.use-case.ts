@@ -23,9 +23,6 @@ export class PayPalGenerateAccessTokenUseCase
       const { username, password } =
         await this.payPalFactory.getUsernamePassword(key);
 
-      console.log('url', url);
-      console.log('username', username);
-      console.log('password', password);
       const response = await axios({
         url: url,
         method: 'POST',
