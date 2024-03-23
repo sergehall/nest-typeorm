@@ -12,6 +12,7 @@ import {
 import * as uuid4 from 'uuid4';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
+import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 
 @Injectable()
 export class PayPalAdapter {
@@ -80,7 +81,15 @@ export class PayPalAdapter {
       },
     };
 
-    const referenceId = paymentDto[0].orderId;
+    const currentClient = paymentDto[0].client;
+    const orderId = paymentDto[0].orderId;
+    let referenceId: string =
+      currentClient instanceof CurrentUserDto
+        ? currentClient.userId
+        : currentClient.guestUserId;
+
+    referenceId += `.${orderId}`;
+
     const currencyCode = paymentDto[0].currency;
 
     const items: Item[] = [];

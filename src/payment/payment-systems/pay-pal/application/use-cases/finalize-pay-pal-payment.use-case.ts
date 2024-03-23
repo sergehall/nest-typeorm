@@ -19,8 +19,12 @@ export class FinalizePayPalPaymentUseCase
     const { body } = command;
 
     try {
+      const [clientId, orderId] =
+        body.resource.purchase_units[0].reference_id.split('.');
       console.log(JSON.stringify(body), 'body');
       console.log('FinalizePayPalPaymentUseCase');
+      console.log(clientId, 'clientId');
+      console.log(orderId, 'orderId');
       //   const { client_reference_id: clientIdAndOrderId } =
       //     checkoutSessionCompletedObject;
       //   if (!clientIdAndOrderId)
