@@ -9,7 +9,6 @@ import {
   Item,
   PayPaPurchaseUnitsType,
 } from '../../types/pay-pal-create-order.type';
-import * as uuid4 from 'uuid4';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PaymentService } from '../../../application/payment.service';
