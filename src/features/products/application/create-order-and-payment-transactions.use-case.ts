@@ -77,7 +77,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
         this.paymentTransactionsRepo.savePaymentTransactionsEntity(
           paymentTransactionEntity,
         ),
-        this.orderItemsRepo.save(orderItemsEntities),
+        this.orderItemsRepo.saveOrderItems(orderItemsEntities),
       ]);
 
       console.log('Order and payment transactions created successfully.');
