@@ -15,6 +15,8 @@ import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { PayPalKeysType } from '../../../../config/pay-pal/types/pay-pal-keys.type';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
+import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
 
 @Injectable()
 export class PayPalAdapter {
@@ -48,7 +50,9 @@ export class PayPalAdapter {
     const headersOption = await this.getHeadersOptions(accessToken);
 
     const mapToPurchaseUnits = await this.mapToPurchaseUnits(paymentDto);
-    const paymentSource = await this.getPaymentSource();
+
+    const client: UsersEntity | GuestUsersEntity = paymentDto[0].client;
+    const paymentSource = await this.getPaymentSource(client);
 
     const data = {
       intent: IntentsEnums.CAPTURE,
@@ -141,21 +145,29 @@ export class PayPalAdapter {
     };
   }
 
-  private async getPaymentSource(): Promise<any> {
+  private async getPaymentSource(
+    client: UsersEntity | GuestUsersEntity,
+  ): Promise<any> {
+    let landing_page;
+    if (client instanceof UsersEntity) {
+      landing_page = 'LOGIN';
+    } else {
+      landing_page = 'GUEST_CHECKOUT';
+    }
+    // payment_method_preference: 'UNRESTRICTED'  || 'IMMEDIATE_PAYMENT_REQUIRED'
     const domain: string =
       await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     return {
       paypal: {
         experience_context: {
-          payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+          payment_method_preference: 'UNRESTRICTED',
           brand_name: 'IT-INCUBATOR INC',
           locale: 'en-US',
-          landing_page: 'NO_PREFERENCE',
+          landing_page: landing_page,
           shipping_preference: 'SET_PROVIDED_ADDRESS',
           payment_method_selected: 'PAYPAL',
           user_action: 'PAY_NOW',
-          return_url: `${domain}/pay-pal/return`,
-          success_url: `${domain}/pay-pal/success`,
+          return_url: `${domain}/pay-pal/success`,
           cancel_url: `${domain}/pay-pal/cancel`,
         },
       },
