@@ -8,6 +8,10 @@ import { GuestUsersDto } from '../../features/users/dto/guest-users.dto';
 import { ProductRequest } from '../../features/products/dto/products-request.dto';
 import { ProductsDataEntity } from '../../features/products/entities/products-data.entity';
 import { GuestUsersEntity } from '../../features/products/entities/unregistered-users.entity';
+import {
+  ReferenceIdDtoType,
+  uuidRegexPattern,
+} from '../payment-systems/types/reference-id-dto.type';
 
 @Injectable()
 export class PaymentService {
@@ -99,6 +103,37 @@ export class PaymentService {
       guestUser.isBanned = currentUserDto.isBanned;
       // Additional logic for GuestUsersDto if needed
       return guestUser;
+    }
+  }
+
+  async generateReferenceId(
+    paymentDto: PaymentDto[],
+  ): Promise<ReferenceIdDtoType> {
+    const currentClient = paymentDto[0].client;
+    const orderId = paymentDto[0].orderId;
+
+    let referenceId: string;
+    try {
+      if (currentClient instanceof UsersEntity) {
+        referenceId = currentClient.userId;
+      } else {
+        referenceId = currentClient.guestUserId;
+      }
+
+      const referenceIdValue = referenceId + `.${orderId}`;
+
+      // Ensure referenceIdValue matches the UUID regex pattern
+      if (!uuidRegexPattern.test(referenceIdValue)) {
+        throw new Error('ReferenceId does not match UUID pattern');
+      }
+
+      // Return a new ReferenceId object
+      return { referenceId: referenceIdValue };
+    } catch (error) {
+      console.error('Failed to createReferenceId:', error.message);
+      throw new InternalServerErrorException(
+        'Failed to createReferenceId: ' + error.message,
+      );
     }
   }
 }

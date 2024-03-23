@@ -3,7 +3,7 @@ import { StripeFactory } from 'config/stripe/stripe-factory';
 import Stripe from 'stripe';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PaymentDto } from '../../../dto/payment.dto';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
+import { UsersEntity } from '../../../../features/users/entities/users.entity';
 
 @Injectable()
 export class StripeAdapter {
@@ -13,7 +13,7 @@ export class StripeAdapter {
   ) {}
 
   async createCheckoutSession(
-    paymentStripeDto: PaymentDto[],
+    paymentDto: PaymentDto[],
   ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
     // Create Stripe instance and retrieve URLs
     const [stripeInstance, successUrl, cancelUrl] = await Promise.all([
@@ -22,17 +22,17 @@ export class StripeAdapter {
       this.getStripeUrls('cancel'),
     ]);
 
-    const currentClient = paymentStripeDto[0].client;
-    const orderId = paymentStripeDto[0].orderId;
+    const currentClient = paymentDto[0].client;
+    const orderId = paymentDto[0].orderId;
     let client_reference_id: string =
-      currentClient instanceof CurrentUserDto
+      currentClient instanceof UsersEntity
         ? currentClient.userId
         : currentClient.guestUserId;
 
     client_reference_id += `.${orderId}`;
 
     // Prepare line items for checkout session
-    const lineItems = paymentStripeDto.map((product: PaymentDto) => {
+    const lineItems = paymentDto.map((product: PaymentDto) => {
       return {
         price_data: {
           product_data: {

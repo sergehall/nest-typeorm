@@ -2,8 +2,8 @@ import { IsString, IsNumber, Min, IsEnum, IsObject } from 'class-validator';
 import { Column } from 'typeorm';
 import { Currency } from '../enums/currency.enums';
 import { PaymentSystem } from '../enums/payment-system.enums';
-import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
-import { GuestUsersDto } from '../../features/users/dto/guest-users.dto';
+import { UsersEntity } from '../../features/users/entities/users.entity';
+import { GuestUsersEntity } from '../../features/products/entities/unregistered-users.entity';
 
 export class PaymentDto {
   @IsString()
@@ -32,7 +32,7 @@ export class PaymentDto {
   totalPrice: string;
 
   @IsObject()
-  client: CurrentUserDto | GuestUsersDto;
+  client: UsersEntity | GuestUsersEntity;
 
   @IsString()
   createdAt: string;
