@@ -27,7 +27,6 @@ export class PayPalCapturePaymentUseCase
       );
 
       console.log(accessToken, 'accessToken ');
-      console.log('------------------------------------');
 
       const response = await axios({
         url: link,
@@ -37,6 +36,7 @@ export class PayPalCapturePaymentUseCase
           Authorization: `Bearer access_token${accessToken}`,
         },
       });
+      console.log('------------------------------------');
 
       return response;
     } catch (error) {
