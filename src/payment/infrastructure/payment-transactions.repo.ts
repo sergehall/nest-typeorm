@@ -24,6 +24,8 @@ export class PaymentTransactionsRepo {
     paymentData: Stripe.Checkout.Session | PayPalEventType,
   ): Promise<boolean> {
     try {
+      console.log(orderId, 'orderId');
+      console.log(clientId, 'clientId');
       return await this.paymentTransactionsRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager): Promise<boolean> => {
           const promises: Promise<boolean>[] = [
