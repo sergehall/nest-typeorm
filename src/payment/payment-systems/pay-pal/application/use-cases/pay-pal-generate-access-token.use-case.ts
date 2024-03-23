@@ -31,7 +31,7 @@ export class PayPalGenerateAccessTokenUseCase
         },
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
-
+      console.log(response.data, 'response.data');
       return response.data.access_token;
     } catch (error) {
       console.log(error.message);
