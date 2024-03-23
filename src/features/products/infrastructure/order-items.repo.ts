@@ -10,7 +10,9 @@ export class OrderItemsRepo {
     private readonly orderItemsRepository: Repository<OrderItemsEntity>,
   ) {}
 
-  async save(orderItems: OrderItemsEntity[]): Promise<OrderItemsEntity[]> {
+  async saveOrderItems(
+    orderItems: OrderItemsEntity[],
+  ): Promise<OrderItemsEntity[]> {
     try {
       return await this.orderItemsRepository.save(orderItems);
     } catch (error) {
