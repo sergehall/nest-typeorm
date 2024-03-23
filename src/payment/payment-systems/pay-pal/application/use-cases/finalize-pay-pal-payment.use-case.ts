@@ -17,7 +17,7 @@ export class FinalizePayPalPaymentUseCase
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
 
-  async execute(command: FinalizePayPalPaymentCommand): Promise<string> {
+  async execute(command: FinalizePayPalPaymentCommand): Promise<void> {
     const { body } = command;
 
     try {
@@ -37,7 +37,12 @@ export class FinalizePayPalPaymentUseCase
         body,
       );
 
-      return 'The purchase was successfully completed';
+      // const emailPayee = body.resource.payer.email_address;
+      // Send email to the payee
+
+      console.log(
+        `The purchase ${orderId} by ${clientId} was successfully completed`,
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(

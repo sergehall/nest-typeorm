@@ -5,7 +5,7 @@ import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-tran
 import { PaymentService } from '../../../../application/payment.service';
 
 export class FinalizeStripePaymentCommand {
-  constructor(public checkoutSessionCompletedObject: Stripe.Checkout.Session) {}
+  constructor(public session: Stripe.Checkout.Session) {}
 }
 
 @CommandHandler(FinalizeStripePaymentCommand)
@@ -17,12 +17,11 @@ export class FinalizeStripePaymentUseCase
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
 
-  async execute(command: FinalizeStripePaymentCommand): Promise<string> {
-    const { checkoutSessionCompletedObject } = command;
+  async execute(command: FinalizeStripePaymentCommand): Promise<void> {
+    const { session } = command;
 
     try {
-      const { client_reference_id: clientIdAndOrderId } =
-        checkoutSessionCompletedObject;
+      const { client_reference_id: clientIdAndOrderId } = session;
       if (!clientIdAndOrderId)
         throw new InternalServerErrorException('Invalid client reference ID');
 
@@ -34,10 +33,15 @@ export class FinalizeStripePaymentUseCase
         orderId,
         clientId,
         updatedAt,
-        checkoutSessionCompletedObject,
+        session,
       );
+      // const emailPayee = session.customer_details?.email;
+      // const emailPayee = session.customer_email;
+      // Send email to the payee
 
-      return 'The purchase was successfully completed';
+      console.log(
+        `The purchase ${orderId} by ${clientId} was successfully completed`,
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
