@@ -14,6 +14,7 @@ import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
+import { PayPalKeysType } from '../../../../config/pay-pal/types/pay-pal-keys.type';
 
 @Injectable()
 export class PayPalAdapter {
@@ -26,7 +27,7 @@ export class PayPalAdapter {
 
   async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
     try {
-      const accessToken = await this.generateAccessToken();
+      const accessToken = await this.generateAccessToken('PAYPAL_CLIENT_ID');
 
       return await this.payPalCreateOrder(paymentDto, accessToken);
     } catch (error) {
@@ -161,7 +162,7 @@ export class PayPalAdapter {
     };
   }
 
-  async generateAccessToken(): Promise<string> {
-    return this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
+  async generateAccessToken(key: PayPalKeysType): Promise<string> {
+    return this.commandBus.execute(new PayPalGenerateAccessTokenCommand(key));
   }
 }

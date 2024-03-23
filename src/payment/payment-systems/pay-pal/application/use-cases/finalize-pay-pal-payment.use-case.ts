@@ -37,6 +37,7 @@ export class FinalizePayPalPaymentUseCase
         body,
       );
       console.log(body, 'body');
+      const id = body.resource.id;
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
