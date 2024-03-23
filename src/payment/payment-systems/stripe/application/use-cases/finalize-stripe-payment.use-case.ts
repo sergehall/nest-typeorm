@@ -41,7 +41,7 @@ export class FinalizeStripePaymentUseCase
       // Send email to the payee
 
       console.log(
-        `The purchase ${orderId} by ${clientId} was successfully completed`,
+        `The purchase orderId: ${orderId} by clientId: ${clientId} was successfully completed`,
       );
     } catch (error) {
       console.error(error);

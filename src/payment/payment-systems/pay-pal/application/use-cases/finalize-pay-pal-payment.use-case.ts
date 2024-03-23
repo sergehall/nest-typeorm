@@ -36,12 +36,13 @@ export class FinalizePayPalPaymentUseCase
         updatedAt,
         body,
       );
+      console.log(body, 'body');
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
 
       console.log(
-        `The purchase ${orderId} by ${clientId} was successfully completed`,
+        `The purchase orderId: ${orderId} by clientId: ${clientId} was successfully completed`,
       );
     } catch (error) {
       console.error(error);
