@@ -3,8 +3,6 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 import { PayPalEventType } from '../../types/pay-pal-event.type';
 import { PaymentService } from '../../../../application/payment.service';
-import { link } from 'joi';
-import { PayPalGenerateAccessTokenCommand } from './pay-pal-generate-access-token.use-case';
 import { PayPalCapturePaymentCommand } from './pay-pal-capture-payment.use-case';
 
 export class FinalizePayPalPaymentCommand {
