@@ -17,11 +17,11 @@ export class ProcessPayPalWebhookUseCase
     const { rawBodyRequest } = command;
 
     try {
+      console.log('rawBodyRequest.body: ', rawBodyRequest.body);
       if (rawBodyRequest.body) {
         const eventType = rawBodyRequest.body.event_type;
         switch (eventType) {
           case 'CHECKOUT.ORDER.APPROVED':
-            console.log('eventType: ', eventType);
             await this.commandBus.execute(
               new FinalizePayPalPaymentCommand(rawBodyRequest.body),
             );
