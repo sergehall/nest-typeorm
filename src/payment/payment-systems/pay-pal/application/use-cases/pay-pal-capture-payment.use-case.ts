@@ -2,34 +2,51 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
 import { PayPalGenerateAccessTokenCommand } from './pay-pal-generate-access-token.use-case';
+import { PayPalEventType } from '../../types/pay-pal-event.type';
+import { PaymentService } from '../../../../application/payment.service';
+import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 
 export class PayPalCapturePaymentCommand {
-  constructor(
-    public link: string,
-    public reference_id: string,
-  ) {}
+  constructor(public body: PayPalEventType) {}
 }
 
 @CommandHandler(PayPalCapturePaymentCommand)
 export class PayPalCapturePaymentUseCase
   implements ICommandHandler<PayPalCapturePaymentCommand>
 {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly paymentService: PaymentService,
+    private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
+  ) {}
 
   async execute(command: PayPalCapturePaymentCommand): Promise<any> {
-    const { link, reference_id } = command;
+    const { body } = command;
     try {
-      console.log('------------------------------------');
-      console.log(link, 'link');
-      console.log(reference_id, 'reference_id');
+      const { reference_id } = body.resource.purchase_units[0];
+      if (!reference_id)
+        throw new InternalServerErrorException('Invalid reference ID');
+
+      const { orderId } =
+        await this.paymentService.extractClientAndOrderId(reference_id);
+
+      await this.paymentTransactionsRepo.updatePaymentStatusToApprovedByOrderId(
+        orderId,
+        body,
+      );
+
+      const captureObj = body.resource.links.find(
+        (link) => link.rel === 'capture',
+      );
+      if (!captureObj)
+        throw new InternalServerErrorException('Invalid capture link');
+
       const accessToken = await this.commandBus.execute(
         new PayPalGenerateAccessTokenCommand(),
       );
 
-      console.log(accessToken, 'accessToken ');
-
-      const response = await axios.post(
-        link,
+      return await axios.post(
+        captureObj.href,
         {},
         {
           headers: {
@@ -38,9 +55,6 @@ export class PayPalCapturePaymentUseCase
           },
         },
       );
-      console.log('------------------------------------');
-
-      return response;
     } catch (error) {
       throw new InternalServerErrorException(
         'Failed to PayPalCapturePayment',
@@ -49,3 +63,42 @@ export class PayPalCapturePaymentUseCase
     }
   }
 }
+
+// export class PayPalCapturePaymentCommand {
+//   constructor(
+//     public link: string,
+//     public reference_id: string,
+//   ) {}
+// }
+//
+// @CommandHandler(PayPalCapturePaymentCommand)
+// export class PayPalCapturePaymentUseCase
+//   implements ICommandHandler<PayPalCapturePaymentCommand>
+// {
+//   constructor(private readonly commandBus: CommandBus) {}
+//
+//   async execute(command: PayPalCapturePaymentCommand): Promise<any> {
+//     const { link, reference_id } = command;
+//     try {
+//       const accessToken = await this.commandBus.execute(
+//         new PayPalGenerateAccessTokenCommand(),
+//       );
+//
+//       return await axios.post(
+//         link,
+//         {},
+//         {
+//           headers: {
+//             'PayPal-Request-Id': reference_id,
+//             Authorization: `Bearer ${accessToken}`,
+//           },
+//         },
+//       );
+//     } catch (error) {
+//       throw new InternalServerErrorException(
+//         'Failed to PayPalCapturePayment',
+//         error.message,
+//       );
+//     }
+//   }
+// }

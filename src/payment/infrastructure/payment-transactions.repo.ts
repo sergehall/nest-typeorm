@@ -17,6 +17,40 @@ export class PaymentTransactionsRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
+  async updatePaymentStatusToApprovedByOrderId(
+    orderId: string,
+    body: PayPalEventType,
+  ): Promise<void> {
+    const updatedAt = new Date().toISOString();
+    try {
+      const paymentTransaction =
+        await this.paymentTransactionsRepository.findOne({
+          where: { order: { orderId } },
+        });
+
+      if (paymentTransaction) {
+        paymentTransaction.paymentStatus = PaymentsStatusEnum.APPROVED;
+        paymentTransaction.updatedAt = updatedAt;
+
+        let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
+
+        if (paymentTransaction.anyConfirmPaymentSystemData) {
+          // If existing data is present, merge it with the new JSON data
+          updatedData = {
+            ...paymentTransaction.anyConfirmPaymentSystemData,
+            ...body,
+          };
+        }
+
+        paymentTransaction.anyConfirmPaymentSystemData = updatedData;
+        await this.paymentTransactionsRepository.save(paymentTransaction);
+      }
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      throw new InternalServerErrorException('Failed to update payment status');
+    }
+  }
+
   async completeOrderAndConfirmPayment(
     orderId: string,
     clientId: string,
@@ -33,7 +67,7 @@ export class PaymentTransactionsRepo {
               updatedAt,
               transactionalEntityManager,
             ),
-            this.confirmPayment(
+            this.completedPayment(
               orderId,
               updatedAt,
               paymentData,
@@ -87,7 +121,7 @@ export class PaymentTransactionsRepo {
       .leftJoinAndSelect('order.guestClient', 'guestClient')
       .where('order.orderId = :orderId', { orderId })
       .andWhere('order.orderStatus = :orderStatus', {
-        orderStatus: OrderStatusEnum.PENDING,
+        orderStatus: OrderStatusEnum.PROCESSING,
       })
       .andWhere(
         '(client.userId = :clientId OR guestClient.guestUserId = :clientId)',
@@ -96,7 +130,7 @@ export class PaymentTransactionsRepo {
       .getOne();
   }
 
-  private async confirmPayment(
+  private async completedPayment(
     orderId: string,
     updatedAt: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
@@ -110,10 +144,20 @@ export class PaymentTransactionsRepo {
         return false;
       }
 
-      paymentTransaction.paymentStatus = PaymentsStatusEnum.CONFIRMED;
+      paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
       paymentTransaction.updatedAt = updatedAt;
-      paymentTransaction.anyConfirmPaymentSystemData =
-        JSON.stringify(paymentData);
+
+      let updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+
+      if (paymentTransaction.anyConfirmPaymentSystemData) {
+        // If existing data is present, merge it with the new JSON data
+        updatedData = {
+          ...paymentTransaction.anyConfirmPaymentSystemData,
+          ...paymentData,
+        };
+      }
+
+      paymentTransaction.anyConfirmPaymentSystemData = updatedData;
 
       await manager.save(paymentTransaction);
       return true;

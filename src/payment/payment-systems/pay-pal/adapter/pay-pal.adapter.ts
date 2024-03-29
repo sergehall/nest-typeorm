@@ -15,6 +15,7 @@ import { ReferenceIdType } from '../../types/reference-id.type';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
 import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
+import { PayerActionRequiredType } from '../types/payer-action-required.type';
 
 @Injectable()
 export class PayPalAdapter {
@@ -24,7 +25,9 @@ export class PayPalAdapter {
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
-  async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<any> {
+  async createCheckoutOrder(
+    paymentDto: PaymentDto[],
+  ): Promise<PayerActionRequiredType> {
     try {
       const accessToken = await this.commandBus.execute(
         new PayPalGenerateAccessTokenCommand(),
@@ -42,7 +45,7 @@ export class PayPalAdapter {
   private async payPalCreateOrder(
     paymentDto: PaymentDto[],
     accessToken: string,
-  ): Promise<any> {
+  ): Promise<PayerActionRequiredType> {
     if (paymentDto.length === 0)
       throw new InternalServerErrorException('PaymentDto is empty');
 
