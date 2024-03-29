@@ -249,18 +249,24 @@ export class PaymentTransactionsRepo {
         return false;
       }
 
-      const updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+      // Convert paymentData to JSON string
+      const updatedData: string = JSON.stringify(paymentData);
 
+      // Retrieve the current array of JSON objects or initialize it if null
       const currentJsonArray: any[] =
         paymentTransaction.paymentProviderInfoJson || [];
 
+      // Add the updatedData to the array
       currentJsonArray.push(updatedData);
 
+      // Update paymentTransaction properties
       paymentTransaction.paymentProviderInfoJson = currentJsonArray;
       paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
       paymentTransaction.updatedAt = updatedAt;
 
+      // Save the updated paymentTransaction
       await manager.save(paymentTransaction);
+
       return true;
     } catch (error) {
       console.error('Error confirming payment:', error);
