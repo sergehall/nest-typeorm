@@ -51,7 +51,7 @@ export class PaymentTransactionsRepo {
     }
   }
 
-  async completeOrderAndConfirmPayment(
+  async completeOrderAndPayment(
     orderId: string,
     clientId: string,
     updatedAt: string,

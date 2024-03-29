@@ -18,7 +18,6 @@ export class ProcessPayPalWebhookUseCase
     const { rawBodyRequest } = command;
 
     try {
-      console.log('rawBodyRequest.body: ', rawBodyRequest.body);
       if (rawBodyRequest.body) {
         const eventType = rawBodyRequest.body.event_type;
         switch (eventType) {
