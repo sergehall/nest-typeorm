@@ -8,20 +8,19 @@ import {
   Amount,
   Item,
   PayPaPurchaseUnitsType,
-} from '../../types/pay-pal-create-order.type';
+} from '../types/pay-pal-create-order.type';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
-import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
 import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
+import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 
 @Injectable()
 export class PayPalAdapter {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly paymentService: PaymentService,
-    private readonly payPalFactory: PayPalFactory,
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
@@ -47,7 +46,10 @@ export class PayPalAdapter {
     if (paymentDto.length === 0)
       throw new InternalServerErrorException('PaymentDto is empty');
 
-    const baseUrl = await this.payPalFactory.getPayPalUrlsDependentEnv();
+    // const baseUrl = await this.payPalFactory.getPayPalUrl();
+    // const url = baseUrl + '/v1/oauth2/token';
+
+    const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
 

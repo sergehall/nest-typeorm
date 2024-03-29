@@ -6,8 +6,8 @@ import { PayPalKeysType } from './types/pay-pal-keys.type';
 export class PayPalConfig extends BaseConfig {
   private config: Record<string, string> = {
     PAYPAL_WEBHOOK_ID: 'PAYPAL_WEBHOOK_ID',
-    PAYPAL_CLIENT_SECRET: 'PAYPAL_CLIENT_SECRET',
     PAYPAL_CLIENT_ID: 'PAYPAL_CLIENT_ID',
+    PAYPAL_CLIENT_SECRET: 'PAYPAL_CLIENT_SECRET',
   };
 
   async getPayPalValueByKey(key: PayPalKeysType): Promise<string> {
@@ -19,7 +19,7 @@ export class PayPalConfig extends BaseConfig {
       );
     }
   }
-  async getPayPalConfig(key: PayPalKeysType): Promise<string> {
+  async getPayPalValue(key: PayPalKeysType): Promise<string> {
     return this.getPayPalValueByKey(key);
   }
 }
