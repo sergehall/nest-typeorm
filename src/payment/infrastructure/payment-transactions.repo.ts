@@ -40,6 +40,7 @@ export class PaymentTransactionsRepo {
 
         currentJsonArray.push(updatedData);
 
+        paymentTransaction.paymentProviderInfoJson = currentJsonArray;
         paymentTransaction.anyConfirmPaymentSystemData = updatedData;
         await this.paymentTransactionsRepository.save(paymentTransaction);
       }
