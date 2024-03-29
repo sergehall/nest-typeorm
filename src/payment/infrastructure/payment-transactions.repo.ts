@@ -32,9 +32,12 @@ export class PaymentTransactionsRepo {
       if (paymentTransaction) {
         paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
         paymentTransaction.updatedAt = updatedAt;
-
+        console.log(
+          paymentTransaction.anyConfirmPaymentSystemData,
+          'paymentTransaction.anyConfirmPaymentSystemData',
+        );
         let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
-
+        console.log(updatedData, 'updatedData');
         if (paymentTransaction.anyConfirmPaymentSystemData) {
           // If existing data is present, merge it with the new JSON data
           updatedData = {
