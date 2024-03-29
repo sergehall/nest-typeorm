@@ -30,7 +30,7 @@ export class FinalizePayPalPaymentUseCase
 
       const updatedAt = new Date().toISOString();
 
-      await this.paymentTransactionsRepo.completeOrderAndConfirmPayment(
+      await this.paymentTransactionsRepo.completeOrderAndPayment(
         orderId,
         clientId,
         updatedAt,
