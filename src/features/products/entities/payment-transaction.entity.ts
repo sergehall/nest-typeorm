@@ -43,8 +43,8 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'character varying', nullable: true })
   paymentProviderOrderId: string | null;
 
-  @Column({ type: 'json', nullable: true })
-  paymentProviderInfoJson: any;
+  @Column({ type: 'jsonb', array: true, nullable: true })
+  paymentProviderInfoJson: any[];
 
   @Column({ type: 'json', nullable: true })
   anyConfirmPaymentSystemData: any;
@@ -73,7 +73,7 @@ export class PaymentTransactionsEntity {
     paymentTransactionEntity.updatedAt = null;
     paymentTransactionEntity.order = order;
     paymentTransactionEntity.paymentProviderOrderId = null;
-    paymentTransactionEntity.paymentProviderInfoJson = null;
+    paymentTransactionEntity.paymentProviderInfoJson = [];
     paymentTransactionEntity.anyConfirmPaymentSystemData = null;
     return paymentTransactionEntity;
   }
