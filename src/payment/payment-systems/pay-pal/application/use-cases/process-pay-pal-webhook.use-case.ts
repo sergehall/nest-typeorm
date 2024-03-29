@@ -2,6 +2,7 @@ import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { FinalizePayPalPaymentCommand } from './finalize-pay-pal-payment.use-case';
+import { PayPalCapturePaymentCommand } from './pay-pal-capture-payment.use-case';
 
 export class ProcessPayPalWebhookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -23,11 +24,13 @@ export class ProcessPayPalWebhookUseCase
         switch (eventType) {
           case 'CHECKOUT.ORDER.APPROVED':
             await this.commandBus.execute(
-              new FinalizePayPalPaymentCommand(rawBodyRequest.body),
+              new PayPalCapturePaymentCommand(rawBodyRequest.body),
             );
             break;
-          case 'CHECKOUT.......':
-            console.log('eventType: ', eventType);
+          case 'PAYMENT.CAPTURE.COMPLETED':
+            await this.commandBus.execute(
+              new FinalizePayPalPaymentCommand(rawBodyRequest.body),
+            );
             break;
           default:
             // Handle other webhook events

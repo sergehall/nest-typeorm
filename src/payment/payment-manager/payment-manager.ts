@@ -4,6 +4,7 @@ import { PaymentDto } from '../dto/payment.dto';
 import { PaymentLinkDto } from '../dto/payment-link.dto';
 import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
 import { PayPalAdapter } from '../payment-systems/pay-pal/adapter/pay-pal.adapter';
+import { PayerActionRequiredType } from '../payment-systems/pay-pal/types/payer-action-required.type';
 
 @Injectable()
 export class PaymentManager {
@@ -53,14 +54,19 @@ export class PaymentManager {
     };
   }
 
-  private async processPayPalPayment(paymentDto: any) {
-    const checkoutOrder =
+  private async processPayPalPayment(
+    paymentDto: any,
+  ): Promise<PaymentLinkDto | null> {
+    const checkoutOrder: PayerActionRequiredType =
       await this.payPalAdapter.createCheckoutOrder(paymentDto);
 
     if (!checkoutOrder) {
       return null;
     }
-    return checkoutOrder;
+
+    return {
+      paymentLink: checkoutOrder.links[1].href,
+    };
   }
 
   private async processApplePayPayment(

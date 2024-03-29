@@ -27,7 +27,7 @@ export class OrdersRepo {
         .leftJoinAndSelect('order.guestClient', 'guestClient')
         .where('order.orderId = :orderId', { orderId })
         .andWhere('order.orderStatus = :orderStatus', {
-          orderStatus: OrderStatusEnum.PENDING,
+          orderStatus: OrderStatusEnum.PROCESSING,
         })
         .andWhere(
           '(client.userId = :clientId OR guestClient.guestUserId = :clientId)',

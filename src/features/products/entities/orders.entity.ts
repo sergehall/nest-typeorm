@@ -39,7 +39,7 @@ export class OrdersEntity {
   @Column({
     type: 'enum',
     enum: OrderStatusEnum,
-    default: OrderStatusEnum.PENDING,
+    default: OrderStatusEnum.PROCESSING,
     nullable: false,
   })
   orderStatus: OrderStatusEnum;
