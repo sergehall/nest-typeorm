@@ -38,9 +38,10 @@ export class PaymentTransactionsRepo {
         if (paymentTransaction.anyConfirmPaymentSystemData) {
           // If existing data is present, merge it with the new JSON data
           updatedData =
-            paymentTransaction.anyConfirmPaymentSystemData + updatedData;
+            paymentTransaction.anyConfirmPaymentSystemData + ', ' + updatedData;
         }
 
+        console.log(updatedData, 'updatedData');
         paymentTransaction.anyConfirmPaymentSystemData = updatedData;
         await this.paymentTransactionsRepository.save(paymentTransaction);
       }
