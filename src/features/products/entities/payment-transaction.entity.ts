@@ -40,6 +40,9 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'character varying', length: 50, nullable: true })
   updatedAt: string | null;
 
+  @Column({ type: 'character varying', nullable: true })
+  paymentProviderOrderId: string | null;
+
   @Column({ type: 'json', nullable: true })
   paymentProviderInfoJson: any;
 
@@ -69,6 +72,7 @@ export class PaymentTransactionsEntity {
     paymentTransactionEntity.createdAt = createdAt;
     paymentTransactionEntity.updatedAt = null;
     paymentTransactionEntity.order = order;
+    paymentTransactionEntity.paymentProviderOrderId = null;
     paymentTransactionEntity.paymentProviderInfoJson = null;
     paymentTransactionEntity.anyConfirmPaymentSystemData = null;
     return paymentTransactionEntity;

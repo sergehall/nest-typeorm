@@ -1,11 +1,10 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
-import { PayPalEventType } from '../../types/pay-pal-event.type';
-import { PaymentService } from '../../../../application/payment.service';
+import { PayPalCompletedEventType } from '../../types/pay-pal-completed-event.type';
 
 export class FinalizePayPalPaymentCommand {
-  constructor(public body: PayPalEventType) {}
+  constructor(public body: PayPalCompletedEventType) {}
 }
 
 @CommandHandler(FinalizePayPalPaymentCommand)
@@ -13,7 +12,6 @@ export class FinalizePayPalPaymentUseCase
   implements ICommandHandler<FinalizePayPalPaymentCommand>
 {
   constructor(
-    private readonly paymentService: PaymentService,
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
   ) {}
 
@@ -22,27 +20,18 @@ export class FinalizePayPalPaymentUseCase
 
     try {
       console.log(JSON.stringify(body), 'bodyFinalize');
-      const { reference_id } = body.resource.purchase_units[0];
-      if (!reference_id)
-        throw new InternalServerErrorException('Invalid reference ID');
+      const { order_id } = body.resource.supplementary_data.related_ids;
 
-      const { clientId, orderId } =
-        await this.paymentService.extractClientAndOrderId(reference_id);
+      if (!order_id)
+        throw new InternalServerErrorException('Invalid reference related_ids');
 
-      const updatedAt = new Date().toISOString();
-
-      await this.paymentTransactionsRepo.completeOrderAndPayment(
-        orderId,
-        clientId,
-        updatedAt,
-        body,
-      );
+      await this.paymentTransactionsRepo.completedPayment(order_id, body);
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
 
       console.log(
-        `The purchase orderId: ${orderId} by clientId: ${clientId} was successfully completed`,
+        `The purchase orderId: ${'orderId'} by clientId: ${'clientId'} was successfully completed`,
       );
     } catch (error) {
       console.error(error);
