@@ -24,6 +24,7 @@ export class PaymentTransactionsRepo {
   ): Promise<void> {
     const updatedAt = new Date().toISOString();
     try {
+      console.log(JSON.stringify(body), 'bodyFinalize');
       const paymentTransaction =
         await this.paymentTransactionsRepository.findOne({
           where: { paymentProviderOrderId: orderId },
@@ -123,9 +124,11 @@ export class PaymentTransactionsRepo {
   async updateOrderAndPaymentApproved(
     orderId: string,
     clientId: string,
+    id: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
   ): Promise<boolean> {
     try {
+      const paymentOrderId = id;
       const updatedAt = new Date().toISOString();
       const statusOrder = OrderStatusEnum.AWAITING_SHIPMENT;
       const paymentStatus = PaymentsStatusEnum.APPROVED;
@@ -144,6 +147,7 @@ export class PaymentTransactionsRepo {
               orderId,
               updatedAt,
               paymentStatus,
+              paymentOrderId,
               paymentData,
               transactionalEntityManager,
             ),
@@ -190,6 +194,7 @@ export class PaymentTransactionsRepo {
     orderId: string,
     updatedAt: string,
     status: PaymentsStatusEnum,
+    paymentOrderId: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
     manager: EntityManager,
   ): Promise<boolean> {
@@ -203,6 +208,7 @@ export class PaymentTransactionsRepo {
 
       paymentTransaction.paymentStatus = status;
       paymentTransaction.updatedAt = updatedAt;
+      paymentTransaction.paymentProviderOrderId = paymentOrderId;
 
       let updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
 

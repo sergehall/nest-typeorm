@@ -23,11 +23,9 @@ export class ProcessStripeWebHookUseCase
       new ConstructStripeEventCommand(rawBodyRequest),
     );
     try {
-      console.log(JSON.stringify(event), 'event');
       if (event) {
         switch (event.type) {
           case 'checkout.session.completed':
-            console.log(event, 'checkout.session.completed');
             await this.commandBus.execute(
               new FinalizeStripePaymentCommand(event.data.object),
             );
