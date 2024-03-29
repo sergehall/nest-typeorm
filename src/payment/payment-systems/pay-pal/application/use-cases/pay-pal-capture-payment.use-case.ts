@@ -23,7 +23,6 @@ export class PayPalCapturePaymentUseCase
   async execute(command: PayPalCapturePaymentCommand): Promise<any> {
     const { body } = command;
     try {
-      console.log(JSON.stringify(body), 'bodyCapture');
       const { reference_id } = body.resource.purchase_units[0];
       if (!reference_id)
         throw new InternalServerErrorException('Invalid reference ID');
@@ -31,9 +30,12 @@ export class PayPalCapturePaymentUseCase
       const { clientId, orderId } =
         await this.paymentService.extractClientAndOrderId(reference_id);
 
+      const { id } = body.resource;
+
       await this.paymentTransactionsRepo.updateOrderAndPaymentApproved(
         orderId,
         clientId,
+        id,
         body,
       );
 
@@ -65,42 +67,3 @@ export class PayPalCapturePaymentUseCase
     }
   }
 }
-
-// export class PayPalCapturePaymentCommand {
-//   constructor(
-//     public link: string,
-//     public reference_id: string,
-//   ) {}
-// }
-//
-// @CommandHandler(PayPalCapturePaymentCommand)
-// export class PayPalCapturePaymentUseCase
-//   implements ICommandHandler<PayPalCapturePaymentCommand>
-// {
-//   constructor(private readonly commandBus: CommandBus) {}
-//
-//   async execute(command: PayPalCapturePaymentCommand): Promise<any> {
-//     const { link, reference_id } = command;
-//     try {
-//       const accessToken = await this.commandBus.execute(
-//         new PayPalGenerateAccessTokenCommand(),
-//       );
-//
-//       return await axios.post(
-//         link,
-//         {},
-//         {
-//           headers: {
-//             'PayPal-Request-Id': reference_id,
-//             Authorization: `Bearer ${accessToken}`,
-//           },
-//         },
-//       );
-//     } catch (error) {
-//       throw new InternalServerErrorException(
-//         'Failed to PayPalCapturePayment',
-//         error.message,
-//       );
-//     }
-//   }
-// }

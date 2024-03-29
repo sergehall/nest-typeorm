@@ -19,7 +19,6 @@ export class FinalizePayPalPaymentUseCase
     const { body } = command;
 
     try {
-      console.log(JSON.stringify(body), 'bodyFinalize');
       const { order_id } = body.resource.supplementary_data.related_ids;
 
       if (!order_id)
@@ -29,10 +28,6 @@ export class FinalizePayPalPaymentUseCase
 
       // const emailPayee = body.resource.payer.email_address;
       // Send email to the payee
-
-      console.log(
-        `The purchase orderId: ${'orderId'} by clientId: ${'clientId'} was successfully completed`,
-      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
