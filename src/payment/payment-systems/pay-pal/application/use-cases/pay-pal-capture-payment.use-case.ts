@@ -23,6 +23,7 @@ export class PayPalCapturePaymentUseCase
   async execute(command: PayPalCapturePaymentCommand): Promise<any> {
     const { body } = command;
     try {
+      console.log(JSON.stringify(body), 'bodyCapture');
       const { reference_id } = body.resource.purchase_units[0];
       if (!reference_id)
         throw new InternalServerErrorException('Invalid reference ID');
