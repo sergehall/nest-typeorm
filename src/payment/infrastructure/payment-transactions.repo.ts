@@ -33,17 +33,12 @@ export class PaymentTransactionsRepo {
         paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
         paymentTransaction.updatedAt = updatedAt;
 
-        let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
+        const updatedData: any = JSON.stringify(body);
 
-        if (paymentTransaction.anyConfirmPaymentSystemData) {
-          // If existing data is present, merge it with the new JSON data
-          updatedData =
-            '[' +
-            paymentTransaction.anyConfirmPaymentSystemData +
-            ', ' +
-            updatedData +
-            ']';
-        }
+        const currentJsonArray: any[] =
+          paymentTransaction.anyConfirmPaymentSystemData || [];
+
+        currentJsonArray.push(updatedData);
 
         paymentTransaction.anyConfirmPaymentSystemData = updatedData;
         await this.paymentTransactionsRepository.save(paymentTransaction);
