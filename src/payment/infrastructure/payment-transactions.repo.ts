@@ -66,7 +66,7 @@ export class PaymentTransactionsRepo {
               updatedAt,
               transactionalEntityManager,
             ),
-            this.confirmPayment(
+            this.paymentConfirm(
               orderId,
               updatedAt,
               paymentData,
@@ -95,7 +95,6 @@ export class PaymentTransactionsRepo {
       const paymentOrderId = id;
       const updatedAt = new Date().toISOString();
       const statusOrder = OrderStatusEnum.AWAITING_SHIPMENT;
-      const paymentStatus = PaymentsStatusEnum.APPROVED;
 
       return await this.paymentTransactionsRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager): Promise<boolean> => {
@@ -110,7 +109,6 @@ export class PaymentTransactionsRepo {
             this.paymentApproved(
               orderId,
               updatedAt,
-              paymentStatus,
               paymentOrderId,
               paymentData,
               transactionalEntityManager,
@@ -157,7 +155,6 @@ export class PaymentTransactionsRepo {
   private async paymentApproved(
     orderId: string,
     updatedAt: string,
-    status: PaymentsStatusEnum,
     paymentOrderId: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
     manager: EntityManager,
@@ -177,10 +174,10 @@ export class PaymentTransactionsRepo {
           paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
       }
 
-      paymentTransaction.paymentProviderInfoJson = updatedData;
-      paymentTransaction.paymentStatus = status;
+      paymentTransaction.paymentStatus = PaymentsStatusEnum.APPROVED;
       paymentTransaction.updatedAt = updatedAt;
       paymentTransaction.paymentProviderOrderId = paymentOrderId;
+      paymentTransaction.paymentProviderInfoJson = updatedData;
 
       await manager.save(paymentTransaction);
       return true;
@@ -234,7 +231,7 @@ export class PaymentTransactionsRepo {
       .getOne();
   }
 
-  private async confirmPayment(
+  private async paymentConfirm(
     orderId: string,
     updatedAt: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
