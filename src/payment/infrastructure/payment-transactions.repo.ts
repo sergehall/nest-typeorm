@@ -36,12 +36,12 @@ export class PaymentTransactionsRepo {
         const updatedData: any = JSON.stringify(body);
 
         const currentJsonArray: any[] =
-          paymentTransaction.anyConfirmPaymentSystemData || [];
+          paymentTransaction.paymentProviderInfoJson || [];
 
         currentJsonArray.push(updatedData);
 
         paymentTransaction.paymentProviderInfoJson = currentJsonArray;
-        paymentTransaction.anyConfirmPaymentSystemData = updatedData;
+        paymentTransaction.paymentProviderInfoJson = updatedData;
         await this.paymentTransactionsRepository.save(paymentTransaction);
       }
     } catch (error) {
@@ -174,17 +174,14 @@ export class PaymentTransactionsRepo {
       paymentTransaction.updatedAt = updatedAt;
       paymentTransaction.paymentProviderOrderId = paymentOrderId;
 
-      let updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+      const updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
 
-      if (paymentTransaction.anyConfirmPaymentSystemData) {
-        // If existing data is present, merge it with the new JSON data
-        updatedData = {
-          ...paymentTransaction.anyConfirmPaymentSystemData,
-          ...paymentData,
-        };
-      }
+      const currentJsonArray: any[] =
+        paymentTransaction.paymentProviderInfoJson || [];
 
-      paymentTransaction.anyConfirmPaymentSystemData = updatedData;
+      currentJsonArray.push(updatedData);
+
+      paymentTransaction.paymentProviderInfoJson = currentJsonArray;
 
       await manager.save(paymentTransaction);
       return true;
@@ -252,20 +249,16 @@ export class PaymentTransactionsRepo {
         return false;
       }
 
+      const updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+
+      const currentJsonArray: any[] =
+        paymentTransaction.paymentProviderInfoJson || [];
+
+      currentJsonArray.push(updatedData);
+
+      paymentTransaction.paymentProviderInfoJson = currentJsonArray;
       paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
       paymentTransaction.updatedAt = updatedAt;
-
-      let updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
-
-      if (paymentTransaction.anyConfirmPaymentSystemData) {
-        // If existing data is present, merge it with the new JSON data
-        updatedData = {
-          ...paymentTransaction.anyConfirmPaymentSystemData,
-          ...paymentData,
-        };
-      }
-
-      paymentTransaction.anyConfirmPaymentSystemData = updatedData;
 
       await manager.save(paymentTransaction);
       return true;
