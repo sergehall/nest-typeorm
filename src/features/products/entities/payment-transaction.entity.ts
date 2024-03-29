@@ -46,9 +46,6 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'jsonb', array: true, nullable: true })
   paymentProviderInfoJson: any[] | null;
 
-  @Column({ type: 'json', nullable: true })
-  anyConfirmPaymentSystemData: any;
-
   @ManyToOne(() => OrdersEntity, (order) => order.payments, {
     nullable: true,
     eager: true,
@@ -74,7 +71,6 @@ export class PaymentTransactionsEntity {
     paymentTransactionEntity.order = order;
     paymentTransactionEntity.paymentProviderOrderId = null;
     paymentTransactionEntity.paymentProviderInfoJson = null;
-    paymentTransactionEntity.anyConfirmPaymentSystemData = null;
     return paymentTransactionEntity;
   }
 }
