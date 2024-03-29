@@ -24,7 +24,7 @@ export class PaymentTransactionsRepo {
   ): Promise<void> {
     const updatedAt = new Date().toISOString();
     try {
-      const paymentTransaction =
+      const paymentTransaction: PaymentTransactionsEntity | null =
         await this.paymentTransactionsRepository.findOne({
           where: { paymentProviderOrderId: orderId },
         });
@@ -32,18 +32,13 @@ export class PaymentTransactionsRepo {
       if (paymentTransaction) {
         paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
         paymentTransaction.updatedAt = updatedAt;
-        console.log(
-          paymentTransaction.anyConfirmPaymentSystemData,
-          'paymentTransaction.anyConfirmPaymentSystemData',
-        );
+
         let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
-        console.log(updatedData, 'updatedData');
+
         if (paymentTransaction.anyConfirmPaymentSystemData) {
           // If existing data is present, merge it with the new JSON data
-          updatedData = {
-            ...paymentTransaction.anyConfirmPaymentSystemData,
-            ...updatedData,
-          };
+          updatedData =
+            paymentTransaction.anyConfirmPaymentSystemData + updatedData;
         }
 
         paymentTransaction.anyConfirmPaymentSystemData = updatedData;
