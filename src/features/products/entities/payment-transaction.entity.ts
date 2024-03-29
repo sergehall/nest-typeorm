@@ -43,8 +43,8 @@ export class PaymentTransactionsEntity {
   @Column({ type: 'character varying', nullable: true })
   paymentProviderOrderId: string | null;
 
-  @Column({ type: 'jsonb', array: true, nullable: true })
-  paymentProviderInfoJson: any[] | null;
+  @Column({ type: 'jsonb', nullable: true })
+  paymentProviderInfoJson: any | null;
 
   @ManyToOne(() => OrdersEntity, (order) => order.payments, {
     nullable: true,
