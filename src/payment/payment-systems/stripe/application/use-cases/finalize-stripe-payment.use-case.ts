@@ -29,7 +29,7 @@ export class FinalizeStripePaymentUseCase
       const { clientId, orderId } =
         await this.paymentService.extractClientAndOrderId(clientIdAndOrderId);
 
-      await this.paymentTransactionsRepo.completeOrderAndPayment(
+      await this.paymentTransactionsRepo.updateOrderAndPayment(
         orderId,
         clientId,
         updatedAt,

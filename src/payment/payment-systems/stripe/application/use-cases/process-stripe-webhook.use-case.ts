@@ -23,6 +23,7 @@ export class ProcessStripeWebHookUseCase
       new ConstructStripeEventCommand(rawBodyRequest),
     );
     try {
+      console.log(JSON.stringify(event), 'event');
       if (event) {
         switch (event.type) {
           case 'checkout.session.completed':

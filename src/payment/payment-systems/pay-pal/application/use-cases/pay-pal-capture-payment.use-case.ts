@@ -28,11 +28,12 @@ export class PayPalCapturePaymentUseCase
       if (!reference_id)
         throw new InternalServerErrorException('Invalid reference ID');
 
-      const { orderId } =
+      const { clientId, orderId } =
         await this.paymentService.extractClientAndOrderId(reference_id);
 
-      await this.paymentTransactionsRepo.updatePaymentStatusToApprovedByOrderId(
+      await this.paymentTransactionsRepo.updateOrderAndPaymentApproved(
         orderId,
+        clientId,
         body,
       );
 

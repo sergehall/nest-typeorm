@@ -7,6 +7,7 @@ import { PaymentsStatusEnum } from '../../features/products/enums/payments-statu
 import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
 import { OrdersEntity } from '../../features/products/entities/orders.entity';
 import { PayPalEventType } from '../payment-systems/pay-pal/types/pay-pal-event.type';
+import { PayPalCompletedEventType } from '../payment-systems/pay-pal/types/pay-pal-completed-event.type';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -17,6 +18,39 @@ export class PaymentTransactionsRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
+  async completedPayment(
+    orderId: string,
+    body: PayPalCompletedEventType,
+  ): Promise<void> {
+    const updatedAt = new Date().toISOString();
+    try {
+      const paymentTransaction =
+        await this.paymentTransactionsRepository.findOne({
+          where: { paymentProviderOrderId: orderId },
+        });
+
+      if (paymentTransaction) {
+        paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
+        paymentTransaction.updatedAt = updatedAt;
+
+        let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
+
+        if (paymentTransaction.anyConfirmPaymentSystemData) {
+          // If existing data is present, merge it with the new JSON data
+          updatedData = {
+            ...paymentTransaction.anyConfirmPaymentSystemData,
+            ...body,
+          };
+        }
+
+        paymentTransaction.anyConfirmPaymentSystemData = updatedData;
+        await this.paymentTransactionsRepository.save(paymentTransaction);
+      }
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      throw new InternalServerErrorException('Failed to update payment status');
+    }
+  }
   async updatePaymentStatusToApprovedByOrderId(
     orderId: string,
     body: PayPalEventType,
@@ -51,7 +85,7 @@ export class PaymentTransactionsRepo {
     }
   }
 
-  async completeOrderAndPayment(
+  async updateOrderAndPayment(
     orderId: string,
     clientId: string,
     updatedAt: string,
@@ -67,7 +101,7 @@ export class PaymentTransactionsRepo {
               updatedAt,
               transactionalEntityManager,
             ),
-            this.completedPayment(
+            this.confirmPayment(
               orderId,
               updatedAt,
               paymentData,
@@ -83,6 +117,110 @@ export class PaymentTransactionsRepo {
       throw new InternalServerErrorException(
         'Failed to complete order and confirm payment',
       );
+    }
+  }
+
+  async updateOrderAndPaymentApproved(
+    orderId: string,
+    clientId: string,
+    paymentData: Stripe.Checkout.Session | PayPalEventType,
+  ): Promise<boolean> {
+    try {
+      const updatedAt = new Date().toISOString();
+      const statusOrder = OrderStatusEnum.AWAITING_SHIPMENT;
+      const paymentStatus = PaymentsStatusEnum.APPROVED;
+
+      return await this.paymentTransactionsRepository.manager.transaction(
+        async (transactionalEntityManager: EntityManager): Promise<boolean> => {
+          const promises: Promise<boolean>[] = [
+            this.updateOrderStatusAwaitingShipment(
+              orderId,
+              clientId,
+              updatedAt,
+              statusOrder,
+              transactionalEntityManager,
+            ),
+            this.approvedPayment(
+              orderId,
+              updatedAt,
+              paymentStatus,
+              paymentData,
+              transactionalEntityManager,
+            ),
+          ];
+          const [orderUpdated, paymentConfirmed] = await Promise.all(promises);
+          return orderUpdated && paymentConfirmed;
+        },
+      );
+    } catch (error) {
+      console.error('Error completing order and confirming payment:', error);
+      throw new InternalServerErrorException(
+        'Failed to complete order and confirm payment',
+      );
+    }
+  }
+
+  private async updateOrderStatusAwaitingShipment(
+    orderId: string,
+    clientId: string,
+    updatedAt: string,
+    status: OrderStatusEnum,
+    manager: EntityManager,
+  ): Promise<boolean> {
+    try {
+      const order = await this.findOrder(orderId, clientId);
+
+      if (!order) {
+        console.log(`Order with ID ${orderId} not found`);
+        return false;
+      }
+
+      order.orderStatus = status;
+      order.updatedAt = updatedAt;
+
+      await manager.save(order);
+      return true;
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      throw new InternalServerErrorException('Failed to update order status');
+    }
+  }
+
+  private async approvedPayment(
+    orderId: string,
+    updatedAt: string,
+    status: PaymentsStatusEnum,
+    paymentData: Stripe.Checkout.Session | PayPalEventType,
+    manager: EntityManager,
+  ): Promise<boolean> {
+    try {
+      const paymentTransaction = await this.findPaymentTransaction(orderId);
+
+      if (!paymentTransaction) {
+        console.log(`Payment transaction with orderId ${orderId} not found`);
+        return false;
+      }
+
+      paymentTransaction.paymentStatus = status;
+      paymentTransaction.updatedAt = updatedAt;
+
+      let updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+
+      if (paymentTransaction.anyConfirmPaymentSystemData) {
+        // If existing data is present, merge it with the new JSON data
+        updatedData = {
+          ...paymentTransaction.anyConfirmPaymentSystemData,
+          ...paymentData,
+        };
+      }
+
+      paymentTransaction.anyConfirmPaymentSystemData = updatedData;
+
+      await manager.save(paymentTransaction);
+      return true;
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      throw new InternalServerErrorException('Failed to confirm payment');
     }
   }
 
@@ -130,7 +268,7 @@ export class PaymentTransactionsRepo {
       .getOne();
   }
 
-  private async completedPayment(
+  private async confirmPayment(
     orderId: string,
     updatedAt: string,
     paymentData: Stripe.Checkout.Session | PayPalEventType,
