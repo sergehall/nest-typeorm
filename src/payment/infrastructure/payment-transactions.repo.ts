@@ -107,7 +107,7 @@ export class PaymentTransactionsRepo {
               statusOrder,
               transactionalEntityManager,
             ),
-            this.approvedPayment(
+            this.paymentApproved(
               orderId,
               updatedAt,
               paymentStatus,
@@ -154,7 +154,7 @@ export class PaymentTransactionsRepo {
     }
   }
 
-  private async approvedPayment(
+  private async paymentApproved(
     orderId: string,
     updatedAt: string,
     status: PaymentsStatusEnum,
@@ -170,18 +170,17 @@ export class PaymentTransactionsRepo {
         return false;
       }
 
+      let updatedData: string = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
+
+      if (paymentTransaction.paymentProviderInfoJson) {
+        updatedData =
+          paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+      }
+
+      paymentTransaction.paymentProviderInfoJson = updatedData;
       paymentTransaction.paymentStatus = status;
       paymentTransaction.updatedAt = updatedAt;
       paymentTransaction.paymentProviderOrderId = paymentOrderId;
-
-      const updatedData: any = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
-
-      const currentJsonArray: any[] =
-        paymentTransaction.paymentProviderInfoJson || [];
-
-      currentJsonArray.push(updatedData);
-
-      paymentTransaction.paymentProviderInfoJson = currentJsonArray;
 
       await manager.save(paymentTransaction);
       return true;
@@ -250,17 +249,15 @@ export class PaymentTransactionsRepo {
       }
 
       // Convert paymentData to JSON string
-      const updatedData: string = JSON.stringify(paymentData);
+      let updatedData: string = JSON.stringify(paymentData);
 
-      // Retrieve the current array of JSON objects or initialize it if null
-      const currentJsonArray: any[] =
-        paymentTransaction.paymentProviderInfoJson || [];
-
-      // Add the updatedData to the array
-      currentJsonArray.push(updatedData);
+      if (paymentTransaction.paymentProviderInfoJson) {
+        updatedData =
+          paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+      }
 
       // Update paymentTransaction properties
-      paymentTransaction.paymentProviderInfoJson = currentJsonArray;
+      paymentTransaction.paymentProviderInfoJson = updatedData;
       paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
       paymentTransaction.updatedAt = updatedAt;
 
