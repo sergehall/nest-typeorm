@@ -20,7 +20,7 @@ export class PaymentTransactionsRepo {
 
   async completedPayment(
     orderId: string,
-    body: PayPalCompletedEventType,
+    paymentData: PayPalCompletedEventType,
   ): Promise<void> {
     const updatedAt = new Date().toISOString();
     try {
@@ -30,18 +30,18 @@ export class PaymentTransactionsRepo {
         });
 
       if (paymentTransaction) {
+        // Convert paymentData to JSON string
+        let updatedData: string = JSON.stringify(paymentData);
+
+        if (paymentTransaction.paymentProviderInfoJson) {
+          updatedData =
+            paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+        }
+
         paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
         paymentTransaction.updatedAt = updatedAt;
-
-        const updatedData: any = JSON.stringify(body);
-
-        const currentJsonArray: any[] =
-          paymentTransaction.paymentProviderInfoJson || [];
-
-        currentJsonArray.push(updatedData);
-
-        paymentTransaction.paymentProviderInfoJson = currentJsonArray;
         paymentTransaction.paymentProviderInfoJson = updatedData;
+
         await this.paymentTransactionsRepository.save(paymentTransaction);
       }
     } catch (error) {
