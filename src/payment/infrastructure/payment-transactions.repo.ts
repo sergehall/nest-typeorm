@@ -24,7 +24,6 @@ export class PaymentTransactionsRepo {
   ): Promise<void> {
     const updatedAt = new Date().toISOString();
     try {
-      console.log(JSON.stringify(body), 'bodyFinalize');
       const paymentTransaction =
         await this.paymentTransactionsRepository.findOne({
           where: { paymentProviderOrderId: orderId },
@@ -40,40 +39,7 @@ export class PaymentTransactionsRepo {
           // If existing data is present, merge it with the new JSON data
           updatedData = {
             ...paymentTransaction.anyConfirmPaymentSystemData,
-            ...body,
-          };
-        }
-
-        paymentTransaction.anyConfirmPaymentSystemData = updatedData;
-        await this.paymentTransactionsRepository.save(paymentTransaction);
-      }
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-      throw new InternalServerErrorException('Failed to update payment status');
-    }
-  }
-  async updatePaymentStatusToApprovedByOrderId(
-    orderId: string,
-    body: PayPalEventType,
-  ): Promise<void> {
-    const updatedAt = new Date().toISOString();
-    try {
-      const paymentTransaction =
-        await this.paymentTransactionsRepository.findOne({
-          where: { order: { orderId } },
-        });
-
-      if (paymentTransaction) {
-        paymentTransaction.paymentStatus = PaymentsStatusEnum.APPROVED;
-        paymentTransaction.updatedAt = updatedAt;
-
-        let updatedData: any = JSON.stringify(body); // Initialize updatedData with the new JSON data
-
-        if (paymentTransaction.anyConfirmPaymentSystemData) {
-          // If existing data is present, merge it with the new JSON data
-          updatedData = {
-            ...paymentTransaction.anyConfirmPaymentSystemData,
-            ...body,
+            ...updatedData,
           };
         }
 
