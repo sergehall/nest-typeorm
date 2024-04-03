@@ -14,6 +14,7 @@ import { PgPortKeyType } from '../db/postgres/types/pg-port-key.type';
 import { MongoDbKeysType } from '../db/mongo/types/mongo-db-keys.type';
 import { AwsKeysTypes } from '../aws/types/aws-keys.types';
 import { MailsKeysTypes, MailsPortKeyType } from '../mails/types/mails.types';
+import { ReCaptchaKeyType } from '../recaptcha/types/re-captcha-key.type';
 
 @Injectable()
 export class BaseConfig {
@@ -41,6 +42,12 @@ export class BaseConfig {
 
   protected async getValuePayPal(key: PayPalKeysType): Promise<string> {
     return this.configService.get('paypal', {
+      infer: true,
+    })[key];
+  }
+
+  protected async getValueReCaptcha(key: ReCaptchaKeyType): Promise<string> {
+    return this.configService.get('reCaptcha', {
       infer: true,
     })[key];
   }
