@@ -86,6 +86,8 @@ export const validationSchemaConfiguration = Joi.object({
   STRIPE_LIVE_API_KEY: Joi.string().min(107).max(107).required(),
   STRIPE_API_VERSION: Joi.string().min(10).max(10).required(),
   STRIPE_WEBHOOK_SECRET: Joi.string().min(38).max(38).required(),
+  RECAPTCHA_SITE_KEY: Joi.string().min(40).max(40).required(),
+  RECAPTCHA_SECRET_KEY: Joi.string().min(40).max(40).required(),
 }).options({
   abortEarly: false,
   messages: {

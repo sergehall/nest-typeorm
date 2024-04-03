@@ -195,6 +195,20 @@ class Configuration {
     );
   }
 
+  private static getReCaptchaSiteKey(): string {
+    return this.readEnvVariableWithDefault(
+      'RECAPTCHA_SITE_KEY',
+      'RECAPTCHA_SITE_KEY',
+    );
+  }
+
+  private static getReCaptchaSecretKey(): string {
+    return this.readEnvVariableWithDefault(
+      'RECAPTCHA_SECRET_KEY',
+      'RECAPTCHA_SECRET_KEY',
+    );
+  }
+
   private static getLiveStripeApiKey(): string {
     return this.readEnvVariableWithDefault(
       'STRIPE_LIVE_API_KEY',
@@ -344,6 +358,10 @@ class Configuration {
         PAYPAL_WEBHOOK_ID: Configuration.getPayPalWebHookId(),
         PAYPAL_CLIENT_SECRET: Configuration.getPayPalClientSecret(),
         PAYPAL_CLIENT_ID: Configuration.getPayPalClientId(),
+      },
+      reCaptcha: {
+        RECAPTCHA_SITE_KEY: Configuration.getReCaptchaSiteKey(),
+        RECAPTCHA_SECRET_KEY: Configuration.getReCaptchaSecretKey(),
       },
     };
   }
