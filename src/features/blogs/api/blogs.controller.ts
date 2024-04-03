@@ -29,6 +29,7 @@ import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use-cases/manage-blogs-subscribe.use-case';
 import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { ReCaptchaGuard } from '../../auth/guards/re-captcha.guard';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -40,6 +41,7 @@ export class BlogsController {
 
   @Get()
   @UseGuards(NoneStatusGuard)
+  @UseGuards(ReCaptchaGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async searchBlogs(
     @Request() req: any,
