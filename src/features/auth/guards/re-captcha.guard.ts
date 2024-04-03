@@ -13,7 +13,7 @@ export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const reCaptchaToken = request.body.reCaptchaToken;
 
-    // If reCaptchaToken is missing or undefined, deny access
+    // If reCaptchaToken is missing or undefined, deny access.
     if (!reCaptchaToken) {
       return false;
     }
