@@ -53,8 +53,10 @@ import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-li
 import { UploadFilesBlogsMainCommand } from '../application/use-cases/upload-files-blogs-main-use-case';
 import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
 import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Blogger')
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(

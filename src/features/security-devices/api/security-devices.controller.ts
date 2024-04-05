@@ -18,8 +18,10 @@ import { SecurityDeviceViewModel } from '../views/security-device.view-model';
 import { SkipThrottle } from '@nestjs/throttler';
 import { SearchDevicesCommand } from '../application/use-cases/search-devices.use-case';
 import { AuthService } from '../../auth/application/auth.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Security')
 @Controller('security')
 export class SecurityDevicesController {
   constructor(

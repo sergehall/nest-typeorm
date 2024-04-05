@@ -16,7 +16,9 @@ import { IfGuestUsersGuard } from '../../../../auth/guards/if-guest-users.guard'
 import { ProductsRequestDto } from '../../../../products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../users/dto/current-user.dto';
 import { GuestUsersDto } from '../../../../users/dto/guest-users.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Pay-pal')
 @Controller('pay-pal')
 export class PayPalController {
   constructor(private readonly commandBus: CommandBus) {}

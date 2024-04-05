@@ -25,7 +25,9 @@ import { SaUpdateQuestionsAndAnswerCommand } from '../application/use-cases/sa-u
 import { SaDeleteQuestionByIdCommand } from '../application/use-cases/sa-delete-question-by-id.use-case';
 import { UpdatePublishDto } from '../dto/update-publish.dto';
 import { SaUpdateQuestionsPublishCommand } from '../application/use-cases/sa-update-questions-publish.use-case';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Super Admin Quiz Questions')
 @Controller('sa/quiz/questions')
 export class SaQuizQuestionsController {
   constructor(

@@ -33,8 +33,11 @@ import { UsersEntity } from '../entities/users.entity';
 import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
 import { UserViewModel } from '../views/user.view-model';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiDocumentation } from '../../../common/decorators/api-documentation.decorator';
 
 @SkipThrottle()
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -60,6 +63,7 @@ export class UsersController {
     return await this.commandBus.execute(new FindUserByICommand(params.id));
   }
 
+  @ApiDocumentation.apply('Create user')
   @Post()
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)

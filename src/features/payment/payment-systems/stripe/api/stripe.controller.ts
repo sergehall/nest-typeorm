@@ -19,7 +19,9 @@ import { ParseQueriesService } from '../../../../../common/query/parse-queries.s
 import { ProductsRequestDto } from '../../../../products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../users/dto/current-user.dto';
 import { GuestUsersDto } from '../../../../users/dto/guest-users.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Stripe')
 @Controller('stripe')
 export class StripeController {
   constructor(

@@ -13,7 +13,9 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BotActivationLink } from '../types/bot-activation-link.type';
 import { GenerateTelegramActivationLinkCommand } from '../application/use-cases/generate-telegram-activation-code.use-case';
 import { ProcessTelegramWebhookMessagesCommand } from '../application/use-cases/process-telegram-webhook-messages.use-case';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Telegram')
 @Controller('integrations/telegram')
 export class TelegramController {
   constructor(private readonly commandBus: CommandBus) {}

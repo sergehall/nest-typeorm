@@ -29,8 +29,10 @@ import { BlogIdParams } from '../../../common/query/params/blogId.params';
 import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use-cases/manage-blogs-subscribe.use-case';
 import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Blogs')
 @Controller('blogs')
 export class BlogsController {
   constructor(

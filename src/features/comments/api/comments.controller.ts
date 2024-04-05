@@ -28,8 +28,10 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CommentViewModel } from '../views/comment.view-model';
 import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { GetCommentByIdCommand } from '../application/use-cases/get-comment-by-id';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Comments')
 @Controller('comments')
 export class CommentsController {
   constructor(protected commandBus: CommandBus) {}
