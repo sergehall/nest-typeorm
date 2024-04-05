@@ -9,6 +9,7 @@ import { HttpExceptionResponseFilter } from './common/filters/http-exception-res
 import * as cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 /**
  * Configure the IoC container for the NestJS application.
@@ -71,6 +72,27 @@ function setupGlobalPipes(app: INestApplication): void {
 }
 
 /**
+ * Set up Swagger documentation for the NestJS application.
+ *
+ * @param app The INestApplication instance of the NestJS application.
+ */
+function setupSwagger(app: INestApplication): void {
+  const config = new DocumentBuilder()
+    .addSecurity('basic', {
+      type: 'http',
+      scheme: 'basic',
+    })
+    .addBearerAuth()
+    .setTitle('NestJS Example')
+    .setDescription('The NestJS Example API description')
+    .setVersion('1.0')
+    .addTag('example')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+}
+
+/**
  * Function to configure and set up a NestJS application.
  *
  * @param app The INestApplication instance of the NestJS application.
@@ -81,5 +103,6 @@ export const createApp = (app: INestApplication): INestApplication => {
   setupExceptionFilter(app);
   setupCookieParser(app);
   setupGlobalPipes(app);
+  setupSwagger(app);
   return app;
 };

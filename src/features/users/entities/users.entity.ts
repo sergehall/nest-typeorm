@@ -13,6 +13,7 @@ import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import * as uuid4 from 'uuid4';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
@@ -20,9 +21,15 @@ import * as uuid4 from 'uuid4';
 @Unique(['userId', 'email'])
 @Unique(['userId', 'login', 'isBanned'])
 export class UsersEntity {
+  @ApiProperty({
+    type: String,
+    example: 'f0f56ed1-a02d-40c6-a7e8-ea5b0f0008fd',
+    description: 'User ID',
+  })
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   userId: string;
 
+  @ApiProperty({ type: String, example: 'my-login', description: 'User login' })
   @Column({
     type: 'character varying',
     length: 10,
@@ -31,18 +38,38 @@ export class UsersEntity {
   })
   login: string;
 
+  @ApiProperty({
+    type: String,
+    example: 'my-email@gmail.com',
+    description: 'User email',
+  })
   @Column({ nullable: false, unique: true })
   email: string;
 
   // @Column({ type: 'date', nullable: true })
   // dob: Date | null;
 
+  @ApiProperty({
+    type: String,
+    example: '$2b$11$Q5d.4g8x26MWQUGRbWclR.jk2q9JQ8Adai1am/9kjFZPgzypzBfV6',
+    description: 'User password hash',
+  })
   @Column({ nullable: false })
   passwordHash: string;
 
+  @ApiProperty({
+    type: String,
+    example: '2024-04-05T07:31:32.342Z',
+    description: 'User creation date',
+  })
   @Column({ nullable: false })
   createdAt: string;
 
+  @ApiProperty({
+    type: String,
+    example: 'It-Incubator',
+    description: 'User organization ID',
+  })
   @Column({
     type: 'enum',
     enum: OrgIdEnums,
@@ -51,6 +78,7 @@ export class UsersEntity {
   })
   orgId: OrgIdEnums;
 
+  @ApiProperty({ type: [String], example: '{user}', description: 'User roles' })
   @Column({
     type: 'enum',
     enum: UserRolesEnums,
@@ -59,26 +87,61 @@ export class UsersEntity {
   })
   roles: UserRolesEnums[];
 
-  @Column({ type: 'character varying', nullable: true, default: null })
-  banDate: string | null = null;
-
-  @Column({ type: 'character varying', nullable: true, default: null })
-  banReason: string | null = null;
-
+  @ApiProperty({
+    type: String,
+    example: '4c9135df-1b6e-40f5-8e14-7e6e41cbe642',
+    description: 'User confirmation code',
+  })
   @Column({ nullable: false, unique: true })
   confirmationCode: string;
 
+  @ApiProperty({
+    type: String,
+    example: '2024-04-05T07:31:32.342Z',
+    description: 'User confirmation expiration date',
+  })
   @Column({ nullable: false })
   expirationDate: string;
 
+  @ApiProperty({
+    type: Boolean,
+    example: false,
+    description: 'User confirmation status',
+  })
   @Column({ default: false })
   isConfirmed: boolean;
 
+  @ApiProperty({
+    type: String,
+    example: '2024-04-05T07:31:32.342Z',
+    description: 'User confirmed date',
+  })
   @Column({ type: 'character varying', nullable: true, default: null })
   isConfirmedDate: string | null = null;
 
+  @ApiProperty({
+    type: Boolean,
+    example: false,
+    description: 'User ban status',
+  })
   @Column({ default: false })
   isBanned: boolean;
+
+  @ApiProperty({
+    type: String,
+    example: '2024-04-05T07:31:32.342Z',
+    description: 'User ban date',
+  })
+  @Column({ type: 'character varying', nullable: true, default: null })
+  banDate: string | null = null;
+
+  @ApiProperty({
+    type: String,
+    example: 'Cheating in the game',
+    description: 'User ban reason',
+  })
+  @Column({ type: 'character varying', nullable: true, default: null })
+  banReason: string | null = null;
 
   @OneToMany(
     () => SecurityDevicesEntity,

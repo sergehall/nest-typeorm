@@ -44,8 +44,10 @@ import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-
 import { GetPostsCommand } from '../application/use-cases/get-posts.use-case';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post-by-post-id.use-case';
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(

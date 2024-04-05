@@ -4,8 +4,10 @@ import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateAndSaveCreateRandomProductsCommand } from '../application/create-and-save-create-random-products.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
   constructor(

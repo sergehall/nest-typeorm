@@ -33,8 +33,10 @@ import { GamesStatisticsViewModel } from '../views/games-statistics.view-model';
 import { JwtAuthAndActiveGameGuard } from '../../auth/guards/jwt-auth-and-active-game.guard';
 import { CurrentUserAndActiveGameDto } from '../../users/dto/current-user-and-active-game.dto';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @SkipThrottle()
+@ApiTags('Pair-game-quiz')
 @Controller('pair-game-quiz')
 export class PairGameQuizController {
   constructor(
