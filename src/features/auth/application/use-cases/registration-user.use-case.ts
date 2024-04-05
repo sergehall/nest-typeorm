@@ -18,7 +18,10 @@ export class RegistrationUserCommand {
 export class RegistrationUserUseCase
   implements ICommandHandler<RegistrationUserCommand>
 {
-  constructor(protected commandBus: CommandBus, protected eventBus: EventBus) {}
+  constructor(
+    protected commandBus: CommandBus,
+    protected eventBus: EventBus,
+  ) {}
   async execute(command: RegistrationUserCommand): Promise<UserViewModel> {
     const { createUserDto } = command;
 
