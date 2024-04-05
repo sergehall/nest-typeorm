@@ -8,7 +8,6 @@ import { AppModule } from './app.module';
 import { HttpExceptionResponseFilter } from './common/filters/http-exception-response-filter';
 import * as cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
-import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 /**
