@@ -2,9 +2,9 @@ import { PaymentSystem } from '../enums/payment-system.enums';
 import { Injectable } from '@nestjs/common';
 import { PaymentDto } from '../dto/payment.dto';
 import { PaymentLinkDto } from '../dto/payment-link.dto';
-import { StripeAdapter } from '../payment-systems/stripe/adapter/stripe-adapter';
 import { PayPalAdapter } from '../payment-systems/pay-pal/adapter/pay-pal.adapter';
 import { PayerActionRequiredType } from '../payment-systems/pay-pal/types/payer-action-required.type';
+import { StripeAdapter } from '../payment-systems/factory/adapter/stripe-adapter';
 
 @Injectable()
 export class PaymentManager {

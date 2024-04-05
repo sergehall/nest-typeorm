@@ -9,12 +9,12 @@ import { UrlDto } from '../dto/url.dto';
 import { InitializeS3Client } from '../../../config/aws/s3/initialize-s3-client';
 import { ImagesBlogsWallpaperMetadataRepo } from '../infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../infrastructure/images-blogs-main-metadata.repo';
-import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
-import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto/image-width-height-size';
-import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
 import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
+import { FilesMetadataService } from '../../../adapters/media-services/files/files-metadata.service';
+import { ImageMetadata } from '../../../adapters/media-services/files/dto/image-metadata';
+import { ImageWidthHeightSize } from '../../../adapters/media-services/files/dto/image-width-height-size';
 
 @Injectable()
 export class BloggerBlogsService {

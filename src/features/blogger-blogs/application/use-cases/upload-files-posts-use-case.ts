@@ -14,13 +14,13 @@ import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { PostsEntity } from '../../../posts/entities/posts.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { PostImagesViewModel } from '../../../posts/views/post-images.view-model';
 import { UrlsPathKeysEtagsDto } from '../../dto/url-pathKey-etag.dto';
 import { ImagesPostsOriginalMetadataRepo } from '../../../posts/infrastructure/images-posts-original-metadata.repo';
 import { ResizedImageDetailsDto } from '../../../posts/dto/resized-image-details.dto';
 import { KeysPathDto } from '../../../posts/dto/keys-path.dto';
 import { OriginalMiddleSmallEntitiesDto } from '../../../posts/dto/original-middle-small-entities.dto';
+import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
 export class UploadFilesPostsCommand {

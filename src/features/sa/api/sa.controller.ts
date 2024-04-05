@@ -52,14 +52,7 @@ import { SaFindBlogsCommand } from '../application/use-cases/sa-find-blogs.use-c
 import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.view-model';
 import { UsersService } from '../../users/application/users.service';
 import { SaUserViewModel } from '../views/sa-user-view-model';
-import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { ApiDocumentation } from '../../../common/decorators/api-documentation.decorator';
 
 @SkipThrottle()

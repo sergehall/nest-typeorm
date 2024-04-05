@@ -18,8 +18,8 @@ import { BannedUsersForBlogsRepo } from '../../../users/infrastructure/banned-us
 import { PostsService } from '../posts.service';
 import { PostWithLikesInfoViewModel } from '../../views/post-with-likes-info.view-model';
 import { PostWithLikesImagesInfoViewModel } from '../../views/post-with-likes-images-info.view-model';
-import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { SendNewBlogPostNotificationsCommand } from '../../../telegram/application/use-cases/send-new-blog-post-notifications.use-case';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
 export class CreatePostCommand {
   constructor(

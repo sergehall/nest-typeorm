@@ -25,14 +25,14 @@ import { SaQuizQuestionsModule } from './features/sa-quiz-questions/sa-quiz-ques
 import { PairGameQuizModule } from './features/pair-game-quiz/pair-game-quiz.module';
 import { TypeOrmPostgresOptions } from './db/type-orm/options/type-orm-postgres.options';
 import { TelegramModule } from './features/telegram/telegram.module';
-import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PaymentModule } from './features/payment/payment.module';
 import { ProductsModule } from './features/products/products.module';
-import { StripeModule } from './features/payment/payment-systems/stripe/stripe.module';
 import { PayPalModule } from './features/payment/payment-systems/pay-pal/pay-pal.module';
+import { StripeModule } from './features/payment/payment-systems/factory/stripe.module';
+import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 
 @Module({
   imports: [

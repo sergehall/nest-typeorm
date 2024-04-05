@@ -8,7 +8,7 @@ import Configuration from '../../src/config/configuration';
 import { TypeOrmPostgresOptions } from '../../src/db/type-orm/options/type-orm-postgres.options';
 
 const ownerNameDb =
-  Configuration.getConfiguration().db.pg.authConfig.PG_HEROKU_USER_NAME;
+  Configuration.getConfiguration().db.postgres.PG_HEROKU_USER_NAME;
 
 export const getTestAppOptions = async () => {
   let app: INestApplication;
