@@ -152,7 +152,7 @@ export class AuthController {
   }
 
   @SkipThrottle()
-  @ApiDocumentation.apply('Me')
+  @ApiDocumentation.apply('Me', 'Enter JWT Bearer token only')
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {

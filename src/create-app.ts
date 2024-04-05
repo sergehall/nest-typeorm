@@ -78,11 +78,16 @@ function setupGlobalPipes(app: INestApplication): void {
  */
 function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
+    .addSecurity('bearer', {
+      type: 'http',
+      scheme: 'bearer',
+      description: 'Enter JWT Bearer token only',
+    })
     .addSecurity('basic', {
       type: 'http',
       scheme: 'basic',
+      description: 'Login with username and password',
     })
-    .addBearerAuth()
     .setTitle('NestJS Example')
     .setDescription('The NestJS Example API description')
     .setVersion('1.0')
