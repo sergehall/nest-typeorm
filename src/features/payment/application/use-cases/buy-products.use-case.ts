@@ -1,19 +1,20 @@
 import { PaymentSystem } from '../../enums/payment-system.enums';
-import {
-  ProductRequest,
-  ProductsRequestDto,
-} from '../../../features/products/dto/products-request.dto';
-import { CurrentUserDto } from '../../../features/users/dto/current-user.dto';
-import { GuestUsersDto } from '../../../features/users/dto/guest-users.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PaymentLinkDto } from '../../dto/payment-link.dto';
 import { PaymentManager } from '../../payment-manager/payment-manager';
-import { ProductsRepo } from '../../../features/products/infrastructure/products.repo';
-import { ProductsDataEntity } from '../../../features/products/entities/products-data.entity';
 import { NotFoundException } from '@nestjs/common';
 import { PaymentDto } from '../../dto/payment.dto';
-import { CreateOrderAndPaymentTransactionsCommand } from '../../../features/products/application/create-order-and-payment-transactions.use-case';
+
 import { PaymentService } from '../payment.service';
+import {
+  ProductRequest,
+  ProductsRequestDto,
+} from '../../../products/dto/products-request.dto';
+import { CurrentUserDto } from '../../../users/dto/current-user.dto';
+import { GuestUsersDto } from '../../../users/dto/guest-users.dto';
+import { ProductsRepo } from '../../../products/infrastructure/products.repo';
+import { ProductsDataEntity } from '../../../products/entities/products-data.entity';
+import { CreateOrderAndPaymentTransactionsCommand } from '../../../products/application/create-order-and-payment-transactions.use-case';
 
 export class BuyProductsCommand {
   constructor(

@@ -11,14 +11,14 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ProcessStripeWebHookCommand } from '../application/use-cases/process-stripe-webhook.use-case';
 import { Request } from 'express';
 import { ProcessStripeSuccessCommand } from '../application/use-cases/process-stripe-success.use-case';
-import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
-import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
-import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 import { PaymentLinkDto } from '../../../dto/payment-link.dto';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
+import { IfGuestUsersGuard } from '../../../../auth/guards/if-guest-users.guard';
+import { ParseQueriesService } from '../../../../../common/query/parse-queries.service';
+import { ProductsRequestDto } from '../../../../products/dto/products-request.dto';
+import { CurrentUserDto } from '../../../../users/dto/current-user.dto';
+import { GuestUsersDto } from '../../../../users/dto/guest-users.dto';
 
 @Controller('stripe')
 export class StripeController {

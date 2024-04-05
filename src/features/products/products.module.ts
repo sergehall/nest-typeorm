@@ -10,11 +10,11 @@ import { OrderItemsEntity } from './entities/order-items.entity';
 import { PaymentTransactionsEntity } from './entities/payment-transaction.entity';
 import { OrdersEntity } from './entities/orders.entity';
 import { OrdersRepo } from './infrastructure/orders.repo';
-import { PaymentTransactionsRepo } from '../../payment/infrastructure/payment-transactions.repo';
 import { OrderItemsRepo } from './infrastructure/order-items.repo';
 import { CreateOrderAndPaymentTransactionsUseCase } from './application/create-order-and-payment-transactions.use-case';
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
+import { PaymentTransactionsRepo } from '../payment/infrastructure/payment-transactions.repo';
 
 const useCases = [
   CreateRandomProductsUseCase,

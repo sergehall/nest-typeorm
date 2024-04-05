@@ -9,10 +9,10 @@ import {
 import { PaymentTransactionsEntity } from './payment-transaction.entity';
 import { OrderItemsEntity } from './order-items.entity';
 import * as uuid4 from 'uuid4';
-import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 import { GuestUsersEntity } from './unregistered-users.entity';
 import { OrderStatusEnum } from '../enums/order-status.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
+import { PaymentSystem } from '../../payment/enums/payment-system.enums';
 
 @Entity('Orders')
 export class OrdersEntity {

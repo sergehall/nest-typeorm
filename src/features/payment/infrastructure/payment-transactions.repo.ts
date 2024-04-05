@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import Stripe from 'stripe';
-import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
-import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
-import { OrdersEntity } from '../../features/products/entities/orders.entity';
+
 import { PayPalEventType } from '../payment-systems/pay-pal/types/pay-pal-event.type';
 import { PayPalCompletedEventType } from '../payment-systems/pay-pal/types/pay-pal-completed-event.type';
+import { PaymentTransactionsEntity } from '../../products/entities/payment-transaction.entity';
+import { OrdersEntity } from '../../products/entities/orders.entity';
+import { PaymentsStatusEnum } from '../../products/enums/payments-status.enum';
+import { OrderStatusEnum } from '../../products/enums/order-status.enum';
 
 @Injectable()
 export class PaymentTransactionsRepo {

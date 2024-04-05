@@ -2,16 +2,16 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaymentDto } from '../dto/payment.dto';
 import * as uuid4 from 'uuid4';
 import { PaymentSystem } from '../enums/payment-system.enums';
-import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
-import { UsersEntity } from '../../features/users/entities/users.entity';
-import { GuestUsersDto } from '../../features/users/dto/guest-users.dto';
-import { ProductRequest } from '../../features/products/dto/products-request.dto';
-import { ProductsDataEntity } from '../../features/products/entities/products-data.entity';
-import { GuestUsersEntity } from '../../features/products/entities/unregistered-users.entity';
 import {
   ReferenceIdType,
   uuidRegexPattern,
 } from '../payment-systems/types/reference-id.type';
+import { ProductRequest } from '../../products/dto/products-request.dto';
+import { ProductsDataEntity } from 'features/products/entities/products-data.entity';
+import { CurrentUserDto } from '../../users/dto/current-user.dto';
+import { GuestUsersDto } from '../../users/dto/guest-users.dto';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 @Injectable()
 export class PaymentService {

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 import * as uuid4 from 'uuid4';
 import { OrderItemsEntity } from './order-items.entity';
-import { Currency } from '../../../payment/enums/currency.enums';
+import { Currency } from '../../payment/enums/currency.enums';
 
 @Entity('ProductsData')
 export class ProductsDataEntity {

@@ -49,7 +49,15 @@ export const validationSchemaConfiguration = Joi.object({
   PORT: Joi.number().default(5000),
   PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
   PG_HOST_HEROKU: Joi.string().min(40).max(40).required(),
-  DATABASE_URL: Joi.string().min(10).max(170).required(),
+  DATABASE_URL: Joi.string()
+    .min(5)
+    .max(200)
+    .pattern(
+      new RegExp(
+        '^postgres:\\/\\/[a-zA-Z0-9]+:[a-f0-9]+@[a-zA-Z0-9.-]+:[0-9]+\\/[a-zA-Z0-9]+$',
+      ),
+    )
+    .required(),
   PG_HEROKU_USER_NAME: Joi.string()
     .min(2)
     .max(50)

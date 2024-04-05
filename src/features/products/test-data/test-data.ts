@@ -1,4 +1,4 @@
-import { Currency } from '../../../payment/enums/currency.enums';
+import { Currency } from '../../payment/enums/currency.enums';
 
 export const TEST_DATA = {
   PRODUCT_NAMES: [

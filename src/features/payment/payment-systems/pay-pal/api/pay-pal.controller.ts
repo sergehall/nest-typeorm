@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus } from '@nestjs/cqrs';
-import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
-import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
-import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
 import { ProcessPayPalWebhookCommand } from '../application/use-cases/process-pay-pal-webhook.use-case';
+import { IfGuestUsersGuard } from '../../../../auth/guards/if-guest-users.guard';
+import { ProductsRequestDto } from '../../../../products/dto/products-request.dto';
+import { CurrentUserDto } from '../../../../users/dto/current-user.dto';
+import { GuestUsersDto } from '../../../../users/dto/guest-users.dto';
 
 @Controller('pay-pal')
 export class PayPalController {
