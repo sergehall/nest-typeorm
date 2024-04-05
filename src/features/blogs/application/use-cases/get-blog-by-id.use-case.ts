@@ -2,12 +2,12 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from '../../../blogger-blogs/infrastructure/images-blogs-main-metadata.repo';
-import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../../../blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { SubscriptionStatus } from '../../../blogger-blogs/enums/subscription-status.enums';
+import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 
 export class GetBlogByIdCommand {
   constructor(

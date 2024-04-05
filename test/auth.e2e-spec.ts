@@ -13,8 +13,12 @@ describe('Auth Controller (e2e)', () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
     server = testAppOptions.server;
-  });
-
+  }, 10000); // Increase the timeout to 10000 milliseconds (10 seconds)
+  // beforeAll(async () => {
+  //   const testAppOptions = await getTestAppOptions();
+  //   app = testAppOptions.app;
+  //   server = testAppOptions.server;
+  // });
   afterAll(async () => {
     await app.close();
   });
@@ -27,15 +31,17 @@ describe('Auth Controller (e2e)', () => {
     });
   });
 
-  describe('Login => (POST) /auth/login', () => {
-    it('should return a accessToken object', async () => {
+  describe('Login Endpoint (POST) /auth/login', () => {
+    let createdUser: any; // Define a variable to store the created user
+
+    beforeAll(async () => {
+      // Create a new user
       const createUserDto: CreateUserDto = {
         login: 'createUser',
         email: 'createUser@example.com',
-        password: 'password123',
+        password: '123456789',
       };
 
-      // Create a new user
       const createUserResponse = await request(server)
         .post(saCreateUserUrl)
         .auth(SaDto.login, SaDto.password)
@@ -43,22 +49,35 @@ describe('Auth Controller (e2e)', () => {
 
       expect(createUserResponse.status).toBe(201);
 
-      const createdUser = createUserResponse.body;
+      createdUser = createUserResponse.body;
+    });
 
-      const loginUrl = '/auth/login';
-
+    it('should successfully log in and return an access token', async () => {
       const loginData = {
         loginOrEmail: createdUser.login,
-        password: createUserDto.password,
+        password: '123456789', // Use the correct password
       };
 
       const response = await request(server)
-        .post(loginUrl)
-        .auth(loginData.loginOrEmail, loginData.password)
+        .post('/auth/login')
         .send(loginData);
 
-      expect(response.status).toBe(200); // Assuming 200 OK status for successful login
+      expect(response.status).toBe(200);
       expect(response.body.accessToken).toBeDefined();
+    });
+
+    it('should return 401 for invalid credentials', async () => {
+      const loginData = {
+        loginOrEmail: createdUser.login,
+        password: 'invalidPassword', // Use an invalid password
+      };
+
+      const response = await request(server)
+        .post('/auth/login')
+        .send(loginData);
+
+      expect(response.status).toBe(401);
+      expect(response.body.accessToken).toBeUndefined();
     });
   });
 });

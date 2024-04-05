@@ -56,7 +56,7 @@ export class AuthController {
   ): Promise<AccessTokenDto> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    const userAgent = req.get('user-agent');
+    const userAgent: string = req.get('user-agent') || 'not found user-agent';
 
     return await this.commandBus.execute(
       new LoginCommand(currentUserDto, ip, userAgent, res),
@@ -152,7 +152,7 @@ export class AuthController {
   }
 
   @SkipThrottle()
-  @ApiDocumentation.apply('Me', 'Enter JWT Bearer token only')
+  @ApiDocumentation.apply('Me')
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {
