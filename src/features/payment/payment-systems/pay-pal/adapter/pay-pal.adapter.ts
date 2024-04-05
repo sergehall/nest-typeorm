@@ -9,13 +9,13 @@ import {
   Item,
   PayPaPurchaseUnitsType,
 } from '../types/pay-pal-create-order.type';
-import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
-import { UsersEntity } from '../../../../features/users/entities/users.entity';
-import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
 import { PayerActionRequiredType } from '../types/payer-action-required.type';
+import { PostgresConfig } from '../../../../../config/db/postgres/postgres.config';
+import { UsersEntity } from '../../../../users/entities/users.entity';
+import { GuestUsersEntity } from '../../../../products/entities/unregistered-users.entity';
 
 @Injectable()
 export class PayPalAdapter {

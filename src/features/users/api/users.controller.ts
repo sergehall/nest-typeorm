@@ -47,9 +47,8 @@ export class UsersController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUsers(@Query() query: any): Promise<PaginatorDto> {
-    const queryData: ParseQueriesDto = await this.parseQueries.getQueriesData(
-      query,
-    );
+    const queryData: ParseQueriesDto =
+      await this.parseQueries.getQueriesData(query);
 
     return await this.commandBus.execute(new FindUsersCommand(queryData));
   }

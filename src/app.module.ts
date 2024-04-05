@@ -29,10 +29,10 @@ import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { PaymentModule } from './payment/payment.module';
+import { PaymentModule } from './features/payment/payment.module';
 import { ProductsModule } from './features/products/products.module';
-import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
-import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
+import { StripeModule } from './features/payment/payment-systems/stripe/stripe.module';
+import { PayPalModule } from './features/payment/payment-systems/pay-pal/pay-pal.module';
 
 @Module({
   imports: [

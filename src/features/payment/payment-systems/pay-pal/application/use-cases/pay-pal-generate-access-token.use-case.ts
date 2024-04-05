@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
-import { PayPalConfig } from '../../../../../config/pay-pal/pay-pal.config';
 import { PayPalUrlsEnum } from '../../enums/pay-pal-urls.enum';
+import { PayPalConfig } from '../../../../../../config/pay-pal/pay-pal.config';
 
 export class PayPalGenerateAccessTokenCommand {
   constructor() {}

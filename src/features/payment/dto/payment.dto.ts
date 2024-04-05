@@ -2,8 +2,8 @@ import { IsString, IsNumber, Min, IsEnum, IsObject } from 'class-validator';
 import { Column } from 'typeorm';
 import { Currency } from '../enums/currency.enums';
 import { PaymentSystem } from '../enums/payment-system.enums';
-import { UsersEntity } from '../../features/users/entities/users.entity';
-import { GuestUsersEntity } from '../../features/products/entities/unregistered-users.entity';
+import { UsersEntity } from '../../users/entities/users.entity';
+import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 export class PaymentDto {
   @IsString()
