@@ -32,9 +32,8 @@ export class SecurityDevicesRepo {
       });
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const deviceId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const deviceId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(
           `SecurityDevicesEntity with ID ${deviceId} not found`,
         );

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TelegramService } from './application/telegram.service';
 import { TelegramController } from './api/telegram.controller';
-import { TelegramAdapter } from '../../adapters/telegram/telegram.adapter';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../config/telegram/telegram.config';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -26,6 +25,7 @@ import { ProcessTelegramWebhookMessagesUseCase } from './application/use-cases/p
 import { SendNewBlogPostNotificationsUseCase } from './application/use-cases/send-new-blog-post-notifications.use-case';
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
+import { TelegramAdapter } from '../../adapters/telegram/telegram.adapter';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,

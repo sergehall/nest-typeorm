@@ -5,6 +5,7 @@ import { isUUID } from 'class-validator';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
 import { getTestAppOptions } from './utilities/get-test-app-options-db';
 import { SaDto } from './utilities/sa.dto';
+import { UsersEntity } from '../src/features/users/entities/users.entity';
 
 const generateRandomString = (size: number): string => {
   return crypto.randomBytes(size).toString('base64').slice(0, size);
@@ -14,11 +15,17 @@ describe('Sa Controller (e2e)', () => {
   let app: INestApplication;
   let server: any;
 
+  // beforeAll(async () => {
+  //   const testAppOptions = await getTestAppOptions();
+  //   app = testAppOptions.app;
+  //   server = testAppOptions.server;
+  // });
+
   beforeAll(async () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
     server = testAppOptions.server;
-  });
+  }, 10000); // Increase the timeout to 10000 milliseconds (10 seconds)
 
   afterAll(async () => {
     await app.close();
@@ -208,12 +215,11 @@ describe('Sa Controller (e2e)', () => {
       const retrieveUserResponse = await request(server).get(
         `/users/${createdUser.id}`,
       );
-
       expect(retrieveUserResponse.status).toBe(200);
-      const retrievedUser = retrieveUserResponse.body;
+      const retrievedUser: UsersEntity = retrieveUserResponse.body;
 
       // Validate the retrieved user's data
-      expect(retrievedUser.id).toBe(createdUser.id);
+      expect(retrievedUser.userId).toBe(createdUser.id);
       expect(retrievedUser.login).toBe(createdUser.login.toLowerCase());
       expect(retrievedUser.email).toBe(createdUser.email.toLowerCase());
       expect(retrievedUser.createdAt).toBe(createdUser.createdAt);

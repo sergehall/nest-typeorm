@@ -7,9 +7,7 @@ import { StripeAdapter } from './adapter/stripe-adapter';
 import { ConstructStripeEventUseCase } from './application/use-cases/construct-stripe-event.use-case';
 import { ProcessStripeSuccessUseCase } from './application/use-cases/process-stripe-success.use-case';
 import { ProcessStripeChargeSucceededUseCase } from './application/use-cases/process-stripe-charge-succeeded.use-case';
-
 import { FinalizeStripePaymentUseCase } from './application/use-cases/finalize-stripe-payment.use-case';
-import { OrdersEntity } from 'features/products/entities/orders.entity';
 import { PayPalAdapter } from '../pay-pal/adapter/pay-pal.adapter';
 import { PaymentService } from '../../application/payment.service';
 import { UuidErrorResolver } from '../../../../common/helpers/uuid-error-resolver';
@@ -24,7 +22,7 @@ import { PaymentTransactionsEntity } from '../../../products/entities/payment-tr
 import { ChallengeQuestionsEntity } from '../../../pair-game-quiz/entities/challenge-questions.entity';
 import { PayPalFactory } from '../../../../config/pay-pal/pay-pal-factory';
 import { PayPalConfig } from '../../../../config/pay-pal/pay-pal.config';
-import { StripeFactory } from '../../../../config/stripe/stripe-factory';
+import { StripeFactory } from './factory/stripe-factory';
 import { NodeEnvConfig } from '../../../../config/node-env/node-env.config';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { StripeConfig } from '../../../../config/stripe/stripe.config';
@@ -39,6 +37,7 @@ import { ProductsRepo } from '../../../products/infrastructure/products.repo';
 import { GamePairsRepo } from '../../../pair-game-quiz/infrastructure/game-pairs.repo';
 import { GameQuestionsRepo } from '../../../pair-game-quiz/infrastructure/game-questions.repo';
 import { PaymentTransactionsRepo } from '../../infrastructure/payment-transactions.repo';
+import { OrdersEntity } from '../../../products/entities/orders.entity';
 
 const stripeUseCases = [
   ConstructStripeEventUseCase,
@@ -66,9 +65,9 @@ const helpers = [KeyResolver, UuidErrorResolver];
   ],
   controllers: [StripeController],
   providers: [
+    StripeFactory,
     PayPalFactory,
     PayPalConfig,
-    StripeFactory,
     NodeEnvConfig,
     PostgresConfig,
     StripeConfig,

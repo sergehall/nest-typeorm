@@ -11,11 +11,11 @@ import { Action } from '../../../../ability/roles/action.enum';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { BloggerBlogsEntity } from '../../entities/blogger-blogs.entity';
 import { FileUploadDto } from '../../dto/file-upload.dto';
-import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { UrlPathKeyEtagDto } from '../../dto/url-pathKey-etag.dto';
 import { BlogIdParams } from '../../../../common/query/params/blogId.params';
 import { ImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { ImagesBlogsWallpaperMetadataRepo } from '../../infrastructure/images-blogs-wallpaper-metadata.repo';
+import { FilesStorageAdapter } from '../../../../adapters/media-services/files-storage-adapter';
 import { FilesMetadataService } from '../../../../adapters/media-services/files/files-metadata.service';
 import { ImageWidthHeightSize } from '../../../../adapters/media-services/files/dto/image-width-height-size';
 

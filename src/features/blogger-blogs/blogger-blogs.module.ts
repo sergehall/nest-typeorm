@@ -35,7 +35,6 @@ import { LikeStatusPostsRepo } from '../posts/infrastructure/like-status-posts.r
 import { AwsConfig } from '../../config/aws/aws.config';
 import { UploadFilesPostsUseCase } from './application/use-cases/upload-files-posts-use-case';
 import { InitializeS3Client } from '../../config/aws/s3/initialize-s3-client';
-import { FilesStorageAdapter } from '../../adapters/media-services/files-storage-adapter';
 import { ImagesPostsOriginalMetadataRepo } from '../posts/infrastructure/images-posts-original-metadata.repo';
 import { UploadFilesBlogsWallpaperUseCase } from './application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ImagesBlogsWallpaperMetadataEntity } from './entities/images-blog-wallpaper-metadata.entity';
@@ -48,12 +47,13 @@ import { ImagesPostsSmallMetadataRepo } from '../posts/infrastructure/images-pos
 import { ImagesPostsMiddleMetadataRepo } from '../posts/infrastructure/images-posts-middle-metadata.repo';
 import { ImagesBlogsWallpaperMetadataRepo } from './infrastructure/images-blogs-wallpaper-metadata.repo';
 import { ImagesBlogsMainMetadataRepo } from './infrastructure/images-blogs-main-metadata.repo';
-import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
 import { ManageBlogsSubscribeUseCase } from './application/use-cases/manage-blogs-subscribe.use-case';
 import { BlogsSubscribersEntity } from './entities/blogs-subscribers.entity';
 import { BlogsSubscribersRepo } from './infrastructure/blogs-subscribers.repo';
 import { TelegramBotStatusEntity } from '../telegram/entities/telegram-bot-status.entity';
 import { TelegramBotStatusRepo } from '../telegram/infrastructure/telegram-bot-status.repo';
+import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
+import { FilesStorageAdapter } from '../../adapters/media-services/files-storage-adapter';
 
 const bloggersBlogUseCases = [
   GetBlogsOwnedByCurrentUserUseCase,

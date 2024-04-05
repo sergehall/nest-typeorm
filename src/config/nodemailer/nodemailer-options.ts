@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailsConfig } from '../mails/mails.config';
 
 @Injectable()
@@ -31,7 +30,7 @@ export class NodemailerOptions
       },
       template: {
         dir: join(__dirname, 'templates'),
-        adapter: new HandlebarsAdapter(),
+        // adapters: new HandlebarsAdapter(),
         options: {
           strict: true,
         },
