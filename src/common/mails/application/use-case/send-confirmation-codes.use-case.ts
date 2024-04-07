@@ -23,10 +23,7 @@ export class SendConfirmationCodesUseCase
     const { user } = command;
 
     const mailOptions: ConfirmationCodeEmailOptions =
-      await this.mailOptionsBuilder.buildOptionsForConfirmationCode(
-        user.email,
-        user.confirmationCode,
-      );
+      await this.mailOptionsBuilder.buildOptionsForConfirmationCode(user);
 
     await this.commandBus.execute(new EmailSendingCommand(mailOptions));
 

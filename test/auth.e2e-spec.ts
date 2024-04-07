@@ -57,7 +57,34 @@ describe('Auth Controller (e2e)', () => {
     // });
   });
 
-  describe('Resending email Endpoint (POST)', () => {
+  describe('Login Endpoint (POST) /auth/login', () => {
+    const authLoginUrl = '/auth/login';
+    it('should successfully log in and return an access token', async () => {
+      const loginData = {
+        loginOrEmail: createdValidUser.login,
+        password: '123456789',
+      };
+
+      const response = await request(server).post(authLoginUrl).send(loginData);
+
+      expect(response.status).toBe(200);
+      expect(response.body.accessToken).toBeDefined();
+    });
+
+    it('should return 401 for invalid credentials', async () => {
+      const loginData = {
+        loginOrEmail: createdValidUser.login,
+        password: 'invalidPassword',
+      };
+
+      const response = await request(server).post(authLoginUrl).send(loginData);
+
+      expect(response.status).toBe(401);
+      expect(response.body.accessToken).toBeUndefined();
+    });
+  });
+
+  describe('Resending email Endpoint (POST) /auth/registration-email-resending', () => {
     const resendingUrl = '/auth/registration-email-resending';
 
     it('should be defined', async () => {
@@ -87,36 +114,6 @@ describe('Auth Controller (e2e)', () => {
       const response = await request(server).post(resendingUrl).send(email);
 
       expect(response.status).toBe(400);
-    });
-  });
-
-  describe('Login Endpoint (POST) /auth/login', () => {
-    it('should successfully log in and return an access token', async () => {
-      const loginData = {
-        loginOrEmail: createdValidUser.login,
-        password: '123456789',
-      };
-
-      const response = await request(server)
-        .post('/auth/login')
-        .send(loginData);
-
-      expect(response.status).toBe(200);
-      expect(response.body.accessToken).toBeDefined();
-    });
-
-    it('should return 401 for invalid credentials', async () => {
-      const loginData = {
-        loginOrEmail: createdValidUser.login,
-        password: 'invalidPassword',
-      };
-
-      const response = await request(server)
-        .post('/auth/login')
-        .send(loginData);
-
-      expect(response.status).toBe(401);
-      expect(response.body.accessToken).toBeUndefined();
     });
   });
 
