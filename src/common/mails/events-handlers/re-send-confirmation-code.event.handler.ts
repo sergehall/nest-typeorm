@@ -9,6 +9,7 @@ export class ReSendConfirmationCodeEventHandler
   constructor(protected mailsService: MailsService) {}
 
   async handle(event: UpdatedConfirmationCodeEvent): Promise<boolean> {
-    return await this.mailsService.sendConfirmationCode(event.userEntity);
+    const { userEntity } = event;
+    return await this.mailsService.sendConfirmationCode(userEntity);
   }
 }
