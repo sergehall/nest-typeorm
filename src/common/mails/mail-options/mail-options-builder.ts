@@ -13,8 +13,8 @@ export class MailOptionsBuilder {
     protected mailsConfig: MailsConfig,
     protected postgresConfig: PostgresConfig,
   ) {
-    this.initializeDomainName();
-    this.initializeFromEmail();
+    this.initializeDomainName().then();
+    this.initializeFromEmail().then();
   }
 
   private async buildOptions(

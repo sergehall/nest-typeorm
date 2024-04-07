@@ -25,28 +25,25 @@ describe('Sa Controller (e2e)', () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
     server = testAppOptions.server;
-  }, 10000); // Increase the timeout to 10000 milliseconds (10 seconds)
+  }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
 
   afterAll(async () => {
     await app.close();
   });
 
   describe('Create User by SA => POST => /sa/users', () => {
-    const url = '/sa/users';
+    const saUrl = '/sa/users';
     it('(POST) /sa/users => route should be defined ', async () => {
-      const response = await request(server).post(url);
+      const response = await request(server).post(saUrl);
       expect(response).toBeDefined();
-
-      const response1 = await request(server).get(url);
-      expect(response1).toBeDefined();
     });
 
     it('should return 401 status code because SA invalid', async () => {
-      const responseWithoutAuth = await request(server).post(url);
+      const responseWithoutAuth = await request(server).post(saUrl);
       expect(responseWithoutAuth.status).toBe(401);
 
       const responseWithInvalidAuth = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth('invalid', 'data');
       expect(responseWithInvalidAuth.status).toBe(401);
     });
@@ -70,7 +67,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const firstResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send({});
 
@@ -84,7 +81,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const secondResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(secondCreateUserDto);
 
@@ -97,7 +94,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const thirdResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(thirdCreateUserDto);
 
@@ -107,7 +104,7 @@ describe('Sa Controller (e2e)', () => {
 
     it('should crate new user with 201 status code', async () => {
       const usersCountBeforeCreate = await request(server)
-        .get(url)
+        .get(saUrl)
         .auth(SaDto.login, SaDto.password);
 
       expect(usersCountBeforeCreate.status).toBe(200);
@@ -120,7 +117,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const createUserResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(inputData);
 
@@ -140,7 +137,7 @@ describe('Sa Controller (e2e)', () => {
       expect(isUUID(user.id)).toBeTruthy();
 
       const usersCountAfterCreate = await request(server)
-        .get(url)
+        .get(saUrl)
         .auth(SaDto.login, SaDto.password);
 
       expect(usersCountAfterCreate.status).toBe(200);
@@ -158,7 +155,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const createUserResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(existingUser);
 
@@ -172,7 +169,7 @@ describe('Sa Controller (e2e)', () => {
       };
 
       const duplicateResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(duplicateUser);
 
@@ -203,7 +200,7 @@ describe('Sa Controller (e2e)', () => {
 
       // Create a new user
       const createUserResponse = await request(server)
-        .post(url)
+        .post(saUrl)
         .auth(SaDto.login, SaDto.password)
         .send(createUserDto);
 

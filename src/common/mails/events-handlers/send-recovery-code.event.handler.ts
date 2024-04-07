@@ -11,6 +11,7 @@ export class SendRecoveryCodeEventHandler
   async handle(
     event: UpdatedConfirmationCodeByRecoveryCodeEvent,
   ): Promise<boolean> {
-    return await this.mailsService.sendRecoveryCode(event.userEntity);
+    const { userEntity } = event;
+    return await this.mailsService.sendRecoveryCode(userEntity);
   }
 }

@@ -9,6 +9,7 @@ export class SendConfirmationCodeWhenRegistrationUserEventHandler
   constructor(protected mailsService: MailsService) {}
 
   async handle(event: RegistrationUserEvent): Promise<boolean> {
-    return await this.mailsService.sendConfirmationCode(event.userEntity);
+    const { userEntity } = event;
+    return await this.mailsService.sendConfirmationCode(userEntity);
   }
 }
