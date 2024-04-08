@@ -3,9 +3,9 @@ import * as request from 'supertest';
 import * as crypto from 'crypto';
 import { isUUID } from 'class-validator';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
-import { getTestAppOptions } from './utilities/get-test-app-options-db';
-import { SaDto } from './utilities/sa.dto';
 import { UsersEntity } from '../src/features/users/entities/users.entity';
+import { getTestAppOptions } from './utilities/get-test-app.options';
+import { MockUserCredentials } from './utilities/mock-test-data';
 
 const generateRandomString = (size: number): string => {
   return crypto.randomBytes(size).toString('base64').slice(0, size);
@@ -14,6 +14,7 @@ const generateRandomString = (size: number): string => {
 describe('Sa Controller (e2e)', () => {
   let app: INestApplication;
   let server: any;
+  let mockUserCredentials: { login: string; password: string };
 
   // beforeAll(async () => {
   //   const testAppOptions = await getTestAppOptions();
@@ -25,6 +26,7 @@ describe('Sa Controller (e2e)', () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
     server = testAppOptions.server;
+    mockUserCredentials = MockUserCredentials;
   }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
 
   afterAll(async () => {
@@ -68,7 +70,7 @@ describe('Sa Controller (e2e)', () => {
 
       const firstResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send({});
 
       expect(firstResponse.status).toBe(400);
@@ -82,7 +84,7 @@ describe('Sa Controller (e2e)', () => {
 
       const secondResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(secondCreateUserDto);
 
       expect(secondResponse.status).toBe(400);
@@ -95,7 +97,7 @@ describe('Sa Controller (e2e)', () => {
 
       const thirdResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(thirdCreateUserDto);
 
       expect(thirdResponse.status).toBe(400);
@@ -105,7 +107,7 @@ describe('Sa Controller (e2e)', () => {
     it('should crate new user with 201 status code', async () => {
       const usersCountBeforeCreate = await request(server)
         .get(saUrl)
-        .auth(SaDto.login, SaDto.password);
+        .auth(mockUserCredentials.login, mockUserCredentials.password);
 
       expect(usersCountBeforeCreate.status).toBe(200);
       expect(usersCountBeforeCreate.body.items).toHaveLength(0);
@@ -118,7 +120,7 @@ describe('Sa Controller (e2e)', () => {
 
       const createUserResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(inputData);
 
       expect(createUserResponse.status).toBe(201);
@@ -138,7 +140,7 @@ describe('Sa Controller (e2e)', () => {
 
       const usersCountAfterCreate = await request(server)
         .get(saUrl)
-        .auth(SaDto.login, SaDto.password);
+        .auth(mockUserCredentials.login, mockUserCredentials.password);
 
       expect(usersCountAfterCreate.status).toBe(200);
       expect(usersCountAfterCreate.body.items).toHaveLength(1);
@@ -156,7 +158,7 @@ describe('Sa Controller (e2e)', () => {
 
       const createUserResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(existingUser);
 
       expect(createUserResponse.status).toBe(201);
@@ -170,7 +172,7 @@ describe('Sa Controller (e2e)', () => {
 
       const duplicateResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(duplicateUser);
 
       // Check that the response status is 400 (Bad Request) due to duplicate login/email
@@ -201,7 +203,7 @@ describe('Sa Controller (e2e)', () => {
       // Create a new user
       const createUserResponse = await request(server)
         .post(saUrl)
-        .auth(SaDto.login, SaDto.password)
+        .auth(mockUserCredentials.login, mockUserCredentials.password)
         .send(createUserDto);
 
       expect(createUserResponse.status).toBe(201);

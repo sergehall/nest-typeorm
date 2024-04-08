@@ -46,7 +46,6 @@ import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/upd
 import { Express } from 'express';
 import { FileUploadDto } from '../dto/file-upload.dto';
 import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
-import { BloggerBlogsWithImagesViewModel } from '../views/blogger-blogs-with-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
 import { getFileConstraints } from '../../../common/pipes/file-constraints/file-constraints';
 import { PostWithLikesImagesInfoViewModel } from '../../posts/views/post-with-likes-images-info.view-model';
@@ -54,6 +53,7 @@ import { UploadFilesBlogsMainCommand } from '../application/use-cases/upload-fil
 import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
 import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
 
 @SkipThrottle()
 @ApiTags('Blogger')
@@ -154,7 +154,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Request() req: any,
     @Body() createBBlogsDto: CreateBlogsDto,
-  ): Promise<BloggerBlogsWithImagesViewModel> {
+  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
     const currentUserDto = req.user;
 
     return await this.commandBus.execute(

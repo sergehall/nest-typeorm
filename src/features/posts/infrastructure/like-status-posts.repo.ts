@@ -56,6 +56,8 @@ export class LikeStatusPostsRepo {
     limitPerPost: number,
     currentUserDto: CurrentUserDto | null,
   ): Promise<PostWithLikesInfoViewModel[]> {
+    if (posts.length === 0) return [];
+
     const result: PostWithLikesInfoViewModel[] = [];
 
     const postIds = posts.map((post) => post.id);

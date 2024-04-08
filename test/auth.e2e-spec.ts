@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getTestAppOptions } from './utilities/get-test-app-options-db';
 import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
-import TestUserUtils from './utilities/create-test-user';
+import TestUtils from './utilities/test.utils';
+import { getTestAppOptions } from './utilities/get-test-app.options';
 
 describe('Auth Controller (e2e)', () => {
   let app: INestApplication;
@@ -15,7 +15,7 @@ describe('Auth Controller (e2e)', () => {
     app = testAppOptions.app;
     server = testAppOptions.server;
 
-    const userUtils = new TestUserUtils(); // Create an instance of UserUtils
+    const userUtils = new TestUtils(); // Create an instance of UserUtils
     createdValidUser = await userUtils.createTestUser(server);
     confirmedUser = await userUtils.createTestConfirmedUser(server);
   }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)

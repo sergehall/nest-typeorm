@@ -12,6 +12,7 @@ import { CreateBlogsDto } from '../../dto/create-blogs.dto';
 import { BloggerBlogsWithImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsViewModel } from '../../views/blogger-blogs.view-model';
 import { BloggerBlogsService } from '../blogger-blogs.service';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../../views/blogger-blogs-with-images-subscribers.view-model';
 
 export class CreateBloggerBlogCommand {
   constructor(
@@ -31,7 +32,7 @@ export class CreateBloggerBlogUseCase
   ) {}
   async execute(
     command: CreateBloggerBlogCommand,
-  ): Promise<BloggerBlogsWithImagesViewModel> {
+  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
     const { createBloggerBlogsDto, currentUser } = command;
 
     await this.checkPermission(command.currentUser);
