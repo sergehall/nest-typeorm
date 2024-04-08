@@ -5,32 +5,53 @@ import { SaDto } from './sa.dto';
 import { UsersEntity } from '../../src/features/users/entities/users.entity';
 
 export class TestUserUtils {
-  constructor() {}
+  private readonly testUser: CreateUserDto;
+  private readonly confirmedUser: CreateUserDto;
 
-  async createTestUser(server: any): Promise<SaUserViewModel> {
-    const createUserDto: CreateUserDto = {
+  constructor() {
+    this.testUser = {
       login: 'testUser',
       email: 'testUser@example.com',
       password: '123456789',
     };
-
-    return await this.createUser(createUserDto, server);
-  }
-
-  async createTestConfirmedUser(server: any): Promise<SaUserViewModel> {
-    const createUserDto: CreateUserDto = {
+    this.confirmedUser = {
       login: 'confUser',
       email: 'confirmedUser@example.com',
       password: '123456789',
     };
+  }
+
+  async createTestUser(server: any): Promise<SaUserViewModel> {
+    const testUser: CreateUserDto = this.testUser;
+    return await this.createUser(testUser, server);
+  }
+
+  async createTestConfirmedUser(server: any): Promise<SaUserViewModel> {
+    const confirmedUser: CreateUserDto = this.confirmedUser;
 
     const createdUser: SaUserViewModel = await this.createUser(
-      createUserDto,
+      confirmedUser,
       server,
     );
-    await this.confirmUserRegistration(createUserDto.email, server);
+    await this.confirmUserRegistration(confirmedUser.email, server);
 
     return createdUser;
+  }
+
+  async getAccessToken(server: any): Promise<string> {
+    // Send a request to the authentication endpoint to obtain an access token
+    const response = await request(server).post('/auth/login').send({
+      loginOrEmail: this.testUser.login.toLowerCase(),
+      password: this.testUser.password,
+    });
+    // Assert the response status is 200
+    expect(response.status).toBe(200);
+
+    // Assert the response body contains an access token
+    expect(response.body).toHaveProperty('accessToken');
+    expect(typeof response.body.accessToken).toBe('string');
+
+    return response.body.accessToken;
   }
 
   private async createUser(
