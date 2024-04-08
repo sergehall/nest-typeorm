@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { BloggerBlogsRepo } from '../../infrastructure/blogger-blogs.repo';
 import { CreateBlogsDto } from '../../dto/create-blogs.dto';
-import { BloggerBlogsWithImagesViewModel } from '../../views/blogger-blogs-with-images.view-model';
 import { BloggerBlogsViewModel } from '../../views/blogger-blogs.view-model';
 import { BloggerBlogsService } from '../blogger-blogs.service';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../../views/blogger-blogs-with-images-subscribers.view-model';
