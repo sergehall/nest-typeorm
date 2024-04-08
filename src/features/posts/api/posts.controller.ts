@@ -131,6 +131,7 @@ export class PostsController {
       new CreateCommentCommand(params.postId, createCommentDto, currentUserDto),
     );
   }
+
   @Put(':id')
   @UseGuards(SaBasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)

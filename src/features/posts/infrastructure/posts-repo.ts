@@ -45,9 +45,8 @@ export class PostsRepo {
       return post[0] ? post[0] : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -81,9 +80,8 @@ export class PostsRepo {
       );
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -156,30 +154,38 @@ export class PostsRepo {
       .createQueryBuilder('posts')
       .where({ dependencyIsBanned })
       .andWhere({ isBanned })
-      .innerJoinAndSelect('posts.blog', 'blog')
-      .innerJoinAndSelect('posts.postOwner', 'postOwner')
+      .leftJoinAndSelect('posts.blog', 'blog')
+      .leftJoinAndSelect('posts.postOwner', 'postOwner')
       .andWhere('blog.id = :blogId', { blogId });
 
     queryBuilder.orderBy(`posts.${field}`, direction);
 
-    const countPosts = await queryBuilder.getCount();
+    try {
+      const countPosts = await queryBuilder.getCount();
 
-    const posts: PostsEntity[] = await queryBuilder
-      .skip(offset)
-      .take(limit)
-      .getMany();
+      const posts: PostsEntity[] = await queryBuilder
+        .skip(offset)
+        .take(limit)
+        .getMany();
 
-    // Retrieve posts with information about likes
-    const postsWithLikes = await this.likeStatusPostsRepo.postsLikesAggregation(
-      posts,
-      numberLastLikes,
-      currentUserDto,
-    );
+      console.log(posts);
 
-    return {
-      posts: postsWithLikes,
-      countPosts,
-    };
+      // Retrieve posts with information about likes
+      const postsWithLikes =
+        await this.likeStatusPostsRepo.postsLikesAggregation(
+          posts,
+          numberLastLikes,
+          currentUserDto,
+        );
+
+      return {
+        posts: postsWithLikes,
+        countPosts,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async getPostsWithPaginationAndCount(

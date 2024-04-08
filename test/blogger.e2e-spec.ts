@@ -1,12 +1,13 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getTestAppOptions } from './utilities/get-test-app-options-db';
-import TestUserUtils from './utilities/create-test-user';
 import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
 import { CreateBlogsDto } from '../src/features/blogger-blogs/dto/create-blogs.dto';
+import { MockBlogData } from './utilities/mock-test-data';
+import { getTestAppOptions } from './utilities/get-test-app.options';
+import TestUtils from './utilities/test.utils';
 
 describe('Blogger Controller (e2e)', () => {
-  const userUtils = new TestUserUtils(); // Create an instance of UserUtils
+  const userUtils = new TestUtils(); // Create an instance of UserUtils
   let app: INestApplication;
   let server: any;
   let createdValidUser: SaUserViewModel;
@@ -23,11 +24,7 @@ describe('Blogger Controller (e2e)', () => {
     createdValidUser = await userUtils.createTestUser(server);
     confirmedUser = await userUtils.createTestConfirmedUser(server);
     token = await userUtils.getAccessToken(server);
-    mockBlogData = {
-      name: 'Test Blog',
-      description: 'This is a test blog',
-      websiteUrl: 'https://test-website-url.com',
-    };
+    mockBlogData = MockBlogData;
     bloggerUrl = '/blogger/blogs';
   }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
 
@@ -95,7 +92,41 @@ describe('Blogger Controller (e2e)', () => {
 
   describe('Get Blogs Owned by Current User (GET) /blogger/blogs', () => {
     it('should retrieve blogs owned by the current user', async () => {
-      // Your test logic here
+      const response = await request(server)
+        .get(bloggerUrl)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          // Asserting the structure of the paginator response
+          pagesCount: expect.any(Number),
+          page: expect.any(Number),
+          pageSize: expect.any(Number),
+          totalCount: expect.any(Number),
+          items: expect.any(Array), // Expecting items array to be present
+          // If items array is present, each item should adhere to the specified structure
+          ...(response.body.items.length > 0 && {
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                id: expect.any(String),
+                name: expect.any(String),
+                description: expect.any(String),
+                websiteUrl: expect.any(String),
+                createdAt: expect.any(String),
+                isMembership: expect.any(Boolean),
+              }),
+            ]),
+          }),
+        }),
+      );
+    });
+
+    it('should require Bearer Authorization to Get Blogs', async () => {
+      const response = await request(server).get(bloggerUrl);
+
+      expect(response.status).toBe(401);
     });
   });
 

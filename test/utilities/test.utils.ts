@@ -1,24 +1,50 @@
 import { SaUserViewModel } from '../../src/features/sa/views/sa-user-view-model';
 import { CreateUserDto } from '../../src/features/users/dto/create-user.dto';
 import * as request from 'supertest';
-import { SaDto } from './sa.dto';
+import {
+  MockBlogData,
+  MockConfirmedUser,
+  MockPostData,
+  MockTestUser,
+  MockUserCredentials,
+} from './mock-test-data';
 import { UsersEntity } from '../../src/features/users/entities/users.entity';
+import { BloggerBlogsWithImagesSubscribersViewModel } from '../../src/features/blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
+import { PostWithLikesImagesInfoViewModel } from '../../src/features/posts/views/post-with-likes-images-info.view-model';
 
-export class TestUserUtils {
+export class TestUtils {
   private readonly testUser: CreateUserDto;
   private readonly confirmedUser: CreateUserDto;
 
   constructor() {
-    this.testUser = {
-      login: 'testUser',
-      email: 'testUser@example.com',
-      password: '123456789',
-    };
-    this.confirmedUser = {
-      login: 'confUser',
-      email: 'confirmedUser@example.com',
-      password: '123456789',
-    };
+    this.testUser = MockTestUser;
+    this.confirmedUser = MockConfirmedUser;
+  }
+
+  async createBlog(
+    server: any,
+    token: string,
+  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
+    const response = await request(server)
+      .post('/blogger/blogs')
+      .send(MockBlogData)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.status).toBe(201);
+    return response.body;
+  }
+
+  async createPost(
+    blogId: string,
+    server: any,
+    token: string,
+  ): Promise<PostWithLikesImagesInfoViewModel> {
+    const createPostUrl = `/blogger/blogs/${blogId}/posts`;
+    const response = await request(server)
+      .post(createPostUrl)
+      .send(MockPostData)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.status).toBe(201);
+    return response.body;
   }
 
   async createTestUser(server: any): Promise<SaUserViewModel> {
@@ -61,7 +87,7 @@ export class TestUserUtils {
     const saCreateUserUrl = '/sa/users';
     const createUserResponse = await request(server)
       .post(saCreateUserUrl)
-      .auth(SaDto.login, SaDto.password)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
       .send(createUserDto);
 
     expect(createUserResponse.status).toBe(201);
@@ -75,7 +101,7 @@ export class TestUserUtils {
   ): Promise<void> {
     const getUsersResponse = await request(server)
       .get('/users')
-      .auth(SaDto.login, SaDto.password);
+      .auth(MockUserCredentials.login, MockUserCredentials.password);
 
     const users: UsersEntity[] = getUsersResponse.body.items;
     const createdUser: UsersEntity | undefined = users.find(
@@ -95,4 +121,4 @@ export class TestUserUtils {
   }
 }
 
-export default TestUserUtils;
+export default TestUtils;
