@@ -27,33 +27,38 @@ export class BloggerApiDocumentationDecorator {
           ApiQuery({
             name: 'searchNameTerm',
             description:
-              'Search term for blog Name: Name should contain this term in any position. Default value: null',
+              'Search term for blog Name: Name should contain this term in any position.\nDefault value: null',
             required: false,
             type: String,
+            example: 'searchNameTerm',
           }),
           ApiQuery({
             name: 'sortBy',
-            description: 'Field to sort by. \nDefault value: createdAt',
+            description: 'Field to sort by.\nDefault value: createdAt',
             required: false,
             type: String,
+            example: 'createdAt',
           }),
           ApiQuery({
             name: 'sortDirection',
-            description: 'Sort direction. \nDefault value: desc',
+            description: 'Sort direction.\nDefault value: desc',
             required: false,
             enum: ['asc', 'desc'],
+            example: 'desc',
           }),
           ApiQuery({
             name: 'pageNumber',
-            description: 'Page number. \nDefault value: 1',
+            description: 'Page number.\nDefault value: 1',
             required: false,
             type: Number,
+            example: 1,
           }),
           ApiQuery({
             name: 'pageSize',
-            description: 'Page size. \nDefault value: 10',
+            description: 'Page size.\nDefault value: 10',
             required: false,
             type: Number,
+            example: 10,
           }),
         );
       default:
