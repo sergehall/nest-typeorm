@@ -54,6 +54,7 @@ import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-p
 import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ApiTags } from '@nestjs/swagger';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
+import { ApiDocumentation } from '../../../common/decorators/api-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Blogger')
@@ -118,6 +119,7 @@ export class BloggerBlogsController {
     );
   }
 
+  @ApiDocumentation.apply('Create user', 'Add a new user to the system')
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(
