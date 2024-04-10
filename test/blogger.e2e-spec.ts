@@ -17,6 +17,13 @@ describe('Blogger Controller (e2e)', () => {
   let createdBlogId: string;
   let bloggerUrl: string;
 
+  // query params default values
+  const searchNameTerm = 'null';
+  const sortBy = 'createdAt';
+  const sortDirection = 'desc';
+  const pageNumber = 1;
+  const pageSize = 10;
+
   beforeAll(async () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
