@@ -1,3 +1,3 @@
 export enum AuthMethods {
-  Me = 'Me',
+  Me = 'Get information about the current user',
 }

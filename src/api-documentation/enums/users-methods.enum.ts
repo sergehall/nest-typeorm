@@ -1,3 +1,3 @@
 export enum UsersMethods {
-  CreateUser = 'CreateUser',
+  CreateUser = 'Add a new user to the system',
 }
