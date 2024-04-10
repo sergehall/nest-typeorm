@@ -3,53 +3,16 @@ import {
   ApiOperation,
   ApiResponse,
   ApiUnauthorizedResponse,
-  ApiBadRequestResponse,
-  ApiBasicAuth,
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { UserViewModel } from '../../features/users/views/user.view-model';
-import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
-import { swaggerUtils } from './swagger.utils';
+import { UserIdEmailLoginDto } from '../../../features/auth/dto/profile.dto';
 
-export class ApiDocumentation {
+export class BloggerApiDocumentationDecorator {
   static apply(key: string, description?: string) {
     let summary;
-    const badRequestResponse = swaggerUtils.badRequestResponse();
 
     switch (key) {
-      case 'App':
-        summary = 'Get hello message';
-        return applyDecorators(
-          ApiOperation({ summary, description }),
-          ApiResponse({
-            status: HttpStatus.OK,
-          }),
-        );
-      case 'Me':
-        summary = 'Get information about the current user';
-        return applyDecorators(
-          ApiOperation({ summary, description }),
-          ApiBearerAuth(),
-          ApiResponse({
-            status: HttpStatus.OK,
-            type: UserIdEmailLoginDto,
-          }),
-          ApiUnauthorizedResponse({ description: 'Unauthorized' }),
-        );
-      case 'Create user':
-        summary = 'Add a new user to the system';
-        return applyDecorators(
-          ApiOperation({ summary, description }),
-          ApiBasicAuth(),
-          ApiBadRequestResponse(badRequestResponse),
-          ApiUnauthorizedResponse({ description: 'Unauthorized' }),
-          ApiResponse({
-            status: HttpStatus.CREATED,
-            type: UserViewModel,
-            description: 'The user data has been successfully created',
-          }),
-        );
       case 'Get blogs owned by the current user':
         summary = 'Get blogs owned by the current user';
         return applyDecorators(
@@ -94,7 +57,7 @@ export class ApiDocumentation {
           }),
         );
       default:
-        // If no key matches, return an empty set of decorators
+        // If no key matches, return an empty set of swagger
         return applyDecorators();
     }
   }

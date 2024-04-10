@@ -35,7 +35,7 @@ import { LogoutCommand } from '../application/use-cases/logout.use-case';
 import { LoginCommand } from '../application/use-cases/login.use-case';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiDocumentation } from '../../../common/decorators/api-documentation.decorator';
+import { AuthApiDocumentationDecorator } from '../../../common/swagger/decorators/auth-api-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Auth')
@@ -152,7 +152,7 @@ export class AuthController {
   }
 
   @SkipThrottle()
-  @ApiDocumentation.apply('Me')
+  @AuthApiDocumentationDecorator.apply('Me')
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {
