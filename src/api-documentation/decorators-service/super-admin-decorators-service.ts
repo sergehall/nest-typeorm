@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { UserViewModel } from '../../features/users/views/user.view-model';
 import { swaggerUtils } from '../utils/swagger.utils';
+import { SaMethods } from '../enums/sa-methods.enum';
 
 @Injectable()
 export class SuperAdminDecoratorsService {
@@ -16,7 +17,7 @@ export class SuperAdminDecoratorsService {
     const badRequestResponse = swaggerUtils.badRequestResponse();
 
     switch (method) {
-      case 'saCreateUser':
+      case SaMethods.CreateUser:
         summary = 'Super admin to add a new user to the system';
         return applyDecorators(
           ApiOperation({ summary, description }),

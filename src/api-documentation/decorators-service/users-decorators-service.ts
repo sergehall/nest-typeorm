@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { UserViewModel } from '../../features/users/views/user.view-model';
 import { swaggerUtils } from '../utils/swagger.utils';
+import { UsersMethods } from '../enums/users-methods.enum';
 
 @Injectable()
 export class UsersDecoratorsService {
@@ -16,7 +17,7 @@ export class UsersDecoratorsService {
     const badRequestResponse = swaggerUtils.badRequestResponse();
 
     switch (method) {
-      case 'Create user':
+      case UsersMethods.CreateUser:
         summary = 'Add a new user to the system';
         return applyDecorators(
           ApiOperation({ summary, description }),

@@ -55,6 +55,7 @@ import { SaUserViewModel } from '../views/sa-user-view-model';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
 import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
+import { SaMethods } from '../../../api-documentation/enums/sa-methods.enum';
 
 @SkipThrottle()
 @ApiTags('Super Admin')
@@ -103,7 +104,7 @@ export class SaController {
     );
   }
 
-  @ApiDocService.apply(EndpointKeys.Users, 'saCreateUser')
+  @ApiDocService.apply(EndpointKeys.Users, SaMethods.CreateUser)
   @Post('users')
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
