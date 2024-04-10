@@ -33,6 +33,7 @@ import { ProductsModule } from './features/products/products.module';
 import { PayPalModule } from './features/payment/payment-systems/pay-pal/pay-pal.module';
 import { StripeModule } from './features/payment/payment-systems/factory/stripe.module';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
+import { ApiDocumentationModule } from './api-documentation/api-documentation.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
     ProductsModule,
     StripeModule,
     PayPalModule,
+    ApiDocumentationModule,
   ],
   controllers: [AppController],
   providers: [

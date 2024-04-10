@@ -1,4 +1,4 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApiOperation,
   ApiResponse,
@@ -6,14 +6,15 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { UserIdEmailLoginDto } from '../../../features/auth/dto/profile.dto';
+import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
 
-export class BloggerApiDocumentationDecorator {
-  static apply(key: string, description?: string) {
+@Injectable()
+export class BloggerDecoratorsService {
+  static getDecorator(method: string, description?: string) {
     let summary;
 
-    switch (key) {
-      case 'Get blogs owned by the current user':
+    switch (method) {
+      case 'GetBlogsOwnedByCurrentUser':
         summary = 'Get blogs owned by the current user';
         return applyDecorators(
           ApiOperation({ summary, description }),
@@ -27,35 +28,35 @@ export class BloggerApiDocumentationDecorator {
           ApiQuery({
             name: 'searchNameTerm',
             description:
-              'Search term for blog Name: Name should contain this term in any position.\nDefault value: null',
+              'Search term for blog Name: Name should contain this term in any position. Default value: null',
             required: false,
             type: String,
             example: 'searchNameTerm',
           }),
           ApiQuery({
             name: 'sortBy',
-            description: 'Field to sort by.\nDefault value: createdAt',
+            description: 'Field to sort by. Default value: createdAt',
             required: false,
             type: String,
             example: 'createdAt',
           }),
           ApiQuery({
             name: 'sortDirection',
-            description: 'Sort direction.\nDefault value: desc',
+            description: 'Sort direction. Default value: desc',
             required: false,
             enum: ['asc', 'desc'],
             example: 'desc',
           }),
           ApiQuery({
             name: 'pageNumber',
-            description: 'Page number.\nDefault value: 1',
+            description: 'Page number. Default value: 1',
             required: false,
             type: Number,
             example: 1,
           }),
           ApiQuery({
             name: 'pageSize',
-            description: 'Page size.\nDefault value: 10',
+            description: 'Page size. Default value: 10',
             required: false,
             type: Number,
             example: 10,

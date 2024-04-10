@@ -1,14 +1,15 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApiOperation,
   ApiResponse,
   ApiUnauthorizedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UserIdEmailLoginDto } from '../../../features/auth/dto/profile.dto';
+import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
 
-export class AuthApiDocumentationDecorator {
-  static apply(key: string, description?: string) {
+@Injectable()
+export class AuthDecoratorsService {
+  static getDecorator(key: string, description?: string) {
     let summary;
 
     switch (key) {

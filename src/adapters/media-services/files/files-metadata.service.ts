@@ -100,7 +100,7 @@ export class FilesMetadataService {
     // Destructure the object to access original, middle, and small metadata
     const { original, middle, small } = imagesMetadata;
 
-    // Process all types of metadata concurrently
+    // Process all enums of metadata concurrently
     const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all(
       [
         this.imageMetadataPostsProcessor(original),
