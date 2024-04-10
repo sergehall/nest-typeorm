@@ -102,7 +102,7 @@ export class SaController {
     );
   }
 
-  @ApiDocumentation.apply('Get blogs owned by the current user')
+  @ApiDocumentation.apply('Create user', 'Add a new user to the system')
   @Post('users')
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)

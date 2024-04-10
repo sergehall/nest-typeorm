@@ -10,40 +10,12 @@ import {
 } from '@nestjs/swagger';
 import { UserViewModel } from '../../features/users/views/user.view-model';
 import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
+import { swaggerUtils } from './swagger.utils';
 
 export class ApiDocumentation {
   static apply(key: string, description?: string) {
     let summary;
-    const badRequestResponse = {
-      description: 'If the inputModel has incorrect values',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              errorsMessages: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    message: { type: 'string' },
-                    field: { type: 'string' },
-                  },
-                },
-              },
-            },
-          },
-          example: {
-            errorsMessages: [
-              {
-                message: 'Invalid value',
-                field: 'fieldName',
-              },
-            ],
-          },
-        },
-      },
-    };
+    const badRequestResponse = swaggerUtils.badRequestResponse();
 
     switch (key) {
       case 'App':
@@ -92,31 +64,31 @@ export class ApiDocumentation {
           ApiQuery({
             name: 'searchNameTerm',
             description:
-              'Search term for blog Name: Name should contain this term in any position',
+              'Search term for blog Name: Name should contain this term in any position. Default value: null',
             required: false,
             type: String,
           }),
           ApiQuery({
             name: 'sortBy',
-            description: 'Default value : createdAt',
+            description: 'Field to sort by. \nDefault value: createdAt',
             required: false,
             type: String,
           }),
           ApiQuery({
             name: 'sortDirection',
-            description: 'Available values : asc, desc',
+            description: 'Sort direction. \nDefault value: desc',
             required: false,
             enum: ['asc', 'desc'],
           }),
           ApiQuery({
             name: 'pageNumber',
-            description: 'Page number',
+            description: 'Page number. \nDefault value: 1',
             required: false,
             type: Number,
           }),
           ApiQuery({
             name: 'pageSize',
-            description: 'pageSize is portions size that should be returned',
+            description: 'Page size. \nDefault value: 10',
             required: false,
             type: Number,
           }),
