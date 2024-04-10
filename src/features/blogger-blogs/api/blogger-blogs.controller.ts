@@ -119,7 +119,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @ApiDocumentation.apply('Create user', 'Add a new user to the system')
+  @ApiDocumentation.apply('Get blogs owned by the current user')
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(
