@@ -16,7 +16,7 @@ export class SuperAdminApiDocumentationDecorator {
 
     switch (key) {
       case 'saCreateUser':
-        summary = 'Add a new user to the system';
+        summary = 'Super admin to add a new user to the system';
         return applyDecorators(
           ApiOperation({ summary, description }),
           ApiBasicAuth(),
