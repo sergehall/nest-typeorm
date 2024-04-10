@@ -37,6 +37,7 @@ import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
 import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
+import { AuthMethods } from '../../../api-documentation/enums/auth-methods.enum';
 
 @SkipThrottle()
 @ApiTags('Auth')
@@ -153,7 +154,7 @@ export class AuthController {
   }
 
   @SkipThrottle()
-  @ApiDocService.apply(EndpointKeys.Auth, 'Me')
+  @ApiDocService.apply(EndpointKeys.Auth, AuthMethods.Me)
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {

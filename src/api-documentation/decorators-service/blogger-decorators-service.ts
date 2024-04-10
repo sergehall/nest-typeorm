@@ -7,6 +7,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
+import { BloggersMethods } from '../enums/bloggers-methods.enum';
 
 @Injectable()
 export class BloggerDecoratorsService {
@@ -14,7 +15,7 @@ export class BloggerDecoratorsService {
     let summary;
 
     switch (method) {
-      case 'GetBlogsOwnedByCurrentUser':
+      case BloggersMethods.GetBlogs:
         summary = 'Get blogs owned by the current user';
         return applyDecorators(
           ApiOperation({ summary, description }),

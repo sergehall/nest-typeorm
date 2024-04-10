@@ -36,6 +36,7 @@ import { UserViewModel } from '../views/user.view-model';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
 import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
+import { UsersMethods } from '../../../api-documentation/enums/users-methods.enum';
 
 @SkipThrottle()
 @ApiTags('Users')
@@ -64,7 +65,7 @@ export class UsersController {
     return await this.commandBus.execute(new FindUserByICommand(params.id));
   }
 
-  @ApiDocService.apply(EndpointKeys.Users, 'CreateUser')
+  @ApiDocService.apply(EndpointKeys.Users, UsersMethods.CreateUser)
   @Post()
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)

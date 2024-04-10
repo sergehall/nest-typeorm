@@ -6,6 +6,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
+import { AuthMethods } from '../enums/auth-methods.enum';
 
 @Injectable()
 export class AuthDecoratorsService {
@@ -13,7 +14,7 @@ export class AuthDecoratorsService {
     let summary;
 
     switch (method) {
-      case 'Me':
+      case AuthMethods.Me:
         summary = 'Get information about the current user';
         return applyDecorators(
           ApiOperation({ summary, description }),
