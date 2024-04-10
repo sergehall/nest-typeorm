@@ -53,8 +53,8 @@ import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.v
 import { UsersService } from '../../users/application/users.service';
 import { SaUserViewModel } from '../views/sa-user-view-model';
 import { ApiTags } from '@nestjs/swagger';
-import { Keys } from '../../../api-documentation/enums/keys.enum';
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
+import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
 
 @SkipThrottle()
 @ApiTags('Super Admin')
@@ -103,7 +103,7 @@ export class SaController {
     );
   }
 
-  @ApiDocService.apply(Keys.Users, 'saCreateUser')
+  @ApiDocService.apply(EndpointKeys.Users, 'saCreateUser')
   @Post('users')
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)

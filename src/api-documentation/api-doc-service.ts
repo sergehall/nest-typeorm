@@ -3,21 +3,24 @@ import { UsersDecoratorsService } from './decorators-service/users-decorators-se
 import { SuperAdminDecoratorsService } from './decorators-service/super-admin-decorators-service';
 import { BloggerDecoratorsService } from './decorators-service/blogger-decorators-service';
 import { AuthDecoratorsService } from './decorators-service/auth-decorators-service';
-import { Keys } from './enums/keys.enum';
-
+import { EndpointKeys } from './enums/endpoint-keys.enum';
 @Injectable()
 export class ApiDocService {
   constructor() {}
 
-  static apply(key: Keys, method: string, description?: string) {
-    switch (key) {
-      case Keys.SA:
+  static apply(
+    endpointKeys: EndpointKeys,
+    method: string,
+    description?: string,
+  ) {
+    switch (endpointKeys) {
+      case EndpointKeys.SA:
         return SuperAdminDecoratorsService.getDecorator(method, description);
-      case Keys.Users:
+      case EndpointKeys.Users:
         return UsersDecoratorsService.getDecorator(method, description);
-      case Keys.Blogger:
+      case EndpointKeys.Blogger:
         return BloggerDecoratorsService.getDecorator(method, description);
-      case Keys.Auth:
+      case EndpointKeys.Auth:
         return AuthDecoratorsService.getDecorator(method, description);
 
       default:

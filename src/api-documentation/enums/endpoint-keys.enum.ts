@@ -1,4 +1,4 @@
-export enum Keys {
+export enum EndpointKeys {
   Me = 'Me',
   Users = 'Users',
   Auth = 'Auth',
