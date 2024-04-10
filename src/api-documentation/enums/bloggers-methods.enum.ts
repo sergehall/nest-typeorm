@@ -1,3 +1,3 @@
 export enum BloggersMethods {
-  GetBlogs = 'GetBlogsOwnedByCurrentUser',
+  GetBlogs = 'Get blogs owned by the current user',
 }
