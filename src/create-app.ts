@@ -92,7 +92,7 @@ function setupSwagger(app: INestApplication): void {
       "The Training IT-Incubator API is a versatile RESTful API built with NestJS for managing training activities. It offers endpoints for user management, blog creation, post management, commenting, scheduling, and email notifications. Additionally, it integrates seamlessly with payment systems like Stripe and PayPal to facilitate secure transactions. With its modular architecture, it's easy to build and deploy training applications of any scale. <a href='https://it-incubator.io'>Learn more</a>",
     )
     .setVersion('1.0')
-    // .addTag('example')
+    .addTag('example')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
