@@ -53,7 +53,7 @@ import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.v
 import { UsersService } from '../../users/application/users.service';
 import { SaUserViewModel } from '../views/sa-user-view-model';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiDocumentation } from '../../../common/decorators/api-documentation.decorator';
+import { SuperAdminApiDocumentationDecorator } from '../../../common/swagger/decorators/super-admin-api-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Super Admin')
@@ -102,7 +102,10 @@ export class SaController {
     );
   }
 
-  @ApiDocumentation.apply('Create user', 'Add a new user to the system')
+  @SuperAdminApiDocumentationDecorator.apply(
+    'saCreateUser',
+    'Add a new user to the system',
+  )
   @Post('users')
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
