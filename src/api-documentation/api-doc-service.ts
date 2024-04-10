@@ -11,10 +11,10 @@ export class ApiDocService {
 
   static apply(key: Keys, method: string, description?: string) {
     switch (key) {
-      case Keys.Users:
-        return UsersDecoratorsService.getDecorator(method, description);
       case Keys.SA:
         return SuperAdminDecoratorsService.getDecorator(method, description);
+      case Keys.Users:
+        return UsersDecoratorsService.getDecorator(method, description);
       case Keys.Blogger:
         return BloggerDecoratorsService.getDecorator(method, description);
       case Keys.Auth:
