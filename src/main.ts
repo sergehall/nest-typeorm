@@ -10,8 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
-  // Set global prefix
-  app.setGlobalPrefix('api');
+  // // Set global prefix
+  // app.setGlobalPrefix('api');
 
   // Apply configurations using the createApp function (assuming it configures the app)
   createApp(app);
