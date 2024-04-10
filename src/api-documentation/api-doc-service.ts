@@ -4,8 +4,6 @@ import { SuperAdminDecoratorsService } from './decorators-service/super-admin-de
 import { BloggerDecoratorsService } from './decorators-service/blogger-decorators-service';
 import { AuthDecoratorsService } from './decorators-service/auth-decorators-service';
 import { EndpointKeys } from './enums/endpoint-keys.enum';
-import { UsersMethods } from './enums/users-methods.enum';
-import { AuthMethods } from './enums/auth-methods.enum';
 
 @Injectable()
 export class ApiDocService {
