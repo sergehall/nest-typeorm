@@ -9,10 +9,10 @@ import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
 
 @Injectable()
 export class AuthDecoratorsService {
-  static getDecorator(key: string, description?: string) {
+  static getDecorator(method: string, description?: string) {
     let summary;
 
-    switch (key) {
+    switch (method) {
       case 'Me':
         summary = 'Get information about the current user';
         return applyDecorators(

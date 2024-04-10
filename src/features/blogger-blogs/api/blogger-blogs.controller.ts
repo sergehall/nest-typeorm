@@ -54,8 +54,8 @@ import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-p
 import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ApiTags } from '@nestjs/swagger';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
-import { Keys } from '../../../api-documentation/enums/keys.enum';
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
+import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
 
 @SkipThrottle()
 @ApiTags('Blogger')
@@ -120,7 +120,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @ApiDocService.apply(Keys.Users, 'GetBlogsOwnedByCurrentUser')
+  @ApiDocService.apply(EndpointKeys.Users, 'GetBlogsOwnedByCurrentUser')
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(
