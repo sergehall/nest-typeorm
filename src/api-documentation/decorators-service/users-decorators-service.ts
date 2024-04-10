@@ -1,4 +1,4 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApiOperation,
   ApiResponse,
@@ -6,15 +6,16 @@ import {
   ApiBadRequestResponse,
   ApiBasicAuth,
 } from '@nestjs/swagger';
-import { UserViewModel } from '../../../features/users/views/user.view-model';
+import { UserViewModel } from '../../features/users/views/user.view-model';
 import { swaggerUtils } from '../utils/swagger.utils';
 
-export class UsersApiDocumentationDecorator {
-  static apply(key: string, description?: string) {
+@Injectable()
+export class UsersDecoratorsService {
+  static getDecorator(method: string, description?: string) {
     let summary;
     const badRequestResponse = swaggerUtils.badRequestResponse();
 
-    switch (key) {
+    switch (method) {
       case 'Create user':
         summary = 'Add a new user to the system';
         return applyDecorators(

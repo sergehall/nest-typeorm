@@ -24,7 +24,7 @@ type MyChatMember = {
     id: number;
     first_name: string;
     username: string;
-    type: 'private' | 'group' | 'supergroup' | 'channel'; // Adjust the types as needed
+    type: 'private' | 'group' | 'supergroup' | 'channel'; // Adjust the enums as needed
   };
   from: {
     id: number;
@@ -42,7 +42,7 @@ type MyChatMember = {
       | 'creator'
       | 'restricted'
       | 'left'
-      | 'kicked'; // Adjust the types as needed
+      | 'kicked'; // Adjust the enums as needed
   };
   new_chat_member: {
     user: any; // Replace `any` with a more specific type if available
@@ -52,7 +52,7 @@ type MyChatMember = {
       | 'creator'
       | 'restricted'
       | 'left'
-      | 'kicked'; // Adjust the types as needed
+      | 'kicked'; // Adjust the enums as needed
     until_date?: number;
   };
 };
