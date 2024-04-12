@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigType } from './config/configuration';
 import { createApp } from './create-app';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
-import { EventsGateway } from './events/events.gateway';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
