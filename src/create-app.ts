@@ -9,6 +9,7 @@ import { HttpExceptionResponseFilter } from './common/filters/http-exception-res
 import * as cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EventsGateway } from './events/events.gateway';
 
 /**
  * Configure the IoC container for the NestJS application.
@@ -97,6 +98,21 @@ function setupSwagger(app: INestApplication): void {
   SwaggerModule.setup('/api/docs', app, document);
 }
 
+// function setupEventGateway(app: INestApplication): void {
+//   const eventGateway = app.get('EventsGateway');
+//   console.log('eventGateway', eventGateway);
+//   setInterval(() => {
+//     eventGateway.sentToAll('Hello from server');
+//   }, 2000);
+// }
+
+// function setupEventGateway(eventGateway: EventsGateway): void {
+//   setInterval(() => {
+//     const newMessage = 'Hello from server';
+//     eventGateway.sentToAll(newMessage);
+//   }, 2000);
+// }
+
 /**
  * Function to configure and set up a NestJS application.
  *
@@ -109,5 +125,6 @@ export const createApp = (app: INestApplication): INestApplication => {
   setupCookieParser(app);
   setupGlobalPipes(app);
   setupSwagger(app);
+  // setupEventGateway(app.get(EventsGateway));
   return app;
 };

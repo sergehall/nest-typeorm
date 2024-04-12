@@ -26,6 +26,8 @@ import { OrdersEntity } from '../features/products/entities/orders.entity';
 import { OrderItemsEntity } from '../features/products/entities/order-items.entity';
 import { PaymentTransactionsEntity } from '../features/products/entities/payment-transaction.entity';
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
+import { ConversationsEntity } from '../messages/entities/conversations.entity';
+import { MessagesEntity } from '../messages/entities/messages.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -63,6 +65,8 @@ export default new DataSource({
     ImagesPostsOriginalMetadataEntity,
     ImagesPostsMiddleMetadataEntity,
     ImagesPostsSmallMetadataEntity,
+    MessagesEntity,
+    ConversationsEntity,
   ],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'], // Specify the path to your migrations
 });

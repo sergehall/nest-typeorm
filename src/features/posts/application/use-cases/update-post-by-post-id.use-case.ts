@@ -53,10 +53,7 @@ export class UpdatePostByPostIdUseCase
 
     await this.checkUserPermission(blog.blogOwner.userId, currentUserDto);
 
-    return await this.postsRepo.updatePostByPostId(
-      params.postId,
-      updatePostDto,
-    );
+    return await this.postsRepo.updatePostByPostId(postId, updatePostDto);
   }
 
   private async checkUserPermission(

@@ -27,6 +27,8 @@ import { OrdersEntity } from '../../../features/products/entities/orders.entity'
 import { OrderItemsEntity } from '../../../features/products/entities/order-items.entity';
 import { PaymentTransactionsEntity } from '../../../features/products/entities/payment-transaction.entity';
 import { ProductsDataEntity } from '../../../features/products/entities/products-data.entity';
+import { MessagesEntity } from '../../../messages/entities/messages.entity';
+import { ConversationsEntity } from '../../../messages/entities/conversations.entity';
 
 @Injectable()
 export class TypeOrmPostgresOptions
@@ -76,6 +78,8 @@ export class TypeOrmPostgresOptions
         ImagesPostsOriginalMetadataEntity,
         ImagesPostsMiddleMetadataEntity,
         ImagesPostsSmallMetadataEntity,
+        MessagesEntity,
+        ConversationsEntity,
       ],
       synchronize: true,
       logging: false,
