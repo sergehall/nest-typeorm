@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
 import { EventsGateway } from '../../events/events.gateway';
 import { MessagesRepo } from '../infrastructure/messages.repo';
-import { ConversationsEntity } from '../entities/conversations.entity';
 import { UsersEntity } from '../../features/users/entities/users.entity';
 import { MessageViewModel } from '../views/message.view-model';
 import { MessagesEntity } from '../entities/messages.entity';
