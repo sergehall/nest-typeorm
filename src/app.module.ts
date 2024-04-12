@@ -34,6 +34,8 @@ import { PayPalModule } from './features/payment/payment-systems/pay-pal/pay-pal
 import { StripeModule } from './features/payment/payment-systems/factory/stripe.module';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { ApiDocumentationModule } from './api-documentation/api-documentation.module';
+import { EventsModule } from './events/events.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { ApiDocumentationModule } from './api-documentation/api-documentation.mo
     StripeModule,
     PayPalModule,
     ApiDocumentationModule,
+    EventsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [
