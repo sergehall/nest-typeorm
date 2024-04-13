@@ -15,7 +15,9 @@ import { UpdateMessageDto } from '../dto/update-message.dto';
 import { MessageViewModel } from '../views/message.view-model';
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Messages')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
