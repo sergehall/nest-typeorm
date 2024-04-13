@@ -43,7 +43,7 @@ export class ProcessStripeWebHookUseCase
             break;
 
           default:
-            // Handle other webhook events
+            // Handle other webhook socket
             break;
         }
       }

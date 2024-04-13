@@ -17,9 +17,6 @@ export class MessagesRepo {
     conversation: ConversationsEntity,
     author: UsersEntity,
   ): Promise<MessagesEntity> {
-    console.log(message, 'message');
-    console.log(conversation, 'conversation');
-    console.log(author, 'author');
     const messageEntity: MessagesEntity = MessagesEntity.createMessageEntity(
       message,
       conversation,

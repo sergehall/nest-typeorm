@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { EventsGateway } from './events.gateway';
+import { SocketGateway } from './socket.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [TypeOrmModule.forFeature([])],
-  providers: [EventsGateway],
-  exports: [EventsGateway],
+  providers: [SocketGateway],
+  exports: [SocketGateway],
 })
-export class EventsModule {}
+export class SocketModule {}

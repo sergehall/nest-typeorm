@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
-import { EventsGateway } from '../../events/events.gateway';
 import { MessagesRepo } from '../infrastructure/messages.repo';
 import { UsersEntity } from '../../features/users/entities/users.entity';
 import { MessageViewModel } from '../views/message.view-model';
 import { MessagesEntity } from '../entities/messages.entity';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
 import { ConversationsRepo } from '../infrastructure/conversations.repo';
+import { SocketGateway } from '../../socket/socket.gateway';
 
 @Injectable()
 export class MessagesService {
   constructor(
-    private readonly eventsGateway: EventsGateway,
+    private readonly socketGateway: SocketGateway,
     private readonly messagesRepo: MessagesRepo,
     private readonly conversationsRepo: ConversationsRepo,
   ) {}
@@ -42,12 +42,12 @@ export class MessagesService {
     author.userId = currentUserDto.userId;
     author.login = currentUserDto.login;
 
-    const content = createMessageDto.message;
+    const message = createMessageDto.message;
 
     const createdMessage: MessagesEntity =
-      await this.messagesRepo.createMessage(content, conversation, author);
+      await this.messagesRepo.createMessage(message, conversation, author);
 
-    this.eventsGateway.sentToAll(createdMessage);
+    this.socketGateway.sentToAll(createdMessage);
 
     return {
       id: createdMessage.id,

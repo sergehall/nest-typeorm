@@ -8,9 +8,9 @@ import {
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
-import { ServerToClientEvent } from './types/events.type';
 import { MessagesEntity } from '../messages/entities/messages.entity';
-import { Events } from './enums/events.enum';
+import { ServerToClientEvent } from './types/socket.events.type';
+import { SocketEvents } from './enums/socket.events.enum';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -18,7 +18,7 @@ import { Events } from './enums/events.enum';
     origin: '*',
   },
 })
-export class EventsGateway {
+export class SocketGateway {
   @WebSocketServer()
   server: Server<any, ServerToClientEvent>;
 
@@ -28,7 +28,7 @@ export class EventsGateway {
   }
 
   sentToAll(message: MessagesEntity): void {
-    this.server.emit(Events.newMessage, message);
+    this.server.emit(SocketEvents.newMessage, message);
   }
 
   @SubscribeMessage('events')
