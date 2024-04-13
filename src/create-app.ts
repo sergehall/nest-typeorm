@@ -97,7 +97,7 @@ function setupSwagger(app: INestApplication): void {
   SwaggerModule.setup('/api/docs', app, document);
 }
 
-// function setupEventGateway(eventGateway: EventsGateway): void {
+// function setupEventGateway(eventGateway: SocketGateway): void {
 //   setInterval(() => {
 //     const newMessage = 'Hello from server';
 //     eventGateway.sentToAll(newMessage);
@@ -116,6 +116,6 @@ export const createApp = (app: INestApplication): INestApplication => {
   setupCookieParser(app);
   setupGlobalPipes(app);
   setupSwagger(app);
-  // setupEventGateway(app.get(EventsGateway));
+  // setupEventGateway(app.get(SocketGateway));
   return app;
 };

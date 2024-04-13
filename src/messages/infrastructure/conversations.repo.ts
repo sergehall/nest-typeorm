@@ -1,5 +1,4 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { MessagesEntity } from '../entities/messages.entity';
 import { InsertResult, Repository } from 'typeorm';
 import { ConversationsEntity } from '../entities/conversations.entity';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -21,12 +20,11 @@ export class ConversationsRepo {
       const queryBuilder = this.conversationsRepository
         .createQueryBuilder()
         .insert()
-        .into(MessagesEntity)
+        .into(ConversationsEntity)
         .values(conversationsEntity)
         .returning('*');
 
       const result: InsertResult = await queryBuilder.execute();
-
       return result.raw[0];
     } catch (error) {
       console.log(error.message);

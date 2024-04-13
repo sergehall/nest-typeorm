@@ -17,8 +17,17 @@ export class ConversationsEntity {
   @Column({ nullable: false })
   createdAt: string;
 
-  @Column({ nullable: false })
-  updatedAt: string;
+  @Column({ type: 'character varying', nullable: true, default: null })
+  updatedAt: string | null = null;
+
+  @Column({ default: false })
+  isBanned: boolean;
+
+  @Column({ type: 'character varying', nullable: true, default: null })
+  banDate: string | null = null;
+
+  @Column({ type: 'character varying', nullable: true, default: null })
+  banReason: string | null = null;
 
   @OneToMany(() => MessagesEntity, (message) => message.conversation)
   messages: MessagesEntity[];
@@ -35,9 +44,10 @@ export class ConversationsEntity {
     conversationEntity.title = title;
     conversationEntity.description = description;
     conversationEntity.createdAt = new Date().toISOString();
-    conversationEntity.updatedAt = new Date().toISOString();
-    conversationEntity.messages = []; // Initialize messages array
-    // conversationEntity.authors = authors;
+    conversationEntity.updatedAt = null;
+    conversationEntity.isBanned = false;
+    conversationEntity.banDate = null;
+    conversationEntity.banReason = null;
     return conversationEntity;
   }
 }

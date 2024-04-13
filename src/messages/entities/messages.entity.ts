@@ -3,7 +3,7 @@ import { UsersEntity } from '../../features/users/entities/users.entity';
 import { ConversationsEntity } from './conversations.entity';
 import * as uuid4 from 'uuid4';
 
-@Entity('Message')
+@Entity('Messages')
 export class MessagesEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;
@@ -14,8 +14,8 @@ export class MessagesEntity {
   @Column({ nullable: false })
   createdAt: string;
 
-  @Column({ nullable: false })
-  updatedAt: string;
+  @Column({ type: 'character varying', nullable: true, default: null })
+  updatedAt: string | null = null;
 
   @Column({ default: false })
   isBanned: boolean;
