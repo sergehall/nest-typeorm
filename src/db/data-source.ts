@@ -26,8 +26,8 @@ import { OrdersEntity } from '../features/products/entities/orders.entity';
 import { OrderItemsEntity } from '../features/products/entities/order-items.entity';
 import { PaymentTransactionsEntity } from '../features/products/entities/payment-transaction.entity';
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
-import { ConversationsEntity } from '../messages/entities/conversations.entity';
-import { MessagesEntity } from '../messages/entities/messages.entity';
+import { ConversationsEntity } from '../features/messages/entities/conversations.entity';
+import { MessagesEntity } from '../features/messages/entities/messages.entity';
 
 export default new DataSource({
   type: 'postgres',

@@ -28,23 +28,23 @@ import { TelegramModule } from './features/telegram/telegram.module';
 import { TelegramConfig } from './config/telegram/telegram.config';
 import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { PaymentModule } from './features/payment/payment.module';
 import { ProductsModule } from './features/products/products.module';
-import { PayPalModule } from './features/payment/payment-systems/pay-pal/pay-pal.module';
-import { StripeModule } from './features/payment/payment-systems/factory/stripe.module';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
 import { ApiDocumentationModule } from './api-documentation/api-documentation.module';
-import { MessagesModule } from './messages/messages.module';
+import { MessagesModule } from './features/messages/messages.module';
 import { SocketModule } from './socket/socket.module';
+import { PaymentModule } from './payment/payment.module';
+import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
+import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
 
 @Module({
   imports: [
     CustomConfigModule,
     TypeOrmModule.forRootAsync({
-      useClass: TypeOrmPostgresOptions, // Use the OrmOptions class as the factory
+      useClass: TypeOrmPostgresOptions, // Use the OrmOptions class as the stripe
     }),
     ThrottlerModule.forRootAsync({
-      useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the factory
+      useClass: ThrottlerOptions, // Use the ThrottlerModuleOptions class as the stripe
     }),
     ScheduleModule.forRoot(),
     CaslModule,

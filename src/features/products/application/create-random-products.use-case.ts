@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
 import { ProductsDataEntity } from '../entities/products-data.entity';
 import { TEST_DATA } from '../test-data/test-data';
-import { Currency } from '../../payment/enums/currency.enums';
+import { Currency } from '../../../payment/enums/currency.enums';
 
 export class CreateRandomProductCommand {
   constructor(public countProducts: number) {}

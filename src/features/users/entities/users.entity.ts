@@ -14,8 +14,8 @@ import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
 import * as uuid4 from 'uuid4';
 import { ApiProperty } from '@nestjs/swagger';
-import { MessagesEntity } from '../../../messages/entities/messages.entity';
-import { ConversationsEntity } from '../../../messages/entities/conversations.entity';
+import { MessagesEntity } from '../../messages/entities/messages.entity';
+import { ConversationsEntity } from '../../messages/entities/conversations.entity';
 
 @Entity('Users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])

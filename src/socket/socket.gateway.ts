@@ -8,7 +8,7 @@ import {
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
-import { MessagesEntity } from '../messages/entities/messages.entity';
+import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
 import { SocketEvents } from './enums/socket.events.enum';
 

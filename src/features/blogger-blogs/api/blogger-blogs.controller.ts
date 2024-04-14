@@ -57,6 +57,7 @@ import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blo
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
 import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
 import { BloggersMethods } from '../../../api-documentation/enums/bloggers-methods.enum';
+import { ReCaptchaGuard } from '../../auth/guards/re-captcha.guard';
 
 @SkipThrottle()
 @ApiTags('Blogger')
@@ -122,6 +123,7 @@ export class BloggerBlogsController {
   }
 
   @ApiDocService.apply(EndpointKeys.Users, BloggersMethods.GetBlogs)
+  @UseGuards(ReCaptchaGuard)
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(

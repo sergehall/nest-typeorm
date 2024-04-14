@@ -55,7 +55,7 @@ function setupGlobalPipes(app: INestApplication): void {
       // Continue validating all properties, even if some validations fail.
       stopAtFirstError: false,
 
-      // Custom exception factory to handle validation errors and throw BadRequestException.
+      // Custom exception stripe to handle validation errors and throw BadRequestException.
       exceptionFactory: (errors) => {
         // Transform each validation error into a custom error object.
         const customErrors = errors.map((e) => {
@@ -97,13 +97,6 @@ function setupSwagger(app: INestApplication): void {
   SwaggerModule.setup('/api/docs', app, document);
 }
 
-// function setupEventGateway(eventGateway: SocketGateway): void {
-//   setInterval(() => {
-//     const newMessage = 'Hello from server';
-//     eventGateway.sentToAll(newMessage);
-//   }, 2000);
-// }
-
 /**
  * Function to configure and set up a NestJS application.
  *
@@ -116,6 +109,5 @@ export const createApp = (app: INestApplication): INestApplication => {
   setupCookieParser(app);
   setupGlobalPipes(app);
   setupSwagger(app);
-  // setupEventGateway(app.get(SocketGateway));
   return app;
 };
