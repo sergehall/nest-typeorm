@@ -3,7 +3,7 @@ import { OrdersEntity } from './orders.entity';
 import * as uuid4 from 'uuid4';
 import { IsOptional, IsUrl } from 'class-validator';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
-import { PaymentSystem } from '../../payment/enums/payment-system.enums';
+import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 
 @Entity('PaymentTransactions')
 export class PaymentTransactionsEntity {

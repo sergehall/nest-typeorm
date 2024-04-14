@@ -24,6 +24,7 @@ export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
     // Construct URL for reCAPTCHA verification endpoint
     const url = 'https://www.google.com/recaptcha/api/siteverify';
 
+    console.log('secretKey:', secretKey);
     // Construct form data for POST request
     const formData = new URLSearchParams();
     formData.append('secret', secretKey);

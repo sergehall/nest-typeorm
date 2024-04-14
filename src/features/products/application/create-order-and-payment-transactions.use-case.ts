@@ -8,9 +8,9 @@ import { OrderItemsRepo } from '../infrastructure/order-items.repo';
 import { ProductsDataEntity } from '../entities/products-data.entity';
 import { GuestUsersEntity } from '../entities/unregistered-users.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { PaymentDto } from '../../payment/dto/payment.dto';
-import { PaymentTransactionsRepo } from '../../payment/infrastructure/payment-transactions.repo';
-import { PaymentSystem } from '../../payment/enums/payment-system.enums';
+import { PaymentDto } from '../../../payment/dto/payment.dto';
+import { PaymentTransactionsRepo } from '../../../payment/infrastructure/payment-transactions.repo';
+import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 
 export class CreateOrderAndPaymentTransactionsCommand {
   constructor(public paymentDto: PaymentDto[]) {}
