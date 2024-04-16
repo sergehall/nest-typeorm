@@ -24,7 +24,7 @@ export class MessagesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(
+  async createMessage(
     @Request() req: any,
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageViewModel> {
