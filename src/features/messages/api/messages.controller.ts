@@ -16,15 +16,14 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { MessagesEntity } from '../entities/messages.entity';
 import { ConversationIdParams } from '../../../common/query/params/conversation-id.params';
-import { WsJwtAuthGuard } from '../../auth/guards/ws-jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @ApiTags('Messages')
 @Controller('conversation')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  // @UseGuards(JwtAuthGuard)
-  @UseGuards(WsJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post(':conversationId/messages')
   async createMessage(
     @Request() req: any,
@@ -33,7 +32,7 @@ export class MessagesController {
   ): Promise<MessagesEntity> {
     const currentUserDto: CurrentUserDto = req.user;
     const conversationId: string = params.conversationId;
-
+    console.log('currentUserDto', currentUserDto);
     return this.messagesService.createMessage(
       conversationId,
       createMessageDto,

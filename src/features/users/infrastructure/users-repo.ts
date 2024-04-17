@@ -497,6 +497,12 @@ export class UsersRepo {
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
+        .from('Messages')
+        .where('authorId = :userId', { userId })
+        .execute();
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
         .from('PairsGame')
         .where('firstPlayerId = :userId', { userId })
         .orWhere('secondPlayerId = :userId', { userId })
