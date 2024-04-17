@@ -32,7 +32,7 @@ export class MessagesController {
   ): Promise<MessagesEntity> {
     const currentUserDto: CurrentUserDto = req.user;
     const conversationId: string = params.conversationId;
-    console.log('currentUserDto', currentUserDto);
+
     return this.messagesService.createMessage(
       conversationId,
       createMessageDto,

@@ -2,6 +2,12 @@ export const jwtIncorrect = {
   message: 'Invalid or expired JWT.',
   field: 'headers.authorization',
 };
+
+export const notFoundHeader = {
+  message: 'Authorization header not found in the request.',
+  field: 'client.request.headers.authorization',
+};
+
 export const jwtCookiesIncorrect = {
   message: 'Invalid, expired or must be provided jwt in cookies.',
   field: 'request.cookies',
