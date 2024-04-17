@@ -45,6 +45,7 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { JwtAndActiveGameStrategy } from './strategies/jwt-and-active-game.strategy';
 import { CalculatorExpirationDate } from '../../common/helpers/calculator-expiration-date/calculator-expiration-date';
 import { ValidLoginPasswordSizesUseCase } from './application/use-cases/valid-login-password-sizes.use-case';
+import { StrategiesOptions } from './strategies/custom-strategies/strategies-options';
 
 const authUseCases = [
   LoginUseCase,
@@ -79,7 +80,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
       ChallengeQuestionsEntity,
     ]),
     UsersModule,
-    PassportModule.register({ customStrategy: 'jwt-active-game' }),
+    PassportModule.register(StrategiesOptions.getStrategies()),
     JwtModule,
     CqrsModule,
   ],

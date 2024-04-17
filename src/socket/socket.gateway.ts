@@ -11,7 +11,6 @@ import { Server, Socket } from 'socket.io';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
 import { SocketEvents } from './enums/socket.events.enum';
-import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -24,10 +23,8 @@ export class SocketGateway {
   server: Server<any, ServerToClientEvent>;
 
   async afterInit(client: Socket): Promise<void> {
-    client.use((packet, next) => {
-      console.log(packet, 'packet');
-    });
-    Logger.log('Socket server initialized');
+    // client.use((WsJwtAuthGuard) => {});
+    console.log('Socket server initialized');
   }
 
   @SubscribeMessage('message')

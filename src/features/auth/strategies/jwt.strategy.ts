@@ -17,9 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: PayloadDto): Promise<CurrentUserDto | null> {
+    console.log('payload', payload);
     const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(
       payload.userId,
     );
+
+    console.log('user', user);
 
     if (user && !user.isBanned) {
       return {
