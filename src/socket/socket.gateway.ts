@@ -3,10 +3,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
@@ -33,23 +30,23 @@ export class SocketGateway {
     }
   }
 
-  @SubscribeMessage('message')
-  async handleMessage(client: Socket, payload: any): Promise<string> {
-    return 'Hello world!';
-  }
-
   async sentToAll(message: MessagesEntity): Promise<void> {
     this.server.emit(SocketEvents.newMessage, message);
   }
 
-  @SubscribeMessage('events')
-  async findAll(
-    @MessageBody() data: any,
-  ): Promise<Observable<WsResponse<number>>> {
-    return from([1, 2, 3]).pipe(
-      map((item) => ({ event: 'events', data: item })),
-    );
+  @SubscribeMessage('message')
+  async handleMessage(client: Socket, payload: any): Promise<string> {
+    return 'Hello from server!';
   }
+
+  // @SubscribeMessage('events')
+  // async findAll(
+  //   @MessageBody() data: any,
+  // ): Promise<Observable<WsResponse<number>>> {
+  //   return from([1, 2, 3]).pipe(
+  //     map((item) => ({ event: 'events', data: item })),
+  //   );
+  // }
 
   @SubscribeMessage('identity')
   async identity(@MessageBody() data: number): Promise<number> {
