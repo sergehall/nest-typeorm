@@ -12,24 +12,33 @@ import {
 import { MessagesService } from '../application/messages.service';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
-import { MessageViewModel } from '../views/message.view-model';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { MessagesEntity } from '../entities/messages.entity';
+import { ConversationIdParams } from '../../../common/query/params/conversation-id.params';
+import { WsJwtAuthGuard } from '../../auth/guards/ws-jwt-auth.guard';
 
 @ApiTags('Messages')
-@Controller('messages')
+@Controller('conversation')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Post()
+  // @UseGuards(JwtAuthGuard)
+  @UseGuards(WsJwtAuthGuard)
+  @Post(':conversationId/messages')
   async createMessage(
     @Request() req: any,
+    @Param() params: ConversationIdParams,
     @Body() createMessageDto: CreateMessageDto,
-  ): Promise<MessageViewModel> {
+  ): Promise<MessagesEntity> {
     const currentUserDto: CurrentUserDto = req.user;
-    return this.messagesService.createMessage(createMessageDto, currentUserDto);
+    const conversationId: string = params.conversationId;
+
+    return this.messagesService.createMessage(
+      conversationId,
+      createMessageDto,
+      currentUserDto,
+    );
   }
 
   @Get()

@@ -3,7 +3,6 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
 import { MessagesRepo } from '../infrastructure/messages.repo';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { MessageViewModel } from '../views/message.view-model';
 import { MessagesEntity } from '../entities/messages.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ConversationsRepo } from '../infrastructure/conversations.repo';
@@ -18,10 +17,11 @@ export class MessagesService {
   ) {}
 
   async createMessage(
+    conversationId: string,
     createMessageDto: CreateMessageDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<MessageViewModel> {
-    // // const conversation = await this.conversationsRepo.findOne(createMessageDto.conversationId)
+  ): Promise<MessagesEntity> {
+    // // const conversation = await this.conversationsRepo.findOne(conversationId)
     // if (!conversation)
     //   throw new NotFoundException(
     //     `Conversations with ID ${conversationId} not found`,
@@ -47,13 +47,9 @@ export class MessagesService {
     const createdMessage: MessagesEntity =
       await this.messagesRepo.createMessage(message, conversation, author);
 
-    this.socketGateway.sentToAll(createdMessage);
+    await this.socketGateway.sentToAll(createdMessage);
 
-    return {
-      id: createdMessage.id,
-      content: createdMessage.message,
-      createdAt: createdMessage.createdAt,
-    };
+    return createdMessage;
   }
 
   async findAll() {
