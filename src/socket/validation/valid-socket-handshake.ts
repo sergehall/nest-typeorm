@@ -10,10 +10,10 @@ import { PayloadDto } from '../../features/auth/dto/payload.dto';
 import { ValidAccessJwtCommand } from '../../features/auth/application/use-cases/valid-access-jwt.use-case';
 
 @Injectable()
-export class ValidSocketJwt {
+export class ValidSocketHandshake {
   constructor(private readonly commandBus: CommandBus) {}
 
-  async handle(client: Socket): Promise<void> {
+  async validate(client: Socket): Promise<void> {
     try {
       // Check if there is a context
       // const authToken = client.request?.headers?.authorization?.split(' ')[1];
@@ -35,8 +35,11 @@ export class ValidSocketJwt {
       console.log(err.message);
       if (err instanceof UnauthorizedException) {
         throw new UnauthorizedException(err.message);
+      } else {
+        throw new InternalServerErrorException(
+          'Error ValidSocketHandshake.' + err.message,
+        );
       }
-      throw new InternalServerErrorException('Error SocketAuthMiddleware.');
     }
   }
 }

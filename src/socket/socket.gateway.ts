@@ -1,5 +1,4 @@
 import {
-  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -8,7 +7,7 @@ import { Server, Socket } from 'socket.io';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
 import { SocketEvents } from './enums/socket.events.enum';
-import { ValidSocketJwt } from './validation/valid-socket-jwt';
+import { ValidSocketHandshake } from './validation/valid-socket-handshake';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -17,15 +16,15 @@ import { ValidSocketJwt } from './validation/valid-socket-jwt';
   },
 })
 export class SocketGateway {
-  constructor(private readonly validSocketJwt: ValidSocketJwt) {}
+  constructor(private readonly validSocketHandshake: ValidSocketHandshake) {}
   @WebSocketServer()
   server: Server<any, ServerToClientEvent>;
 
   async handleConnection(client: Socket) {
     try {
-      await this.validSocketJwt.handle(client);
+      await this.validSocketHandshake.validate(client);
     } catch (err) {
-      console.error('Error validSocketJwt:', err);
+      console.log('Error handleConnection:', err);
       client.disconnect(true);
     }
   }
@@ -48,8 +47,8 @@ export class SocketGateway {
   //   );
   // }
 
-  @SubscribeMessage('identity')
-  async identity(@MessageBody() data: number): Promise<number> {
-    return data;
-  }
+  // @SubscribeMessage('identity')
+  // async identity(@MessageBody() data: number): Promise<number> {
+  //   return data;
+  // }
 }
