@@ -16,14 +16,16 @@ export class ValidSocketJwt {
   async handle(client: Socket): Promise<void> {
     try {
       // Check if there is a context
-      const authToken = client.request?.headers?.authorization?.split(' ')[1];
-      if (!authToken) {
+      // const authToken = client.request?.headers?.authorization?.split(' ')[1];
+      const authHeader = client.handshake.headers['authorization'];
+
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw new UnauthorizedException(notFoundHeader.message);
       }
 
       // Check if the token is valid
       const result: PayloadDto | null = await this.commandBus.execute(
-        new ValidAccessJwtCommand(authToken),
+        new ValidAccessJwtCommand(authHeader.substring(7)),
       );
 
       if (!result) {
