@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
 import { SocketEvents } from './enums/socket.events.enum';
+import { ValidSocketJwt } from './validation/valid-socket-jwt';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -19,22 +20,22 @@ import { SocketEvents } from './enums/socket.events.enum';
   },
 })
 export class SocketGateway {
+  constructor(private readonly validSocketJwt: ValidSocketJwt) {}
   @WebSocketServer()
   server: Server<any, ServerToClientEvent>;
 
-  async afterInit(client: Socket): Promise<void> {
-    // client.use((WsJwtAuthGuard) => {});
-    console.log('Socket server initialized');
+  async handleConnection(client: Socket) {
+    try {
+      await this.validSocketJwt.handle(client);
+    } catch (err) {
+      console.error('Error validSocketJwt:', err);
+      client.disconnect(true);
+    }
   }
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<string> {
     return 'Hello world!';
-  }
-
-  async handleConnection(client: Socket, ...args: any[]): Promise<void> {
-    client.handshake.headers.authorization =
-      'Bearer  ' + client.handshake.query.token;
   }
 
   async sentToAll(message: MessagesEntity): Promise<void> {

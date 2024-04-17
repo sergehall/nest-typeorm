@@ -19,7 +19,7 @@ export class ValidAccessJwtUseCase
     const { accessToken } = command;
 
     const ACCESS_SECRET_KEY =
-      await this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
+      this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
 
     try {
       const payload: PayloadDto = await this.jwtService.verify(accessToken, {

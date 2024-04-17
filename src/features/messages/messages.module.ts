@@ -18,6 +18,8 @@ import { ChallengeQuestionsEntity } from '../pair-game-quiz/entities/challenge-q
 import { GameQuestionsRepo } from '../pair-game-quiz/infrastructure/game-questions.repo';
 import { QuestionsQuizEntity } from '../sa-quiz-questions/entities/questions-quiz.entity';
 import { JwtConfig } from '../../config/jwt/jwt.config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { ValidSocketJwt } from '../../socket/validation/valid-socket-jwt';
 
 const helpers = [KeyResolver, UuidErrorResolver];
 
@@ -31,9 +33,11 @@ const helpers = [KeyResolver, UuidErrorResolver];
       QuestionsQuizEntity,
       ChallengeQuestionsEntity,
     ]),
+    CqrsModule,
   ],
   controllers: [MessagesController],
   providers: [
+    ValidSocketJwt,
     JwtConfig,
     MessagesService,
     ConversationsRepo,
