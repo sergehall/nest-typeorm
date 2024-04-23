@@ -101,7 +101,7 @@ describe('Blogger Controller (e2e)', () => {
     it('should retrieve blogs owned by the current user', async () => {
       const response = await request(server)
         .get(bloggerUrl)
-        .set('Authorization', `Bearer ${token}`);
+        .set('authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
 

@@ -123,7 +123,7 @@ export class BloggerBlogsController {
   }
 
   @ApiDocService.apply(EndpointKeys.Users, BloggersMethods.GetBlogs)
-  @UseGuards(ReCaptchaGuard)
+  // @UseGuards(ReCaptchaGuard)
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
   async getBlogsOwnedByCurrentUser(
