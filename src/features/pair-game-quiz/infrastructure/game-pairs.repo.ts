@@ -72,9 +72,8 @@ export class GamePairsRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -98,9 +97,8 @@ export class GamePairsRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -161,9 +159,8 @@ export class GamePairsRepo {
       };
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -196,9 +193,8 @@ export class GamePairsRepo {
       return pair ? pair : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -225,9 +221,8 @@ export class GamePairsRepo {
       return pair ? pair : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);

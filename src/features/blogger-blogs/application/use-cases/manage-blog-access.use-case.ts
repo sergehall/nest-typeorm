@@ -67,9 +67,8 @@ export class ManageBlogAccessUseCase
 
   // Fetches the user to be banned from the repository based on the provided user ID.
   private async getUserToBan(userId: string): Promise<UsersEntity> {
-    const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(
-      userId,
-    );
+    const userToBan: UsersEntity | null =
+      await this.usersRepo.findUserByUserId(userId);
     if (!userToBan)
       throw new NotFoundException(`User with id: ${userId} not found`);
     return userToBan;

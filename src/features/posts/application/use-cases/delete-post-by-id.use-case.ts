@@ -12,7 +12,10 @@ import { IdParams } from '../../../../common/query/params/id.params';
 import { PostsRepo } from '../../infrastructure/posts-repo';
 
 export class DeletePostByIdCommand {
-  constructor(public params: IdParams, public currentUserDto: CurrentUserDto) {}
+  constructor(
+    public params: IdParams,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 
 @CommandHandler(DeletePostByIdCommand)

@@ -6,7 +6,10 @@ import { SecurityDevicesRepo } from '../../infrastructure/security-devices.repo'
 import { SecurityDevicesEntity } from '../../entities/session-devices.entity';
 
 export class RemoveDevicesByDeviceIdCommand {
-  constructor(public deviceId: string, public currentPayload: PayloadDto) {}
+  constructor(
+    public deviceId: string,
+    public currentPayload: PayloadDto,
+  ) {}
 }
 
 @CommandHandler(RemoveDevicesByDeviceIdCommand)

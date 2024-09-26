@@ -43,9 +43,8 @@ export class SaBanUnbanUserUseCase
       );
     }
 
-    const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(
-      userId,
-    );
+    const userToBan: UsersEntity | null =
+      await this.usersRepo.findUserByUserId(userId);
 
     if (!userToBan)
       throw new NotFoundException(`User with ID ${userId} not found`);

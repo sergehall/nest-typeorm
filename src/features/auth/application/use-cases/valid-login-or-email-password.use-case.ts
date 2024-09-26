@@ -6,7 +6,10 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { validatePasswordFailed } from '../../../../common/filters/custom-errors-messages';
 
 export class ValidLoginOrEmailPasswordCommand {
-  constructor(public loginOrEmail: string, public password: string) {}
+  constructor(
+    public loginOrEmail: string,
+    public password: string,
+  ) {}
 }
 
 @CommandHandler(ValidLoginOrEmailPasswordCommand)

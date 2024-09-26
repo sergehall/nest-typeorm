@@ -103,9 +103,8 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -143,9 +142,8 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -168,9 +166,8 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);

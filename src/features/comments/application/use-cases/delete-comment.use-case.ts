@@ -29,9 +29,8 @@ export class DeleteCommentUseCase
   async execute(command: DeleteCommentCommand): Promise<boolean> {
     const { commentId, currentUserDto } = command;
 
-    const commentToDelete = await this.commentsRepo.getCommentByIdWithoutLikes(
-      commentId,
-    );
+    const commentToDelete =
+      await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
     if (!commentToDelete)
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
 

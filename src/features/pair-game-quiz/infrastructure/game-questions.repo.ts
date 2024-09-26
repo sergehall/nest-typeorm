@@ -42,9 +42,8 @@ export class GameQuestionsRepo {
       return questionsQuizEntity ? questionsQuizEntity : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -71,9 +70,8 @@ export class GameQuestionsRepo {
       );
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);

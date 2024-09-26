@@ -12,7 +12,10 @@ import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
 
 export class RemoveUserByIdCommand {
-  constructor(public id: string, public currentUserDto: CurrentUserDto) {}
+  constructor(
+    public id: string,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 
 @CommandHandler(RemoveUserByIdCommand)
