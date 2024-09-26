@@ -10272,7 +10272,7 @@ __metadata:
     ts-loader: "npm:^9.5.1"
     ts-node: "npm:^10.9.2"
     tsconfig-paths: "npm:^4.2.0"
-    typeorm: "npm:0.3.20"
+    typeorm: "npm:0.3.21-dev.e7649d2"
     typescript: "npm:^5.3.3"
     uuid4: "npm:^2.0.3"
     webpack: "npm:^5.90.3"
@@ -13394,9 +13394,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:0.3.20":
-  version: 0.3.20
-  resolution: "typeorm@npm:0.3.20"
+"typeorm@npm:0.3.21-dev.e7649d2":
+  version: 0.3.21-dev.e7649d2
+  resolution: "typeorm@npm:0.3.21-dev.e7649d2"
   dependencies:
     "@sqltools/formatter": "npm:^1.2.5"
     app-root-path: "npm:^3.1.0"
@@ -13408,7 +13408,6 @@ __metadata:
     dotenv: "npm:^16.0.3"
     glob: "npm:^10.3.10"
     mkdirp: "npm:^2.1.3"
-    reflect-metadata: "npm:^0.2.1"
     sha.js: "npm:^2.4.11"
     tslib: "npm:^2.5.0"
     uuid: "npm:^9.0.0"
@@ -13427,6 +13426,7 @@ __metadata:
     pg-native: ^3.0.0
     pg-query-stream: ^4.0.0
     redis: ^3.1.1 || ^4.0.0
+    reflect-metadata: ^0.1.14 || ^0.2.0
     sql.js: ^1.4.0
     sqlite3: ^5.0.3
     ts-node: ^10.7.0
@@ -13470,7 +13470,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 10c0/7e4be724641beef86ae36289c87b6e66bfaf19a4313f089926d36d2d6f0d67f9314d942711c9d83ab8a174b8622148c2f7e83e6c1448d638ee3ab24469257814
+  checksum: 10c0/a84d143291459c7b1078ca63b59d6da87905c6d370ceaeb611898d4a8210484048cf02754a6d211a0e2976f3fcc0ab87e4774d142c9117cf26a373fe0f7d49fc
   languageName: node
   linkType: hard
 
