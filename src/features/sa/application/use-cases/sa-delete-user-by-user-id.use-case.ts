@@ -8,7 +8,10 @@ import { UsersRepo } from '../../../users/infrastructure/users-repo';
 import { UsersEntity } from '../../../users/entities/users.entity';
 
 export class SaDeleteUserByUserIdCommand {
-  constructor(public userId: string, public currentUserDto: CurrentUserDto) {}
+  constructor(
+    public userId: string,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 @CommandHandler(SaDeleteUserByUserIdCommand)
 export class SaDeleteUserByUserIdUseCase

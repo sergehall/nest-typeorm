@@ -20,7 +20,10 @@ import { PairsGameEntity } from '../../entities/pairs-game.entity';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 
 export class GetGameByIdCommand {
-  constructor(public id: string, public currentUserDto: CurrentUserDto) {}
+  constructor(
+    public id: string,
+    public currentUserDto: CurrentUserDto,
+  ) {}
 }
 
 @CommandHandler(GetGameByIdCommand)

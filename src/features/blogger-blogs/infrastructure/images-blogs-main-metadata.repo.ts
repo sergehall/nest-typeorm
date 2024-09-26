@@ -39,9 +39,8 @@ export class ImagesBlogsMainMetadataRepo {
       return blogsMain || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(
           `Blog Wallpaper with ID ${userId} not found`,
         );
@@ -78,9 +77,8 @@ export class ImagesBlogsMainMetadataRepo {
       return resultMap; // Return the retrieved blogs main metadata with their associated blogOwners as an object with IDs as keys
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId = await this.uuidErrorResolver.extractUserIdFromError(
-          error,
-        );
+        const userId =
+          await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(
           `Blog Wallpaper with ID ${userId} not found`,
         );

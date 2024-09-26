@@ -7,7 +7,10 @@ import {
 import { CustomErrorsMessagesType } from '../../../../common/filters/types/custom-errors-messages.types';
 
 export class ValidLoginPasswordSizesCommand {
-  constructor(public loginOrEmail: string, public password: string) {}
+  constructor(
+    public loginOrEmail: string,
+    public password: string,
+  ) {}
 }
 
 @CommandHandler(ValidLoginPasswordSizesCommand)

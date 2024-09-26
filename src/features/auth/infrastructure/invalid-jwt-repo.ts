@@ -19,9 +19,8 @@ export class InvalidJwtRepo {
         expirationDate: expirationDate,
       });
 
-      const result: InvalidJwtEntity = await this.invalidJwtRepository.save(
-        invalidJwtEntity,
-      );
+      const result: InvalidJwtEntity =
+        await this.invalidJwtRepository.save(invalidJwtEntity);
 
       return !!result.id;
     } catch (error) {

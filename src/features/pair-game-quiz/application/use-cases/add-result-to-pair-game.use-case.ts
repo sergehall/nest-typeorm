@@ -63,14 +63,14 @@ export class AddResultToPairGameUseCase
         firstPlayerCountCorrectAnswer === secondPlayerCountCorrectAnswer
           ? GamesResultsEnum.DRAW
           : firstPlayerCountCorrectAnswer > secondPlayerCountCorrectAnswer
-          ? GamesResultsEnum.WON
-          : GamesResultsEnum.LOST,
+            ? GamesResultsEnum.WON
+            : GamesResultsEnum.LOST,
       secondPlayer:
         firstPlayerCountCorrectAnswer === secondPlayerCountCorrectAnswer
           ? GamesResultsEnum.DRAW
           : firstPlayerCountCorrectAnswer > secondPlayerCountCorrectAnswer
-          ? GamesResultsEnum.LOST
-          : GamesResultsEnum.WON,
+            ? GamesResultsEnum.LOST
+            : GamesResultsEnum.WON,
     };
   }
 }

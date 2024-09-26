@@ -31,9 +31,8 @@ export class UpdateCommentUseCase
   async execute(command: UpdateCommentCommand): Promise<boolean> {
     const { commentId, updateCommentDto, currentUserDto } = command;
 
-    const findComment = await this.commentsRepo.getCommentByIdWithoutLikes(
-      commentId,
-    );
+    const findComment =
+      await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
     if (!findComment)
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
 

@@ -4,7 +4,10 @@ import { InvalidJwtDto } from '../../dto/invalid-jwt.dto';
 import { InvalidJwtRepo } from '../../infrastructure/invalid-jwt-repo';
 
 export class AddInvalidJwtToBlacklistCommand {
-  constructor(public refreshToken: string, public currentPayload: PayloadDto) {}
+  constructor(
+    public refreshToken: string,
+    public currentPayload: PayloadDto,
+  ) {}
 }
 @CommandHandler(AddInvalidJwtToBlacklistCommand)
 export class AddInvalidJwtToBlacklistUseCase
