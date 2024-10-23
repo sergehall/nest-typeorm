@@ -48,32 +48,25 @@ export const validationSchemaConfiguration = Joi.object({
   THROTTLE_LIMIT: Joi.number().required(),
   PORT: Joi.number().default(5000),
   PG_URI_LOCAL: Joi.string().min(9).max(9).required(),
-  PG_HOST_HEROKU: Joi.string().min(40).max(40).required(),
+  PG_HOST_HEROKU: Joi.string().min(63).max(63).required(),
   DATABASE_URL: Joi.string()
-    .min(5)
-    .max(200)
+    .min(174)
+    .max(174)
     .pattern(
       new RegExp(
-        '^postgres:\\/\\/[a-zA-Z0-9]+:[a-f0-9]+@[a-zA-Z0-9.-]+:[0-9]+\\/[a-zA-Z0-9]+$',
+        '^postgres:\\/\\/[a-zA-Z0-9]+:[\\w\\W]+@[a-zA-Z0-9.-]+:[0-9]+\\/[a-zA-Z0-9]+$',
       ),
     )
     .required(),
   PG_HEROKU_USER_NAME: Joi.string()
-    .min(2)
-    .max(50)
+    .min(14)
+    .max(14)
     .pattern(new RegExp('^[a-zA-Z0-9]'))
     .required(),
-  PG_HEROKU_USER_PASSWORD: Joi.string().min(2).max(70).required(),
-  PG_LOCAL_USER_NAME: Joi.string()
-    .min(2)
-    .max(20)
-    .pattern(new RegExp('^[a-zA-Z0-9]'))
-    .required(),
-  PG_LOCAL_USER_PASSWORD: Joi.string().min(2).max(20).required(),
-  PG_PORT: Joi.number().default(5432),
   PG_HEROKU_NAME_DATABASE: Joi.string()
-    .pattern(new RegExp('^[-a-zA-Z0-9]{14}$'))
+    .pattern(new RegExp('^[-a-zA-Z0-9]{13}$'))
     .required(),
+  PG_HEROKU_USER_PASSWORD: Joi.string().min(65).max(65).required(),
   PG_DOMAIN_HEROKU: Joi.string()
     .pattern(
       new RegExp(
@@ -81,6 +74,13 @@ export const validationSchemaConfiguration = Joi.object({
       ),
     )
     .required(),
+  PG_LOCAL_USER_NAME: Joi.string()
+    .min(2)
+    .max(20)
+    .pattern(new RegExp('^[a-zA-Z0-9]'))
+    .required(),
+  PG_LOCAL_USER_PASSWORD: Joi.string().min(2).max(20).required(),
+  PG_PORT: Joi.number().default(5432),
   ACCESS_KEY_ID: Joi.string().min(20).max(20).required(),
   SECRET_ACCESS_KEY: Joi.string().min(40).max(40).required(),
   AWS_ENDPOINT: Joi.string().min(34).max(34).required(),
