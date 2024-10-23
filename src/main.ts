@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { createApp } from './create-app';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -13,13 +15,13 @@ async function bootstrap() {
 
   // Apply configurations using the createApp function (assuming it configures the app)
   createApp(app);
-  // // Retrieve the configuration service to access environment variables
-  // const configService = app.get(ConfigService<ConfigType, true>);
-  //
-  // // Retrieve the port from environment variables, default to 5000 if not provided
-  // const port = configService.get<number>('PORT');
 
-  const port = 5005;
+  // Retrieve the configuration service to access environment variables
+  const configService = app.get(ConfigService<ConfigType, true>);
+
+  // Retrieve the port from environment variables, default to 5000 if not provided
+  const port = configService.get<number>('PORT');
+
   console.log('port', port);
   // Start the application and listen on the specified port
   await app.listen(port, () => {
