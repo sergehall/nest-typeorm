@@ -6,11 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "packageManager": "yarn@4.5.1",
-  "engines": {
-    "node": "20.11.1",
-    "yarn": "4.5.1",
-    "npm": "10.8.2"
-  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
