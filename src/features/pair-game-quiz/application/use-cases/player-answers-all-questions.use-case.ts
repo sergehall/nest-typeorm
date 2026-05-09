@@ -1,10 +1,5 @@
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { GamePairsRepo } from '../../infrastructure/game-pairs.repo';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { StatusGameEnum } from '../../enums/status-game.enum';
@@ -18,9 +13,7 @@ export class PlayerAnswersAllQuestionsCommand {
 }
 
 @CommandHandler(PlayerAnswersAllQuestionsCommand)
-export class PlayerAnswersAllQuestionsUseCase
-  implements ICommandHandler<PlayerAnswersAllQuestionsCommand>
-{
+export class PlayerAnswersAllQuestionsUseCase implements ICommandHandler<PlayerAnswersAllQuestionsCommand> {
   constructor(
     protected gamePairsRepo: GamePairsRepo,
     protected commandBus: CommandBus,

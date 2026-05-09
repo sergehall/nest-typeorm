@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsArray,
-  ValidateNested,
-  IsEnum,
-  Matches,
-} from 'class-validator';
+import { IsString, IsArray, ValidateNested, IsEnum, Matches } from 'class-validator';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
 
@@ -68,18 +62,12 @@ export class GameViewModel {
   })
   status: StatusGameEnum;
 
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   pairCreatedDate: string;
 
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   startGameDate: string | null;
 
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   finishGameDate: string | null;
 }

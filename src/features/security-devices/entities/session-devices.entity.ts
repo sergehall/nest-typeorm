@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 @Entity('SecurityDevices')
@@ -47,14 +47,10 @@ export class SecurityDevicesEntity {
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: UsersEntity;
 
-  @ManyToOne(
-    () => GuestUsersEntity,
-    (guestUsersEntity) => guestUsersEntity.securityDevices,
-    {
-      nullable: true,
-      eager: true,
-    },
-  )
+  @ManyToOne(() => GuestUsersEntity, (guestUsersEntity) => guestUsersEntity.securityDevices, {
+    nullable: true,
+    eager: true,
+  })
   @JoinColumn({ name: 'guestUserId', referencedColumnName: 'guestUserId' })
   guestUser: GuestUsersEntity | null;
 

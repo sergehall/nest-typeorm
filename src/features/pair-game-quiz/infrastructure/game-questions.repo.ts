@@ -1,10 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import { EntityManager, Repository } from 'typeorm';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { UpdatePublishDto } from '../../sa-quiz-questions/dto/update-publish.dto';
 import { UpdateQuizQuestionDto } from '../../sa-quiz-questions/dto/update-quiz-question.dto';
@@ -36,24 +33,19 @@ export class GameQuestionsRepo {
           published: true,
         });
 
-      const questionsQuizEntity: QuestionsQuizEntity | null =
-        await queryBuilder.getOne();
+      const questionsQuizEntity: QuestionsQuizEntity | null = await queryBuilder.getOne();
 
       return questionsQuizEntity ? questionsQuizEntity : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async verifyAnswerByQuestionsId(
-    id: string,
-    answer: string,
-  ): Promise<boolean> {
+  async verifyAnswerByQuestionsId(id: string, answer: string): Promise<boolean> {
     try {
       const queryBuilder = this.questionsRepository
         .createQueryBuilder('questionsQuiz')
@@ -61,17 +53,12 @@ export class GameQuestionsRepo {
           id,
         });
 
-      const questionsQuizEntity: QuestionsQuizEntity | null =
-        await queryBuilder.getOne();
+      const questionsQuizEntity: QuestionsQuizEntity | null = await queryBuilder.getOne();
 
-      return !!(
-        questionsQuizEntity &&
-        questionsQuizEntity.hashedAnswers.includes(answer)
-      );
+      return !!(questionsQuizEntity && questionsQuizEntity.hashedAnswers.includes(answer));
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Questions with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -146,9 +133,7 @@ export class GameQuestionsRepo {
     }
   }
 
-  async getRandomQuestions(
-    numberQuestions: number,
-  ): Promise<QuestionsQuizEntity[]> {
+  async getRandomQuestions(numberQuestions: number): Promise<QuestionsQuizEntity[]> {
     const queryBuilderQuestions = this.questionsRepository
       .createQueryBuilder('questionsQuiz')
       .where('questionsQuiz.published = :published', { published: true })
@@ -162,13 +147,10 @@ export class GameQuestionsRepo {
     }
   }
 
-  async saGetQuestions(
-    queryData: ParseQueriesDto,
-  ): Promise<QuestionsAndCountDto> {
+  async saGetQuestions(queryData: ParseQueriesDto): Promise<QuestionsAndCountDto> {
     const bodySearchTerm = queryData.bodySearchTerm;
 
-    const { sortBy, sortDirection, pageSize, pageNumber } =
-      queryData.queryPagination;
+    const { sortBy, sortDirection, pageSize, pageNumber } = queryData.queryPagination;
 
     // Retrieve paging parameters
     const direction: SortDirectionEnum = sortDirection;
@@ -244,16 +226,12 @@ export class GameQuestionsRepo {
 
   async saDeleteQuestionById(id: string): Promise<boolean> {
     try {
-      await this.questionsRepository.manager.transaction(
-        async (transactionalEntityManager) => {
-          await this.deleteQuestionsData(id, transactionalEntityManager);
-        },
-      );
+      await this.questionsRepository.manager.transaction(async (transactionalEntityManager) => {
+        await this.deleteQuestionsData(id, transactionalEntityManager);
+      });
       return true;
     } catch (error) {
-      console.error(
-        `Error while removing data for question id: ${error.message}`,
-      );
+      console.error(`Error while removing data for question id: ${error.message}`);
       throw new Error(`Error while removing data for question id`);
     }
   }
@@ -263,20 +241,18 @@ export class GameQuestionsRepo {
     entityManager: EntityManager,
   ): Promise<void> {
     try {
-      await Promise.all([
-        await entityManager
-          .createQueryBuilder()
-          .delete()
-          .from('ChallengeQuestions', 'challengeQuestions')
-          .where('questionId = :questionId', { questionId })
-          .execute(),
-        await entityManager
-          .createQueryBuilder()
-          .delete()
-          .from('ChallengeAnswers', 'challengeAnswers')
-          .where('questionId = :questionId', { questionId })
-          .execute(),
-      ]);
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('ChallengeQuestions', 'challengeQuestions')
+        .where('questionId = :questionId', { questionId })
+        .execute();
+      await entityManager
+        .createQueryBuilder()
+        .delete()
+        .from('ChallengeAnswers', 'challengeAnswers')
+        .where('questionId = :questionId', { questionId })
+        .execute();
       await entityManager
         .createQueryBuilder()
         .delete()
@@ -284,12 +260,8 @@ export class GameQuestionsRepo {
         .where('id = :questionId', { questionId })
         .execute();
     } catch (error) {
-      console.error(
-        `Error while removing data for question id ${questionId}: ${error.message}`,
-      );
-      throw new Error(
-        `Error while removing data for question id ${questionId}`,
-      );
+      console.error(`Error while removing data for question id ${questionId}: ${error.message}`);
+      throw new Error(`Error while removing data for question id ${questionId}`);
     }
   }
 
@@ -301,9 +273,7 @@ export class GameQuestionsRepo {
     );
   }
 
-  private async getQuestionsByComplexity(
-    numberQuestions: number,
-  ): Promise<QuestionsQuizEntity[]> {
+  private async getQuestionsByComplexity(numberQuestions: number): Promise<QuestionsQuizEntity[]> {
     const complexityLevels = [
       ComplexityEnums.EASY,
       ComplexityEnums.MEDIUM,
@@ -333,10 +303,7 @@ export class GameQuestionsRepo {
     return randomQuestions.slice(0, numberQuestions);
   }
 
-  private async stringsToHashes(
-    answers: string[],
-    hashLength: number,
-  ): Promise<string[]> {
+  private async stringsToHashes(answers: string[], hashLength: number): Promise<string[]> {
     const hashedArray: string[] = [];
 
     for (const answer of answers) {
@@ -347,15 +314,9 @@ export class GameQuestionsRepo {
     return hashedArray;
   }
 
-  private async hashToString(
-    hash: string,
-    answers: string[],
-  ): Promise<string | null> {
+  private async hashToString(hash: string, answers: string[]): Promise<string | null> {
     for (const answer of answers) {
-      const computedHash = crypto
-        .createHash('sha256')
-        .update(answer)
-        .digest('hex');
+      const computedHash = crypto.createHash('sha256').update(answer).digest('hex');
       if (computedHash === hash) {
         return answer;
       }
@@ -363,18 +324,12 @@ export class GameQuestionsRepo {
     return null; // Hash doesn't match any of the original strings
   }
 
-  private async hashesToStrings(
-    hashes: string[],
-    answers: string[],
-  ): Promise<string[]> {
+  private async hashesToStrings(hashes: string[], answers: string[]): Promise<string[]> {
     const matchedStrings: string[] = [];
 
     for (const hash of hashes) {
       for (const answer of answers) {
-        const computedHash = crypto
-          .createHash('sha256')
-          .update(answer)
-          .digest('hex');
+        const computedHash = crypto.createHash('sha256').update(answer).digest('hex');
         if (computedHash === hash) {
           matchedStrings.push(answer);
           break; // Break the inner loop once a match is found for the current hash

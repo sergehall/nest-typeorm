@@ -40,13 +40,10 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
-  async execute(
-    command: CreatePostCommand,
-  ): Promise<PostWithLikesImagesInfoViewModel> {
+  async execute(command: CreatePostCommand): Promise<PostWithLikesImagesInfoViewModel> {
     const { blogId, currentUserDto, createPostDto } = command;
 
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
@@ -59,9 +56,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       currentUserDto,
     );
 
-    await this.commandBus.execute(
-      new SendNewBlogPostNotificationsCommand(blog, post),
-    );
+    await this.commandBus.execute(new SendNewBlogPostNotificationsCommand(blog, post));
 
     const postWithLikes: PostWithLikesInfoViewModel =
       await this.postsService.addExtendedLikesInfoToPostsEntity(post);
@@ -69,10 +64,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     return await this.imagesMetadataService.addImagesToPostModel(postWithLikes);
   }
 
-  private async checkUserPermission(
-    blog: BloggerBlogsEntity,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(blog: BloggerBlogsEntity, currentUserDto: CurrentUserDto) {
     // Check if the user is banned from posting in this blog
     const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
       currentUserDto.userId,
@@ -85,8 +77,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     });
 
     // User is banned from posting in this blog, throw a ForbiddenException with a custom error message
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForPost);
+    if (userIsBannedForBlog) throw new ForbiddenException(userNotHavePermissionForPost);
 
     try {
       // Check the user's ability to create a post in this blog
@@ -95,9 +86,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'Leaving post for this user is not allowed. ' + error.message,
-        );
+        throw new ForbiddenException('Leaving post for this user is not allowed. ' + error.message);
       }
       throw new InternalServerErrorException(error.message);
     }

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BotStatus } from '../enums/bot-status.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('TelegramBotStatus')
 export class TelegramBotStatusEntity {

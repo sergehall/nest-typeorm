@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrdersEntity } from '../entities/orders.entity';
@@ -15,11 +11,7 @@ export class OrdersRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
-  async completedPayment(
-    orderId: string,
-    clientId: string,
-    updatedAt: string,
-  ): Promise<boolean> {
+  async completedPayment(orderId: string, clientId: string, updatedAt: string): Promise<boolean> {
     try {
       const order = await this.ordersRepository
         .createQueryBuilder('order')
@@ -29,10 +21,9 @@ export class OrdersRepo {
         .andWhere('order.orderStatus = :orderStatus', {
           orderStatus: OrderStatusEnum.PROCESSING,
         })
-        .andWhere(
-          '(client.userId = :clientId OR guestClient.guestUserId = :clientId)',
-          { clientId },
-        )
+        .andWhere('(client.userId = :clientId OR guestClient.guestUserId = :clientId)', {
+          clientId,
+        })
         .getOne();
 
       if (!order) {
@@ -42,10 +33,7 @@ export class OrdersRepo {
       order.orderStatus = OrderStatusEnum.COMPLETED;
       order.updatedAt = updatedAt;
 
-      const updatedOrder = await this.ordersRepository.update(
-        order.orderId,
-        order,
-      );
+      const updatedOrder = await this.ordersRepository.update(order.orderId, order);
 
       return updatedOrder.affected === 1;
     } catch (error) {
@@ -61,9 +49,7 @@ export class OrdersRepo {
       return await this.ordersRepository.save(order);
     } catch (error) {
       console.log('Error saving order:', error);
-      throw new InternalServerErrorException(
-        'Error saving order' + error.message,
-      );
+      throw new InternalServerErrorException('Error saving order' + error.message);
     }
   }
 }

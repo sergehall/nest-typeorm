@@ -16,9 +16,7 @@ export class DataCleanupService {
       return await this.invalidJwtRepo.clearingExpiredJwt();
     } catch (error) {
       console.error('Error while clearing invalid JWT tokens:', error.message);
-      throw new InternalServerErrorException(
-        'Error while clearing invalid JWT tokens',
-      );
+      throw new InternalServerErrorException('Error while clearing invalid JWT tokens');
     }
   }
 
@@ -27,9 +25,7 @@ export class DataCleanupService {
       return await this.usersRepo.clearingExpiredUsersData();
     } catch (error) {
       console.error('Error while removing expired user data:', error.message);
-      throw new InternalServerErrorException(
-        'Error while removing expired user data',
-      );
+      throw new InternalServerErrorException('Error while removing expired user data');
     }
   }
 
@@ -37,13 +33,8 @@ export class DataCleanupService {
     try {
       return await this.securityDevicesRepo.clearingExpiredDevices();
     } catch (error) {
-      console.error(
-        'Error while clearing devices with expired date:',
-        error.message,
-      );
-      throw new InternalServerErrorException(
-        'Error while clearing devices with expired date',
-      );
+      console.error('Error while clearing devices with expired date:', error.message);
+      throw new InternalServerErrorException('Error while clearing devices with expired date');
     }
   }
 }

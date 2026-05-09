@@ -10,10 +10,7 @@ import { CurrentUserAndActiveGameDto } from '../../users/dto/current-user-and-ac
 import { noOpenGameMessage } from '../../../common/filters/custom-errors-messages';
 
 @Injectable()
-export class JwtAndActiveGameStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-active-game',
-) {
+export class JwtAndActiveGameStrategy extends PassportStrategy(Strategy, 'jwt-active-game') {
   constructor(
     private readonly usersRepo: UsersRepo,
     private readonly gamePairsRepo: GamePairsRepo,
@@ -22,16 +19,10 @@ export class JwtAndActiveGameStrategy extends PassportStrategy(
     super(JwtAndActiveGameStrategy.getJwtOptions(jwtConfig));
   }
 
-  async validate(
-    payload: PayloadDto,
-  ): Promise<CurrentUserAndActiveGameDto | null> {
-    const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(
-      payload.userId,
-    );
+  async validate(payload: PayloadDto): Promise<CurrentUserAndActiveGameDto | null> {
+    const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(payload.userId);
     if (user && !user.isBanned) {
-      const activeGame = await this.gamePairsRepo.getActiveGameByUserId(
-        payload.userId,
-      );
+      const activeGame = await this.gamePairsRepo.getActiveGameByUserId(payload.userId);
       if (!activeGame) {
         throw new ForbiddenException(noOpenGameMessage); // No active game found, return 403
       }

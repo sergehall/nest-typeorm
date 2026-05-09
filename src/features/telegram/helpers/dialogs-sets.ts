@@ -100,13 +100,7 @@ export const dialogsSets: DialogTemplate[] = [
   },
   {
     id: 'thank_you',
-    variations: [
-      'thank you',
-      'thanks',
-      'appreciate it',
-      'thanks a lot',
-      'thankful',
-    ],
+    variations: ['thank you', 'thanks', 'appreciate it', 'thanks a lot', 'thankful'],
     response: `You're welcome, {nameRecipient}!`,
   },
   {
@@ -116,24 +110,12 @@ export const dialogsSets: DialogTemplate[] = [
   },
   {
     id: 'what_is_new',
-    variations: [
-      "what's new",
-      'any news',
-      "what's happening",
-      'latest updates',
-      "what's going on",
-    ],
+    variations: ["what's new", 'any news', "what's happening", 'latest updates', "what's going on"],
     response: `Nothing much is new, {nameRecipient}.`,
   },
   {
     id: 'how_is_work',
-    variations: [
-      "how's work",
-      'work going well',
-      "how's the job",
-      'job going well',
-      'work update',
-    ],
+    variations: ["how's work", 'work going well', "how's the job", 'job going well', 'work update'],
     response: `Work is going fine, {nameRecipient}.`,
   },
   {

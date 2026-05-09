@@ -4,11 +4,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import axios from 'axios';
 import { PaymentDto } from '../../../dto/payment.dto';
 import { IntentsEnums } from '../../../enums/intents.enums';
-import {
-  Amount,
-  Item,
-  PayPaPurchaseUnitsType,
-} from '../types/pay-pal-create-order.type';
+import { Amount, Item, PayPaPurchaseUnitsType } from '../types/pay-pal-create-order.type';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
@@ -25,20 +21,14 @@ export class PayPalAdapter {
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
-  async createCheckoutOrder(
-    paymentDto: PaymentDto[],
-  ): Promise<PayerActionRequiredType> {
+  async createCheckoutOrder(paymentDto: PaymentDto[]): Promise<PayerActionRequiredType> {
     try {
-      const accessToken = await this.commandBus.execute(
-        new PayPalGenerateAccessTokenCommand(),
-      );
+      const accessToken = await this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
 
       return await this.payPalCreateOrder(paymentDto, accessToken);
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'Failed to createCheckoutOrder' + error.message,
-      );
+      throw new InternalServerErrorException('Failed to createCheckoutOrder' + error.message);
     }
   }
 
@@ -46,8 +36,7 @@ export class PayPalAdapter {
     paymentDto: PaymentDto[],
     accessToken: string,
   ): Promise<PayerActionRequiredType> {
-    if (paymentDto.length === 0)
-      throw new InternalServerErrorException('PaymentDto is empty');
+    if (paymentDto.length === 0) throw new InternalServerErrorException('PaymentDto is empty');
 
     // const baseUrl = await this.payPalFactory.getPayPalUrl();
     // const url = baseUrl + '/v1/oauth2/token';
@@ -69,10 +58,7 @@ export class PayPalAdapter {
       payment_source: paymentSource,
     };
 
-    const headersOption = await this.getHeadersOptions(
-      payPalRequestId,
-      accessToken,
-    );
+    const headersOption = await this.getHeadersOptions(payPalRequestId, accessToken);
 
     try {
       const response = await axios.post(url, data, headersOption);
@@ -83,9 +69,7 @@ export class PayPalAdapter {
     }
   }
 
-  private async mapToPurchaseUnits(
-    paymentDto: PaymentDto[],
-  ): Promise<PayPaPurchaseUnitsType[]> {
+  private async mapToPurchaseUnits(paymentDto: PaymentDto[]): Promise<PayPaPurchaseUnitsType[]> {
     const purchaseUnits: PayPaPurchaseUnitsType[] = [];
 
     const shipping = {
@@ -146,10 +130,7 @@ export class PayPalAdapter {
     return purchaseUnits;
   }
 
-  private async getHeadersOptions(
-    payPalRequestId: string,
-    accessToken: string,
-  ): Promise<any> {
+  private async getHeadersOptions(payPalRequestId: string, accessToken: string): Promise<any> {
     return {
       headers: {
         'Content-Type': 'application/json',
@@ -159,9 +140,7 @@ export class PayPalAdapter {
     };
   }
 
-  private async getPaymentSource(
-    client: UsersEntity | GuestUsersEntity,
-  ): Promise<any> {
+  private async getPaymentSource(client: UsersEntity | GuestUsersEntity): Promise<any> {
     let landing_page;
     if (client instanceof UsersEntity) {
       landing_page = 'LOGIN';
@@ -169,8 +148,7 @@ export class PayPalAdapter {
       landing_page = 'GUEST_CHECKOUT';
     }
     // payment_method_preference: 'UNRESTRICTED'  || 'IMMEDIATE_PAYMENT_REQUIRED'
-    const domain: string =
-      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    const domain: string = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     return {
       paypal: {
         experience_context: {

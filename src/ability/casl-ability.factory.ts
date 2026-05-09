@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  AbilityBuilder,
-  AbilityTuple,
-  MatchConditions,
-  PureAbility,
-} from '@casl/ability';
+import { AbilityBuilder, AbilityTuple, MatchConditions, PureAbility } from '@casl/ability';
 import { Action } from './roles/action.enum';
 import { IdDto } from './dto/id.dto';
 import { CurrentUserDto } from '../features/users/dto/current-user.dto';
@@ -19,11 +14,9 @@ export class CaslAbilityFactory {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility);
     if (currentUser.roles.includes(UserRolesEnums.SA)) {
       can(Action.MANAGE, 'all');
-      cannot(
-        Action.CREATE,
-        'User',
-        ({ orgId }) => orgId !== currentUser.orgId,
-      ).because('Because different organizations');
+      cannot(Action.CREATE, 'User', ({ orgId }) => orgId !== currentUser.orgId).because(
+        'Because different organizations',
+      );
     } else {
       can(Action.READ, 'all');
       can(Action.CREATE, 'all');

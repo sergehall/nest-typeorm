@@ -3,10 +3,7 @@ import { InsertResult, Repository } from 'typeorm';
 import { PostsEntity } from '../entities/posts.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PostWithLikesInfoViewModel } from '../views/post-with-likes-info.view-model';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
@@ -45,8 +42,7 @@ export class PostsRepo {
       return post[0] ? post[0] : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -80,8 +76,7 @@ export class PostsRepo {
       );
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -114,9 +109,7 @@ export class PostsRepo {
       return result.raw[0];
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new post.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new post.');
     }
   }
 
@@ -138,8 +131,7 @@ export class PostsRepo {
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Retrieve common parameters
-    const { sortDirection, sortBy, pageNumber, pageSize } =
-      queryData.queryPagination;
+    const { sortDirection, sortBy, pageNumber, pageSize } = queryData.queryPagination;
 
     const field: string = await this.getSortByField(sortBy);
     const direction: SortDirectionEnum = sortDirection;
@@ -163,20 +155,16 @@ export class PostsRepo {
     try {
       const countPosts = await queryBuilder.getCount();
 
-      const posts: PostsEntity[] = await queryBuilder
-        .skip(offset)
-        .take(limit)
-        .getMany();
+      const posts: PostsEntity[] = await queryBuilder.skip(offset).take(limit).getMany();
 
       console.log(posts);
 
       // Retrieve posts with information about likes
-      const postsWithLikes =
-        await this.likeStatusPostsRepo.postsLikesAggregation(
-          posts,
-          numberLastLikes,
-          currentUserDto,
-        );
+      const postsWithLikes = await this.likeStatusPostsRepo.postsLikesAggregation(
+        posts,
+        numberLastLikes,
+        currentUserDto,
+      );
 
       return {
         posts: postsWithLikes,
@@ -197,8 +185,7 @@ export class PostsRepo {
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
     // Retrieve common parameters
-    const { sortDirection, sortBy, pageNumber, pageSize } =
-      queryData.queryPagination;
+    const { sortDirection, sortBy, pageNumber, pageSize } = queryData.queryPagination;
 
     const field: string = await this.getSortByField(sortBy);
     const direction: SortDirectionEnum = sortDirection;
@@ -218,10 +205,7 @@ export class PostsRepo {
 
     const countPosts: number = await queryBuilder.getCount();
 
-    const posts: PostsEntity[] = await queryBuilder
-      .offset(offset)
-      .limit(limit)
-      .getMany();
+    const posts: PostsEntity[] = await queryBuilder.offset(offset).limit(limit).getMany();
 
     if (posts.length === 0) {
       return {
@@ -231,11 +215,7 @@ export class PostsRepo {
     }
 
     const postsWithLikes: PostWithLikesInfoViewModel[] =
-      await this.likeStatusPostsRepo.postsLikesAggregation(
-        posts,
-        numberLastLikes,
-        currentUserDto,
-      );
+      await this.likeStatusPostsRepo.postsLikesAggregation(posts, numberLastLikes, currentUserDto);
 
     return {
       posts: postsWithLikes,
@@ -284,10 +264,7 @@ export class PostsRepo {
     });
   }
 
-  async updatePostByPostId(
-    postId: string,
-    updatePostDto: UpdatePostDto,
-  ): Promise<boolean> {
+  async updatePostByPostId(postId: string, updatePostDto: UpdatePostDto): Promise<boolean> {
     try {
       const { title, shortDescription, content } = updatePostDto;
 

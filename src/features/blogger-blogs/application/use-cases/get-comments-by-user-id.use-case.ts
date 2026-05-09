@@ -13,9 +13,7 @@ export class GetCommentsByUserIdCommand {
 }
 
 @CommandHandler(GetCommentsByUserIdCommand)
-export class GetCommentsByUserIdUseCase
-  implements ICommandHandler<GetCommentsByUserIdCommand>
-{
+export class GetCommentsByUserIdUseCase implements ICommandHandler<GetCommentsByUserIdCommand> {
   constructor(
     protected commentsRepo: CommentsRepo,
     protected commandBus: CommandBus,
@@ -25,10 +23,7 @@ export class GetCommentsByUserIdUseCase
     const { pageNumber, pageSize } = queryData.queryPagination;
 
     const commentsAndCountComments: CommentsAndCountDto =
-      await this.commentsRepo.getCommentsWithLikesByUserId(
-        queryData,
-        currentUserDto,
-      );
+      await this.commentsRepo.getCommentsWithLikesByUserId(queryData, currentUserDto);
 
     const { comments, countComments } = commentsAndCountComments;
 
@@ -42,9 +37,7 @@ export class GetCommentsByUserIdUseCase
       };
     }
 
-    const pagesCount = Math.ceil(
-      countComments / command.queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(countComments / command.queryData.queryPagination.pageSize);
 
     return {
       pagesCount: pagesCount,

@@ -53,17 +53,11 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
-  async getMyGames(
-    @Request() req: any,
-    @Query() query: any,
-  ): Promise<PaginatorDto> {
+  async getMyGames(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
-    return await this.commandBus.execute(
-      new GetMyGamesCommand(queryData, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetMyGamesCommand(queryData, currentUserDto));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -71,17 +65,12 @@ export class PairGameQuizController {
   async getMyStatistic(@Request() req: any): Promise<GameSummaryViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new MyGamesStatisticCommand(currentUserDto),
-    );
+    return await this.commandBus.execute(new MyGamesStatisticCommand(currentUserDto));
   }
 
   @Get('users/top')
-  async getGamesStatistic(
-    @Query() query: any,
-  ): Promise<GamesStatisticsViewModel[]> {
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+  async getGamesStatistic(@Query() query: any): Promise<GamesStatisticsViewModel[]> {
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(new GamesStatisticCommand(queryData));
   }
@@ -91,9 +80,7 @@ export class PairGameQuizController {
   async findUnfinishedGame(@Request() req: any): Promise<GameViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new MyCurrentGameCommand(currentUserDto),
-    );
+    return await this.commandBus.execute(new MyCurrentGameCommand(currentUserDto));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -110,9 +97,7 @@ export class PairGameQuizController {
   async findGameById(@Request() req: any, @Param('id') id: string) {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new GetGameByIdCommand(id, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetGameByIdCommand(id, currentUserDto));
   }
 
   @UseGuards(JwtAuthAndActiveGameGuard)

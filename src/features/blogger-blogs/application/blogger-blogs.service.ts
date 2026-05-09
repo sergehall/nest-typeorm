@@ -37,9 +37,7 @@ export class BloggerBlogsService {
         ? blogIdSubscription.currentUserSubscriptionStatus
         : SubscriptionStatus.None;
 
-      const subscribersCount = blogIdSubscription
-        ? blogIdSubscription.subscribersCount
-        : 0;
+      const subscribersCount = blogIdSubscription ? blogIdSubscription.subscribersCount : 0;
 
       return {
         id: bloggerBlog.id,
@@ -59,8 +57,7 @@ export class BloggerBlogsService {
     newBlog: BloggerBlogsViewModel,
   ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
     const images = new ImagesViewModel();
-    const blogsWithImagesSubscribersViewMode =
-      new BloggerBlogsWithImagesSubscribersViewModel();
+    const blogsWithImagesSubscribersViewMode = new BloggerBlogsWithImagesSubscribersViewModel();
     return {
       ...newBlog,
       images: images,
@@ -80,9 +77,7 @@ export class BloggerBlogsService {
 
     // Fetching image metadata for wallpapers and main files in parallel
     const [imagesBlogsWallpaper, imagesBlogsMain] = await Promise.all([
-      this.imagesBlogsWallpaperMetadataRepo.findImagesBlogsWallpaperByIds(
-        blogsIds,
-      ),
+      this.imagesBlogsWallpaperMetadataRepo.findImagesBlogsWallpaperByIds(blogsIds),
       this.imagesBlogsMainMetadataRepo.findImagesBlogsMainByIds(blogsIds),
     ]);
 
@@ -104,9 +99,7 @@ export class BloggerBlogsService {
             wallpaperMetadata.buffer,
           );
         // Generating signed URL for wallpaper image
-        const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-          wallpaperMetadata.pathKey,
-        );
+        const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(wallpaperMetadata.pathKey);
         // Constructing wallpaper image object
         imageBlogWallpaper = {
           url: unitedUrl.url,
@@ -123,13 +116,9 @@ export class BloggerBlogsService {
           mainMetadata.map(async (metadata) => {
             // Extracting metadata for main image
             const fileMetadata: ImageWidthHeightSize =
-              await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(
-                metadata.buffer,
-              );
+              await this.imagesMetadataService.extractWidthHeightSizeFromBuffer(metadata.buffer);
             // Generating signed URL for main image
-            const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-              metadata.pathKey,
-            );
+            const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(metadata.pathKey);
             // Constructing main image object and pushing it to the array
             imagesBlogMain.push({
               url: unitedUrl.url,
@@ -157,9 +146,7 @@ export class BloggerBlogsService {
     return resultMap;
   }
 
-  async transformedBlogs(
-    blogsArr: BloggerBlogsEntity[],
-  ): Promise<BloggerBlogsViewModel[]> {
+  async transformedBlogs(blogsArr: BloggerBlogsEntity[]): Promise<BloggerBlogsViewModel[]> {
     return blogsArr.map((row: BloggerBlogsEntity) => ({
       id: row.id,
       name: row.name,

@@ -1,14 +1,7 @@
-import {
-  Entity,
-  Column,
-  OneToMany,
-  PrimaryColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { PaymentTransactionsEntity } from './payment-transaction.entity';
 import { OrderItemsEntity } from './order-items.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { GuestUsersEntity } from './unregistered-users.entity';
 import { OrderStatusEnum } from '../enums/order-status.enum';
 import { UsersEntity } from '../../users/entities/users.entity';

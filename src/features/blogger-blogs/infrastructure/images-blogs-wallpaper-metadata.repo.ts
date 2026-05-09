@@ -1,10 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImagesBlogsWallpaperMetadataEntity } from '../entities/images-blog-wallpaper-metadata.entity';
 import { Repository } from 'typeorm';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
 import { FileUploadDto } from '../dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
@@ -38,11 +35,8 @@ export class ImagesBlogsWallpaperMetadataRepo {
       return blogsWallpaper || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(
-          `Blog Wallpaper with ID ${userId} not found`,
-        );
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Blog Wallpaper with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -65,8 +59,7 @@ export class ImagesBlogsWallpaperMetadataRepo {
     try {
       const blogsWallpapers = await queryBuilder.getMany(); // Execute the query and get multiple results
 
-      const resultMap: { [id: string]: ImagesBlogsWallpaperMetadataEntity } =
-        {};
+      const resultMap: { [id: string]: ImagesBlogsWallpaperMetadataEntity } = {};
       blogsWallpapers.forEach((blogWallpaper) => {
         resultMap[blogWallpaper.blog.id] = blogWallpaper;
       });
@@ -74,11 +67,8 @@ export class ImagesBlogsWallpaperMetadataRepo {
       return resultMap;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(
-          `Blog Wallpaper with ID ${userId} not found`,
-        );
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Blog Wallpaper with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -101,8 +91,7 @@ export class ImagesBlogsWallpaperMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesBlogsWallpaperMetadataEntity | null =
-      await queryBuilder.getOne();
+    const existingEntity: ImagesBlogsWallpaperMetadataEntity | null = await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {

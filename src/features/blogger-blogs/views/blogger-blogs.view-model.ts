@@ -20,17 +20,13 @@ export class BloggerBlogsViewModel {
   @Length(0, 100, {
     message: 'Incorrect websiteUrl length! Must be max 100 ch.',
   })
-  @Matches(
-    '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$',
-  )
+  @Matches('^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$')
   websiteUrl: string;
   @IsNotEmpty()
   @Length(0, 100, {
     message: 'Incorrect createdAt length! Must be max 100 ch.',
   })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   createdAt: string;
   @IsNotEmpty()
   @IsBoolean()

@@ -10,9 +10,7 @@ export class AddInvalidJwtToBlacklistCommand {
   ) {}
 }
 @CommandHandler(AddInvalidJwtToBlacklistCommand)
-export class AddInvalidJwtToBlacklistUseCase
-  implements ICommandHandler<AddInvalidJwtToBlacklistCommand>
-{
+export class AddInvalidJwtToBlacklistUseCase implements ICommandHandler<AddInvalidJwtToBlacklistCommand> {
   constructor(private invalidJwtRepo: InvalidJwtRepo) {}
   async execute(command: AddInvalidJwtToBlacklistCommand): Promise<boolean> {
     const { refreshToken, currentPayload } = command;

@@ -26,25 +26,17 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
   async execute(command: LoginCommand): Promise<AccessTokenDto> {
     const { currentUserDto, ip, userAgent, res } = command;
 
-    const signedToken = await this.commandBus.execute(
-      new SignRefreshJwtCommand(currentUserDto),
-    );
+    const signedToken = await this.commandBus.execute(new SignRefreshJwtCommand(currentUserDto));
 
-    const payload: PayloadDto = await this.authService.toExtractPayload(
-      signedToken.refreshToken,
-    );
+    const payload: PayloadDto = await this.authService.toExtractPayload(signedToken.refreshToken);
 
-    await this.commandBus.execute(
-      new CreateDeviceCommand(payload, ip, userAgent),
-    );
+    await this.commandBus.execute(new CreateDeviceCommand(payload, ip, userAgent));
 
     res.cookie('refreshToken', signedToken, {
       httpOnly: true,
       secure: true,
     });
 
-    return await this.commandBus.execute(
-      new SignAccessJwtUseCommand(currentUserDto),
-    );
+    return await this.commandBus.execute(new SignAccessJwtUseCommand(currentUserDto));
   }
 }

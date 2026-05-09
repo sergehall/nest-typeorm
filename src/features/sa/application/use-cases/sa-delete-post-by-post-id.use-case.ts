@@ -18,9 +18,7 @@ export class SaDeletePostByPostIdCommand {
 }
 
 @CommandHandler(SaDeletePostByPostIdCommand)
-export class SaDeletePostByPostIdUseCase
-  implements ICommandHandler<SaDeletePostByPostIdCommand>
-{
+export class SaDeletePostByPostIdUseCase implements ICommandHandler<SaDeletePostByPostIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly postsRepo: PostsRepo,
@@ -30,12 +28,10 @@ export class SaDeletePostByPostIdUseCase
     const { params, currentUserDto } = command;
     const { blogId, postId } = params;
 
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) throw new NotFoundException(`Blog with ID ${blogId} not found`);
 
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkSaPermission(currentUserDto);
@@ -51,9 +47,7 @@ export class SaDeletePostByPostIdUseCase
         id: currentUser.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to delete this post. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to delete this post. ' + error.message);
     }
   }
 }

@@ -13,9 +13,7 @@ export class CreateUserCommand {
 }
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserUseCase
-  implements ICommandHandler<RegistrationUserCommand>
-{
+export class CreateUserUseCase implements ICommandHandler<RegistrationUserCommand> {
   constructor(
     private readonly expirationDateCalculator: CalculatorExpirationDate,
     private readonly usersRepo: UsersRepo,
@@ -28,8 +26,11 @@ export class CreateUserUseCase
     const passwordHash = await this.encryptConfig.encryptPassword(password);
 
     // Return the expirationDate in ISO format for user registration.
-    const expirationDateDto: ExpirationDateDto =
-      await this.expirationDateCalculator.createExpDate(0, 2, 0);
+    const expirationDateDto: ExpirationDateDto = await this.expirationDateCalculator.createExpDate(
+      0,
+      2,
+      0,
+    );
 
     const dataForCreateUserDto: DataForCreateUserDto = {
       login,

@@ -7,7 +7,7 @@ import { ImagesPostsMetadataEntity } from '../../../features/posts/dto/images-po
 import { UrlDto } from '../../../features/blogger-blogs/dto/url.dto';
 import { PathKeyBufferDto } from '../../../features/posts/dto/path-key-buffer.dto';
 import { InitializeS3Client } from '../../../config/aws/s3/initialize-s3-client';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { ImageWidthHeightSize } from './dto/image-width-height-size';
 import { ImageMetadata } from './dto/image-metadata';
 import { FileUploadDto } from '../../../features/blogger-blogs/dto/file-upload.dto';
@@ -20,9 +20,7 @@ export class FilesMetadataService {
   constructor(protected s3Service: InitializeS3Client) {}
 
   async processImageBlogsWallpaperOrMain(
-    metadataEntity:
-      | ImagesBlogsWallpaperMetadataEntity
-      | ImagesBlogsMainMetadataEntity,
+    metadataEntity: ImagesBlogsWallpaperMetadataEntity | ImagesBlogsMainMetadataEntity,
   ): Promise<ImageMetadata> {
     const { buffer, pathKey } = metadataEntity;
     const metadata = await this.extractWidthHeightSizeFromBuffer(buffer);
@@ -62,9 +60,7 @@ export class FilesMetadataService {
     width: number,
     height: number,
   ): Promise<{ buffer: Buffer; size: number }> {
-    const resizedImageBuffer = await sharp(buffer)
-      .resize(width, height)
-      .toBuffer();
+    const resizedImageBuffer = await sharp(buffer).resize(width, height).toBuffer();
 
     return {
       buffer: resizedImageBuffer,
@@ -72,9 +68,7 @@ export class FilesMetadataService {
     };
   }
 
-  async extractWidthHeightSizeFromBuffer(
-    buffer: Buffer,
-  ): Promise<ImageWidthHeightSize> {
+  async extractWidthHeightSizeFromBuffer(buffer: Buffer): Promise<ImageWidthHeightSize> {
     try {
       const metadata = await sharp(buffer).metadata();
       const width = metadata.width || 0;
@@ -84,9 +78,7 @@ export class FilesMetadataService {
       return { width, height, fileSize };
     } catch (error) {
       console.error('Error extracting file metadata:', error);
-      throw new InternalServerErrorException(
-        'Error extracting file metadata:' + error.message,
-      );
+      throw new InternalServerErrorException('Error extracting file metadata:' + error.message);
     }
   }
 
@@ -101,13 +93,11 @@ export class FilesMetadataService {
     const { original, middle, small } = imagesMetadata;
 
     // Process all enums of metadata concurrently
-    const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all(
-      [
-        this.imageMetadataPostsProcessor(original),
-        this.imageMetadataPostsProcessor(middle),
-        this.imageMetadataPostsProcessor(small),
-      ],
-    );
+    const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all([
+      this.imageMetadataPostsProcessor(original),
+      this.imageMetadataPostsProcessor(middle),
+      this.imageMetadataPostsProcessor(small),
+    ]);
 
     // Combine all processed metadata into an array
     // Construct the main property of PostImagesViewModel
@@ -119,15 +109,12 @@ export class FilesMetadataService {
 
     return { main };
   }
-  async imageMetadataPostsProcessor(
-    metadata: ImagesPostsMetadataEntity,
-  ): Promise<ImageMetadata[]> {
-    const imageMetadata: ImageWidthHeightSize =
-      await this.extractWidthHeightSizeFromBuffer(metadata.buffer);
-
-    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-      metadata.pathKey,
+  async imageMetadataPostsProcessor(metadata: ImagesPostsMetadataEntity): Promise<ImageMetadata[]> {
+    const imageMetadata: ImageWidthHeightSize = await this.extractWidthHeightSizeFromBuffer(
+      metadata.buffer,
     );
+
+    const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(metadata.pathKey);
 
     return [
       {
@@ -147,12 +134,11 @@ export class FilesMetadataService {
     }
     const processedMetadataPromises = imagesMetadata.map(async (metadata) => {
       // Extract file metadata
-      const imageMetadata: ImageWidthHeightSize =
-        await this.extractWidthHeightSizeFromBuffer(metadata.buffer);
-
-      const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(
-        metadata.pathKey,
+      const imageMetadata: ImageWidthHeightSize = await this.extractWidthHeightSizeFromBuffer(
+        metadata.buffer,
       );
+
+      const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(metadata.pathKey);
 
       return {
         url: unitedUrl.url, // Assuming pathKey contains the URL of the image

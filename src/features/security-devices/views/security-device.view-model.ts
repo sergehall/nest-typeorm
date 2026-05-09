@@ -15,9 +15,7 @@ export class SecurityDeviceViewModel {
   @Length(0, 30, {
     message: 'Incorrect lastActiveDate length! Must be max 30 ch.',
   })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   lastActiveDate: string;
   @IsNotEmpty()
   @Length(0, 30, {

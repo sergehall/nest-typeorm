@@ -6,7 +6,7 @@ import { ChallengesQuestionsRepo } from '../../infrastructure/challenges-questio
 import { ChallengeAnswersEntity } from '../../entities/challenge-answers.entity';
 import { UsersEntity } from '../../../users/entities/users.entity';
 import { QuestionsQuizEntity } from '../../../sa-quiz-questions/entities/questions-quiz.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 import { GameOverEvent } from '../../events/game-over.event';
 
@@ -18,17 +18,13 @@ export class FinishGameForAnotherUseCommand {
 }
 
 @CommandHandler(FinishGameForAnotherUseCommand)
-export class FinishGameForAnotherUserUseCase
-  implements ICommandHandler<FinishGameForAnotherUseCommand>
-{
+export class FinishGameForAnotherUserUseCase implements ICommandHandler<FinishGameForAnotherUseCommand> {
   constructor(
     protected challengesAnswersRepo: ChallengesAnswersRepo,
     protected challengesQuestionsRepo: ChallengesQuestionsRepo,
   ) {}
 
-  async execute(
-    command: FinishGameForAnotherUseCommand,
-  ): Promise<PairsGameEntity> {
+  async execute(command: FinishGameForAnotherUseCommand): Promise<PairsGameEntity> {
     const { game, currentUserDto } = command;
 
     const anotherUserId =
@@ -44,11 +40,10 @@ export class FinishGameForAnotherUserUseCase
 
     const countChallengeAnswers = challengesAnswers.length;
 
-    const remainingQuestions =
-      await this.challengesQuestionsRepo.getRemainingChallengeQuestions(
-        game.id,
-        countChallengeAnswers,
-      );
+    const remainingQuestions = await this.challengesQuestionsRepo.getRemainingChallengeQuestions(
+      game.id,
+      countChallengeAnswers,
+    );
 
     const challengeAnswers: ChallengeAnswersEntity[] = [];
 
@@ -59,11 +54,9 @@ export class FinishGameForAnotherUserUseCase
 
         const questionsQuizEntity = new QuestionsQuizEntity();
         questionsQuizEntity.id = challengeQuestion.question.id;
-        questionsQuizEntity.questionText =
-          challengeQuestion.question.questionText;
+        questionsQuizEntity.questionText = challengeQuestion.question.questionText;
 
-        const challengeAnswer: ChallengeAnswersEntity =
-          new ChallengeAnswersEntity();
+        const challengeAnswer: ChallengeAnswersEntity = new ChallengeAnswersEntity();
         challengeAnswer.id = uuid4();
         challengeAnswer.answer = 'The timer ran out 10 sec.';
         challengeAnswer.answerStatus = AnswerStatusEnum.INCORRECT;
@@ -81,9 +74,7 @@ export class FinishGameForAnotherUserUseCase
       return game;
     }
 
-    await this.challengesAnswersRepo.saveChallengeAnswersEntities(
-      challengeAnswers,
-    );
+    await this.challengesAnswersRepo.saveChallengeAnswersEntities(challengeAnswers);
     const event: GameOverEvent = new GameOverEvent(game);
     game.events.push(event);
 

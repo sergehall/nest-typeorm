@@ -29,9 +29,7 @@ export class UploadFilesBlogWallpaperCommand {
 
 /** Command handler for the UploadImageBlogWallpaperCommand. */
 @CommandHandler(UploadFilesBlogWallpaperCommand)
-export class UploadFilesBlogsWallpaperUseCase
-  implements ICommandHandler<UploadFilesBlogWallpaperCommand>
-{
+export class UploadFilesBlogsWallpaperUseCase implements ICommandHandler<UploadFilesBlogWallpaperCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
@@ -40,9 +38,7 @@ export class UploadFilesBlogsWallpaperUseCase
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
-  async execute(
-    command: UploadFilesBlogWallpaperCommand,
-  ): Promise<ImagesViewModel> {
+  async execute(command: UploadFilesBlogWallpaperCommand): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId } = params;
 
@@ -59,9 +55,7 @@ export class UploadFilesBlogsWallpaperUseCase
 
     // Extract file metadata
     const metadata: ImageWidthHeightSize =
-      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(
-        fileUploadDto.buffer,
-      );
+      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(fileUploadDto.buffer);
 
     // Upload file for the post to s3
     const urlPathKeyEtagDto: UrlPathKeyEtagDto =
@@ -104,9 +98,7 @@ export class UploadFilesBlogsWallpaperUseCase
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'You do not have permission to upload file. ' + error.message,
-        );
+        throw new ForbiddenException('You do not have permission to upload file. ' + error.message);
       }
       throw new InternalServerErrorException(error.message);
     }

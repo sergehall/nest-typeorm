@@ -14,9 +14,7 @@ export class GamesStatisticCommand {
 }
 
 @CommandHandler(GamesStatisticCommand)
-export class GamesStatisticUseCase
-  implements ICommandHandler<GamesStatisticCommand>
-{
+export class GamesStatisticUseCase implements ICommandHandler<GamesStatisticCommand> {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
   async execute(command: GamesStatisticCommand): Promise<PaginatorDto> {
@@ -36,11 +34,14 @@ export class GamesStatisticUseCase
       };
     }
 
-    const gamesStatistics: GamesStatisticsViewModel[] =
-      await this.gamesStatistics(allGames);
+    const gamesStatistics: GamesStatisticsViewModel[] = await this.gamesStatistics(allGames);
 
-    const sortedGamesStatistics: GamesStatisticsViewModel[] =
-      await this.customSort(sort, pageNumber, pageSize, gamesStatistics);
+    const sortedGamesStatistics: GamesStatisticsViewModel[] = await this.customSort(
+      sort,
+      pageNumber,
+      pageSize,
+      gamesStatistics,
+    );
 
     const totalCount = gamesStatistics.length;
 
@@ -55,9 +56,7 @@ export class GamesStatisticUseCase
     };
   }
 
-  private async gamesStatistics(
-    allGames: PairsGameEntity[],
-  ): Promise<GamesStatisticsViewModel[]> {
+  private async gamesStatistics(allGames: PairsGameEntity[]): Promise<GamesStatisticsViewModel[]> {
     const userStatisticsMap = new Map<string, GamesStatisticsViewModel>();
 
     for (const game of allGames) {
@@ -111,9 +110,7 @@ export class GamesStatisticUseCase
       userStats.winsCount += gameResult === GamesResultsEnum.WON ? 1 : 0;
       userStats.lossesCount += gameResult === GamesResultsEnum.LOST ? 1 : 0;
       userStats.drawsCount += gameResult === GamesResultsEnum.DRAW ? 1 : 0;
-      userStats.avgScores = +(
-        userStats.sumScore / userStats.gamesCount
-      ).toFixed(2);
+      userStats.avgScores = +(userStats.sumScore / userStats.gamesCount).toFixed(2);
     }
   }
 
@@ -143,9 +140,7 @@ export class GamesStatisticUseCase
           const direction: SortDirectionEnum = field[key];
 
           const compareValue =
-            direction === SortDirectionEnum.ASC
-              ? a[key] - b[key]
-              : b[key] - a[key];
+            direction === SortDirectionEnum.ASC ? a[key] - b[key] : b[key] - a[key];
 
           if (compareValue !== 0) {
             return compareValue;

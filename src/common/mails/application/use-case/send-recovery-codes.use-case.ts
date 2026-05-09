@@ -10,9 +10,7 @@ export class SendRecoveryCodesCommand {
 }
 
 @CommandHandler(SendRecoveryCodesCommand)
-export class SendRecoveryCodesUseCase
-  implements ICommandHandler<SendRecoveryCodesCommand>
-{
+export class SendRecoveryCodesUseCase implements ICommandHandler<SendRecoveryCodesCommand> {
   constructor(
     protected commandBus: CommandBus,
     protected mailOptionsBuilder: MailOptionsBuilder,

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  RawBodyRequest,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, RawBodyRequest, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus } from '@nestjs/cqrs';
 import { PaymentSystem } from '../../../enums/payment-system.enums';

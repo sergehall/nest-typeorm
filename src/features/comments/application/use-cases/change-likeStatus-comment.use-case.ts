@@ -23,25 +23,20 @@ export class ChangeLikeStatusCommentCommand {
 }
 
 @CommandHandler(ChangeLikeStatusCommentCommand)
-export class ChangeLikeStatusCommentUseCase
-  implements ICommandHandler<ChangeLikeStatusCommentCommand>
-{
+export class ChangeLikeStatusCommentUseCase implements ICommandHandler<ChangeLikeStatusCommentCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected commentsRepo: CommentsRepo,
     protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
     protected likeStatusCommentsRepo: LikeStatusCommentsRepo,
   ) {}
-  async execute(
-    command: ChangeLikeStatusCommentCommand,
-  ): Promise<LikeStatusCommentsEntity> {
+  async execute(command: ChangeLikeStatusCommentCommand): Promise<LikeStatusCommentsEntity> {
     const { commentId, likeStatusDto, currentUserDto } = command;
 
     const findComment: CommentsEntity | null =
       await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
 
-    if (!findComment)
-      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    if (!findComment) throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
     await this.checkUserPermission(currentUserDto.userId, findComment.blog.id);
 
@@ -62,7 +57,6 @@ export class ChangeLikeStatusCommentUseCase
       userId,
       postInfoBlogId,
     );
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForBlog);
+    if (userIsBannedForBlog) throw new ForbiddenException(userNotHavePermissionForBlog);
   }
 }

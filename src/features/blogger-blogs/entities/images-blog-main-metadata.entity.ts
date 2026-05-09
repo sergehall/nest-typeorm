@@ -4,7 +4,7 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { FileUploadDto } from '../dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('ImagesBlogsMainMetadata')
 export class ImagesBlogsMainMetadataEntity {
@@ -80,8 +80,7 @@ export class ImagesBlogsMainMetadataEntity {
     urlKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesBlogsMainMetadataEntity {
-    const { fieldname, buffer, mimetype, encoding, size, originalname } =
-      fileUploadDto;
+    const { fieldname, buffer, mimetype, encoding, size, originalname } = fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;

@@ -15,25 +15,18 @@ export class GetBlogsOwnedByCurrentUserCommand {
 }
 
 @CommandHandler(GetBlogsOwnedByCurrentUserCommand)
-export class GetBlogsOwnedByCurrentUserUseCase
-  implements ICommandHandler<GetBlogsOwnedByCurrentUserCommand>
-{
+export class GetBlogsOwnedByCurrentUserUseCase implements ICommandHandler<GetBlogsOwnedByCurrentUserCommand> {
   constructor(
     protected commandBus: CommandBus,
     protected bloggerBlogsService: BloggerBlogsService,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
   ) {}
-  async execute(
-    command: GetBlogsOwnedByCurrentUserCommand,
-  ): Promise<PaginatorDto> {
+  async execute(command: GetBlogsOwnedByCurrentUserCommand): Promise<PaginatorDto> {
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
     const blogsCountBlogsDto: BlogsCountBlogsDto =
-      await this.bloggerBlogsRepo.getBlogsOwnedByCurrentUser(
-        currentUserDto,
-        queryData,
-      );
+      await this.bloggerBlogsRepo.getBlogsOwnedByCurrentUser(currentUserDto, queryData);
 
     if (blogsCountBlogsDto.countBlogs === 0) {
       return {

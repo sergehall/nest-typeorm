@@ -51,9 +51,7 @@ export class BuyProductsUseCase implements ICommandHandler<BuyProductsCommand> {
       currentUserDto,
     );
 
-    await this.commandBus.execute(
-      new CreateOrderAndPaymentTransactionsCommand(paymentDto),
-    );
+    await this.commandBus.execute(new CreateOrderAndPaymentTransactionsCommand(paymentDto));
 
     return await this.paymentManager.processPayment(paymentDto, paymentSystem);
   }

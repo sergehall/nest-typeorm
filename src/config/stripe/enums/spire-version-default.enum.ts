@@ -1,3 +1,3 @@
 export enum SpireVersionDefaultEnum {
-  default = '2023-10-16',
+  default = '2026-04-22.dahlia',
 }

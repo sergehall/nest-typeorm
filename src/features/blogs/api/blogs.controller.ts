@@ -43,18 +43,12 @@ export class BlogsController {
   @Get()
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async searchBlogs(
-    @Request() req: any,
-    @Query() query: any,
-  ): Promise<PaginatorDto> {
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+  async searchBlogs(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     const currentUserDto: CurrentUserDto | null = req.user;
 
-    return await this.commandBus.execute(
-      new SearchBlogsCommand(queryData, currentUserDto),
-    );
+    return await this.commandBus.execute(new SearchBlogsCommand(queryData, currentUserDto));
   }
 
   @Get(':id')
@@ -66,9 +60,7 @@ export class BlogsController {
   ): Promise<BloggerBlogsWithImagesViewModel> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
-    return await this.commandBus.execute(
-      new GetBlogByIdCommand(params.id, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetBlogByIdCommand(params.id, currentUserDto));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -79,15 +71,10 @@ export class BlogsController {
     @Param() params: BlogIdParams,
   ): Promise<BloggerBlogsWithImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
-    const subscriptionStatus: SubscriptionStatus =
-      SubscriptionStatus.Subscribed;
+    const subscriptionStatus: SubscriptionStatus = SubscriptionStatus.Subscribed;
 
     return await this.commandBus.execute(
-      new ManageBlogsSubscribeCommand(
-        params,
-        subscriptionStatus,
-        currentUserDto,
-      ),
+      new ManageBlogsSubscribeCommand(params, subscriptionStatus, currentUserDto),
     );
   }
 
@@ -100,15 +87,10 @@ export class BlogsController {
   ): Promise<BloggerBlogsWithImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    const subscriptionStatus: SubscriptionStatus =
-      SubscriptionStatus.Unsubscribed;
+    const subscriptionStatus: SubscriptionStatus = SubscriptionStatus.Unsubscribed;
 
     return await this.commandBus.execute(
-      new ManageBlogsSubscribeCommand(
-        params,
-        subscriptionStatus,
-        currentUserDto,
-      ),
+      new ManageBlogsSubscribeCommand(params, subscriptionStatus, currentUserDto),
     );
   }
 
@@ -122,8 +104,7 @@ export class BlogsController {
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
       new GetPostsInBlogCommand(blogId, queryData, currentUserDto),

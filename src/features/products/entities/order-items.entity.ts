@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { OrdersEntity } from './orders.entity';
 import { ProductsDataEntity } from './products-data.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('OrderItems')
 export class OrderItemsEntity {

@@ -26,10 +26,7 @@ export class CookiesJwtVerificationGuard implements CanActivate {
     const validationErrors = await validate(refreshTokenDto);
 
     if (validationErrors.length > 0) {
-      throw new HttpException(
-        { message: [jwtCookiesIncorrect] },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException({ message: [jwtCookiesIncorrect] }, HttpStatus.UNAUTHORIZED);
     }
     const { refreshToken } = refreshTokenDto;
 
@@ -43,10 +40,7 @@ export class CookiesJwtVerificationGuard implements CanActivate {
 
       return validRefreshJwt !== null;
     } else {
-      throw new HttpException(
-        { message: [jwtCookiesIncorrect] },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException({ message: [jwtCookiesIncorrect] }, HttpStatus.UNAUTHORIZED);
     }
   }
 }

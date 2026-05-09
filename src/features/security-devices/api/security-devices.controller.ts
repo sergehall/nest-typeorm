@@ -36,9 +36,7 @@ export class SecurityDevicesController {
       req.cookies.refreshToken,
     );
 
-    return await this.commandBus.execute(
-      new SearchDevicesCommand(currentPayload),
-    );
+    return await this.commandBus.execute(new SearchDevicesCommand(currentPayload));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -49,9 +47,7 @@ export class SecurityDevicesController {
       req.cookies.refreshToken,
     );
 
-    return await this.commandBus.execute(
-      new RemoveDevicesExceptCurrentCommand(currentPayload),
-    );
+    return await this.commandBus.execute(new RemoveDevicesExceptCurrentCommand(currentPayload));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

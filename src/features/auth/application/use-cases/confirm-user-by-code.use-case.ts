@@ -6,9 +6,7 @@ export class ConfirmUserByCodeCommand {
 }
 
 @CommandHandler(ConfirmUserByCodeCommand)
-export class ConfirmUserByCodeUseCase
-  implements ICommandHandler<ConfirmUserByCodeCommand>
-{
+export class ConfirmUserByCodeUseCase implements ICommandHandler<ConfirmUserByCodeCommand> {
   constructor(protected usersRepo: UsersRepo) {}
   async execute(command: ConfirmUserByCodeCommand): Promise<boolean> {
     const { code } = command;

@@ -29,8 +29,7 @@ export const loginOrEmailAlreadyExists = {
   field: 'field',
 };
 export const invalidLoginOrEmailLengthError = {
-  message:
-    'Invalid login or email length. Must be between 3 and 20 characters.',
+  message: 'Invalid login or email length. Must be between 3 and 20 characters.',
   field: 'loginOrEmail',
 };
 export const passwordInvalid = {
@@ -46,18 +45,15 @@ export const userNotHavePermission = {
   params: 'blogId',
 };
 export const userNotHavePermissionForBlog = {
-  message:
-    'Leaving comments for this user is not allowed, and accessing the blog is restricted.',
+  message: 'Leaving comments for this user is not allowed, and accessing the blog is restricted.',
   params: 'blogId',
 };
 export const userNotHavePermissionForPost = {
-  message:
-    'Leaving posts for this user is not allowed, and accessing the blog is restricted.',
+  message: 'Leaving posts for this user is not allowed, and accessing the blog is restricted.',
   params: 'blogId',
 };
 export const userNotHavePermissionSubscribeForBlog = {
-  message:
-    'Subscribe for blog for this user is not allowed, and accessing the blog is restricted.',
+  message: 'Subscribe for blog for this user is not allowed, and accessing the blog is restricted.',
   params: 'blogId',
 };
 export const cannotBlockOwnBlog = {

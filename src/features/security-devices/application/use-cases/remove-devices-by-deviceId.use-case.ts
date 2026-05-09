@@ -13,9 +13,7 @@ export class RemoveDevicesByDeviceIdCommand {
 }
 
 @CommandHandler(RemoveDevicesByDeviceIdCommand)
-export class RemoveDevicesByDeviceIdUseCase
-  implements ICommandHandler<RemoveDevicesByDeviceIdCommand>
-{
+export class RemoveDevicesByDeviceIdUseCase implements ICommandHandler<RemoveDevicesByDeviceIdCommand> {
   constructor(protected securityDevicesRepo: SecurityDevicesRepo) {}
 
   async execute(command: RemoveDevicesByDeviceIdCommand): Promise<boolean> {

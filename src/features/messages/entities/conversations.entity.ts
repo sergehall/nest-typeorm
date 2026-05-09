@@ -1,7 +1,7 @@
 import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
 import { MessagesEntity } from './messages.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('Conversations')
 export class ConversationsEntity {
@@ -35,10 +35,7 @@ export class ConversationsEntity {
   @OneToMany(() => UsersEntity, (user) => user.conversations)
   authors: UsersEntity[];
 
-  static createConversationEntity(
-    title: string,
-    description: string,
-  ): ConversationsEntity {
+  static createConversationEntity(title: string, description: string): ConversationsEntity {
     const conversationEntity = new ConversationsEntity();
     conversationEntity.id = uuid4().toString();
     conversationEntity.title = title;

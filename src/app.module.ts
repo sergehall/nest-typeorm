@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { appProviders } from './app.providers';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './features/auth/auth.module';
@@ -36,6 +35,7 @@ import { SocketModule } from './socket/socket.module';
 import { PaymentModule } from './payment/payment.module';
 import { PayPalModule } from './payment/payment-systems/pay-pal/pay-pal.module';
 import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
+import { appProviders } from './app.providers';
 
 @Module({
   imports: [
@@ -73,13 +73,7 @@ import { StripeModule } from './payment/payment-systems/stripe/stripe.module';
     MessagesModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    TelegramAdapter,
-    TelegramConfig,
-    PostgresConfig,
-    ...appProviders,
-  ],
+  providers: [AppService, TelegramAdapter, TelegramConfig, PostgresConfig, ...appProviders],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

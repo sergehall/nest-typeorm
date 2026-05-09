@@ -13,9 +13,7 @@ export class ManageTelegramBotCommand {
 }
 
 @CommandHandler(ManageTelegramBotCommand)
-export class ManageTelegramBotUseCase
-  implements ICommandHandler<ManageTelegramBotCommand>
-{
+export class ManageTelegramBotUseCase implements ICommandHandler<ManageTelegramBotCommand> {
   constructor(
     protected usersRepo: UsersRepo,
     protected telegramBotStatusRepo: TelegramBotStatusRepo,
@@ -28,8 +26,7 @@ export class ManageTelegramBotUseCase
       payloadTelegramMessage.message.from.first_name ||
       payloadTelegramMessage.message.from.username;
 
-    const user: UsersEntity | null =
-      await this.usersRepo.findNotBannedUserById(code);
+    const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(code);
 
     if (!user) {
       return null;

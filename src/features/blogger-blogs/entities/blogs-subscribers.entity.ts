@@ -3,7 +3,7 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { BloggerBlogsEntity } from './blogger-blogs.entity';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('BlogsSubscribers')
 export class BlogsSubscribersEntity {

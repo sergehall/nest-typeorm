@@ -5,6 +5,7 @@ import { StripeConfig } from '../../../../config/stripe/stripe.config';
 import { SpireVersionDefaultEnum } from '../../../../config/stripe/enums/spire-version-default.enum';
 import { EnvNamesEnums } from '../../../../config/enums/env-names.enums';
 import { StripeConfigDto } from '../../../../config/stripe/dto/stripe-config.dto';
+import { StripeClient } from '../types/stripe-sdk.types';
 
 @Injectable()
 export class StripeFactory {
@@ -13,7 +14,7 @@ export class StripeFactory {
     private readonly stripeConfig: StripeConfig,
   ) {}
 
-  async createStripeInstance(): Promise<Stripe> {
+  async createStripeInstance(): Promise<StripeClient> {
     const version: SpireVersionDefaultEnum =
       await this.stripeConfig.getStripeVersion('STRIPE_API_VERSION');
     const envNames: EnvNamesEnums = await this.nodeEnvConfig.getValueENV();
@@ -38,18 +39,14 @@ export class StripeFactory {
   }
 
   async getTestApiKey(): Promise<StripeConfigDto> {
-    const stripeTestApiKey = await this.stripeConfig.getStripeApiKey(
-      'STRIPE_TEST_API_KEY',
-    );
+    const stripeTestApiKey = await this.stripeConfig.getStripeApiKey('STRIPE_TEST_API_KEY');
     return {
       apiKey: stripeTestApiKey,
     };
   }
 
   async getLiveApiKey(): Promise<StripeConfigDto> {
-    const stripeTestApiKey = await this.stripeConfig.getStripeApiKey(
-      'STRIPE_LIVE_API_KEY',
-    );
+    const stripeTestApiKey = await this.stripeConfig.getStripeApiKey('STRIPE_LIVE_API_KEY');
     return {
       apiKey: stripeTestApiKey,
     };

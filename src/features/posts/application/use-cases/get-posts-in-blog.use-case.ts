@@ -18,9 +18,7 @@ export class GetPostsInBlogCommand {
 }
 
 @CommandHandler(GetPostsInBlogCommand)
-export class GetPostsInBlogUseCase
-  implements ICommandHandler<GetPostsInBlogCommand>
-{
+export class GetPostsInBlogUseCase implements ICommandHandler<GetPostsInBlogCommand> {
   constructor(
     private readonly postsRepo: PostsRepo,
     private readonly postsService: PostsService,
@@ -33,11 +31,7 @@ export class GetPostsInBlogUseCase
 
     // Retrieve posts and their count
     const postsAndNumberOfPosts: PostsAndCountDto =
-      await this.postsRepo.getPostsInBlogWithPagination(
-        blogId,
-        queryData,
-        currentUserDto,
-      );
+      await this.postsRepo.getPostsInBlogWithPagination(blogId, queryData, currentUserDto);
     const totalCount = postsAndNumberOfPosts.countPosts;
 
     // If no posts found, return empty result
@@ -58,18 +52,14 @@ export class GetPostsInBlogUseCase
     // Retrieve metadata for files associated with posts
     const imagesMetadataForPosts: {
       [postId: string]: PathKeyBufferDto[];
-    }[] =
-      await this.imagesPostsOriginalMetadataRepo.findAndMergeImagesMetadataForPosts(
-        postIds,
-        posts[0].blogId,
-      );
+    }[] = await this.imagesPostsOriginalMetadataRepo.findAndMergeImagesMetadataForPosts(
+      postIds,
+      posts[0].blogId,
+    );
 
     // Map posts to their respective view models with image metadata
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
-      await this.postsService.mapPostsWithLikesAndImagesMetadata(
-        posts,
-        imagesMetadataForPosts,
-      );
+      await this.postsService.mapPostsWithLikesAndImagesMetadata(posts, imagesMetadataForPosts);
     const pagesCount: number = Math.ceil(totalCount / pageSize);
 
     return {

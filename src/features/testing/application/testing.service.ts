@@ -3,9 +3,7 @@ import { TestingDeleteAllDataRepository } from '../infrastructure/testing-delete
 
 @Injectable()
 export class TestingService {
-  constructor(
-    protected testingDeleteAllDataRepository: TestingDeleteAllDataRepository,
-  ) {}
+  constructor(protected testingDeleteAllDataRepository: TestingDeleteAllDataRepository) {}
   async removeAllDataRawSQL(): Promise<void> {
     return await this.testingDeleteAllDataRepository.removeAllData();
   }

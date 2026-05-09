@@ -12,9 +12,7 @@ export class SaUpdateQuestionsAndAnswerCommand {
 }
 
 @CommandHandler(SaUpdateQuestionsAndAnswerCommand)
-export class SaUpdateQuestionsAndAnswerUseCase
-  implements ICommandHandler<SaUpdateQuestionsAndAnswerCommand>
-{
+export class SaUpdateQuestionsAndAnswerUseCase implements ICommandHandler<SaUpdateQuestionsAndAnswerCommand> {
   constructor(private readonly gameQuestionsRepo: GameQuestionsRepo) {}
 
   async execute(command: SaUpdateQuestionsAndAnswerCommand): Promise<boolean> {
@@ -22,12 +20,8 @@ export class SaUpdateQuestionsAndAnswerUseCase
 
     const question: QuestionsQuizEntity | null =
       await this.gameQuestionsRepo.getQuestionById(questionId);
-    if (!question)
-      throw new NotFoundException(`Question with ID ${questionId} not found`);
+    if (!question) throw new NotFoundException(`Question with ID ${questionId} not found`);
 
-    return await this.gameQuestionsRepo.saUpdateQuestionAndAnswers(
-      question,
-      updateQuizQuestionDto,
-    );
+    return await this.gameQuestionsRepo.saUpdateQuestionAndAnswers(question, updateQuizQuestionDto);
   }
 }

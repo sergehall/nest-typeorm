@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { noAuthHeadersError } from '../../../common/filters/custom-errors-messages';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CommandBus } from '@nestjs/cqrs';
@@ -29,15 +24,11 @@ export class BasicAuthGuard implements CanActivate {
       throw new UnauthorizedException([noAuthHeadersError]);
     }
 
-    const credentials = Buffer.from(base64Credentials, 'base64').toString(
-      'utf-8',
-    );
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
 
     const [username, password] = credentials.split(':');
 
-    await this.commandBus.execute(
-      new ValidLoginPasswordSizesCommand(username, password),
-    );
+    await this.commandBus.execute(new ValidLoginPasswordSizesCommand(username, password));
 
     const user: UsersEntity = await this.commandBus.execute(
       new ValidLoginOrEmailPasswordCommand(username, password),

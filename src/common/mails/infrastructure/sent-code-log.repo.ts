@@ -21,9 +21,7 @@ export class SentCodeLogRepo {
     }
   }
 
-  private async createNewLogEntry(
-    user: UsersEntity,
-  ): Promise<SentCodesLogEntity> {
+  private async createNewLogEntry(user: UsersEntity): Promise<SentCodesLogEntity> {
     const newLogEntry = new SentCodesLogEntity();
     newLogEntry.sentForUser = user;
     newLogEntry.sentCodeTime = new Date().toISOString();

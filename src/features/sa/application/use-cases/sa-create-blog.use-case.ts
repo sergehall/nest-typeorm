@@ -3,10 +3,7 @@ import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
-import {
-  ForbiddenException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { CreateBlogsDto } from '../../../blogger-blogs/dto/create-blogs.dto';
 import { BloggerBlogsRepo } from '../../../blogger-blogs/infrastructure/blogger-blogs.repo';
 import { BloggerBlogsViewModel } from '../../../blogger-blogs/views/blogger-blogs.view-model';
@@ -19,9 +16,7 @@ export class SaCreateBlogCommand {
 }
 
 @CommandHandler(SaCreateBlogCommand)
-export class SaCreateBlogUseCase
-  implements ICommandHandler<SaCreateBlogCommand>
-{
+export class SaCreateBlogUseCase implements ICommandHandler<SaCreateBlogCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -38,10 +33,7 @@ export class SaCreateBlogUseCase
     // In the future, you can add a checkPermission
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
-      ForbiddenError.from(ability).throwUnlessCan(
-        Action.CREATE,
-        currentUserDto,
-      );
+      ForbiddenError.from(ability).throwUnlessCan(Action.CREATE, currentUserDto);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(error.message);

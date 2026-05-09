@@ -64,17 +64,14 @@ export class LikeStatusCommentsRepo {
         likeStatusCommentEntity.likeStatus = likeStatusDto.likeStatus;
         likeStatusCommentEntity.addedAt = new Date().toISOString();
       } else {
-        likeStatusCommentEntity =
-          LikeStatusCommentsEntity.createLikeStatusCommentsEntity(
-            comment,
-            likeStatusDto,
-            currentUserDto,
-          );
+        likeStatusCommentEntity = LikeStatusCommentsEntity.createLikeStatusCommentsEntity(
+          comment,
+          likeStatusDto,
+          currentUserDto,
+        );
       }
 
-      return await this.likeStatusCommentRepository.save(
-        likeStatusCommentEntity,
-      );
+      return await this.likeStatusCommentRepository.save(likeStatusCommentEntity);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

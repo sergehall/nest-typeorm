@@ -43,9 +43,7 @@ export class MailOptionsBuilder {
     };
   }
 
-  async buildOptionsForRecoveryCode(
-    user: UsersEntity,
-  ): Promise<ConfirmationCodeEmailOptions> {
+  async buildOptionsForRecoveryCode(user: UsersEntity): Promise<ConfirmationCodeEmailOptions> {
     const domainName = this.domainName;
     const path = '/auth/password-recovery';
     const parameter = `?recoveryCode=${user.confirmationCode}`;
@@ -60,9 +58,7 @@ export class MailOptionsBuilder {
     return this.buildOptions(fullURL, user, subject, emailText, htmlText);
   }
 
-  async buildOptionsForConfirmationCode(
-    user: UsersEntity,
-  ): Promise<ConfirmationCodeEmailOptions> {
+  async buildOptionsForConfirmationCode(user: UsersEntity): Promise<ConfirmationCodeEmailOptions> {
     const domainName = this.domainName;
     const path = '/auth/confirm-registration';
     const parameter = `?code=${user.confirmationCode}`;
@@ -78,8 +74,7 @@ export class MailOptionsBuilder {
   }
 
   private async initializeDomainName(): Promise<void> {
-    this.domainName =
-      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    this.domainName = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
   }
 
   private async initializeFromEmail(): Promise<void> {

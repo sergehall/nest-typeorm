@@ -29,13 +29,15 @@ import { ProductsDataEntity } from '../features/products/entities/products-data.
 import { ConversationsEntity } from '../features/messages/entities/conversations.entity';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL environment variable is required to initialize TypeORM.');
+}
+
 export default new DataSource({
   type: 'postgres',
-  host: process.env.PG_HOST_HEROKU,
-  port: parseInt(process.env.PG_HOST_HEROKU as string, 10) || 5432,
-  username: process.env.PG_HEROKU_USER_NAME,
-  password: process.env.PG_HEROKU_USER_PASSWORD,
-  database: process.env.PG_HEROKU_NAME_DATABASE,
+  url: databaseUrl,
   ssl: { rejectUnauthorized: false },
   migrationsTableName: 'migrationsNest',
   entities: [

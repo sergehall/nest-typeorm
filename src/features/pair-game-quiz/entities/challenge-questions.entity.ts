@@ -17,14 +17,10 @@ export class ChallengeQuestionsEntity {
   @JoinColumn({ name: 'pairGameQuizId', referencedColumnName: 'id' })
   pairGameQuiz: PairsGameEntity;
 
-  @ManyToOne(
-    () => QuestionsQuizEntity,
-    (question) => question.challengeQuestion,
-    {
-      nullable: false,
-      eager: true,
-    },
-  )
+  @ManyToOne(() => QuestionsQuizEntity, (question) => question.challengeQuestion, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn([
     { name: 'questionId', referencedColumnName: 'id' },
     { name: 'body', referencedColumnName: 'questionText' },

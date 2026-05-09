@@ -8,12 +8,8 @@ export class FinalizePayPalPaymentCommand {
 }
 
 @CommandHandler(FinalizePayPalPaymentCommand)
-export class FinalizePayPalPaymentUseCase
-  implements ICommandHandler<FinalizePayPalPaymentCommand>
-{
-  constructor(
-    private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
-  ) {}
+export class FinalizePayPalPaymentUseCase implements ICommandHandler<FinalizePayPalPaymentCommand> {
+  constructor(private readonly paymentTransactionsRepo: PaymentTransactionsRepo) {}
 
   async execute(command: FinalizePayPalPaymentCommand): Promise<void> {
     const { body } = command;
@@ -21,8 +17,7 @@ export class FinalizePayPalPaymentUseCase
     try {
       const { order_id } = body.resource.supplementary_data.related_ids;
 
-      if (!order_id)
-        throw new InternalServerErrorException('Invalid reference related_ids');
+      if (!order_id) throw new InternalServerErrorException('Invalid reference related_ids');
 
       await this.paymentTransactionsRepo.completedPayment(order_id, body);
 
@@ -30,9 +25,7 @@ export class FinalizePayPalPaymentUseCase
       // Send email to the payee
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(
-        'Failed to finalize order payment',
-      );
+      throw new InternalServerErrorException('Failed to finalize order payment');
     }
   }
 }

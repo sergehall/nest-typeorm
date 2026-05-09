@@ -19,9 +19,7 @@ export class DeletePostByIdCommand {
 }
 
 @CommandHandler(DeletePostByIdCommand)
-export class DeletePostByIdUseCase
-  implements ICommandHandler<DeletePostByIdCommand>
-{
+export class DeletePostByIdUseCase implements ICommandHandler<DeletePostByIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsRepo: PostsRepo,

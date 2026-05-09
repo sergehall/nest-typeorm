@@ -1,17 +1,15 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
-import Stripe from 'stripe';
 import { StripeChargeObjectType } from '../../types/stripe-charge-object.type';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
+import { StripeEvent } from '../../types/stripe-sdk.types';
 
 export class ProcessChargeSucceededCommand {
-  constructor(public event: Stripe.Event) {}
+  constructor(public event: StripeEvent) {}
 }
 
 @CommandHandler(ProcessChargeSucceededCommand)
-export class ProcessStripeChargeSucceededUseCase
-  implements ICommandHandler<ProcessChargeSucceededCommand>
-{
+export class ProcessStripeChargeSucceededUseCase implements ICommandHandler<ProcessChargeSucceededCommand> {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
@@ -20,7 +18,7 @@ export class ProcessStripeChargeSucceededUseCase
   async execute(command: ProcessChargeSucceededCommand): Promise<string> {
     const { event } = command;
     try {
-      const stripeChargeObject = event.data.object as StripeChargeObjectType;
+      const stripeChargeObject = event.data.object as unknown as StripeChargeObjectType;
       const receiptUrl = stripeChargeObject.receipt_url;
       if (receiptUrl) {
         // await this.paymentTransactionsRepo.saveReceiptUrl({

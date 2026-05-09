@@ -16,11 +16,7 @@ import { ReSendConfirmationCodeEventHandler } from './events-handlers/re-send-co
 import { SendRecoveryCodeEventHandler } from './events-handlers/send-recovery-code.event.handler';
 import { MailsConfig } from '../../config/mails/mails.config';
 
-const mailsUseCases = [
-  EmailSendingUseCase,
-  SendConfirmationCodesUseCase,
-  SendRecoveryCodesUseCase,
-];
+const mailsUseCases = [EmailSendingUseCase, SendConfirmationCodesUseCase, SendRecoveryCodesUseCase];
 
 const mailsEventHandlers = [
   SendRecoveryCodeEventHandler,

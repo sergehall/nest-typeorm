@@ -1,9 +1,5 @@
 import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SecurityDevicesEntity } from '../entities/session-devices.entity';
 import { PayloadDto } from '../../auth/dto/payload.dto';
@@ -18,9 +14,7 @@ export class SecurityDevicesRepo {
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async findDeviceByDeviceId(
-    deviceId: string,
-  ): Promise<SecurityDevicesEntity[]> {
+  async findDeviceByDeviceId(deviceId: string): Promise<SecurityDevicesEntity[]> {
     try {
       const currentTime = new Date().toISOString();
 
@@ -32,11 +26,8 @@ export class SecurityDevicesRepo {
       });
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const deviceId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(
-          `SecurityDevicesEntity with ID ${deviceId} not found`,
-        );
+        const deviceId = await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`SecurityDevicesEntity with ID ${deviceId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -50,12 +41,7 @@ export class SecurityDevicesRepo {
 
       return await this.securityDevicesRepository
         .createQueryBuilder('device')
-        .select([
-          'device.ip',
-          'device.title',
-          'device.lastActiveDate',
-          'device.deviceId',
-        ])
+        .select(['device.ip', 'device.title', 'device.lastActiveDate', 'device.deviceId'])
         .where('device.userId = :userId', { userId: payload.userId })
         .andWhere('device.expirationDate >= :currentTime', { currentTime })
         .orderBy('device.lastActiveDate', 'DESC')
@@ -81,9 +67,7 @@ export class SecurityDevicesRepo {
       return await this.securityDevicesRepository.save(newDeviceEntity);
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new device.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new device.');
     }
   }
 
@@ -103,19 +87,13 @@ export class SecurityDevicesRepo {
 
       sessionToUpdate.ip = clientIp;
       sessionToUpdate.title = userAgent;
-      sessionToUpdate.lastActiveDate = new Date(
-        updatedPayload.iat * 1000,
-      ).toISOString();
-      sessionToUpdate.expirationDate = new Date(
-        updatedPayload.exp * 1000,
-      ).toISOString();
+      sessionToUpdate.lastActiveDate = new Date(updatedPayload.iat * 1000).toISOString();
+      sessionToUpdate.expirationDate = new Date(updatedPayload.exp * 1000).toISOString();
 
       return await this.securityDevicesRepository.save(sessionToUpdate);
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new device.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new device.');
     }
   }
 
@@ -168,9 +146,7 @@ export class SecurityDevicesRepo {
     }
   }
 
-  async deleteDevicesExceptCurrent(
-    currentPayload: PayloadDto,
-  ): Promise<boolean> {
+  async deleteDevicesExceptCurrent(currentPayload: PayloadDto): Promise<boolean> {
     try {
       const deleteResult = await this.securityDevicesRepository
         .createQueryBuilder()

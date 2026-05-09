@@ -8,23 +8,16 @@ export class ChangePasswordByRecoveryCodeCommand {
 }
 
 @CommandHandler(ChangePasswordByRecoveryCodeCommand)
-export class ChangePasswordByRecoveryCodeUseCase
-  implements ICommandHandler<ChangePasswordByRecoveryCodeCommand>
-{
+export class ChangePasswordByRecoveryCodeUseCase implements ICommandHandler<ChangePasswordByRecoveryCodeCommand> {
   constructor(
     protected usersRepo: UsersRepo,
     protected encryptConfig: EncryptConfig,
   ) {}
-  async execute(
-    command: ChangePasswordByRecoveryCodeCommand,
-  ): Promise<boolean> {
+  async execute(command: ChangePasswordByRecoveryCodeCommand): Promise<boolean> {
     const { newPassword, recoveryCode } = command.newPasswordRecoveryDto;
 
     const passwordHash = await this.encryptConfig.encryptPassword(newPassword);
 
-    return await this.usersRepo.updateUserPasswordHashByRecoveryCode(
-      recoveryCode,
-      passwordHash,
-    );
+    return await this.usersRepo.updateUserPasswordHashByRecoveryCode(recoveryCode, passwordHash);
   }
 }

@@ -4,11 +4,7 @@ import { ExpirationDateDto } from './dto/expiration-date.dto';
 // Function to calculate the expiration date
 @Injectable()
 export class CalculatorExpirationDate {
-  async createExpDate(
-    days: number,
-    hours: number,
-    minutes: number,
-  ): Promise<ExpirationDateDto> {
+  async createExpDate(days: number, hours: number, minutes: number): Promise<ExpirationDateDto> {
     // Convert days, hours, and minutes to milliseconds
     const daysInMilliseconds: number = days * 24 * 60 * 60 * 1000;
     const hoursInMilliseconds: number = hours * 60 * 60 * 1000;

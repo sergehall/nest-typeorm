@@ -11,7 +11,7 @@ import { UsersRepo } from '../../features/users/infrastructure/users-repo';
 export class LoginEmailExistsValidator implements ValidatorConstraintInterface {
   constructor(protected usersRepo: UsersRepo) {}
 
-  async validate(value: any, args: ValidationArguments): Promise<boolean> {
+  async validate(value: any, _args: ValidationArguments): Promise<boolean> {
     if (!value) {
       return true; // Don't perform validation if value is not provided
     }

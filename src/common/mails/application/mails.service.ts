@@ -9,14 +9,10 @@ export class MailsService {
   constructor(protected commandBus: CommandBus) {}
 
   async sendConfirmationCode(user: UsersEntity): Promise<boolean> {
-    return await this.commandBus.execute(
-      new SendConfirmationCodesCommand(user),
-    );
+    return await this.commandBus.execute(new SendConfirmationCodesCommand(user));
   }
 
   async sendRecoveryCode(updatedUser: UsersEntity): Promise<boolean> {
-    return await this.commandBus.execute(
-      new SendRecoveryCodesCommand(updatedUser),
-    );
+    return await this.commandBus.execute(new SendRecoveryCodesCommand(updatedUser));
   }
 }

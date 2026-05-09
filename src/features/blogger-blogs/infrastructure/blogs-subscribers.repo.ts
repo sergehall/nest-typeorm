@@ -3,10 +3,7 @@ import { Repository } from 'typeorm';
 import { BlogsSubscribersEntity } from '../entities/blogs-subscribers.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { BlogsSubscriptionStatusCountType } from '../types/blogs-subscription-status-count.type';
@@ -22,9 +19,7 @@ export class BlogsSubscribersRepo {
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async findSubscribersForBlogWithEnabledBot(
-    blogId: string,
-  ): Promise<TelegramBotStatusEntity[]> {
+  async findSubscribersForBlogWithEnabledBot(blogId: string): Promise<TelegramBotStatusEntity[]> {
     try {
       return await this.telegramBotStatusRepository
         .createQueryBuilder('telegramBotStatus')
@@ -81,8 +76,7 @@ export class BlogsSubscribersRepo {
         .getRawMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const blogId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -116,15 +110,11 @@ export class BlogsSubscribersRepo {
             currentUserDto,
           );
 
-        return await this.blogsSubscribersRepository.save(
-          blogsSubscribersEntity,
-        );
+        return await this.blogsSubscribersRepository.save(blogsSubscribersEntity);
       }
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while managing blog subscription.',
-      );
+      throw new InternalServerErrorException('An error occurred while managing blog subscription.');
     }
   }
 }

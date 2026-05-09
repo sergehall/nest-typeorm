@@ -10,24 +10,18 @@ export class SaCreateQuestionsAndAnswerCommand {
 }
 
 @CommandHandler(SaCreateQuestionsAndAnswerCommand)
-export class SaCreateQuestionsAndAnswerUseCase
-  implements ICommandHandler<SaCreateQuestionsAndAnswerCommand>
-{
+export class SaCreateQuestionsAndAnswerUseCase implements ICommandHandler<SaCreateQuestionsAndAnswerCommand> {
   constructor(
     protected gameQuestionsRepo: GameQuestionsRepo,
     protected quizQuestionsService: SaQuizQuestionsService,
   ) {}
-  async execute(
-    command: SaCreateQuestionsAndAnswerCommand,
-  ): Promise<QuestionsViewModel> {
+  async execute(command: SaCreateQuestionsAndAnswerCommand): Promise<QuestionsViewModel> {
     const { createQuizQuestionDto } = command;
     const newQuestion: QuestionsQuizEntity =
       await this.gameQuestionsRepo.saCreateQuestion(createQuizQuestionDto);
 
     const newQuestionArr: QuestionsViewModel[] =
-      await this.quizQuestionsService.transformEntityToQuestionsModelArray([
-        newQuestion,
-      ]);
+      await this.quizQuestionsService.transformEntityToQuestionsModelArray([newQuestion]);
 
     return newQuestionArr[0];
   }

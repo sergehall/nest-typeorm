@@ -6,11 +6,8 @@ import { AnswerStatusEnum } from '../enums/answer-status.enum';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
-import * as uuid4 from 'uuid4';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import uuid4 from 'uuid4';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 
@@ -87,9 +84,7 @@ export class ChallengesAnswersRepo {
     }
   }
 
-  async getChallengeAnswersByGameId(
-    pairGameQuizId: string,
-  ): Promise<ChallengeAnswersEntity[]> {
+  async getChallengeAnswersByGameId(pairGameQuizId: string): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepo
       .createQueryBuilder('challengeAnswers')
       .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
@@ -103,8 +98,7 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -142,17 +136,14 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getChallengeAnswersByIds(
-    pairGameQuizIds: string[],
-  ): Promise<ChallengeAnswersEntity[]> {
+  async getChallengeAnswersByIds(pairGameQuizIds: string[]): Promise<ChallengeAnswersEntity[]> {
     const queryBuilder = this.challengeAnswersRepo
       .createQueryBuilder('challengeAnswers')
       .leftJoinAndSelect('challengeAnswers.pairGameQuiz', 'pairGameQuiz')
@@ -166,8 +157,7 @@ export class ChallengesAnswersRepo {
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);

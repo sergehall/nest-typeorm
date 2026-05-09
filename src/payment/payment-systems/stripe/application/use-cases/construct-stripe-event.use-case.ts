@@ -1,26 +1,22 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
-import Stripe from 'stripe';
 import { StripeFactory } from '../../factory/stripe-factory';
 import { StripeConfig } from '../../../../../config/stripe/stripe.config';
+import { StripeClient, StripeEvent } from '../../types/stripe-sdk.types';
 
 export class ConstructStripeEventCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
 }
 
 @CommandHandler(ConstructStripeEventCommand)
-export class ConstructStripeEventUseCase
-  implements ICommandHandler<ConstructStripeEventCommand>
-{
+export class ConstructStripeEventUseCase implements ICommandHandler<ConstructStripeEventCommand> {
   constructor(
     private readonly stripeConfig: StripeConfig,
     private readonly stripeFactory: StripeFactory,
   ) {}
 
-  async execute(
-    command: ConstructStripeEventCommand,
-  ): Promise<Stripe.Event | undefined> {
+  async execute(command: ConstructStripeEventCommand): Promise<StripeEvent | undefined> {
     const { rawBodyRequest } = command;
 
     try {
@@ -36,8 +32,7 @@ export class ConstructStripeEventUseCase
 
         // const stripeInstance: Stripe =
         //   await this.stripeAdapter.createStripeInstance();
-        const stripeInstance: Stripe =
-          await this.stripeFactory.createStripeInstance();
+        const stripeInstance: StripeClient = await this.stripeFactory.createStripeInstance();
 
         return stripeInstance.webhooks.constructEvent(
           rawBodyRequest.rawBody,
@@ -47,9 +42,7 @@ export class ConstructStripeEventUseCase
       }
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(
-        'Error constructStripeEvent' + error.message,
-      );
+      throw new InternalServerErrorException('Error constructStripeEvent' + error.message);
     }
   }
 }

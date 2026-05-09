@@ -12,17 +12,11 @@ export class CreateDeviceCommand {
 }
 
 @CommandHandler(CreateDeviceCommand)
-export class CreateDeviceUseCase
-  implements ICommandHandler<CreateDeviceCommand>
-{
+export class CreateDeviceUseCase implements ICommandHandler<CreateDeviceCommand> {
   constructor(private readonly securityDevicesRepo: SecurityDevicesRepo) {}
   async execute(command: CreateDeviceCommand): Promise<SecurityDevicesEntity> {
     const { newPayload, clientIp, userAgent } = command;
 
-    return await this.securityDevicesRepo.createDevice(
-      newPayload,
-      clientIp,
-      userAgent,
-    );
+    return await this.securityDevicesRepo.createDevice(newPayload, clientIp, userAgent);
   }
 }

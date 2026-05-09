@@ -7,9 +7,7 @@ export class EmailSendingCommand {
 }
 
 @CommandHandler(EmailSendingCommand)
-export class EmailSendingUseCase
-  implements ICommandHandler<EmailSendingCommand>
-{
+export class EmailSendingUseCase implements ICommandHandler<EmailSendingCommand> {
   constructor(protected mailerService: MailerService) {}
 
   async execute(command: EmailSendingCommand): Promise<boolean> {

@@ -10,16 +10,12 @@ export class OrderItemsRepo {
     private readonly orderItemsRepository: Repository<OrderItemsEntity>,
   ) {}
 
-  async saveOrderItems(
-    orderItems: OrderItemsEntity[],
-  ): Promise<OrderItemsEntity[]> {
+  async saveOrderItems(orderItems: OrderItemsEntity[]): Promise<OrderItemsEntity[]> {
     try {
       return await this.orderItemsRepository.save(orderItems);
     } catch (error) {
       console.log('Error saving orderItems:', error);
-      throw new InternalServerErrorException(
-        'Error saving orderItems' + error.message,
-      );
+      throw new InternalServerErrorException('Error saving orderItems' + error.message);
     }
   }
 }

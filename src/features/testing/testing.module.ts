@@ -10,10 +10,6 @@ const testingEventHandlers = [ConsoleNamesOfClearedTablesEventHandler];
 @Module({
   imports: [CqrsModule],
   controllers: [TestingController],
-  providers: [
-    TestingService,
-    TestingDeleteAllDataRepository,
-    ...testingEventHandlers,
-  ],
+  providers: [TestingService, TestingDeleteAllDataRepository, ...testingEventHandlers],
 })
 export class TestingModule {}

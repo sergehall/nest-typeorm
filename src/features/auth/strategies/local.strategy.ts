@@ -15,13 +15,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(
-    loginOrEmail: string,
-    password: string,
-  ): Promise<CurrentUserDto | null> {
-    await this.commandBus.execute(
-      new ValidLoginPasswordSizesCommand(loginOrEmail, password),
-    );
+  async validate(loginOrEmail: string, password: string): Promise<CurrentUserDto | null> {
+    await this.commandBus.execute(new ValidLoginPasswordSizesCommand(loginOrEmail, password));
 
     const user: UsersEntity = await this.commandBus.execute(
       new ValidLoginOrEmailPasswordCommand(loginOrEmail, password),

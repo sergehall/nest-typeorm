@@ -39,30 +39,29 @@ export class ImagesPostsOriginalMetadataRepo {
     currentUserDto: CurrentUserDto,
   ): Promise<OriginalMiddleSmallEntitiesDto> {
     try {
-      const [originalMetadata, middleMetadata, smallMetadata] =
-        await Promise.all([
-          this.createImagePostOriginalMetadata(
-            blog,
-            post,
-            resizedImages.original,
-            urlsPathKeysEtagsDto.original,
-            currentUserDto,
-          ),
-          this.imagesPostsMiddleMetadataRepo.createImagePostMiddleMetadata(
-            blog,
-            post,
-            resizedImages.middle,
-            urlsPathKeysEtagsDto.middle,
-            currentUserDto,
-          ),
-          this.imagesPostsSmallMetadataRepo.createImagePostSmallMetadata(
-            blog,
-            post,
-            resizedImages.small,
-            urlsPathKeysEtagsDto.small,
-            currentUserDto,
-          ),
-        ]);
+      const [originalMetadata, middleMetadata, smallMetadata] = await Promise.all([
+        this.createImagePostOriginalMetadata(
+          blog,
+          post,
+          resizedImages.original,
+          urlsPathKeysEtagsDto.original,
+          currentUserDto,
+        ),
+        this.imagesPostsMiddleMetadataRepo.createImagePostMiddleMetadata(
+          blog,
+          post,
+          resizedImages.middle,
+          urlsPathKeysEtagsDto.middle,
+          currentUserDto,
+        ),
+        this.imagesPostsSmallMetadataRepo.createImagePostSmallMetadata(
+          blog,
+          post,
+          resizedImages.small,
+          urlsPathKeysEtagsDto.small,
+          currentUserDto,
+        ),
+      ]);
 
       return {
         original: originalMetadata,
@@ -97,8 +96,7 @@ export class ImagesPostsOriginalMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesPostsOriginalMetadataEntity | null =
-      await queryBuilder.getOne();
+    const existingEntity: ImagesPostsOriginalMetadataEntity | null = await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {
@@ -123,9 +121,7 @@ export class ImagesPostsOriginalMetadataRepo {
     }
 
     try {
-      return await this.imagesPostsOriginalMetadataRepository.save(
-        postsImagesFileMetadataEntity,
-      );
+      return await this.imagesPostsOriginalMetadataRepository.save(postsImagesFileMetadataEntity);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(
@@ -144,34 +140,27 @@ export class ImagesPostsOriginalMetadataRepo {
     // Wrap the database queries within a transaction
     return this.imagesPostsOriginalMetadataRepository.manager.transaction(
       async (transactionManager) => {
-        // Parallelize the retrieval of metadata for different sizes of files
-        const [
-          originalMetadataPromise,
-          middleMetadataPromise,
-          smallMetadataPromise,
-        ] = await Promise.all([
-          this.findImagesPostOriginalMetadataMany(
-            postIds,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            transactionManager,
-          ),
-          this.findImagesPostMiddleMetadataMany(
-            postIds,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            transactionManager,
-          ),
-          this.findImagesPostSmallMetadataMany(
-            postIds,
-            blogId,
-            dependencyIsBanned,
-            isBanned,
-            transactionManager,
-          ),
-        ]);
+        const originalMetadataPromise = await this.findImagesPostOriginalMetadataMany(
+          postIds,
+          blogId,
+          dependencyIsBanned,
+          isBanned,
+          transactionManager,
+        );
+        const middleMetadataPromise = await this.findImagesPostMiddleMetadataMany(
+          postIds,
+          blogId,
+          dependencyIsBanned,
+          isBanned,
+          transactionManager,
+        );
+        const smallMetadataPromise = await this.findImagesPostSmallMetadataMany(
+          postIds,
+          blogId,
+          dependencyIsBanned,
+          isBanned,
+          transactionManager,
+        );
 
         // Merge the results into a single array
         const mergedMetadata: {
@@ -301,8 +290,7 @@ export class ImagesPostsOriginalMetadataRepo {
       .andWhere('blog.id = :blogId', { blogId });
 
     try {
-      const originalMetadata: ImagesPostsOriginalMetadataEntity[] =
-        await queryBuilder.getMany();
+      const originalMetadata: ImagesPostsOriginalMetadataEntity[] = await queryBuilder.getMany();
 
       return await this.mapEntitiesToDTOs(originalMetadata);
     } catch (error) {
@@ -354,8 +342,7 @@ export class ImagesPostsOriginalMetadataRepo {
       .andWhere('blog.id = :blogId', { blogId });
 
     try {
-      const smallMetadata: ImagesPostsSmallMetadataEntity[] =
-        await queryBuilder.getMany();
+      const smallMetadata: ImagesPostsSmallMetadataEntity[] = await queryBuilder.getMany();
       return await this.mapEntitiesToDTOs(smallMetadata);
     } catch (error) {
       console.error(error);

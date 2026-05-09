@@ -1,17 +1,15 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import Stripe from 'stripe';
 import { PaymentTransactionsRepo } from '../../../../infrastructure/payment-transactions.repo';
 import { PaymentService } from '../../../../application/payment.service';
+import { StripeCheckoutSession } from '../../types/stripe-sdk.types';
 
 export class FinalizeStripePaymentCommand {
-  constructor(public session: Stripe.Checkout.Session) {}
+  constructor(public session: StripeCheckoutSession) {}
 }
 
 @CommandHandler(FinalizeStripePaymentCommand)
-export class FinalizeStripePaymentUseCase
-  implements ICommandHandler<FinalizeStripePaymentCommand>
-{
+export class FinalizeStripePaymentUseCase implements ICommandHandler<FinalizeStripePaymentCommand> {
   constructor(
     private readonly paymentService: PaymentService,
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
@@ -45,9 +43,7 @@ export class FinalizeStripePaymentUseCase
       );
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(
-        'Failed to finalize order payment',
-      );
+      throw new InternalServerErrorException('Failed to finalize order payment');
     }
   }
 }

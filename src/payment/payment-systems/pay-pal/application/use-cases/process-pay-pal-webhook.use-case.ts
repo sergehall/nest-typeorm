@@ -9,9 +9,7 @@ export class ProcessPayPalWebhookCommand {
 }
 
 @CommandHandler(ProcessPayPalWebhookCommand)
-export class ProcessPayPalWebhookUseCase
-  implements ICommandHandler<ProcessPayPalWebhookCommand>
-{
+export class ProcessPayPalWebhookUseCase implements ICommandHandler<ProcessPayPalWebhookCommand> {
   constructor(private readonly commandBus: CommandBus) {}
 
   async execute(command: ProcessPayPalWebhookCommand): Promise<boolean> {
@@ -22,14 +20,10 @@ export class ProcessPayPalWebhookUseCase
         const eventType = rawBodyRequest.body.event_type;
         switch (eventType) {
           case 'CHECKOUT.ORDER.APPROVED':
-            await this.commandBus.execute(
-              new PayPalCapturePaymentCommand(rawBodyRequest.body),
-            );
+            await this.commandBus.execute(new PayPalCapturePaymentCommand(rawBodyRequest.body));
             break;
           case 'PAYMENT.CAPTURE.COMPLETED':
-            await this.commandBus.execute(
-              new FinalizePayPalPaymentCommand(rawBodyRequest.body),
-            );
+            await this.commandBus.execute(new FinalizePayPalPaymentCommand(rawBodyRequest.body));
             break;
           default:
             // Handle other webhook socket

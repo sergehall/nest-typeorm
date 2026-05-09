@@ -9,11 +9,7 @@ import { EndpointKeys } from './enums/endpoint-keys.enum';
 export class ApiDocService {
   constructor() {}
 
-  static apply(
-    endpointKeys: EndpointKeys,
-    method: string,
-    description?: string,
-  ) {
+  static apply(endpointKeys: EndpointKeys, method: string, description?: string) {
     switch (endpointKeys) {
       case EndpointKeys.SA:
         return SuperAdminDecoratorsService.getDecorator(method, description);

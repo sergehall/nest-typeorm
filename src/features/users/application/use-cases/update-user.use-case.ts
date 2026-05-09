@@ -24,8 +24,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
   async execute(command: UpdateUserCommand): Promise<boolean> {
     const { userId, updateUserDto, currentUserDto } = command;
 
-    const userToUpdate: UsersEntity | null =
-      await this.usersRepo.findNotBannedUserById(userId);
+    const userToUpdate: UsersEntity | null = await this.usersRepo.findNotBannedUserById(userId);
 
     if (!userToUpdate) {
       throw new NotFoundException(`User with ID ${userId} not found`);
@@ -37,10 +36,7 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
     console.log(updateUserDto, `This action update a #${userId} user`);
     return true;
   }
-  private async checkUserPermission(
-    userToUpdate: UsersEntity,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(userToUpdate: UsersEntity, currentUserDto: CurrentUserDto) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, userToUpdate);

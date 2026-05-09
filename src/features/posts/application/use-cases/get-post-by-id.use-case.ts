@@ -22,9 +22,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     private readonly postsService: PostsService,
     private readonly postsImagesFileMetadataRepo: ImagesPostsOriginalMetadataRepo,
   ) {}
-  async execute(
-    command: GetPostByIdCommand,
-  ): Promise<PostWithLikesImagesInfoViewModel> {
+  async execute(command: GetPostByIdCommand): Promise<PostWithLikesImagesInfoViewModel> {
     const { postId, currentUserDto } = command;
 
     const postWithLikesArr: PostWithLikesInfoViewModel[] | null =
@@ -37,17 +35,13 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
 
     const pathKeyBufferArr: {
       [postId: string]: PathKeyBufferDto[];
-    }[] =
-      await this.postsImagesFileMetadataRepo.findAndMergeImagesMetadataForPosts(
-        [post.id],
-        post.blogId,
-      );
+    }[] = await this.postsImagesFileMetadataRepo.findAndMergeImagesMetadataForPosts(
+      [post.id],
+      post.blogId,
+    );
 
     const postWithLikesImages: PostWithLikesImagesInfoViewModel[] =
-      await this.postsService.mapPostsWithLikesAndImagesMetadata(
-        [post],
-        pathKeyBufferArr,
-      );
+      await this.postsService.mapPostsWithLikesAndImagesMetadata([post], pathKeyBufferArr);
 
     return postWithLikesImages[0];
   }

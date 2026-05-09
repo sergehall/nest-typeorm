@@ -40,15 +40,10 @@ export class CommentsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
-  async findCommentById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<CommentViewModel> {
+  async findCommentById(@Request() req: any, @Param() params: IdParams): Promise<CommentViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new GetCommentByIdCommand(params.id, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetCommentByIdCommand(params.id, currentUserDto));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -62,21 +57,14 @@ export class CommentsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new UpdateCommentCommand(
-        params.commentId,
-        updateCommentDto,
-        currentUserDto,
-      ),
+      new UpdateCommentCommand(params.commentId, updateCommentDto, currentUserDto),
     );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete(':commentId')
-  async deleteComment(
-    @Request() req: any,
-    @Param() params: CommentIdParams,
-  ): Promise<boolean> {
+  async deleteComment(@Request() req: any, @Param() params: CommentIdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -95,11 +83,7 @@ export class CommentsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new ChangeLikeStatusCommentCommand(
-        params.commentId,
-        likeStatusDto,
-        currentUserDto,
-      ),
+      new ChangeLikeStatusCommentCommand(params.commentId, likeStatusDto, currentUserDto),
     );
   }
 }

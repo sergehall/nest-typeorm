@@ -17,9 +17,7 @@ export class SendNewBlogPostNotificationsCommand {
 }
 
 @CommandHandler(SendNewBlogPostNotificationsCommand)
-export class SendNewBlogPostNotificationsUseCase
-  implements ICommandHandler<SendNewBlogPostNotificationsCommand>
-{
+export class SendNewBlogPostNotificationsUseCase implements ICommandHandler<SendNewBlogPostNotificationsCommand> {
   constructor(
     private readonly blogsSubscribersRepo: BlogsSubscribersRepo,
     private readonly postgresConfig: PostgresConfig,
@@ -29,16 +27,11 @@ export class SendNewBlogPostNotificationsUseCase
     const { blog, newPost } = command;
 
     const subscribers: TelegramBotStatusEntity[] =
-      await this.blogsSubscribersRepo.findSubscribersForBlogWithEnabledBot(
-        blog.id,
-      );
+      await this.blogsSubscribersRepo.findSubscribersForBlogWithEnabledBot(blog.id);
 
-    const telegramIds: number[] = subscribers.map(
-      (subscriber) => subscriber.telegramId,
-    );
+    const telegramIds: number[] = subscribers.map((subscriber) => subscriber.telegramId);
 
-    const baseUrl: string =
-      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    const baseUrl: string = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const postLink: string = baseUrl + `/posts/${newPost.id}`;
 
     const tokenTelegramBot = await this.telegramConfig.getTelegramValue(

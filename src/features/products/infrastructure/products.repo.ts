@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsDataEntity } from '../entities/products-data.entity';
@@ -23,9 +19,7 @@ export class ProductsRepo {
    * @returns Either an array of ProductsDataEntity objects if all products are available,
    *          or a string indicating products that are not available.
    */
-  async getProductsByIds(
-    products: ProductRequest[],
-  ): Promise<string | ProductsDataEntity[]> {
+  async getProductsByIds(products: ProductRequest[]): Promise<string | ProductsDataEntity[]> {
     try {
       // Fetch product data for all product IDs concurrently
       const productPromises = products.map(async (product) => {
@@ -71,8 +65,7 @@ export class ProductsRepo {
       return updatedProducts;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const productId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const productId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Products with ID ${productId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -119,9 +112,7 @@ export class ProductsRepo {
   //   }
   // }
 
-  async checkProductQuantities(
-    products: ProductRequest[],
-  ): Promise<string | null> {
+  async checkProductQuantities(products: ProductRequest[]): Promise<string | null> {
     const insufficientProducts: string[] = [];
 
     try {
@@ -157,9 +148,7 @@ export class ProductsRepo {
     }
   }
 
-  async saveTestArrProducts(
-    products: ProductsDataEntity[],
-  ): Promise<ProductsDataEntity[]> {
+  async saveTestArrProducts(products: ProductsDataEntity[]): Promise<ProductsDataEntity[]> {
     try {
       const savedProductsPromises = products.map(async (product) => {
         const existingProduct = await this.productsRepository.findOne({

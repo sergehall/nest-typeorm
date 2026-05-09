@@ -17,9 +17,7 @@ export class AwsConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueAwsByKey(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in AWS configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in AWS configuration`);
     }
   }
 

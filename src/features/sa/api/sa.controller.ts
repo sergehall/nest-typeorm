@@ -96,8 +96,7 @@ export class SaController {
     @Query() query: any,
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
       new GetPostsInBlogCommand(blogId, queryData, currentUserDto),
@@ -109,15 +108,14 @@ export class SaController {
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
-  async saCreateUser(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<SaUserViewModel> {
+  async saCreateUser(@Body() createUserDto: CreateUserDto): Promise<SaUserViewModel> {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
 
-    const transformedUser: SaUserViewModel[] =
-      await this.usersService.transformUserForSa([newUser]);
+    const transformedUser: SaUserViewModel[] = await this.usersService.transformUserForSa([
+      newUser,
+    ]);
 
     return transformedUser[0];
   }
@@ -132,9 +130,7 @@ export class SaController {
   ): Promise<BloggerBlogsViewModel> {
     const currentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new SaCreateBlogCommand(createBlogsDto, currentUserDto),
-    );
+    return await this.commandBus.execute(new SaCreateBlogCommand(createBlogsDto, currentUserDto));
   }
 
   @Put('blogs/:id/ban')
@@ -214,15 +210,10 @@ export class SaController {
   @Put('blogs/:id/bind-with-user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
-  async bindBlogWithUser(
-    @Request() req: any,
-    @Param() params: IdUserIdParams,
-  ): Promise<boolean> {
+  async bindBlogWithUser(@Request() req: any, @Param() params: IdUserIdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new SaBindBlogWithUserCommand(params, currentUserDto),
-    );
+    return await this.commandBus.execute(new SaBindBlogWithUserCommand(params, currentUserDto));
   }
 
   @Put('blogs/:id/ban-with-user/:userId')
@@ -248,18 +239,13 @@ export class SaController {
   ): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new SaDeletePostByPostIdCommand(params, currentUserDto),
-    );
+    return await this.commandBus.execute(new SaDeletePostByPostIdCommand(params, currentUserDto));
   }
 
   @Delete('users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
-  async deleteUserById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
+  async deleteUserById(@Request() req: any, @Param() params: IdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
@@ -270,10 +256,7 @@ export class SaController {
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
-  async saDeleteBlogById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
+  async saDeleteBlogById(@Request() req: any, @Param() params: IdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(

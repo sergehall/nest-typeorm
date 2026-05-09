@@ -19,9 +19,7 @@ export class MyCurrentGameCommand {
 }
 
 @CommandHandler(MyCurrentGameCommand)
-export class MyCurrentGameUseCase
-  implements ICommandHandler<MyCurrentGameCommand>
-{
+export class MyCurrentGameUseCase implements ICommandHandler<MyCurrentGameCommand> {
   constructor(
     protected pairsGameRepo: GamePairsRepo,
     protected mapPairGame: MapPairGame,
@@ -32,13 +30,12 @@ export class MyCurrentGameUseCase
   async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
-    const game: PairsGameEntity | null =
-      await this.pairsGameRepo.getUnfinishedGameByUserId(currentUserDto.userId);
+    const game: PairsGameEntity | null = await this.pairsGameRepo.getUnfinishedGameByUserId(
+      currentUserDto.userId,
+    );
 
     if (!game) {
-      throw new NotFoundException(
-        `Active game for user ID ${currentUserDto.userId} not found.`,
-      );
+      throw new NotFoundException(`Active game for user ID ${currentUserDto.userId} not found.`);
     }
 
     if (game.status === StatusGameEnum.PENDING) {
@@ -48,9 +45,7 @@ export class MyCurrentGameUseCase
     return this.createGameModelForActive(game);
   }
 
-  private createGameModelForPending(
-    game: PairsGameEntity,
-  ): Promise<GameViewModel> {
+  private createGameModelForPending(game: PairsGameEntity): Promise<GameViewModel> {
     const challengeQuestions: ChallengeQuestionsEntity[] = [];
     const challengeAnswers: ChallengeAnswersEntity[] = [];
 
@@ -65,14 +60,14 @@ export class MyCurrentGameUseCase
     });
   }
 
-  private async createGameModelForActive(
-    game: PairsGameEntity,
-  ): Promise<GameViewModel> {
+  private async createGameModelForActive(game: PairsGameEntity): Promise<GameViewModel> {
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
-    const currentScores: CountCorrectAnswerDto =
-      await this.pairGameQuizService.getScores(game, challengeAnswers);
+    const currentScores: CountCorrectAnswerDto = await this.pairGameQuizService.getScores(
+      game,
+      challengeAnswers,
+    );
 
     const challengeQuestions: ChallengeQuestionsEntity[] =
       await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(game.id);

@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
 import { CreateBlogsDto } from '../src/features/blogger-blogs/dto/create-blogs.dto';
 import { MockBlogData } from './utilities/mock-test-data';
@@ -10,26 +10,26 @@ describe('Blogger Controller (e2e)', () => {
   const userUtils = new TestUtils(); // Create an instance of UserUtils
   let app: INestApplication;
   let server: any;
-  let createdValidUser: SaUserViewModel;
-  let confirmedUser: SaUserViewModel;
+  let _createdValidUser: SaUserViewModel;
+  let _confirmedUser: SaUserViewModel;
   let token: string;
   let mockBlogData: CreateBlogsDto;
-  let createdBlogId: string;
+  let _createdBlogId: string;
   let bloggerUrl: string;
 
   // query params default values
-  const searchNameTerm = 'null';
-  const sortBy = 'createdAt';
-  const sortDirection = 'desc';
-  const pageNumber = 1;
-  const pageSize = 10;
+  const _searchNameTerm = 'null';
+  const _sortBy = 'createdAt';
+  const _sortDirection = 'desc';
+  const _pageNumber = 1;
+  const _pageSize = 10;
 
   beforeAll(async () => {
     const testAppOptions = await getTestAppOptions();
     app = testAppOptions.app;
     server = testAppOptions.server;
-    createdValidUser = await userUtils.createTestUser(server);
-    confirmedUser = await userUtils.createTestConfirmedUser(server);
+    _createdValidUser = await userUtils.createTestUser(server);
+    _confirmedUser = await userUtils.createTestConfirmedUser(server);
     token = await userUtils.getAccessToken(server);
     mockBlogData = MockBlogData;
     bloggerUrl = '/blogger/blogs';
@@ -76,7 +76,7 @@ describe('Blogger Controller (e2e)', () => {
       );
 
       // Optionally, you can store the created blog ID for further testing
-      createdBlogId = response.body.id;
+      _createdBlogId = response.body.id;
     });
 
     it('should require valid blog data to create a new blog', async () => {
@@ -90,9 +90,7 @@ describe('Blogger Controller (e2e)', () => {
     });
 
     it('should require Bearer Authorization to create a new blog', async () => {
-      const response = await request(server)
-        .post(bloggerUrl)
-        .send(mockBlogData);
+      const response = await request(server).post(bloggerUrl).send(mockBlogData);
       expect(response.status).toBe(401);
     });
   });

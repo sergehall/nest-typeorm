@@ -3,7 +3,7 @@ import { ChallengeQuestionsEntity } from '../entities/challenge-questions.entity
 import { Repository } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { GameQuestionsRepo } from './game-questions.repo';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 
@@ -64,9 +64,7 @@ export class ChallengesQuestionsRepo {
     }
   }
 
-  async getChallengeQuestionsByGameId(
-    pairGameQuizId: string,
-  ): Promise<ChallengeQuestionsEntity[]> {
+  async getChallengeQuestionsByGameId(pairGameQuizId: string): Promise<ChallengeQuestionsEntity[]> {
     try {
       return await this.challengeQuestionsRepo
         .createQueryBuilder('challengeQuestions')
@@ -100,9 +98,7 @@ export class ChallengesQuestionsRepo {
     }
   }
 
-  async createChallengeQuestions(
-    pairGameQuizId: string,
-  ): Promise<ChallengeQuestionsEntity[]> {
+  async createChallengeQuestions(pairGameQuizId: string): Promise<ChallengeQuestionsEntity[]> {
     const numberQuestions = 5;
 
     // Fetch random questions

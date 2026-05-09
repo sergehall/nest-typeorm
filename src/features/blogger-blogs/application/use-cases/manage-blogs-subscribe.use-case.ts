@@ -24,22 +24,17 @@ export class ManageBlogsSubscribeCommand {
 }
 
 @CommandHandler(ManageBlogsSubscribeCommand)
-export class ManageBlogsSubscribeUseCase
-  implements ICommandHandler<ManageBlogsSubscribeCommand>
-{
+export class ManageBlogsSubscribeUseCase implements ICommandHandler<ManageBlogsSubscribeCommand> {
   constructor(
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
     private readonly blogsSubscribersRepo: BlogsSubscribersRepo,
     private readonly bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
   ) {}
-  async execute(
-    command: ManageBlogsSubscribeCommand,
-  ): Promise<BlogsSubscribersEntity> {
+  async execute(command: ManageBlogsSubscribeCommand): Promise<BlogsSubscribersEntity> {
     const { params, subscriptionStatus, currentUserDto } = command;
     const blogId = params.blogId;
 
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
@@ -59,10 +54,7 @@ export class ManageBlogsSubscribeUseCase
   ): Promise<void> {
     try {
       // Check if the user is banned from posting in this blog
-      await this.bannedUsersForBlogsRepo.userIsBanned(
-        currentUserDto.userId,
-        blog.id,
-      );
+      await this.bannedUsersForBlogsRepo.userIsBanned(currentUserDto.userId, blog.id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new ForbiddenException(userNotHavePermissionSubscribeForBlog);

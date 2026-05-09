@@ -12,9 +12,7 @@ export class SaUpdateQuestionsPublishCommand {
 }
 
 @CommandHandler(SaUpdateQuestionsPublishCommand)
-export class SaUpdateQuestionsPublishUseCase
-  implements ICommandHandler<SaUpdateQuestionsPublishCommand>
-{
+export class SaUpdateQuestionsPublishUseCase implements ICommandHandler<SaUpdateQuestionsPublishCommand> {
   constructor(private readonly gameQuestionsRepo: GameQuestionsRepo) {}
 
   async execute(command: SaUpdateQuestionsPublishCommand): Promise<boolean> {
@@ -22,12 +20,8 @@ export class SaUpdateQuestionsPublishUseCase
 
     const question: QuestionsQuizEntity | null =
       await this.gameQuestionsRepo.getQuestionById(questionId);
-    if (!question)
-      throw new NotFoundException(`Question with ID ${questionId} not found`);
+    if (!question) throw new NotFoundException(`Question with ID ${questionId} not found`);
 
-    return await this.gameQuestionsRepo.saUpdateQuestionPublish(
-      question,
-      updatePublishDto,
-    );
+    return await this.gameQuestionsRepo.saUpdateQuestionPublish(question, updatePublishDto);
   }
 }

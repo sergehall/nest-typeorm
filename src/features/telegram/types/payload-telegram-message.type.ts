@@ -36,23 +36,11 @@ type MyChatMember = {
   date: number;
   old_chat_member: {
     user: any; // Replace `any` with a more specific type if available
-    status:
-      | 'member'
-      | 'administrator'
-      | 'creator'
-      | 'restricted'
-      | 'left'
-      | 'kicked'; // Adjust the enums as needed
+    status: 'member' | 'administrator' | 'creator' | 'restricted' | 'left' | 'kicked'; // Adjust the enums as needed
   };
   new_chat_member: {
     user: any; // Replace `any` with a more specific type if available
-    status:
-      | 'member'
-      | 'administrator'
-      | 'creator'
-      | 'restricted'
-      | 'left'
-      | 'kicked'; // Adjust the enums as needed
+    status: 'member' | 'administrator' | 'creator' | 'restricted' | 'left' | 'kicked'; // Adjust the enums as needed
     until_date?: number;
   };
 };

@@ -3,9 +3,7 @@ import { SaUserViewModel } from '../../sa/views/sa-user-view-model';
 import { UserViewModel } from '../views/user.view-model';
 
 export class UsersService {
-  async transformUserForSa(
-    usersArr: UsersEntity[],
-  ): Promise<SaUserViewModel[]> {
+  async transformUserForSa(usersArr: UsersEntity[]): Promise<SaUserViewModel[]> {
     return usersArr.map((user: UsersEntity) => ({
       id: user.userId,
       login: user.login,

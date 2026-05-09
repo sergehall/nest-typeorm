@@ -1,5 +1,3 @@
-
-
 import { CurrentUserDto } from '../../../users/dto/current-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PairsGameEntity } from '../../entities/pairs-game.entity';
@@ -12,19 +10,14 @@ export class MyGamesStatisticCommand {
 }
 
 @CommandHandler(MyGamesStatisticCommand)
-export class MyGamesStatisticUseCase
-  implements ICommandHandler<MyGamesStatisticCommand>
-{
+export class MyGamesStatisticUseCase implements ICommandHandler<MyGamesStatisticCommand> {
   constructor(protected pairsGameRepo: GamePairsRepo) {}
 
-  async execute(
-    command: MyGamesStatisticCommand,
-  ): Promise<GameSummaryViewModel> {
+  async execute(command: MyGamesStatisticCommand): Promise<GameSummaryViewModel> {
     const { currentUserDto } = command;
     const { userId } = currentUserDto;
 
-    const allGames: PairsGameEntity[] =
-      await this.pairsGameRepo.getAllGamesByUserId(userId);
+    const allGames: PairsGameEntity[] = await this.pairsGameRepo.getAllGamesByUserId(userId);
 
     return await this.calculateUserGameStats(allGames, userId);
   }
@@ -45,9 +38,7 @@ export class MyGamesStatisticUseCase
 
       if (isUserFirstPlayer || isUserSecondPlayer) {
         gamesCount++;
-        const currentUserScore = isUserFirstPlayer
-          ? game.firstPlayerScore
-          : game.secondPlayerScore;
+        const currentUserScore = isUserFirstPlayer ? game.firstPlayerScore : game.secondPlayerScore;
 
         sumScore += currentUserScore;
 

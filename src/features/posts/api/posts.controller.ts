@@ -58,16 +58,10 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async openFindPosts(
-    @Request() req: any,
-    @Query() query: any,
-  ): Promise<PaginatorDto> {
+  async openFindPosts(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
-    return await this.commandBus.execute(
-      new GetPostsCommand(queryData, currentUserDto),
-    );
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
+    return await this.commandBus.execute(new GetPostsCommand(queryData, currentUserDto));
   }
 
   @Get(':id')
@@ -80,9 +74,7 @@ export class PostsController {
   ): Promise<PostWithLikesImagesInfoViewModel> {
     const currentUserDto: CurrentUserDto | null = req.user;
 
-    return await this.commandBus.execute(
-      new GetPostByIdCommand(id, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetPostByIdCommand(id, currentUserDto));
   }
 
   @Get(':postId/comments')
@@ -95,8 +87,7 @@ export class PostsController {
     @Query() query: any,
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
       new GetCommentsByPostIdCommand(params.postId, queryData, currentUserDto),
@@ -148,26 +139,17 @@ export class PostsController {
     };
 
     return await this.commandBus.execute(
-      new UpdatePostByPostIdCommand(
-        postIdBlogId,
-        updatePostDto,
-        currentUserDto,
-      ),
+      new UpdatePostByPostIdCommand(postIdBlogId, updatePostDto, currentUserDto),
     );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
   @Delete(':id')
-  async removePost(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
+  async removePost(@Request() req: any, @Param() params: IdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new DeletePostByIdCommand(params, currentUserDto),
-    );
+    return await this.commandBus.execute(new DeletePostByIdCommand(params, currentUserDto));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -181,11 +163,7 @@ export class PostsController {
     const currentUserDto: CurrentUserDto = req.user;
 
     return await this.commandBus.execute(
-      new ChangeLikeStatusPostCommand(
-        params.postId,
-        likeStatusDto,
-        currentUserDto,
-      ),
+      new ChangeLikeStatusPostCommand(params.postId, likeStatusDto, currentUserDto),
     );
   }
 }

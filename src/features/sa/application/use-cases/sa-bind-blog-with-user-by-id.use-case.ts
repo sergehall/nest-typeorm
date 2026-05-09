@@ -18,9 +18,7 @@ export class SaBindBlogWithUserByIdCommand {
 }
 
 @CommandHandler(SaBindBlogWithUserByIdCommand)
-export class SaBindBlogWithUserByIdUseCase
-  implements ICommandHandler<SaBindBlogWithUserByIdCommand>
-{
+export class SaBindBlogWithUserByIdUseCase implements ICommandHandler<SaBindBlogWithUserByIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly usersRepo: UsersRepo,
@@ -36,16 +34,10 @@ export class SaBindBlogWithUserByIdUseCase
 
     await this.checkUserPermission(currentUserDto, userId);
 
-    return await this.bloggerBlogsRepo.saBindBlogWithUser(
-      userForBind,
-      blogForBind,
-    );
+    return await this.bloggerBlogsRepo.saBindBlogWithUser(userForBind, blogForBind);
   }
 
-  private async checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    userForBindUserId: string,
-  ) {
+  private async checkUserPermission(currentUserDto: CurrentUserDto, userForBindUserId: string) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
@@ -59,8 +51,7 @@ export class SaBindBlogWithUserByIdUseCase
   }
 
   private async getUserForBind(userId: string): Promise<UsersEntity> {
-    const userForBind: UsersEntity | null =
-      await this.usersRepo.findUserByUserId(userId);
+    const userForBind: UsersEntity | null = await this.usersRepo.findUserByUserId(userId);
     if (!userForBind) {
       throw new NotFoundException('Not found user.');
     }

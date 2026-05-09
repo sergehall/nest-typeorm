@@ -1,11 +1,4 @@
-import {
-  IsEnum,
-  IsInt,
-  IsObject,
-  IsString,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator';
+import { IsEnum, IsInt, IsObject, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 
 class CommentatorInfo {

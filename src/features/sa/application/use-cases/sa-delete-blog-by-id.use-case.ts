@@ -15,9 +15,7 @@ export class SaDeleteBlogByBlogIdCommand {
 }
 
 @CommandHandler(SaDeleteBlogByBlogIdCommand)
-export class SaDeleteBlogByBlogIdUseCase
-  implements ICommandHandler<SaDeleteBlogByBlogIdCommand>
-{
+export class SaDeleteBlogByBlogIdUseCase implements ICommandHandler<SaDeleteBlogByBlogIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -27,8 +25,7 @@ export class SaDeleteBlogByBlogIdUseCase
 
     const blogToRemove: BloggerBlogsEntity | null =
       await this.bloggerBlogsRepo.findBlogById(blogId);
-    if (!blogToRemove)
-      throw new NotFoundException(`User with ID ${blogId} not found`);
+    if (!blogToRemove) throw new NotFoundException(`User with ID ${blogId} not found`);
 
     await this.checkUserPermission(currentUserDto);
 
@@ -42,9 +39,7 @@ export class SaDeleteBlogByBlogIdUseCase
         id: currentUserDto.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to remove this blog. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to remove this blog. ' + error.message);
     }
   }
 }

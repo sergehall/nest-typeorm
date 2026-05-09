@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
 import { getTestAppOptions } from './utilities/get-test-app.options';
 import TestUtils from './utilities/test.utils';
@@ -10,8 +10,8 @@ import { MockCommentData } from './utilities/mock-test-data';
 describe('Comments Controller (e2e)', () => {
   let app: INestApplication;
   let server: any;
-  let createdValidUser: SaUserViewModel;
-  let confirmedUser: SaUserViewModel;
+  let _createdValidUser: SaUserViewModel;
+  let _confirmedUser: SaUserViewModel;
   let token: string;
   let blog: BloggerBlogsWithImagesSubscribersViewModel;
   let post: PostWithLikesImagesInfoViewModel;
@@ -22,8 +22,8 @@ describe('Comments Controller (e2e)', () => {
     app = testAppOptions.app;
     server = testAppOptions.server;
     const testUtils = new TestUtils();
-    createdValidUser = await testUtils.createTestUser(server);
-    confirmedUser = await testUtils.createTestConfirmedUser(server);
+    _createdValidUser = await testUtils.createTestUser(server);
+    _confirmedUser = await testUtils.createTestConfirmedUser(server);
     token = await testUtils.getAccessToken(server);
     blog = await testUtils.createBlog(server, token);
     post = await testUtils.createPost(blog.id, server, token);
@@ -72,9 +72,7 @@ describe('Comments Controller (e2e)', () => {
 
   it('should return 401 if user is not authenticated', async () => {
     const createCommentUrl = `/posts/${post.id}/comments`;
-    const response = await request(server)
-      .post(createCommentUrl)
-      .send(commentData);
+    const response = await request(server).post(createCommentUrl).send(commentData);
 
     expect(response.status).toEqual(401);
   });

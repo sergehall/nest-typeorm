@@ -18,18 +18,16 @@ export class PostsService {
     imagesMetadata: { [postId: string]: PathKeyBufferDto[] }[],
   ): Promise<PostWithLikesImagesInfoViewModel[]> {
     // Map posts to promises of their respective view models with image metadata
-    const resultPromises = posts.map(
-      async (post: PostWithLikesInfoViewModel) => {
-        const postId = post.id;
-        const images: PathKeyBufferDto[] =
-          imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
+    const resultPromises = posts.map(async (post: PostWithLikesInfoViewModel) => {
+      const postId = post.id;
+      const images: PathKeyBufferDto[] =
+        imagesMetadata.find((entry) => entry[postId])?.[postId] || [];
 
-        // Retrieve metadata for files
-        const metadataPromise: PostImagesViewModel =
-          await this.imagesMetadataService.imagesPostsMetadataProcessor(images);
-        return { post, metadataPromise };
-      },
-    );
+      // Retrieve metadata for files
+      const metadataPromise: PostImagesViewModel =
+        await this.imagesMetadataService.imagesPostsMetadataProcessor(images);
+      return { post, metadataPromise };
+    });
 
     // Wait for all promises to resolve
     const results = await Promise.all(resultPromises);

@@ -18,12 +18,9 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
   async execute(command: LogoutCommand): Promise<boolean> {
     const { refreshToken } = command;
     console.log(refreshToken);
-    const payload: PayloadDto =
-      await this.authService.toExtractPayload(refreshToken);
+    const payload: PayloadDto = await this.authService.toExtractPayload(refreshToken);
 
-    await this.commandBus.execute(
-      new AddInvalidJwtToBlacklistCommand(refreshToken, payload),
-    );
+    await this.commandBus.execute(new AddInvalidJwtToBlacklistCommand(refreshToken, payload));
 
     await this.commandBus.execute(new DeleteDevicesAfterLogoutCommand(payload));
     return true;

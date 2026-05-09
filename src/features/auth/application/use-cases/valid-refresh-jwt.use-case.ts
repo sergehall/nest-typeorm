@@ -10,9 +10,7 @@ export class ValidRefreshJwtCommand {
 }
 
 @CommandHandler(ValidRefreshJwtCommand)
-export class ValidRefreshJwtUseCase
-  implements ICommandHandler<ValidRefreshJwtCommand>
-{
+export class ValidRefreshJwtUseCase implements ICommandHandler<ValidRefreshJwtCommand> {
   constructor(
     private jwtService: JwtService,
     private jwtConfig: JwtConfig,
@@ -20,8 +18,7 @@ export class ValidRefreshJwtUseCase
   async execute(command: ValidRefreshJwtCommand): Promise<PayloadDto | null> {
     const { refreshToken } = command;
 
-    const REFRESH_SECRET_KEY =
-      await this.jwtConfig.getJwtConfigValue('REFRESH_SECRET_KEY');
+    const REFRESH_SECRET_KEY = await this.jwtConfig.getJwtConfigValue('REFRESH_SECRET_KEY');
 
     try {
       const result = await this.jwtService.verify(refreshToken, {
@@ -30,10 +27,7 @@ export class ValidRefreshJwtUseCase
       return result;
     } catch (error) {
       console.log(error.message);
-      throw new HttpException(
-        { message: [jwtCookiesIncorrect] },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException({ message: [jwtCookiesIncorrect] }, HttpStatus.UNAUTHORIZED);
     }
   }
 }

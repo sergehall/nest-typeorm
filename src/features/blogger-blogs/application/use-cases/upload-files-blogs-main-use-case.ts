@@ -29,9 +29,7 @@ export class UploadFilesBlogsMainCommand {
 }
 
 @CommandHandler(UploadFilesBlogsMainCommand)
-export class UploadFilesBlogsMainUseCase
-  implements ICommandHandler<UploadFilesBlogsMainCommand>
-{
+export class UploadFilesBlogsMainUseCase implements ICommandHandler<UploadFilesBlogsMainCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
@@ -40,9 +38,7 @@ export class UploadFilesBlogsMainUseCase
     protected imagesBlogsMainMetadataRepo: ImagesBlogsMainMetadataRepo,
   ) {}
 
-  async execute(
-    command: UploadFilesBlogWallpaperCommand,
-  ): Promise<ImagesViewModel> {
+  async execute(command: UploadFilesBlogWallpaperCommand): Promise<ImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId } = params;
 
@@ -58,17 +54,14 @@ export class UploadFilesBlogsMainUseCase
 
     // Extract file metadata
     const metadata: ImageWidthHeightSize =
-      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(
-        fileUploadDto.buffer,
-      );
+      await this.filesMetadataService.extractWidthHeightSizeFromBuffer(fileUploadDto.buffer);
 
     // Upload file for the post to s3
-    const urlEtagDto: UrlPathKeyEtagDto =
-      await this.fileStorageAdapter.uploadFileImageBlogMain(
-        params,
-        fileUploadDto,
-        currentUserDto,
-      );
+    const urlEtagDto: UrlPathKeyEtagDto = await this.fileStorageAdapter.uploadFileImageBlogMain(
+      params,
+      fileUploadDto,
+      currentUserDto,
+    );
 
     // Create post files file metadata into postgresSql
     await this.imagesBlogsMainMetadataRepo.createImagesBlogMain(
@@ -105,9 +98,7 @@ export class UploadFilesBlogsMainUseCase
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'You do not have permission to upload file. ' + error.message,
-        );
+        throw new ForbiddenException('You do not have permission to upload file. ' + error.message);
       }
       throw new InternalServerErrorException(error.message);
     }

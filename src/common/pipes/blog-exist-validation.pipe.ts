@@ -7,8 +7,7 @@ export class BlogExistValidationPipe implements PipeTransform {
   constructor(private bloggerBlogsRepo: BloggerBlogsRepo) {}
 
   async transform(value: string): Promise<string> {
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(value);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(value);
     if (!blog) {
       throw new NotFoundException(`Blog with id: ${value} not found`);
     }

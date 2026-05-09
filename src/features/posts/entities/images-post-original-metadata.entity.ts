@@ -3,7 +3,7 @@ import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.e
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from './posts.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { FileUploadDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 
@@ -89,8 +89,7 @@ export class ImagesPostsOriginalMetadataEntity {
     urlPathKeyEtagDto: UrlPathKeyEtagDto,
     currentUserDto: CurrentUserDto,
   ): ImagesPostsOriginalMetadataEntity {
-    const { fieldname, buffer, mimetype, encoding, size, originalname } =
-      fileUploadDto;
+    const { fieldname, buffer, mimetype, encoding, size, originalname } = fileUploadDto;
 
     const user = new UsersEntity();
     user.userId = currentUserDto.userId;

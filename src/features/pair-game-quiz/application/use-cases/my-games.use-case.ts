@@ -63,9 +63,7 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     };
   }
 
-  private async createGameModels(
-    games: PairsGameEntity[],
-  ): Promise<GameViewModel[]> {
+  private async createGameModels(games: PairsGameEntity[]): Promise<GameViewModel[]> {
     const gameIds = games
       .filter((game) => game.status === StatusGameEnum.FINISHED)
       .map((game) => game.id);
@@ -89,20 +87,14 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
         pairsGame.push(await this.createGameModelForActive(game));
       } else if (game.status === StatusGameEnum.FINISHED) {
         pairsGame.push(
-          await this.createGameModelForFinished(
-            game,
-            questionsFinishedGames,
-            answersFinishedGames,
-          ),
+          await this.createGameModelForFinished(game, questionsFinishedGames, answersFinishedGames),
         );
       }
     }
     return pairsGame;
   }
 
-  private async createGameModelForPending(
-    game: PairsGameEntity,
-  ): Promise<GameViewModel> {
+  private async createGameModelForPending(game: PairsGameEntity): Promise<GameViewModel> {
     const challengeQuestions: ChallengeQuestionsEntity[] = [];
     const challengeAnswers: ChallengeAnswersEntity[] = [];
 
@@ -117,14 +109,14 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
     });
   }
 
-  private async createGameModelForActive(
-    game: PairsGameEntity,
-  ): Promise<GameViewModel> {
+  private async createGameModelForActive(game: PairsGameEntity): Promise<GameViewModel> {
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
-    const currentScores: CountCorrectAnswerDto =
-      await this.pairGameQuizService.getScores(game, challengeAnswers);
+    const currentScores: CountCorrectAnswerDto = await this.pairGameQuizService.getScores(
+      game,
+      challengeAnswers,
+    );
 
     const challengeQuestions: ChallengeQuestionsEntity[] =
       await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(game.id);
@@ -151,10 +143,9 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
       secondPlayerCountCorrectAnswer: game.secondPlayerScore,
     };
 
-    const challengeQuestions: ChallengeQuestionsEntity[] =
-      questionsFinishedGames.filter(
-        (challengeQuestion) => challengeQuestion.pairGameQuiz.id === game.id,
-      );
+    const challengeQuestions: ChallengeQuestionsEntity[] = questionsFinishedGames.filter(
+      (challengeQuestion) => challengeQuestion.pairGameQuiz.id === game.id,
+    );
 
     return this.mapPairGame.toGameModel({
       pair: game,
@@ -173,8 +164,6 @@ export class GetMyGamesUseCase implements ICommandHandler<GetMyGamesCommand> {
   private async getChallengeQuestionsFinishedGames(
     gameIds: string[],
   ): Promise<ChallengeQuestionsEntity[]> {
-    return await this.challengesQuestionsRepo.getChallengeQuestionsByGameIds(
-      gameIds,
-    );
+    return await this.challengesQuestionsRepo.getChallengeQuestionsByGameIds(gameIds);
   }
 }

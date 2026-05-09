@@ -14,9 +14,7 @@ export class PayPalConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValuePayPal(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in PayPal configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in PayPal configuration`);
     }
   }
   async getPayPalValue(key: PayPalKeysType): Promise<string> {

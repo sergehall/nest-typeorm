@@ -27,9 +27,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
     protected imagesBlogsWallpaperMetadataRepo: ImagesBlogsWallpaperMetadataRepo,
   ) {}
 
-  async execute(
-    command: GetBlogByIdCommand,
-  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
+  async execute(command: GetBlogByIdCommand): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
     const { blogId, currentUserDto } = command;
 
     const blog = await this.bloggerBlogsRepo.findBlogById(blogId);
@@ -38,18 +36,12 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       throw new NotFoundException(`Blog with id: ${blogId} not found`);
     }
 
-    const [
-      imageWallpaperMetadataEntity,
-      imageMainMetadataEntity,
-      blogsSubscriptionStatusCount,
-    ] = await Promise.all([
-      this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(blog.id),
-      this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
-      this.blogsSubscribersRepo.blogsSubscribersStatusCount(
-        [blog.id],
-        currentUserDto,
-      ),
-    ]);
+    const [imageWallpaperMetadataEntity, imageMainMetadataEntity, blogsSubscriptionStatusCount] =
+      await Promise.all([
+        this.imagesBlogsWallpaperMetadataRepo.findImageBlogWallpaperById(blog.id),
+        this.imagesBlogsMainMetadataRepo.findImageBlogMainById(blog.id),
+        this.blogsSubscribersRepo.blogsSubscribersStatusCount([blog.id], currentUserDto),
+      ]);
 
     const wallpaper = imageWallpaperMetadataEntity
       ? await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
@@ -58,11 +50,7 @@ export class GetBlogByIdUseCase implements ICommandHandler<GetBlogByIdCommand> {
       : null;
 
     const main = imageMainMetadataEntity
-      ? [
-          await this.imagesMetadataService.processImageBlogsWallpaperOrMain(
-            imageMainMetadataEntity,
-          ),
-        ]
+      ? [await this.imagesMetadataService.processImageBlogsWallpaperOrMain(imageMainMetadataEntity)]
       : [];
 
     const firstBlogSubscriptionStatus = blogsSubscriptionStatusCount[0];

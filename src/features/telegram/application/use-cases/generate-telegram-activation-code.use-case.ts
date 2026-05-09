@@ -9,20 +9,14 @@ export class GenerateTelegramActivationLinkCommand {
 }
 
 @CommandHandler(GenerateTelegramActivationLinkCommand)
-export class GenerateTelegramActivationLinkUseCase
-  implements ICommandHandler<GenerateTelegramActivationLinkCommand>
-{
+export class GenerateTelegramActivationLinkUseCase implements ICommandHandler<GenerateTelegramActivationLinkCommand> {
   constructor(private readonly telegramConfig: TelegramConfig) {}
-  async execute(
-    command: GenerateTelegramActivationLinkCommand,
-  ): Promise<BotActivationLink> {
+  async execute(command: GenerateTelegramActivationLinkCommand): Promise<BotActivationLink> {
     const { currentUserDto } = command;
 
     const telegramBaseShortUrl = TelegramUrlsEnum.BaseShortUrl;
 
-    const botName = await this.telegramConfig.getTelegramValue(
-      'TELEGRAM_BOT_USERNAME',
-    );
+    const botName = await this.telegramConfig.getTelegramValue('TELEGRAM_BOT_USERNAME');
 
     // const query = `?start=code${currentUserDto.userId}`;
     const query = `?code=${currentUserDto.userId}`;

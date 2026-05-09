@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  Logger,
-  NestMiddleware,
-} from '@nestjs/common';
+import { HttpException, Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
@@ -41,18 +36,12 @@ export class HttpLoggingMiddleware implements NestMiddleware {
   ) {
     const { statusCode, statusMessage } = res;
     const contentLength = res.getHeader('content-length');
-    const logMessage = `${method} ${url} ${statusCode} ${statusMessage} ${contentLength} - ${userAgent} ${ip}`;
-    // this.logger.log(logMessage);
+    const _logMessage = `${method} ${url} ${statusCode} ${statusMessage} ${contentLength} - ${userAgent} ${ip}`;
+    // this.logger.log(_logMessage);
   }
 
   // Handle errors and log HTTP exceptions
-  private handleError(
-    ip: string,
-    method: string,
-    url: string,
-    userAgent: string,
-    error: any,
-  ) {
+  private handleError(ip: string, method: string, url: string, userAgent: string, error: any) {
     if (error instanceof HttpException) {
       const statusCode = error.getStatus(); // Get status code from HttpException
       const message = error.message || 'Internal server error'; // Get error message

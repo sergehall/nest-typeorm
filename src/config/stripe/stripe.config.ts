@@ -16,9 +16,7 @@ export class StripeConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueStripe(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in Stripe configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in Stripe configuration`);
     }
   }
 
@@ -30,9 +28,7 @@ export class StripeConfig extends BaseConfig {
     return this.getStripeValueByKey(key);
   }
 
-  async getStripeVersion(
-    key: StripeKeysType,
-  ): Promise<SpireVersionDefaultEnum.default> {
+  async getStripeVersion(key: StripeKeysType): Promise<SpireVersionDefaultEnum.default> {
     // Get the version from the configuration or database
     const version = await this.getStripeValueByKey(key);
 

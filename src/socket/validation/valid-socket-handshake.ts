@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Socket } from 'socket.io';
 import { notFoundHeader } from '../../common/filters/custom-errors-messages';
@@ -36,9 +32,7 @@ export class ValidSocketHandshake {
       if (err instanceof UnauthorizedException) {
         throw new UnauthorizedException(err.message);
       } else {
-        throw new InternalServerErrorException(
-          'Error ValidSocketHandshake.' + err.message,
-        );
+        throw new InternalServerErrorException('Error ValidSocketHandshake.' + err.message);
       }
     }
   }

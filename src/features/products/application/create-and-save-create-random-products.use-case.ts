@@ -9,17 +9,13 @@ export class CreateAndSaveCreateRandomProductsCommand {
 
 @Injectable()
 @CommandHandler(CreateAndSaveCreateRandomProductsCommand)
-export class CreateAndSaveCreateRandomProductsUseCase
-  implements ICommandHandler<CreateAndSaveCreateRandomProductsCommand>
-{
+export class CreateAndSaveCreateRandomProductsUseCase implements ICommandHandler<CreateAndSaveCreateRandomProductsCommand> {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly productsRepo: ProductsRepo,
   ) {}
 
-  async execute(
-    command: CreateAndSaveCreateRandomProductsCommand,
-  ): Promise<string> {
+  async execute(command: CreateAndSaveCreateRandomProductsCommand): Promise<string> {
     const { countProducts } = command;
     const randomProducts = await this.commandBus.execute(
       new CreateRandomProductCommand(countProducts),

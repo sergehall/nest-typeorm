@@ -8,9 +8,7 @@ export class SaDeleteQuestionByIdCommand {
 }
 
 @CommandHandler(SaDeleteQuestionByIdCommand)
-export class SaDeleteQuestionByIdUseCase
-  implements ICommandHandler<SaDeleteQuestionByIdCommand>
-{
+export class SaDeleteQuestionByIdUseCase implements ICommandHandler<SaDeleteQuestionByIdCommand> {
   constructor(private readonly gameQuestionsRepo: GameQuestionsRepo) {}
 
   async execute(command: SaDeleteQuestionByIdCommand): Promise<boolean> {
@@ -18,8 +16,7 @@ export class SaDeleteQuestionByIdUseCase
 
     const question: QuestionsQuizEntity | null =
       await this.gameQuestionsRepo.getQuestionById(questionId);
-    if (!question)
-      throw new NotFoundException(`Question with ID ${questionId} not found`);
+    if (!question) throw new NotFoundException(`Question with ID ${questionId} not found`);
 
     return await this.gameQuestionsRepo.saDeleteQuestionById(questionId);
   }

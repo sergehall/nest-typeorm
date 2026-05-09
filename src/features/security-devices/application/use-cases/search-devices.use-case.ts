@@ -8,14 +8,10 @@ export class SearchDevicesCommand {
 }
 
 @CommandHandler(SearchDevicesCommand)
-export class SearchDevicesUseCase
-  implements ICommandHandler<SearchDevicesCommand>
-{
+export class SearchDevicesUseCase implements ICommandHandler<SearchDevicesCommand> {
   constructor(protected securityDevicesRepo: SecurityDevicesRepo) {}
 
-  async execute(
-    command: SearchDevicesCommand,
-  ): Promise<SecurityDeviceViewModel[]> {
+  async execute(command: SearchDevicesCommand): Promise<SecurityDeviceViewModel[]> {
     return await this.securityDevicesRepo.findDevices(command.currentPayload);
   }
 }

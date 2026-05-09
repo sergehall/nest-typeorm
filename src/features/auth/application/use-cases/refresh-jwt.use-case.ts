@@ -29,13 +29,10 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
     const { refreshTokenDto, ip, userAgent, res } = command;
     const { refreshToken } = refreshTokenDto;
 
-    const currentPayload: PayloadDto =
-      await this.authService.toExtractPayload(refreshToken);
+    const currentPayload: PayloadDto = await this.authService.toExtractPayload(refreshToken);
 
     const currentTimestamp = new Date().toISOString();
-    const expirationTimestamp = new Date(
-      currentPayload.exp * 1000,
-    ).toISOString();
+    const expirationTimestamp = new Date(currentPayload.exp * 1000).toISOString();
 
     if (expirationTimestamp > currentTimestamp) {
       await this.commandBus.execute(
@@ -56,12 +53,8 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
       updatedJwt.refreshToken,
     );
 
-    await this.commandBus.execute(
-      new UpdateDeviceCommand(updatedPayload, ip, userAgent),
-    );
+    await this.commandBus.execute(new UpdateDeviceCommand(updatedPayload, ip, userAgent));
 
-    return await this.commandBus.execute(
-      new UpdateAccessJwtCommand(updatedPayload),
-    );
+    return await this.commandBus.execute(new UpdateAccessJwtCommand(updatedPayload));
   }
 }

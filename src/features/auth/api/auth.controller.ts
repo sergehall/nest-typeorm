@@ -60,9 +60,7 @@ export class AuthController {
 
     const userAgent: string = req.get('user-agent') || 'not found user-agent';
 
-    return await this.commandBus.execute(
-      new LoginCommand(currentUserDto, ip, userAgent, res),
-    );
+    return await this.commandBus.execute(new LoginCommand(currentUserDto, ip, userAgent, res));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -74,9 +72,7 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async registrationEmailResending(@Body() emailDto: EmailDto) {
-    return await this.commandBus.execute(
-      new UpdateSentConfirmationCodeCommand(emailDto.email),
-    );
+    return await this.commandBus.execute(new UpdateSentConfirmationCodeCommand(emailDto.email));
   }
 
   @HttpCode(HttpStatus.OK)
@@ -107,10 +103,7 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('logout')
-  async logout(
-    @Request() req: any,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<boolean> {
+  async logout(@Request() req: any, @Res({ passthrough: true }) res: Response): Promise<boolean> {
     const refreshTokenDto: RefreshTokenDto = req.cookies.refreshToken;
     const { refreshToken } = refreshTokenDto;
 
@@ -123,14 +116,10 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
-  async confirmRegistrationByCodeFromQuery(
-    @Query() query: any,
-  ): Promise<boolean> {
+  async confirmRegistrationByCodeFromQuery(@Query() query: any): Promise<boolean> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
-    return await this.commandBus.execute(
-      new ConfirmUserByCodeCommand(queryData.code),
-    );
+    return await this.commandBus.execute(new ConfirmUserByCodeCommand(queryData.code));
   }
 
   @SkipThrottle()
@@ -145,9 +134,7 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
-  async newPassword(
-    @Body() newPasswordRecoveryDto: NewPasswordRecoveryDto,
-  ): Promise<boolean> {
+  async newPassword(@Body() newPasswordRecoveryDto: NewPasswordRecoveryDto): Promise<boolean> {
     return await this.commandBus.execute(
       new ChangePasswordByRecoveryCodeCommand(newPasswordRecoveryDto),
     );

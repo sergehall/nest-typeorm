@@ -1,13 +1,7 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
 import { UsersEntity } from '../../../features/users/entities/users.entity';
 
-@Entity('SentCodesLog')
+@Entity('nt-sent-codes-log')
 export class SentCodesLogEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

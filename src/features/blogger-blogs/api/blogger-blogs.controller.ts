@@ -43,7 +43,6 @@ import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { GetPostsInBlogCommand } from '../../posts/application/use-cases/get-posts-in-blog.use-case';
 import { GetCommentsByUserIdCommand } from '../application/use-cases/get-comments-by-user-id.use-case';
 import { UpdatePostByPostIdCommand } from '../../posts/application/use-cases/update-post-by-post-id.use-case';
-import { Express } from 'express';
 import { FileUploadDto } from '../dto/file-upload.dto';
 import { PostImagesViewModel } from '../../posts/views/post-images.view-model';
 import { FileValidationPipe } from '../../../common/pipes/file-validation.pipe';
@@ -57,7 +56,6 @@ import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blo
 import { ApiDocService } from '../../../api-documentation/api-doc-service';
 import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
 import { BloggersMethods } from '../../../api-documentation/enums/bloggers-methods.enum';
-import { ReCaptchaGuard } from '../../auth/guards/re-captcha.guard';
 
 @SkipThrottle()
 @ApiTags('Blogger')
@@ -74,7 +72,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imagePost))
-    file: Express.Multer.File,
+    file: FileUploadDto,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUpload: FileUploadDto = file;
@@ -91,17 +89,13 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogWallpaper))
-    file: Express.Multer.File,
+    file: FileUploadDto,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUploadDto: FileUploadDto = file;
 
     return await this.commandBus.execute(
-      new UploadFilesBlogWallpaperCommand(
-        params,
-        fileUploadDto,
-        currentUserDto,
-      ),
+      new UploadFilesBlogWallpaperCommand(params, fileUploadDto, currentUserDto),
     );
   }
 
@@ -112,7 +106,7 @@ export class BloggerBlogsController {
     @Request() req: any,
     @Param() params: BlogIdParams,
     @UploadedFile(new FileValidationPipe(getFileConstraints.imageBlogMain))
-    file: Express.Multer.File,
+    file: FileUploadDto,
   ): Promise<PostImagesViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const fileUploadDto: FileUploadDto = file;
@@ -132,8 +126,7 @@ export class BloggerBlogsController {
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
       new GetBlogsOwnedByCurrentUserCommand(queryData, currentUserDto),
@@ -147,12 +140,9 @@ export class BloggerBlogsController {
     @Query() query: any,
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
-    return await this.commandBus.execute(
-      new GetCommentsByUserIdCommand(queryData, currentUserDto),
-    );
+    return await this.commandBus.execute(new GetCommentsByUserIdCommand(queryData, currentUserDto));
   }
 
   @Post('blogs')
@@ -192,8 +182,7 @@ export class BloggerBlogsController {
     @Query() query: any,
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return await this.commandBus.execute(
       new GetPostsInBlogCommand(blogId, queryData, currentUserDto),
@@ -222,8 +211,7 @@ export class BloggerBlogsController {
     @Query() query: any,
   ): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
     return await this.commandBus.execute(
       new SearchBannedUsersInBlogCommand(params.id, queryData, currentUserDto),
     );
@@ -276,14 +264,9 @@ export class BloggerBlogsController {
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async deleteBlogById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
+  async deleteBlogById(@Request() req: any, @Param() params: IdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new DeleteBlogByBlogIdCommand(params.id, currentUserDto),
-    );
+    return await this.commandBus.execute(new DeleteBlogByBlogIdCommand(params.id, currentUserDto));
   }
 }

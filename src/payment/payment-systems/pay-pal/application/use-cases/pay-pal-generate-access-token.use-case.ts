@@ -9,9 +9,7 @@ export class PayPalGenerateAccessTokenCommand {
 }
 
 @CommandHandler(PayPalGenerateAccessTokenCommand)
-export class PayPalGenerateAccessTokenUseCase
-  implements ICommandHandler<PayPalGenerateAccessTokenCommand>
-{
+export class PayPalGenerateAccessTokenUseCase implements ICommandHandler<PayPalGenerateAccessTokenCommand> {
   constructor(private readonly payPalConfig: PayPalConfig) {}
 
   async execute(): Promise<string> {
@@ -21,11 +19,8 @@ export class PayPalGenerateAccessTokenUseCase
       const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
       const url = baseUrl + '/v1/oauth2/token';
 
-      const username =
-        await this.payPalConfig.getPayPalValue('PAYPAL_CLIENT_ID');
-      const password = await this.payPalConfig.getPayPalValue(
-        'PAYPAL_CLIENT_SECRET',
-      );
+      const username = await this.payPalConfig.getPayPalValue('PAYPAL_CLIENT_ID');
+      const password = await this.payPalConfig.getPayPalValue('PAYPAL_CLIENT_SECRET');
 
       const data = 'grant_type=client_credentials';
       const config = {
@@ -42,10 +37,7 @@ export class PayPalGenerateAccessTokenUseCase
       return response.data.access_token;
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'Failed to generate access token',
-        error.message,
-      );
+      throw new InternalServerErrorException('Failed to generate access token', error.message);
     }
   }
 }

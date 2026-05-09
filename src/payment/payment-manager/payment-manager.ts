@@ -41,9 +41,7 @@ export class PaymentManager {
     }
   }
 
-  private async processStripePayment(
-    paymentDto: PaymentDto[],
-  ): Promise<PaymentLinkDto | null> {
+  private async processStripePayment(paymentDto: PaymentDto[]): Promise<PaymentLinkDto | null> {
     const session = await this.stripeAdapter.createCheckoutSession(paymentDto);
     console.log('session', session);
     if (!session.url) {
@@ -54,9 +52,7 @@ export class PaymentManager {
     };
   }
 
-  private async processPayPalPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processPayPalPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     const checkoutOrder: PayerActionRequiredType =
       await this.payPalAdapter.createCheckoutOrder(paymentDto);
 
@@ -69,52 +65,38 @@ export class PaymentManager {
     };
   }
 
-  private async processApplePayPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processApplePayPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     console.log(`Processing Apple Pay payment of $${paymentDto}`);
     // Your Apple Pay payment processing logic here
     return null;
   }
 
-  private async processGooglePayPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processGooglePayPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     console.log(`Processing Google Pay payment of $${paymentDto}`);
     // Your Google Pay payment processing logic here
     return null;
   }
 
-  private async processVenmoPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processVenmoPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     console.log(`Processing Venmo payment of $${paymentDto}`);
     // Your Venmo payment processing logic here
     return null;
   }
 
-  private async processBitcoinPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processBitcoinPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     console.log(`Processing Bitcoin payment of $${paymentDto}`);
     // Your Bitcoin payment processing logic here
     return null;
   }
 
-  private async processVisaCheckoutPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
+  private async processVisaCheckoutPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
     console.log(`Processing Visa Checkout payment of $${paymentDto}`);
     // Your Visa Checkout payment processing logic here
     return null;
   }
 
-  private async processAmexCheckoutPayment(
-    paymentDto: any,
-  ): Promise<PaymentLinkDto | null> {
-    console.log(
-      `Processing American Express Checkout payment of $${paymentDto}`,
-    );
+  private async processAmexCheckoutPayment(paymentDto: any): Promise<PaymentLinkDto | null> {
+    console.log(`Processing American Express Checkout payment of $${paymentDto}`);
     return null;
     // Your American Express Checkout payment processing logic here
   }

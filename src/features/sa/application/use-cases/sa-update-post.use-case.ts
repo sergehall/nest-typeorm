@@ -20,9 +20,7 @@ export class SaUpdatePostsByPostIdCommand {
 }
 
 @CommandHandler(SaUpdatePostsByPostIdCommand)
-export class SaUpdatePostsByPostIdUseCase
-  implements ICommandHandler<SaUpdatePostsByPostIdCommand>
-{
+export class SaUpdatePostsByPostIdUseCase implements ICommandHandler<SaUpdatePostsByPostIdCommand> {
   constructor(
     private readonly postsRepo: PostsRepo,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -33,12 +31,10 @@ export class SaUpdatePostsByPostIdUseCase
     const { params, updatePostDto, currentUserDto } = command;
     const { blogId, postId } = params;
 
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) throw new NotFoundException(`Blog with ID ${blogId} not found`);
 
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkSaPermission(currentUserDto);
@@ -54,9 +50,7 @@ export class SaUpdatePostsByPostIdUseCase
         id: currentUser.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to update this post. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to update this post. ' + error.message);
     }
   }
 }

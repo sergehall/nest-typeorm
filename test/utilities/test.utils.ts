@@ -1,6 +1,6 @@
 import { SaUserViewModel } from '../../src/features/sa/views/sa-user-view-model';
 import { CreateUserDto } from '../../src/features/users/dto/create-user.dto';
-import * as request from 'supertest';
+import request from 'supertest';
 import {
   MockBlogData,
   MockConfirmedUser,
@@ -55,10 +55,7 @@ export class TestUtils {
   async createTestConfirmedUser(server: any): Promise<SaUserViewModel> {
     const confirmedUser: CreateUserDto = this.confirmedUser;
 
-    const createdUser: SaUserViewModel = await this.createUser(
-      confirmedUser,
-      server,
-    );
+    const createdUser: SaUserViewModel = await this.createUser(confirmedUser, server);
     await this.confirmUserRegistration(confirmedUser.email, server);
 
     return createdUser;
@@ -80,10 +77,7 @@ export class TestUtils {
     return response.body.accessToken;
   }
 
-  private async createUser(
-    createUserDto: CreateUserDto,
-    server: any,
-  ): Promise<SaUserViewModel> {
+  private async createUser(createUserDto: CreateUserDto, server: any): Promise<SaUserViewModel> {
     const saCreateUserUrl = '/sa/users';
     const createUserResponse = await request(server)
       .post(saCreateUserUrl)
@@ -95,10 +89,7 @@ export class TestUtils {
     return createUserResponse.body;
   }
 
-  private async confirmUserRegistration(
-    email: string,
-    server: any,
-  ): Promise<void> {
+  private async confirmUserRegistration(email: string, server: any): Promise<void> {
     const getUsersResponse = await request(server)
       .get('/users')
       .auth(MockUserCredentials.login, MockUserCredentials.password);

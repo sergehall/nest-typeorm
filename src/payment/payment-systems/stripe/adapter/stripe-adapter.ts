@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
 import { PaymentDto } from '../../../dto/payment.dto';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { PaymentService } from '../../../application/payment.service';
 import { StripeFactory } from '../factory/stripe-factory';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
+import { StripeCheckoutSession } from '../types/stripe-sdk.types';
 
 @Injectable()
 export class StripeAdapter {
@@ -14,9 +14,7 @@ export class StripeAdapter {
     private readonly postgresConfig: PostgresConfig,
   ) {}
 
-  async createCheckoutSession(
-    paymentDto: PaymentDto[],
-  ): Promise<Stripe.Response<Stripe.Checkout.Session>> {
+  async createCheckoutSession(paymentDto: PaymentDto[]): Promise<StripeCheckoutSession> {
     // Create Stripe instance and retrieve URLs
     const [stripeInstance, successUrl, cancelUrl] = await Promise.all([
       this.stripeFactory.createStripeInstance(),
@@ -54,8 +52,7 @@ export class StripeAdapter {
   }
 
   async getStripeUrls(key: 'success' | 'cancel'): Promise<string> {
-    const baseUrl =
-      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    const baseUrl = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     const urlMap: { [key in 'success' | 'cancel']: string } = {
       success: '/stripe/success',
       cancel: '/stripe/cancel',
