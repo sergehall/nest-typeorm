@@ -26,8 +26,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/regiser -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest -i --detectOpenHandles --forceExit --config ./test/jest-e2e.json",
     "generate-migrations": "node ./src/db/tools/generate-migration.js",
-    "apply-migrations": "typeorm-ts-node-esm migration:run -d ./src/db/data-source.ts",
-    "revert-last-migrations": "typeorm-ts-node-esm migration:revert -d ./src/db/data-source.ts"
+    "apply-migrations": "typeorm-ts-node-commonjs migration:run -d ./src/db/data-source.ts",
+    "revert-last-migrations": "typeorm-ts-node-commonjs migration:revert -d ./src/db/data-source.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1045.0",
