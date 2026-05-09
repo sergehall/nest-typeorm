@@ -19,9 +19,7 @@ export class RemoveUserByIdCommand {
 }
 
 @CommandHandler(RemoveUserByIdCommand)
-export class RemoveUserByIdUseCase
-  implements ICommandHandler<RemoveUserByIdCommand>
-{
+export class RemoveUserByIdUseCase implements ICommandHandler<RemoveUserByIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepo: UsersRepo,
@@ -29,8 +27,7 @@ export class RemoveUserByIdUseCase
   async execute(command: RemoveUserByIdCommand) {
     const { id, currentUserDto } = command;
 
-    const userToDelete: UsersEntity | null =
-      await this.usersRepo.findNotBannedUserById(command.id);
+    const userToDelete: UsersEntity | null = await this.usersRepo.findNotBannedUserById(command.id);
     if (!userToDelete) throw new NotFoundException('Not found user.');
 
     try {
@@ -40,9 +37,7 @@ export class RemoveUserByIdUseCase
       return await this.usersRepo.deleteUserDataByUserId(id);
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'You are not allowed to delete this user. ' + error.message,
-        );
+        throw new ForbiddenException('You are not allowed to delete this user. ' + error.message);
       }
       throw new InternalServerErrorException(error.message);
     }

@@ -8,10 +8,7 @@ import { PostsEntity } from '../entities/posts.entity';
 import { LikeStatusEnums } from '../../../db/enums/like-status.enums';
 import { LikesDislikesMyStatusInfoDto } from '../../comments/dto/likes-dislikes-my-status-info.dto';
 import { BannedFlagsDto } from '../dto/banned-flags.dto';
-import {
-  NewestLikes,
-  PostWithLikesInfoViewModel,
-} from '../views/post-with-likes-info.view-model';
+import { NewestLikes, PostWithLikesInfoViewModel } from '../views/post-with-likes-info.view-model';
 
 export class LikeStatusPostsRepo {
   constructor(
@@ -36,12 +33,11 @@ export class LikeStatusPostsRepo {
         likeStatusPostEntity.likeStatus = likeStatusDto.likeStatus;
         likeStatusPostEntity.addedAt = new Date().toISOString();
       } else {
-        likeStatusPostEntity =
-          LikeStatusPostsEntity.createLikeStatusPostsEntity(
-            post,
-            likeStatusDto,
-            currentUserDto,
-          );
+        likeStatusPostEntity = LikeStatusPostsEntity.createLikeStatusPostsEntity(
+          post,
+          likeStatusDto,
+          currentUserDto,
+        );
       }
 
       return await this.likeStatusPostsRepository.save(likeStatusPostEntity);
@@ -62,21 +58,19 @@ export class LikeStatusPostsRepo {
 
     const postIds = posts.map((post) => post.id);
 
-    const likesInfoArr: LikesDislikesMyStatusInfoDto[] =
-      await this.getPostsLikesDislikesMyStatus(postIds, currentUserDto);
+    const likesInfoArr: LikesDislikesMyStatusInfoDto[] = await this.getPostsLikesDislikesMyStatus(
+      postIds,
+      currentUserDto,
+    );
 
     const lookupExtendedLikesInfo = await this.createLookupTable(likesInfoArr);
 
     for (const post of posts) {
       const postId = post.id; // Get the post ID
 
-      const likesInfo: LikesDislikesMyStatusInfoDto =
-        lookupExtendedLikesInfo(postId);
+      const likesInfo: LikesDislikesMyStatusInfoDto = lookupExtendedLikesInfo(postId);
 
-      const lastThreeLikes = await this.getLastThreeLastLikesByPostId(
-        postId,
-        limitPerPost,
-      );
+      const lastThreeLikes = await this.getLastThreeLastLikesByPostId(postId, limitPerPost);
 
       const lastLikes: NewestLikes[] = lastThreeLikes.reduce(
         (accumulator: NewestLikes[], item: LikeStatusPostsEntity) => {

@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
 import TestUtils from './utilities/test.utils';
 import { getTestAppOptions } from './utilities/get-test-app.options';
@@ -35,9 +35,7 @@ describe('Auth Controller (e2e)', () => {
     it('should require valid user data for registration', async () => {
       // Missing required fields
       const invalidUserData = {};
-      const response = await request(server)
-        .post(registrationUrl)
-        .send(invalidUserData);
+      const response = await request(server).post(registrationUrl).send(invalidUserData);
       expect(response.status).toBe(400);
     });
 
@@ -95,9 +93,7 @@ describe('Auth Controller (e2e)', () => {
     it('should require valid email for resending', async () => {
       // Missing required fields
       const invalidUserData = {};
-      const response = await request(server)
-        .post(resendingUrl)
-        .send(invalidUserData);
+      const response = await request(server).post(resendingUrl).send(invalidUserData);
       expect(response.status).toBe(400);
     });
 

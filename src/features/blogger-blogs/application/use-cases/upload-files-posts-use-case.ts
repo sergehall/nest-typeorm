@@ -33,9 +33,7 @@ export class UploadFilesPostsCommand {
 
 /** Command handler for the UploadImageForPostCommand. */
 @CommandHandler(UploadFilesPostsCommand)
-export class UploadFilesPostsUseCase
-  implements ICommandHandler<UploadFilesPostsCommand>
-{
+export class UploadFilesPostsUseCase implements ICommandHandler<UploadFilesPostsCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsRepo: PostsRepo,
@@ -50,9 +48,7 @@ export class UploadFilesPostsUseCase
    * @param command The UploadImageForPostCommand.
    * @returns A promise that resolves to the post files view model.
    */
-  async execute(
-    command: UploadFilesPostsCommand,
-  ): Promise<PostImagesViewModel> {
+  async execute(command: UploadFilesPostsCommand): Promise<PostImagesViewModel> {
     const { params, fileUploadDto, currentUserDto } = command;
     const { blogId, postId } = params;
     const { mimetype } = fileUploadDto;
@@ -65,8 +61,7 @@ export class UploadFilesPostsUseCase
     }
 
     // Check if the post exists
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
@@ -77,20 +72,16 @@ export class UploadFilesPostsUseCase
     const resizedImages: ResizedImageDetailsDto =
       await this.filesMetadataService.resizeImages(fileUploadDto);
 
-    const pathsKeys: KeysPathDto =
-      await this.filesStorageAdapter.generatePathsKeysForPost(
-        currentUserDto.userId,
-        blogId,
-        postId,
-        mimetype,
-      );
+    const pathsKeys: KeysPathDto = await this.filesStorageAdapter.generatePathsKeysForPost(
+      currentUserDto.userId,
+      blogId,
+      postId,
+      mimetype,
+    );
 
     // Upload file for the post to s3
     const urlsPathKeysEtagsDto: UrlsPathKeysEtagsDto =
-      await this.filesStorageAdapter.uploadFileImagePost(
-        resizedImages,
-        pathsKeys,
-      );
+      await this.filesStorageAdapter.uploadFileImagePost(resizedImages, pathsKeys);
 
     // Create post file Original Middle Small sizes metadata into postgresSql
     const imagesMetadataEntity: OriginalMiddleSmallEntitiesDto =
@@ -102,9 +93,7 @@ export class UploadFilesPostsUseCase
         currentUserDto,
       );
 
-    return await this.filesMetadataService.processImagePostsMetadata(
-      imagesMetadataEntity,
-    );
+    return await this.filesMetadataService.processImagePostsMetadata(imagesMetadataEntity);
   }
 
   /**
@@ -127,9 +116,7 @@ export class UploadFilesPostsUseCase
       });
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          'You do not have permission to upload file. ' + error.message,
-        );
+        throw new ForbiddenException('You do not have permission to upload file. ' + error.message);
       }
       throw new InternalServerErrorException(error.message);
     }

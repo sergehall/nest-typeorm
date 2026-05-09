@@ -18,9 +18,7 @@ export class FindUsersUseCase implements ICommandHandler<FindUsersCommand> {
 
     const totalCount = await this.usersRepo.totalCountUsers(queryData);
 
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(totalCount / queryData.queryPagination.pageSize);
     return {
       pagesCount: pagesCount,
       page: queryData.queryPagination.pageNumber,

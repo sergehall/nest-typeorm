@@ -1,6 +1,6 @@
 import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm';
 import { UserRolesEnums } from '../../../ability/enums/user-roles.enums';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
 
 @Unique(['guestUserId', 'isBanned'])
@@ -29,10 +29,7 @@ export class GuestUsersEntity {
   @Column({ default: false })
   isBanned: boolean;
 
-  @OneToMany(
-    () => SecurityDevicesEntity,
-    (securityDevice) => securityDevice.guestUser,
-  )
+  @OneToMany(() => SecurityDevicesEntity, (securityDevice) => securityDevice.guestUser)
   securityDevices: SecurityDevicesEntity[];
 
   events: any[] = [];

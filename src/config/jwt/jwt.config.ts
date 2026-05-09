@@ -15,9 +15,7 @@ export class JwtConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueJwtByKey(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in JWT configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in JWT configuration`);
     }
   }
 

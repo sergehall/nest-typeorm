@@ -68,8 +68,10 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 - Website - [https://sergioartg.com](https://sergioartg.com/)
 
 ## Respect
+
 - My first steps work with NodeJS, Express, NestJS, Swagger, MongoDB, PostgreSQL, Microservices, RabbitMQ, WebSocket, DevOps basics (docker + kubernetes + jenkins), SOLID, Hexagonal architecture, SAGA,front-end basics.
 - I am a student of a wonderful team [IT-KAMASUTRA](https://it-incubator.io/en) that give education to the front-end and back-end. These are my first steps in this area and the project is being written from scratch with the knowledge gained here. I highly recommend this team to everyone.
+
 ## License
 
 Nest is [MIT licensed](LICENSE).

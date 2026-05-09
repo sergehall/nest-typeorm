@@ -1,10 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImagesBlogsMainMetadataEntity } from '../entities/images-blog-main-metadata.entity';
 import { Repository } from 'typeorm';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BannedFlagsDto } from '../../posts/dto/banned-flags.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
@@ -20,9 +17,7 @@ export class ImagesBlogsMainMetadataRepo {
     protected uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async findImageBlogMainById(
-    blogId: string,
-  ): Promise<ImagesBlogsMainMetadataEntity | null> {
+  async findImageBlogMainById(blogId: string): Promise<ImagesBlogsMainMetadataEntity | null> {
     const bannedFlags: BannedFlagsDto = await this.getBannedFlags();
     const { dependencyIsBanned, isBanned } = bannedFlags;
 
@@ -39,11 +34,8 @@ export class ImagesBlogsMainMetadataRepo {
       return blogsMain || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(
-          `Blog Wallpaper with ID ${userId} not found`,
-        );
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Blog Wallpaper with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -77,11 +69,8 @@ export class ImagesBlogsMainMetadataRepo {
       return resultMap; // Return the retrieved blogs main metadata with their associated blogOwners as an object with IDs as keys
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
-        throw new NotFoundException(
-          `Blog Wallpaper with ID ${userId} not found`,
-        );
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
+        throw new NotFoundException(`Blog Wallpaper with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -135,9 +124,7 @@ export class ImagesBlogsMainMetadataRepo {
     // }
 
     try {
-      return await this.imagesBlogsMainMetadataRepository.save(
-        imagesBlogMainMetadataEntity,
-      );
+      return await this.imagesBlogsMainMetadataRepository.save(imagesBlogMainMetadataEntity);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(

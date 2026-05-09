@@ -1,13 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import Stripe from 'stripe';
 import { PayPalEventType } from '../payment-systems/pay-pal/types/pay-pal-event.type';
 import { PayPalCompletedEventType } from '../payment-systems/pay-pal/types/pay-pal-completed-event.type';
 import { PaymentTransactionsEntity } from '../../features/products/entities/payment-transaction.entity';
 import { OrdersEntity } from '../../features/products/entities/orders.entity';
 import { PaymentsStatusEnum } from '../../features/products/enums/payments-status.enum';
 import { OrderStatusEnum } from '../../features/products/enums/order-status.enum';
+import { StripeCheckoutSession } from '../payment-systems/stripe/types/stripe-sdk.types';
 
 @Injectable()
 export class PaymentTransactionsRepo {
@@ -18,10 +18,7 @@ export class PaymentTransactionsRepo {
     private readonly ordersRepository: Repository<OrdersEntity>,
   ) {}
 
-  async completedPayment(
-    orderId: string,
-    paymentData: PayPalCompletedEventType,
-  ): Promise<void> {
+  async completedPayment(orderId: string, paymentData: PayPalCompletedEventType): Promise<void> {
     const updatedAt = new Date().toISOString();
     try {
       const paymentTransaction: PaymentTransactionsEntity | null =
@@ -34,8 +31,7 @@ export class PaymentTransactionsRepo {
         let updatedData: string = JSON.stringify(paymentData);
 
         if (paymentTransaction.paymentProviderInfoJson) {
-          updatedData =
-            paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+          updatedData = paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
         }
 
         paymentTransaction.paymentStatus = PaymentsStatusEnum.COMPLETED;
@@ -54,34 +50,29 @@ export class PaymentTransactionsRepo {
     orderId: string,
     clientId: string,
     updatedAt: string,
-    paymentData: Stripe.Checkout.Session | PayPalEventType,
+    paymentData: StripeCheckoutSession | PayPalEventType,
   ): Promise<boolean> {
     try {
       return await this.paymentTransactionsRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager): Promise<boolean> => {
-          const promises: Promise<boolean>[] = [
-            this.updateOrderStatus(
-              orderId,
-              clientId,
-              updatedAt,
-              transactionalEntityManager,
-            ),
-            this.paymentConfirm(
-              orderId,
-              updatedAt,
-              paymentData,
-              transactionalEntityManager,
-            ),
-          ];
-          const [orderUpdated, paymentConfirmed] = await Promise.all(promises);
+          const orderUpdated = await this.updateOrderStatus(
+            orderId,
+            clientId,
+            updatedAt,
+            transactionalEntityManager,
+          );
+          const paymentConfirmed = await this.paymentConfirm(
+            orderId,
+            updatedAt,
+            paymentData,
+            transactionalEntityManager,
+          );
           return orderUpdated && paymentConfirmed;
         },
       );
     } catch (error) {
       console.error('Error completing order and confirming payment:', error);
-      throw new InternalServerErrorException(
-        'Failed to complete order and confirm payment',
-      );
+      throw new InternalServerErrorException('Failed to complete order and confirm payment');
     }
   }
 
@@ -89,7 +80,7 @@ export class PaymentTransactionsRepo {
     orderId: string,
     clientId: string,
     id: string,
-    paymentData: Stripe.Checkout.Session | PayPalEventType,
+    paymentData: StripeCheckoutSession | PayPalEventType,
   ): Promise<boolean> {
     try {
       const paymentOrderId = id;
@@ -98,31 +89,26 @@ export class PaymentTransactionsRepo {
 
       return await this.paymentTransactionsRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager): Promise<boolean> => {
-          const promises: Promise<boolean>[] = [
-            this.updateOrderStatusAwaitingShipment(
-              orderId,
-              clientId,
-              updatedAt,
-              statusOrder,
-              transactionalEntityManager,
-            ),
-            this.paymentApproved(
-              orderId,
-              updatedAt,
-              paymentOrderId,
-              paymentData,
-              transactionalEntityManager,
-            ),
-          ];
-          const [orderUpdated, paymentConfirmed] = await Promise.all(promises);
+          const orderUpdated = await this.updateOrderStatusAwaitingShipment(
+            orderId,
+            clientId,
+            updatedAt,
+            statusOrder,
+            transactionalEntityManager,
+          );
+          const paymentConfirmed = await this.paymentApproved(
+            orderId,
+            updatedAt,
+            paymentOrderId,
+            paymentData,
+            transactionalEntityManager,
+          );
           return orderUpdated && paymentConfirmed;
         },
       );
     } catch (error) {
       console.error('Error completing order and confirming payment:', error);
-      throw new InternalServerErrorException(
-        'Failed to complete order and confirm payment',
-      );
+      throw new InternalServerErrorException('Failed to complete order and confirm payment');
     }
   }
 
@@ -134,7 +120,7 @@ export class PaymentTransactionsRepo {
     manager: EntityManager,
   ): Promise<boolean> {
     try {
-      const order = await this.findOrder(orderId, clientId);
+      const order = await this.findOrder(orderId, clientId, manager);
 
       if (!order) {
         console.log(`Order with ID ${orderId} not found`);
@@ -156,11 +142,11 @@ export class PaymentTransactionsRepo {
     orderId: string,
     updatedAt: string,
     paymentOrderId: string,
-    paymentData: Stripe.Checkout.Session | PayPalEventType,
+    paymentData: StripeCheckoutSession | PayPalEventType,
     manager: EntityManager,
   ): Promise<boolean> {
     try {
-      const paymentTransaction = await this.findPaymentTransaction(orderId);
+      const paymentTransaction = await this.findPaymentTransaction(orderId, manager);
 
       if (!paymentTransaction) {
         console.log(`Payment transaction with orderId ${orderId} not found`);
@@ -170,8 +156,7 @@ export class PaymentTransactionsRepo {
       let updatedData: string = JSON.stringify(paymentData); // Initialize updatedData with the new JSON data
 
       if (paymentTransaction.paymentProviderInfoJson) {
-        updatedData =
-          paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+        updatedData = paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
       }
 
       paymentTransaction.paymentStatus = PaymentsStatusEnum.APPROVED;
@@ -194,7 +179,7 @@ export class PaymentTransactionsRepo {
     manager: EntityManager,
   ): Promise<boolean> {
     try {
-      const order = await this.findOrder(orderId, clientId);
+      const order = await this.findOrder(orderId, clientId, manager);
 
       if (!order) {
         console.log(`Order with ID ${orderId} not found`);
@@ -215,8 +200,9 @@ export class PaymentTransactionsRepo {
   private async findOrder(
     orderId: string,
     clientId: string,
+    manager: EntityManager,
   ): Promise<OrdersEntity | null> {
-    return await this.ordersRepository.manager
+    return await manager
       .createQueryBuilder(OrdersEntity, 'order')
       .leftJoinAndSelect('order.client', 'client')
       .leftJoinAndSelect('order.guestClient', 'guestClient')
@@ -224,21 +210,18 @@ export class PaymentTransactionsRepo {
       .andWhere('order.orderStatus = :orderStatus', {
         orderStatus: OrderStatusEnum.PROCESSING,
       })
-      .andWhere(
-        '(client.userId = :clientId OR guestClient.guestUserId = :clientId)',
-        { clientId },
-      )
+      .andWhere('(client.userId = :clientId OR guestClient.guestUserId = :clientId)', { clientId })
       .getOne();
   }
 
   private async paymentConfirm(
     orderId: string,
     updatedAt: string,
-    paymentData: Stripe.Checkout.Session | PayPalEventType,
+    paymentData: StripeCheckoutSession | PayPalEventType,
     manager: EntityManager,
   ): Promise<boolean> {
     try {
-      const paymentTransaction = await this.findPaymentTransaction(orderId);
+      const paymentTransaction = await this.findPaymentTransaction(orderId, manager);
 
       if (!paymentTransaction) {
         console.log(`Payment transaction with orderId ${orderId} not found`);
@@ -249,8 +232,7 @@ export class PaymentTransactionsRepo {
       let updatedData: string = JSON.stringify(paymentData);
 
       if (paymentTransaction.paymentProviderInfoJson) {
-        updatedData =
-          paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
+        updatedData = paymentTransaction.paymentProviderInfoJson + ', ' + updatedData;
       }
 
       // Update paymentTransaction properties
@@ -270,8 +252,9 @@ export class PaymentTransactionsRepo {
 
   private async findPaymentTransaction(
     orderId: string,
+    manager: EntityManager,
   ): Promise<PaymentTransactionsEntity | null> {
-    return await this.paymentTransactionsRepository.manager
+    return await manager
       .createQueryBuilder(PaymentTransactionsEntity, 'paymentTransaction')
       .leftJoinAndSelect('paymentTransaction.order', 'order')
       .where('paymentTransaction.orderId = :orderId', { orderId })
@@ -285,14 +268,10 @@ export class PaymentTransactionsRepo {
     paymentTransactionsEntity: PaymentTransactionsEntity,
   ): Promise<PaymentTransactionsEntity> {
     try {
-      return await this.paymentTransactionsRepository.save(
-        paymentTransactionsEntity,
-      );
+      return await this.paymentTransactionsRepository.save(paymentTransactionsEntity);
     } catch (error) {
       console.log('Error saving payment transaction:', error);
-      throw new InternalServerErrorException(
-        'Error saving payment transaction' + error.message,
-      );
+      throw new InternalServerErrorException('Error saving payment transaction' + error.message);
     }
   }
 }

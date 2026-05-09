@@ -10,9 +10,7 @@ export class SendConfirmationCodesCommand {
 }
 
 @CommandHandler(SendConfirmationCodesCommand)
-export class SendConfirmationCodesUseCase
-  implements ICommandHandler<SendConfirmationCodesCommand>
-{
+export class SendConfirmationCodesUseCase implements ICommandHandler<SendConfirmationCodesCommand> {
   constructor(
     protected commandBus: CommandBus,
     protected mailOptionsBuilder: MailOptionsBuilder,

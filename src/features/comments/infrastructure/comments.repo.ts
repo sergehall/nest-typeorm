@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository, SelectQueryBuilder } from 'typeorm';
 import { CommentsEntity } from '../entities/comments.entity';
 
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { PostsEntity } from '../../posts/entities/posts.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
@@ -47,8 +44,7 @@ export class CommentsRepo {
       return comment[0] ? comment[0] : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -74,14 +70,15 @@ export class CommentsRepo {
         return null;
       }
 
-      const result: CommentWithLikesInfoViewModel[] =
-        await this.commentsLikesAggregation(comment, currentUserDto);
+      const result: CommentWithLikesInfoViewModel[] = await this.commentsLikesAggregation(
+        comment,
+        currentUserDto,
+      );
 
       return result[0];
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -98,16 +95,10 @@ export class CommentsRepo {
       const limit: number = pageSize;
       const offset: number = (pageNumber - 1) * limit;
 
-      const queryBuilder = await this.createQueryBuilderForPostsComments(
-        queryData,
-        postId,
-      );
+      const queryBuilder = await this.createQueryBuilderForPostsComments(queryData, postId);
       const countComment = await queryBuilder.getCount();
 
-      const comments: CommentsEntity[] = await queryBuilder
-        .skip(offset)
-        .take(limit)
-        .getMany();
+      const comments: CommentsEntity[] = await queryBuilder.skip(offset).take(limit).getMany();
 
       if (comments.length === 0) {
         return {
@@ -117,8 +108,10 @@ export class CommentsRepo {
       }
 
       // Retrieve comments with information about likes
-      const commentsWithLikes: CommentViewModel[] =
-        await this.commentsLikesAggregation(comments, currentUserDto);
+      const commentsWithLikes: CommentViewModel[] = await this.commentsLikesAggregation(
+        comments,
+        currentUserDto,
+      );
 
       return {
         comments: commentsWithLikes,
@@ -145,10 +138,7 @@ export class CommentsRepo {
     try {
       const countComment = await queryBuilder.getCount();
 
-      const comments: CommentsEntity[] = await queryBuilder
-        .skip(offset)
-        .take(limit)
-        .getMany();
+      const comments: CommentsEntity[] = await queryBuilder.skip(offset).take(limit).getMany();
 
       if (comments.length === 0) {
         return {
@@ -158,8 +148,10 @@ export class CommentsRepo {
       }
 
       // Retrieve comments with information about likes
-      const commentsWithLikes: CommentViewModel[] =
-        await this.commentsLikesAggregationForBlogger(comments, currentUserDto);
+      const commentsWithLikes: CommentViewModel[] = await this.commentsLikesAggregationForBlogger(
+        comments,
+        currentUserDto,
+      );
 
       return {
         comments: commentsWithLikes,
@@ -247,25 +239,18 @@ export class CommentsRepo {
         .insert()
         .into(CommentsEntity)
         .values(commentsEntity)
-        .returning(
-          `"id", "content", "createdAt", "commentatorId", "commentatorLogin"`,
-        );
+        .returning(`"id", "content", "createdAt", "commentatorId", "commentatorLogin"`);
 
       const result: InsertResult = await queryBuilder.execute();
 
       return await this.addLikesInfoAndTransformedComment(result.raw[0]);
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new comment.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new comment.');
     }
   }
 
-  async updateComment(
-    commentId: string,
-    updateCommentDto: UpdateCommentDto,
-  ): Promise<boolean> {
+  async updateComment(commentId: string, updateCommentDto: UpdateCommentDto): Promise<boolean> {
     try {
       const updateResult = await this.commentsRepository.update(
         { id: commentId },
@@ -318,10 +303,9 @@ export class CommentsRepo {
       );
 
     return comments.map((comment: CommentsEntity): CommentViewModel => {
-      const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
-        likesInfoArr.find(
-          (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
-        );
+      const likesInfo: LikesDislikesMyStatusInfoDto | undefined = likesInfoArr.find(
+        (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
+      );
 
       return {
         id: comment.id,
@@ -353,10 +337,9 @@ export class CommentsRepo {
       );
 
     return comments.map((comment: CommentsEntity): BloggerCommentViewModel => {
-      const likesInfo: LikesDislikesMyStatusInfoDto | undefined =
-        likesInfoArr.find(
-          (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
-        );
+      const likesInfo: LikesDislikesMyStatusInfoDto | undefined = likesInfoArr.find(
+        (result: LikesDislikesMyStatusInfoDto) => result.id === comment.id,
+      );
 
       return {
         id: comment.id,

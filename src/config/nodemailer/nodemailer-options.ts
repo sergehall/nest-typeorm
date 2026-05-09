@@ -4,10 +4,7 @@ import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { MailsConfig } from '../mails/mails.config';
 
 @Injectable()
-export class NodemailerOptions
-  extends MailsConfig
-  implements MailerOptionsFactory
-{
+export class NodemailerOptions extends MailsConfig implements MailerOptionsFactory {
   async createMailerOptions(): Promise<MailerOptions> {
     const host: string = await this.getMailsConfig('MAIL_HOST');
     const port: number = await this.getMailsPort('EMAIL_PORT');

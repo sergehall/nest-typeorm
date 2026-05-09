@@ -16,9 +16,7 @@ export class SaConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueSa(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in PayPal configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in PayPal configuration`);
     }
   }
 

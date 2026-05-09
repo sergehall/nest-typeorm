@@ -46,20 +46,12 @@ export class TelegramBotStatusRepo {
 
     if (telegramBotStatusEntity) {
       telegramBotStatusEntity.botStatus = botStatus;
-      return await this.telegramBotStatusRepository.save(
-        telegramBotStatusEntity,
-      );
+      return await this.telegramBotStatusRepository.save(telegramBotStatusEntity);
     }
 
     const newTelegramBotStatusEntity: TelegramBotStatusEntity =
-      TelegramBotStatusEntity.createTelegramBotStatusEntity(
-        telegramId,
-        user,
-        botStatus,
-      );
+      TelegramBotStatusEntity.createTelegramBotStatusEntity(telegramId, user, botStatus);
 
-    return await this.telegramBotStatusRepository.save(
-      newTelegramBotStatusEntity,
-    );
+    return await this.telegramBotStatusRepository.save(newTelegramBotStatusEntity);
   }
 }

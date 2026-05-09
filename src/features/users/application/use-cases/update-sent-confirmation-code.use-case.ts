@@ -1,4 +1,4 @@
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users-repo';
 import { UsersEntity } from '../../entities/users.entity';
@@ -10,9 +10,7 @@ export class UpdateSentConfirmationCodeCommand {
   constructor(public email: string) {}
 }
 @CommandHandler(UpdateSentConfirmationCodeCommand)
-export class UpdateSentConfirmationCodeUseCase
-  implements ICommandHandler<UpdateSentConfirmationCodeCommand>
-{
+export class UpdateSentConfirmationCodeUseCase implements ICommandHandler<UpdateSentConfirmationCodeCommand> {
   constructor(
     private readonly usersRepo: UsersRepo,
     private readonly eventBus: EventBus,
@@ -23,18 +21,19 @@ export class UpdateSentConfirmationCodeUseCase
 
     const confirmationCode = uuid4().toString();
 
-    const expirationDateDto: ExpirationDateDto =
-      await this.expirationDateCalculator.createExpDate(0, 1, 0);
+    const expirationDateDto: ExpirationDateDto = await this.expirationDateCalculator.createExpDate(
+      0,
+      1,
+      0,
+    );
 
-    const updatedUser: UsersEntity =
-      await this.usersRepo.updateCodeAndExpirationByEmail(
-        email,
-        confirmationCode,
-        expirationDateDto.expirationDate,
-      );
+    const updatedUser: UsersEntity = await this.usersRepo.updateCodeAndExpirationByEmail(
+      email,
+      confirmationCode,
+      expirationDateDto.expirationDate,
+    );
 
-    const event: UpdatedConfirmationCodeEvent =
-      new UpdatedConfirmationCodeEvent(updatedUser);
+    const event: UpdatedConfirmationCodeEvent = new UpdatedConfirmationCodeEvent(updatedUser);
     updatedUser.events.push(event);
 
     updatedUser.events.forEach((e) => {

@@ -12,9 +12,7 @@ export class ProcessTelegramWebhookMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
 }
 @CommandHandler(ProcessTelegramWebhookMessagesCommand)
-export class ProcessTelegramWebhookMessagesUseCase
-  implements ICommandHandler<ProcessTelegramWebhookMessagesCommand>
-{
+export class ProcessTelegramWebhookMessagesUseCase implements ICommandHandler<ProcessTelegramWebhookMessagesCommand> {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly telegramConfig: TelegramConfig,
@@ -59,10 +57,7 @@ export class ProcessTelegramWebhookMessagesUseCase
             return;
           }
 
-          await this.sendTelegramMessage(
-            payloadTelegramMessage.message.from.id,
-            feedbackMessage,
-          );
+          await this.sendTelegramMessage(payloadTelegramMessage.message.from.id, feedbackMessage);
           return;
         }
       }
@@ -70,20 +65,14 @@ export class ProcessTelegramWebhookMessagesUseCase
       const feedbackMessage = await this.commandBus.execute(
         new TelegramTextParserCommand(payloadTelegramMessage),
       );
-      await this.sendTelegramMessage(
-        payloadTelegramMessage.message.from.id,
-        feedbackMessage,
-      );
+      await this.sendTelegramMessage(payloadTelegramMessage.message.from.id, feedbackMessage);
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  private async sendTelegramMessage(
-    chatId: number,
-    text: string,
-  ): Promise<void> {
+  private async sendTelegramMessage(chatId: number, text: string): Promise<void> {
     const tokenTelegramBot = await this.telegramConfig.getTelegramValue(
       'TOKEN_TELEGRAM_IT_INCUBATOR',
     );
@@ -100,10 +89,7 @@ export class ProcessTelegramWebhookMessagesUseCase
   ): Promise<void> {
     const { first_name } = payloadTelegramMessage.message.from;
     const welcomeMessage = `Welcome, ${first_name || 'new user'}!`;
-    await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
-      welcomeMessage,
-    );
+    await this.sendTelegramMessage(payloadTelegramMessage.message.from.id, welcomeMessage);
   }
 
   private async sendUnknownCommandMessage(
@@ -112,18 +98,13 @@ export class ProcessTelegramWebhookMessagesUseCase
   ): Promise<void> {
     const { first_name } = payloadTelegramMessage.message.from;
     const unknownCommandMessage = `Welcome, ${first_name || 'new user'}! But I do not understand the command: ${parts}!`;
-    await this.sendTelegramMessage(
-      payloadTelegramMessage.message.from.id,
-      unknownCommandMessage,
-    );
+    await this.sendTelegramMessage(payloadTelegramMessage.message.from.id, unknownCommandMessage);
   }
 
   private async sendMemberStatusMessage(
     payloadTelegramMessage: PayloadTelegramMessageType,
   ): Promise<void> {
-    const bot_chatId = await this.telegramConfig.getTelegramValue(
-      'TELEGRAM_BOT_CHAT_ID',
-    );
+    const bot_chatId = await this.telegramConfig.getTelegramValue('TELEGRAM_BOT_CHAT_ID');
     let name = 'new_user';
     let userName = 'user_name';
     let status = 'status';

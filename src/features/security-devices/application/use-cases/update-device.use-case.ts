@@ -13,9 +13,7 @@ export class UpdateDeviceCommand {
 }
 
 @CommandHandler(UpdateDeviceCommand)
-export class UpdateDeviceUseCase
-  implements ICommandHandler<UpdateDeviceCommand>
-{
+export class UpdateDeviceUseCase implements ICommandHandler<UpdateDeviceCommand> {
   constructor(private readonly securityDevicesRepo: SecurityDevicesRepo) {}
   async execute(command: UpdateDeviceCommand): Promise<SecurityDevicesEntity> {
     const { newPayload, clientIp, userAgent } = command;
@@ -27,9 +25,7 @@ export class UpdateDeviceUseCase
     );
 
     if (!updatedDevice)
-      throw new NotFoundException(
-        `Device with ID ${newPayload.deviceId} not found`,
-      );
+      throw new NotFoundException(`Device with ID ${newPayload.deviceId} not found`);
 
     return updatedDevice;
   }

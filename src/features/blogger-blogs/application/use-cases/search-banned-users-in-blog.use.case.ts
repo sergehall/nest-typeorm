@@ -21,18 +21,14 @@ export class SearchBannedUsersInBlogCommand {
 }
 
 @CommandHandler(SearchBannedUsersInBlogCommand)
-export class SearchBannedUsersInBlogUseCase
-  implements ICommandHandler<SearchBannedUsersInBlogCommand>
-{
+export class SearchBannedUsersInBlogUseCase implements ICommandHandler<SearchBannedUsersInBlogCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
     protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
     protected commandBus: CommandBus,
   ) {}
-  async execute(
-    command: SearchBannedUsersInBlogCommand,
-  ): Promise<PaginatorDto> {
+  async execute(command: SearchBannedUsersInBlogCommand): Promise<PaginatorDto> {
     const { blogId, queryData, currentUser } = command;
     const { pageNumber, pageSize } = queryData.queryPagination;
 
@@ -61,12 +57,11 @@ export class SearchBannedUsersInBlogUseCase
     }
 
     // Calculate the number of pages for pagination
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(totalCount / queryData.queryPagination.pageSize);
 
-    const transformedBannedUsers: BannedUserForBlogViewModel[] =
-      await this.transformedBannedUsers(bannedUsersAndCount.bannedUsers);
+    const transformedBannedUsers: BannedUserForBlogViewModel[] = await this.transformedBannedUsers(
+      bannedUsersAndCount.bannedUsers,
+    );
 
     // Return the paginated and transformed banned users data
     return {

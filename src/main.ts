@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
-  // // Set global prefix 
+  // // Set global prefix
   // app.setGlobalPrefix('api');
 
   // Apply configurations using the createApp function (assuming it configures the app)
@@ -22,7 +22,6 @@ async function bootstrap() {
   // Retrieve the port from environment variables, default to 5000 if not provided
   const port = configService.get<number>('PORT');
 
-  console.log('port', port);
   // Start the application and listen on the specified port
   await app.listen(port, () => {
     console.log(`Example app listening on port: ${port}`);

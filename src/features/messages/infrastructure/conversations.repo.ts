@@ -9,12 +9,11 @@ export class ConversationsRepo {
     protected conversationsRepository: Repository<ConversationsEntity>,
   ) {}
 
-  async createConversations(
-    title: string,
-    description: string,
-  ): Promise<ConversationsEntity> {
-    const conversationsEntity: ConversationsEntity =
-      ConversationsEntity.createConversationEntity(title, description);
+  async createConversations(title: string, description: string): Promise<ConversationsEntity> {
+    const conversationsEntity: ConversationsEntity = ConversationsEntity.createConversationEntity(
+      title,
+      description,
+    );
 
     try {
       const queryBuilder = this.conversationsRepository

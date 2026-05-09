@@ -7,16 +7,12 @@ export class RemoveDevicesExceptCurrentCommand {
 }
 
 @CommandHandler(RemoveDevicesExceptCurrentCommand)
-export class RemoveDevicesExceptCurrentUseCase
-  implements ICommandHandler<RemoveDevicesExceptCurrentCommand>
-{
+export class RemoveDevicesExceptCurrentUseCase implements ICommandHandler<RemoveDevicesExceptCurrentCommand> {
   constructor(protected securityDevicesRepo: SecurityDevicesRepo) {}
 
   async execute(command: RemoveDevicesExceptCurrentCommand): Promise<boolean> {
     const { currentPayload } = command;
 
-    return await this.securityDevicesRepo.deleteDevicesExceptCurrent(
-      currentPayload,
-    );
+    return await this.securityDevicesRepo.deleteDevicesExceptCurrent(currentPayload);
   }
 }

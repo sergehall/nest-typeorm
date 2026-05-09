@@ -11,9 +11,7 @@ export class SaGetQuestionsCommand {
 }
 
 @CommandHandler(SaGetQuestionsCommand)
-export class SaGetQuestionsUseCase
-  implements ICommandHandler<SaGetQuestionsCommand>
-{
+export class SaGetQuestionsUseCase implements ICommandHandler<SaGetQuestionsCommand> {
   constructor(
     protected gameQuestionsRepo: GameQuestionsRepo,
     protected quizQuestionsService: SaQuizQuestionsService,

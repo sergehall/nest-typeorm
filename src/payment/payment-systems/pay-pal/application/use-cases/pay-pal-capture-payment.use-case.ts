@@ -11,9 +11,7 @@ export class PayPalCapturePaymentCommand {
 }
 
 @CommandHandler(PayPalCapturePaymentCommand)
-export class PayPalCapturePaymentUseCase
-  implements ICommandHandler<PayPalCapturePaymentCommand>
-{
+export class PayPalCapturePaymentUseCase implements ICommandHandler<PayPalCapturePaymentCommand> {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly paymentService: PaymentService,
@@ -24,30 +22,18 @@ export class PayPalCapturePaymentUseCase
     const { body } = command;
     try {
       const { reference_id } = body.resource.purchase_units[0];
-      if (!reference_id)
-        throw new InternalServerErrorException('Invalid reference ID');
+      if (!reference_id) throw new InternalServerErrorException('Invalid reference ID');
 
-      const { clientId, orderId } =
-        await this.paymentService.extractClientAndOrderId(reference_id);
+      const { clientId, orderId } = await this.paymentService.extractClientAndOrderId(reference_id);
 
       const { id } = body.resource;
 
-      await this.paymentTransactionsRepo.updateOrderAndPaymentApproved(
-        orderId,
-        clientId,
-        id,
-        body,
-      );
+      await this.paymentTransactionsRepo.updateOrderAndPaymentApproved(orderId, clientId, id, body);
 
-      const captureObj = body.resource.links.find(
-        (link) => link.rel === 'capture',
-      );
-      if (!captureObj)
-        throw new InternalServerErrorException('Invalid capture link');
+      const captureObj = body.resource.links.find((link) => link.rel === 'capture');
+      if (!captureObj) throw new InternalServerErrorException('Invalid capture link');
 
-      const accessToken = await this.commandBus.execute(
-        new PayPalGenerateAccessTokenCommand(),
-      );
+      const accessToken = await this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
 
       return await axios.post(
         captureObj.href,
@@ -60,10 +46,7 @@ export class PayPalCapturePaymentUseCase
         },
       );
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Failed to PayPalCapturePayment',
-        error.message,
-      );
+      throw new InternalServerErrorException('Failed to PayPalCapturePayment', error.message);
     }
   }
 }

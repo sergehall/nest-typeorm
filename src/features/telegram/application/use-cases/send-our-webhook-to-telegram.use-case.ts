@@ -10,9 +10,7 @@ export class SendOurWebhookToTelegramCommand {
 }
 
 @CommandHandler(SendOurWebhookToTelegramCommand)
-export class SendOurWebhookToTelegramUseCase
-  implements ICommandHandler<SendOurWebhookToTelegramCommand>
-{
+export class SendOurWebhookToTelegramUseCase implements ICommandHandler<SendOurWebhookToTelegramCommand> {
   constructor(
     private readonly postgresConfig: PostgresConfig,
     private readonly telegramConfig: TelegramConfig,
@@ -25,8 +23,7 @@ export class SendOurWebhookToTelegramUseCase
     const method = TelegramMethodsEnum.SET_WEBHOOK;
     const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${method}`;
 
-    const baseUrl =
-      await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
+    const baseUrl = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
 
     const url = baseUrl + '/integrations/telegram/webhook';
 

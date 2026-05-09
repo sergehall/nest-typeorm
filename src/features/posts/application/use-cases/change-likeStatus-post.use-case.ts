@@ -19,22 +19,17 @@ export class ChangeLikeStatusPostCommand {
 }
 
 @CommandHandler(ChangeLikeStatusPostCommand)
-export class ChangeLikeStatusPostUseCase
-  implements ICommandHandler<ChangeLikeStatusPostCommand>
-{
+export class ChangeLikeStatusPostUseCase implements ICommandHandler<ChangeLikeStatusPostCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected likeStatusPostsRepo: LikeStatusPostsRepo,
     protected bannedUsersForBlogsRepo: BannedUsersForBlogsRepo,
     protected postsRepo: PostsRepo,
   ) {}
-  async execute(
-    command: ChangeLikeStatusPostCommand,
-  ): Promise<LikeStatusPostsEntity> {
+  async execute(command: ChangeLikeStatusPostCommand): Promise<LikeStatusPostsEntity> {
     const { postId, likeStatusDto, currentUserDto } = command;
 
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkUserPermission(post, currentUserDto);
@@ -46,15 +41,11 @@ export class ChangeLikeStatusPostUseCase
     );
   }
 
-  private async checkUserPermission(
-    post: PostsEntity,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(post: PostsEntity, currentUserDto: CurrentUserDto) {
     const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
       currentUserDto.userId,
       post.blog.id,
     );
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForBlog);
+    if (userIsBannedForBlog) throw new ForbiddenException(userNotHavePermissionForBlog);
   }
 }

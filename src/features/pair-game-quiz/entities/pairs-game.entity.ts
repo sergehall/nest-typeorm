@@ -1,18 +1,11 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { StatusGameEnum } from '../enums/status-game.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ChallengeQuestionsEntity } from './challenge-questions.entity';
 import { GamesResultsEnum } from '../enums/games-results.enum';
 import { ChallengeAnswersEntity } from './challenge-answers.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { PlayersResultDto } from '../dto/players-result.dto';
 
 @Entity('PairsGame')
@@ -77,23 +70,15 @@ export class PairsGameEntity {
   @Column({ type: 'character varying', length: 50, nullable: true })
   finishGameDate: string | null;
 
-  @OneToMany(
-    () => ChallengeQuestionsEntity,
-    (challengeQuestion) => challengeQuestion.pairGameQuiz,
-  )
+  @OneToMany(() => ChallengeQuestionsEntity, (challengeQuestion) => challengeQuestion.pairGameQuiz)
   questions: ChallengeQuestionsEntity[];
 
-  @OneToMany(
-    () => ChallengeAnswersEntity,
-    (challengeAnswer) => challengeAnswer.pairGameQuiz,
-  )
+  @OneToMany(() => ChallengeAnswersEntity, (challengeAnswer) => challengeAnswer.pairGameQuiz)
   answers: ChallengeAnswersEntity[];
 
   events: any[] = [];
 
-  static createPairsGameEntity(
-    currentUserDto: CurrentUserDto,
-  ): PairsGameEntity {
+  static createPairsGameEntity(currentUserDto: CurrentUserDto): PairsGameEntity {
     const firstPlayer = new UsersEntity();
     firstPlayer.userId = currentUserDto.userId;
     firstPlayer.login = currentUserDto.login;
@@ -124,10 +109,7 @@ export class PairsGameEntity {
     return pairGameQuiz;
   }
 
-  static updateGameResult(
-    game: PairsGameEntity,
-    playersData: PlayersResultDto,
-  ): PairsGameEntity {
+  static updateGameResult(game: PairsGameEntity, playersData: PlayersResultDto): PairsGameEntity {
     // Update the first player's data
     game.firstPlayer = playersData.firstPlayer.player;
     game.firstPlayerScore = playersData.firstPlayer.sumScore;

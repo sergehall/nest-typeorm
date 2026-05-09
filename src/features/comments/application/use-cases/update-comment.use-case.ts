@@ -21,9 +21,7 @@ export class UpdateCommentCommand {
 }
 
 @CommandHandler(UpdateCommentCommand)
-export class UpdateCommentUseCase
-  implements ICommandHandler<UpdateCommentCommand>
-{
+export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected commentsRepo: CommentsRepo,
@@ -31,10 +29,8 @@ export class UpdateCommentUseCase
   async execute(command: UpdateCommentCommand): Promise<boolean> {
     const { commentId, updateCommentDto, currentUserDto } = command;
 
-    const findComment =
-      await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
-    if (!findComment)
-      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    const findComment = await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
+    if (!findComment) throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
     this.checkUserPermission(currentUserDto, findComment.commentator.userId);
 
@@ -46,10 +42,7 @@ export class UpdateCommentUseCase
     }
   }
 
-  private checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    commentatorId: string,
-  ) {
+  private checkUserPermission(currentUserDto: CurrentUserDto, commentatorId: string) {
     const userIdDto: IdDto = { id: currentUserDto.userId };
     const ability = this.caslAbilityFactory.createForUserId(userIdDto);
     try {
@@ -57,9 +50,7 @@ export class UpdateCommentUseCase
         id: commentatorId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to update this comment. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to update this comment. ' + error.message);
     }
   }
 }

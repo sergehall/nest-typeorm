@@ -8,12 +8,8 @@ export class TelegramTextParserCommand {
 }
 
 @CommandHandler(TelegramTextParserCommand)
-export class TelegramTextParserUseCase
-  implements ICommandHandler<TelegramTextParserCommand>
-{
-  async execute({
-    payloadTelegramMessage,
-  }: TelegramTextParserCommand): Promise<string> {
+export class TelegramTextParserUseCase implements ICommandHandler<TelegramTextParserCommand> {
+  async execute({ payloadTelegramMessage }: TelegramTextParserCommand): Promise<string> {
     // Extract message text and recipient's name from the payload
     const inputPhrase = payloadTelegramMessage.message.text.toLowerCase();
     const nameRecipient =

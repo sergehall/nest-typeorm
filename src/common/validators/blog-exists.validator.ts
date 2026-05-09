@@ -14,10 +14,9 @@ export class BlogExistsValidator implements ValidatorConstraintInterface {
 
   async validate(value: string): Promise<boolean> {
     try {
-      const blog: BloggerBlogsEntity | null =
-        await this.bloggerBlogsRepo.findBlogById(value);
+      const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(value);
       return !!blog; // Convert the blog to a boolean value (true if not null, false if null)
-    } catch (error) {
+    } catch {
       return false;
     }
   }

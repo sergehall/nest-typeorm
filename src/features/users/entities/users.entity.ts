@@ -12,12 +12,12 @@ import { BannedUsersForBlogsEntity } from './banned-users-for-blogs.entity';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
 import { ChallengeAnswersEntity } from '../../pair-game-quiz/entities/challenge-answers.entity';
 import { DataForCreateUserDto } from '../dto/data-for-create-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { ApiProperty } from '@nestjs/swagger';
 import { MessagesEntity } from '../../messages/entities/messages.entity';
 import { ConversationsEntity } from '../../messages/entities/conversations.entity';
 
-@Entity('Users')
+@Entity('nt-users')
 @Unique(['userId', 'login', 'email', 'confirmationCode'])
 @Unique(['userId', 'login'])
 @Unique(['userId', 'email'])
@@ -145,10 +145,7 @@ export class UsersEntity {
   @Column({ type: 'character varying', nullable: true, default: null })
   banReason: string | null = null;
 
-  @OneToMany(
-    () => SecurityDevicesEntity,
-    (securityDevice) => securityDevice.user,
-  )
+  @OneToMany(() => SecurityDevicesEntity, (securityDevice) => securityDevice.user)
   securityDevices: SecurityDevicesEntity[];
 
   @OneToMany(() => MessagesEntity, (message) => message.author)
@@ -166,10 +163,7 @@ export class UsersEntity {
   @OneToMany(() => CommentsEntity, (comments) => comments.commentator)
   comments: CommentsEntity[];
 
-  @OneToMany(
-    () => LikeStatusPostsEntity,
-    (LikeStatusPosts) => LikeStatusPosts.ratedPostUser,
-  )
+  @OneToMany(() => LikeStatusPostsEntity, (LikeStatusPosts) => LikeStatusPosts.ratedPostUser)
   ratedPostUser: LikeStatusPostsEntity[];
 
   @OneToMany(
@@ -178,16 +172,10 @@ export class UsersEntity {
   )
   ratedCommentUser: LikeStatusCommentsEntity[];
 
-  @OneToMany(
-    () => SentCodesLogEntity,
-    (sentCodesLog) => sentCodesLog.sentForUser,
-  )
+  @OneToMany(() => SentCodesLogEntity, (sentCodesLog) => sentCodesLog.sentForUser)
   sentCodeLogs: SentCodesLogEntity[];
 
-  @OneToMany(
-    () => BannedUsersForBlogsEntity,
-    (bannedBlogs) => bannedBlogs.bannedUserForBlogs,
-  )
+  @OneToMany(() => BannedUsersForBlogsEntity, (bannedBlogs) => bannedBlogs.bannedUserForBlogs)
   bannedBlogsForUser: BannedUsersForBlogsEntity[];
 
   @OneToMany(() => PairsGameEntity, (pair) => pair.firstPlayer)

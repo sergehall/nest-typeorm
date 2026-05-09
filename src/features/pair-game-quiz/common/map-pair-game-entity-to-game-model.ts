@@ -18,8 +18,7 @@ export class MapPairGame {
   async toGameModel(
     pairQuestionsAnswersScoresDto: PairQuestionsAnswersScoresDto,
   ): Promise<GameViewModel> {
-    const { pair, challengeQuestions, challengeAnswers, scores } =
-      pairQuestionsAnswersScoresDto;
+    const { pair, challengeQuestions, challengeAnswers, scores } = pairQuestionsAnswersScoresDto;
 
     const processPlayersProgress = await this.processPlayersProgress(
       pair,
@@ -131,12 +130,10 @@ export class MapPairGame {
     });
 
     // Process each user's answers concurrently
-    const processingPromises = Object.keys(answersByUser).map(
-      async (userID) => {
-        // You can perform additional processing here if needed
-        return userID;
-      },
-    );
+    const processingPromises = Object.keys(answersByUser).map(async (userID) => {
+      // You can perform additional processing here if needed
+      return userID;
+    });
 
     // Wait for all processing to complete
     await Promise.all(processingPromises);

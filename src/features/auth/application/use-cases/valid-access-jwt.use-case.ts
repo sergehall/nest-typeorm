@@ -8,9 +8,7 @@ export class ValidAccessJwtCommand {
 }
 
 @CommandHandler(ValidAccessJwtCommand)
-export class ValidAccessJwtUseCase
-  implements ICommandHandler<ValidAccessJwtCommand>
-{
+export class ValidAccessJwtUseCase implements ICommandHandler<ValidAccessJwtCommand> {
   constructor(
     private jwtService: JwtService,
     private jwtConfig: JwtConfig,
@@ -18,8 +16,7 @@ export class ValidAccessJwtUseCase
   async execute(command: ValidAccessJwtCommand): Promise<PayloadDto | null> {
     const { accessToken } = command;
 
-    const ACCESS_SECRET_KEY =
-      this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
+    const ACCESS_SECRET_KEY = this.jwtConfig.getJwtConfigValue('ACCESS_SECRET_KEY');
 
     try {
       const payload: PayloadDto = await this.jwtService.verify(accessToken, {
@@ -28,7 +25,7 @@ export class ValidAccessJwtUseCase
 
       // Token verification was successful, return the payload
       return payload;
-    } catch (error) {
+    } catch {
       return null; // Token verification failed, return null
     }
   }

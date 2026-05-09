@@ -1,19 +1,11 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  PrimaryColumn,
-  Unique,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn, Unique, OneToMany } from 'typeorm';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { CommentsEntity } from '../../comments/entities/comments.entity';
 import { LikeStatusCommentsEntity } from '../../comments/entities/like-status-comments.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('Posts')
 @Unique(['id'])

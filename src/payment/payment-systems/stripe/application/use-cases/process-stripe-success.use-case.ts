@@ -6,9 +6,7 @@ export class ProcessStripeSuccessCommand {
 }
 
 @CommandHandler(ProcessStripeSuccessCommand)
-export class ProcessStripeSuccessUseCase
-  implements ICommandHandler<ProcessStripeSuccessCommand>
-{
+export class ProcessStripeSuccessUseCase implements ICommandHandler<ProcessStripeSuccessCommand> {
   constructor() {}
 
   async execute(command: ProcessStripeSuccessCommand): Promise<string> {

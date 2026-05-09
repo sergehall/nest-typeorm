@@ -20,14 +20,10 @@ interface ProductData {
 
 @Injectable()
 @CommandHandler(CreateRandomProductCommand)
-export class CreateRandomProductsUseCase
-  implements ICommandHandler<CreateRandomProductCommand>
-{
+export class CreateRandomProductsUseCase implements ICommandHandler<CreateRandomProductCommand> {
   constructor() {}
 
-  async execute(
-    command: CreateRandomProductCommand,
-  ): Promise<ProductsDataEntity[]> {
+  async execute(command: CreateRandomProductCommand): Promise<ProductsDataEntity[]> {
     const { countProducts } = command;
 
     if (countProducts < 1 || countProducts > 100) {
@@ -81,8 +77,7 @@ export class CreateRandomProductsUseCase
   }
 
   private async generateRandomString(): Promise<string> {
-    const randomLetter = (): string =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    const randomLetter = (): string => String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const randomNumber = (): string => String(Math.floor(Math.random() * 10));
     return `${randomLetter()}${randomLetter()}${randomLetter()}-${randomNumber()}${randomNumber()}${randomNumber()}`;
   }

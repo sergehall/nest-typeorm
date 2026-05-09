@@ -33,10 +33,7 @@ export class MessagesService {
     const title: string = 'New conversation';
     const description: string = 'New conversation description';
 
-    const conversation = await this.conversationsRepo.createConversations(
-      title,
-      description,
-    );
+    const conversation = await this.conversationsRepo.createConversations(title, description);
 
     const author = new UsersEntity();
     author.userId = currentUserDto.userId;
@@ -44,8 +41,11 @@ export class MessagesService {
 
     const message = createMessageDto.message;
 
-    const createdMessage: MessagesEntity =
-      await this.messagesRepo.createMessage(message, conversation, author);
+    const createdMessage: MessagesEntity = await this.messagesRepo.createMessage(
+      message,
+      conversation,
+      author,
+    );
 
     await this.socketGateway.sentToAll(createdMessage);
 
@@ -60,7 +60,7 @@ export class MessagesService {
     return `This action returns a #${id} message`;
   }
 
-  async update(id: number, updateMessageDto: UpdateMessageDto) {
+  async update(id: number, _updateMessageDto: UpdateMessageDto) {
     return `This action updates a #${id} message`;
   }
 

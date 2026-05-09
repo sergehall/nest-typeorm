@@ -22,9 +22,7 @@ export class DeletePostByPostIdAndBlogIdCommand {
 }
 
 @CommandHandler(DeletePostByPostIdAndBlogIdCommand)
-export class DeletePostByPostIdAndBlogIdUseCase
-  implements ICommandHandler<DeletePostByPostIdAndBlogIdCommand>
-{
+export class DeletePostByPostIdAndBlogIdUseCase implements ICommandHandler<DeletePostByPostIdAndBlogIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -34,27 +32,18 @@ export class DeletePostByPostIdAndBlogIdUseCase
     const { params, currentUserDto } = command;
     const { blogId, postId } = params;
 
-    const blog: BloggerBlogsEntity | null =
-      await this.bloggerBlogsRepo.findBlogById(blogId);
+    const blog: BloggerBlogsEntity | null = await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blog) throw new NotFoundException(`Blog with id: ${blogId} not found`);
 
-    const postToRemove: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
-    if (!postToRemove)
-      throw new NotFoundException(`Post with id: ${postId} not found`);
+    const postToRemove: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
+    if (!postToRemove) throw new NotFoundException(`Post with id: ${postId} not found`);
 
-    await this.checkUserPermission(
-      postToRemove.postOwner.userId,
-      currentUserDto,
-    );
+    await this.checkUserPermission(postToRemove.postOwner.userId, currentUserDto);
 
     return await this.postsRepo.deletePostByPostId(postToRemove.id);
   }
 
-  private async checkUserPermission(
-    postOwnerId: string,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(postOwnerId: string, currentUserDto: CurrentUserDto) {
     const ability = this.caslAbilityFactory.createForUserId({
       id: postOwnerId,
     });

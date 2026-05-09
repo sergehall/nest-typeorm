@@ -1,10 +1,5 @@
 import { UpdateBanUserDto } from '../../dto/update-ban-user.dto';
-import {
-  ForbiddenException,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -26,9 +21,7 @@ export class ManageBlogAccessCommand {
 }
 
 @CommandHandler(ManageBlogAccessCommand)
-export class ManageBlogAccessUseCase
-  implements ICommandHandler<ManageBlogAccessCommand>
-{
+export class ManageBlogAccessUseCase implements ICommandHandler<ManageBlogAccessCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -41,19 +34,14 @@ export class ManageBlogAccessUseCase
     const { userId, updateBanUserDto, currentUserDto } = command;
 
     if (userId === currentUserDto.userId) {
-      throw new HttpException(
-        { message: cannotBlockYourself },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: cannotBlockYourself }, HttpStatus.BAD_REQUEST);
     }
 
     // Fetch the user to be banned from the repository.
     const userForBan: UsersEntity = await this.getUserToBan(userId);
 
     // Fetch the blog associated with the ban from the repository.
-    const blogForBan: BloggerBlogsEntity = await this.getBlogForBan(
-      updateBanUserDto.blogId,
-    );
+    const blogForBan: BloggerBlogsEntity = await this.getBlogForBan(updateBanUserDto.blogId);
 
     // Check if the current user has permission to perform the ban action.
     await this.checkUserPermission(blogForBan.blogOwner.userId, currentUserDto);
@@ -67,26 +55,20 @@ export class ManageBlogAccessUseCase
 
   // Fetches the user to be banned from the repository based on the provided user ID.
   private async getUserToBan(userId: string): Promise<UsersEntity> {
-    const userToBan: UsersEntity | null =
-      await this.usersRepo.findUserByUserId(userId);
-    if (!userToBan)
-      throw new NotFoundException(`User with id: ${userId} not found`);
+    const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(userId);
+    if (!userToBan) throw new NotFoundException(`User with id: ${userId} not found`);
     return userToBan;
   }
 
   // Fetches the blog associated with the ban from the repository based on the provided blog ID.
   private async getBlogForBan(blogId: string): Promise<BloggerBlogsEntity> {
     const blogForBan = await this.bloggerBlogsRepo.findBlogById(blogId);
-    if (!blogForBan)
-      throw new NotFoundException(`Blog with id: ${blogId} not found`);
+    if (!blogForBan) throw new NotFoundException(`Blog with id: ${blogId} not found`);
     return blogForBan;
   }
 
   // Checks if the current user has permission to ban the user associated with the provided user ID.
-  private async checkUserPermission(
-    userId: string,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(userId: string, currentUserDto: CurrentUserDto) {
     const ability = this.caslAbilityFactory.createForUserId({ id: userId });
     try {
       // Throws a ForbiddenError if the current user doesn't have the permission to perform the action.

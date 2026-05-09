@@ -13,9 +13,7 @@ export class AddResultToPairGameCommand {
 }
 
 @CommandHandler(AddResultToPairGameCommand)
-export class AddResultToPairGameUseCase
-  implements ICommandHandler<AddResultToPairGameCommand>
-{
+export class AddResultToPairGameUseCase implements ICommandHandler<AddResultToPairGameCommand> {
   constructor(
     protected gameQuizRepo: GamePairsRepo,
     protected pairGameQuizService: PairGameQuizService,
@@ -28,8 +26,10 @@ export class AddResultToPairGameUseCase
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
-    const scores: CountCorrectAnswerDto =
-      await this.pairGameQuizService.getScores(game, challengeAnswers);
+    const scores: CountCorrectAnswerDto = await this.pairGameQuizService.getScores(
+      game,
+      challengeAnswers,
+    );
 
     const gameResult = await this.gameResult(scores);
 
@@ -55,8 +55,7 @@ export class AddResultToPairGameUseCase
     firstPlayer: GamesResultsEnum;
     secondPlayer: GamesResultsEnum;
   }> {
-    const { firstPlayerCountCorrectAnswer, secondPlayerCountCorrectAnswer } =
-      scores;
+    const { firstPlayerCountCorrectAnswer, secondPlayerCountCorrectAnswer } = scores;
 
     return {
       firstPlayer:

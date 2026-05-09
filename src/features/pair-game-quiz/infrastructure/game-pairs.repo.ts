@@ -36,13 +36,10 @@ export class GamePairsRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-          {
-            activeStatus: StatusGameEnum.ACTIVE,
-            pendingStatus: StatusGameEnum.FINISHED,
-          },
-        );
+        .where('(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)', {
+          activeStatus: StatusGameEnum.ACTIVE,
+          pendingStatus: StatusGameEnum.FINISHED,
+        });
       return await queryBuilder.getMany();
     } catch (error) {
       console.log(error.message);
@@ -56,49 +53,36 @@ export class GamePairsRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-          {
-            userId,
-          },
-        )
-        .andWhere(
-          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-          {
-            activeStatus: StatusGameEnum.ACTIVE,
-            pendingStatus: StatusGameEnum.FINISHED,
-          },
-        );
+        .where('(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)', {
+          userId,
+        })
+        .andWhere('(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)', {
+          activeStatus: StatusGameEnum.ACTIVE,
+          pendingStatus: StatusGameEnum.FINISHED,
+        });
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getAllGamesByUserIdForDelete(
-    userId: string,
-  ): Promise<PairsGameEntity[]> {
+  async getAllGamesByUserIdForDelete(userId: string): Promise<PairsGameEntity[]> {
     try {
       const queryBuilder = this.pairsGameQuizRepo
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-          {
-            userId,
-          },
-        );
+        .where('(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)', {
+          userId,
+        });
       return await queryBuilder.getMany();
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -110,8 +94,7 @@ export class GamePairsRepo {
     userId: string,
   ): Promise<PairsCountPairsDto> {
     // Retrieve paging parameters
-    const { sortBy, sortDirection, pageSize, pageNumber } =
-      queryData.queryPagination;
+    const { sortBy, sortDirection, pageSize, pageNumber } = queryData.queryPagination;
 
     const field: string = await this.getSortField(sortBy);
     const direction: SortDirectionEnum = sortDirection;
@@ -123,19 +106,13 @@ export class GamePairsRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-          {
-            userId,
-          },
-        )
-        .andWhere(
-          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-          {
-            activeStatus: StatusGameEnum.ACTIVE,
-            pendingStatus: StatusGameEnum.FINISHED,
-          },
-        );
+        .where('(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)', {
+          userId,
+        })
+        .andWhere('(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)', {
+          activeStatus: StatusGameEnum.ACTIVE,
+          pendingStatus: StatusGameEnum.FINISHED,
+        });
 
       queryBuilder.orderBy(`pairsGame.${field}`, direction);
 
@@ -159,42 +136,32 @@ export class GamePairsRepo {
       };
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getUnfinishedGameByUserId(
-    userId: string,
-  ): Promise<PairsGameEntity | null> {
+  async getUnfinishedGameByUserId(userId: string): Promise<PairsGameEntity | null> {
     try {
       const queryBuilder = this.pairsGameQuizRepo
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-          {
-            userId,
-          },
-        )
-        .andWhere(
-          '(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)',
-          {
-            activeStatus: StatusGameEnum.ACTIVE,
-            pendingStatus: StatusGameEnum.PENDING,
-          },
-        );
+        .where('(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)', {
+          userId,
+        })
+        .andWhere('(pairsGame.status = :activeStatus OR pairsGame.status = :pendingStatus)', {
+          activeStatus: StatusGameEnum.ACTIVE,
+          pendingStatus: StatusGameEnum.PENDING,
+        });
       const pair: PairsGameEntity | null = await queryBuilder.getOne();
 
       return pair ? pair : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -207,12 +174,9 @@ export class GamePairsRepo {
         .createQueryBuilder('pairsGame')
         .leftJoinAndSelect('pairsGame.firstPlayer', 'firstPlayer')
         .leftJoinAndSelect('pairsGame.secondPlayer', 'secondPlayer')
-        .where(
-          '(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)',
-          {
-            userId,
-          },
-        )
+        .where('(firstPlayer.userId = :userId OR secondPlayer.userId = :userId)', {
+          userId,
+        })
         .andWhere('(pairsGame.status = :activeStatus)', {
           activeStatus: StatusGameEnum.ACTIVE,
         });
@@ -221,8 +185,7 @@ export class GamePairsRepo {
       return pair ? pair : null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -263,12 +226,11 @@ export class GamePairsRepo {
     try {
       let createdGame: PairsGameEntity;
 
-      const pendingGame: PairsGameEntity | null =
-        await this.pairsGameQuizRepo.findOne({
-          where: {
-            status: StatusGameEnum.PENDING,
-          },
-        });
+      const pendingGame: PairsGameEntity | null = await this.pairsGameQuizRepo.findOne({
+        where: {
+          status: StatusGameEnum.PENDING,
+        },
+      });
 
       if (!pendingGame) {
         createdGame = PairsGameEntity.createPairsGameEntity(currentUserDto);
@@ -276,10 +238,9 @@ export class GamePairsRepo {
 
         const challengeQuestions: ChallengeQuestionsEntity[] = [];
         const challengeAnswers: ChallengeAnswersEntity[] = [];
-        const challengesQuestion =
-          await this.challengesQuestionsRepo.createChallengeQuestions(
-            createdGame.id,
-          );
+        const challengesQuestion = await this.challengesQuestionsRepo.createChallengeQuestions(
+          createdGame.id,
+        );
         if (challengesQuestion.length === 0) {
           // handle the error if there are not enough questions for the game
         }
@@ -294,17 +255,12 @@ export class GamePairsRepo {
         };
       }
 
-      createdGame = PairsGameEntity.addSecondPlayer(
-        pendingGame,
-        currentUserDto,
-      );
+      createdGame = PairsGameEntity.addSecondPlayer(pendingGame, currentUserDto);
 
       await this.pairsGameQuizRepo.save(createdGame);
 
       const challengeQuestions: ChallengeQuestionsEntity[] =
-        await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(
-          createdGame.id,
-        );
+        await this.challengesQuestionsRepo.getChallengeQuestionsByGameId(createdGame.id);
 
       const challengeAnswers: ChallengeAnswersEntity[] = [];
 
@@ -333,10 +289,7 @@ export class GamePairsRepo {
       // Save the updated game back to the database
       return await this.pairsGameQuizRepo.save(updatedGame);
     } catch (error) {
-      console.error(
-        'Error update PairsGameQuizEntity by updatePairsGameQuizByResult:',
-        error,
-      );
+      console.error('Error update PairsGameQuizEntity by updatePairsGameQuizByResult:', error);
       throw new InternalServerErrorException(error.message);
     }
   }

@@ -4,9 +4,7 @@ import { SaBloggerBlogsViewModel } from '../views/sa-blogger-blogs.view-model';
 
 @Injectable()
 export class SaService {
-  async transformBlogsForSa(
-    blogs: BloggerBlogsEntity[],
-  ): Promise<SaBloggerBlogsViewModel[]> {
+  async transformBlogsForSa(blogs: BloggerBlogsEntity[]): Promise<SaBloggerBlogsViewModel[]> {
     return blogs.map((blog: BloggerBlogsEntity) => ({
       id: blog.id,
       name: blog.name,

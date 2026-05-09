@@ -27,8 +27,7 @@ export class NoneStatusGuard implements CanActivate {
         await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
 
       if (payload && !jwtExistInBlackList) {
-        const user: UsersEntity | null =
-          await this.usersRepo.findNotBannedUserById(payload.userId);
+        const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(payload.userId);
 
         request.user =
           user && !user.isBanned

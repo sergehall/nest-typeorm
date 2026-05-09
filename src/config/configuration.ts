@@ -1,45 +1,24 @@
 import { EnvNamesEnums } from './enums/env-names.enums';
 
 class Configuration {
-  private static readEnvVariableWithDefault(
-    variable: string,
-    defaultValue: any,
-  ) {
+  private static readEnvVariableWithDefault(variable: string, defaultValue: any) {
     return process.env[variable] || defaultValue;
   }
 
   private static getEnvName(): string {
-    return this.readEnvVariableWithDefault(
-      'NODE_ENV',
-      EnvNamesEnums.DEVELOPMENT,
-    );
+    return this.readEnvVariableWithDefault('NODE_ENV', EnvNamesEnums.DEVELOPMENT);
   }
 
   private static getPort(): number {
-    return Number(this.readEnvVariableWithDefault('PORT', 5000));
+    return Number(this.readEnvVariableWithDefault('PORT', 5005));
   }
 
   private static getDatabaseURL(): string {
     return this.readEnvVariableWithDefault('DATABASE_URL', 'localhost');
   }
 
-  private static getUriHostLocal(): string {
-    return this.readEnvVariableWithDefault('PG_URI_LOCAL', 'localhost');
-  }
-
-  private static getUriHostHeroku(): string {
-    return this.readEnvVariableWithDefault('PG_HOST_HEROKU', 'localhost');
-  }
-
-  private static getPgPort(): number {
-    return Number(this.readEnvVariableWithDefault('PG_PORT', 5432));
-  }
-
   private static getMongoUriLocal(): string {
-    return this.readEnvVariableWithDefault(
-      'MONGO_URI_LOCAL',
-      'localhost://0.0.0.0',
-    );
+    return this.readEnvVariableWithDefault('MONGO_URI_LOCAL', 'localhost://0.0.0.0');
   }
 
   private static getMongoUriAtlas(): string {
@@ -62,22 +41,8 @@ class Configuration {
     return this.readEnvVariableWithDefault('PROD_NEST_DATABASE', 'Test-DB');
   }
 
-  private static getPgLocalNameDB(): string {
-    return this.readEnvVariableWithDefault('PG_NEST_LOCAL_DATABASE', 'Test-DB');
-  }
-
-  private static getPgHerokuNameDB(): string {
-    return this.readEnvVariableWithDefault(
-      'PG_HEROKU_NAME_DATABASE',
-      'Test-DB',
-    );
-  }
-
   private static getNodeMailerEmail(): string {
-    return this.readEnvVariableWithDefault(
-      'NODEMAILER_EMAIL',
-      'test@gmail.com',
-    );
+    return this.readEnvVariableWithDefault('NODEMAILER_EMAIL', 'test@gmail.com');
   }
 
   private static getNodeMailerAppPassword(): string {
@@ -93,17 +58,11 @@ class Configuration {
   }
 
   private static getAccessSecretKey(): string {
-    return this.readEnvVariableWithDefault(
-      'ACCESS_SECRET_KEY',
-      'ACCESS_SECRET',
-    );
+    return this.readEnvVariableWithDefault('ACCESS_SECRET_KEY', 'ACCESS_SECRET');
   }
 
   private static getRefreshSecretKey(): string {
-    return this.readEnvVariableWithDefault(
-      'REFRESH_SECRET_KEY',
-      'REFRESH_SECRET',
-    );
+    return this.readEnvVariableWithDefault('REFRESH_SECRET_KEY', 'REFRESH_SECRET');
   }
 
   private static getAccessExpTime(): string {
@@ -127,30 +86,11 @@ class Configuration {
   }
 
   private static getSaPasswordHash(): string {
-    return this.readEnvVariableWithDefault(
-      'SA_PASSWORD_HASH',
-      'SA_PASSWORD_HASH',
-    );
+    return this.readEnvVariableWithDefault('SA_PASSWORD_HASH', 'SA_PASSWORD_HASH');
   }
 
   private static getSaEmail(): string {
     return this.readEnvVariableWithDefault('SA_EMAIL', 'SA_EMAIL');
-  }
-
-  private static getPgLocalUserName(): string {
-    return this.readEnvVariableWithDefault('PG_LOCAL_USER_NAME', 'postgres');
-  }
-
-  private static getPgLocalUserPassword(): string {
-    return this.readEnvVariableWithDefault('PG_LOCAL_USER_PASSWORD', 'local');
-  }
-
-  private static getPgHerokuUserName(): string {
-    return this.readEnvVariableWithDefault('PG_HEROKU_USER_NAME', 'postgres');
-  }
-
-  private static getPgHerokuUserPassword(): string {
-    return this.readEnvVariableWithDefault('PG_HEROKU_USER_PASSWORD', 'local');
   }
 
   private static getPgHerokuDomain(): string {
@@ -170,63 +110,36 @@ class Configuration {
   }
 
   private static getTestStripeApiKey(): string {
-    return this.readEnvVariableWithDefault(
-      'STRIPE_TEST_API_KEY',
-      'STRIPE_TEST_API_KEY',
-    );
+    return this.readEnvVariableWithDefault('STRIPE_TEST_API_KEY', 'STRIPE_TEST_API_KEY');
   }
 
   private static getPayPalWebHookId(): string {
-    return this.readEnvVariableWithDefault(
-      'PAYPAL_WEBHOOK_ID',
-      'PAYPAL_WEBHOOK_ID',
-    );
+    return this.readEnvVariableWithDefault('PAYPAL_WEBHOOK_ID', 'PAYPAL_WEBHOOK_ID');
   }
   private static getPayPalClientSecret(): string {
-    return this.readEnvVariableWithDefault(
-      'PAYPAL_CLIENT_SECRET',
-      'PAYPAL_CLIENT_SECRET',
-    );
+    return this.readEnvVariableWithDefault('PAYPAL_CLIENT_SECRET', 'PAYPAL_CLIENT_SECRET');
   }
   private static getPayPalClientId(): string {
-    return this.readEnvVariableWithDefault(
-      'PAYPAL_CLIENT_ID',
-      'PAYPAL_CLIENT_ID',
-    );
+    return this.readEnvVariableWithDefault('PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_ID');
   }
 
   private static getReCaptchaSiteKey(): string {
-    return this.readEnvVariableWithDefault(
-      'RECAPTCHA_SITE_KEY',
-      'RECAPTCHA_SITE_KEY',
-    );
+    return this.readEnvVariableWithDefault('RECAPTCHA_SITE_KEY', 'RECAPTCHA_SITE_KEY');
   }
 
   private static getReCaptchaSecretKey(): string {
-    return this.readEnvVariableWithDefault(
-      'RECAPTCHA_SECRET_KEY',
-      'RECAPTCHA_SECRET_KEY',
-    );
+    return this.readEnvVariableWithDefault('RECAPTCHA_SECRET_KEY', 'RECAPTCHA_SECRET_KEY');
   }
 
   private static getLiveStripeApiKey(): string {
-    return this.readEnvVariableWithDefault(
-      'STRIPE_LIVE_API_KEY',
-      'STRIPE_LIVE_API_KEY',
-    );
+    return this.readEnvVariableWithDefault('STRIPE_LIVE_API_KEY', 'STRIPE_LIVE_API_KEY');
   }
 
   private static getStripeApiVersion(): string {
-    return this.readEnvVariableWithDefault(
-      'STRIPE_API_VERSION',
-      'STRIPE_API_VERSION',
-    );
+    return this.readEnvVariableWithDefault('STRIPE_API_VERSION', '2026-04-22.dahlia');
   }
   private static getStripeWebhookSecret(): string {
-    return this.readEnvVariableWithDefault(
-      'STRIPE_WEBHOOK_SECRET',
-      'STRIPE_WEBHOOK_SECRET',
-    );
+    return this.readEnvVariableWithDefault('STRIPE_WEBHOOK_SECRET', 'STRIPE_WEBHOOK_SECRET');
   }
 
   private static getAwsAccessKeyId(): string {
@@ -234,10 +147,7 @@ class Configuration {
   }
 
   private static getAwsAccessSecretKey(): string {
-    return this.readEnvVariableWithDefault(
-      'SECRET_ACCESS_KEY',
-      'SECRET_ACCESS_KEY',
-    );
+    return this.readEnvVariableWithDefault('SECRET_ACCESS_KEY', 'SECRET_ACCESS_KEY');
   }
 
   private static getS3PrivateBucket(): string {
@@ -245,10 +155,7 @@ class Configuration {
   }
 
   private static getS3PublicBucket(): string {
-    return this.readEnvVariableWithDefault(
-      'S3_PUBLIC_BUCKET',
-      'S3_PUBLIC_BUCKET',
-    );
+    return this.readEnvVariableWithDefault('S3_PUBLIC_BUCKET', 'S3_PUBLIC_BUCKET');
   }
 
   private static getEndpointNameAws(): string {
@@ -267,17 +174,11 @@ class Configuration {
   }
 
   private static getTelegramBotUsername(): string {
-    return this.readEnvVariableWithDefault(
-      'TELEGRAM_BOT_USERNAME',
-      'TELEGRAM_BOT_USERNAME',
-    );
+    return this.readEnvVariableWithDefault('TELEGRAM_BOT_USERNAME', 'TELEGRAM_BOT_USERNAME');
   }
 
   private static getTelegramBotChatId(): string {
-    return this.readEnvVariableWithDefault(
-      'TELEGRAM_BOT_CHAT_ID',
-      'TELEGRAM_BOT_CHAT_ID',
-    );
+    return this.readEnvVariableWithDefault('TELEGRAM_BOT_CHAT_ID', 'TELEGRAM_BOT_CHAT_ID');
   }
 
   static getConfiguration() {
@@ -287,16 +188,7 @@ class Configuration {
       PORT: Configuration.getPort(),
       db: {
         postgres: {
-          PG_PORT: Configuration.getPgPort(),
           DATABASE_URL: Configuration.getDatabaseURL(),
-          PG_URI_LOCAL: Configuration.getUriHostLocal(),
-          PG_HOST_HEROKU: Configuration.getUriHostHeroku(),
-          PG_LOCAL_DATABASE: Configuration.getPgLocalNameDB(),
-          PG_HEROKU_NAME_DATABASE: Configuration.getPgHerokuNameDB(),
-          PG_LOCAL_USER_NAME: Configuration.getPgLocalUserName(),
-          PG_LOCAL_USER_PASSWORD: Configuration.getPgLocalUserPassword(),
-          PG_HEROKU_USER_NAME: Configuration.getPgHerokuUserName(),
-          PG_HEROKU_USER_PASSWORD: Configuration.getPgHerokuUserPassword(),
           PG_DOMAIN_HEROKU: Configuration.getPgHerokuDomain(),
         },
         mongo: {
@@ -343,8 +235,7 @@ class Configuration {
         SALT_FACTOR: Configuration.getSaltFactor(),
       },
       telegram: {
-        TOKEN_TELEGRAM_IT_INCUBATOR:
-          Configuration.getTokenTelegramItIncubator(),
+        TOKEN_TELEGRAM_IT_INCUBATOR: Configuration.getTokenTelegramItIncubator(),
         TELEGRAM_BOT_USERNAME: Configuration.getTelegramBotUsername(),
         TELEGRAM_BOT_CHAT_ID: Configuration.getTelegramBotChatId(),
       },

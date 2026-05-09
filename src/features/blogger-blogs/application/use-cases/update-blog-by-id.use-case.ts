@@ -15,9 +15,7 @@ export class UpdateBlogByIdCommand {
   ) {}
 }
 @CommandHandler(UpdateBlogByIdCommand)
-export class UpdateBlogByIdUseCase
-  implements ICommandHandler<UpdateBlogByIdCommand>
-{
+export class UpdateBlogByIdUseCase implements ICommandHandler<UpdateBlogByIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -30,10 +28,7 @@ export class UpdateBlogByIdUseCase
       throw new NotFoundException(`Blog with id: ${id} not found`);
     }
 
-    await this.checkUpdatePermission(
-      blogToUpdate.blogOwner.userId,
-      currentUserDto,
-    );
+    await this.checkUpdatePermission(blogToUpdate.blogOwner.userId, currentUserDto);
 
     return await this.bloggerBlogsRepo.updateBlogById(id, updateBlogDto);
   }
@@ -51,9 +46,7 @@ export class UpdateBlogByIdUseCase
         id: currentUser.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to update this blog. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to update this blog. ' + error.message);
     }
   }
 }

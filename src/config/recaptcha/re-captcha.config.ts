@@ -13,9 +13,7 @@ export class ReCaptchaConfig extends BaseConfig {
     if (this.config.hasOwnProperty(key)) {
       return this.getValueReCaptcha(key);
     } else {
-      throw new BadRequestException(
-        `Key ${key} not found in PayPal configuration`,
-      );
+      throw new BadRequestException(`Key ${key} not found in PayPal configuration`);
     }
   }
   async getReCaptchaValue(key: ReCaptchaKeyType): Promise<string> {

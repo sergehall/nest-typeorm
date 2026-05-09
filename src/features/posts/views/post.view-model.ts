@@ -36,8 +36,6 @@ export class PostViewModel {
   @Length(0, 100, {
     message: 'Incorrect createdAt length! Must be min 0, max 100 ch.',
   })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   createdAt: string;
 }

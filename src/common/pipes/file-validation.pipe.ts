@@ -10,7 +10,7 @@ import {
   fileSizeLimit,
   invalidFileExtension,
 } from '../filters/custom-errors-messages';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { FileUploadDto } from '../../features/blogger-blogs/dto/file-upload.dto';
 import { CustomErrorsMessagesType } from '../filters/types/custom-errors-messages.types';
 import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
@@ -19,10 +19,7 @@ import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 export class FileValidationPipe implements PipeTransform {
   constructor(private readonly constraintsKey: FileConstraintsDto) {}
 
-  async transform(
-    value: any,
-    metadata: ArgumentMetadata,
-  ): Promise<FileUploadDto> {
+  async transform(value: any, _metadata: ArgumentMetadata): Promise<FileUploadDto> {
     const constraints: FileConstraintsDto = this.constraintsKey;
 
     if (!constraints) {
@@ -41,10 +38,7 @@ export class FileValidationPipe implements PipeTransform {
     ]);
 
     if (errorMessage.length > 0) {
-      throw new HttpException(
-        { message: errorMessage },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: errorMessage }, HttpStatus.BAD_REQUEST);
     }
 
     return value;
@@ -52,10 +46,7 @@ export class FileValidationPipe implements PipeTransform {
 
   private async checkFileNotProvided(value: any): Promise<void> {
     if (!value) {
-      throw new HttpException(
-        { message: fileNotProvided },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: fileNotProvided }, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -103,11 +94,8 @@ export class FileValidationPipe implements PipeTransform {
           file: 'file.dimensions',
         });
       }
-    } catch (error) {
-      throw new HttpException(
-        { message: 'Error reading image metadata' },
-        HttpStatus.BAD_REQUEST,
-      );
+    } catch {
+      throw new HttpException({ message: 'Error reading image metadata' }, HttpStatus.BAD_REQUEST);
     }
   }
 }

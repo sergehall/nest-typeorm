@@ -17,18 +17,14 @@ export class CreateOrderAndPaymentTransactionsCommand {
 }
 
 @CommandHandler(CreateOrderAndPaymentTransactionsCommand)
-export class CreateOrderAndPaymentTransactionsUseCase
-  implements ICommandHandler<CreateOrderAndPaymentTransactionsCommand>
-{
+export class CreateOrderAndPaymentTransactionsUseCase implements ICommandHandler<CreateOrderAndPaymentTransactionsCommand> {
   constructor(
     private readonly paymentTransactionsRepo: PaymentTransactionsRepo,
     private readonly ordersRepo: OrdersRepo,
     private readonly orderItemsRepo: OrderItemsRepo,
   ) {}
 
-  async execute(
-    command: CreateOrderAndPaymentTransactionsCommand,
-  ): Promise<void> {
+  async execute(command: CreateOrderAndPaymentTransactionsCommand): Promise<void> {
     const { paymentDto } = command;
     try {
       const totalPrice: string = paymentDto
@@ -65,17 +61,12 @@ export class CreateOrderAndPaymentTransactionsUseCase
       );
 
       // Create order items entities
-      const orderItemsEntities = this.createOrderItemsEntities(
-        paymentDto,
-        order,
-      );
+      const orderItemsEntities = this.createOrderItemsEntities(paymentDto, order);
       await this.ordersRepo.saveOrdersEntity(order);
 
       // Store paymentTransaction, orderItem in the database
       await Promise.all([
-        this.paymentTransactionsRepo.savePaymentTransactionsEntity(
-          paymentTransactionEntity,
-        ),
+        this.paymentTransactionsRepo.savePaymentTransactionsEntity(paymentTransactionEntity),
         this.orderItemsRepo.saveOrderItems(orderItemsEntities),
       ]);
 
@@ -113,11 +104,7 @@ export class CreateOrderAndPaymentTransactionsUseCase
       productsData.productId = product.productId;
 
       orderItemsEntities.push(
-        OrderItemsEntity.createOrderItemEntity(
-          product.quantity,
-          productsData,
-          order,
-        ),
+        OrderItemsEntity.createOrderItemEntity(product.quantity, productsData, order),
       );
     }
 

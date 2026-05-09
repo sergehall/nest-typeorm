@@ -4,11 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppModule } from '../../src/app.module';
 import { createApp } from '../../src/create-app';
 import { DataSource } from 'typeorm';
-import Configuration from '../../src/config/configuration';
 import { TypeOrmPostgresOptions } from '../../src/db/type-orm/options/type-orm-postgres.options';
-
-const ownerNameDb =
-  Configuration.getConfiguration().db.postgres.PG_HEROKU_USER_NAME;
 
 export const getTestAppOptions = async () => {
   let app: INestApplication;
@@ -28,6 +24,8 @@ export const getTestAppOptions = async () => {
   const server = app.getHttpServer();
 
   const dataSours = await app.resolve(DataSource);
+  const [{ current_user: ownerNameDb }] = await dataSours.query('SELECT current_user');
+
   await dataSours.query(`CREATE OR REPLACE FUNCTION truncate_tables(username IN VARCHAR) RETURNS void AS $$
     DECLARE
         statements CURSOR FOR
@@ -39,8 +37,8 @@ export const getTestAppOptions = async () => {
         END LOOP;
     END;
     $$ LANGUAGE plpgsql;
-    SELECT truncate_tables('${ownerNameDb}');
     `);
+  await dataSours.query('SELECT truncate_tables($1);', [ownerNameDb]);
 
   return { app, server, moduleFixture, dataSours };
 };

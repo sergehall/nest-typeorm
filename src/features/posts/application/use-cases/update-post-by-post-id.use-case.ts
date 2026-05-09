@@ -24,9 +24,7 @@ export class UpdatePostByPostIdCommand {
 }
 
 @CommandHandler(UpdatePostByPostIdCommand)
-export class UpdatePostByPostIdUseCase
-  implements ICommandHandler<UpdatePostByPostIdCommand>
-{
+export class UpdatePostByPostIdUseCase implements ICommandHandler<UpdatePostByPostIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected postsRepo: PostsRepo,
@@ -44,8 +42,7 @@ export class UpdatePostByPostIdUseCase
       throw new NotFoundException(`Blog with ID ${blogId} not found`);
     }
 
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
 
     if (!post) {
       throw new NotFoundException(`Blog with ID ${postId} not found`);
@@ -56,10 +53,7 @@ export class UpdatePostByPostIdUseCase
     return await this.postsRepo.updatePostByPostId(postId, updatePostDto);
   }
 
-  private async checkUserPermission(
-    blogOwnerId: string,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkUserPermission(blogOwnerId: string, currentUserDto: CurrentUserDto) {
     const ability = this.caslAbilityFactory.createForUserId({
       id: blogOwnerId,
     });

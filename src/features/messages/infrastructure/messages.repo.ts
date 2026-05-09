@@ -36,9 +36,7 @@ export class MessagesRepo {
       return result.raw[0];
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new message.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new message.');
     }
   }
 
@@ -60,10 +58,10 @@ export class MessagesRepo {
     }
   }
 
-  async update(id: string, updateMessageDto: CreateMessageDto) {
+  async update(id: string, _updateMessageDto: CreateMessageDto) {
     try {
       return `This action updates a #${id} message`;
-    } catch (error) {
+    } catch {
       // Handle errors
       throw new Error(`Failed to update message with id ${id}`);
     }
@@ -72,7 +70,7 @@ export class MessagesRepo {
   async remove(id: string): Promise<string> {
     try {
       return `This action removes a #${id} message`;
-    } catch (error) {
+    } catch {
       // Handle errors
       throw new Error(`Failed to remove message with id ${id}`);
     }

@@ -38,8 +38,7 @@ export class SaQuizQuestionsController {
   @Get()
   @UseGuards(SaBasicAuthGuard)
   async saGetQuestions(@Query() query: any) {
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     return this.commandBus.execute(new SaGetQuestionsCommand(queryData));
   }
@@ -50,9 +49,7 @@ export class SaQuizQuestionsController {
   async saCreateQuestion(
     @Body() createQuizQuestionDto: CreateQuizQuestionDto,
   ): Promise<QuestionsViewModel> {
-    return this.commandBus.execute(
-      new SaCreateQuestionsAndAnswerCommand(createQuizQuestionDto),
-    );
+    return this.commandBus.execute(new SaCreateQuestionsAndAnswerCommand(createQuizQuestionDto));
   }
 
   @Put(':id')
@@ -83,8 +80,6 @@ export class SaQuizQuestionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
   async deleteById(@Param() params: IdParams): Promise<boolean> {
-    return await this.commandBus.execute(
-      new SaDeleteQuestionByIdCommand(params.id),
-    );
+    return await this.commandBus.execute(new SaDeleteQuestionByIdCommand(params.id));
   }
 }

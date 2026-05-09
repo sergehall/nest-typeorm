@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { OrdersEntity } from './orders.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { IsOptional, IsUrl } from 'class-validator';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';

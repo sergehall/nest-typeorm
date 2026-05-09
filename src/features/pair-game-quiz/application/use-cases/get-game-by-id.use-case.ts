@@ -39,11 +39,9 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
   async execute(command: GetGameByIdCommand): Promise<GameViewModel> {
     const { id, currentUserDto } = command;
 
-    const pairByGameId: PairsGameEntity | null =
-      await this.pairsGameRepo.getGameByPairId(id);
+    const pairByGameId: PairsGameEntity | null = await this.pairsGameRepo.getGameByPairId(id);
 
-    if (!pairByGameId)
-      throw new NotFoundException(`Pair game with ID ${id} not found`);
+    if (!pairByGameId) throw new NotFoundException(`Pair game with ID ${id} not found`);
 
     await this.checkPermission(pairByGameId, currentUserDto);
 
@@ -57,8 +55,10 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     const challengeAnswers: ChallengeAnswersEntity[] =
       await this.challengesAnswersRepo.getChallengeAnswersByGameId(game.id);
 
-    const currentScores: CountCorrectAnswerDto =
-      await this.pairGameQuizService.getScores(game, challengeAnswers);
+    const currentScores: CountCorrectAnswerDto = await this.pairGameQuizService.getScores(
+      game,
+      challengeAnswers,
+    );
 
     return this.mapPairGame.toGameModel({
       pair: game,
@@ -68,10 +68,7 @@ export class GetGameByIdUseCase implements ICommandHandler<GetGameByIdCommand> {
     });
   }
 
-  private async checkPermission(
-    game: PairsGameEntity,
-    currentUserDto: CurrentUserDto,
-  ) {
+  private async checkPermission(game: PairsGameEntity, currentUserDto: CurrentUserDto) {
     let abilityId: string | undefined = 'invalidId';
 
     if (game.firstPlayer.userId === currentUserDto.userId) {

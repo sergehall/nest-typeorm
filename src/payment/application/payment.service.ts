@@ -1,11 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaymentDto } from '../dto/payment.dto';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 import { PaymentSystem } from '../enums/payment-system.enums';
-import {
-  ReferenceIdType,
-  uuidRegexPattern,
-} from '../payment-systems/types/reference-id.type';
+import { ReferenceIdType, uuidRegexPattern } from '../payment-systems/types/reference-id.type';
 import { ProductRequest } from '../../features/products/dto/products-request.dto';
 import { ProductsDataEntity } from '../../features/products/entities/products-data.entity';
 import { CurrentUserDto } from '../../features/users/dto/current-user.dto';
@@ -35,20 +32,18 @@ export class PaymentService {
       const orderArr: PaymentDto[] = [];
       const orderId: string = uuid4();
       const createdAt: string = new Date().toISOString();
-      const client: UsersEntity | GuestUsersEntity =
-        this.createClientFromDto(currentUserDto);
+      const client: UsersEntity | GuestUsersEntity = this.createClientFromDto(currentUserDto);
 
       try {
         for (const product of productsRequest) {
-          const productData: ProductsDataEntity | undefined =
-            productsDataEntities.find(
-              (data) => data.productId === product.productId,
-            );
+          const productData: ProductsDataEntity | undefined = productsDataEntities.find(
+            (data) => data.productId === product.productId,
+          );
 
           if (productData) {
-            const totalPrice: string = (
-              product.quantity * Number(productData.unitAmount)
-            ).toFixed(2);
+            const totalPrice: string = (product.quantity * Number(productData.unitAmount)).toFixed(
+              2,
+            );
             const order: PaymentDto = {
               orderId: orderId,
               productId: product.productId,
@@ -71,9 +66,7 @@ export class PaymentService {
         }
 
         if (orderArr.length === 0) {
-          reject(
-            new InternalServerErrorException('No valid orders were created.'),
-          );
+          reject(new InternalServerErrorException('No valid orders were created.'));
         } else {
           resolve(orderArr);
         }
@@ -106,9 +99,7 @@ export class PaymentService {
     }
   }
 
-  async generateReferenceId(
-    paymentDto: PaymentDto[],
-  ): Promise<ReferenceIdType> {
+  async generateReferenceId(paymentDto: PaymentDto[]): Promise<ReferenceIdType> {
     const currentClient = paymentDto[0].client;
     const orderId = paymentDto[0].orderId;
 
@@ -131,9 +122,7 @@ export class PaymentService {
       return { referenceId: referenceId };
     } catch (error) {
       console.error('Failed to createReferenceId:', error.message);
-      throw new InternalServerErrorException(
-        'Failed to createReferenceId: ' + error.message,
-      );
+      throw new InternalServerErrorException('Failed to createReferenceId: ' + error.message);
     }
   }
   async extractClientAndOrderId(

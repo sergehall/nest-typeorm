@@ -21,8 +21,9 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
   async execute(command: StartGameCommand): Promise<GameViewModel> {
     const { currentUserDto } = command;
 
-    const gameByUserId: PairsGameEntity | null =
-      await this.gameQuizRepo.getUnfinishedGameByUserId(currentUserDto.userId);
+    const gameByUserId: PairsGameEntity | null = await this.gameQuizRepo.getUnfinishedGameByUserId(
+      currentUserDto.userId,
+    );
 
     await this.checkPermission(gameByUserId);
 
@@ -32,9 +33,7 @@ export class StartGameUseCase implements ICommandHandler<StartGameCommand> {
     return await this.mapPairGame.toGameModel(pairQuestionsScoreDto);
   }
 
-  private async checkPermission(
-    gameByUserId: PairsGameEntity | null,
-  ): Promise<void> {
+  private async checkPermission(gameByUserId: PairsGameEntity | null): Promise<void> {
     if (gameByUserId && gameByUserId.status !== StatusGameEnum.FINISHED) {
       throw new ForbiddenException(
         'The current player is already involved in an ongoing active game pairing.',

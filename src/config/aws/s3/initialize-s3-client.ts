@@ -26,8 +26,7 @@ export class InitializeS3Client {
       }
 
       const accessKeyId = await this.awsConfig.getAwsConfig('ACCESS_KEY_ID');
-      const secretAccessKey =
-        await this.awsConfig.getAwsConfig('SECRET_ACCESS_KEY');
+      const secretAccessKey = await this.awsConfig.getAwsConfig('SECRET_ACCESS_KEY');
       const endpoint = await this.awsConfig.getAwsConfig('AWS_ENDPOINT');
       const region = await this.awsConfig.getAwsConfig('S3_REGION');
 
@@ -37,9 +36,7 @@ export class InitializeS3Client {
         credentials: { accessKeyId, secretAccessKey },
       });
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Error initializing S3 client:' + error.message,
-      );
+      throw new InternalServerErrorException('Error initializing S3 client:' + error.message);
     }
   }
 
@@ -48,7 +45,7 @@ export class InitializeS3Client {
    * @param bucketName Name of the S3 bucket.
    * @returns True if the bucket exists, false otherwise.
    */
-  async bucketExists(bucketName: string): Promise<boolean> {
+  async bucketExists(_bucketName: string): Promise<boolean> {
     try {
       // await this.s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
       return true;
@@ -57,9 +54,7 @@ export class InitializeS3Client {
         return false;
       } else {
         console.error('Error checking bucket existence:', error);
-        throw new InternalServerErrorException(
-          'Error checking bucket existence:' + error.message,
-        );
+        throw new InternalServerErrorException('Error checking bucket existence:' + error.message);
       }
     }
   }
@@ -75,9 +70,7 @@ export class InitializeS3Client {
       await this.s3Client.send(new CreateBucketCommand(params));
     } catch (error) {
       console.error('Error creating S3 bucket:', error);
-      throw new InternalServerErrorException(
-        'Error creating S3 bucket:' + error.message,
-      );
+      throw new InternalServerErrorException('Error creating S3 bucket:' + error.message);
     }
   }
 
@@ -94,9 +87,7 @@ export class InitializeS3Client {
       return await this.awsConfig.getAwsConfig('S3_PRIVATE_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
-      throw new InternalServerErrorException(
-        'Error fetching S3 bucket name:' + error.message,
-      );
+      throw new InternalServerErrorException('Error fetching S3 bucket name:' + error.message);
     }
   }
 
@@ -105,9 +96,7 @@ export class InitializeS3Client {
       return await this.awsConfig.getAwsConfig('S3_PUBLIC_BUCKET');
     } catch (error) {
       console.error('Error fetching S3 bucket name:', error);
-      throw new InternalServerErrorException(
-        'Error fetching S3 bucket name:' + error.message,
-      );
+      throw new InternalServerErrorException('Error fetching S3 bucket name:' + error.message);
     }
   }
 
@@ -129,9 +118,7 @@ export class InitializeS3Client {
     } catch (error) {
       // Handle errors here
       console.error('Error uniteStrings:', error);
-      throw new InternalServerErrorException(
-        'Error uniteStrings:' + error.message,
-      );
+      throw new InternalServerErrorException('Error uniteStrings:' + error.message);
     }
   }
 }

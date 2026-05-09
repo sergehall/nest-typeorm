@@ -1,10 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, InsertQueryBuilder, Repository } from 'typeorm';
 import { BloggerBlogsEntity } from '../entities/blogger-blogs.entity';
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { UsersEntity } from '../../users/entities/users.entity';
@@ -27,9 +24,7 @@ export class BloggerBlogsRepo {
     private readonly uuidErrorResolver: UuidErrorResolver,
   ) {}
 
-  async getBlogsPublic(
-    queryData: ParseQueriesDto,
-  ): Promise<BlogsCountBlogsDto> {
+  async getBlogsPublic(queryData: ParseQueriesDto): Promise<BlogsCountBlogsDto> {
     const dependencyIsBanned = false;
     const isBanned = false;
 
@@ -63,10 +58,7 @@ export class BloggerBlogsRepo {
     try {
       const countBlogs: number = await queryBuilder.getCount();
 
-      const blogs: BloggerBlogsEntity[] = await queryBuilder
-        .offset(offset)
-        .limit(limit)
-        .getMany();
+      const blogs: BloggerBlogsEntity[] = await queryBuilder.offset(offset).limit(limit).getMany();
 
       return { blogs, countBlogs };
     } catch (error) {
@@ -115,10 +107,7 @@ export class BloggerBlogsRepo {
     try {
       const countBlogs = await queryBuilder.getCount();
 
-      const blogs: BloggerBlogsEntity[] = await queryBuilder
-        .offset(offset)
-        .limit(limit)
-        .getMany();
+      const blogs: BloggerBlogsEntity[] = await queryBuilder.offset(offset).limit(limit).getMany();
 
       return { blogs, countBlogs };
     } catch (error) {
@@ -157,10 +146,7 @@ export class BloggerBlogsRepo {
     try {
       const countBlogs: number = await queryBuilder.getCount();
 
-      const blogs: BloggerBlogsEntity[] = await queryBuilder
-        .offset(offset)
-        .limit(limit)
-        .getMany();
+      const blogs: BloggerBlogsEntity[] = await queryBuilder.offset(offset).limit(limit).getMany();
 
       if (blogs.length === 0) {
         return {
@@ -192,8 +178,7 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const blogId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const blogId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Blog with ID ${blogId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -212,17 +197,14 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async findNotBannedBlogById(
-    blogId: string,
-  ): Promise<BloggerBlogsEntity | null> {
+  async findNotBannedBlogById(blogId: string): Promise<BloggerBlogsEntity | null> {
     const dependencyIsBanned = false;
     const isBanned = false;
 
@@ -239,8 +221,7 @@ export class BloggerBlogsRepo {
       return blog || null; // Return the retrieved blog with its associated blogOwner
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`Post with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -256,31 +237,23 @@ export class BloggerBlogsRepo {
       currentUser,
     );
 
-    const queryBuilder: InsertQueryBuilder<BloggerBlogsEntity> =
-      this.bloggerBlogsRepository
-        .createQueryBuilder()
-        .insert()
-        .into(BloggerBlogsEntity)
-        .values(blogEntity)
-        .returning(
-          `"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`,
-        );
+    const queryBuilder: InsertQueryBuilder<BloggerBlogsEntity> = this.bloggerBlogsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(BloggerBlogsEntity)
+      .values(blogEntity)
+      .returning(`"id", "name", "description", "websiteUrl", "createdAt", "isMembership"`);
 
     try {
       const result = await queryBuilder.execute();
       return result.raw[0];
     } catch (error) {
       console.log(error.message);
-      throw new InternalServerErrorException(
-        'An error occurred while creating a new blog.',
-      );
+      throw new InternalServerErrorException('An error occurred while creating a new blog.');
     }
   }
 
-  async updateBlogById(
-    id: string,
-    updateBlogDto: CreateBlogsDto,
-  ): Promise<boolean> {
+  async updateBlogById(id: string, updateBlogDto: CreateBlogsDto): Promise<boolean> {
     try {
       const { name, description, websiteUrl } = updateBlogDto;
 
@@ -351,10 +324,7 @@ export class BloggerBlogsRepo {
     }
   }
 
-  async saManageBlogAccess(
-    blog: BloggerBlogsEntity,
-    saBanBlogDto: SaBanBlogDto,
-  ): Promise<boolean> {
+  async saManageBlogAccess(blog: BloggerBlogsEntity, saBanBlogDto: SaBanBlogDto): Promise<boolean> {
     const { isBanned } = saBanBlogDto;
     const isBannedDate = isBanned ? new Date().toISOString() : null;
     const banReason = isBanned ? 'Super admin did it' : null;
@@ -367,28 +337,16 @@ export class BloggerBlogsRepo {
       await queryRunner.startTransaction();
 
       // Update LikeStatusCommentsEntity
-      await connection.manager.update(
-        LikeStatusCommentsEntity,
-        { blog },
-        { isBanned },
-      );
+      await connection.manager.update(LikeStatusCommentsEntity, { blog }, { isBanned });
 
       // Update LikeStatusPostsEntity
-      await connection.manager.update(
-        LikeStatusPostsEntity,
-        { blog },
-        { isBanned },
-      );
+      await connection.manager.update(LikeStatusPostsEntity, { blog }, { isBanned });
 
       // Update CommentsEntity
       await connection.manager.update(CommentsEntity, { blog }, { isBanned });
 
       // Update PostsEntity
-      await connection.manager.update(
-        PostsEntity,
-        { blog },
-        { dependencyIsBanned: isBanned },
-      );
+      await connection.manager.update(PostsEntity, { blog }, { dependencyIsBanned: isBanned });
 
       // Update BloggerBlogsEntity
       await connection.manager.update(
@@ -417,10 +375,7 @@ export class BloggerBlogsRepo {
 
       return true;
     } catch (error) {
-      console.error(
-        `Error occurred while banning blog for blog ID ${blog.id}:`,
-        error,
-      );
+      console.error(`Error occurred while banning blog for blog ID ${blog.id}:`, error);
       console.log('rollbackTransaction');
       await queryRunner.rollbackTransaction();
       return false;
@@ -431,11 +386,9 @@ export class BloggerBlogsRepo {
 
   async saDeleteBlogDataById(id: string): Promise<boolean> {
     try {
-      await this.bloggerBlogsRepository.manager.transaction(
-        async (transactionalEntityManager) => {
-          await this.deleteBlogData(id, transactionalEntityManager);
-        },
-      );
+      await this.bloggerBlogsRepository.manager.transaction(async (transactionalEntityManager) => {
+        await this.deleteBlogData(id, transactionalEntityManager);
+      });
       return true;
     } catch (error) {
       console.error(`Error while removing data for blog: ${error.message}`);
@@ -443,20 +396,15 @@ export class BloggerBlogsRepo {
     }
   }
 
-  private async deleteBlogData(
-    id: string,
-    entityManager: EntityManager,
-  ): Promise<void> {
+  private async deleteBlogData(id: string, entityManager: EntityManager): Promise<void> {
     try {
-      await Promise.all([
-        entityManager.delete('BannedUsersForBlogs', {
-          bannedBlog: id,
-        }),
-        entityManager.delete('LikeStatusComments', {
-          blog: id,
-        }),
-        entityManager.delete('LikeStatusPosts', { blog: id }),
-      ]);
+      await entityManager.delete('BannedUsersForBlogs', {
+        bannedBlog: id,
+      });
+      await entityManager.delete('LikeStatusComments', {
+        blog: id,
+      });
+      await entityManager.delete('LikeStatusPosts', { blog: id });
       await entityManager
         .createQueryBuilder()
         .delete()
@@ -471,9 +419,7 @@ export class BloggerBlogsRepo {
         .execute();
       await entityManager.delete('BloggerBlogs', { id });
     } catch (error) {
-      console.error(
-        `Error while removing data for user ${id}: ${error.message}`,
-      );
+      console.error(`Error while removing data for user ${id}: ${error.message}`);
       throw new Error(`Error while removing data for user ${id}`);
     }
   }

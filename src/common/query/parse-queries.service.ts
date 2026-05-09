@@ -93,23 +93,17 @@ export class ParseQueriesService {
 
   private async parseSearchLoginTerm(query: any): Promise<string> {
     const queryLogin = query.searchLoginTerm?.toString();
-    return queryLogin && queryLogin.length !== 0
-      ? `%${queryLogin.toLowerCase()}%`
-      : '%';
+    return queryLogin && queryLogin.length !== 0 ? `%${queryLogin.toLowerCase()}%` : '%';
   }
 
   private async parseSearchEmailTerm(query: any): Promise<string> {
     const queryEmail = query.searchEmailTerm?.toString();
-    return queryEmail && queryEmail.length !== 0
-      ? `%${queryEmail.toLowerCase()}%`
-      : '%';
+    return queryEmail && queryEmail.length !== 0 ? `%${queryEmail.toLowerCase()}%` : '%';
   }
 
   private async parseBodySearchTerm(query: any): Promise<string> {
     const queryBody = query.bodySearchTerm?.toString();
-    return queryBody && queryBody.length !== 0
-      ? `%${queryBody.toLowerCase()}%`
-      : '%';
+    return queryBody && queryBody.length !== 0 ? `%${queryBody.toLowerCase()}%` : '%';
   }
 
   private async parseSearchNameTerm(query: any): Promise<string> {
@@ -134,9 +128,7 @@ export class ParseQueriesService {
 
   private async parseSortDirection(query: any): Promise<SortDirectionEnum> {
     const querySortDirection = query?.sortDirection;
-    return ['ascending', 'ASCENDING', 'asc', 'ASC', -1].includes(
-      querySortDirection,
-    )
+    return ['ascending', 'ASCENDING', 'asc', 'ASC', -1].includes(querySortDirection)
       ? SortDirectionEnum.ASC
       : SortDirectionEnum.DESC;
   }
@@ -175,9 +167,7 @@ export class ParseQueriesService {
     }
     // Ensure both arrays have the same length
     if (productIdArray.length !== quantityArray.length) {
-      throw new Error(
-        'productId and quantity arrays must have the same length',
-      );
+      throw new Error('productId and quantity arrays must have the same length');
     }
 
     for (let i = 0; i < productIdArray.length; i++) {

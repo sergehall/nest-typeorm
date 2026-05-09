@@ -17,9 +17,7 @@ class BanInfo {
   @Length(0, 100, {
     message: 'Incorrect banDate length! Must be max 100 ch.',
   })
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   banDate: string | null;
   @ApiProperty({
     type: String,
@@ -65,9 +63,7 @@ export class SaUserViewModel {
     description: 'User creation date',
   })
   @IsNotEmpty()
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   createdAt: string;
   banInfo: BanInfo;
 }

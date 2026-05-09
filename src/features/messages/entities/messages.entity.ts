@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { ConversationsEntity } from './conversations.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('Messages')
 export class MessagesEntity {
@@ -26,14 +26,10 @@ export class MessagesEntity {
   @Column({ type: 'character varying', nullable: true, default: null })
   banReason: string | null = null;
 
-  @ManyToOne(
-    () => ConversationsEntity,
-    (conversation) => conversation.messages,
-    {
-      nullable: false,
-      eager: true,
-    },
-  )
+  @ManyToOne(() => ConversationsEntity, (conversation) => conversation.messages, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn([{ name: 'conversationId', referencedColumnName: 'id' }])
   conversation: ConversationsEntity;
 

@@ -10,7 +10,6 @@ import { StripeKeysType } from '../stripe/types/stripe-keys.type';
 import { SaKeysType } from '../sa/types/sa-keys.type';
 import { PgKeysType } from '../db/postgres/types/pg-keys.type';
 import { JwtKeysType } from '../jwt/types/jwt-keys.types';
-import { PgPortKeyType } from '../db/postgres/types/pg-port-key.type';
 import { MongoDbKeysType } from '../db/mongo/types/mongo-db-keys.type';
 import { AwsKeysTypes } from '../aws/types/aws-keys.types';
 import { MailsKeysTypes, MailsPortKeyType } from '../mails/types/mails.types';
@@ -82,14 +81,6 @@ export class BaseConfig {
     })[key];
   }
 
-  protected async getValuePgPort(key: PgPortKeyType): Promise<number> {
-    const value = this.configService.get('db.postgres', {
-      infer: true,
-    })[key];
-    await this.validationNumbersType(value);
-    return value;
-  }
-
   protected getValueJwtByKey(key: JwtKeysType): string {
     return this.configService.get('jwt', {
       infer: true,
@@ -118,9 +109,7 @@ export class BaseConfig {
       infer: true,
     }).BASIC_AUTH;
 
-    const decodedPassword = Buffer.from(basicAuth, 'base64')
-      .toString('utf8')
-      .split(':')[1];
+    const decodedPassword = Buffer.from(basicAuth, 'base64').toString('utf8').split(':')[1];
     const SALT_FACTOR = this.configService.get('bcrypt', {
       infer: true,
     }).SALT_FACTOR;

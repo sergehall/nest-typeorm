@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  Unique,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique } from 'typeorm';
 import { ComplexityEnums } from '../../pair-game-quiz/enums/complexity.enums';
 import { ChallengeQuestionsEntity } from '../../pair-game-quiz/entities/challenge-questions.entity';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
@@ -57,9 +51,6 @@ export class QuestionsQuizEntity {
   @OneToMany(() => PairsGameEntity, (pairGame) => pairGame.id)
   pairGame: PairsGameEntity;
 
-  @OneToMany(
-    () => ChallengeQuestionsEntity,
-    (gameChallenge) => gameChallenge.question,
-  )
+  @OneToMany(() => ChallengeQuestionsEntity, (gameChallenge) => gameChallenge.question)
   challengeQuestion: ChallengeQuestionsEntity[];
 }

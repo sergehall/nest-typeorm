@@ -16,8 +16,7 @@ export class ProductsController {
   ) {}
   @Get('/test-products')
   async getBlogsOwnedByCurrentUser(@Query() query: any): Promise<string> {
-    const queryData: ParseQueriesDto =
-      await this.parseQueriesService.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
     const countProducts: number = queryData.countProducts;
 

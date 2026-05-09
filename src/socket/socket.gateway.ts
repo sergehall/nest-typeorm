@@ -1,8 +1,4 @@
-import {
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
 import { ServerToClientEvent } from './types/socket.events.type';
@@ -34,7 +30,7 @@ export class SocketGateway {
   }
 
   @SubscribeMessage('message')
-  async handleMessage(client: Socket, payload: any): Promise<string> {
+  async handleMessage(_client: Socket, _payload: any): Promise<string> {
     return 'Hello from server!';
   }
 

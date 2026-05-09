@@ -7,9 +7,7 @@ export class DeleteDevicesAfterLogoutCommand {
 }
 
 @CommandHandler(DeleteDevicesAfterLogoutCommand)
-export class DeleteDevicesAfterLogoutUseCase
-  implements ICommandHandler<DeleteDevicesAfterLogoutCommand>
-{
+export class DeleteDevicesAfterLogoutUseCase implements ICommandHandler<DeleteDevicesAfterLogoutCommand> {
   constructor(protected securityDevicesRepo: SecurityDevicesRepo) {}
 
   async execute(command: DeleteDevicesAfterLogoutCommand): Promise<boolean> {

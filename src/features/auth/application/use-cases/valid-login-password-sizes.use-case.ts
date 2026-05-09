@@ -14,21 +14,13 @@ export class ValidLoginPasswordSizesCommand {
 }
 
 @CommandHandler(ValidLoginPasswordSizesCommand)
-export class ValidLoginPasswordSizesUseCase
-  implements ICommandHandler<ValidLoginPasswordSizesCommand>
-{
+export class ValidLoginPasswordSizesUseCase implements ICommandHandler<ValidLoginPasswordSizesCommand> {
   async execute(command: ValidLoginPasswordSizesCommand): Promise<void> {
     const { loginOrEmail, password } = command;
 
     const messages: CustomErrorsMessagesType[] = [];
 
-    this.validateLength(
-      loginOrEmail.toString(),
-      3,
-      50,
-      invalidLoginOrEmailLengthError,
-      messages,
-    );
+    this.validateLength(loginOrEmail.toString(), 3, 50, invalidLoginOrEmailLengthError, messages);
 
     this.validateLength(password.toString(), 6, 20, passwordInvalid, messages);
 

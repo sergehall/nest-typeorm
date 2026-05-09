@@ -24,8 +24,7 @@ export class BannedUsersForBlogsRepo {
     blogId: string,
     queryData: ParseQueriesDto,
   ): Promise<BannedUsersEntityAndCountDto> {
-    const { sortBy, sortDirection, pageSize, pageNumber } =
-      queryData.queryPagination;
+    const { sortBy, sortDirection, pageSize, pageNumber } = queryData.queryPagination;
 
     try {
       const searchLoginTerm = queryData.searchLoginTerm;
@@ -45,10 +44,7 @@ export class BannedUsersForBlogsRepo {
           'banned_users.banDate',
           'banned_users.banReason',
         ])
-        .leftJoinAndSelect(
-          'banned_users.bannedUserForBlogs',
-          'bannedUserForBlogs',
-        )
+        .leftJoinAndSelect('banned_users.bannedUserForBlogs', 'bannedUserForBlogs')
         .leftJoinAndSelect('banned_users.bannedBlog', 'bannedBlog')
         .where('banned_users.blogId = :blogId', { blogId })
         .andWhere('banned_users.login ILIKE :searchLoginTerm', {
@@ -81,10 +77,7 @@ export class BannedUsersForBlogsRepo {
     try {
       const bannedUser = await this.bannedUsersForBlogsRepo
         .createQueryBuilder('banned_users')
-        .leftJoinAndSelect(
-          'banned_users.bannedUserForBlogs',
-          'bannedUserForBlogs',
-        )
+        .leftJoinAndSelect('banned_users.bannedUserForBlogs', 'bannedUserForBlogs')
         .leftJoinAndSelect('banned_users.bannedBlog', 'bannedBlog')
         .where('bannedUserForBlogs.userId = :userId', { userId })
         .andWhere('bannedBlog.id = :blogId', { blogId })
@@ -109,11 +102,7 @@ export class BannedUsersForBlogsRepo {
     await queryRunner.connect();
 
     const bannedUserEntity: BannedUsersForBlogsEntity =
-      BannedUsersForBlogsEntity.createBannedUserEntity(
-        user,
-        blog,
-        updateBanUserDto,
-      );
+      BannedUsersForBlogsEntity.createBannedUserEntity(user, blog, updateBanUserDto);
 
     try {
       await queryRunner.startTransaction();
@@ -156,10 +145,7 @@ export class BannedUsersForBlogsRepo {
 
       if (updateBanUserDto.isBanned) {
         // Insert if banned
-        await connection.manager.save(
-          BannedUsersForBlogsEntity,
-          bannedUserEntity,
-        );
+        await connection.manager.save(BannedUsersForBlogsEntity, bannedUserEntity);
         await queryRunner.commitTransaction();
       } else {
         // Delete record from BannedUsersForBlogs if unBan user
@@ -172,9 +158,7 @@ export class BannedUsersForBlogsRepo {
 
       if (updateBanUserDto.isBanned) {
         // Successful User Ban Message
-        console.log(
-          `User ${user.userId} has been blocked from accessing Blog ID ${blog.id}. 🚫`,
-        );
+        console.log(`User ${user.userId} has been blocked from accessing Blog ID ${blog.id}. 🚫`);
       } else {
         // Successful User unBan Message
         console.log(

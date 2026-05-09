@@ -16,9 +16,7 @@ export class SaUpdateBlogByIdCommand {
 }
 
 @CommandHandler(SaUpdateBlogByIdCommand)
-export class SaUpdateBlogByIdUseCase
-  implements ICommandHandler<SaUpdateBlogByIdCommand>
-{
+export class SaUpdateBlogByIdUseCase implements ICommandHandler<SaUpdateBlogByIdCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected bloggerBlogsRepo: BloggerBlogsRepo,
@@ -31,9 +29,7 @@ export class SaUpdateBlogByIdUseCase
     return await this.bloggerBlogsRepo.updateBlogById(id, updateBlogDto);
   }
 
-  private async checkUpdatePermission(
-    currentUser: CurrentUserDto,
-  ): Promise<void> {
+  private async checkUpdatePermission(currentUser: CurrentUserDto): Promise<void> {
     const ability = this.caslAbilityFactory.createSaUser(currentUser);
 
     try {
@@ -41,9 +37,7 @@ export class SaUpdateBlogByIdUseCase
         id: currentUser.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to update this blog. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to update this blog. ' + error.message);
     }
   }
 }

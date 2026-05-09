@@ -8,16 +8,13 @@ export class FindUserByICommand {
 }
 
 @CommandHandler(FindUserByICommand)
-export class FindUserByIdUseCase
-  implements ICommandHandler<FindUserByICommand>
-{
+export class FindUserByIdUseCase implements ICommandHandler<FindUserByICommand> {
   constructor(protected usersRepo: UsersRepo) {}
 
   async execute(command: FindUserByICommand): Promise<UsersEntity> {
     const { userId } = command;
 
-    const user: UsersEntity | null =
-      await this.usersRepo.findNotBannedUserById(userId);
+    const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(userId);
 
     if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 

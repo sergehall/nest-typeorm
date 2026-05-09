@@ -1,15 +1,8 @@
-import {
-  Entity,
-  Column,
-  Unique,
-  PrimaryColumn,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, Unique, PrimaryColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { UpdateBanUserDto } from '../../blogger-blogs/dto/update-ban-user.dto';
 import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.entity';
 import { UsersEntity } from './users.entity';
-import * as uuid4 from 'uuid4';
+import uuid4 from 'uuid4';
 
 @Entity('BannedUsersForBlogs')
 @Unique(['id'])

@@ -33,11 +33,7 @@ export class MessagesController {
     const currentUserDto: CurrentUserDto = req.user;
     const conversationId: string = params.conversationId;
 
-    return this.messagesService.createMessage(
-      conversationId,
-      createMessageDto,
-      currentUserDto,
-    );
+    return this.messagesService.createMessage(conversationId, createMessageDto, currentUserDto);
   }
 
   @Get()
@@ -51,10 +47,7 @@ export class MessagesController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateMessageDto: UpdateMessageDto,
-  ) {
+  async update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
     return this.messagesService.update(+id, updateMessageDto);
   }
 

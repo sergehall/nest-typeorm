@@ -9,9 +9,7 @@ import { SaConfig } from '../../../../config/sa/sa.config';
 export class CreateSaUserCommand {}
 
 @CommandHandler(CreateSaUserCommand)
-export class CreateSaUserUseCase
-  implements ICommandHandler<CreateSaUserCommand>
-{
+export class CreateSaUserUseCase implements ICommandHandler<CreateSaUserCommand> {
   constructor(
     private readonly saConfig: SaConfig,
     private readonly usersRepo: UsersRepo,
@@ -26,8 +24,11 @@ export class CreateSaUserUseCase
     ]);
 
     // Return the expirationDate in ISO format for user registration.
-    const expirationDateDto: ExpirationDateDto =
-      await this.expirationDateCalculator.createExpDate(5, 0, 0);
+    const expirationDateDto: ExpirationDateDto = await this.expirationDateCalculator.createExpDate(
+      5,
+      0,
+      0,
+    );
 
     const dataForCreateUserDto: DataForCreateUserDto = {
       login: saLogin,

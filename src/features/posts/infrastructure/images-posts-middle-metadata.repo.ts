@@ -35,8 +35,7 @@ export class ImagesPostsMiddleMetadataRepo {
       .andWhere({ isBanned: bannedFlags.isBanned });
 
     // Check if entity already exists
-    const existingEntity: ImagesPostsMiddleMetadataEntity | null =
-      await queryBuilder.getOne();
+    const existingEntity: ImagesPostsMiddleMetadataEntity | null = await queryBuilder.getOne();
 
     // If entity exists, update it; otherwise, create a new one
     if (existingEntity) {
@@ -61,9 +60,7 @@ export class ImagesPostsMiddleMetadataRepo {
     }
 
     try {
-      return await this.imagesPostMiddleMetadataRepository.save(
-        postsImagesFileMetadataEntity,
-      );
+      return await this.imagesPostMiddleMetadataRepository.save(postsImagesFileMetadataEntity);
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(

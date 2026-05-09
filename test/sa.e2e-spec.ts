@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import * as crypto from 'crypto';
 import { isUUID } from 'class-validator';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
@@ -44,9 +44,7 @@ describe('Sa Controller (e2e)', () => {
       const responseWithoutAuth = await request(server).post(saUrl);
       expect(responseWithoutAuth.status).toBe(401);
 
-      const responseWithInvalidAuth = await request(server)
-        .post(saUrl)
-        .auth('invalid', 'data');
+      const responseWithInvalidAuth = await request(server).post(saUrl).auth('invalid', 'data');
       expect(responseWithInvalidAuth.status).toBe(401);
     });
 
@@ -211,9 +209,7 @@ describe('Sa Controller (e2e)', () => {
       const createdUser = createUserResponse.body;
 
       // Retrieve the user by their ID
-      const retrieveUserResponse = await request(server).get(
-        `/users/${createdUser.id}`,
-      );
+      const retrieveUserResponse = await request(server).get(`/users/${createdUser.id}`);
       expect(retrieveUserResponse.status).toBe(200);
       const retrievedUser: UsersEntity = retrieveUserResponse.body;
 

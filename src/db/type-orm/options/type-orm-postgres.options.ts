@@ -31,24 +31,14 @@ import { MessagesEntity } from '../../../features/messages/entities/messages.ent
 import { ConversationsEntity } from '../../../features/messages/entities/conversations.entity';
 
 @Injectable()
-export class TypeOrmPostgresOptions
-  extends PostgresConfig
-  implements TypeOrmOptionsFactory
-{
+export class TypeOrmPostgresOptions extends PostgresConfig implements TypeOrmOptionsFactory {
   async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
-    const host = await this.getPostgresConfig('PG_HOST_HEROKU');
-    const port = await this.getPort('PG_PORT');
-    const username = await this.getPostgresConfig('PG_HEROKU_USER_NAME');
-    const password = await this.getPostgresConfig('PG_HEROKU_USER_PASSWORD');
-    const database = await this.getPostgresConfig('PG_HEROKU_NAME_DATABASE');
+    const url = await this.getPostgresConfig('DATABASE_URL');
+    const synchronize = process.env.TYPEORM_SYNCHRONIZE === 'true';
 
     return {
       type: 'postgres',
-      host,
-      port,
-      username,
-      password,
-      database,
+      url,
       autoLoadEntities: true,
       ssl: { rejectUnauthorized: false },
       entities: [
@@ -81,7 +71,7 @@ export class TypeOrmPostgresOptions
         MessagesEntity,
         ConversationsEntity,
       ],
-      synchronize: true,
+      synchronize,
       logging: false,
     };
   }

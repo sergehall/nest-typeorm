@@ -10,7 +10,7 @@ import {
 export class IsArrayValidator implements ValidatorConstraintInterface {
   constructor() {}
 
-  async validate(value: any, args: ValidationArguments): Promise<boolean> {
+  async validate(value: any, _args: ValidationArguments): Promise<boolean> {
     return !(!Array.isArray(value) || value.length === 0);
   }
 

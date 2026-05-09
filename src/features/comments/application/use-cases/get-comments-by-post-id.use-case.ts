@@ -16,9 +16,7 @@ export class GetCommentsByPostIdCommand {
 }
 
 @CommandHandler(GetCommentsByPostIdCommand)
-export class GetCommentsByPostIdUseCase
-  implements ICommandHandler<GetCommentsByPostIdCommand>
-{
+export class GetCommentsByPostIdUseCase implements ICommandHandler<GetCommentsByPostIdCommand> {
   constructor(
     private readonly postsRepo: PostsRepo,
     private readonly commentsRepo: CommentsRepo,
@@ -32,11 +30,7 @@ export class GetCommentsByPostIdUseCase
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     const commentsAndCountComments: CommentsAndCountDto =
-      await this.commentsRepo.getCommentsWithLikesByPostId(
-        postId,
-        queryData,
-        currentUserDto,
-      );
+      await this.commentsRepo.getCommentsWithLikesByPostId(postId, queryData, currentUserDto);
 
     const { comments, countComments } = commentsAndCountComments;
 
@@ -50,9 +44,7 @@ export class GetCommentsByPostIdUseCase
       };
     }
 
-    const pagesCount = Math.ceil(
-      countComments / queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(countComments / queryData.queryPagination.pageSize);
 
     return {
       pagesCount: pagesCount,

@@ -13,9 +13,7 @@ export class GetCommentByIdCommand {
 }
 
 @CommandHandler(GetCommentByIdCommand)
-export class GetCommentByIdUseCase
-  implements ICommandHandler<GetCommentByIdCommand>
-{
+export class GetCommentByIdUseCase implements ICommandHandler<GetCommentByIdCommand> {
   constructor(
     protected commandBus: CommandBus,
     protected commentsRepo: CommentsRepo,
@@ -24,13 +22,9 @@ export class GetCommentByIdUseCase
     const { commentId, currentUserDto } = command;
 
     const comment: CommentWithLikesInfoViewModel | null =
-      await this.commentsRepo.getCommentWithLikesById(
-        commentId,
-        currentUserDto,
-      );
+      await this.commentsRepo.getCommentWithLikesById(commentId, currentUserDto);
 
-    if (!comment)
-      throw new NotFoundException(`Comment with id: ${commentId} not found.`);
+    if (!comment) throw new NotFoundException(`Comment with id: ${commentId} not found.`);
 
     return comment;
   }

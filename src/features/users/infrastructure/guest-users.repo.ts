@@ -19,9 +19,7 @@ export class GuestUsersRepo {
       return await this.guestUsersRepository.save(guestUsersEntity);
     } catch (error) {
       console.log('Error saving guestUsersEntity:', error);
-      throw new InternalServerErrorException(
-        'Error saving guestUsersEntity' + error.message,
-      );
+      throw new InternalServerErrorException('Error saving guestUsersEntity' + error.message);
     }
   }
 }

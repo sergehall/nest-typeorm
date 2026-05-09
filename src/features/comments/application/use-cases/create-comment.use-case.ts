@@ -18,9 +18,7 @@ export class CreateCommentCommand {
 }
 
 @CommandHandler(CreateCommentCommand)
-export class CreateCommentUseCase
-  implements ICommandHandler<CreateCommentCommand>
-{
+export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommand> {
   constructor(
     protected postsRepo: PostsRepo,
     protected commentsRepo: CommentsRepo,
@@ -29,29 +27,17 @@ export class CreateCommentUseCase
   async execute(command: CreateCommentCommand): Promise<CommentViewModel> {
     const { postId, createCommentDto, currentUserDto } = command;
 
-    const post: PostsEntity | null =
-      await this.postsRepo.getPostByIdWithoutLikes(postId);
+    const post: PostsEntity | null = await this.postsRepo.getPostByIdWithoutLikes(postId);
 
     if (!post) throw new NotFoundException(`Post with ID ${postId} not found`);
 
     await this.checkUserPermission(currentUserDto.userId, post.blog.id);
 
-    return await this.commentsRepo.createComments(
-      post,
-      createCommentDto,
-      currentUserDto,
-    );
+    return await this.commentsRepo.createComments(post, createCommentDto, currentUserDto);
   }
 
-  private async checkUserPermission(
-    userId: string,
-    blogId: string,
-  ): Promise<void> {
-    const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(
-      userId,
-      blogId,
-    );
-    if (userIsBannedForBlog)
-      throw new ForbiddenException(userNotHavePermissionForBlog);
+  private async checkUserPermission(userId: string, blogId: string): Promise<void> {
+    const userIsBannedForBlog = await this.bannedUsersForBlogsRepo.userIsBanned(userId, blogId);
+    if (userIsBannedForBlog) throw new ForbiddenException(userNotHavePermissionForBlog);
   }
 }

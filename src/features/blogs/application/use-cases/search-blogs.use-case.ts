@@ -26,8 +26,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
     const { queryData, currentUserDto } = command;
     const { pageSize, pageNumber } = queryData.queryPagination;
 
-    const blogsCountBlogsDto =
-      await this.bloggerBlogsRepo.getBlogsPublic(queryData);
+    const blogsCountBlogsDto = await this.bloggerBlogsRepo.getBlogsPublic(queryData);
 
     if (blogsCountBlogsDto.countBlogs === 0) {
       return {
@@ -43,10 +42,7 @@ export class SearchBlogsUseCase implements ICommandHandler<SearchBlogsCommand> {
 
     const [blogsWithImages, blogsSubscribersAndCount] = await Promise.all([
       this.bloggerBlogsService.blogsImagesAggregation(blogsCountBlogsDto.blogs),
-      this.blogsSubscribersRepo.blogsSubscribersStatusCount(
-        blogIds,
-        currentUserDto,
-      ),
+      this.blogsSubscribersRepo.blogsSubscribersStatusCount(blogIds, currentUserDto),
     ]);
 
     const blogs: BloggerBlogsWithImagesSubscribersViewModel[] =

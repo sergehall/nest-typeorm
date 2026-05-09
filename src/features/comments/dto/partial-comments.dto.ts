@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  Length,
-  Matches,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, Length, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class PartialCommentsDto {
   @IsNotEmpty()
@@ -20,9 +14,7 @@ export class PartialCommentsDto {
   @IsNotEmpty()
   @MinLength(0)
   @MaxLength(100)
-  @Matches(
-    '/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/',
-  )
+  @Matches('/\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z)/')
   createdAt: string;
   @IsNotEmpty()
   @Length(0, 100, {

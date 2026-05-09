@@ -1,10 +1,5 @@
 import { applyDecorators, HttpStatus, Injectable } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserIdEmailLoginDto } from '../../features/auth/dto/profile.dto';
 import { AuthMethods } from '../enums/auth-methods.enum';
 

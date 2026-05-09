@@ -1,11 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  EntityManager,
-  LessThan,
-  MoreThan,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { EntityManager, LessThan, MoreThan, Repository, UpdateResult } from 'typeorm';
 import {
   HttpException,
   HttpStatus,
@@ -21,6 +15,7 @@ import { BanInfoDto } from '../dto/ban-info.dto';
 import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { GamePairsRepo } from '../../pair-game-quiz/infrastructure/game-pairs.repo';
 import { PairsGameEntity } from '../../pair-game-quiz/entities/pairs-game.entity';
+import { SentCodesLogEntity } from '../../../common/mails/entities/sent-codes-log.entity';
 
 export class UsersRepo {
   constructor(
@@ -43,14 +38,11 @@ export class UsersRepo {
 
       const query = this.usersRepository
         .createQueryBuilder('user')
-        .where(
-          '(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin',
-          {
-            email: searchEmailTerm,
-            login: searchLoginTerm,
-            admin: 'admin',
-          },
-        )
+        .where('(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin', {
+          email: searchEmailTerm,
+          login: searchLoginTerm,
+          admin: 'admin',
+        })
         .andWhere('user.isBanned IN (:...banStatus)', {
           banStatus: banCondition,
         })
@@ -73,14 +65,11 @@ export class UsersRepo {
       const totalCount = await this.usersRepository
         .createQueryBuilder('user')
         .select('COUNT(user.userId)', 'count')
-        .where(
-          '(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin',
-          {
-            email: searchEmailTerm,
-            login: searchLoginTerm,
-            admin: 'admin',
-          },
-        )
+        .where('(user.email LIKE :email OR user.login LIKE :login) AND user.login != :admin', {
+          email: searchEmailTerm,
+          login: searchLoginTerm,
+          admin: 'admin',
+        })
         .andWhere('user.isBanned IN (:...banStatus)', {
           banStatus: banCondition,
         })
@@ -102,8 +91,7 @@ export class UsersRepo {
       return user || null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
@@ -121,17 +109,14 @@ export class UsersRepo {
       return user || null;
     } catch (error) {
       if (await this.uuidErrorResolver.isInvalidUUIDError(error)) {
-        const userId =
-          await this.uuidErrorResolver.extractUserIdFromError(error);
+        const userId = await this.uuidErrorResolver.extractUserIdFromError(error);
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UsersEntity | null> {
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<UsersEntity | null> {
     try {
       const user = await this.usersRepository.findOne({
         where: [{ email: loginOrEmail }, { login: loginOrEmail }],
@@ -237,7 +222,7 @@ export class UsersRepo {
             user: userId,
           });
           await transactionalEntityManager.update(
-            'Users',
+            UsersEntity,
             { userId },
             { isBanned, banDate, banReason },
           );
@@ -266,21 +251,14 @@ export class UsersRepo {
     }
   }
 
-  async createUser(
-    dataForCreateUserDto: DataForCreateUserDto,
-  ): Promise<UsersEntity> {
+  async createUser(dataForCreateUserDto: DataForCreateUserDto): Promise<UsersEntity> {
     try {
-      const newUserEntity: UsersEntity =
-        UsersEntity.createUserEntity(dataForCreateUserDto);
+      const newUserEntity: UsersEntity = UsersEntity.createUserEntity(dataForCreateUserDto);
 
       return await this.usersRepository.save(newUserEntity);
     } catch (error) {
-      if (
-        error.message.includes('duplicate key value violates unique constraint')
-      ) {
-        const extractedFieldName = await this.extractValueFromMessage(
-          error.detail,
-        );
+      if (error.message.includes('duplicate key value violates unique constraint')) {
+        const extractedFieldName = await this.extractValueFromMessage(error.detail);
         const constraint = error.message.match(/"(.*?)"/)[1];
 
         const field = extractedFieldName || constraint;
@@ -299,9 +277,7 @@ export class UsersRepo {
     }
   }
 
-  async createSaUser(
-    dataForCreateUserDto: DataForCreateUserDto,
-  ): Promise<UsersEntity> {
+  async createSaUser(dataForCreateUserDto: DataForCreateUserDto): Promise<UsersEntity> {
     const { login, email } = dataForCreateUserDto;
 
     // Check if a user with the same login or email already exists
@@ -316,8 +292,7 @@ export class UsersRepo {
     }
 
     // If no existing user found, create a new userSaEntity
-    const newSaUserEntity: UsersEntity =
-      UsersEntity.createSaUser(dataForCreateUserDto);
+    const newSaUserEntity: UsersEntity = UsersEntity.createSaUser(dataForCreateUserDto);
 
     return await this.usersRepository.save(newSaUserEntity);
   }
@@ -330,8 +305,7 @@ export class UsersRepo {
     try {
       const userToUpdate = await this.usersRepository.findOneBy({ email });
 
-      if (!userToUpdate)
-        throw new NotFoundException(`User with email ${email} not found`);
+      if (!userToUpdate) throw new NotFoundException(`User with email ${email} not found`);
 
       userToUpdate.confirmationCode = confirmationCode;
       userToUpdate.expirationDate = expirationDate;
@@ -367,10 +341,9 @@ export class UsersRepo {
 
     try {
       // Update the user roles
-      const updateResult: UpdateResult = await this.usersRepository.update(
-        userId,
-        { roles: newRoles },
-      );
+      const updateResult: UpdateResult = await this.usersRepository.update(userId, {
+        roles: newRoles,
+      });
 
       if (updateResult.affected === 0) {
         // If no rows were affected, user not found
@@ -387,11 +360,9 @@ export class UsersRepo {
 
   async deleteUserDataByUserId(userId: string): Promise<void> {
     try {
-      await this.usersRepository.manager.transaction(
-        async (transactionalEntityManager) => {
-          await this.deleteUserData(userId, transactionalEntityManager);
-        },
-      );
+      await this.usersRepository.manager.transaction(async (transactionalEntityManager) => {
+        await this.deleteUserData(userId, transactionalEntityManager);
+      });
     } catch (error) {
       console.error(`Error while removing data for users: ${error.message}`);
       throw new Error(`Error while removing data for users`);
@@ -400,30 +371,24 @@ export class UsersRepo {
 
   async clearingExpiredUsersData(): Promise<void> {
     try {
-      await this.usersRepository.manager.transaction(
-        async (transactionalEntityManager) => {
-          const isConfirmed = false;
-          const currentTime = new Date().toISOString();
+      await this.usersRepository.manager.transaction(async (transactionalEntityManager) => {
+        const isConfirmed = false;
+        const currentTime = new Date().toISOString();
 
-          const allUsersWithExpiredDate = await this.usersRepository.find({
-            select: ['userId'],
-            where: {
-              isConfirmed,
-              expirationDate: LessThan(currentTime),
-            },
-          });
-          await Promise.all(
-            allUsersWithExpiredDate.map((user) =>
-              this.deleteUserData(user.userId, transactionalEntityManager),
-            ),
-          );
-        },
-      );
+        const allUsersWithExpiredDate = await this.usersRepository.find({
+          select: ['userId'],
+          where: {
+            isConfirmed,
+            expirationDate: LessThan(currentTime),
+          },
+        });
+        for (const user of allUsersWithExpiredDate) {
+          await this.deleteUserData(user.userId, transactionalEntityManager);
+        }
+      });
     } catch (error) {
       console.error(`Error while removing data for users: ${error.message}`);
-      throw new InternalServerErrorException(
-        `Error while removing data for users`,
-      );
+      throw new InternalServerErrorException(`Error while removing data for users`);
     }
   }
 
@@ -467,33 +432,31 @@ export class UsersRepo {
           .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
           .execute();
       }
-      await Promise.all([
-        transactionalEntityManager
-          .createQueryBuilder()
-          .delete()
-          .from('ChallengeAnswers')
-          .where('answerOwnerId = :userId', { userId })
-          .execute(),
-        transactionalEntityManager.delete('TelegramBotStatus', {
-          user: userId,
-        }),
-        transactionalEntityManager.delete('BlogsSubscribers', {
-          subscriber: userId,
-        }),
-        transactionalEntityManager.delete('SecurityDevices', { user: userId }),
-        transactionalEntityManager.delete('BannedUsersForBlogs', {
-          bannedUserForBlogs: userId,
-        }),
-        transactionalEntityManager.delete('SentCodesLog', {
-          sentForUser: userId,
-        }),
-        transactionalEntityManager.delete('LikeStatusComments', {
-          ratedCommentUser: userId,
-        }),
-        transactionalEntityManager.delete('LikeStatusPosts', {
-          ratedPostUser: userId,
-        }),
-      ]);
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from('ChallengeAnswers')
+        .where('answerOwnerId = :userId', { userId })
+        .execute();
+      await transactionalEntityManager.delete('TelegramBotStatus', {
+        user: userId,
+      });
+      await transactionalEntityManager.delete('BlogsSubscribers', {
+        subscriber: userId,
+      });
+      await transactionalEntityManager.delete('SecurityDevices', { user: userId });
+      await transactionalEntityManager.delete('BannedUsersForBlogs', {
+        bannedUserForBlogs: userId,
+      });
+      await transactionalEntityManager.delete(SentCodesLogEntity, {
+        sentForUser: userId,
+      });
+      await transactionalEntityManager.delete('LikeStatusComments', {
+        ratedCommentUser: userId,
+      });
+      await transactionalEntityManager.delete('LikeStatusPosts', {
+        ratedPostUser: userId,
+      });
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
@@ -521,11 +484,9 @@ export class UsersRepo {
         .where('blogOwnerId = :userId', { userId })
         .execute();
 
-      await transactionalEntityManager.delete('Users', { userId });
+      await transactionalEntityManager.delete(UsersEntity, { userId });
     } catch (error) {
-      console.error(
-        `Error while removing data for user ${userId}: ${error.message}`,
-      );
+      console.error(`Error while removing data for user ${userId}: ${error.message}`);
       throw new Error(`Error while removing data for user ${userId}`);
     }
   }

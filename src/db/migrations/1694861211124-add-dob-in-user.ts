@@ -4,10 +4,10 @@ export class AddDobInUser1694861211124 implements MigrationInterface {
   name = 'AddDobInUser1694861211124';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "Users" ADD "dob" date`);
+    await queryRunner.query(`ALTER TABLE "nt-users" ADD "dob" date`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "Users" DROP COLUMN "dob"`);
+    await queryRunner.query(`ALTER TABLE "nt-users" DROP COLUMN "dob"`);
   }
 }

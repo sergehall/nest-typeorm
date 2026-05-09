@@ -13,28 +13,16 @@ export class ValidLoginOrEmailPasswordCommand {
 }
 
 @CommandHandler(ValidLoginOrEmailPasswordCommand)
-export class ValidLoginOrEmailPasswordUseCase
-  implements ICommandHandler<ValidLoginOrEmailPasswordCommand>
-{
+export class ValidLoginOrEmailPasswordUseCase implements ICommandHandler<ValidLoginOrEmailPasswordCommand> {
   constructor(private readonly usersRepo: UsersRepo) {}
 
-  async execute(
-    command: ValidLoginOrEmailPasswordCommand,
-  ): Promise<UsersEntity> {
+  async execute(command: ValidLoginOrEmailPasswordCommand): Promise<UsersEntity> {
     const { loginOrEmail, password } = command;
 
-    const user: UsersEntity | null =
-      await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
+    const user: UsersEntity | null = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
 
-    if (
-      !user ||
-      user.isBanned ||
-      !(await bcrypt.compare(password, user.passwordHash))
-    ) {
-      throw new HttpException(
-        { message: [validatePasswordFailed] },
-        HttpStatus.UNAUTHORIZED,
-      );
+    if (!user || user.isBanned || !(await bcrypt.compare(password, user.passwordHash))) {
+      throw new HttpException({ message: [validatePasswordFailed] }, HttpStatus.UNAUTHORIZED);
     }
 
     return user;

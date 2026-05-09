@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from './casl-ability.factory';
 import { CHECK_ABILITY, RequiredRule } from './abilities.decorator';
@@ -18,10 +13,7 @@ export class AbilitiesGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const rules = this.reflector.get<RequiredRule[]>(
-      CHECK_ABILITY,
-      context.getHandler() || [],
-    );
+    const rules = this.reflector.get<RequiredRule[]>(CHECK_ABILITY, context.getHandler() || []);
     let { currentUser } = context.switchToHttp().getRequest();
     if (!currentUser) {
       currentUser = { roles: UserRolesEnums.USER };

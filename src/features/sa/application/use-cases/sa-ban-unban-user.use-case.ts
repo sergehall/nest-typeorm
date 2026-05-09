@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from '../../../../ability/roles/action.enum';
 import { CaslAbilityFactory } from '../../../../ability/casl-ability.factory';
@@ -24,9 +19,7 @@ export class SaBanUnbanUserCommand {
 }
 
 @CommandHandler(SaBanUnbanUserCommand)
-export class SaBanUnbanUserUseCase
-  implements ICommandHandler<SaBanUnbanUserCommand>
-{
+export class SaBanUnbanUserUseCase implements ICommandHandler<SaBanUnbanUserCommand> {
   constructor(
     protected caslAbilityFactory: CaslAbilityFactory,
     protected usersRepo: UsersRepo,
@@ -37,17 +30,12 @@ export class SaBanUnbanUserUseCase
     const { userId } = command;
 
     if (userId === currentUserDto.userId) {
-      throw new HttpException(
-        { message: cannotBlockYourself },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: cannotBlockYourself }, HttpStatus.BAD_REQUEST);
     }
 
-    const userToBan: UsersEntity | null =
-      await this.usersRepo.findUserByUserId(userId);
+    const userToBan: UsersEntity | null = await this.usersRepo.findUserByUserId(userId);
 
-    if (!userToBan)
-      throw new NotFoundException(`User with ID ${userId} not found`);
+    if (!userToBan) throw new NotFoundException(`User with ID ${userId} not found`);
 
     await this.checkUserPermission(currentUserDto, userToBan);
 
@@ -61,19 +49,14 @@ export class SaBanUnbanUserUseCase
     return await this.usersRepo.saBanUnbanUser(userToBan.userId, banInfo);
   }
 
-  private async checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    userToBan: UsersEntity,
-  ) {
+  private async checkUserPermission(currentUserDto: CurrentUserDto, userToBan: UsersEntity) {
     const ability = this.caslAbilityFactory.createSaUser(currentUserDto);
     try {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, {
         id: userToBan.userId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to ban a user. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to ban a user. ' + error.message);
     }
   }
 }

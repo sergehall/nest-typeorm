@@ -52,8 +52,7 @@ export class UsersController {
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUsers(@Query() query: any): Promise<PaginatorDto> {
-    const queryData: ParseQueriesDto =
-      await this.parseQueries.getQueriesData(query);
+    const queryData: ParseQueriesDto = await this.parseQueries.getQueriesData(query);
 
     return await this.commandBus.execute(new FindUsersCommand(queryData));
   }
@@ -70,9 +69,7 @@ export class UsersController {
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.CREATE, subject: CurrentUserDto })
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<UserViewModel> {
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserViewModel> {
     const newUser: UsersEntity = await this.commandBus.execute(
       new CreateUserCommand(createUserDto),
     );
@@ -101,14 +98,9 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(SaBasicAuthGuard)
   @Delete(':id')
-  async removeUserById(
-    @Request() req: any,
-    @Param() params: IdParams,
-  ): Promise<boolean> {
+  async removeUserById(@Request() req: any, @Param() params: IdParams): Promise<boolean> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
-      new RemoveUserByIdCommand(params.id, currentUserDto),
-    );
+    return await this.commandBus.execute(new RemoveUserByIdCommand(params.id, currentUserDto));
   }
 }

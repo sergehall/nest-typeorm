@@ -21,8 +21,10 @@ export class FilesStorageAdapter {
     resizedImages: ResizedImageDetailsDto,
     pathsKeys: KeysPathDto,
   ): Promise<UrlsPathKeysEtagsDto> {
-    const files: PathsKeysFileUploadDto =
-      await this.createPathKeyFileUploadDtoArray(resizedImages, pathsKeys);
+    const files: PathsKeysFileUploadDto = await this.createPathKeyFileUploadDtoArray(
+      resizedImages,
+      pathsKeys,
+    );
 
     return this.uploadFiles(files);
   }
@@ -31,8 +33,7 @@ export class FilesStorageAdapter {
     resizedImages: ResizedImageDetailsDto,
     pathsKeys: KeysPathDto,
   ): Promise<PathsKeysFileUploadDto> {
-    const pathKeyFileUploadDtoObj: PathsKeysFileUploadDto =
-      new PathsKeysFileUploadDto();
+    const pathKeyFileUploadDtoObj: PathsKeysFileUploadDto = new PathsKeysFileUploadDto();
 
     for (const key of ['original', 'middle', 'small'] as const) {
       const pathKey = pathsKeys[key];
@@ -48,16 +49,14 @@ export class FilesStorageAdapter {
     return pathKeyFileUploadDtoObj;
   }
 
-  private async uploadFiles(
-    files: PathsKeysFileUploadDto,
-  ): Promise<UrlsPathKeysEtagsDto> {
+  private async uploadFiles(files: PathsKeysFileUploadDto): Promise<UrlsPathKeysEtagsDto> {
     try {
       const s3Client = await this.s3Service.getS3Client();
       const bucketName = await this.s3Service.getS3PublicBucketName();
 
-      const uploadPromises: Promise<UrlPathKeyEtagDto>[] = Object.keys(
-        files,
-      ).map(async (size: 'original' | 'middle' | 'small') => {
+      const uploadPromises: Promise<UrlPathKeyEtagDto>[] = (
+        ['original', 'middle', 'small'] as const
+      ).map(async (size) => {
         const { pathKey, fileUploadDto } = files[size];
 
         const { buffer, mimetype } = fileUploadDto;
@@ -68,8 +67,7 @@ export class FilesStorageAdapter {
           ContentType: mimetype,
         };
         const command: PutObjectCommand = new PutObjectCommand(bucketParams);
-        const resultUploaded: PutObjectCommandOutput =
-          await s3Client.send(command);
+        const resultUploaded: PutObjectCommandOutput = await s3Client.send(command);
         const eTag = resultUploaded.ETag;
 
         if (!eTag) {
@@ -77,8 +75,7 @@ export class FilesStorageAdapter {
           throw new InternalServerErrorException('Error uploading file to S3:');
         }
 
-        const unitedUrl: UrlDto =
-          await this.s3Service.generateSignedUrl(pathKey);
+        const unitedUrl: UrlDto = await this.s3Service.generateSignedUrl(pathKey);
         return {
           url: unitedUrl.url,
           pathKey: pathKey,
@@ -95,9 +92,7 @@ export class FilesStorageAdapter {
       };
     } catch (error) {
       console.error('Error uploading files to S3:', error);
-      throw new InternalServerErrorException(
-        'Error uploading files to S3:' + error.message,
-      );
+      throw new InternalServerErrorException('Error uploading files to S3:' + error.message);
     }
   }
 
@@ -163,9 +158,7 @@ export class FilesStorageAdapter {
       return { url: unitedUrl.url, pathKey: pathKey, eTag: eTag };
     } catch (error) {
       console.error('Error uploading file to S3:', error);
-      throw new InternalServerErrorException(
-        'Error uploading file to S3:' + error.message,
-      );
+      throw new InternalServerErrorException('Error uploading file to S3:' + error.message);
     }
   }
 
@@ -198,9 +191,7 @@ export class FilesStorageAdapter {
     blogId: string,
     mimetype: string,
   ): Promise<string> {
-    return `content/users/${userId}/blogs/${blogId}_main.${await this.getFileExtension(
-      mimetype,
-    )}`;
+    return `content/users/${userId}/blogs/${blogId}_main.${await this.getFileExtension(mimetype)}`;
   }
 
   private async getFileExtension(mimetype: string): Promise<string> {

@@ -19,9 +19,7 @@ export class DeleteCommentCommand {
 }
 
 @CommandHandler(DeleteCommentCommand)
-export class DeleteCommentUseCase
-  implements ICommandHandler<DeleteCommentCommand>
-{
+export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentCommand> {
   constructor(
     protected commentsRepo: CommentsRepo,
     protected caslAbilityFactory: CaslAbilityFactory,
@@ -29,15 +27,10 @@ export class DeleteCommentUseCase
   async execute(command: DeleteCommentCommand): Promise<boolean> {
     const { commentId, currentUserDto } = command;
 
-    const commentToDelete =
-      await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
-    if (!commentToDelete)
-      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    const commentToDelete = await this.commentsRepo.getCommentByIdWithoutLikes(commentId);
+    if (!commentToDelete) throw new NotFoundException(`Comment with ID ${commentId} not found`);
 
-    this.checkUserPermission(
-      currentUserDto,
-      commentToDelete.commentator.userId,
-    );
+    this.checkUserPermission(currentUserDto, commentToDelete.commentator.userId);
 
     try {
       return this.commentsRepo.deleteCommentById(command.commentId);
@@ -46,10 +39,7 @@ export class DeleteCommentUseCase
     }
   }
 
-  private checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    commentatorInfoUserId: string,
-  ) {
+  private checkUserPermission(currentUserDto: CurrentUserDto, commentatorInfoUserId: string) {
     const userIdDto: IdDto = { id: currentUserDto.userId };
     const ability = this.caslAbilityFactory.createForUserId(userIdDto);
     try {
@@ -57,9 +47,7 @@ export class DeleteCommentUseCase
         id: commentatorInfoUserId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to remove this comment. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to remove this comment. ' + error.message);
     }
   }
 }

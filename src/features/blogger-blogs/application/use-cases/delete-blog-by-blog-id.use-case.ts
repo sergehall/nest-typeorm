@@ -16,9 +16,7 @@ export class DeleteBlogByBlogIdCommand {
 }
 
 @CommandHandler(DeleteBlogByBlogIdCommand)
-export class DeleteBlogByBlogIdUseCase
-  implements ICommandHandler<DeleteBlogByBlogIdCommand>
-{
+export class DeleteBlogByBlogIdUseCase implements ICommandHandler<DeleteBlogByBlogIdCommand> {
   constructor(
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly bloggerBlogsRepo: BloggerBlogsRepo,
@@ -30,18 +28,12 @@ export class DeleteBlogByBlogIdUseCase
       await this.bloggerBlogsRepo.findBlogById(blogId);
     if (!blogToRemove) throw new NotFoundException('Not found blog.');
 
-    await this.checkUserPermission(
-      currentUserDto,
-      blogToRemove.blogOwner.userId,
-    );
+    await this.checkUserPermission(currentUserDto, blogToRemove.blogOwner.userId);
 
     return await this.bloggerBlogsRepo.saDeleteBlogDataById(blogId);
   }
 
-  private async checkUserPermission(
-    currentUserDto: CurrentUserDto,
-    blogOwnerId: string,
-  ) {
+  private async checkUserPermission(currentUserDto: CurrentUserDto, blogOwnerId: string) {
     const userIdDto: IdDto = { id: currentUserDto.userId };
     const ability = this.caslAbilityFactory.createForUserId(userIdDto);
     try {
@@ -49,9 +41,7 @@ export class DeleteBlogByBlogIdUseCase
         id: blogOwnerId,
       });
     } catch (error) {
-      throw new ForbiddenException(
-        'You are not allowed to remove this blog. ' + error.message,
-      );
+      throw new ForbiddenException('You are not allowed to remove this blog. ' + error.message);
     }
   }
 }

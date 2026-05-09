@@ -22,9 +22,7 @@ export class SaFindUsersUseCase implements ICommandHandler<SaFindUsersCommand> {
 
     const totalCount = await this.usersRepo.totalCountUsers(queryData);
 
-    const pagesCount = Math.ceil(
-      totalCount / queryData.queryPagination.pageSize,
-    );
+    const pagesCount = Math.ceil(totalCount / queryData.queryPagination.pageSize);
 
     const transformedArrUsers: SaUserViewModel[] =
       await this.usersService.transformUserForSa(arrUsers);

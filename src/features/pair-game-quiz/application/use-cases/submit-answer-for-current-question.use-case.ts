@@ -1,14 +1,6 @@
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { AnswerDto } from '../../dto/answer.dto';
-import {
-  ForbiddenException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { AnswerStatusEnum } from '../../enums/answer-status.enum';
 import {
   answeredAllQuestionsMessage,
@@ -36,9 +28,7 @@ export class SubmitAnswerCommand {
 }
 
 @CommandHandler(SubmitAnswerCommand)
-export class SubmitAnswerForCurrentQuestionUseCase
-  implements ICommandHandler<SubmitAnswerCommand>
-{
+export class SubmitAnswerForCurrentQuestionUseCase implements ICommandHandler<SubmitAnswerCommand> {
   constructor(
     protected gameQuizRepo: GamePairsRepo,
     protected gameQuestionsRepo: GameQuestionsRepo,
@@ -52,10 +42,9 @@ export class SubmitAnswerForCurrentQuestionUseCase
     const { answerDto, activeGame, currentUserDto } = command;
 
     // Fetch challenge answers for the active game
-    const challengeAnswers =
-      await this.challengesAnswersRepo.getChallengeAnswersByGameId(
-        activeGame.id,
-      );
+    const challengeAnswers = await this.challengesAnswersRepo.getChallengeAnswersByGameId(
+      activeGame.id,
+    );
 
     // Count user's answers and total answers
     const { countAnswersUser, countAnswersBoth } = this.countChallengeAnswers(
@@ -67,15 +56,9 @@ export class SubmitAnswerForCurrentQuestionUseCase
     await this.validateAnswerCount(countAnswersUser);
 
     // Get the next challenge question
-    const nextQuestion = await this.fetchNextChallengeQuestion(
-      activeGame.id,
-      countAnswersUser,
-    );
+    const nextQuestion = await this.fetchNextChallengeQuestion(activeGame.id, countAnswersUser);
 
-    const isAnswerCorrect = await this.verifyAnswer(
-      nextQuestion.question.id,
-      answerDto.answer,
-    );
+    const isAnswerCorrect = await this.verifyAnswer(nextQuestion.question.id, answerDto.answer);
 
     const savedAnswer: ChallengeAnswersEntity = await this.saveAnswer(
       answerDto,
@@ -84,12 +67,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
       currentUserDto,
     );
 
-    await this.handleGameProgress(
-      countAnswersUser,
-      countAnswersBoth,
-      activeGame,
-      currentUserDto,
-    );
+    await this.handleGameProgress(countAnswersUser, countAnswersBoth, activeGame, currentUserDto);
 
     return this.mapToViewModel(savedAnswer);
   }
@@ -105,25 +83,18 @@ export class SubmitAnswerForCurrentQuestionUseCase
     gameId: string,
     countAnswersUser: number,
   ): Promise<ChallengeQuestionsEntity> {
-    const nextQuestion =
-      await this.challengesQuestionsRepo.getNextChallengeQuestions(
-        gameId,
-        countAnswersUser,
-      );
+    const nextQuestion = await this.challengesQuestionsRepo.getNextChallengeQuestions(
+      gameId,
+      countAnswersUser,
+    );
     if (!nextQuestion) {
       throw new ForbiddenException(notFoundChallengeQuestions);
     }
     return nextQuestion;
   }
 
-  private async verifyAnswer(
-    questionId: string,
-    answer: string,
-  ): Promise<boolean> {
-    return await this.gameQuestionsRepo.verifyAnswerByQuestionsId(
-      questionId,
-      answer,
-    );
+  private async verifyAnswer(questionId: string, answer: string): Promise<boolean> {
+    return await this.gameQuestionsRepo.verifyAnswerByQuestionsId(questionId, answer);
   }
 
   private async saveAnswer(
@@ -132,9 +103,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
     isAnswerCorrect: boolean,
     user: CurrentUserDto,
   ): Promise<ChallengeAnswersEntity> {
-    const answerStatus = isAnswerCorrect
-      ? AnswerStatusEnum.CORRECT
-      : AnswerStatusEnum.INCORRECT;
+    const answerStatus = isAnswerCorrect ? AnswerStatusEnum.CORRECT : AnswerStatusEnum.INCORRECT;
     const savedAnswer = await this.challengesAnswersRepo.saveChallengeAnswer(
       answerDto.answer,
       nextQuestion,
@@ -143,9 +112,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
     );
 
     if (!savedAnswer) {
-      throw new InternalServerErrorException(
-        'Failed to save the challenge Answer.',
-      );
+      throw new InternalServerErrorException('Failed to save the challenge Answer.');
     }
     return savedAnswer;
   }
@@ -164,9 +131,7 @@ export class SubmitAnswerForCurrentQuestionUseCase
       countAnswersUser + currentAnswer === MAX_ANSWER_COUNT &&
       countAnswersBoth + currentAnswer !== MAX_ANSWER_BOTH_COUNT
     ) {
-      await this.commandBus.execute(
-        new PlayerAnswersAllQuestionsCommand(game, user),
-      );
+      await this.commandBus.execute(new PlayerAnswersAllQuestionsCommand(game, user));
     } else if (countAnswersBoth + currentAnswer === MAX_ANSWER_BOTH_COUNT) {
       await this.endGame(game);
     }
