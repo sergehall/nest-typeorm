@@ -4,7 +4,7 @@ import { PayloadDto } from '../../auth/dto/payload.dto';
 import uuid4 from 'uuid4';
 import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
-@Entity('SecurityDevices')
+@Entity('nt-SecurityDevices')
 export class SecurityDevicesEntity {
   @PrimaryColumn('uuid', { unique: true })
   id: string;

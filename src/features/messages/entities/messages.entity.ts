@@ -3,7 +3,7 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { ConversationsEntity } from './conversations.entity';
 import uuid4 from 'uuid4';
 
-@Entity('Messages')
+@Entity('nt-Messages')
 export class MessagesEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;

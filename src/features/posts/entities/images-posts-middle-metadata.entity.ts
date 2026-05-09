@@ -7,7 +7,7 @@ import uuid4 from 'uuid4';
 import { FileUploadDto } from '../../blogger-blogs/dto/file-upload.dto';
 import { UrlPathKeyEtagDto } from '../../blogger-blogs/dto/url-pathKey-etag.dto';
 
-@Entity('ImagesPostsMiddleMetadata')
+@Entity('nt-ImagesPostsMiddleMetadata')
 export class ImagesPostsMiddleMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;

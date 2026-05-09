@@ -3,7 +3,7 @@ import { BloggerBlogsEntity } from '../../blogger-blogs/entities/blogger-blogs.e
 import { UsersEntity } from '../../users/entities/users.entity';
 import { PostsEntity } from '../entities/posts.entity';
 
-@Entity('ImagesPostsMetadataEntity')
+@Entity('nt-ImagesPostsMetadataEntity')
 export class ImagesPostsMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;

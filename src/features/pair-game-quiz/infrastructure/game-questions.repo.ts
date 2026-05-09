@@ -244,19 +244,19 @@ export class GameQuestionsRepo {
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('ChallengeQuestions', 'challengeQuestions')
+        .from('nt-ChallengeQuestions', 'challengeQuestions')
         .where('questionId = :questionId', { questionId })
         .execute();
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('ChallengeAnswers', 'challengeAnswers')
+        .from('nt-ChallengeAnswers', 'challengeAnswers')
         .where('questionId = :questionId', { questionId })
         .execute();
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('QuestionsQuiz', 'challengeAnswers')
+        .from('nt-QuestionsQuiz', 'challengeAnswers')
         .where('id = :questionId', { questionId })
         .execute();
     } catch (error) {

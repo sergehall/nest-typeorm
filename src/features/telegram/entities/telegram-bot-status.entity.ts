@@ -3,7 +3,7 @@ import { BotStatus } from '../enums/bot-status.enum';
 import { UsersEntity } from '../../users/entities/users.entity';
 import uuid4 from 'uuid4';
 
-@Entity('TelegramBotStatus')
+@Entity('nt-TelegramBotStatus')
 export class TelegramBotStatusEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;

@@ -190,35 +190,35 @@ export class UsersRepo {
       await this.usersRepository.manager.transaction(
         async (transactionalEntityManager: EntityManager) => {
           await transactionalEntityManager.update(
-            'LikeStatusComments',
+            'nt-LikeStatusComments',
             { ratedCommentUser: userId },
             { isBanned },
           );
 
           await transactionalEntityManager.update(
-            'LikeStatusPosts',
+            'nt-LikeStatusPosts',
             { ratedPostUser: userId },
             { isBanned },
           );
           await transactionalEntityManager
             .createQueryBuilder()
-            .update('Comments')
+            .update('nt-Comments')
             .set({ dependencyIsBanned: isBanned })
             .where('commentator.userId = :userId', { userId })
             .execute();
           await transactionalEntityManager
             .createQueryBuilder()
-            .update('Posts')
+            .update('nt-Posts')
             .set({ dependencyIsBanned: isBanned })
             .where('postOwner = :userId', { userId })
             .execute();
           await transactionalEntityManager
             .createQueryBuilder()
-            .update('BloggerBlogs')
+            .update('nt-BloggerBlogs')
             .set({ dependencyIsBanned: isBanned })
             .where('blogOwnerId = :userId', { userId })
             .execute();
-          await transactionalEntityManager.delete('SecurityDevices', {
+          await transactionalEntityManager.delete('nt-SecurityDevices', {
             user: userId,
           });
           await transactionalEntityManager.update(
@@ -428,59 +428,59 @@ export class UsersRepo {
         await transactionalEntityManager
           .createQueryBuilder()
           .delete()
-          .from('challengeQuestions')
+          .from('nt-ChallengeQuestions')
           .where('pairGameQuizId IN (:...gameIds)', { gameIds: allGamesIds })
           .execute();
       }
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
-        .from('ChallengeAnswers')
+        .from('nt-ChallengeAnswers')
         .where('answerOwnerId = :userId', { userId })
         .execute();
-      await transactionalEntityManager.delete('TelegramBotStatus', {
+      await transactionalEntityManager.delete('nt-TelegramBotStatus', {
         user: userId,
       });
-      await transactionalEntityManager.delete('BlogsSubscribers', {
+      await transactionalEntityManager.delete('nt-BlogsSubscribers', {
         subscriber: userId,
       });
-      await transactionalEntityManager.delete('SecurityDevices', { user: userId });
-      await transactionalEntityManager.delete('BannedUsersForBlogs', {
+      await transactionalEntityManager.delete('nt-SecurityDevices', { user: userId });
+      await transactionalEntityManager.delete('nt-BannedUsersForBlogs', {
         bannedUserForBlogs: userId,
       });
       await transactionalEntityManager.delete(SentCodesLogEntity, {
         sentForUser: userId,
       });
-      await transactionalEntityManager.delete('LikeStatusComments', {
+      await transactionalEntityManager.delete('nt-LikeStatusComments', {
         ratedCommentUser: userId,
       });
-      await transactionalEntityManager.delete('LikeStatusPosts', {
+      await transactionalEntityManager.delete('nt-LikeStatusPosts', {
         ratedPostUser: userId,
       });
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
-        .from('Messages')
+        .from('nt-Messages')
         .where('authorId = :userId', { userId })
         .execute();
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
-        .from('PairsGame')
+        .from('nt-PairsGame')
         .where('firstPlayerId = :userId', { userId })
         .orWhere('secondPlayerId = :userId', { userId })
         .execute();
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
-        .from('Comments')
+        .from('nt-Comments')
         .where('commentatorId = :userId', { userId })
         .execute();
-      await transactionalEntityManager.delete('Posts', { postOwner: userId });
+      await transactionalEntityManager.delete('nt-Posts', { postOwner: userId });
       await transactionalEntityManager
         .createQueryBuilder()
         .delete()
-        .from('BloggerBlogs')
+        .from('nt-BloggerBlogs')
         .where('blogOwnerId = :userId', { userId })
         .execute();
 

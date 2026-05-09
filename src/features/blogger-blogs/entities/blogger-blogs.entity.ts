@@ -7,7 +7,7 @@ import uuid4 from 'uuid4';
 import { CreateBlogsDto } from '../dto/create-blogs.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 
-@Entity('BloggerBlogs')
+@Entity('nt-BloggerBlogs')
 @Unique(['id'])
 @Unique(['id', 'name'])
 export class BloggerBlogsEntity {
