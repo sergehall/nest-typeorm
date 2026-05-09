@@ -4,7 +4,7 @@ import uuid4 from 'uuid4';
 import { SecurityDevicesEntity } from '../../security-devices/entities/session-devices.entity';
 
 @Unique(['guestUserId', 'isBanned'])
-@Entity('GuestUsers')
+@Entity('nt-GuestUsers')
 export class GuestUsersEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   guestUserId: string;

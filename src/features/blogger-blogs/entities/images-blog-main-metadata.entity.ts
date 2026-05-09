@@ -6,7 +6,7 @@ import { UrlPathKeyEtagDto } from '../dto/url-pathKey-etag.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import uuid4 from 'uuid4';
 
-@Entity('ImagesBlogsMainMetadata')
+@Entity('nt-ImagesBlogsMainMetadata')
 export class ImagesBlogsMainMetadataEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;

@@ -4,7 +4,7 @@ import { UsersEntity } from '../../users/entities/users.entity';
 import { AnswerStatusEnum } from '../enums/answer-status.enum';
 import { PairsGameEntity } from './pairs-game.entity';
 
-@Entity('ChallengeAnswers')
+@Entity('nt-ChallengeAnswers')
 export class ChallengeAnswersEntity {
   @PrimaryColumn('uuid')
   id: string;

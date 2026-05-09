@@ -7,7 +7,7 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import uuid4 from 'uuid4';
 
-@Entity('Posts')
+@Entity('nt-Posts')
 @Unique(['id'])
 @Unique(['id', 'title'])
 export class PostsEntity {

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('InvalidJwt')
+@Entity('nt-InvalidJwt')
 export class InvalidJwtEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

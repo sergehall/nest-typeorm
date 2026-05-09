@@ -5,7 +5,7 @@ import { IsOptional, IsUrl } from 'class-validator';
 import { PaymentsStatusEnum } from '../enums/payments-status.enum';
 import { PaymentSystem } from '../../../payment/enums/payment-system.enums';
 
-@Entity('PaymentTransactions')
+@Entity('nt-PaymentTransactions')
 export class PaymentTransactionsEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   id: string;

@@ -398,26 +398,26 @@ export class BloggerBlogsRepo {
 
   private async deleteBlogData(id: string, entityManager: EntityManager): Promise<void> {
     try {
-      await entityManager.delete('BannedUsersForBlogs', {
+      await entityManager.delete('nt-BannedUsersForBlogs', {
         bannedBlog: id,
       });
-      await entityManager.delete('LikeStatusComments', {
+      await entityManager.delete('nt-LikeStatusComments', {
         blog: id,
       });
-      await entityManager.delete('LikeStatusPosts', { blog: id });
+      await entityManager.delete('nt-LikeStatusPosts', { blog: id });
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('Comments')
+        .from('nt-Comments')
         .where('blogId = :id', { id })
         .execute();
       await entityManager
         .createQueryBuilder()
         .delete()
-        .from('Posts')
+        .from('nt-Posts')
         .where('blogId = :id', { id })
         .execute();
-      await entityManager.delete('BloggerBlogs', { id });
+      await entityManager.delete('nt-BloggerBlogs', { id });
     } catch (error) {
       console.error(`Error while removing data for user ${id}: ${error.message}`);
       throw new Error(`Error while removing data for user ${id}`);

@@ -243,7 +243,7 @@ export class PostsRepo {
         await manager
           .createQueryBuilder()
           .delete()
-          .from('Comments')
+          .from('nt-Comments')
           .where('postId = :id', { id: postId })
           .execute();
 

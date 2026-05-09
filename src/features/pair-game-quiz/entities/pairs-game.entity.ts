@@ -8,7 +8,7 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import uuid4 from 'uuid4';
 import { PlayersResultDto } from '../dto/players-result.dto';
 
-@Entity('PairsGame')
+@Entity('nt-PairsGame')
 export class PairsGameEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -5,7 +5,7 @@ import { SubscriptionStatus } from '../enums/subscription-status.enums';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import uuid4 from 'uuid4';
 
-@Entity('BlogsSubscribers')
+@Entity('nt-BlogsSubscribers')
 export class BlogsSubscribersEntity {
   @PrimaryColumn('uuid', { nullable: false })
   id: string;

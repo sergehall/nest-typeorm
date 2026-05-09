@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { QuestionsQuizEntity } from '../../sa-quiz-questions/entities/questions-quiz.entity';
 import { PairsGameEntity } from './pairs-game.entity';
 
-@Entity('ChallengeQuestions')
+@Entity('nt-ChallengeQuestions')
 export class ChallengeQuestionsEntity {
   @PrimaryColumn('uuid')
   id: string;

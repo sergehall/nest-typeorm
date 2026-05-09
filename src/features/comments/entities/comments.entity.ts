@@ -6,7 +6,7 @@ import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import uuid4 from 'uuid4';
 
-@Entity('Comments')
+@Entity('nt-Comments')
 @Unique(['id'])
 export class CommentsEntity {
   @PrimaryColumn('uuid', { unique: true })

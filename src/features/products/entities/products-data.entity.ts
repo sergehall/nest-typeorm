@@ -3,7 +3,7 @@ import uuid4 from 'uuid4';
 import { OrderItemsEntity } from './order-items.entity';
 import { Currency } from '../../../payment/enums/currency.enums';
 
-@Entity('ProductsData')
+@Entity('nt-ProductsData')
 export class ProductsDataEntity {
   @PrimaryColumn('uuid', { unique: true, nullable: false })
   productId: string;

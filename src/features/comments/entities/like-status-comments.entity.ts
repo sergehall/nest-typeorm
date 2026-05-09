@@ -8,7 +8,7 @@ import { LikeStatusDto } from '../dto/like-status.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import uuid4 from 'uuid4';
 
-@Entity('LikeStatusComments')
+@Entity('nt-LikeStatusComments')
 @Unique(['id'])
 export class LikeStatusCommentsEntity {
   @PrimaryColumn('uuid', { nullable: false, unique: true })
