@@ -28,6 +28,13 @@
 
 ## Installation
 
+Use Node.js 24.15.0 for local development. The deploy runtime accepts Node.js 24.x.
+
+```bash
+$ nvm use
+$ npm run runtime:check
+```
+
 ```bash
 $ npm install
 ```

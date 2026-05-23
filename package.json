@@ -10,9 +10,10 @@
     "fastify": "5.8.5"
   },
   "engines": {
-    "node": "24.14.1"
+    "node": "24.x"
   },
   "scripts": {
+    "runtime:check": "node -e \"const expected = '24.15.0'; const actual = process.versions.node; if (actual !== expected) { console.error('Expected Node.js ' + expected + ', got ' + actual); process.exit(1); }\"",
     "prebuild": "rimraf dist tsconfig.build.tsbuildinfo",
     "build": "nest build",
     "start": "nest start",
