@@ -3,7 +3,7 @@ import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
-import axios from 'axios';
+import { sendTelegramRequest } from '../../helpers/send-telegram-request';
 
 export class SendOurWebhookToTelegramCommand {
   constructor() {}
@@ -27,6 +27,6 @@ export class SendOurWebhookToTelegramUseCase implements ICommandHandler<SendOurW
 
     const url = baseUrl + '/integrations/telegram/webhook';
 
-    await axios.post(telegramUrl, { url: url });
+    await sendTelegramRequest(telegramUrl, { url });
   }
 }

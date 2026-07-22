@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import axios from 'axios';
 import { PostViewModel } from '../../../posts/views/post.view-model';
 import { BloggerBlogsEntity } from '../../../blogger-blogs/entities/blogger-blogs.entity';
 import { BlogsSubscribersRepo } from '../../../blogger-blogs/infrastructure/blogs-subscribers.repo';
@@ -8,6 +7,7 @@ import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
+import { sendTelegramRequest } from '../../helpers/send-telegram-request';
 
 export class SendNewBlogPostNotificationsCommand {
   constructor(
@@ -50,20 +50,18 @@ export class SendNewBlogPostNotificationsUseCase implements ICommandHandler<Send
       await Promise.all(
         telegramIds.map(async (telegramId) => {
           try {
-            await axios.post(telegramUrl, {
+            await sendTelegramRequest(telegramUrl, {
               chat_id: telegramId,
               text: message,
             });
             console.log(`Notification sent to Telegram ID ${telegramId}`);
-          } catch (error) {
-            console.error(
-              `Failed to send notification to Telegram ID ${telegramId}: ${error.message}`,
-            );
+          } catch (error: unknown) {
+            console.error(`Failed to send notification to Telegram ID ${telegramId}`, error);
           }
         }),
       );
-    } catch (error) {
-      console.error(`Failed to send notifications: ${error.message}`);
+    } catch (error: unknown) {
+      console.error('Failed to send notifications', error);
     }
   }
 }
