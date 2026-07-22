@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MailsService } from './application/mails.service';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { PostgresConfig } from '../../config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { EmailSendingUseCase } from './application/use-case/email-sending-use-case';
@@ -10,7 +9,10 @@ import { MailOptionsBuilder } from './mail-options/mail-options-builder';
 import { SentCodeLogRepo } from './infrastructure/sent-code-log.repo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentCodesLogEntity } from './entities/sent-codes-log.entity';
-import { NodemailerOptions } from '../../config/nodemailer/nodemailer-options';
+import {
+  NODEMAILER_TRANSPORT,
+  NodemailerOptions,
+} from '../../config/nodemailer/nodemailer-options';
 import { SendConfirmationCodeWhenRegistrationUserEventHandler } from './events-handlers/send-confirmation-code-when-registration-user.event.handler';
 import { ReSendConfirmationCodeEventHandler } from './events-handlers/re-send-confirmation-code.event.handler';
 import { SendRecoveryCodeEventHandler } from './events-handlers/send-recovery-code.event.handler';
@@ -25,15 +27,15 @@ const mailsEventHandlers = [
 ];
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([SentCodesLogEntity]),
-    CqrsModule,
-    MailerModule.forRootAsync({
-      useClass: NodemailerOptions, // Use the custom NodemailerOptions
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([SentCodesLogEntity]), CqrsModule],
   providers: [
     MailsConfig,
+    NodemailerOptions,
+    {
+      provide: NODEMAILER_TRANSPORT,
+      inject: [NodemailerOptions],
+      useFactory: (options: NodemailerOptions) => options.createTransport(),
+    },
     PostgresConfig,
     MailOptionsBuilder,
     MailsService,

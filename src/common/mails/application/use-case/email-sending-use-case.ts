@@ -1,5 +1,7 @@
-import { MailerService } from '@nestjs-modules/mailer';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { type Transporter } from 'nodemailer';
+import { NODEMAILER_TRANSPORT } from '../../../../config/nodemailer/nodemailer-options';
 import { ConfirmationCodeEmailOptions } from '../dto/confirmation-code-email-options';
 
 export class EmailSendingCommand {
@@ -8,12 +10,15 @@ export class EmailSendingCommand {
 
 @CommandHandler(EmailSendingCommand)
 export class EmailSendingUseCase implements ICommandHandler<EmailSendingCommand> {
-  constructor(protected mailerService: MailerService) {}
+  constructor(
+    @Inject(NODEMAILER_TRANSPORT)
+    protected readonly mailTransport: Transporter,
+  ) {}
 
   async execute(command: EmailSendingCommand): Promise<boolean> {
     const { sendMailOptions } = command;
     try {
-      const success = await this.mailerService.sendMail(sendMailOptions);
+      const success = await this.mailTransport.sendMail(sendMailOptions);
       console.log(success);
       return true; // Email sent successfully
     } catch (error) {

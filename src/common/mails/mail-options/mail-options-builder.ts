@@ -27,19 +27,12 @@ export class MailOptionsBuilder {
     const { email } = user;
     const fromEmail = this.fromEmail;
 
-    const context = {
-      name: email,
-      fullURL,
-    };
-
     return {
       to: email,
       from: fromEmail,
       subject,
-      template: 'index',
       text: emailText,
       html: htmlText,
-      context,
     };
   }
 

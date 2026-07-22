@@ -24,7 +24,7 @@ closer to production code:
 
 ## Tech Stack
 
-- **Runtime:** Node.js 24.15.0
+- **Runtime:** Node.js 24.18.0
 - **Package manager:** Yarn 4.14.1
 - **Framework:** NestJS 11
 - **Language:** TypeScript
@@ -88,7 +88,7 @@ and `/pair-game-quiz/pairs/connection`.
 
 ## Requirements
 
-- Node.js 24.15.0
+- Node.js 24.18.0
 - Yarn 4.14.1, configured through `.yarn/releases/yarn-4.14.1.cjs`
 - PostgreSQL database URL
 - Environment variables for the integrations you want to run
