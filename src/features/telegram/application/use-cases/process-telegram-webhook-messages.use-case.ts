@@ -1,5 +1,4 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import axios from 'axios';
 import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { PayloadTelegramMessageType } from '../../types/payload-telegram-message.type';
 import { ManageTelegramBotCommand } from './manage-telegram-bot.use-case';
@@ -7,6 +6,7 @@ import { TelegramTextParserCommand } from './telegram-text-parser.use-case';
 import { InternalServerErrorException } from '@nestjs/common';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
+import { sendTelegramRequest } from '../../helpers/send-telegram-request';
 
 export class ProcessTelegramWebhookMessagesCommand {
   constructor(public payloadTelegramMessage: PayloadTelegramMessageType) {}
@@ -66,9 +66,11 @@ export class ProcessTelegramWebhookMessagesUseCase implements ICommandHandler<Pr
         new TelegramTextParserCommand(payloadTelegramMessage),
       );
       await this.sendTelegramMessage(payloadTelegramMessage.message.from.id, feedbackMessage);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException('Failed to process Telegram webhook', {
+        cause: error,
+      });
     }
   }
 
@@ -81,7 +83,7 @@ export class ProcessTelegramWebhookMessagesUseCase implements ICommandHandler<Pr
     const telegramUrl = `${TelegramUrlsEnum.Bot}${tokenTelegramBot}/${sendMessage}`;
 
     const data = { chat_id: chatId, text };
-    await axios.post(telegramUrl, data);
+    await sendTelegramRequest(telegramUrl, data);
   }
 
   private async sendNewUserWelcomeMessage(

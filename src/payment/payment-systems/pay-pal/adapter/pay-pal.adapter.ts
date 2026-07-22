@@ -1,17 +1,36 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PayPalGenerateAccessTokenCommand } from '../application/use-cases/pay-pal-generate-access-token.use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import axios from 'axios';
 import { PaymentDto } from '../../../dto/payment.dto';
 import { IntentsEnums } from '../../../enums/intents.enums';
 import { Amount, Item, PayPaPurchaseUnitsType } from '../types/pay-pal-create-order.type';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
 import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
-import { PayerActionRequiredType } from '../types/payer-action-required.type';
+import {
+  isPayerActionRequired,
+  PayerActionRequiredType,
+} from '../types/payer-action-required.type';
 import { PostgresConfig } from '../../../../config/db/postgres/postgres.config';
 import { UsersEntity } from '../../../../features/users/entities/users.entity';
 import { GuestUsersEntity } from '../../../../features/products/entities/unregistered-users.entity';
+import { requestExternalJson } from '../../../../common/http/external-json-client';
+
+type PayPalPaymentSource = {
+  readonly paypal: {
+    readonly experience_context: {
+      readonly payment_method_preference: 'UNRESTRICTED';
+      readonly brand_name: string;
+      readonly locale: string;
+      readonly landing_page: 'LOGIN' | 'GUEST_CHECKOUT';
+      readonly shipping_preference: 'SET_PROVIDED_ADDRESS';
+      readonly payment_method_selected: 'PAYPAL';
+      readonly user_action: 'PAY_NOW';
+      readonly return_url: string;
+      readonly cancel_url: string;
+    };
+  };
+};
 
 @Injectable()
 export class PayPalAdapter {
@@ -26,9 +45,8 @@ export class PayPalAdapter {
       const accessToken = await this.commandBus.execute(new PayPalGenerateAccessTokenCommand());
 
       return await this.payPalCreateOrder(paymentDto, accessToken);
-    } catch (error) {
-      console.log(error.message);
-      throw new InternalServerErrorException('Failed to createCheckoutOrder' + error.message);
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Failed to create checkout order', { cause: error });
     }
   }
 
@@ -58,14 +76,21 @@ export class PayPalAdapter {
       payment_source: paymentSource,
     };
 
-    const headersOption = await this.getHeadersOptions(payPalRequestId, accessToken);
+    const headers = this.getHeaders(payPalRequestId, accessToken);
 
     try {
-      const response = await axios.post(url, data, headersOption);
-      return response.data;
-    } catch (error) {
-      console.error('Error:', error.response.data);
-      throw new InternalServerErrorException(error.message);
+      return await requestExternalJson({
+        provider: 'PayPal Orders API',
+        url,
+        init: {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(data),
+        },
+        validate: isPayerActionRequired,
+      });
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Failed to create PayPal order', { cause: error });
     }
   }
 
@@ -130,23 +155,18 @@ export class PayPalAdapter {
     return purchaseUnits;
   }
 
-  private async getHeadersOptions(payPalRequestId: string, accessToken: string): Promise<any> {
+  private getHeaders(payPalRequestId: string, accessToken: string): HeadersInit {
     return {
-      headers: {
-        'Content-Type': 'application/json',
-        'PayPal-Request-Id': payPalRequestId,
-        Authorization: `Bearer ${accessToken}`,
-      },
+      'Content-Type': 'application/json',
+      'PayPal-Request-Id': payPalRequestId,
+      Authorization: `Bearer ${accessToken}`,
     };
   }
 
-  private async getPaymentSource(client: UsersEntity | GuestUsersEntity): Promise<any> {
-    let landing_page;
-    if (client instanceof UsersEntity) {
-      landing_page = 'LOGIN';
-    } else {
-      landing_page = 'GUEST_CHECKOUT';
-    }
+  private async getPaymentSource(
+    client: UsersEntity | GuestUsersEntity,
+  ): Promise<PayPalPaymentSource> {
+    const landingPage = client instanceof UsersEntity ? 'LOGIN' : 'GUEST_CHECKOUT';
     // payment_method_preference: 'UNRESTRICTED'  || 'IMMEDIATE_PAYMENT_REQUIRED'
     const domain: string = await this.postgresConfig.getPostgresConfig('PG_DOMAIN_HEROKU');
     return {
@@ -155,7 +175,7 @@ export class PayPalAdapter {
           payment_method_preference: 'UNRESTRICTED',
           brand_name: 'IT-INCUBATOR INC',
           locale: 'en-US',
-          landing_page: landing_page,
+          landing_page: landingPage,
           shipping_preference: 'SET_PROVIDED_ADDRESS',
           payment_method_selected: 'PAYPAL',
           user_action: 'PAY_NOW',

@@ -1,6 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import axios from 'axios';
 import { ReCaptchaConfig } from '../../../config/recaptcha/re-captcha.config';
+import { isRecord, requestExternalJson } from '../../../common/http/external-json-client';
+
+type ReCaptchaResponse = {
+  readonly success: boolean;
+  readonly score: number;
+};
+
+function isReCaptchaResponse(value: unknown): value is ReCaptchaResponse {
+  return isRecord(value) && typeof value.success === 'boolean' && typeof value.score === 'number';
+}
 
 @Injectable()
 export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
@@ -24,7 +33,6 @@ export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
     // Construct URL for reCAPTCHA verification endpoint
     const url = 'https://www.google.com/recaptcha/api/siteverify';
 
-    console.log('secretKey:', secretKey);
     // Construct form data for POST request
     const formData = new URLSearchParams();
     formData.append('secret', secretKey);
@@ -33,14 +41,20 @@ export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
 
     try {
       // Send POST request to reCAPTCHA verification endpoint
-      const response = await axios.post(url, formData.toString(), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const response = await requestExternalJson({
+        provider: 'Google reCAPTCHA API',
+        url,
+        init: {
+          method: 'POST',
+          body: formData.toString(),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
         },
+        validate: isReCaptchaResponse,
       });
 
-      // Extract response data
-      const { success, score } = response.data;
+      const { success, score } = response;
 
       // If reCAPTCHA validation fails or score is below threshold, deny access
       if (!success || score < 0.8) {
@@ -49,7 +63,7 @@ export class ReCaptchaGuard extends ReCaptchaConfig implements CanActivate {
 
       // If reCAPTCHA validation is successful, allow access
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       // Log or handle error
       console.error('Error occurred while verifying reCAPTCHA token:', error);
       return false; // Deny access in case of error
