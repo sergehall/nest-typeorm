@@ -9,6 +9,9 @@
   --blue: #1956d8;
   --orange: #ff6b35;
   --lime: #c8f169;
+  --success: #16a34a;
+  --success-deep: #08752f;
+  --success-soft: #dcfce7;
   --white: #fffef9;
   --shadow: 0 24px 70px rgba(23, 36, 60, 0.12);
   --radius-sm: 0.7rem;
@@ -275,6 +278,12 @@ p {
 .button--light {
   background: var(--white);
   color: var(--ink);
+}
+
+.button--api {
+  background: var(--ink);
+  box-shadow: 0 10px 28px rgba(23, 36, 60, 0.2);
+  color: var(--white);
 }
 
 .arrow-icon {
@@ -885,10 +894,11 @@ p {
 }
 
 .status-card--online .status-card__signal span {
-  background: var(--lime);
+  background: #22c55e;
   box-shadow:
-    0 0 0 16px rgba(200, 241, 105, 0.13),
-    0 0 0 34px rgba(200, 241, 105, 0.06);
+    0 0 0 16px rgba(34, 197, 94, 0.28),
+    0 0 0 34px rgba(34, 197, 94, 0.13),
+    0 0 32px rgba(34, 197, 94, 0.78);
 }
 
 .status-card__main {
@@ -906,6 +916,10 @@ p {
   font-size: clamp(1.75rem, 3vw, 2.75rem);
 }
 
+.status-card--online .status-card__heading h2 {
+  color: var(--success-deep);
+}
+
 .status-pill {
   padding: 7px 12px;
   border-radius: 999px;
@@ -919,8 +933,9 @@ p {
 }
 
 .status-card--online .status-pill {
-  background: rgba(87, 130, 0, 0.13);
-  color: #436200;
+  background: var(--success);
+  box-shadow: 0 8px 22px rgba(22, 163, 74, 0.28);
+  color: white;
 }
 
 .status-card__message {
@@ -931,7 +946,7 @@ p {
 
 .status-details {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 0.6fr;
+  grid-template-columns: 1.5fr 1fr 0.65fr 0.65fr;
   margin: 0;
   border-top: 1px solid var(--line);
 }
@@ -956,6 +971,37 @@ p {
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.status-value--online {
+  color: var(--success-deep);
+  font-family: var(--font-mono), monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.status-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.status-card__actions > div {
+  max-width: 560px;
+}
+
+.status-card__actions p:last-child {
+  margin: 7px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.status-card__actions .button {
+  flex: 0 0 auto;
 }
 
 .code-note {
@@ -1339,9 +1385,14 @@ p {
 
   .cta-panel,
   .contact-item,
-  .status-card__heading {
+  .status-card__heading,
+  .status-card__actions {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .status-card__actions .button {
+    width: 100%;
   }
 
   .status-card {

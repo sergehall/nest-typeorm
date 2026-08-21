@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { getApiHealth } from '@/features/platform/data/get-api-health';
+import { getPublicApiUrl } from '@/config/site';
+import { ArrowIcon } from '@/components/ui/arrow-icon';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function StatusPage() {
   const health = await getApiHealth();
+  const apiUrl = getPublicApiUrl();
   const checkedAt = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
     timeStyle: 'medium',
@@ -55,9 +58,21 @@ export default async function StatusPage() {
             </div>
             <div>
               <dt>PostgreSQL</dt>
-              <dd>{health.status === 'online' ? health.databaseStatus : 'unavailable'}</dd>
+              <dd className={health.status === 'online' ? 'status-value--online' : undefined}>
+                {health.status === 'online' ? health.databaseStatus : 'unavailable'}
+              </dd>
             </div>
           </dl>
+
+          <div className="status-card__actions">
+            <div>
+              <p className="eyebrow">Backend control surface</p>
+              <p>Open runtime health, Swagger documentation, and the complete endpoint contract.</p>
+            </div>
+            <a className="button button--api" href={apiUrl}>
+              Open backend API <ArrowIcon />
+            </a>
+          </div>
         </div>
       </section>
 
