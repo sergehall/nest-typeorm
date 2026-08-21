@@ -38,9 +38,7 @@ exec(command, (error, stdout, stderr) => {
   const migrationWildcard = './src/db/migrations/*.ts';
   glob(migrationWildcard, (globError, files) => {
     if (globError) {
-      console.error(
-        `Error while globbing migration files: ${globError.message}`,
-      );
+      console.error(`Error while globbing migration files: ${globError.message}`);
       process.exit(1);
     }
     if (files.length === 0) {
@@ -55,9 +53,7 @@ exec(command, (error, stdout, stderr) => {
 
     exec(gitAddCommand, (addError) => {
       if (addError) {
-        console.error(
-          `Error adding migration files to Git: ${addError.message}`,
-        );
+        console.error(`Error adding migration files to Git: ${addError.message}`);
         process.exit(1);
       }
       console.log(
