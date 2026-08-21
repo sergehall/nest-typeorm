@@ -4,6 +4,7 @@ import { API_OPERATION_COUNT, API_VERSION } from '../api-documentation/swagger.c
 type ApiDashboardOptions = {
   readonly health: HealthResponseDto;
   readonly webUrl: string;
+  readonly cspNonce: string;
 };
 
 function escapeHtml(value: string): string {
@@ -15,7 +16,7 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
-export function renderApiDashboard({ health, webUrl }: ApiDashboardOptions): string {
+export function renderApiDashboard({ health, webUrl, cspNonce }: ApiDashboardOptions): string {
   const isHealthy = health.status === 'healthy';
   const databaseIsUp = health.checks.database.status === 'up';
   const overallLabel = isHealthy ? 'All systems operational' : 'Service degraded';
@@ -32,7 +33,7 @@ export function renderApiDashboard({ health, webUrl }: ApiDashboardOptions): str
     <meta name="color-scheme" content="light" />
     <meta name="description" content="NestLab API documentation, health, and runtime overview." />
     <title>NestLab API · Backend control surface</title>
-    <style>
+    <style nonce="${escapeHtml(cspNonce)}">
       :root {
         --ink: #14213d;
         --muted: #5e687a;

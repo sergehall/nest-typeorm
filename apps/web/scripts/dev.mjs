@@ -15,7 +15,7 @@ const shouldOpenBrowser =
 
 const devServer = spawn(
   process.execPath,
-  [nextCliPath, 'dev', '--hostname', host, '--port', port],
+  [nextCliPath, 'dev', '--webpack', '--hostname', host, '--port', port],
   {
     env: process.env,
     stdio: 'inherit',

@@ -12,6 +12,7 @@ function escapeHtml(value: string): string {
 type LoginPageOptions = Readonly<{
   csrfToken: string;
   returnTo: string;
+  cspNonce: string;
   error?: string;
 }>;
 
@@ -27,7 +28,7 @@ export function renderSwaggerLoginPage(options: LoginPageOptions): string {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <title>NestLab documentation access</title>
-    <style>
+    <style nonce="${escapeHtml(options.cspNonce)}">
       :root { color-scheme: light; --ink: #13213d; --muted: #59647a; --paper: #f5f1e8; --accent: #225bd9; --line: rgba(19,33,61,.16); }
       * { box-sizing: border-box; }
       body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; color: var(--ink); background-color: var(--paper); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
@@ -78,17 +79,28 @@ export function renderSwaggerLoginPage(options: LoginPageOptions): string {
 </html>`;
 }
 
-export function renderSwaggerLogoutPage(csrfToken: string): string {
+export function renderSwaggerLogoutPage(csrfToken: string, cspNonce: string): string {
   return `<!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>Sign out of NestLab documentation</title></head>
-  <body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f1e8;color:#13213d;font-family:system-ui,sans-serif">
-    <main style="width:min(100% - 32px,520px);padding:40px;border:1px solid rgba(19,33,61,.16);border-radius:24px;background:white">
-      <h1 style="margin-top:0">End documentation session?</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Sign out of NestLab documentation</title>
+    <style nonce="${escapeHtml(cspNonce)}">
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f5f1e8; color: #13213d; font-family: system-ui, sans-serif; }
+      main { width: min(100% - 32px, 520px); padding: 40px; border: 1px solid rgba(19,33,61,.16); border-radius: 24px; background: white; }
+      h1 { margin-top: 0; }
+      button { min-height: 48px; border: 0; border-radius: 999px; padding: 0 24px; color: white; background: #225bd9; font-weight: 800; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>End documentation session?</h1>
       <p>The Viewer or Admin session cookie will be removed from this browser.</p>
       <form method="post" action="/api/docs/logout">
         <input type="hidden" name="csrfToken" value="${escapeHtml(csrfToken)}" />
-        <button type="submit" style="min-height:48px;border:0;border-radius:999px;padding:0 24px;color:white;background:#225bd9;font-weight:800">Sign out</button>
+        <button type="submit">Sign out</button>
       </form>
     </main>
   </body>

@@ -34,6 +34,7 @@ describe('API dashboard renderer', () => {
     const html = renderApiDashboard({
       health: createHealth('healthy'),
       webUrl: 'http://localhost:3000',
+      cspNonce: 'dashboard-test-nonce',
     });
 
     expect(html).toContain('<!doctype html>');
@@ -45,12 +46,14 @@ describe('API dashboard renderer', () => {
     expect(html).toContain(`/api/docs/openapi.yaml`);
     expect(html).toContain(`<code>/health</code>`);
     expect(html).toContain(`href="http://localhost:3000"`);
+    expect(html).toContain('<style nonce="dashboard-test-nonce">');
   });
 
   it('renders a degraded state and escapes configurable web origins', () => {
     const html = renderApiDashboard({
       health: createHealth('degraded'),
       webUrl: 'https://example.com/?value=<unsafe>',
+      cspNonce: 'dashboard-test-nonce',
     });
 
     expect(html).toContain('Service degraded');

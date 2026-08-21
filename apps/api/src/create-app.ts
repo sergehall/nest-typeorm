@@ -8,24 +8,28 @@ import { setupSwagger } from './api-documentation/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { isHardenedRuntime } from './common/environment/runtime-environment';
+import { NextFunction, Request, Response } from 'express';
+import {
+  createContentSecurityPolicy,
+  ensureResponseCspNonce,
+} from './common/security/content-security-policy';
 
 function setupSecurityHeaders(app: NestExpressApplication): void {
   const hardenedRuntime = isHardenedRuntime();
 
+  app.use((_request: Request, response: Response, next: NextFunction) => {
+    const nonce = ensureResponseCspNonce(response);
+    response.setHeader(
+      'Content-Security-Policy',
+      createContentSecurityPolicy(nonce, hardenedRuntime),
+    );
+    next();
+  });
+
   app.use(
     helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          connectSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:'],
-          scriptSrc: ["'self'", "'unsafe-inline'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          // Local development serves plain HTTP. Asking the browser to upgrade
-          // relative links here would turn them into unsupported HTTPS requests.
-          upgradeInsecureRequests: hardenedRuntime ? [] : null,
-        },
-      },
+      contentSecurityPolicy: false,
+      frameguard: { action: 'deny' },
       strictTransportSecurity: hardenedRuntime
         ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
         : false,

@@ -20,6 +20,10 @@ import {
   SwaggerLoginAttemptLimiter,
 } from './access/swagger-access.service';
 import { renderSwaggerLoginPage, renderSwaggerLogoutPage } from './access/swagger-access.renderer';
+import {
+  addCspNonceToStyleElements,
+  ensureResponseCspNonce,
+} from '../common/security/content-security-policy';
 
 const logger = new Logger('Swagger');
 const httpMethods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] as const;
@@ -109,12 +113,13 @@ function registerSwaggerAccessRoutes(
     status = 200,
   ): void => {
     const csrfToken = accessService.createCsrfToken();
+    const cspNonce = ensureResponseCspNonce(response);
     accessService.setCsrfCookie(response, csrfToken);
     setPrivateResponseHeaders(response);
     response
       .status(status)
       .type('html')
-      .send(renderSwaggerLoginPage({ csrfToken, returnTo, error }));
+      .send(renderSwaggerLoginPage({ csrfToken, returnTo, cspNonce, error }));
   };
 
   expressApp.get(SWAGGER_LOGIN_PATH, (request, response) => {
@@ -169,9 +174,10 @@ function registerSwaggerAccessRoutes(
 
   expressApp.get(SWAGGER_LOGOUT_PATH, (_request, response) => {
     const csrfToken = accessService.createCsrfToken();
+    const cspNonce = ensureResponseCspNonce(response);
     accessService.setCsrfCookie(response, csrfToken);
     setPrivateResponseHeaders(response);
-    response.type('html').send(renderSwaggerLogoutPage(csrfToken));
+    response.type('html').send(renderSwaggerLogoutPage(csrfToken, cspNonce));
   });
 
   expressApp.post(SWAGGER_LOGOUT_PATH, loginBodyParser, (request, response) => {
@@ -190,6 +196,33 @@ function registerSwaggerAccessRoutes(
   expressApp.use(SWAGGER_JSON_PATH, createAccessMiddleware(accessService, 'viewer', true));
   expressApp.use(SWAGGER_YAML_PATH, createAccessMiddleware(accessService, 'viewer', true));
   expressApp.use(`/${SWAGGER_PATH}`, createAccessMiddleware(accessService, 'viewer'));
+}
+
+function registerSwaggerUiCspMiddleware(expressApp: Express): void {
+  const swaggerUiPaths = new Set([`/${SWAGGER_PATH}`, `/${SWAGGER_ADMIN_PATH}`]);
+
+  expressApp.use((request, response, next) => {
+    if (!swaggerUiPaths.has(request.path)) {
+      next();
+      return;
+    }
+
+    const originalSend = response.send.bind(response);
+    response.send = ((body: unknown) => {
+      if (typeof body !== 'string' || !body.includes('<div id="swagger-ui"></div>')) {
+        return originalSend(body);
+      }
+
+      const nonce = ensureResponseCspNonce(response);
+      const html = addCspNonceToStyleElements(body, nonce).replace(
+        'style="position:absolute;width:0;height:0"',
+        'class="swagger-ui-symbols"',
+      );
+      return originalSend(html);
+    }) as Response['send'];
+
+    next();
+  });
 }
 
 export function createSwaggerDocument(app: INestApplication): OpenAPIObject {
@@ -289,6 +322,7 @@ export function setupSwagger(
 
   const expressApp = app.getHttpAdapter().getInstance() as Express;
   registerSwaggerAccessRoutes(expressApp, new SwaggerAccessService(accessConfig, environment));
+  registerSwaggerUiCspMiddleware(expressApp);
 
   const document = createSwaggerDocument(app);
   const report = assertSwaggerCoverage(document);
@@ -303,6 +337,7 @@ export function setupSwagger(
   SwaggerModule.setup(SWAGGER_PATH, app, document, {
     customSiteTitle: 'NestLab HTTP API — Viewer',
     explorer: true,
+    customCss: '.swagger-ui-symbols { position: absolute; width: 0; height: 0; }',
     jsonDocumentUrl: SWAGGER_JSON_PATH,
     yamlDocumentUrl: SWAGGER_YAML_PATH,
     swaggerOptions: {
@@ -315,6 +350,7 @@ export function setupSwagger(
   SwaggerModule.setup(SWAGGER_ADMIN_PATH, app, document, {
     customSiteTitle: 'NestLab HTTP API — Admin',
     explorer: true,
+    customCss: '.swagger-ui-symbols { position: absolute; width: 0; height: 0; }',
     jsonDocumentUrl: SWAGGER_JSON_PATH,
     yamlDocumentUrl: SWAGGER_YAML_PATH,
     swaggerOptions: {

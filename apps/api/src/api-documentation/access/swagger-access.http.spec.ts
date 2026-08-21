@@ -71,6 +71,7 @@ describe('Swagger access HTTP boundary', () => {
 
   async function login(username: string, password: string): Promise<string[]> {
     const loginPage = await request(app.getHttpServer()).get('/api/docs/login').expect(200);
+    expect(loginPage.text).toMatch(/<style nonce="[A-Za-z0-9_-]+">/);
     const csrfToken = csrfTokenFromHtml(loginPage.text);
     const csrfCookies = cookiePairs(loginPage);
     const loginResponse = await request(app.getHttpServer())
@@ -103,6 +104,8 @@ describe('Swagger access HTTP boundary', () => {
       .set('Cookie', viewerCookies)
       .expect(200);
     expect(viewerUi.text).toContain('<title>NestLab HTTP API — Viewer</title>');
+    expect(viewerUi.text).toMatch(/<style nonce="[A-Za-z0-9_-]+">/);
+    expect(viewerUi.text).not.toContain('style="position:absolute;width:0;height:0"');
 
     const contract = await request(app.getHttpServer())
       .get('/api/docs/openapi.json')

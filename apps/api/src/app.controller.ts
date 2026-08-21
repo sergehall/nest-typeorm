@@ -10,6 +10,7 @@ import { ApiControllerDocumentation } from './api-documentation/decorators/api-c
 import { Response } from 'express';
 import { renderApiDashboard } from './api-dashboard/api-dashboard.renderer';
 import { HealthResponseDto, LivenessResponseDto } from './health/dto/health-response.dto';
+import { ensureResponseCspNonce } from './common/security/content-security-policy';
 
 @ApiTags('App')
 @ApiControllerDocumentation()
@@ -26,8 +27,9 @@ export class AppController {
   async getApiDashboard(@Res() response: Response): Promise<void> {
     const health = await this.appService.getHealth();
     const webUrl = process.env.WEB_ORIGIN?.split(',')[0]?.trim() || 'http://localhost:3000';
+    const cspNonce = ensureResponseCspNonce(response);
 
-    response.type('html').send(renderApiDashboard({ health, webUrl }));
+    response.type('html').send(renderApiDashboard({ health, webUrl, cspNonce }));
   }
 
   @Get('health')
