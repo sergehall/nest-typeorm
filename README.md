@@ -8,8 +8,14 @@ payments, API documentation, testing, and production hardening.
 The project runs locally and does not require a public web domain. The screenshots below show the
 production-style interface available from the local development environment.
 
-**[Open the GitHub Pages showcase](https://sergehall.github.io/nest-typeorm/)** ·
-**[Browse the source](https://github.com/sergehall/nest-typeorm)**
+<p>
+  <a href="https://sergehall.github.io/nest-typeorm/#tour">
+    <img
+      alt="Open the NestLab screenshot slideshow"
+      src="https://img.shields.io/badge/Open%20slideshow-NestLab%20screens-ff6838?style=for-the-badge&logo=github&logoColor=white"
+    />
+  </a>
+</p>
 
 ## Product tour
 
