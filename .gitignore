@@ -5,6 +5,17 @@
 **/node_modules
 **/next-env.d.ts
 .yarn/install-state.gz
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/sdks/
+
+# Local tooling
+**/.vercel/
+**/.turbo/
+**/.eslintcache
+**/playwright-report/
+**/test-results/
 
 # local environment variables
 **/.env
