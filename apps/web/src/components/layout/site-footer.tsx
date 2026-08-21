@@ -15,6 +15,7 @@ export function SiteFooter() {
         </div>
         <div className="site-footer__links" aria-label="Project links">
           <Link href="/features">Capabilities</Link>
+          <Link href="/api">HTTP API</Link>
           <Link href="/contact">Contact</Link>
           <a href={siteConfig.repositoryUrl} target="_blank" rel="noopener noreferrer">
             GitHub ↗
