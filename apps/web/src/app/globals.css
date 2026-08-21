@@ -172,6 +172,17 @@ button {
   color: var(--ink);
 }
 
+.site-header__nav a[aria-current='page'] {
+  background: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--orange);
+  color: var(--white);
+}
+
+.site-header__nav a[aria-current='page']:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
 .hero-section {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
