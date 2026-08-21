@@ -18,6 +18,8 @@ import { UuidErrorResolver } from '../../../common/helpers/uuid-error-resolver';
 import { PostViewModel } from '../views/post.view-model';
 import { LikeStatusPostsRepo } from './like-status-posts.repo';
 import { ImagesPostsOriginalMetadataEntity } from '../entities/images-post-original-metadata.entity';
+import { ImagesPostsMiddleMetadataEntity } from '../entities/images-posts-middle-metadata.entity';
+import { ImagesPostsSmallMetadataEntity } from '../entities/images-posts-small-metadata.entity';
 
 export class PostsRepo {
   constructor(
@@ -157,8 +159,6 @@ export class PostsRepo {
 
       const posts: PostsEntity[] = await queryBuilder.skip(offset).take(limit).getMany();
 
-      console.log(posts);
-
       // Retrieve posts with information about likes
       const postsWithLikes = await this.likeStatusPostsRepo.postsLikesAggregation(
         posts,
@@ -226,18 +226,40 @@ export class PostsRepo {
   async deletePostByPostId(postId: string): Promise<boolean> {
     return this.postsRepository.manager.transaction(async (manager) => {
       try {
-        // Delete files associated with the post
-        await manager.delete(ImagesPostsOriginalMetadataEntity, {
-          post: { id: postId },
-        });
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from(ImagesPostsOriginalMetadataEntity)
+          .where('"postId" = :postId', { postId })
+          .execute();
 
-        // Delete likes posts associated with the post
-        await manager.delete(LikeStatusPostsEntity, { post: { id: postId } });
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from(ImagesPostsMiddleMetadataEntity)
+          .where('"postId" = :postId', { postId })
+          .execute();
 
-        // Delete likes comments associated with the post
-        await manager.delete(LikeStatusCommentsEntity, {
-          post: { id: postId },
-        });
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from(ImagesPostsSmallMetadataEntity)
+          .where('"postId" = :postId', { postId })
+          .execute();
+
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from(LikeStatusPostsEntity)
+          .where('"postId" = :postId', { postId })
+          .execute();
+
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from(LikeStatusCommentsEntity)
+          .where('"postId" = :postId', { postId })
+          .execute();
 
         // Delete comments associated with the post
         await manager

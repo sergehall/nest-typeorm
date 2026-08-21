@@ -1,226 +1,160 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import * as crypto from 'crypto';
 import { isUUID } from 'class-validator';
+import { Server } from 'node:http';
+import request from 'supertest';
+import { DataSource } from 'typeorm';
 import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
-import { UsersEntity } from '../src/features/users/entities/users.entity';
-import { getTestAppOptions } from './utilities/get-test-app.options';
+import { getTestAppOptions, resetTestDatabase } from './utilities/get-test-app.options';
+import {
+  getResponseBody,
+  getValidationErrorFields,
+  parsePaginator,
+  parseTestUser,
+  parseTestUserRecord,
+} from './utilities/http-response.utils';
 import { MockUserCredentials } from './utilities/mock-test-data';
+import TestUtils from './utilities/test.utils';
 
-const generateRandomString = (size: number): string => {
-  return crypto.randomBytes(size).toString('base64').slice(0, size);
-};
+const USER_INPUT = {
+  login: 'newUser',
+  password: 'password123',
+  email: 'new-user@example.com',
+} as const satisfies CreateUserDto;
 
-describe('Sa Controller (e2e)', () => {
-  let app: INestApplication;
-  let server: any;
-  let mockUserCredentials: { login: string; password: string };
-
-  // beforeAll(async () => {
-  //   const testAppOptions = await getTestAppOptions();
-  //   app = testAppOptions.app;
-  //   server = testAppOptions.server;
-  // });
+describe('Super Admin API (e2e)', () => {
+  let app: INestApplication | undefined;
+  let dataSource: DataSource;
+  let server: Server;
+  let testUtils: TestUtils;
 
   beforeAll(async () => {
-    const testAppOptions = await getTestAppOptions();
-    app = testAppOptions.app;
-    server = testAppOptions.server;
-    mockUserCredentials = MockUserCredentials;
-  }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
-
-  afterAll(async () => {
-    await app.close();
+    const testContext = await getTestAppOptions();
+    app = testContext.app;
+    dataSource = testContext.dataSource;
+    server = testContext.server;
+    testUtils = new TestUtils(server);
   });
 
-  describe('Create User by SA => POST => /sa/users', () => {
-    const saUrl = '/sa/users';
-    it('(POST) /sa/users => route should be defined ', async () => {
-      const response = await request(server).post(saUrl);
-      expect(response).toBeDefined();
+  beforeEach(async () => {
+    await resetTestDatabase(dataSource);
+  });
+
+  afterAll(async () => {
+    await app?.close();
+  });
+
+  it('requires valid Basic authentication', async () => {
+    const missingAuthResponse = await request(server)
+      .post('/sa/users')
+      .send(USER_INPUT)
+      .expect(401);
+    expect(getValidationErrorFields(getResponseBody(missingAuthResponse))).toContain(
+      'headers.authorization',
+    );
+
+    const invalidAuthResponse = await request(server)
+      .post('/sa/users')
+      .auth('invalid', 'credentials')
+      .send(USER_INPUT)
+      .expect(401);
+    expect(getValidationErrorFields(getResponseBody(invalidAuthResponse))).toContain(
+      'headers.authorization',
+    );
+  });
+
+  it('returns field-level errors for invalid user input', async () => {
+    const emptyResponse = await request(server)
+      .post('/sa/users')
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .send({})
+      .expect(400);
+
+    expect(getValidationErrorFields(getResponseBody(emptyResponse))).toEqual(
+      expect.arrayContaining(['login', 'email', 'password']),
+    );
+
+    const boundaryResponse = await request(server)
+      .post('/sa/users')
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .send({
+        login: 'login-is-too-long',
+        email: 'not-an-email',
+        password: 'password-is-more-than-twenty-characters',
+      })
+      .expect(400);
+
+    expect(getValidationErrorFields(getResponseBody(boundaryResponse))).toEqual(
+      expect.arrayContaining(['login', 'email', 'password']),
+    );
+  });
+
+  it('supports create, query, retrieve, duplicate-check, and delete behavior', async () => {
+    const createdUser = await testUtils.createUser(USER_INPUT);
+
+    expect(createdUser).toMatchObject({
+      login: USER_INPUT.login.toLowerCase(),
+      email: USER_INPUT.email.toLowerCase(),
     });
+    expect(isUUID(createdUser.id)).toBe(true);
+    expect(Date.parse(createdUser.createdAt)).not.toBeNaN();
 
-    it('should return 401 status code because SA invalid', async () => {
-      const responseWithoutAuth = await request(server).post(saUrl);
-      expect(responseWithoutAuth.status).toBe(401);
+    const usersResponse = await request(server)
+      .get('/sa/users?searchLoginTerm=new&pageNumber=1&pageSize=5')
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .expect(200);
+    const users = parsePaginator(getResponseBody(usersResponse), parseTestUser);
 
-      const responseWithInvalidAuth = await request(server).post(saUrl).auth('invalid', 'data');
-      expect(responseWithInvalidAuth.status).toBe(401);
-    });
+    expect(users).toMatchObject({ page: 1, pageSize: 5, totalCount: 1 });
+    expect(users.items).toEqual([createdUser]);
 
-    it('should return 400 because invalid input data', async () => {
-      const errors = {
-        errorsMessages: expect.arrayContaining([
-          {
-            message: expect.any(String),
-            field: 'login',
-          },
-          {
-            message: expect.any(String),
-            field: 'email',
-          },
-          {
-            message: expect.any(String),
-            field: 'password',
-          },
-        ]),
-      };
+    const retrievedUserResponse = await request(server).get(`/users/${createdUser.id}`).expect(200);
+    expect(parseTestUserRecord(getResponseBody(retrievedUserResponse))).toMatchObject(createdUser);
 
-      const firstResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send({});
+    const duplicateResponse = await request(server)
+      .post('/sa/users')
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .send(USER_INPUT)
+      .expect(400);
+    expect(getValidationErrorFields(getResponseBody(duplicateResponse))).toEqual(
+      expect.arrayContaining(['login', 'email']),
+    );
 
-      expect(firstResponse.status).toBe(400);
-      expect(firstResponse.body).toStrictEqual(errors);
+    await request(server)
+      .delete(`/sa/users/${createdUser.id}`)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .expect(204);
+    await request(server).get(`/users/${createdUser.id}`).expect(404);
+  });
 
-      const secondCreateUserDto: CreateUserDto = {
-        login: '',
-        email: '',
-        password: '',
-      };
+  it('blocks login while a user is banned and restores it after unbanning', async () => {
+    const createdUser = await testUtils.createUser(USER_INPUT);
 
-      const secondResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(secondCreateUserDto);
+    await request(server)
+      .put(`/sa/users/${createdUser.id}/ban`)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .send({
+        isBanned: true,
+        banReason: 'Repeated violation of platform rules.',
+      })
+      .expect(204);
 
-      expect(secondResponse.status).toBe(400);
-      expect(secondResponse.body).toStrictEqual(errors);
-      const thirdCreateUserDto: CreateUserDto = {
-        login: generateRandomString(11),
-        email: generateRandomString(50),
-        password: generateRandomString(21),
-      };
+    await request(server)
+      .post('/auth/login')
+      .send({ loginOrEmail: createdUser.login, password: USER_INPUT.password })
+      .expect(401);
 
-      const thirdResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(thirdCreateUserDto);
+    await request(server)
+      .put(`/sa/users/${createdUser.id}/ban`)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .send({
+        isBanned: false,
+        banReason: 'The user has completed the account review.',
+      })
+      .expect(204);
 
-      expect(thirdResponse.status).toBe(400);
-      expect(thirdResponse.body).toEqual(errors);
-    });
-
-    it('should crate new user with 201 status code', async () => {
-      const usersCountBeforeCreate = await request(server)
-        .get(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password);
-
-      expect(usersCountBeforeCreate.status).toBe(200);
-      expect(usersCountBeforeCreate.body.items).toHaveLength(0);
-
-      const inputData: CreateUserDto = {
-        login: 'login',
-        password: 'password',
-        email: 'anyEmail@myMail.com',
-      };
-
-      const createUserResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(inputData);
-
-      expect(createUserResponse.status).toBe(201);
-      const user = createUserResponse.body;
-      expect(user).toStrictEqual({
-        id: expect.any(String),
-        login: inputData.login.toLowerCase(),
-        email: inputData.email.toLowerCase(),
-        createdAt: expect.any(String),
-        banInfo: {
-          isBanned: false,
-          banDate: null,
-          banReason: null,
-        },
-      });
-      expect(isUUID(user.id)).toBeTruthy();
-
-      const usersCountAfterCreate = await request(server)
-        .get(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password);
-
-      expect(usersCountAfterCreate.status).toBe(200);
-      expect(usersCountAfterCreate.body.items).toHaveLength(1);
-
-      expect.setState({ user: { ...user, password: inputData.password } });
-    });
-
-    it('should check the creation of a user with an existing login and email', async () => {
-      // First, create a user with a specific login and email
-      const existingUser: CreateUserDto = {
-        login: 'user',
-        email: 'user@example.com',
-        password: 'password123',
-      };
-
-      const createUserResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(existingUser);
-
-      expect(createUserResponse.status).toBe(201);
-
-      // Now, attempt to create another user with the same login and email
-      const duplicateUser: CreateUserDto = {
-        login: 'user', // Same login as above
-        email: 'user@example.com', // Same email as above
-        password: 'password123',
-      };
-
-      const duplicateResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(duplicateUser);
-
-      // Check that the response status is 400 (Bad Request) due to duplicate login/email
-      expect(duplicateResponse.status).toBe(400);
-
-      // Check error messages for login and email constraints
-      expect(duplicateResponse.body).toEqual({
-        errorsMessages: [
-          {
-            message: `{"LoginEmailExistsValidator":"User with '${duplicateUser.login}' already exists."}`,
-            field: 'login',
-          },
-          {
-            message: `{"LoginEmailExistsValidator":"User with '${duplicateUser.email}' already exists."}`,
-            field: 'email',
-          },
-        ],
-      });
-    });
-
-    it('should retrieve a created user by ID', async () => {
-      const createUserDto: CreateUserDto = {
-        login: 'createUser',
-        email: 'createUser@example.com',
-        password: 'password123',
-      };
-
-      // Create a new user
-      const createUserResponse = await request(server)
-        .post(saUrl)
-        .auth(mockUserCredentials.login, mockUserCredentials.password)
-        .send(createUserDto);
-
-      expect(createUserResponse.status).toBe(201);
-
-      const createdUser = createUserResponse.body;
-
-      // Retrieve the user by their ID
-      const retrieveUserResponse = await request(server).get(`/users/${createdUser.id}`);
-      expect(retrieveUserResponse.status).toBe(200);
-      const retrievedUser: UsersEntity = retrieveUserResponse.body;
-
-      // Validate the retrieved user's data
-      expect(retrievedUser.userId).toBe(createdUser.id);
-      expect(retrievedUser.login).toBe(createdUser.login.toLowerCase());
-      expect(retrievedUser.email).toBe(createdUser.email.toLowerCase());
-      expect(retrievedUser.createdAt).toBe(createdUser.createdAt);
-      expect(retrievedUser.isBanned).toEqual(createdUser.banInfo.isBanned);
-      expect(retrievedUser.banDate).toEqual(createdUser.banInfo.banDate);
-      expect(retrievedUser.banReason).toEqual(createdUser.banInfo.banReason);
-    });
+    await request(server)
+      .post('/auth/login')
+      .send({ loginOrEmail: createdUser.login, password: USER_INPUT.password })
+      .expect(200);
   });
 });

@@ -1,95 +1,150 @@
 import { INestApplication } from '@nestjs/common';
+import { Server } from 'node:http';
 import request from 'supertest';
-import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
-import { getTestAppOptions } from './utilities/get-test-app.options';
+import { DataSource } from 'typeorm';
+import { LikeStatusEnums } from '../src/db/enums/like-status.enums';
+import { CreateUserDto } from '../src/features/users/dto/create-user.dto';
+import { getTestAppOptions, resetTestDatabase } from './utilities/get-test-app.options';
+import {
+  getResponseBody,
+  getValidationErrorFields,
+  parseTestComment,
+} from './utilities/http-response.utils';
+import { MockCommentData, MockTestUser } from './utilities/mock-test-data';
 import TestUtils from './utilities/test.utils';
-import { BloggerBlogsWithImagesSubscribersViewModel } from '../src/features/blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
-import { PostWithLikesImagesInfoViewModel } from '../src/features/posts/views/post-with-likes-images-info.view-model';
-import { MockCommentData } from './utilities/mock-test-data';
 
-describe('Comments Controller (e2e)', () => {
-  let app: INestApplication;
-  let server: any;
-  let _createdValidUser: SaUserViewModel;
-  let _confirmedUser: SaUserViewModel;
-  let token: string;
-  let blog: BloggerBlogsWithImagesSubscribersViewModel;
-  let post: PostWithLikesImagesInfoViewModel;
-  let commentData: { content: string };
+const OTHER_COMMENTER = {
+  login: 'commenter',
+  email: 'commenter@example.com',
+  password: '123456789',
+} as const satisfies CreateUserDto;
+
+describe('Comments API (e2e)', () => {
+  let app: INestApplication | undefined;
+  let dataSource: DataSource;
+  let server: Server;
+  let testUtils: TestUtils;
 
   beforeAll(async () => {
-    const testAppOptions = await getTestAppOptions();
-    app = testAppOptions.app;
-    server = testAppOptions.server;
-    const testUtils = new TestUtils();
-    _createdValidUser = await testUtils.createTestUser(server);
-    _confirmedUser = await testUtils.createTestConfirmedUser(server);
-    token = await testUtils.getAccessToken(server);
-    blog = await testUtils.createBlog(server, token);
-    post = await testUtils.createPost(blog.id, server, token);
-    commentData = MockCommentData;
-  }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
+    const testContext = await getTestAppOptions();
+    app = testContext.app;
+    dataSource = testContext.dataSource;
+    server = testContext.server;
+    testUtils = new TestUtils(server);
+  });
+
+  beforeEach(async () => {
+    await resetTestDatabase(dataSource);
+  });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
-  describe('Comments Endpoint (POST) /comments', () => {
-    it('should be defined', async () => {
-      const commentsUrl = '/comments';
-      const response = await request(server).post(commentsUrl);
-      expect(response).toBeDefined();
-    });
-  });
+  const createCommentPrerequisites = async () => {
+    await testUtils.createTestUser();
+    const token = await testUtils.getAccessToken(MockTestUser.login, MockTestUser.password);
+    const blog = await testUtils.createBlog(token);
+    const post = await testUtils.createPost(blog.id, token);
+    return { blog, post, token };
+  };
 
-  it('should create a new comment', async () => {
-    const createCommentUrl = `/posts/${post.id}/comments`;
+  it('enforces authentication and validates comment content', async () => {
+    const { post, token } = await createCommentPrerequisites();
+    const url = `/posts/${post.id}/comments`;
+
+    await request(server).post(url).send(MockCommentData).expect(401);
 
     const response = await request(server)
-      .post(createCommentUrl)
-      .send(commentData)
-      .set('Authorization', `Bearer ${token}`);
+      .post(url)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: 'too short' })
+      .expect(400);
 
-    expect(response.status).toEqual(201);
-    // Assert the response body contains the created blog data
-    expect(response.body).toEqual(
+    expect(getValidationErrorFields(getResponseBody(response))).toContain('content');
+  });
+
+  it('supports create, read, update, like, and delete behavior', async () => {
+    const { post, token } = await createCommentPrerequisites();
+    const comment = await testUtils.createComment(post.id, token);
+
+    expect(comment).toMatchObject(MockCommentData);
+    expect(Date.parse(comment.createdAt)).not.toBeNaN();
+
+    const publicCommentResponse = await request(server).get(`/comments/${comment.id}`).expect(200);
+    expect(parseTestComment(getResponseBody(publicCommentResponse))).toEqual(comment);
+    expect(getResponseBody(publicCommentResponse)).toEqual(
       expect.objectContaining({
-        id: expect.any(String),
-        content: commentData.content,
-        createdAt: expect.any(String),
-        commentatorInfo: {
+        commentatorInfo: expect.objectContaining({
           userId: expect.any(String),
-          userLogin: expect.any(String),
-        },
+          userLogin: MockTestUser.login.toLowerCase(),
+        }),
         likesInfo: {
           likesCount: 0,
           dislikesCount: 0,
-          myStatus: 'None',
+          myStatus: LikeStatusEnums.NONE,
         },
       }),
     );
+
+    const updatedContent = 'Updated comment content with enough characters.';
+    await request(server)
+      .put(`/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: updatedContent })
+      .expect(204);
+
+    const updatedCommentResponse = await request(server).get(`/comments/${comment.id}`).expect(200);
+    expect(parseTestComment(getResponseBody(updatedCommentResponse)).content).toBe(updatedContent);
+
+    await request(server)
+      .put(`/comments/${comment.id}/like-status`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ likeStatus: LikeStatusEnums.LIKE })
+      .expect(204);
+
+    const likedCommentResponse = await request(server)
+      .get(`/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+    expect(getResponseBody(likedCommentResponse)).toEqual(
+      expect.objectContaining({
+        likesInfo: {
+          likesCount: 1,
+          dislikesCount: 0,
+          myStatus: LikeStatusEnums.LIKE,
+        },
+      }),
+    );
+
+    await request(server)
+      .delete(`/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204);
+    await request(server).get(`/comments/${comment.id}`).expect(404);
   });
 
-  it('should return 401 if user is not authenticated', async () => {
-    const createCommentUrl = `/posts/${post.id}/comments`;
-    const response = await request(server).post(createCommentUrl).send(commentData);
+  it('prevents another user from editing or deleting a comment', async () => {
+    const { post, token } = await createCommentPrerequisites();
+    const comment = await testUtils.createComment(post.id, token);
 
-    expect(response.status).toEqual(401);
-  });
+    await testUtils.createUser(OTHER_COMMENTER);
+    const otherToken = await testUtils.getAccessToken(
+      OTHER_COMMENTER.login,
+      OTHER_COMMENTER.password,
+    );
 
-  describe('Comments Endpoint (GET) /comments/:id', () => {
-    // Test cases for GET /comments/:id endpoint
-  });
+    await request(server)
+      .put(`/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .send({ content: 'Another user must not update this comment.' })
+      .expect(403);
 
-  describe('Comments Endpoint (PUT) /comments/:commentId', () => {
-    // Test cases for PUT /comments/:commentId endpoint
-  });
+    await request(server)
+      .delete(`/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(403);
 
-  describe('Comments Endpoint (DELETE) /comments/:commentId', () => {
-    // Test cases for DELETE /comments/:commentId endpoint
-  });
-
-  describe('Comments Endpoint (PUT) /comments/:commentId/like-status', () => {
-    // Test cases for PUT /comments/:commentId/like-status endpoint
+    await request(server).get(`/comments/${comment.id}`).expect(200);
   });
 });
