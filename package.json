@@ -33,6 +33,7 @@
     "test": "yarn workspace @nest-typeorm/api test",
     "test:e2e": "yarn workspace @nest-typeorm/api test:e2e",
     "test:cov": "yarn workspace @nest-typeorm/api test:cov",
+    "swagger:credentials": "yarn workspace @nest-typeorm/api swagger:credentials",
     "language:check": "node ./scripts/check-english-language.mjs",
     "format": "prettier . --write",
     "format:api": "yarn workspace @nest-typeorm/api format",

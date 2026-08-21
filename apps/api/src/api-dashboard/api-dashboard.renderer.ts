@@ -274,7 +274,7 @@ export function renderApiDashboard({ health, webUrl }: ApiDashboardOptions): str
           <span>NestLab API</span>
         </a>
         <nav class="topbar__links" aria-label="API navigation">
-          <a href="/api/docs">Documentation</a>
+          <a href="/api/docs/login">Documentation</a>
           <a href="${escapeHtml(webUrl)}">Web application ↗</a>
         </nav>
       </div>
@@ -344,11 +344,11 @@ export function renderApiDashboard({ health, webUrl }: ApiDashboardOptions): str
           </div>
 
           <div class="doc-grid">
-            <a class="doc-card doc-card--primary" href="/api/docs">
+            <a class="doc-card doc-card--primary" href="/api/docs/login">
               <span class="doc-card__arrow">↗</span>
-              <span class="doc-card__type">Interactive</span>
+              <span class="doc-card__type">Protected access</span>
               <h3>Swagger UI</h3>
-              <p>Browse every operation, schema, security requirement, and response.</p>
+              <p>Viewer opens the read-only contract. Admin enters the interactive workspace.</p>
             </a>
             <a class="doc-card" href="/api/docs/openapi.json">
               <span class="doc-card__arrow">↗</span>

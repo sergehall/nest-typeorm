@@ -26,6 +26,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_ENV=test jest --runInBand --detectOpenHandles --config ./test/jest-e2e.json",
+    "swagger:credentials": "node ./scripts/generate-swagger-credentials.mjs",
     "generate-migrations": "node ./src/db/tools/generate-migration.js",
     "apply-migrations": "typeorm migration:run -d ./dist/db/data-source.js",
     "revert-last-migrations": "typeorm migration:revert -d ./dist/db/data-source.js"
@@ -49,6 +50,7 @@
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.1",
     "@nestjs/websockets": "^11.1.28",
+    "argon2": "^0.45.1",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",

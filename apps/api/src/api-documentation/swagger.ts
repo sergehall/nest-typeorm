@@ -1,20 +1,30 @@
-import { timingSafeEqual } from 'node:crypto';
 import { INestApplication, Logger } from '@nestjs/common';
 import { OpenAPIObject, OperationObject, SwaggerModule } from '@nestjs/swagger';
-import { NextFunction, Request, Response } from 'express';
+import { Express, NextFunction, Request, Response, urlencoded } from 'express';
 import { OPTIONAL_AUTH_EXTENSION } from './decorators/api-controller-documentation.decorator';
 import {
   createSwaggerConfig,
+  SWAGGER_ADMIN_PATH,
   SWAGGER_JSON_PATH,
+  SWAGGER_LOGIN_PATH,
+  SWAGGER_LOGOUT_PATH,
   SWAGGER_PATH,
+  SWAGGER_SESSION_PATH,
   SWAGGER_YAML_PATH,
 } from './swagger.config';
-import { isHardenedRuntime, isLocalRuntime } from '../common/environment/runtime-environment';
+import { isLocalRuntime } from '../common/environment/runtime-environment';
+import {
+  resolveSwaggerAccessConfig,
+  SwaggerAccessRole,
+  SwaggerAccessService,
+  SwaggerLoginAttemptLimiter,
+} from './access/swagger-access.service';
+import { renderSwaggerLoginPage, renderSwaggerLogoutPage } from './access/swagger-access.renderer';
 
 const logger = new Logger('Swagger');
 const httpMethods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] as const;
 
-type SwaggerEnvironment = NodeJS.ProcessEnv;
+export type SwaggerEnvironment = NodeJS.ProcessEnv;
 type OptionalAuthOperation = OperationObject & { 'x-optional-auth'?: boolean };
 
 export type SwaggerCoverageReport = {
@@ -24,48 +34,162 @@ export type SwaggerCoverageReport = {
   readonly missingSuccessResponses: readonly string[];
 };
 
-function safeEqual(actual: string, expected: string): boolean {
-  const actualBuffer = Buffer.from(actual);
-  const expectedBuffer = Buffer.from(expected);
-
-  return (
-    actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer)
-  );
+export function isSwaggerEnabled(environment: SwaggerEnvironment = process.env): boolean {
+  const enabledForRuntime = isLocalRuntime(environment) || environment.SWAGGER_ENABLED === 'true';
+  return enabledForRuntime && Boolean(resolveSwaggerAccessConfig(environment));
 }
 
-function createSwaggerBasicAuthMiddleware(environment: SwaggerEnvironment) {
-  const expectedUsername = environment.SWAGGER_USERNAME ?? '';
-  const expectedPassword = environment.SWAGGER_PASSWORD ?? '';
+const allowedReturnPaths = new Set([
+  `/${SWAGGER_PATH}`,
+  `/${SWAGGER_ADMIN_PATH}`,
+  SWAGGER_JSON_PATH,
+  SWAGGER_YAML_PATH,
+]);
 
+function sanitizeReturnPath(value: unknown): string {
+  return typeof value === 'string' && allowedReturnPaths.has(value) ? value : `/${SWAGGER_PATH}`;
+}
+
+function readFormValue(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function setPrivateResponseHeaders(response: Response): void {
+  response.setHeader('Cache-Control', 'no-store, max-age=0');
+  response.setHeader('Pragma', 'no-cache');
+  response.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+}
+
+function createLoginRedirect(returnTo: string): string {
+  return `${SWAGGER_LOGIN_PATH}?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
+function requestPrefersHtml(request: Request): boolean {
+  return request.headers.accept?.includes('text/html') === true;
+}
+
+function createAccessMiddleware(
+  accessService: SwaggerAccessService,
+  role: SwaggerAccessRole,
+  machineReadable = false,
+) {
   return (request: Request, response: Response, next: NextFunction): void => {
-    const authorization = request.headers.authorization;
+    setPrivateResponseHeaders(response);
+    const authenticatedRole = accessService.readRequestSession(request, role);
 
-    if (authorization?.startsWith('Basic ')) {
-      const decoded = Buffer.from(authorization.slice('Basic '.length), 'base64').toString('utf8');
-      const separatorIndex = decoded.indexOf(':');
-      const username = separatorIndex >= 0 ? decoded.slice(0, separatorIndex) : '';
-      const password = separatorIndex >= 0 ? decoded.slice(separatorIndex + 1) : '';
-
-      if (safeEqual(username, expectedUsername) && safeEqual(password, expectedPassword)) {
-        next();
-        return;
-      }
+    if (authenticatedRole) {
+      next();
+      return;
     }
 
-    response.setHeader('WWW-Authenticate', 'Basic realm="NestLab API documentation"');
-    response.status(401).send('Swagger authentication is required.');
+    if (!machineReadable || requestPrefersHtml(request)) {
+      response.redirect(303, createLoginRedirect(request.originalUrl));
+      return;
+    }
+
+    response.status(401).json({
+      statusCode: 401,
+      message: 'Documentation authentication is required.',
+      path: request.path,
+    });
   };
 }
 
-export function isSwaggerEnabled(environment: SwaggerEnvironment = process.env): boolean {
-  if (isLocalRuntime(environment)) {
-    return true;
-  }
+function registerSwaggerAccessRoutes(
+  expressApp: Express,
+  accessService: SwaggerAccessService,
+): void {
+  const attemptLimiter = new SwaggerLoginAttemptLimiter();
+  const loginBodyParser = urlencoded({ extended: false, limit: '4kb', parameterLimit: 8 });
 
-  const hasUsername = Boolean(environment.SWAGGER_USERNAME);
-  const hasPassword = Boolean(environment.SWAGGER_PASSWORD);
+  const renderLogin = (
+    response: Response,
+    returnTo: string,
+    error?: string,
+    status = 200,
+  ): void => {
+    const csrfToken = accessService.createCsrfToken();
+    accessService.setCsrfCookie(response, csrfToken);
+    setPrivateResponseHeaders(response);
+    response
+      .status(status)
+      .type('html')
+      .send(renderSwaggerLoginPage({ csrfToken, returnTo, error }));
+  };
 
-  return environment.SWAGGER_ENABLED === 'true' && hasUsername === hasPassword;
+  expressApp.get(SWAGGER_LOGIN_PATH, (request, response) => {
+    const requestedReturnPath = sanitizeReturnPath(request.query.returnTo);
+    const existingRole = accessService.readRequestSession(request, 'viewer');
+
+    if (existingRole) {
+      const destination = existingRole === 'admin' ? `/${SWAGGER_ADMIN_PATH}` : `/${SWAGGER_PATH}`;
+      response.redirect(303, destination);
+      return;
+    }
+
+    renderLogin(response, requestedReturnPath);
+  });
+
+  expressApp.post(SWAGGER_SESSION_PATH, loginBodyParser, async (request, response) => {
+    const body = request.body as Record<string, unknown> | undefined;
+    const username = readFormValue(body?.username).trim();
+    const password = readFormValue(body?.password);
+    const returnTo = sanitizeReturnPath(body?.returnTo);
+    const attemptKey = `${request.ip}:${username.toLowerCase()}`;
+    const retryAfter = attemptLimiter.getRetryAfterSeconds(attemptKey);
+
+    if (retryAfter) {
+      response.setHeader('Retry-After', retryAfter.toString());
+      renderLogin(response, returnTo, 'Too many login attempts. Try again later.', 429);
+      return;
+    }
+
+    if (!accessService.verifyCsrfToken(request, body?.csrfToken)) {
+      renderLogin(response, returnTo, 'The login form expired. Please try again.', 403);
+      return;
+    }
+
+    const role = await accessService.authenticate(username, password);
+    if (!role) {
+      attemptLimiter.recordFailure(attemptKey);
+      renderLogin(response, returnTo, 'The username or password is invalid.', 401);
+      return;
+    }
+
+    attemptLimiter.clear(attemptKey);
+    accessService.setSessionCookie(response, accessService.createSession(role));
+    const destination =
+      returnTo === SWAGGER_JSON_PATH || returnTo === SWAGGER_YAML_PATH
+        ? returnTo
+        : role === 'admin'
+          ? `/${SWAGGER_ADMIN_PATH}`
+          : `/${SWAGGER_PATH}`;
+    response.redirect(303, destination);
+  });
+
+  expressApp.get(SWAGGER_LOGOUT_PATH, (_request, response) => {
+    const csrfToken = accessService.createCsrfToken();
+    accessService.setCsrfCookie(response, csrfToken);
+    setPrivateResponseHeaders(response);
+    response.type('html').send(renderSwaggerLogoutPage(csrfToken));
+  });
+
+  expressApp.post(SWAGGER_LOGOUT_PATH, loginBodyParser, (request, response) => {
+    const body = request.body as Record<string, unknown> | undefined;
+    if (!accessService.verifyCsrfToken(request, body?.csrfToken)) {
+      response.status(403).send('The logout form expired.');
+      return;
+    }
+
+    accessService.clearCookies(response);
+    setPrivateResponseHeaders(response);
+    response.redirect(303, SWAGGER_LOGIN_PATH);
+  });
+
+  expressApp.use(`/${SWAGGER_ADMIN_PATH}`, createAccessMiddleware(accessService, 'admin'));
+  expressApp.use(SWAGGER_JSON_PATH, createAccessMiddleware(accessService, 'viewer', true));
+  expressApp.use(SWAGGER_YAML_PATH, createAccessMiddleware(accessService, 'viewer', true));
+  expressApp.use(`/${SWAGGER_PATH}`, createAccessMiddleware(accessService, 'viewer'));
 }
 
 export function createSwaggerDocument(app: INestApplication): OpenAPIObject {
@@ -152,40 +276,56 @@ export function setupSwagger(
   environment: SwaggerEnvironment = process.env,
 ): OpenAPIObject | undefined {
   if (!isSwaggerEnabled(environment)) {
-    logger.log('Swagger is disabled for this environment.');
+    logger.warn(
+      'Swagger is disabled because access control is not enabled or its Viewer/Admin secrets are incomplete.',
+    );
     return undefined;
   }
 
-  if (
-    isHardenedRuntime(environment) &&
-    environment.SWAGGER_USERNAME &&
-    environment.SWAGGER_PASSWORD
-  ) {
-    const middleware = createSwaggerBasicAuthMiddleware(environment);
-    app.use(`/${SWAGGER_PATH}`, middleware);
-    app.use(SWAGGER_JSON_PATH, middleware);
-    app.use(SWAGGER_YAML_PATH, middleware);
+  const accessConfig = resolveSwaggerAccessConfig(environment);
+  if (!accessConfig) {
+    return undefined;
   }
+
+  const expressApp = app.getHttpAdapter().getInstance() as Express;
+  registerSwaggerAccessRoutes(expressApp, new SwaggerAccessService(accessConfig, environment));
 
   const document = createSwaggerDocument(app);
   const report = assertSwaggerCoverage(document);
 
+  const commonSwaggerOptions = {
+    displayRequestDuration: true,
+    filter: true,
+    persistAuthorization: false,
+    validatorUrl: null,
+  };
+
   SwaggerModule.setup(SWAGGER_PATH, app, document, {
-    customSiteTitle: 'NestLab HTTP API documentation',
+    customSiteTitle: 'NestLab HTTP API — Viewer',
     explorer: true,
     jsonDocumentUrl: SWAGGER_JSON_PATH,
     yamlDocumentUrl: SWAGGER_YAML_PATH,
     swaggerOptions: {
-      displayRequestDuration: true,
-      filter: true,
-      persistAuthorization: isLocalRuntime(environment),
+      ...commonSwaggerOptions,
       tryItOutEnabled: false,
-      supportedSubmitMethods: isHardenedRuntime(environment)
-        ? []
-        : ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'],
+      supportedSubmitMethods: [],
     },
   });
 
-  logger.log(`Swagger documents ${report.operationCount} HTTP operations at /${SWAGGER_PATH}.`);
+  SwaggerModule.setup(SWAGGER_ADMIN_PATH, app, document, {
+    customSiteTitle: 'NestLab HTTP API — Admin',
+    explorer: true,
+    jsonDocumentUrl: SWAGGER_JSON_PATH,
+    yamlDocumentUrl: SWAGGER_YAML_PATH,
+    swaggerOptions: {
+      ...commonSwaggerOptions,
+      tryItOutEnabled: true,
+      supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'],
+    },
+  });
+
+  logger.log(
+    `Swagger documents ${report.operationCount} HTTP operations at /${SWAGGER_PATH} (Viewer) and /${SWAGGER_ADMIN_PATH} (Admin).`,
+  );
   return document;
 }

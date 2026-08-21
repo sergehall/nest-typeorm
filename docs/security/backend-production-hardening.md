@@ -10,13 +10,37 @@ unknown values as hardened production, so an environment typo cannot expose educ
 
 - `TestingController`, `GET /products/test-products`, and
   `GET /pair-game-quiz/pairs/create-questions` return `404` in production.
-- Swagger remains available when `SWAGGER_ENABLED=true`, but production Swagger cannot submit
-  requests. Supplying both `SWAGGER_USERNAME` and `SWAGGER_PASSWORD` additionally protects the
-  documentation with Basic authentication.
+- Swagger is fail-closed and remains unavailable until `SWAGGER_ENABLED=true` and the complete
+  Viewer/Admin access configuration is present. `/api/docs` is the read-only Viewer surface;
+  `/api/docs/admin` is the interactive Admin surface. OpenAPI JSON and YAML require at least a
+  Viewer session.
+- Documentation passwords are stored only as Argon2id hashes. The signed session uses a short-lived
+  `HttpOnly`, `Secure`, `SameSite=Strict` cookie in production. Login attempts are locally limited,
+  and the hosting edge should provide an additional distributed rate limit.
 - Application throttling is enforced globally. Production deployments must run behind exactly
   one trusted reverse proxy because Express is configured with `trust proxy = 1`.
 - Keep an edge rate limit on the hosting provider as a second layer. The built-in NestJS storage
   is process-local and is not a distributed denial-of-service control.
+
+## Swagger access configuration
+
+Generate a fresh credential set with `yarn swagger:credentials`, save the two plaintext passwords
+in a password manager, and configure only the generated hashes and session secret at runtime:
+
+```dotenv
+SWAGGER_ENABLED=true
+SWAGGER_VIEWER_USERNAME=viewer
+SWAGGER_VIEWER_PASSWORD_HASH='$argon2id$...'
+SWAGGER_ADMIN_USERNAME=admin
+SWAGGER_ADMIN_PASSWORD_HASH='$argon2id$...'
+SWAGGER_SESSION_SECRET='base64url-random-secret'
+SWAGGER_SESSION_TTL_SECONDS=1200
+```
+
+Viewer can browse the contract and download OpenAPI JSON/YAML, but Swagger UI cannot submit HTTP
+requests. Admin can use `Try it out`; this does not bypass the authentication and authorization
+guards of the documented endpoints. Rotate both password hashes and the session secret together to
+invalidate every existing documentation session.
 
 ## PostgreSQL role separation
 

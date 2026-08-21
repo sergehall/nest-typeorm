@@ -127,24 +127,33 @@ describe('Swagger architecture', () => {
     ).toEqual(['pageNumber', 'pageSize', 'sortBy', 'sortDirection', 'searchNameTerm']);
   });
 
-  it('supports public read-only production documentation or optional Basic Auth', () => {
-    expect(isSwaggerEnabled({ NODE_ENV: 'development' })).toBe(true);
+  it('enables Swagger only with complete Viewer and Admin access configuration', () => {
+    const accessEnvironment = {
+      SWAGGER_VIEWER_USERNAME: 'viewer',
+      SWAGGER_VIEWER_PASSWORD_HASH: '$argon2id$viewer-hash-value-with-more-than-forty-characters',
+      SWAGGER_ADMIN_USERNAME: 'admin',
+      SWAGGER_ADMIN_PASSWORD_HASH: '$argon2id$admin-hash-value-with-more-than-forty-characters',
+      SWAGGER_SESSION_SECRET: 'session-secret-with-more-than-forty-three-characters',
+      SWAGGER_SESSION_TTL_SECONDS: '1200',
+    };
+
+    expect(isSwaggerEnabled({ NODE_ENV: 'development' })).toBe(false);
+    expect(isSwaggerEnabled({ NODE_ENV: 'development', ...accessEnvironment })).toBe(true);
     expect(isSwaggerEnabled({ NODE_ENV: 'production' })).toBe(false);
-    expect(isSwaggerEnabled({ NODE_ENV: 'production', SWAGGER_ENABLED: 'true' })).toBe(true);
     expect(
       isSwaggerEnabled({
         NODE_ENV: 'production',
         SWAGGER_ENABLED: 'true',
-        SWAGGER_USERNAME: 'docs-user',
-      }),
-    ).toBe(false);
-    expect(
-      isSwaggerEnabled({
-        NODE_ENV: 'production',
-        SWAGGER_ENABLED: 'true',
-        SWAGGER_USERNAME: 'docs-user',
-        SWAGGER_PASSWORD: 'strong-docs-password',
+        ...accessEnvironment,
       }),
     ).toBe(true);
+    expect(
+      isSwaggerEnabled({
+        NODE_ENV: 'production',
+        SWAGGER_ENABLED: 'true',
+        ...accessEnvironment,
+        SWAGGER_ADMIN_PASSWORD_HASH: undefined,
+      }),
+    ).toBe(false);
   });
 });
