@@ -98,11 +98,11 @@ class Configuration {
   }
 
   private static getThrottleTTL(): number {
-    return Number(this.readEnvVariableWithDefault('THROTTLE_TTL', 10));
+    return Number(this.readEnvVariableWithDefault('THROTTLE_TTL', 60000));
   }
 
   private static getThrottleLIMIT(): number {
-    return Number(this.readEnvVariableWithDefault('THROTTLE_LIMIT', 5));
+    return Number(this.readEnvVariableWithDefault('THROTTLE_LIMIT', 100));
   }
 
   private static getSaltFactor(): number {

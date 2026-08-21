@@ -14,10 +14,15 @@ export class AbilitiesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const rules = this.reflector.get<RequiredRule[]>(CHECK_ABILITY, context.getHandler() || []);
-    let { currentUser } = context.switchToHttp().getRequest();
-    if (!currentUser) {
-      currentUser = { roles: UserRolesEnums.USER };
-    }
+    const request = context.switchToHttp().getRequest();
+    const currentUser = request.user ?? {
+      userId: 'anonymous',
+      login: 'anonymous',
+      email: '',
+      orgId: 'anonymous',
+      roles: [UserRolesEnums.USER],
+      isBanned: false,
+    };
     const ability = this.caslAbilityFactory.createSaUser(currentUser);
     try {
       rules.forEach((rule) =>

@@ -11,7 +11,7 @@ import {
   Res,
   Query,
 } from '@nestjs/common';
-import { SkipThrottle } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from '../dto/login.dto';
@@ -38,8 +38,8 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiConfirmationCodeQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 import { LoginRequestDto } from '../dto/login-request.dto';
+import { getRefreshTokenCookieOptions } from '../cookies/refresh-token-cookie.options';
 
-@SkipThrottle()
 @ApiTags('Auth')
 @ApiControllerDocumentation()
 @Controller('auth')
@@ -53,6 +53,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginRequestDto })
   @Post('login')
+  @Throttle({
+    short: { limit: 2, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 20, ttl: 3_600_000 },
+  })
   async login(
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
@@ -67,12 +72,22 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 3, ttl: 60_000 },
+    long: { limit: 10, ttl: 3_600_000 },
+  })
   async registration(@Body() loginDto: LoginDto): Promise<UserIdEmailLoginDto> {
     return await this.commandBus.execute(new RegistrationUserCommand(loginDto));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 3, ttl: 60_000 },
+    long: { limit: 6, ttl: 3_600_000 },
+  })
   async registrationEmailResending(@Body() emailDto: EmailDto) {
     return await this.commandBus.execute(new UpdateSentConfirmationCodeCommand(emailDto.email));
   }
@@ -80,6 +95,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('refresh-token')
+  @Throttle({
+    short: { limit: 3, ttl: 1_000 },
+    medium: { limit: 20, ttl: 60_000 },
+    long: { limit: 100, ttl: 3_600_000 },
+  })
   async refreshToken(
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,
@@ -96,12 +116,16 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
+  @Throttle({
+    short: { limit: 2, ttl: 1_000 },
+    medium: { limit: 10, ttl: 60_000 },
+    long: { limit: 30, ttl: 3_600_000 },
+  })
   async registrationConfirmation(@Body() codeDto: CodeDto): Promise<boolean> {
     const { code } = codeDto;
     return await this.commandBus.execute(new ConfirmUserByCodeCommand(code));
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(CookiesJwtVerificationGuard)
   @Post('logout')
@@ -111,11 +135,10 @@ export class AuthController {
 
     await this.commandBus.execute(new LogoutCommand(refreshToken));
 
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', getRefreshTokenCookieOptions());
     return true;
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
   @ApiConfirmationCodeQuery()
@@ -125,25 +148,32 @@ export class AuthController {
     return await this.commandBus.execute(new ConfirmUserByCodeCommand(queryData.code));
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 3, ttl: 60_000 },
+    long: { limit: 6, ttl: 3_600_000 },
+  })
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<boolean> {
     const { email } = emailDto;
 
     return await this.commandBus.execute(new PasswordRecoveryCommand(email));
   }
 
-  @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 15, ttl: 3_600_000 },
+  })
   async newPassword(@Body() newPasswordRecoveryDto: NewPasswordRecoveryDto): Promise<boolean> {
     return await this.commandBus.execute(
       new ChangePasswordByRecoveryCodeCommand(newPasswordRecoveryDto),
     );
   }
 
-  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {

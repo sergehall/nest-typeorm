@@ -107,7 +107,10 @@ describe('Super Admin API (e2e)', () => {
     expect(users).toMatchObject({ page: 1, pageSize: 5, totalCount: 1 });
     expect(users.items).toEqual([createdUser]);
 
-    const retrievedUserResponse = await request(server).get(`/users/${createdUser.id}`).expect(200);
+    const retrievedUserResponse = await request(server)
+      .get(`/users/${createdUser.id}`)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .expect(200);
     expect(parseTestUserRecord(getResponseBody(retrievedUserResponse))).toMatchObject(createdUser);
 
     const duplicateResponse = await request(server)
@@ -123,7 +126,10 @@ describe('Super Admin API (e2e)', () => {
       .delete(`/sa/users/${createdUser.id}`)
       .auth(MockUserCredentials.login, MockUserCredentials.password)
       .expect(204);
-    await request(server).get(`/users/${createdUser.id}`).expect(404);
+    await request(server)
+      .get(`/users/${createdUser.id}`)
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .expect(404);
   });
 
   it('blocks login while a user is banned and restores it after unbanning', async () => {

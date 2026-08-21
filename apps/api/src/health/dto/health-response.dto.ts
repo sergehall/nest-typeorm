@@ -64,3 +64,17 @@ export class HealthResponseDto {
   @ApiProperty({ type: HealthChecksDto })
   checks: HealthChecksDto;
 }
+
+export class LivenessResponseDto {
+  @ApiProperty({ enum: ['up'], example: 'up' })
+  status: 'up';
+
+  @ApiProperty({ example: 'NestLab API' })
+  service: string;
+
+  @ApiProperty({ format: 'date-time', example: '2026-08-20T20:45:00.000Z' })
+  timestamp: string;
+
+  @ApiProperty({ type: Number, example: 125 })
+  uptimeSeconds: number;
+}

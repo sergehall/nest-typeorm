@@ -31,7 +31,7 @@ import { Action } from '../../../ability/roles/action.enum';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { SkipThrottle } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import { PaginatorDto } from '../../../common/helpers/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { SearchBannedUsersInBlogCommand } from '../application/use-cases/search-banned-users-in-blog.use.case';
@@ -57,7 +57,6 @@ import { ApiImageUpload } from '../../../api-documentation/decorators/api-image-
 import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
 
-@SkipThrottle()
 @ApiTags('Blogger')
 @ApiControllerDocumentation()
 @Controller('blogger')
@@ -67,9 +66,18 @@ export class BloggerBlogsController {
     protected commandBus: CommandBus,
   ) {}
   @Post('blogs/:blogId/posts/:postId/images/main')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 20, ttl: 3_600_000 },
+  })
   @ApiImageUpload(getFileConstraints.imagePost)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: getFileConstraints.imagePost.maxSize, files: 1 },
+    }),
+  )
   async uploadImageForPost(
     @Request() req: any,
     @Param() params: BlogIdPostIdParams,
@@ -85,9 +93,18 @@ export class BloggerBlogsController {
   }
 
   @Post('blogs/:blogId/images/wallpaper')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 20, ttl: 3_600_000 },
+  })
   @ApiImageUpload(getFileConstraints.imageBlogWallpaper)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: getFileConstraints.imageBlogWallpaper.maxSize, files: 1 },
+    }),
+  )
   async uploadImageBlogWallpaper(
     @Request() req: any,
     @Param() params: BlogIdParams,
@@ -103,9 +120,18 @@ export class BloggerBlogsController {
   }
 
   @Post('blogs/:blogId/images/main')
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 20, ttl: 3_600_000 },
+  })
   @ApiImageUpload(getFileConstraints.imageBlogMain)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: getFileConstraints.imageBlogMain.maxSize, files: 1 },
+    }),
+  )
   async uploadFilesBlogMain(
     @Request() req: any,
     @Param() params: BlogIdParams,

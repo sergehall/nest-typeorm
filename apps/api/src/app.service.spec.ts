@@ -52,4 +52,16 @@ describe('AppService health', () => {
     expect(health.status).toBe('degraded');
     expect(health.checks.database.status).toBe('down');
   });
+
+  it('coalesces readiness checks to protect PostgreSQL from health polling', async () => {
+    const dataSource = createDataSource();
+    const service = new AppService(dataSource);
+
+    const [first, second] = await Promise.all([service.getHealth(), service.getHealth()]);
+    const cached = await service.getHealth();
+
+    expect(dataSource.query).toHaveBeenCalledTimes(1);
+    expect(second).toBe(first);
+    expect(cached).toBe(first);
+  });
 });

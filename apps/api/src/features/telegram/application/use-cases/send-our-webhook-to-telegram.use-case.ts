@@ -4,6 +4,7 @@ import { TelegramConfig } from '../../../../config/telegram/telegram.config';
 import { TelegramUrlsEnum } from '../../enums/telegram-urls.enum';
 import { TelegramMethodsEnum } from '../../enums/telegram-methods.enum';
 import { sendTelegramRequest } from '../../helpers/send-telegram-request';
+import { deriveTelegramWebhookSecret } from '../../guards/telegram-webhook.guard';
 
 export class SendOurWebhookToTelegramCommand {
   constructor() {}
@@ -27,6 +28,10 @@ export class SendOurWebhookToTelegramUseCase implements ICommandHandler<SendOurW
 
     const url = baseUrl + '/integrations/telegram/webhook';
 
-    await sendTelegramRequest(telegramUrl, { url });
+    await sendTelegramRequest(telegramUrl, {
+      url,
+      secret_token: deriveTelegramWebhookSecret(tokenTelegramBot),
+      allowed_updates: ['message'],
+    });
   }
 }

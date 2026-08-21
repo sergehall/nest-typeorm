@@ -29,12 +29,14 @@ import { InvalidJwtRepo } from '../../../features/auth/infrastructure/invalid-jw
 import { GuestUsersRepo } from '../../../features/users/infrastructure/guest-users.repo';
 import { GameQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/game-questions.repo';
 import { ChallengesQuestionsRepo } from '../../../features/pair-game-quiz/infrastructure/challenges-questions.repo';
+import { VerifyPayPalWebhookUseCase } from './application/use-cases/verify-pay-pal-webhook.use-case';
 
 const payPalUseCases = [
   PayPalCapturePaymentUseCase,
   PayPalGenerateAccessTokenUseCase,
   ProcessPayPalWebhookUseCase,
   FinalizePayPalPaymentUseCase,
+  VerifyPayPalWebhookUseCase,
 ];
 const helpers = [KeyResolver, UuidErrorResolver];
 

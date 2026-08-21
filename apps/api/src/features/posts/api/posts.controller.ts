@@ -13,7 +13,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { CheckAbilities } from '../../../ability/abilities.decorator';
-import { SkipThrottle } from '@nestjs/throttler';
 import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
 import { AbilitiesGuard } from '../../../ability/abilities.guard';
 import { Action } from '../../../ability/roles/action.enum';
@@ -47,7 +46,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
-@SkipThrottle()
 @ApiTags('Posts')
 @ApiControllerDocumentation()
 @Controller('posts')

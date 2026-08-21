@@ -9,7 +9,10 @@ import { ConfigType } from './config/configuration';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
+    bodyParser: false,
   });
+  app.useBodyParser('json', { limit: '100kb' });
+  app.useBodyParser('urlencoded', { limit: '100kb', extended: true });
   // // Set global prefix
   // app.setGlobalPrefix('api');
 
@@ -37,4 +40,4 @@ async function bootstrap() {
 }
 
 // Call the bootstrap function to start the application
-bootstrap();
+void bootstrap();

@@ -19,7 +19,10 @@ import { FileConstraintsDto } from './file-constraints/file-constraints.dto';
 export class FileValidationPipe implements PipeTransform {
   constructor(private readonly constraintsKey: FileConstraintsDto) {}
 
-  async transform(value: any, _metadata: ArgumentMetadata): Promise<FileUploadDto> {
+  async transform(
+    value: Express.Multer.File | undefined,
+    _metadata: ArgumentMetadata,
+  ): Promise<FileUploadDto> {
     const constraints: FileConstraintsDto = this.constraintsKey;
 
     if (!constraints) {
@@ -28,45 +31,48 @@ export class FileValidationPipe implements PipeTransform {
         HttpStatus.BAD_REQUEST,
       );
     }
+    this.checkFileNotProvided(value);
+    const file = value;
     const errorMessage: CustomErrorsMessagesType[] = [];
 
     await Promise.all([
-      this.checkFileNotProvided(value),
-      this.checkFileSize(value, constraints, errorMessage),
-      this.checkFileExtension(value, constraints, errorMessage),
-      this.checkImageDimensions(value, constraints, errorMessage),
+      this.checkFileSize(file, constraints, errorMessage),
+      this.checkFileExtension(file, constraints, errorMessage),
+      this.checkImageDimensions(file, constraints, errorMessage),
     ]);
 
     if (errorMessage.length > 0) {
       throw new HttpException({ message: errorMessage }, HttpStatus.BAD_REQUEST);
     }
 
-    return value;
+    return file;
   }
 
-  private async checkFileNotProvided(value: any): Promise<void> {
+  private checkFileNotProvided(
+    value: Express.Multer.File | undefined,
+  ): asserts value is Express.Multer.File {
     if (!value) {
       throw new HttpException({ message: fileNotProvided }, HttpStatus.BAD_REQUEST);
     }
   }
 
-  private async checkFileSize(
-    value: any,
-    constraints: any,
+  private checkFileSize(
+    value: Express.Multer.File,
+    constraints: FileConstraintsDto,
     errorMessage: CustomErrorsMessagesType[],
-  ): Promise<void> {
+  ): void {
     if (value.size > constraints.maxSize) {
       errorMessage.push(fileSizeLimit);
     }
   }
 
-  private async checkFileExtension(
-    value: any,
-    constraints: any,
+  private checkFileExtension(
+    value: Express.Multer.File,
+    constraints: FileConstraintsDto,
     errorMessage: CustomErrorsMessagesType[],
-  ): Promise<void> {
+  ): void {
     const fileExtension = this.getFileExtension(value.mimetype);
-    if (!constraints.allowedExtensions.includes(fileExtension)) {
+    if (!constraints.allowedExtensions.some((extension) => extension === fileExtension)) {
       errorMessage.push(invalidFileExtension);
     }
   }
@@ -77,13 +83,18 @@ export class FileValidationPipe implements PipeTransform {
   }
 
   private async checkImageDimensions(
-    value: any,
+    value: Express.Multer.File,
     constraints: FileConstraintsDto,
     errorMessage: CustomErrorsMessagesType[],
   ): Promise<void> {
     try {
       const metadata = await sharp(value.buffer).metadata();
+      const expectedFormats = constraints.allowedExtensions.map((extension) =>
+        extension.slice(1).replace('jpg', 'jpeg'),
+      );
       if (
+        !metadata.format ||
+        !expectedFormats.includes(metadata.format) ||
         !metadata.width ||
         metadata.width !== constraints.width ||
         !metadata.height ||

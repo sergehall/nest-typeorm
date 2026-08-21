@@ -1,24 +1,30 @@
-import { IsNotEmpty, Validate } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsInt,
+  IsUUID,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 export class ProductRequest {
-  @IsNotEmpty()
+  @IsUUID('4')
   productId: string;
 
-  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  @Max(100)
   quantity: number;
 }
 
-class IsArrayAndNotEmpty {
-  validate(array: any[]) {
-    return !(!Array.isArray(array) || array.length === 0);
-  }
-
-  defaultMessage() {
-    return 'products must be a non-empty array';
-  }
-}
-
 export class ProductsRequestDto {
-  @Validate(IsArrayAndNotEmpty)
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => ProductRequest)
   products: ProductRequest[];
 }

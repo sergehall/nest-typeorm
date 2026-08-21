@@ -25,7 +25,6 @@ import { SaBanBlogDto } from '../dto/sa-ban-blog.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { IdUserIdParams } from '../../../common/query/params/id-userId.params';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { SkipThrottle } from '@nestjs/throttler';
 import { SaBanUnbanBlogCommand } from '../application/use-cases/sa-ban-unban-blog-for-user.use-case';
 import { SaBanUnbanUserCommand } from '../application/use-cases/sa-ban-unban-user.use-case';
 import { SaBindBlogWithUserCommand } from '../application/use-cases/sa-bind-blog-with-user.use-case';
@@ -56,7 +55,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
-@SkipThrottle()
 @ApiTags('Super Admin')
 @ApiControllerDocumentation()
 @Controller('sa')

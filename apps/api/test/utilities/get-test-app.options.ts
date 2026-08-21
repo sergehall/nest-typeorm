@@ -7,6 +7,7 @@ import { Server } from 'node:http';
 import { getSafeTestDatabase } from './database-safety';
 import { TypeOrmPostgresOptions } from '../../src/db/type-orm/options/type-orm-postgres.options';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 interface DatabaseNameRow {
   readonly database_name: string;
@@ -126,7 +127,7 @@ export const getTestAppOptions = async (): Promise<TestAppContext> => {
     .useValue(new E2eTypeOrmOptions(url, isLoopback))
     .compile();
 
-  let app = moduleFixture.createNestApplication();
+  let app = moduleFixture.createNestApplication<NestExpressApplication>();
   app = createApp(app);
 
   try {

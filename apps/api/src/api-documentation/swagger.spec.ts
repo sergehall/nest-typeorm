@@ -127,10 +127,17 @@ describe('Swagger architecture', () => {
     ).toEqual(['pageNumber', 'pageSize', 'sortBy', 'sortDirection', 'searchNameTerm']);
   });
 
-  it('keeps production documentation disabled unless it is enabled and protected', () => {
+  it('supports public read-only production documentation or optional Basic Auth', () => {
     expect(isSwaggerEnabled({ NODE_ENV: 'development' })).toBe(true);
     expect(isSwaggerEnabled({ NODE_ENV: 'production' })).toBe(false);
-    expect(isSwaggerEnabled({ NODE_ENV: 'production', SWAGGER_ENABLED: 'true' })).toBe(false);
+    expect(isSwaggerEnabled({ NODE_ENV: 'production', SWAGGER_ENABLED: 'true' })).toBe(true);
+    expect(
+      isSwaggerEnabled({
+        NODE_ENV: 'production',
+        SWAGGER_ENABLED: 'true',
+        SWAGGER_USERNAME: 'docs-user',
+      }),
+    ).toBe(false);
     expect(
       isSwaggerEnabled({
         NODE_ENV: 'production',

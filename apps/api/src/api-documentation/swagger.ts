@@ -9,6 +9,7 @@ import {
   SWAGGER_PATH,
   SWAGGER_YAML_PATH,
 } from './swagger.config';
+import { isHardenedRuntime, isLocalRuntime } from '../common/environment/runtime-environment';
 
 const logger = new Logger('Swagger');
 const httpMethods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] as const;
@@ -57,15 +58,14 @@ function createSwaggerBasicAuthMiddleware(environment: SwaggerEnvironment) {
 }
 
 export function isSwaggerEnabled(environment: SwaggerEnvironment = process.env): boolean {
-  if (environment.NODE_ENV !== 'production') {
+  if (isLocalRuntime(environment)) {
     return true;
   }
 
-  return (
-    environment.SWAGGER_ENABLED === 'true' &&
-    Boolean(environment.SWAGGER_USERNAME) &&
-    Boolean(environment.SWAGGER_PASSWORD)
-  );
+  const hasUsername = Boolean(environment.SWAGGER_USERNAME);
+  const hasPassword = Boolean(environment.SWAGGER_PASSWORD);
+
+  return environment.SWAGGER_ENABLED === 'true' && hasUsername === hasPassword;
 }
 
 export function createSwaggerDocument(app: INestApplication): OpenAPIObject {
@@ -156,8 +156,15 @@ export function setupSwagger(
     return undefined;
   }
 
-  if (environment.NODE_ENV === 'production') {
-    app.use(`/${SWAGGER_PATH}`, createSwaggerBasicAuthMiddleware(environment));
+  if (
+    isHardenedRuntime(environment) &&
+    environment.SWAGGER_USERNAME &&
+    environment.SWAGGER_PASSWORD
+  ) {
+    const middleware = createSwaggerBasicAuthMiddleware(environment);
+    app.use(`/${SWAGGER_PATH}`, middleware);
+    app.use(SWAGGER_JSON_PATH, middleware);
+    app.use(SWAGGER_YAML_PATH, middleware);
   }
 
   const document = createSwaggerDocument(app);
@@ -171,8 +178,11 @@ export function setupSwagger(
     swaggerOptions: {
       displayRequestDuration: true,
       filter: true,
-      persistAuthorization: true,
+      persistAuthorization: isLocalRuntime(environment),
       tryItOutEnabled: false,
+      supportedSubmitMethods: isHardenedRuntime(environment)
+        ? []
+        : ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'],
     },
   });
 

@@ -26,7 +26,6 @@ import { RemoveUserByIdCommand } from '../application/use-cases/remove-user-byId
 import { IdParams } from '../../../common/query/params/id.params';
 import { CurrentUserDto } from '../dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { PaginatorDto } from '../../../common/helpers/paginator.dto';
 import { UsersEntity } from '../entities/users.entity';
@@ -37,7 +36,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
-@SkipThrottle()
 @ApiTags('Users')
 @ApiControllerDocumentation()
 @Controller('users')
@@ -59,7 +57,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(AbilitiesGuard)
+  @UseGuards(SaBasicAuthGuard, AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
   async findUserByUserId(@Param() params: IdParams): Promise<UserViewModel> {
     return await this.commandBus.execute(new FindUserByICommand(params.id));

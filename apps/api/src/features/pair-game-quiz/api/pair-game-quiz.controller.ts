@@ -20,7 +20,6 @@ import { GameViewModel } from '../views/game.view-model';
 import { GetGameByIdCommand } from '../application/use-cases/get-game-by-id.use-case';
 import { AnswerDto } from '../dto/answer.dto';
 import { SubmitAnswerCommand } from '../application/use-cases/submit-answer-for-current-question.use-case';
-import { SkipThrottle } from '@nestjs/throttler';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { GetMyGamesCommand } from '../application/use-cases/my-games.use-case';
@@ -39,8 +38,8 @@ import {
   ApiCollectionQuery,
   ApiStatisticsQuery,
 } from '../../../api-documentation/decorators/api-query-parameters.decorator';
+import { ProductionDisabledGuard } from '../../../common/guards/production-disabled.guard';
 
-@SkipThrottle()
 @ApiTags('Pair-game-quiz')
 @ApiControllerDocumentation()
 @Controller('pair-game-quiz')
@@ -52,6 +51,7 @@ export class PairGameQuizController {
   ) {}
 
   @Get('pairs/create-questions')
+  @UseGuards(ProductionDisabledGuard)
   @HttpCode(HttpStatus.CREATED)
   async createAndSaveQuestion(): Promise<boolean> {
     return await this.pairGameQuizService.createAndSaveQuestion();

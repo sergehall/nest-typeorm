@@ -13,7 +13,7 @@ import { ParseQueriesService } from '../../../../common/query/parse-queries.serv
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
-import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Stripe')
 @ApiControllerDocumentation()
@@ -24,14 +24,19 @@ export class StripeController {
     private readonly parseQueriesService: ParseQueriesService,
   ) {}
 
-  @Get('buy/products')
+  @Post('buy/products')
   @UseGuards(IfGuestUsersGuard)
+  @Throttle({
+    short: { limit: 1, ttl: 1_000 },
+    medium: { limit: 5, ttl: 60_000 },
+    long: { limit: 20, ttl: 3_600_000 },
+  })
   async buy(
     @Body() productsRequestDto: ProductsRequestDto,
     @Req() req: any,
     // @Query() query: any,
   ): Promise<PaymentLinkDto | null> {
-    const currentUserDto: CurrentUserDto | GuestUsersDto = req.user;
+    const currentUserDto: CurrentUserDto | null = req.user;
     const paymentSystem = PaymentSystem.STRIPE;
     // const queryData: ParseQueriesDto =
     //   await this.parseQueriesService.getQueriesData(query);
@@ -43,6 +48,11 @@ export class StripeController {
   }
 
   @Post('webhook')
+  @Throttle({
+    short: { limit: 10, ttl: 1_000 },
+    medium: { limit: 100, ttl: 60_000 },
+    long: { limit: 1_000, ttl: 3_600_000 },
+  })
   @ApiProviderWebhook({ provider: 'Stripe', signatureHeader: 'stripe-signature' })
   async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
     return await this.commandBus.execute(new ProcessStripeWebHookCommand(req));
