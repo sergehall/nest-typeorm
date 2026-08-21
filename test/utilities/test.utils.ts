@@ -1,114 +1,126 @@
-import { SaUserViewModel } from '../../src/features/sa/views/sa-user-view-model';
 import { CreateUserDto } from '../../src/features/users/dto/create-user.dto';
 import request from 'supertest';
 import {
   MockBlogData,
+  MockCommentData,
   MockConfirmedUser,
   MockPostData,
   MockTestUser,
   MockUserCredentials,
 } from './mock-test-data';
-import { UsersEntity } from '../../src/features/users/entities/users.entity';
-import { BloggerBlogsWithImagesSubscribersViewModel } from '../../src/features/blogger-blogs/views/blogger-blogs-with-images-subscribers.view-model';
-import { PostWithLikesImagesInfoViewModel } from '../../src/features/posts/views/post-with-likes-images-info.view-model';
+import { Server } from 'node:http';
+import { CreateBlogsDto } from '../../src/features/blogger-blogs/dto/create-blogs.dto';
+import { CreatePostDto } from '../../src/features/posts/dto/create-post.dto';
+import { CreateCommentDto } from '../../src/features/comments/dto/create-comment.dto';
+import {
+  getResponseBody,
+  parseAccessToken,
+  parsePaginator,
+  parseTestBlog,
+  parseTestComment,
+  parseTestPost,
+  parseTestUser,
+  parseTestUserRecord,
+  TestBlog,
+  TestComment,
+  TestPost,
+  TestUser,
+} from './http-response.utils';
 
 export class TestUtils {
-  private readonly testUser: CreateUserDto;
-  private readonly confirmedUser: CreateUserDto;
+  constructor(private readonly server: Server) {}
 
-  constructor() {
-    this.testUser = MockTestUser;
-    this.confirmedUser = MockConfirmedUser;
-  }
-
-  async createBlog(
-    server: any,
-    token: string,
-  ): Promise<BloggerBlogsWithImagesSubscribersViewModel> {
-    const response = await request(server)
+  async createBlog(token: string, blogData: CreateBlogsDto = MockBlogData): Promise<TestBlog> {
+    const response = await request(this.server)
       .post('/blogger/blogs')
-      .send(MockBlogData)
-      .set('Authorization', `Bearer ${token}`);
-    expect(response.status).toBe(201);
-    return response.body;
+      .send(blogData)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201);
+
+    return parseTestBlog(getResponseBody(response));
   }
 
   async createPost(
     blogId: string,
-    server: any,
     token: string,
-  ): Promise<PostWithLikesImagesInfoViewModel> {
+    postData: CreatePostDto = MockPostData,
+  ): Promise<TestPost> {
     const createPostUrl = `/blogger/blogs/${blogId}/posts`;
-    const response = await request(server)
+    const response = await request(this.server)
       .post(createPostUrl)
-      .send(MockPostData)
-      .set('Authorization', `Bearer ${token}`);
-    expect(response.status).toBe(201);
-    return response.body;
+      .send(postData)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201);
+
+    return parseTestPost(getResponseBody(response));
   }
 
-  async createTestUser(server: any): Promise<SaUserViewModel> {
-    const testUser: CreateUserDto = this.testUser;
-    return await this.createUser(testUser, server);
+  async createComment(
+    postId: string,
+    token: string,
+    commentData: CreateCommentDto = MockCommentData,
+  ): Promise<TestComment> {
+    const response = await request(this.server)
+      .post(`/posts/${postId}/comments`)
+      .send(commentData)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201);
+
+    return parseTestComment(getResponseBody(response));
   }
 
-  async createTestConfirmedUser(server: any): Promise<SaUserViewModel> {
-    const confirmedUser: CreateUserDto = this.confirmedUser;
+  async createTestUser(): Promise<TestUser> {
+    return this.createUser(MockTestUser);
+  }
 
-    const createdUser: SaUserViewModel = await this.createUser(confirmedUser, server);
-    await this.confirmUserRegistration(confirmedUser.email, server);
+  async createTestConfirmedUser(): Promise<TestUser> {
+    const createdUser = await this.createUser(MockConfirmedUser);
+    await this.confirmUserRegistration(MockConfirmedUser.email);
 
     return createdUser;
   }
 
-  async getAccessToken(server: any): Promise<string> {
-    // Send a request to the authentication endpoint to obtain an access token
-    const response = await request(server).post('/auth/login').send({
-      loginOrEmail: this.testUser.login.toLowerCase(),
-      password: this.testUser.password,
-    });
-    // Assert the response status is 200
-    expect(response.status).toBe(200);
+  async getAccessToken(
+    loginOrEmail: string = MockTestUser.login,
+    password: string = MockTestUser.password,
+  ): Promise<string> {
+    const response = await request(this.server)
+      .post('/auth/login')
+      .send({ loginOrEmail: loginOrEmail.toLowerCase(), password })
+      .expect(200);
 
-    // Assert the response body contains an access token
-    expect(response.body).toHaveProperty('accessToken');
-    expect(typeof response.body.accessToken).toBe('string');
-
-    return response.body.accessToken;
+    return parseAccessToken(getResponseBody(response));
   }
 
-  private async createUser(createUserDto: CreateUserDto, server: any): Promise<SaUserViewModel> {
+  async createUser(createUserDto: CreateUserDto): Promise<TestUser> {
     const saCreateUserUrl = '/sa/users';
-    const createUserResponse = await request(server)
+    const createUserResponse = await request(this.server)
       .post(saCreateUserUrl)
       .auth(MockUserCredentials.login, MockUserCredentials.password)
-      .send(createUserDto);
+      .send(createUserDto)
+      .expect(201);
 
-    expect(createUserResponse.status).toBe(201);
-
-    return createUserResponse.body;
+    return parseTestUser(getResponseBody(createUserResponse));
   }
 
-  private async confirmUserRegistration(email: string, server: any): Promise<void> {
-    const getUsersResponse = await request(server)
+  private async confirmUserRegistration(email: string): Promise<void> {
+    const getUsersResponse = await request(this.server)
       .get('/users')
-      .auth(MockUserCredentials.login, MockUserCredentials.password);
+      .auth(MockUserCredentials.login, MockUserCredentials.password)
+      .expect(200);
 
-    const users: UsersEntity[] = getUsersResponse.body.items;
-    const createdUser: UsersEntity | undefined = users.find(
-      (user: UsersEntity) => user.email === email.toLowerCase(),
-    );
+    const users = parsePaginator(getResponseBody(getUsersResponse), parseTestUserRecord);
+    const createdUser = users.items.find((user) => user.email === email.toLowerCase());
 
-    expect(users.length).toBeGreaterThan(0);
     expect(createdUser).toBeDefined();
-
-    if (createdUser) {
-      const confirmationResponse = await request(server)
-        .post('/auth/registration-confirmation')
-        .send({ code: createdUser.confirmationCode });
-
-      expect(confirmationResponse.status).toBe(204);
+    if (!createdUser?.confirmationCode) {
+      throw new Error(`User ${email} has no confirmation code.`);
     }
+
+    await request(this.server)
+      .post('/auth/registration-confirmation')
+      .send({ code: createdUser.confirmationCode })
+      .expect(204);
   }
 }
 

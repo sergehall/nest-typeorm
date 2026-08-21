@@ -1,115 +1,108 @@
 import { INestApplication } from '@nestjs/common';
+import { Server } from 'node:http';
 import request from 'supertest';
-import { SaUserViewModel } from '../src/features/sa/views/sa-user-view-model';
+import { DataSource } from 'typeorm';
+import { getTestAppOptions, resetTestDatabase } from './utilities/get-test-app.options';
+import {
+  getResponseBody,
+  getValidationErrorFields,
+  parseAccessToken,
+} from './utilities/http-response.utils';
+import { MockConfirmedUser, MockTestUser } from './utilities/mock-test-data';
 import TestUtils from './utilities/test.utils';
-import { getTestAppOptions } from './utilities/get-test-app.options';
 
-describe('Auth Controller (e2e)', () => {
-  let app: INestApplication;
-  let server: any;
-  let createdValidUser: SaUserViewModel;
-  let confirmedUser: SaUserViewModel;
+describe('Auth API (e2e)', () => {
+  let app: INestApplication | undefined;
+  let dataSource: DataSource;
+  let server: Server;
+  let testUtils: TestUtils;
 
   beforeAll(async () => {
-    const testAppOptions = await getTestAppOptions();
-    app = testAppOptions.app;
-    server = testAppOptions.server;
+    const testContext = await getTestAppOptions();
+    app = testContext.app;
+    dataSource = testContext.dataSource;
+    server = testContext.server;
+    testUtils = new TestUtils(server);
+  });
 
-    const userUtils = new TestUtils(); // Create an instance of UserUtils
-    createdValidUser = await userUtils.createTestUser(server);
-    confirmedUser = await userUtils.createTestConfirmedUser(server);
-  }, 20000); // Increase the timeout to 20000 milliseconds (20 seconds)
+  beforeEach(async () => {
+    await resetTestDatabase(dataSource);
+  });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
-  describe('Registration Endpoint (POST) /auth/registration', () => {
-    const registrationUrl = '/auth/registration';
+  it('rejects an invalid registration payload with field-level errors', async () => {
+    const response = await request(server).post('/auth/registration').send({}).expect(400);
 
-    it('should be defined', async () => {
-      const response = await request(server).post(registrationUrl);
-      expect(response).toBeDefined();
-    });
-
-    it('should require valid user data for registration', async () => {
-      // Missing required fields
-      const invalidUserData = {};
-      const response = await request(server).post(registrationUrl).send(invalidUserData);
-      expect(response.status).toBe(400);
-    });
-
-    // it('should successfully register a new user with valid data', async () => {
-    //   // Valid user data
-    //   const validUserData = {
-    //     login: 'testUser',
-    //     email: 'test@example.com',
-    //     password: 'password123',
-    //   };
-    //   const response = await request(server)
-    //     .post(registrationUrl)
-    //     .send(validUserData);
-    //
-    //   // Expect a 204 No Content response indicating successful registration
-    //   expect(response.status).toBe(204);
-    // });
+    expect(getValidationErrorFields(getResponseBody(response))).toEqual(
+      expect.arrayContaining(['login', 'email', 'password']),
+    );
   });
 
-  describe('Login Endpoint (POST) /auth/login', () => {
-    const authLoginUrl = '/auth/login';
-    it('should successfully log in and return an access token', async () => {
-      const loginData = {
-        loginOrEmail: createdValidUser.login,
-        password: '123456789',
-      };
+  it('logs in a valid user and returns secure token contracts', async () => {
+    const user = await testUtils.createTestUser();
 
-      const response = await request(server).post(authLoginUrl).send(loginData);
+    const response = await request(server)
+      .post('/auth/login')
+      .set('User-Agent', 'nest-typeorm-e2e')
+      .send({ loginOrEmail: user.login, password: MockTestUser.password })
+      .expect(200);
 
-      expect(response.status).toBe(200);
-      expect(response.body.accessToken).toBeDefined();
-    });
-
-    it('should return 401 for invalid credentials', async () => {
-      const loginData = {
-        loginOrEmail: createdValidUser.login,
-        password: 'invalidPassword',
-      };
-
-      const response = await request(server).post(authLoginUrl).send(loginData);
-
-      expect(response.status).toBe(401);
-      expect(response.body.accessToken).toBeUndefined();
-    });
+    expect(parseAccessToken(getResponseBody(response))).toBeTruthy();
+    expect(response.headers['set-cookie']).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^refreshToken=.*HttpOnly.*Secure/)]),
+    );
   });
 
-  describe('Resending email Endpoint (POST) /auth/registration-email-resending', () => {
-    const resendingUrl = '/auth/registration-email-resending';
+  it('rejects invalid credentials without exposing an access token', async () => {
+    const user = await testUtils.createTestUser();
+    const response = await request(server)
+      .post('/auth/login')
+      .send({ loginOrEmail: user.login, password: 'invalidPassword' })
+      .expect(401);
 
-    it('should be defined', async () => {
-      const response = await request(server).post(resendingUrl);
-      expect(response).toBeDefined();
-    });
+    expect(getResponseBody(response)).not.toHaveProperty('accessToken');
+    expect(getValidationErrorFields(getResponseBody(response))).toContain(
+      'headers.authorization or password',
+    );
+  });
 
-    it('should require valid email for resending', async () => {
-      // Missing required fields
-      const invalidUserData = {};
-      const response = await request(server).post(resendingUrl).send(invalidUserData);
-      expect(response.status).toBe(400);
-    });
+  it('protects the current-user profile and returns the authenticated identity', async () => {
+    await request(server).get('/auth/me').expect(401);
 
-    // it('should successfully resending and status 204', async () => {
-    //   // Valid user data
-    //   const email = { email: createdValidUser.email };
-    //   const response = await request(server).post(resendingUrl).send(email);
-    //
-    //   expect(response.status).toBe(204);
-    // });
+    const user = await testUtils.createTestUser();
+    const accessToken = await testUtils.getAccessToken();
 
-    it('should return status 400 because user is confirmed ', async () => {
-      const email = { email: confirmedUser.email };
-      const response = await request(server).post(resendingUrl).send(email);
+    await request(server)
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200)
+      .expect({
+        userId: user.id,
+        login: user.login,
+        email: user.email,
+      });
+  });
 
-      expect(response.status).toBe(400);
-    });
+  it('rejects email resending for an already confirmed user', async () => {
+    await testUtils.createTestConfirmedUser();
+
+    const response = await request(server)
+      .post('/auth/registration-email-resending')
+      .send({ email: MockConfirmedUser.email })
+      .expect(400);
+
+    expect(getValidationErrorFields(getResponseBody(response))).toContain('email');
+  });
+
+  it('rejects a missing confirmation code with the public validation contract', async () => {
+    const response = await request(server)
+      .post('/auth/registration-confirmation')
+      .send({})
+      .expect(400);
+
+    expect(getValidationErrorFields(getResponseBody(response))).toContain('code');
   });
 });

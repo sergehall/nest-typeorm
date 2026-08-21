@@ -16,6 +16,7 @@ import { ConfigType } from '../../../config/configuration';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateSaUserCommand } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
+import { UsersEntity } from '../../users/entities/users.entity';
 
 @Injectable()
 export class SaBasicAuthGuard extends SaConfig implements CanActivate {
@@ -50,11 +51,22 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
         );
       }
       const saLogin = await this.getSaValue('SA_LOGIN');
-      const saUser = await this.usersRepo.findSaUserByLoginOrEmail(saLogin);
-      if (saUser) {
-        return true;
-      }
-      request.user = await this.commandBus.execute(new CreateSaUserCommand());
+      const existingSaUser = await this.usersRepo.findSaUserByLoginOrEmail(saLogin);
+      const saUser: UsersEntity =
+        existingSaUser ??
+        (await this.commandBus.execute<CreateSaUserCommand, UsersEntity>(
+          new CreateSaUserCommand(),
+        ));
+
+      request.user = {
+        userId: saUser.userId,
+        login: saUser.login,
+        email: saUser.email,
+        orgId: saUser.orgId,
+        roles: saUser.roles,
+        isBanned: saUser.isBanned,
+      };
+
       return true;
     }
   }

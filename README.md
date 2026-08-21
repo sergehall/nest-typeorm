@@ -188,8 +188,8 @@ Use it carefully and avoid enabling synchronization for production databases.
 # unit tests
 yarn test
 
-# e2e tests
-yarn test:e2e
+# e2e tests (requires a dedicated PostgreSQL database)
+E2E_DATABASE_URL=postgres://user:password@127.0.0.1:5432/nest_typeorm_test yarn test:e2e
 
 # coverage
 yarn test:cov
@@ -200,6 +200,10 @@ yarn lint
 # format check
 yarn format:check
 ```
+
+The E2E bootstrap refuses to reset a database unless `NODE_ENV=test`, the database name contains
+a `test` or `e2e` segment, and the host is loopback. A remote test database additionally requires
+`E2E_ALLOW_REMOTE_DATABASE_RESET=true`.
 
 ## Project Structure
 
