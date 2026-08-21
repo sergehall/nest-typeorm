@@ -1,46 +1,183 @@
 # NestLab
 
-An educational full-stack platform that combines a large modular NestJS API with a new Next.js
-web application. The project remains a monorepo while giving each application a clear boundary and
-an independent entry point.
+NestLab is an educational full-stack monorepo built around a large modular NestJS API and a
+server-first Next.js web application. It began as backend coursework and evolved into a practical
+platform for studying application architecture, PostgreSQL, authentication, realtime features,
+payments, API documentation, testing, and production hardening.
 
-## Project structure
+The project runs locally and does not require a public web domain. The screenshots below show the
+production-style interface available from the local development environment.
+
+**[Open the GitHub Pages showcase](https://sergehall.github.io/nest-typeorm/)** ·
+**[Browse the source](https://github.com/sergehall/nest-typeorm)**
+
+<p align="center">
+  <a href="docs/screenshots/web-home.webp">
+    <img src="docs/screenshots/web-home.webp" alt="NestLab web application home page" width="100%" />
+  </a>
+</p>
+
+## Product tour
+
+Click any preview to open the full-size screenshot.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/screenshots/web-home.webp">
+        <img src="docs/screenshots/web-home.webp" alt="NestLab home page" />
+      </a>
+      <br />
+      <strong>Home</strong><br />
+      Monorepo overview and the boundary between the Next.js and NestJS applications.
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/screenshots/web-capabilities.webp">
+        <img src="docs/screenshots/web-capabilities.webp" alt="NestLab capabilities page" />
+      </a>
+      <br />
+      <strong>Capabilities</strong><br />
+      Product-oriented map of identity, publishing, learning, and integration domains.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/screenshots/web-api-status.webp">
+        <img src="docs/screenshots/web-api-status.webp" alt="NestLab API status page" />
+      </a>
+      <br />
+      <strong>API status</strong><br />
+      Server-side health check for the NestJS runtime and PostgreSQL connection.
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/screenshots/web-contact.webp">
+        <img src="docs/screenshots/web-contact.webp" alt="NestLab contact page" />
+      </a>
+      <br />
+      <strong>Contact</strong><br />
+      Project, profile, and collaboration links presented through the shared design system.
+    </td>
+  </tr>
+</table>
+
+<details>
+  <summary><strong>Backend API dashboard</strong></summary>
+  <br />
+  <p>
+    The NestJS root route is an operational control surface with live application and database
+    health, OpenAPI entry points, release metadata, and a concise route map.
+  </p>
+  <a href="docs/screenshots/api-dashboard.webp">
+    <img src="docs/screenshots/api-dashboard.webp" alt="NestLab backend API dashboard" width="100%" />
+  </a>
+</details>
+
+## Architecture
+
+NestLab remains a monorepo, but the frontend and backend have independent application boundaries,
+runtime configuration, builds, and entry points.
 
 ```text
-apps/
-  api/                 NestJS, TypeORM, PostgreSQL, REST, WebSocket
-    src/               backend modules and integrations
-    test/              API end-to-end tests
-  web/                 Next.js App Router and React Server Components
-    src/app/           routes and layouts
-    src/components/    shared UI components
-    src/features/      frontend feature modules
+Browser
+  |
+  v
+apps/web                         apps/api
+Next.js 16 + React 19   HTTP     NestJS 11 + TypeORM
+App Router + RSC       ------->  REST + Socket.IO + OpenAPI
+  :3000                            :5005
+                                      |
+                                      v
+                                  PostgreSQL
 ```
 
-Backend code no longer lives at the repository root or shares application boundaries with the
-frontend. The root `package.json` only orchestrates Yarn workspaces and shared quality gates.
+| Application | Responsibility                                                                              | Development URL         |
+| ----------- | ------------------------------------------------------------------------------------------- | ----------------------- |
+| `apps/web`  | Next.js interface, navigation, contact information, and server-side API status              | `http://localhost:3000` |
+| `apps/api`  | NestJS modules, REST endpoints, realtime transport, integrations, health, and documentation | `http://localhost:5005` |
+
+The root `package.json` coordinates Yarn workspaces and shared quality gates. Backend source files
+do not live at the repository root and are not mixed with frontend modules.
 
 ## Technology stack
 
-- Node.js 24.18.0 and Yarn 4.14.1
-- Next.js 16, React 19, strict TypeScript, and Tailwind CSS 4
-- NestJS 11, TypeORM, PostgreSQL
-- Swagger / OpenAPI, Socket.IO, Jest, and Supertest
+### Web application
+
+- Next.js 16.3 with App Router and React Server Components
+- React 19.2 and strict TypeScript 6
+- Tailwind CSS 4 and a responsive project-specific design system
+- Server-only health requests that keep the backend address out of the client bundle
+
+### API
+
+- NestJS 11, TypeORM 0.3, PostgreSQL, REST, and Socket.IO
+- Passport, JWT access and refresh tokens, CASL authorization, and device sessions
+- Swagger / OpenAPI 3 with separate read-only Viewer and interactive Admin access
 - Stripe, PayPal, Telegram, email, and S3-compatible storage integrations
+- Jest, Supertest, guarded end-to-end database resets, and OpenAPI coverage checks
+
+### Tooling
+
+- Node.js 24.18.0 and Yarn 4.14.1
+- ESLint, Prettier, strict TypeScript, workspace builds, and an English-only source check
+
+## Platform capabilities
+
+- **Identity and access:** registration, login, password recovery, JWT rotation, roles, CASL
+  permissions, and device management.
+- **Publishing and communication:** blogs, posts, comments, reactions, subscriptions, moderation,
+  uploads, and realtime conversations.
+- **Pair quiz:** matchmaking, game pairs, answers, scoring, statistics, and leaderboards.
+- **Commerce and integrations:** Stripe and PayPal payments, Telegram automation, email delivery,
+  and S3-compatible media storage.
+- **Operations:** application liveness, PostgreSQL readiness, response timing, API dashboard, and
+  generated OpenAPI JSON/YAML contracts.
+
+Application routes currently do not use a global `/api` prefix. Examples include `/auth/login`,
+`/blogs`, and `/posts`; `/api/docs` is reserved for API documentation.
+
+## Security boundaries
+
+- Production-only educational mutation routes are disabled by guards.
+- Request validation, parameterized TypeORM operations, throttling, trusted proxy handling, and
+  bounded PostgreSQL connection settings protect the public API boundary.
+- Swagger fails closed unless its complete access configuration is present.
+- Viewer documentation cannot use `Try it out`; Admin documentation remains subject to the real
+  authentication and authorization guards of every endpoint.
+- Swagger passwords are stored as Argon2id hashes. Documentation sessions use signed, short-lived,
+  `HttpOnly`, `Secure`, `SameSite=Strict` cookies in production.
+- Production database access is designed for a least-privilege runtime role separate from the
+  migration owner.
+
+See [Backend production hardening](docs/security/backend-production-hardening.md) for deployment and
+database-role guidance.
 
 ## Getting started
+
+### Prerequisites
+
+- Node.js `24.18.0`
+- Corepack with Yarn `4.14.1`
+- PostgreSQL for the API runtime
+
+Install workspace dependencies from the repository root:
 
 ```bash
 nvm use
 yarn install
 ```
 
-The backend loads local environment variables from `apps/api/.env` or `apps/api/.env.dev`. Existing
-local environment files were moved with the application. Configure the frontend with:
+Create local configuration files without committing their secret values:
 
 ```bash
+cp apps/api/.env.example apps/api/.env.dev
 cp apps/web/.env.example apps/web/.env.local
 ```
+
+At minimum, configure the API database connection in `apps/api/.env.dev`. The web application uses
+`API_URL=http://localhost:5005` for server-side calls by default. Set `NEXT_PUBLIC_API_URL` only when
+browser navigation should open a different backend dashboard.
+
+### Start the platform
 
 Run the applications in separate terminals:
 
@@ -49,62 +186,68 @@ yarn dev:api
 yarn dev:web
 ```
 
-`dev:web` opens the frontend in the default browser after Next.js is ready. Use
-`yarn dev:web:no-open` to start the development server without opening a browser.
+`yarn dev:web` opens the frontend automatically after Next.js is ready. Use
+`yarn dev:web:no-open` when automatic browser launch is not wanted.
 
-- Web: [http://localhost:3000](http://localhost:3000)
-- API dashboard and health overview: [http://localhost:5005](http://localhost:5005)
-- Health contract: [http://localhost:5005/health](http://localhost:5005/health)
-- Swagger: [http://localhost:5005/api/docs](http://localhost:5005/api/docs)
+| Surface             | URL                                                                          |
+| ------------------- | ---------------------------------------------------------------------------- |
+| Web application     | [http://localhost:3000](http://localhost:3000)                               |
+| API dashboard       | [http://localhost:5005](http://localhost:5005)                               |
+| Health overview     | [http://localhost:5005/health](http://localhost:5005/health)                 |
+| Documentation login | [http://localhost:5005/api/docs/login](http://localhost:5005/api/docs/login) |
+| Viewer Swagger UI   | [http://localhost:5005/api/docs](http://localhost:5005/api/docs)             |
+| Admin Swagger UI    | [http://localhost:5005/api/docs/admin](http://localhost:5005/api/docs/admin) |
 
-Swagger also exposes machine-readable contracts at
-`http://localhost:5005/api/docs/openapi.json` and
-`http://localhost:5005/api/docs/openapi.yaml`. Documentation is enabled automatically outside
-production. To expose it in production, set `SWAGGER_ENABLED=true`, `SWAGGER_USERNAME`, and
-`SWAGGER_PASSWORD`; production documentation remains disabled unless all three values are present.
+## Swagger access
 
-`API_URL` is a server-only Next.js variable and is never included in the browser bundle. It defaults
-to `http://localhost:5005`. The API allows localhost browser requests in development. In production,
-provide one or more comma-separated origins through `WEB_ORIGIN`.
+Generate independent Viewer and Admin credentials from the repository root:
 
-Set `NEXT_PUBLIC_API_URL` when the web navigation should open a deployed backend dashboard instead
-of the local `http://localhost:5005` default.
+```bash
+yarn swagger:credentials
+```
+
+Save the generated plaintext passwords in a password manager. Runtime configuration receives only
+the Argon2id hashes and the random session-signing secret:
+
+```dotenv
+SWAGGER_ENABLED=true
+SWAGGER_VIEWER_USERNAME=viewer
+SWAGGER_VIEWER_PASSWORD_HASH='$argon2id$...'
+SWAGGER_ADMIN_USERNAME=admin
+SWAGGER_ADMIN_PASSWORD_HASH='$argon2id$...'
+SWAGGER_SESSION_SECRET='base64url-random-secret'
+SWAGGER_SESSION_TTL_SECONDS=1200
+```
+
+Authenticated Viewer sessions can also open the machine-readable contracts:
+
+- `http://localhost:5005/api/docs/openapi.json`
+- `http://localhost:5005/api/docs/openapi.yaml`
 
 ## Root commands
 
 ```bash
-yarn dev:api          # NestJS in watch mode
-yarn dev:web          # Next.js development server with automatic browser launch
-yarn dev:web:no-open  # Next.js development server without opening a browser
-yarn typecheck        # TypeScript checks for both workspaces
-yarn lint             # ESLint checks for both workspaces
-yarn lint:fix         # Fix ESLint issues in the API and web applications
+yarn dev:api          # Start NestJS in watch mode
+yarn dev:web          # Start Next.js and open it in the default browser
+yarn dev:web:no-open  # Start Next.js without opening a browser
+yarn typecheck        # Check both TypeScript workspaces
+yarn lint             # Run ESLint for API and web
+yarn lint:fix         # Fix ESLint issues in both applications
 yarn format           # Format the entire monorepo
-yarn test             # API unit tests
-yarn test:e2e         # API end-to-end tests against a dedicated PostgreSQL database
-yarn language:check   # Reject Cyrillic text outside dependencies and generated files
-yarn build            # Production builds for the API and web applications
-yarn verify           # Language, types, linting, unit tests, and production builds
+yarn test             # Run API unit and integration tests
+yarn test:e2e         # Run API end-to-end tests against a dedicated database
+yarn test:cov         # Generate API test coverage
+yarn language:check   # Reject Cyrillic source text
+yarn build            # Build API and web for production
+yarn verify           # Run language, type, lint, test, and build gates
 ```
 
-Application-specific commands can also be run through their workspace:
+Application-specific commands remain available through their workspace names:
 
 ```bash
 yarn workspace @nest-typeorm/api test:cov
 yarn workspace @nest-typeorm/web build
 ```
-
-## API capabilities
-
-- Authentication, JWT access and refresh tokens, cookies, devices, roles, and CASL authorization.
-- Users, blogs, posts, comments, reactions, subscriptions, and moderation.
-- Pair quiz matchmaking, answers, scoring, statistics, and leaderboards.
-- Real-time messaging through Socket.IO.
-- Stripe, PayPal, Telegram, email, and S3 image uploads.
-- Swagger documentation and an end-to-end environment protected from accidental database resets.
-
-Application endpoints currently do not use a global `/api` prefix. Examples include `/auth/login`,
-`/blogs`, and `/posts`. `/api/docs` is reserved for Swagger.
 
 ## End-to-end database safety
 
@@ -114,15 +257,34 @@ End-to-end tests require a dedicated PostgreSQL database:
 E2E_DATABASE_URL=postgres://user:password@127.0.0.1:5432/nest_typeorm_e2e yarn test:e2e
 ```
 
-The test bootstrap refuses to reset a database unless `NODE_ENV` equals `test`, the database name
-contains a distinct `test` or `e2e` segment, and the host is a loopback address. Resetting a remote
-test database additionally requires `E2E_ALLOW_REMOTE_DATABASE_RESET=true`.
+The test bootstrap refuses to reset a database unless `NODE_ENV=test`, the database name contains a
+distinct `test` or `e2e` segment, and the host is a loopback address. Resetting a remote test database
+additionally requires `E2E_ALLOW_REMOTE_DATABASE_RESET=true`.
+
+## Repository structure
+
+```text
+apps/
+  api/
+    scripts/             API maintenance and credential tooling
+    src/                 NestJS modules, infrastructure, and integrations
+    test/                End-to-end suites and database safety helpers
+  web/
+    src/app/             Next.js routes, layouts, and server boundaries
+    src/components/      Shared interface components
+    src/features/        Frontend feature modules and data access
+docs/
+  screenshots/           Optimized README product tour assets
+  security/              Production hardening guidance
+scripts/                 Repository-wide maintenance checks
+```
 
 ## Learning context
 
-The project began as an [IT-Incubator](https://it-incubator.io/en) backend course and gradually grew
-into a platform for studying architecture, testing, and integrations. The frontend continues that
-journey by making the API capabilities visible and establishing a foundation for real user flows.
+The backend began as an [IT-Incubator](https://it-incubator.io/en) course project. It now serves as a
+long-running engineering laboratory for modular backend design, secure API delivery, database
+safety, automated testing, and full-stack integration. The frontend makes those capabilities
+visible while leaving room for future user-facing workflows.
 
 ## Author
 
