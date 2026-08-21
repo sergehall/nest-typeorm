@@ -7,13 +7,17 @@ import { BotActivationLink } from '../types/bot-activation-link.type';
 import { GenerateTelegramActivationLinkCommand } from '../application/use-cases/generate-telegram-activation-code.use-case';
 import { ProcessTelegramWebhookMessagesCommand } from '../application/use-cases/process-telegram-webhook-messages.use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiProviderWebhook } from '../../../api-documentation/decorators/api-provider-webhook.decorator';
 
 @ApiTags('Telegram')
+@ApiControllerDocumentation()
 @Controller('integrations/telegram')
 export class TelegramController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post('webhook')
+  @ApiProviderWebhook({ provider: 'Telegram' })
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {
     console.log(payload, 'payload Webhook');
     return await this.commandBus.execute(new ProcessTelegramWebhookMessagesCommand(payload));

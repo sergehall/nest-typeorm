@@ -5,12 +5,15 @@ import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
 import { ProcessPayPalWebhookCommand } from '../application/use-cases/process-pay-pal-webhook.use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiProviderWebhook } from '../../../../api-documentation/decorators/api-provider-webhook.decorator';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto';
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 
 @ApiTags('Pay-pal')
+@ApiControllerDocumentation()
 @Controller('pay-pal')
 export class PayPalController {
   constructor(private readonly commandBus: CommandBus) {}
@@ -35,6 +38,7 @@ export class PayPalController {
   }
 
   @Post('webhooks')
+  @ApiProviderWebhook({ provider: 'PayPal' })
   async payPalWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
     return await this.commandBus.execute(new ProcessPayPalWebhookCommand(req));
   }

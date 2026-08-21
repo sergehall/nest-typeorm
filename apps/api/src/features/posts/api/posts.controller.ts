@@ -38,16 +38,18 @@ import { PostExistValidationPipe } from '../../../common/pipes/post-exist-valida
 import { DeletePostByIdCommand } from '../application/use-cases/delete-post-by-id.use-case';
 import { CommentViewModel } from '../../comments/views/comment.view-model';
 import { PostWithLikesInfoViewModel } from '../views/post-with-likes-info.view-model';
-import { LikeStatusPostsEntity } from '../entities/like-status-posts.entity';
 import { GetCommentsByPostIdCommand } from '../../comments/application/use-cases/get-comments-by-post-id.use-case';
 import { GetPostByIdCommand } from '../application/use-cases/get-post-by-id.use-case';
 import { GetPostsCommand } from '../application/use-cases/get-posts.use-case';
 import { UpdatePostByPostIdCommand } from '../application/use-cases/update-post-by-post-id.use-case';
 import { PostWithLikesImagesInfoViewModel } from '../views/post-with-likes-images-info.view-model';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Posts')
+@ApiControllerDocumentation()
 @Controller('posts')
 export class PostsController {
   constructor(
@@ -58,6 +60,7 @@ export class PostsController {
   @UseGuards(NoneStatusGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery()
   async openFindPosts(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto | null = req.user;
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
@@ -81,6 +84,7 @@ export class PostsController {
   @UseGuards(AbilitiesGuard)
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery()
   async getCommentsByPostId(
     @Request() req: any,
     @Param() params: PostIdParams,
@@ -159,10 +163,10 @@ export class PostsController {
     @Request() req: any,
     @Param() params: PostIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ): Promise<LikeStatusPostsEntity> {
+  ): Promise<void> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
+    await this.commandBus.execute(
       new ChangeLikeStatusPostCommand(params.postId, likeStatusDto, currentUserDto),
     );
   }

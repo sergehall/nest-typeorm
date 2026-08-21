@@ -56,6 +56,12 @@ yarn dev:web
 - API: [http://localhost:5005](http://localhost:5005)
 - Swagger: [http://localhost:5005/api/docs](http://localhost:5005/api/docs)
 
+Swagger also exposes machine-readable contracts at
+`http://localhost:5005/api/docs/openapi.json` and
+`http://localhost:5005/api/docs/openapi.yaml`. Documentation is enabled automatically outside
+production. To expose it in production, set `SWAGGER_ENABLED=true`, `SWAGGER_USERNAME`, and
+`SWAGGER_PASSWORD`; production documentation remains disabled unless all three values are present.
+
 `API_URL` is a server-only Next.js variable and is never included in the browser bundle. It defaults
 to `http://localhost:5005`. The API allows localhost browser requests in development. In production,
 provide one or more comma-separated origins through `WEB_ORIGIN`.

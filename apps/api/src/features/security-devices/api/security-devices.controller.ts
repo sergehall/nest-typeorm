@@ -19,9 +19,11 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { SearchDevicesCommand } from '../application/use-cases/search-devices.use-case';
 import { AuthService } from '../../auth/application/auth.service';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Security')
+@ApiControllerDocumentation()
 @Controller('security')
 export class SecurityDevicesController {
   constructor(

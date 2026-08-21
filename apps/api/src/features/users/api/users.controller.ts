@@ -34,12 +34,12 @@ import { FindUsersCommand } from '../application/use-cases/find-users.use-case';
 import { FindUserByICommand } from '../application/use-cases/find-user-by-id.use-case';
 import { UserViewModel } from '../views/user.view-model';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiDocService } from '../../../api-documentation/api-doc-service';
-import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
-import { UsersMethods } from '../../../api-documentation/enums/users-methods.enum';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Users')
+@ApiControllerDocumentation()
 @Controller('users')
 export class UsersController {
   constructor(
@@ -51,6 +51,7 @@ export class UsersController {
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery({ filters: ['searchLoginTerm', 'searchEmailTerm', 'banStatus'] })
   async findUsers(@Query() query: any): Promise<PaginatorDto> {
     const queryData: ParseQueriesDto = await this.parseQueries.getQueriesData(query);
 
@@ -60,11 +61,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
-  async findUserByUserId(@Param() params: IdParams): Promise<UsersEntity> {
+  async findUserByUserId(@Param() params: IdParams): Promise<UserViewModel> {
     return await this.commandBus.execute(new FindUserByICommand(params.id));
   }
 
-  @ApiDocService.apply(EndpointKeys.Users, UsersMethods.CreateUser)
   @Post()
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)

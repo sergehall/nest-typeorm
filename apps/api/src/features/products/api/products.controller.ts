@@ -5,9 +5,12 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateAndSaveCreateRandomProductsCommand } from '../application/create-and-save-create-random-products.use-case';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiProductCountQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Products')
+@ApiControllerDocumentation()
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -15,6 +18,7 @@ export class ProductsController {
     private readonly commandBus: CommandBus,
   ) {}
   @Get('/test-products')
+  @ApiProductCountQuery()
   async getBlogsOwnedByCurrentUser(@Query() query: any): Promise<string> {
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 

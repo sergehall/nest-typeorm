@@ -29,7 +29,6 @@ import { PostgresConfig } from './config/db/postgres/postgres.config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ProductsModule } from './features/products/products.module';
 import { TelegramAdapter } from './adapters/telegram/telegram.adapter';
-import { ApiDocumentationModule } from './api-documentation/api-documentation.module';
 import { MessagesModule } from './features/messages/messages.module';
 import { SocketModule } from './socket/socket.module';
 import { PaymentModule } from './payment/payment.module';
@@ -68,7 +67,6 @@ import { appProviders } from './app.providers';
     ProductsModule,
     StripeModule,
     PayPalModule,
-    ApiDocumentationModule,
     SocketModule,
     MessagesModule,
   ],

@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionResponseFilter } from './common/filters/http-exception-response-filter';
 import cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { setupSwagger } from './api-documentation/swagger';
 
 function setupCors(app: INestApplication): void {
   const configuredOrigins = process.env.WEB_ORIGIN?.split(',')
@@ -81,33 +81,6 @@ function setupGlobalPipes(app: INestApplication): void {
       },
     }),
   );
-}
-
-/**
- * Set up Swagger documentation for the NestJS application.
- *
- * @param app The INestApplication instance of the NestJS application.
- */
-function setupSwagger(app: INestApplication): void {
-  const config = new DocumentBuilder()
-    .addSecurity('bearer', {
-      type: 'http',
-      scheme: 'bearer',
-      description: 'Enter JWT Bearer token only',
-    })
-    .addSecurity('basic', {
-      type: 'http',
-      scheme: 'basic',
-      description: 'Login with username and password',
-    })
-    .setTitle('IT-Incubator API')
-    .setDescription(
-      "The Training IT-Incubator API is a versatile RESTful API built with Nests for managing training activities. It offers endpoints for user management, blog creation, post management, commenting, scheduling, and email notifications. Additionally, it integrates seamlessly with payment systems like Stripe and PayPal to facilitate secure transactions. Postgresql is utilized for database storage, and AWS S3 is employed for file storage. Moreover, it includes integration with Telegram. With its modular architecture, it's easy to build and deploy training applications of any scale. <a href='https://it-incubator.io'>Learn more</a>",
-    )
-    .setVersion('36.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api/docs', app, document);
 }
 
 /**

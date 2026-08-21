@@ -34,13 +34,14 @@ import { RefreshJwtCommand } from '../application/use-cases/refresh-jwt.use-case
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
 import { LoginCommand } from '../application/use-cases/login.use-case';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { ApiDocService } from '../../../api-documentation/api-doc-service';
-import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
-import { AuthMethods } from '../../../api-documentation/enums/auth-methods.enum';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiConfirmationCodeQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
+import { LoginRequestDto } from '../dto/login-request.dto';
 
 @SkipThrottle()
 @ApiTags('Auth')
+@ApiControllerDocumentation()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -50,6 +51,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: LoginRequestDto })
   @Post('login')
   async login(
     @Request() req: any,
@@ -116,6 +118,7 @@ export class AuthController {
   @SkipThrottle()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('confirm-registration')
+  @ApiConfirmationCodeQuery()
   async confirmRegistrationByCodeFromQuery(@Query() query: any): Promise<boolean> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
@@ -141,7 +144,6 @@ export class AuthController {
   }
 
   @SkipThrottle()
-  @ApiDocService.apply(EndpointKeys.Auth, AuthMethods.Me)
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: any): Promise<UserIdEmailLoginDto> {
