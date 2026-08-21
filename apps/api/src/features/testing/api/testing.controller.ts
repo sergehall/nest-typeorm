@@ -2,9 +2,11 @@ import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { TestingService } from '../application/testing.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Testing')
+@ApiControllerDocumentation()
 @Controller('testing')
 export class TestingController {
   constructor(private readonly testingService: TestingService) {}

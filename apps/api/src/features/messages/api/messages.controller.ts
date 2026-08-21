@@ -14,11 +14,13 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { MessagesEntity } from '../entities/messages.entity';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ConversationIdParams } from '../../../common/query/params/conversation-id.params';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { MessageViewModel } from '../views/message.view-model';
 
 @ApiTags('Messages')
+@ApiControllerDocumentation()
 @Controller('conversation')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
@@ -29,7 +31,7 @@ export class MessagesController {
     @Request() req: any,
     @Param() params: ConversationIdParams,
     @Body() createMessageDto: CreateMessageDto,
-  ): Promise<MessagesEntity> {
+  ): Promise<MessageViewModel> {
     const currentUserDto: CurrentUserDto = req.user;
     const conversationId: string = params.conversationId;
 

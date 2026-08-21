@@ -26,12 +26,13 @@ import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommentViewModel } from '../views/comment.view-model';
-import { LikeStatusCommentsEntity } from '../entities/like-status-comments.entity';
 import { GetCommentByIdCommand } from '../application/use-cases/get-comment-by-id';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 
 @SkipThrottle()
 @ApiTags('Comments')
+@ApiControllerDocumentation()
 @Controller('comments')
 export class CommentsController {
   constructor(protected commandBus: CommandBus) {}
@@ -79,10 +80,10 @@ export class CommentsController {
     @Request() req: any,
     @Param() params: CommentIdParams,
     @Body() likeStatusDto: LikeStatusDto,
-  ): Promise<LikeStatusCommentsEntity> {
+  ): Promise<void> {
     const currentUserDto: CurrentUserDto = req.user;
 
-    return await this.commandBus.execute(
+    await this.commandBus.execute(
       new ChangeLikeStatusCommentCommand(params.commentId, likeStatusDto, currentUserDto),
     );
   }

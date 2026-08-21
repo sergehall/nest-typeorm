@@ -52,13 +52,14 @@ import { UploadFilesBlogsMainCommand } from '../application/use-cases/upload-fil
 import { UploadFilesPostsCommand } from '../application/use-cases/upload-files-posts-use-case';
 import { UploadFilesBlogWallpaperCommand } from '../application/use-cases/upload-files-blogs-wallpaper-use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiImageUpload } from '../../../api-documentation/decorators/api-image-upload.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 import { BloggerBlogsWithImagesSubscribersViewModel } from '../views/blogger-blogs-with-images-subscribers.view-model';
-import { ApiDocService } from '../../../api-documentation/api-doc-service';
-import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
-import { BloggersMethods } from '../../../api-documentation/enums/bloggers-methods.enum';
 
 @SkipThrottle()
 @ApiTags('Blogger')
+@ApiControllerDocumentation()
 @Controller('blogger')
 export class BloggerBlogsController {
   constructor(
@@ -66,6 +67,7 @@ export class BloggerBlogsController {
     protected commandBus: CommandBus,
   ) {}
   @Post('blogs/:blogId/posts/:postId/images/main')
+  @ApiImageUpload(getFileConstraints.imagePost)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageForPost(
@@ -83,6 +85,7 @@ export class BloggerBlogsController {
   }
 
   @Post('blogs/:blogId/images/wallpaper')
+  @ApiImageUpload(getFileConstraints.imageBlogWallpaper)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageBlogWallpaper(
@@ -100,6 +103,7 @@ export class BloggerBlogsController {
   }
 
   @Post('blogs/:blogId/images/main')
+  @ApiImageUpload(getFileConstraints.imageBlogMain)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFilesBlogMain(
@@ -116,10 +120,10 @@ export class BloggerBlogsController {
     );
   }
 
-  @ApiDocService.apply(EndpointKeys.Users, BloggersMethods.GetBlogs)
   // @UseGuards(ReCaptchaGuard)
   @UseGuards(JwtAuthGuard)
   @Get('blogs')
+  @ApiCollectionQuery({ filters: ['searchNameTerm'] })
   async getBlogsOwnedByCurrentUser(
     @Request() req: any,
     @Query() query: any,
@@ -135,6 +139,7 @@ export class BloggerBlogsController {
 
   @Get('blogs/comments')
   @UseGuards(JwtAuthGuard)
+  @ApiCollectionQuery()
   async getCommentsOwnedByCurrentUser(
     @Request() req: any,
     @Query() query: any,
@@ -176,6 +181,7 @@ export class BloggerBlogsController {
   @Get('blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery()
   async getPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
@@ -205,6 +211,7 @@ export class BloggerBlogsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users/blog/:id')
+  @ApiCollectionQuery({ filters: ['searchLoginTerm'] })
   async searchBannedUsersInBlog(
     @Request() req: any,
     @Param() params: IdParams,

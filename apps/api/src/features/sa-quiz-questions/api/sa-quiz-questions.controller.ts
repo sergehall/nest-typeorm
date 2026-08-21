@@ -26,8 +26,11 @@ import { SaDeleteQuestionByIdCommand } from '../application/use-cases/sa-delete-
 import { UpdatePublishDto } from '../dto/update-publish.dto';
 import { SaUpdateQuestionsPublishCommand } from '../application/use-cases/sa-update-questions-publish.use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @ApiTags('Super Admin Quiz Questions')
+@ApiControllerDocumentation()
 @Controller('sa/quiz/questions')
 export class SaQuizQuestionsController {
   constructor(
@@ -37,6 +40,7 @@ export class SaQuizQuestionsController {
 
   @Get()
   @UseGuards(SaBasicAuthGuard)
+  @ApiCollectionQuery({ filters: ['bodySearchTerm', 'publishedStatus'] })
   async saGetQuestions(@Query() query: any) {
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 

@@ -5,6 +5,8 @@ import { httpApiGroups } from '@/features/platform/data/http-api-reference';
 
 const localApiUrl = 'http://localhost:5005';
 const swaggerUrl = `${localApiUrl}/api/docs`;
+const openApiJsonUrl = `${swaggerUrl}/openapi.json`;
+const openApiYamlUrl = `${swaggerUrl}/openapi.yaml`;
 
 export const metadata: Metadata = {
   title: 'HTTP API',
@@ -42,13 +44,21 @@ export default function HttpApiPage() {
           </div>
           <div>
             <dt>Protocol</dt>
-            <dd>REST · JSON</dd>
+            <dd>REST · JSON · 95 operations</dd>
           </div>
           <div>
             <dt>Live contract</dt>
             <dd>
               <a href={swaggerUrl} target="_blank" rel="noopener noreferrer">
-                Open Swagger <span aria-hidden="true">↗</span>
+                Swagger UI <span aria-hidden="true">↗</span>
+              </a>
+              {' · '}
+              <a href={openApiJsonUrl} target="_blank" rel="noopener noreferrer">
+                JSON <span aria-hidden="true">↗</span>
+              </a>
+              {' · '}
+              <a href={openApiYamlUrl} target="_blank" rel="noopener noreferrer">
+                YAML <span aria-hidden="true">↗</span>
               </a>
             </dd>
           </div>

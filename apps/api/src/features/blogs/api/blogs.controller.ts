@@ -30,9 +30,12 @@ import { ManageBlogsSubscribeCommand } from '../../blogger-blogs/application/use
 import { SubscriptionStatus } from '../../blogger-blogs/enums/subscription-status.enums';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Blogs')
+@ApiControllerDocumentation()
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -43,6 +46,7 @@ export class BlogsController {
   @Get()
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery({ filters: ['searchNameTerm'] })
   async searchBlogs(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 
@@ -97,6 +101,7 @@ export class BlogsController {
   @Get(':blogId/posts')
   @UseGuards(NoneStatusGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery()
   async openSearchPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,

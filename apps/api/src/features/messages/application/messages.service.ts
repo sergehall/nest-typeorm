@@ -7,6 +7,7 @@ import { MessagesEntity } from '../entities/messages.entity';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ConversationsRepo } from '../infrastructure/conversations.repo';
 import { SocketGateway } from '../../../socket/socket.gateway';
+import { MessageViewModel } from '../views/message.view-model';
 
 @Injectable()
 export class MessagesService {
@@ -20,7 +21,7 @@ export class MessagesService {
     conversationId: string,
     createMessageDto: CreateMessageDto,
     currentUserDto: CurrentUserDto,
-  ): Promise<MessagesEntity> {
+  ): Promise<MessageViewModel> {
     // // const conversation = await this.conversationsRepo.findOne(conversationId)
     // if (!conversation)
     //   throw new NotFoundException(
@@ -49,7 +50,11 @@ export class MessagesService {
 
     await this.socketGateway.sentToAll(createdMessage);
 
-    return createdMessage;
+    return {
+      id: createdMessage.id,
+      content: createdMessage.message,
+      createdAt: createdMessage.createdAt,
+    };
   }
 
   async findAll() {

@@ -34,9 +34,15 @@ import { JwtAuthAndActiveGameGuard } from '../../auth/guards/jwt-auth-and-active
 import { CurrentUserAndActiveGameDto } from '../../users/dto/current-user-and-active-game.dto';
 import { PairsGameEntity } from '../entities/pairs-game.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import {
+  ApiCollectionQuery,
+  ApiStatisticsQuery,
+} from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Pair-game-quiz')
+@ApiControllerDocumentation()
 @Controller('pair-game-quiz')
 export class PairGameQuizController {
   constructor(
@@ -53,6 +59,7 @@ export class PairGameQuizController {
 
   @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
+  @ApiCollectionQuery({ sortByExample: 'pairCreatedDate' })
   async getMyGames(@Request() req: any, @Query() query: any): Promise<PaginatorDto> {
     const currentUserDto: CurrentUserDto = req.user;
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
@@ -69,6 +76,7 @@ export class PairGameQuizController {
   }
 
   @Get('users/top')
+  @ApiStatisticsQuery()
   async getGamesStatistic(@Query() query: any): Promise<GamesStatisticsViewModel[]> {
     const queryData: ParseQueriesDto = await this.parseQueriesService.getQueriesData(query);
 

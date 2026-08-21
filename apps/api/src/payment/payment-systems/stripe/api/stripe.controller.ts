@@ -7,6 +7,8 @@ import { PaymentLinkDto } from '../../../dto/payment-link.dto';
 import { PaymentSystem } from '../../../enums/payment-system.enums';
 import { BuyProductsCommand } from '../../../application/use-cases/buy-products.use-case';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiControllerDocumentation } from '../../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiProviderWebhook } from '../../../../api-documentation/decorators/api-provider-webhook.decorator';
 import { ParseQueriesService } from '../../../../common/query/parse-queries.service';
 import { IfGuestUsersGuard } from '../../../../features/auth/guards/if-guest-users.guard';
 import { ProductsRequestDto } from '../../../../features/products/dto/products-request.dto';
@@ -14,6 +16,7 @@ import { CurrentUserDto } from '../../../../features/users/dto/current-user.dto'
 import { GuestUsersDto } from '../../../../features/users/dto/guest-users.dto';
 
 @ApiTags('Stripe')
+@ApiControllerDocumentation()
 @Controller('stripe')
 export class StripeController {
   constructor(
@@ -40,6 +43,7 @@ export class StripeController {
   }
 
   @Post('webhook')
+  @ApiProviderWebhook({ provider: 'Stripe', signatureHeader: 'stripe-signature' })
   async stripeWebhook(@Req() req: RawBodyRequest<Request>): Promise<boolean> {
     return await this.commandBus.execute(new ProcessStripeWebHookCommand(req));
   }

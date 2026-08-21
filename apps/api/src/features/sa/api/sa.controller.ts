@@ -53,12 +53,12 @@ import { BloggerBlogsViewModel } from '../../blogger-blogs/views/blogger-blogs.v
 import { UsersService } from '../../users/application/users.service';
 import { SaUserViewModel } from '../views/sa-user-view-model';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiDocService } from '../../../api-documentation/api-doc-service';
-import { EndpointKeys } from '../../../api-documentation/enums/endpoint-keys.enum';
-import { SaMethods } from '../../../api-documentation/enums/sa-methods.enum';
+import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
+import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
 @SkipThrottle()
 @ApiTags('Super Admin')
+@ApiControllerDocumentation()
 @Controller('sa')
 export class SaController {
   constructor(
@@ -71,6 +71,7 @@ export class SaController {
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery({ filters: ['searchLoginTerm', 'searchEmailTerm', 'banStatus'] })
   async saFindUsers(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
@@ -81,6 +82,7 @@ export class SaController {
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery({ filters: ['searchNameTerm'] })
   async saFindBlogs(@Query() query: any): Promise<PaginatorDto> {
     const queryData = await this.parseQueriesService.getQueriesData(query);
 
@@ -90,6 +92,7 @@ export class SaController {
   @Get('blogs/:blogId/posts')
   @UseGuards(SaBasicAuthGuard)
   @CheckAbilities({ action: Action.READ, subject: CurrentUserDto })
+  @ApiCollectionQuery()
   async saGetPostsInBlog(
     @Request() req: any,
     @Param('blogId', BlogExistValidationPipe) blogId: string,
@@ -103,7 +106,6 @@ export class SaController {
     );
   }
 
-  @ApiDocService.apply(EndpointKeys.Users, SaMethods.CreateUser)
   @Post('users')
   @UseGuards(SaBasicAuthGuard)
   @UseGuards(AbilitiesGuard)
