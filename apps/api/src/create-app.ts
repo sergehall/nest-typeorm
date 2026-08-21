@@ -10,6 +10,8 @@ import helmet from 'helmet';
 import { isHardenedRuntime } from './common/environment/runtime-environment';
 
 function setupSecurityHeaders(app: NestExpressApplication): void {
+  const hardenedRuntime = isHardenedRuntime();
+
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -19,9 +21,12 @@ function setupSecurityHeaders(app: NestExpressApplication): void {
           imgSrc: ["'self'", 'data:'],
           scriptSrc: ["'self'", "'unsafe-inline'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
+          // Local development serves plain HTTP. Asking the browser to upgrade
+          // relative links here would turn them into unsupported HTTPS requests.
+          upgradeInsecureRequests: hardenedRuntime ? [] : null,
         },
       },
-      strictTransportSecurity: isHardenedRuntime()
+      strictTransportSecurity: hardenedRuntime
         ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
         : false,
     }),
