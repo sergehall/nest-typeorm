@@ -5,13 +5,12 @@ on:
     branches:
       - staging # specify the name of the branch in which we want to push and launch our deployment
 
-
 jobs:
   tests:
     name: Tests # the name of a specific job in pipeline !!!
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout  # cloning the repository
+      - name: Checkout # cloning the repository
         uses: actions/checkout@v3
 
       - name: Install dependencies

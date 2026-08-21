@@ -1,5 +1,5 @@
 const tseslint = require('@typescript-eslint/eslint-plugin');
-const prettierRecommended = require('eslint-plugin-prettier/recommended');
+const eslintConfigPrettier = require('eslint-config-prettier/flat');
 
 module.exports = [
   {
@@ -7,14 +7,7 @@ module.exports = [
   },
   ...tseslint.configs['flat/recommended'],
   {
-    files: ['{src,apps,libs,test}/**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.json',
-        tsconfigRootDir: __dirname,
-        sourceType: 'module',
-      },
-    },
+    files: ['**/*.ts'],
     rules: {
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -30,5 +23,14 @@ module.exports = [
       ],
     },
   },
-  prettierRecommended,
+  {
+    files: ['**/*.{js,cjs}'],
+    languageOptions: {
+      sourceType: 'commonjs',
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  eslintConfigPrettier,
 ];

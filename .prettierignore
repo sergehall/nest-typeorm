@@ -7,3 +7,6 @@ coverage
 *.log
 *.tsbuildinfo
 yarn.lock
+
+# Prettier's Handlebars parser can alter the HTML document structure.
+src/common/mails/templates/**/*.hbs
