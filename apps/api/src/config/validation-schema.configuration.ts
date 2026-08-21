@@ -32,6 +32,13 @@ export const validationSchemaConfiguration = Joi.object({
   SA_PASSWORD_HASH: Joi.string().min(100).max(100).required(),
   THROTTLE_TTL: Joi.number().integer().positive().default(60000),
   THROTTLE_LIMIT: Joi.number().integer().min(1).max(10000).default(100),
+  SWAGGER_ENABLED: Joi.boolean().truthy('true').falsy('false').default(false),
+  SWAGGER_VIEWER_USERNAME: Joi.string().min(3).max(64),
+  SWAGGER_VIEWER_PASSWORD_HASH: Joi.string().pattern(/^\$argon2id\$.{40,}$/),
+  SWAGGER_ADMIN_USERNAME: Joi.string().min(3).max(64),
+  SWAGGER_ADMIN_PASSWORD_HASH: Joi.string().pattern(/^\$argon2id\$.{40,}$/),
+  SWAGGER_SESSION_SECRET: Joi.string().min(43).max(256),
+  SWAGGER_SESSION_TTL_SECONDS: Joi.number().integer().min(300).max(3600).default(1200),
   PORT: Joi.number().default(5000),
   DATABASE_URL: Joi.string()
     .uri({ scheme: ['postgres', 'postgresql'] })

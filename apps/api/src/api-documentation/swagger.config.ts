@@ -1,6 +1,10 @@
 import { DocumentBuilder } from '@nestjs/swagger';
 
 export const SWAGGER_PATH = 'api/docs';
+export const SWAGGER_ADMIN_PATH = 'api/docs/admin';
+export const SWAGGER_LOGIN_PATH = '/api/docs/login';
+export const SWAGGER_SESSION_PATH = '/api/docs/session';
+export const SWAGGER_LOGOUT_PATH = '/api/docs/logout';
 export const SWAGGER_JSON_PATH = '/api/docs/openapi.json';
 export const SWAGGER_YAML_PATH = '/api/docs/openapi.yaml';
 export const API_VERSION = '1.36.0';

@@ -40,6 +40,7 @@ describe('API dashboard renderer', () => {
     expect(html).toContain('All systems operational');
     expect(html).toContain('PostgreSQL database');
     expect(html).toContain(`${API_OPERATION_COUNT}</strong><span>operations`);
+    expect(html).toContain(`href="/api/docs/login"`);
     expect(html).toContain(`/api/docs/openapi.json`);
     expect(html).toContain(`/api/docs/openapi.yaml`);
     expect(html).toContain(`<code>/health</code>`);
