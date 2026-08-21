@@ -15,10 +15,10 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   return (
     <div className="shell not-found" role="alert">
       <p className="eyebrow">Error / application</p>
-      <h1>Что-то пошло не так.</h1>
-      <p>Попробуйте повторить запрос. Если ошибка сохранится, сообщите о ней через контакты.</p>
+      <h1>Something went wrong.</h1>
+      <p>Try the request again. If the error persists, report it through the contact page.</p>
       <button className="button button--primary" type="button" onClick={reset}>
-        Повторить
+        Try again
       </button>
     </div>
   );

@@ -4,8 +4,8 @@ import { ArrowIcon } from '@/components/ui/arrow-icon';
 import { platformCapabilities } from '@/features/platform/data/platform-capabilities';
 
 export const metadata: Metadata = {
-  title: 'Возможности',
-  description: 'Основные предметные области и интеграции учебной full-stack платформы NestLab.',
+  title: 'Capabilities',
+  description: 'Core product domains and integrations in the NestLab educational platform.',
 };
 
 export default function FeaturesPage() {
@@ -13,10 +13,10 @@ export default function FeaturesPage() {
     <div className="shell page-stack">
       <header className="page-hero">
         <p className="eyebrow">Platform map / 04 domains</p>
-        <h1>От авторизации до realtime и платежей.</h1>
+        <h1>From authentication to real-time communication and payments.</h1>
         <p>
-          Backend уже содержит десятки сценариев. Здесь они собраны не по папкам фреймворка, а по
-          продуктовым задачам, которые решает платформа.
+          The backend already supports dozens of workflows. They are organized here by the product
+          problems the platform solves, not by framework folders.
         </p>
       </header>
 
@@ -29,7 +29,7 @@ export default function FeaturesPage() {
               <h2>{capability.title}</h2>
               <p>{capability.description}</p>
             </div>
-            <ul className="feature-row__tags" aria-label="Технологии">
+            <ul className="feature-row__tags" aria-label="Technologies">
               {capability.technologies.map((technology) => (
                 <li key={technology}>{technology}</li>
               ))}
@@ -41,13 +41,11 @@ export default function FeaturesPage() {
       <aside className="cta-panel">
         <div>
           <p className="eyebrow">Live boundary</p>
-          <h2>Web умеет проверять API.</h2>
-          <p>
-            Страница состояния делает server-side запрос и корректно переживает выключенный backend.
-          </p>
+          <h2>The web application can verify the API.</h2>
+          <p>The status page performs a server-side request and handles an unavailable backend.</p>
         </div>
         <Link className="button button--light" href="/status">
-          Открыть статус <ArrowIcon />
+          View API status <ArrowIcon />
         </Link>
       </aside>
     </div>

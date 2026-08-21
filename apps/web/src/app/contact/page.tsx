@@ -8,19 +8,19 @@ const socialProfiles = [
     label: 'Instagram',
     handle: '@sergioartg',
     href: siteConfig.instagramUrl,
-    description: 'Визуальные проекты, текущая работа и творческое направление.',
+    description: 'Visual projects, current work, and creative direction.',
   },
   {
     label: 'GitHub',
     handle: 'SergeHall',
     href: 'https://github.com/SergeHall',
-    description: 'Код, backend-системы, архитектурные эксперименты и история проекта.',
+    description: 'Code, backend systems, architectural experiments, and project history.',
   },
 ] as const;
 
 export const metadata: Metadata = {
-  title: 'Контакты',
-  description: 'Email и профили автора учебной платформы NestLab.',
+  title: 'Contact',
+  description: 'Email and social profiles for the creator of the NestLab educational platform.',
 };
 
 export default function ContactPage() {
@@ -28,10 +28,11 @@ export default function ContactPage() {
     <div className="shell page-stack contact-page">
       <header className="page-hero">
         <p className="eyebrow">Contact / Los Angeles</p>
-        <h1>Поговорим о проекте и инженерной практике.</h1>
+        <h1>Let us talk about the project and engineering practice.</h1>
         <p>
-          Вопрос по архитектуре, идея для следующего модуля или просто обратная связь — выбирайте
-          удобный канал. Контактный блок адаптирован из проекта Lavoval.
+          Whether you have an architecture question, an idea for the next module, or general
+          feedback, choose the channel that works best for you. This contact block was adapted from
+          the Lavoval project.
         </p>
       </header>
 
@@ -46,11 +47,11 @@ export default function ContactPage() {
             <article className="contact-item">
               <div>
                 <p className="eyebrow">Email</p>
-                <h3>Прямое сообщение</h3>
-                <p>Лучший канал для вопросов о продукте, архитектуре и совместной работе.</p>
+                <h3>Direct message</h3>
+                <p>The best channel for product, architecture, and collaboration inquiries.</p>
               </div>
               <ContactEmailAction>
-                Отправить письмо <ArrowIcon />
+                Send an email <ArrowIcon />
               </ContactEmailAction>
             </article>
 
@@ -77,10 +78,10 @@ export default function ContactPage() {
 
         <aside className="contact-card contact-card--note">
           <p className="eyebrow">About this build</p>
-          <h2>Учебный проект, открытый для развития.</h2>
+          <h2>An educational project designed to evolve.</h2>
           <p>
-            Сейчас frontend показывает архитектуру и проверяет API. Следующий шаг — подключать
-            настоящие пользовательские сценарии: авторизацию, блоги, викторину и realtime.
+            The frontend currently presents the architecture and verifies the API. The next step is
+            to integrate real user flows for authentication, blogs, quizzes, and real-time features.
           </p>
           <a
             className="text-link"
@@ -88,7 +89,7 @@ export default function ContactPage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Открыть репозиторий <ArrowIcon />
+            Open the repository <ArrowIcon />
           </a>
         </aside>
       </section>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     type: 'website',
-    locale: 'ru_RU',
+    locale: 'en_US',
   },
 };
 
@@ -27,10 +27,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang="en">
       <body>
         <a className="skip-link" href="#main-content">
-          Перейти к содержимому
+          Skip to main content
         </a>
         <SiteHeader />
         <main id="main-content">{children}</main>
