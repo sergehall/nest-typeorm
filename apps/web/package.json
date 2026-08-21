@@ -4,14 +4,15 @@
   "description": "Next.js frontend for the Nest TypeORM educational platform.",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build --webpack",
-    "start": "next start --port 3000",
+    "dev": "node ./scripts/dev.mjs",
+    "dev:no-open": "node ./scripts/dev.mjs --no-open",
+    "build": "next build --webpack && node ./scripts/prepare-standalone.mjs",
+    "start": "node ./.next/standalone/apps/web/server.js",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --max-warnings=0",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "typecheck": "tsc --noEmit"
+    "format": "prettier . --write --ignore-path ../../.prettierignore",
+    "format:check": "prettier . --check --ignore-path ../../.prettierignore",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "next": "16.3.1",

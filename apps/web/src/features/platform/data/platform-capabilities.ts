@@ -10,33 +10,32 @@ export const platformCapabilities: readonly PlatformCapability[] = [
   {
     number: '01',
     eyebrow: 'Identity',
-    title: 'Пользователи и доступ',
+    title: 'Users and access',
     description:
-      'Регистрация, JWT-сессии, восстановление пароля, роли, разрешения CASL и управление устройствами.',
+      'Registration, JWT sessions, password recovery, roles, CASL permissions, and device management.',
     technologies: ['Passport', 'JWT', 'CASL'],
   },
   {
     number: '02',
     eyebrow: 'Publishing',
-    title: 'Блоги и общение',
+    title: 'Publishing and communication',
     description:
-      'Блоги, публикации, комментарии, реакции, подписки, модерация и обмен сообщениями в реальном времени.',
+      'Blogs, posts, comments, reactions, subscriptions, moderation, and real-time messaging.',
     technologies: ['TypeORM', 'Socket.IO', 'S3'],
   },
   {
     number: '03',
     eyebrow: 'Learning',
-    title: 'Парная викторина',
-    description:
-      'Подбор игроков, игровые пары, ответы, подсчёт очков, статистика и таблица лидеров.',
+    title: 'Pair quiz',
+    description: 'Player matchmaking, game pairs, answers, scoring, statistics, and leaderboards.',
     technologies: ['CQRS', 'PostgreSQL', 'Jest'],
   },
   {
     number: '04',
     eyebrow: 'Integrations',
-    title: 'Внешние сервисы',
+    title: 'External services',
     description:
-      'Платежи Stripe и PayPal, Telegram-бот, email-уведомления и S3-совместимое файловое хранилище.',
+      'Stripe and PayPal payments, a Telegram bot, email notifications, and S3-compatible file storage.',
     technologies: ['Stripe', 'Telegram', 'AWS SDK'],
   },
 ] as const;

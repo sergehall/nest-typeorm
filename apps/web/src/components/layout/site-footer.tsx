@@ -11,11 +11,11 @@ export function SiteFooter() {
             <BrandMark compact />
             <span>NestLab</span>
           </Link>
-          <p>Учебный монолит с чёткой границей между web и API.</p>
+          <p>An educational monorepo with a clear boundary between the web application and API.</p>
         </div>
-        <div className="site-footer__links" aria-label="Ссылки проекта">
-          <Link href="/features">Возможности</Link>
-          <Link href="/contact">Контакты</Link>
+        <div className="site-footer__links" aria-label="Project links">
+          <Link href="/features">Capabilities</Link>
+          <Link href="/contact">Contact</Link>
           <a href={siteConfig.repositoryUrl} target="_blank" rel="noopener noreferrer">
             GitHub ↗
           </a>

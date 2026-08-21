@@ -32,7 +32,7 @@ export async function getApiHealth(): Promise<ApiHealth> {
         status: 'offline',
         url,
         checkedAt,
-        message: `API ответил с HTTP ${response.status}.`,
+        message: `The API responded with HTTP ${response.status}.`,
       };
     }
 
@@ -42,7 +42,7 @@ export async function getApiHealth(): Promise<ApiHealth> {
       status: 'online',
       url,
       checkedAt,
-      message: message || 'API отвечает.',
+      message: message || 'The API is responding.',
       responseTimeMs: Math.round(performance.now() - startedAt),
     };
   } catch {
@@ -50,7 +50,7 @@ export async function getApiHealth(): Promise<ApiHealth> {
       status: 'offline',
       url,
       checkedAt,
-      message: 'API недоступен. Запустите backend командой yarn dev:api.',
+      message: 'The API is unavailable. Start the backend with yarn dev:api.',
     };
   }
 }

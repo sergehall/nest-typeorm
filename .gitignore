@@ -3,6 +3,7 @@
 **/.next
 **/out
 **/node_modules
+**/next-env.d.ts
 .yarn/install-state.gz
 
 # local environment variables

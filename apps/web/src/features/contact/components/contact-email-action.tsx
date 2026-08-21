@@ -20,7 +20,7 @@ export function ContactEmailAction({ children }: ContactEmailActionProps) {
     <button
       className="button button--primary"
       type="button"
-      aria-label="Написать Serge Hall по электронной почте"
+      aria-label="Email Serge Hall"
       onClick={() => {
         const mailProtocol = String.fromCharCode(109, 97, 105, 108, 116, 111, 58);
         window.open(`${mailProtocol}${getContactEmail()}`, '_self', 'noopener,noreferrer');

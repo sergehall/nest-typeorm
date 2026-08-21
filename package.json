@@ -15,6 +15,7 @@
     "runtime:check": "node -e \"const expected = '24.18.0'; const actual = process.versions.node; if (actual !== expected) { console.error('Expected Node.js ' + expected + ', got ' + actual); process.exit(1); }\"",
     "dev:api": "yarn workspace @nest-typeorm/api start:dev",
     "dev:web": "yarn workspace @nest-typeorm/web dev",
+    "dev:web:no-open": "yarn workspace @nest-typeorm/web dev:no-open",
     "build": "yarn build:api && yarn build:web",
     "build:api": "yarn workspace @nest-typeorm/api build",
     "build:web": "yarn workspace @nest-typeorm/web build",
@@ -32,11 +33,12 @@
     "test": "yarn workspace @nest-typeorm/api test",
     "test:e2e": "yarn workspace @nest-typeorm/api test:e2e",
     "test:cov": "yarn workspace @nest-typeorm/api test:cov",
+    "language:check": "node ./scripts/check-english-language.mjs",
     "format": "prettier . --write",
     "format:api": "yarn workspace @nest-typeorm/api format",
     "format:web": "yarn workspace @nest-typeorm/web format",
     "format:check": "prettier . --check",
-    "verify": "yarn typecheck && yarn lint && yarn test && yarn build"
+    "verify": "yarn language:check && yarn typecheck && yarn lint && yarn test && yarn build"
   },
   "devDependencies": {
     "prettier": "^3.9.6"

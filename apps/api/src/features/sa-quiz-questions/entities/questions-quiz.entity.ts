@@ -44,7 +44,7 @@ export class QuestionsQuizEntity {
     type: 'character varying',
     length: 50,
     nullable: false,
-    default: 'Еhe topic is not defined',
+    default: 'The topic is not defined',
   })
   topic: string;
 
