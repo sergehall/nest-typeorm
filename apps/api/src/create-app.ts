@@ -6,6 +6,23 @@ import cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+function setupCors(app: INestApplication): void {
+  const configuredOrigins = process.env.WEB_ORIGIN?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const developmentOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
+  app.enableCors({
+    origin:
+      configuredOrigins && configuredOrigins.length > 0
+        ? configuredOrigins
+        : process.env.NODE_ENV === 'production'
+          ? false
+          : developmentOrigins,
+    credentials: true,
+  });
+}
+
 /**
  * Configure the IoC container for the NestJS application.
  *
@@ -100,6 +117,7 @@ function setupSwagger(app: INestApplication): void {
  * @returns The same INestApplication instance after applying configurations.
  */
 export const createApp = (app: INestApplication): INestApplication => {
+  setupCors(app);
   setupContainer(app);
   setupExceptionFilter(app);
   setupCookieParser(app);
