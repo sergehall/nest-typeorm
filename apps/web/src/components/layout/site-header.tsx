@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { BrandMark } from '@/components/ui/brand-mark';
-import { getPublicApiUrl } from '@/config/site';
 
 const internalNavigation = [
   { href: '/', label: 'Home' },
@@ -10,8 +9,6 @@ const internalNavigation = [
 ] as const;
 
 export function SiteHeader() {
-  const apiUrl = getPublicApiUrl();
-
   return (
     <header className="site-header">
       <div className="shell site-header__inner">
@@ -22,15 +19,7 @@ export function SiteHeader() {
 
         <nav aria-label="Primary navigation">
           <ul className="site-header__nav">
-            {internalNavigation.slice(0, 2).map((item) => (
-              <li key={item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
-            <li>
-              <a href={apiUrl}>Backend API</a>
-            </li>
-            {internalNavigation.slice(2).map((item) => (
+            {internalNavigation.map((item) => (
               <li key={item.href}>
                 <Link href={item.href}>{item.label}</Link>
               </li>
