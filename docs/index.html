@@ -277,14 +277,7 @@
         line-height: 1.7;
       }
 
-      .gallery {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px;
-      }
-
-      figure {
-        margin: 0;
+      .slideshow {
         border: 1px solid var(--line);
         border-radius: 24px;
         overflow: hidden;
@@ -292,34 +285,154 @@
         box-shadow: 0 18px 48px rgba(20, 33, 61, 0.1);
       }
 
-      figure.backend {
-        grid-column: 1 / -1;
-      }
-
-      figure a {
-        display: block;
+      .slide-stage {
+        position: relative;
         background: #e9e4d9;
       }
 
-      figure img {
-        width: 100%;
-        height: auto;
+      .slide-link {
         display: block;
       }
 
-      figcaption {
-        padding: 20px 22px 22px;
+      .slide-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: opacity 160ms ease;
       }
 
-      figcaption strong {
+      .slide-image.is-loading {
+        opacity: 0.35;
+      }
+
+      .slide-button {
+        position: absolute;
+        top: 50%;
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 50%;
+        color: white;
+        background: rgba(23, 38, 64, 0.86);
+        box-shadow: 0 8px 22px rgba(20, 33, 61, 0.24);
+        font-size: 1.4rem;
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition:
+          background 160ms ease,
+          transform 160ms ease;
+      }
+
+      .slide-button:hover {
+        background: var(--orange);
+        transform: translateY(-50%) scale(1.06);
+      }
+
+      .slide-button.previous {
+        left: 18px;
+      }
+
+      .slide-button.next {
+        right: 18px;
+      }
+
+      .slide-meta {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 20px 22px;
+        border-top: 1px solid var(--line);
+      }
+
+      .slide-copy strong {
         display: block;
         margin-bottom: 6px;
         font-size: 1.12rem;
       }
 
-      figcaption span {
+      .slide-copy span {
         color: var(--muted);
         line-height: 1.55;
+      }
+
+      .slide-counter {
+        flex: none;
+        color: var(--muted);
+        font:
+          800 0.76rem/1.4 ui-monospace,
+          monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .slide-dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 22px 18px;
+      }
+
+      .slide-dot {
+        width: 9px;
+        height: 9px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(20, 33, 61, 0.22);
+        cursor: pointer;
+        transition:
+          background 160ms ease,
+          transform 160ms ease;
+      }
+
+      .slide-dot[aria-current='true'] {
+        background: var(--orange);
+        transform: scale(1.35);
+      }
+
+      .slide-thumbnails {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0 22px 22px;
+      }
+
+      .slide-thumbnail {
+        min-width: 0;
+        padding: 0;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--paper);
+        cursor: pointer;
+        opacity: 0.54;
+        transition:
+          border-color 160ms ease,
+          opacity 160ms ease;
+      }
+
+      .slide-thumbnail:hover,
+      .slide-thumbnail[aria-current='true'] {
+        border-color: var(--orange);
+        opacity: 1;
+      }
+
+      .slide-thumbnail img {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        display: block;
+        object-fit: cover;
+        object-position: top;
+      }
+
+      .slide-hint {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-align: center;
       }
 
       .local {
@@ -399,7 +512,6 @@
         }
 
         .architecture,
-        .gallery,
         .local-card {
           grid-template-columns: 1fr;
         }
@@ -409,8 +521,29 @@
           border-left: 0;
         }
 
-        figure.backend {
-          grid-column: auto;
+        .slide-button {
+          width: 42px;
+          height: 42px;
+        }
+
+        .slide-button.previous {
+          left: 10px;
+        }
+
+        .slide-button.next {
+          right: 10px;
+        }
+
+        .slide-meta {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .slide-thumbnails {
+          grid-template-columns: repeat(5, 72px);
+          justify-content: start;
+          overflow-x: auto;
         }
 
         footer .shell {
@@ -490,94 +623,53 @@
           <p class="eyebrow">Product tour · five surfaces</p>
           <h2>See the local platform before running it.</h2>
           <p>
-            These optimized previews document the current frontend and backend experience. Open any
-            image to inspect the full-size interface.
+            Browse the optimized frontend and backend previews one at a time. Use the arrows,
+            thumbnails, or keyboard, and open the active image to inspect it at full size.
           </p>
         </div>
 
-        <div class="gallery">
-          <figure>
-            <a href="./screenshots/web-home.webp">
+        <div class="slideshow" aria-roledescription="carousel" aria-label="NestLab product tour">
+          <div class="slide-stage">
+            <a class="slide-link" id="slide-link" href="./screenshots/web-home.webp">
               <img
+                class="slide-image"
+                id="slide-image"
                 src="./screenshots/web-home.webp"
                 alt="NestLab web application home page"
-                loading="lazy"
                 width="1600"
                 height="1316"
               />
             </a>
-            <figcaption>
-              <strong>Home</strong>
-              <span>Monorepo overview and the web-to-API boundary.</span>
-            </figcaption>
-          </figure>
+            <button
+              class="slide-button previous"
+              id="slide-previous"
+              type="button"
+              aria-label="Show previous screenshot"
+            >
+              &#8592;
+            </button>
+            <button
+              class="slide-button next"
+              id="slide-next"
+              type="button"
+              aria-label="Show next screenshot"
+            >
+              &#8594;
+            </button>
+          </div>
 
-          <figure>
-            <a href="./screenshots/web-capabilities.webp">
-              <img
-                src="./screenshots/web-capabilities.webp"
-                alt="NestLab capabilities page"
-                loading="lazy"
-                width="1600"
-                height="1311"
-              />
-            </a>
-            <figcaption>
-              <strong>Capabilities</strong>
-              <span>Identity, publishing, learning, and integration domains.</span>
-            </figcaption>
-          </figure>
+          <div class="slide-meta" aria-live="polite">
+            <div class="slide-copy">
+              <strong id="slide-title">Home</strong>
+              <span id="slide-description">Monorepo overview and the web-to-API boundary.</span>
+            </div>
+            <span class="slide-counter" id="slide-counter">01 / 05</span>
+          </div>
 
-          <figure>
-            <a href="./screenshots/web-api-status.webp">
-              <img
-                src="./screenshots/web-api-status.webp"
-                alt="NestLab API status page"
-                loading="lazy"
-                width="1600"
-                height="1309"
-              />
-            </a>
-            <figcaption>
-              <strong>API status</strong>
-              <span>Live NestJS and PostgreSQL health from a server-side request.</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <a href="./screenshots/web-contact.webp">
-              <img
-                src="./screenshots/web-contact.webp"
-                alt="NestLab contact page"
-                loading="lazy"
-                width="1600"
-                height="1311"
-              />
-            </a>
-            <figcaption>
-              <strong>Contact</strong>
-              <span>Project, profile, and collaboration entry points.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="backend">
-            <a href="./screenshots/api-dashboard.webp">
-              <img
-                src="./screenshots/api-dashboard.webp"
-                alt="NestLab backend API dashboard"
-                loading="lazy"
-                width="1600"
-                height="1311"
-              />
-            </a>
-            <figcaption>
-              <strong>Backend API dashboard</strong>
-              <span
-                >Runtime health, database readiness, OpenAPI contracts, and route discovery.</span
-              >
-            </figcaption>
-          </figure>
+          <div class="slide-dots" id="slide-dots" aria-label="Choose a screenshot"></div>
+          <div class="slide-thumbnails" id="slide-thumbnails"></div>
         </div>
+        <p class="slide-hint">Use the ← and → arrow keys to navigate.</p>
       </section>
 
       <section class="local shell">
@@ -608,5 +700,117 @@
         <span>Built by <a href="https://github.com/SergeHall">Serge Hall</a></span>
       </div>
     </footer>
+    <script>
+      const slides = [
+        {
+          file: './screenshots/web-home.webp',
+          title: 'Home',
+          description: 'Monorepo overview and the web-to-API boundary.',
+          alt: 'NestLab web application home page',
+          height: 1316,
+        },
+        {
+          file: './screenshots/web-capabilities.webp',
+          title: 'Capabilities',
+          description: 'Identity, publishing, learning, and integration domains.',
+          alt: 'NestLab capabilities page',
+          height: 1311,
+        },
+        {
+          file: './screenshots/web-api-status.webp',
+          title: 'API status',
+          description: 'Live NestJS and PostgreSQL health from a server-side request.',
+          alt: 'NestLab API status page',
+          height: 1309,
+        },
+        {
+          file: './screenshots/web-contact.webp',
+          title: 'Contact',
+          description: 'Project, profile, and collaboration entry points.',
+          alt: 'NestLab contact page',
+          height: 1311,
+        },
+        {
+          file: './screenshots/api-dashboard.webp',
+          title: 'Backend API dashboard',
+          description: 'Runtime health, database readiness, OpenAPI contracts, and routes.',
+          alt: 'NestLab backend API dashboard',
+          height: 1311,
+        },
+      ];
+
+      const slideImage = document.querySelector('#slide-image');
+      const slideLink = document.querySelector('#slide-link');
+      const slideTitle = document.querySelector('#slide-title');
+      const slideDescription = document.querySelector('#slide-description');
+      const slideCounter = document.querySelector('#slide-counter');
+      const slideDots = document.querySelector('#slide-dots');
+      const slideThumbnails = document.querySelector('#slide-thumbnails');
+      let activeSlide = 0;
+
+      const selectSlide = (index) => {
+        activeSlide = (index + slides.length) % slides.length;
+        const slide = slides[activeSlide];
+        const preload = new Image();
+
+        slideImage.classList.add('is-loading');
+        preload.addEventListener('load', () => {
+          slideImage.src = slide.file;
+          slideImage.alt = slide.alt;
+          slideImage.height = slide.height;
+          slideImage.classList.remove('is-loading');
+        });
+        preload.src = slide.file;
+
+        slideLink.href = slide.file;
+        slideTitle.textContent = slide.title;
+        slideDescription.textContent = slide.description;
+        slideCounter.textContent = `${String(activeSlide + 1).padStart(2, '0')} / ${String(
+          slides.length,
+        ).padStart(2, '0')}`;
+
+        [...slideDots.children].forEach((dot, index) => {
+          dot.setAttribute('aria-current', String(index === activeSlide));
+        });
+        [...slideThumbnails.children].forEach((thumbnail, index) => {
+          thumbnail.setAttribute('aria-current', String(index === activeSlide));
+        });
+      };
+
+      slides.forEach((slide, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'slide-dot';
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Show screenshot ${index + 1}: ${slide.title}`);
+        dot.setAttribute('aria-current', String(index === activeSlide));
+        dot.addEventListener('click', () => selectSlide(index));
+        slideDots.appendChild(dot);
+
+        const thumbnail = document.createElement('button');
+        const thumbnailImage = document.createElement('img');
+        thumbnail.className = 'slide-thumbnail';
+        thumbnail.type = 'button';
+        thumbnail.setAttribute('aria-label', `Show ${slide.title}`);
+        thumbnail.setAttribute('aria-current', String(index === activeSlide));
+        thumbnail.addEventListener('click', () => selectSlide(index));
+        thumbnailImage.src = slide.file;
+        thumbnailImage.alt = '';
+        thumbnailImage.loading = 'lazy';
+        thumbnail.appendChild(thumbnailImage);
+        slideThumbnails.appendChild(thumbnail);
+      });
+
+      document
+        .querySelector('#slide-previous')
+        .addEventListener('click', () => selectSlide(activeSlide - 1));
+      document
+        .querySelector('#slide-next')
+        .addEventListener('click', () => selectSlide(activeSlide + 1));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') selectSlide(activeSlide - 1);
+        if (event.key === 'ArrowRight') selectSlide(activeSlide + 1);
+      });
+    </script>
   </body>
 </html>

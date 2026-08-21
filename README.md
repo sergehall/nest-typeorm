@@ -11,65 +11,68 @@ production-style interface available from the local development environment.
 **[Open the GitHub Pages showcase](https://sergehall.github.io/nest-typeorm/)** ·
 **[Browse the source](https://github.com/sergehall/nest-typeorm)**
 
-<p align="center">
-  <a href="docs/screenshots/web-home.webp">
-    <img src="docs/screenshots/web-home.webp" alt="NestLab web application home page" width="100%" />
+<p>
+  <a href="https://sergehall.github.io/nest-typeorm/#tour">
+    <img
+      alt="Open the NestLab screenshot slideshow"
+      src="https://img.shields.io/badge/Open%20slideshow-NestLab%20screens-ff6838?style=for-the-badge&logo=github&logoColor=white"
+    />
   </a>
 </p>
 
 ## Product tour
 
-Click any preview to open the full-size screenshot.
+<details>
+  <summary><strong>View screenshots gallery (5 pages)</strong></summary>
+  <br />
 
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <a href="docs/screenshots/web-home.webp">
-        <img src="docs/screenshots/web-home.webp" alt="NestLab home page" />
+        <img src="docs/screenshots/web-home.webp" width="360" alt="NestLab home page" />
       </a>
-      <br />
-      <strong>Home</strong><br />
-      Monorepo overview and the boundary between the Next.js and NestJS applications.
+      <br /><sub><strong>Home</strong> — monorepo overview and application boundaries</sub>
     </td>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <a href="docs/screenshots/web-capabilities.webp">
-        <img src="docs/screenshots/web-capabilities.webp" alt="NestLab capabilities page" />
+        <img
+          src="docs/screenshots/web-capabilities.webp"
+          width="360"
+          alt="NestLab capabilities page"
+        />
       </a>
-      <br />
-      <strong>Capabilities</strong><br />
-      Product-oriented map of identity, publishing, learning, and integration domains.
+      <br /><sub><strong>Capabilities</strong> — identity, publishing, learning, and integrations</sub>
     </td>
   </tr>
   <tr>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <a href="docs/screenshots/web-api-status.webp">
-        <img src="docs/screenshots/web-api-status.webp" alt="NestLab API status page" />
+        <img src="docs/screenshots/web-api-status.webp" width="360" alt="NestLab API status page" />
       </a>
-      <br />
-      <strong>API status</strong><br />
-      Server-side health check for the NestJS runtime and PostgreSQL connection.
+      <br /><sub><strong>API status</strong> — NestJS and PostgreSQL health</sub>
     </td>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <a href="docs/screenshots/web-contact.webp">
-        <img src="docs/screenshots/web-contact.webp" alt="NestLab contact page" />
+        <img src="docs/screenshots/web-contact.webp" width="360" alt="NestLab contact page" />
       </a>
-      <br />
-      <strong>Contact</strong><br />
-      Project, profile, and collaboration links presented through the shared design system.
+      <br /><sub><strong>Contact</strong> — project, profile, and collaboration links</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center" valign="top">
+      <a href="docs/screenshots/api-dashboard.webp">
+        <img
+          src="docs/screenshots/api-dashboard.webp"
+          width="720"
+          alt="NestLab backend API dashboard"
+        />
+      </a>
+      <br /><sub><strong>Backend API dashboard</strong> — health, OpenAPI contracts, and routes</sub>
     </td>
   </tr>
 </table>
 
-<details>
-  <summary><strong>Backend API dashboard</strong></summary>
-  <br />
-  <p>
-    The NestJS root route is an operational control surface with live application and database
-    health, OpenAPI entry points, release metadata, and a concise route map.
-  </p>
-  <a href="docs/screenshots/api-dashboard.webp">
-    <img src="docs/screenshots/api-dashboard.webp" alt="NestLab backend API dashboard" width="100%" />
-  </a>
 </details>
 
 ## Architecture
