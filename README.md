@@ -1,243 +1,118 @@
-# IT-Incubator Training API
+# NestLab
 
-Educational backend API built with NestJS while studying backend development with the
-wonderful [IT-KAMASUTRA / IT-Incubator](https://it-incubator.io/en) team.
+Учебная full-stack платформа: большой модульный API на NestJS и новый web-интерфейс на Next.js.
+Проект остаётся монолитным репозиторием, но приложения теперь имеют явные границы и независимые
+точки запуска.
 
-This repository is not a default NestJS starter anymore. It is a learning project where I
-practiced building a real modular API: authentication, users, blogs, posts, comments,
-quiz games, payments, file uploads, Telegram integration, WebSocket messaging,
-database persistence, validation, guards, testing, and deployment basics.
-
-## Project Purpose
-
-The goal of this project was to move from framework tutorials to a backend that looks
-closer to production code:
-
-- REST API design with NestJS controllers, DTOs, pipes, filters, guards, and modules.
-- PostgreSQL persistence with TypeORM entities and repositories.
-- Authentication with JWT access/refresh tokens, cookies, device sessions, and token blacklist.
-- Role and permission experiments with CASL and Super Admin flows.
-- Blog platform features: users, blogs, blogger ownership, posts, comments, likes, bans, subscriptions, and image metadata.
-- Quiz game domain with pair games, answers, scoring, statistics, and admin-managed questions.
-- Integrations with email, Telegram, AWS S3-compatible storage, Stripe, and PayPal.
-- Swagger documentation and e2e/unit testing practice.
-
-## Tech Stack
-
-- **Runtime:** Node.js 24.18.0
-- **Package manager:** Yarn 4.14.1
-- **Framework:** NestJS 11
-- **Language:** TypeScript
-- **Database:** PostgreSQL with TypeORM
-- **Additional storage experiments:** MongoDB connection module
-- **Auth:** Passport, JWT, cookies, bcrypt
-- **Validation:** class-validator, class-transformer, Joi config validation
-- **Docs:** Swagger / OpenAPI
-- **Realtime:** Socket.IO / WebSocket gateway
-- **Files:** AWS SDK S3-compatible storage, Sharp image metadata/processing
-- **Payments:** Stripe and PayPal modules
-- **Testing:** Jest, Supertest, ts-jest
-
-## Main API Areas
-
-### Public and User Features
-
-- `auth` - registration, login, logout, refresh token, email confirmation, password recovery, current user profile.
-- `users` - user search, create, update, delete.
-- `blogs` - public blog search, blog details, blog subscriptions, posts in blog.
-- `posts` - post search, post details, comments, likes/dislikes.
-- `comments` - comment details, update, delete, like/dislike.
-- `security/devices` - active session/device management.
-
-### Blogger Features
-
-- `blogger/blogs` - current blogger's blogs, posts, comments, banned users, subscriptions.
-- Blog and post image uploads for wallpaper, main images, and post images.
-- Blogger-level user banning inside a blog.
-
-### Super Admin Features
-
-- `sa/users` - user administration and bans.
-- `sa/blogs` - blog administration, binding blogs to users, ban/unban flows.
-- `sa/quiz/questions` - quiz question CRUD and publication status.
-
-### Quiz Game
-
-- `pair-game-quiz` - connect players, create pairs, submit answers, finish games, get current game, game history, user statistics, and top users.
-
-### Integrations
-
-- `integrations/telegram` - Telegram webhook and bot activation link.
-- `stripe` - Stripe checkout, success/cancel callbacks, webhook processing.
-- `pay-pal` - PayPal checkout, success/cancel callbacks, webhook processing.
-- `conversation` - message and conversation endpoints with WebSocket support.
-- `products` - test products/orders/payment domain experiments.
-- `testing/all-data` - cleanup endpoint for test scenarios.
-
-## API Documentation
-
-Swagger is available after the app starts:
+## Структура
 
 ```text
-http://localhost:5005/api/docs
+apps/
+  api/                 NestJS, TypeORM, PostgreSQL, REST, WebSocket
+    src/               backend-модули и интеграции
+    test/              e2e-тесты API
+  web/                 Next.js App Router и React Server Components
+    src/app/           маршруты и layouts
+    src/components/    общие UI-компоненты
+    src/features/      feature-модули frontend
 ```
 
-The app currently does not use a global `/api` prefix, so regular endpoints are mounted
-directly from their controller paths, for example `/auth/login`, `/blogs`, `/posts`,
-and `/pair-game-quiz/pairs/connection`.
+Backend-код больше не лежит в корне и не смешивается с frontend. Корневой `package.json` только
+оркестрирует Yarn workspaces и общие quality gates.
 
-## Requirements
+## Стек
 
-- Node.js 24.18.0
-- Yarn 4.14.1, configured through `.yarn/releases/yarn-4.14.1.cjs`
-- PostgreSQL database URL
-- Environment variables for the integrations you want to run
+- Node.js 24.18.0 и Yarn 4.14.1
+- Next.js 16, React 19, TypeScript strict, Tailwind CSS 4
+- NestJS 11, TypeORM, PostgreSQL
+- Swagger / OpenAPI, Socket.IO, Jest и Supertest
+- Интеграции с Stripe, PayPal, Telegram, email и S3-совместимым хранилищем
 
-Use the repository Node version:
+## Быстрый старт
 
 ```bash
 nvm use
-```
-
-Check the expected runtime:
-
-```bash
-yarn runtime:check
-```
-
-## Installation
-
-```bash
 yarn install
 ```
 
-## Environment Configuration
-
-The configuration loader uses:
-
-- `.env` by default
-- `.env.dev` when `NODE_ENV=development`
-- `.env.test` when `NODE_ENV=testing`
-
-Important environment variable groups:
-
-- App: `NODE_ENV`, `PORT`
-- PostgreSQL: `DATABASE_URL`, `PG_DOMAIN_HEROKU`, `TYPEORM_SYNCHRONIZE`
-- Mongo experiments: `MONGO_URI_LOCAL`, `ATLAS_URI`, `TEST_DATABASE`, `DEV_DATABASE`, `PROD_NEST_DATABASE`
-- Auth/JWT: `ACCESS_SECRET_KEY`, `REFRESH_SECRET_KEY`, `EXP_ACC_TIME`, `EXP_REF_TIME`
-- Super Admin: `BASIC_AUTH`, `SA_LOGIN`, `SA_EMAIL`, `SA_KEY`, `SA_PASSWORD_HASH`
-- Mail: `NODEMAILER_EMAIL`, `NODEMAILER_APP_PASSWORD`, `MAIL_HOST`, `EMAIL_PORT`
-- AWS/S3: `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY`, `AWS_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_PUBLIC_BUCKET`
-- Telegram: `TOKEN_TELEGRAM_IT_INCUBATOR`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_CHAT_ID`
-- Stripe: `STRIPE_TEST_API_KEY`, `STRIPE_LIVE_API_KEY`, `STRIPE_API_VERSION`, `STRIPE_WEBHOOK_SECRET`
-- PayPal: `PAYPAL_WEBHOOK_ID`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`
-- Security: `THROTTLE_TTL`, `THROTTLE_LIMIT`, `SALT_FACTOR`
-- reCAPTCHA: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`
-
-Do not commit real secrets. Use local `.env*` files for development and platform-level
-environment variables for deployment.
-
-## Running The App
+Backend читает локальные переменные из `apps/api/.env` или `apps/api/.env.dev`. Существующие
+локальные файлы перенесены туда вместе с приложением. Для frontend:
 
 ```bash
-# development
-yarn start:dev
-
-# regular start
-yarn start
-
-# production build
-yarn build
-yarn start:prod
+cp apps/web/.env.example apps/web/.env.local
 ```
 
-By default, the application uses port `5005` unless `PORT` is provided.
-
-## Database And Migrations
-
-Generate a migration:
+Запустите приложения в двух терминалах:
 
 ```bash
-yarn generate-migrations
+yarn dev:api
+yarn dev:web
 ```
 
-Apply migrations after building the project:
+- Web: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:5005](http://localhost:5005)
+- Swagger: [http://localhost:5005/api/docs](http://localhost:5005/api/docs)
+
+`API_URL` — server-only переменная Next.js. Она не попадает в браузерный bundle и по умолчанию
+равна `http://localhost:5005`. Для browser-запросов API разрешает localhost в development; в
+production укажите один или несколько origin через `WEB_ORIGIN` (через запятую).
+
+## Основные команды
 
 ```bash
-yarn build
-yarn apply-migrations
+yarn dev:api          # NestJS в watch-режиме
+yarn dev:web          # Next.js development server
+yarn typecheck        # TypeScript в обоих workspaces
+yarn lint             # ESLint в обоих workspaces
+yarn lint:fix         # исправить ESLint-проблемы в API и web
+yarn format           # форматировать всю монорепу
+yarn test             # unit-тесты API
+yarn test:e2e         # e2e API с отдельной PostgreSQL
+yarn build            # production build API и web
+yarn verify           # types + lint + unit tests + build
 ```
 
-Revert the last migration:
+Команды отдельного приложения также можно запускать через workspace, например:
 
 ```bash
-yarn revert-last-migrations
+yarn workspace @nest-typeorm/api test:cov
+yarn workspace @nest-typeorm/web build
 ```
 
-For local experiments, TypeORM synchronization can be enabled with:
+## Что умеет API
+
+- Авторизация, JWT access/refresh tokens, cookies, устройства, роли и CASL.
+- Пользователи, блоги, публикации, комментарии, реакции, подписки и модерация.
+- Парная викторина: matchmaking, ответы, очки, статистика и рейтинг.
+- Realtime-сообщения через Socket.IO.
+- Stripe, PayPal, Telegram, email и S3-загрузка изображений.
+- Swagger-документация и защищённый от случайной очистки e2e-контур.
+
+Обычные endpoint-ы пока не используют глобальный `/api` prefix: например `/auth/login`, `/blogs`
+и `/posts`. `/api/docs` зарезервирован для Swagger.
+
+## E2E и безопасность базы
+
+Для e2e нужна отдельная PostgreSQL:
 
 ```bash
-TYPEORM_SYNCHRONIZE=true
+E2E_DATABASE_URL=postgres://user:password@127.0.0.1:5432/nest_typeorm_e2e yarn test:e2e
 ```
 
-Use it carefully and avoid enabling synchronization for production databases.
-
-## Tests
-
-```bash
-# unit tests
-yarn test
-
-# e2e tests (requires a dedicated PostgreSQL database)
-E2E_DATABASE_URL=postgres://user:password@127.0.0.1:5432/nest_typeorm_test yarn test:e2e
-
-# coverage
-yarn test:cov
-
-# lint
-yarn lint
-
-# format check
-yarn format:check
-```
-
-The E2E bootstrap refuses to reset a database unless `NODE_ENV=test`, the database name contains
-a `test` or `e2e` segment, and the host is loopback. A remote test database additionally requires
+Тестовый bootstrap откажется очищать базу, если `NODE_ENV` не равен `test`, имя базы не содержит
+`test` или `e2e`, либо хост не loopback. Удалённая тестовая база дополнительно требует
 `E2E_ALLOW_REMOTE_DATABASE_RESET=true`.
 
-## Project Structure
+## Контекст обучения
 
-```text
-src/
-  ability/              CASL abilities, roles, guards
-  adapters/             External service adapters
-  api-documentation/    Swagger decorators and documentation helpers
-  common/               Filters, pipes, validators, helpers, mail, scheduling
-  config/               Typed configuration and Joi validation
-  db/                   TypeORM/PostgreSQL and Mongo connection setup
-  features/             Main business modules
-  middlewares/          HTTP logging middleware
-  payment/              Payment orchestration, Stripe, PayPal
-  socket/               WebSocket gateway and events
-```
+Проект начался как backend-курс [IT-Incubator](https://it-incubator.io/en) и постепенно вырос в
+площадку для изучения архитектуры, тестирования и интеграций. Новый frontend продолжает эту
+историю: показывает возможности API и создаёт основу для реальных пользовательских сценариев.
 
-## Learning Context
+## Автор
 
-This API was built as part of my learning journey with
-[IT-KAMASUTRA / IT-Incubator](https://it-incubator.io/en). It reflects my first serious
-steps with backend engineering: Node.js, NestJS, PostgreSQL, TypeORM, MongoDB,
-Swagger, WebSocket, authentication, authorization, payments, integrations, testing,
-deployment basics, and architectural patterns such as modular design and use cases.
+Serge Hall · [sergioartg.com](https://sergioartg.com/) · [GitHub](https://github.com/SergeHall)
 
-Special thanks to the IT-KAMASUTRA team for the education, structure, and practical
-tasks that helped this project grow from simple exercises into a full training backend.
+## Лицензия
 
-## Author
-
-Serge Hall
-
-- Website: [https://sergioartg.com](https://sergioartg.com/)
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+[MIT](LICENSE)

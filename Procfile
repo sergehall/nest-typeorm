@@ -1,1 +1,1 @@
-web: npm run start:prod
+web: yarn workspace @nest-typeorm/api start:prod

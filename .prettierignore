@@ -1,12 +1,15 @@
 node_modules
 dist
+.next
+out
 coverage
 .yarn
 .idea
 
 *.log
 *.tsbuildinfo
+**/next-env.d.ts
 yarn.lock
 
 # Prettier's Handlebars parser can alter the HTML document structure.
-src/common/mails/templates/**/*.hbs
+apps/api/src/common/mails/templates/**/*.hbs
