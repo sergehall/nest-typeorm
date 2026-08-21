@@ -53,6 +53,10 @@ export default async function StatusPage() {
               <dt>Response time</dt>
               <dd>{health.status === 'online' ? `${health.responseTimeMs} ms` : '—'}</dd>
             </div>
+            <div>
+              <dt>PostgreSQL</dt>
+              <dd>{health.status === 'online' ? health.databaseStatus : 'unavailable'}</dd>
+            </div>
           </dl>
         </div>
       </section>

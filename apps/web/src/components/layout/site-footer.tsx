@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { BrandMark } from '@/components/ui/brand-mark';
-import { siteConfig } from '@/config/site';
+import { getPublicApiUrl, siteConfig } from '@/config/site';
 
 export function SiteFooter() {
+  const apiUrl = getPublicApiUrl();
+
   return (
     <footer className="site-footer">
       <div className="shell site-footer__grid">
@@ -15,7 +17,7 @@ export function SiteFooter() {
         </div>
         <div className="site-footer__links" aria-label="Project links">
           <Link href="/features">Capabilities</Link>
-          <Link href="/api">HTTP API</Link>
+          <a href={apiUrl}>Backend API ↗</a>
           <Link href="/contact">Contact</Link>
           <a href={siteConfig.repositoryUrl} target="_blank" rel="noopener noreferrer">
             GitHub ↗

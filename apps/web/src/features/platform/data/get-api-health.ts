@@ -7,6 +7,7 @@ export type ApiHealth =
       readonly message: string;
       readonly checkedAt: string;
       readonly responseTimeMs: number;
+      readonly databaseStatus: 'up';
     }
   | {
       readonly status: 'offline';
@@ -16,7 +17,7 @@ export type ApiHealth =
     };
 
 export async function getApiHealth(): Promise<ApiHealth> {
-  const url = getApiUrl();
+  const url = `${getApiUrl()}/health`;
   const checkedAt = new Date().toISOString();
   const startedAt = performance.now();
 
@@ -24,26 +25,32 @@ export async function getApiHealth(): Promise<ApiHealth> {
     const response = await fetch(url, {
       cache: 'no-store',
       signal: AbortSignal.timeout(2_500),
-      headers: { Accept: 'text/plain, application/json' },
+      headers: { Accept: 'application/json' },
     });
+
+    const body = (await response.json()) as {
+      readonly checks?: {
+        readonly database?: { readonly message?: string };
+      };
+    };
 
     if (!response.ok) {
       return {
         status: 'offline',
         url,
         checkedAt,
-        message: `The API responded with HTTP ${response.status}.`,
+        message:
+          body.checks?.database?.message ?? `The API responded with HTTP ${response.status}.`,
       };
     }
-
-    const message = (await response.text()).trim();
 
     return {
       status: 'online',
       url,
       checkedAt,
-      message: message || 'The API is responding.',
+      message: 'NestJS and PostgreSQL are operational.',
       responseTimeMs: Math.round(performance.now() - startedAt),
+      databaseStatus: 'up',
     };
   } catch {
     return {
