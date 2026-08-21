@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { API_OPERATION_COUNT } from './swagger.config';
 
 function findControllerFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -30,6 +31,6 @@ describe('Swagger controller coverage', () => {
       expect(source).toContain('@ApiControllerDocumentation()');
     }
 
-    expect(operationCount).toBe(95);
+    expect(operationCount).toBe(API_OPERATION_COUNT);
   });
 });

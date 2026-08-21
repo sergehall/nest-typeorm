@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { ArrowIcon } from '@/components/ui/arrow-icon';
 import { platformCapabilities } from '@/features/platform/data/platform-capabilities';
+import { getPublicApiUrl } from '@/config/site';
 
 export default function HomePage() {
+  const apiUrl = getPublicApiUrl();
+
   return (
     <>
       <section className="hero-section shell">
@@ -23,9 +26,9 @@ export default function HomePage() {
             <Link className="button button--primary" href="/features">
               Explore the platform <ArrowIcon />
             </Link>
-            <Link className="button button--ghost" href="/status">
-              Check the API
-            </Link>
+            <a className="button button--ghost" href={apiUrl}>
+              Open backend API <ArrowIcon />
+            </a>
           </div>
         </div>
 

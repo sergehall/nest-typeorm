@@ -3,6 +3,8 @@ import { DocumentBuilder } from '@nestjs/swagger';
 export const SWAGGER_PATH = 'api/docs';
 export const SWAGGER_JSON_PATH = '/api/docs/openapi.json';
 export const SWAGGER_YAML_PATH = '/api/docs/openapi.yaml';
+export const API_VERSION = '1.36.0';
+export const API_OPERATION_COUNT = 96;
 
 const swaggerTags = [
   ['App', 'Service availability and application information.'],
@@ -30,7 +32,7 @@ export function createSwaggerConfig() {
     .setDescription(
       'Complete OpenAPI contract for the NestLab educational backend. The API covers identity, publishing, comments, quizzes, messaging, payments, Telegram integration, and administration.',
     )
-    .setVersion('1.36.0')
+    .setVersion(API_VERSION)
     .addServer('http://localhost:5005', 'Local development')
     .addBearerAuth(
       {

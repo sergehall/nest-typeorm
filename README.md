@@ -53,7 +53,8 @@ yarn dev:web
 `yarn dev:web:no-open` to start the development server without opening a browser.
 
 - Web: [http://localhost:3000](http://localhost:3000)
-- API: [http://localhost:5005](http://localhost:5005)
+- API dashboard and health overview: [http://localhost:5005](http://localhost:5005)
+- Health contract: [http://localhost:5005/health](http://localhost:5005/health)
 - Swagger: [http://localhost:5005/api/docs](http://localhost:5005/api/docs)
 
 Swagger also exposes machine-readable contracts at
@@ -65,6 +66,9 @@ production. To expose it in production, set `SWAGGER_ENABLED=true`, `SWAGGER_USE
 `API_URL` is a server-only Next.js variable and is never included in the browser bundle. It defaults
 to `http://localhost:5005`. The API allows localhost browser requests in development. In production,
 provide one or more comma-separated origins through `WEB_ORIGIN`.
+
+Set `NEXT_PUBLIC_API_URL` when the web navigation should open a deployed backend dashboard instead
+of the local `http://localhost:5005` default.
 
 ## Root commands
 

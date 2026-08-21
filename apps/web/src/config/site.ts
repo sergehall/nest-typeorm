@@ -10,3 +10,7 @@ export const siteConfig = {
 export function getApiUrl(): string {
   return process.env.API_URL ?? 'http://localhost:5005';
 }
+
+export function getPublicApiUrl(): string {
+  return process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5005';
+}

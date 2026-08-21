@@ -1,7 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiProduces,
+  ApiServiceUnavailableResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ApiControllerDocumentation } from './api-documentation/decorators/api-controller-documentation.decorator';
+import { Response } from 'express';
+import { renderApiDashboard } from './api-dashboard/api-dashboard.renderer';
+import { HealthResponseDto } from './health/dto/health-response.dto';
 
 @ApiTags('App')
 @ApiControllerDocumentation()
@@ -10,7 +18,34 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  async getHello(): Promise<string> {
-    return this.appService.getHello();
+  @ApiProduces('text/html')
+  @ApiOkResponse({
+    description: 'Backend dashboard with health, documentation, and endpoint navigation.',
+    schema: { type: 'string', example: '<!doctype html>...' },
+  })
+  async getApiDashboard(@Res() response: Response): Promise<void> {
+    const health = await this.appService.getHealth();
+    const webUrl = process.env.WEB_ORIGIN?.split(',')[0]?.trim() || 'http://localhost:3000';
+
+    response.type('html').send(renderApiDashboard({ health, webUrl }));
+  }
+
+  @Get('health')
+  @ApiOkResponse({
+    description: 'The API and PostgreSQL database are operational.',
+    type: HealthResponseDto,
+  })
+  @ApiServiceUnavailableResponse({
+    description: 'The API is running, but PostgreSQL is unavailable.',
+    type: HealthResponseDto,
+  })
+  async getHealth(@Res({ passthrough: true }) response: Response): Promise<HealthResponseDto> {
+    const health = await this.appService.getHealth();
+
+    if (health.status === 'degraded') {
+      response.status(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    return health;
   }
 }
