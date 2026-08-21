@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
-import { PayPalUrlsEnum } from '../../enums/pay-pal-urls.enum';
+import { getPayPalApiBaseUrl } from '../../enums/pay-pal-urls.enum';
 import { PayPalConfig } from '../../../../../config/pay-pal/pay-pal.config';
 import { isRecord, requestExternalJson } from '../../../../../common/http/external-json-client';
 
@@ -22,9 +22,7 @@ export class PayPalGenerateAccessTokenUseCase implements ICommandHandler<PayPalG
 
   async execute(): Promise<string> {
     try {
-      // const baseUrl = await this.payPalFactory.getPayPalUrl();
-      // const url = baseUrl + '/v1/oauth2/token';
-      const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
+      const baseUrl = getPayPalApiBaseUrl();
       const url = baseUrl + '/v1/oauth2/token';
 
       const username = await this.payPalConfig.getPayPalValue('PAYPAL_CLIENT_ID');

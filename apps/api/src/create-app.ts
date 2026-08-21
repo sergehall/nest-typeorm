@@ -1,12 +1,41 @@
-import { BadRequestException, INestApplication, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import { HttpExceptionResponseFilter } from './common/filters/http-exception-response-filter';
 import cookieParser from 'cookie-parser';
 import { TrimPipe } from './common/pipes/trim.pipe';
 import { setupSwagger } from './api-documentation/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
+import { isHardenedRuntime } from './common/environment/runtime-environment';
 
-function setupCors(app: INestApplication): void {
+function setupSecurityHeaders(app: NestExpressApplication): void {
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          connectSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:'],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+        },
+      },
+      strictTransportSecurity: isHardenedRuntime()
+        ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
+        : false,
+    }),
+  );
+}
+
+function setupProxy(app: NestExpressApplication): void {
+  if (isHardenedRuntime()) {
+    // The deployed API is expected to run behind exactly one trusted platform proxy.
+    app.set('trust proxy', 1);
+  }
+}
+
+function setupCors(app: NestExpressApplication): void {
   const configuredOrigins = process.env.WEB_ORIGIN?.split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
@@ -16,7 +45,7 @@ function setupCors(app: INestApplication): void {
     origin:
       configuredOrigins && configuredOrigins.length > 0
         ? configuredOrigins
-        : process.env.NODE_ENV === 'production'
+        : isHardenedRuntime()
           ? false
           : developmentOrigins,
     credentials: true,
@@ -28,7 +57,7 @@ function setupCors(app: INestApplication): void {
  *
  * @param app The INestApplication instance of the NestJS application.
  */
-function setupContainer(app: INestApplication): void {
+function setupContainer(app: NestExpressApplication): void {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 }
 
@@ -37,7 +66,7 @@ function setupContainer(app: INestApplication): void {
  *
  * @param app The INestApplication instance of the NestJS application.
  */
-function setupExceptionFilter(app: INestApplication): void {
+function setupExceptionFilter(app: NestExpressApplication): void {
   app.useGlobalFilters(new HttpExceptionResponseFilter());
 }
 
@@ -46,7 +75,7 @@ function setupExceptionFilter(app: INestApplication): void {
  *
  * @param app The INestApplication instance of the NestJS application.
  */
-function setupCookieParser(app: INestApplication): void {
+function setupCookieParser(app: NestExpressApplication): void {
   app.use(cookieParser());
 }
 
@@ -55,7 +84,7 @@ function setupCookieParser(app: INestApplication): void {
  *
  * @param app The INestApplication instance of the NestJS application.
  */
-function setupGlobalPipes(app: INestApplication): void {
+function setupGlobalPipes(app: NestExpressApplication): void {
   app.useGlobalPipes(
     // Custom pipe to automatically trim whitespace from incoming request data.
     new TrimPipe(),
@@ -64,6 +93,11 @@ function setupGlobalPipes(app: INestApplication): void {
     new ValidationPipe({
       // Enable automatic transformation of incoming payload data to matching dto.
       transform: true,
+
+      // Remove undeclared fields and reject over-posting attempts.
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
 
       // Continue validating all properties, even if some validations fail.
       stopAtFirstError: false,
@@ -89,7 +123,9 @@ function setupGlobalPipes(app: INestApplication): void {
  * @param app The INestApplication instance of the NestJS application.
  * @returns The same INestApplication instance after applying configurations.
  */
-export const createApp = (app: INestApplication): INestApplication => {
+export const createApp = (app: NestExpressApplication): NestExpressApplication => {
+  setupProxy(app);
+  setupSecurityHeaders(app);
   setupCors(app);
   setupContainer(app);
   setupExceptionFilter(app);

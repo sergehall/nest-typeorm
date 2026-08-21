@@ -24,13 +24,11 @@ import { DeleteCommentCommand } from '../application/use-cases/delete-comment.us
 import { IdParams } from '../../../common/query/params/id.params';
 import { CommentIdParams } from '../../../common/query/params/commentId.params';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
-import { SkipThrottle } from '@nestjs/throttler';
 import { CommentViewModel } from '../views/comment.view-model';
 import { GetCommentByIdCommand } from '../application/use-cases/get-comment-by-id';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 
-@SkipThrottle()
 @ApiTags('Comments')
 @ApiControllerDocumentation()
 @Controller('comments')

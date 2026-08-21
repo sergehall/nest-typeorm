@@ -1,8 +1,9 @@
-import { InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
+import { HttpException, InternalServerErrorException, RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { FinalizePayPalPaymentCommand } from './finalize-pay-pal-payment.use-case';
 import { PayPalCapturePaymentCommand } from './pay-pal-capture-payment.use-case';
+import { VerifyPayPalWebhookCommand } from './verify-pay-pal-webhook.use-case';
 
 export class ProcessPayPalWebhookCommand {
   constructor(public rawBodyRequest: RawBodyRequest<Request>) {}
@@ -16,6 +17,8 @@ export class ProcessPayPalWebhookUseCase implements ICommandHandler<ProcessPayPa
     const { rawBodyRequest } = command;
 
     try {
+      await this.commandBus.execute(new VerifyPayPalWebhookCommand(rawBodyRequest));
+
       if (rawBodyRequest.body) {
         const eventType = rawBodyRequest.body.event_type;
         switch (eventType) {
@@ -31,9 +34,14 @@ export class ProcessPayPalWebhookUseCase implements ICommandHandler<ProcessPayPa
         }
       }
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       console.error(error);
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException('Failed to process PayPal webhook.', {
+        cause: error,
+      });
     }
   }
 }

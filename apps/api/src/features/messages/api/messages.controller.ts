@@ -21,11 +21,11 @@ import { MessageViewModel } from '../views/message.view-model';
 
 @ApiTags('Messages')
 @ApiControllerDocumentation()
+@UseGuards(JwtAuthGuard)
 @Controller('conversation')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post(':conversationId/messages')
   async createMessage(
     @Request() req: any,

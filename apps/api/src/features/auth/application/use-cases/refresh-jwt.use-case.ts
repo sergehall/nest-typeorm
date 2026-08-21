@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { UpdateAccessJwtCommand } from './update-access-jwt.use-case';
 import { AccessTokenDto } from '../../dto/access-token.dto';
 import { AuthService } from '../auth.service';
+import { getRefreshTokenCookieOptions } from '../../cookies/refresh-token-cookie.options';
 
 export class RefreshJwtCommand {
   constructor(
@@ -44,10 +45,7 @@ export class RefreshJwtUseCase implements ICommandHandler<RefreshJwtCommand> {
       new UpdateRefreshJwtCommand(currentPayload),
     );
 
-    res.cookie('refreshToken', updatedJwt, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie('refreshToken', updatedJwt, getRefreshTokenCookieOptions());
 
     const updatedPayload: PayloadDto = await this.authService.toExtractPayload(
       updatedJwt.refreshToken,

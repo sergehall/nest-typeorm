@@ -15,13 +15,11 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RemoveDevicesByDeviceIdCommand } from '../application/use-cases/remove-devices-by-deviceId.use-case';
 import { DeviceIdParams } from '../../../common/query/params/deviceId.params';
 import { SecurityDeviceViewModel } from '../views/security-device.view-model';
-import { SkipThrottle } from '@nestjs/throttler';
 import { SearchDevicesCommand } from '../application/use-cases/search-devices.use-case';
 import { AuthService } from '../../auth/application/auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 
-@SkipThrottle()
 @ApiTags('Security')
 @ApiControllerDocumentation()
 @Controller('security')

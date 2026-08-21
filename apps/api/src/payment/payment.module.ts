@@ -15,6 +15,8 @@ import { PayPalFactory } from '../config/pay-pal/pay-pal-factory';
 import { ProductsRepo } from '../features/products/infrastructure/products.repo';
 import { StripeAdapter } from './payment-systems/stripe/adapter/stripe-adapter';
 import { StripeFactory } from './payment-systems/stripe/factory/stripe-factory';
+import { GuestUsersEntity } from '../features/products/entities/unregistered-users.entity';
+import { GuestUsersRepo } from '../features/users/infrastructure/guest-users.repo';
 
 const paymentUseCases = [BuyProductsUseCase];
 const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
@@ -22,7 +24,7 @@ const paymentConfigs = [NodeEnvConfig, StripeConfig, PostgresConfig];
 const helpers = [UuidErrorResolver];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductsDataEntity]), CqrsModule],
+  imports: [TypeOrmModule.forFeature([ProductsDataEntity, GuestUsersEntity]), CqrsModule],
   controllers: [],
   providers: [
     PaymentService,
@@ -33,6 +35,7 @@ const helpers = [UuidErrorResolver];
     StripeFactory,
     PaymentManager,
     ProductsRepo,
+    GuestUsersRepo,
     ...helpers,
     ...paymentConfigs,
     ...paymentUseCases,

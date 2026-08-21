@@ -5,7 +5,9 @@ import {
   UnauthorizedException,
   HttpException,
   HttpStatus,
+  ServiceUnavailableException,
 } from '@nestjs/common';
+import { timingSafeEqual } from 'node:crypto';
 import { SaConfig } from '../../../config/sa/sa.config';
 import {
   loginOrPassInvalid,
@@ -13,15 +15,15 @@ import {
 } from '../../../common/filters/custom-errors-messages';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../../config/configuration';
+import { UsersRepo } from '../../users/infrastructure/users-repo';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateSaUserCommand } from '../../sa/application/use-cases/sa-create-super-admin.use-case';
-import { UsersRepo } from '../../users/infrastructure/users-repo';
-import { UsersEntity } from '../../users/entities/users.entity';
+import { isLocalRuntime } from '../../../common/environment/runtime-environment';
 
 @Injectable()
 export class SaBasicAuthGuard extends SaConfig implements CanActivate {
-  private readonly commandBus: CommandBus;
   private readonly usersRepo: UsersRepo;
+  private readonly commandBus: CommandBus;
 
   constructor(
     commandBus: CommandBus,
@@ -29,7 +31,7 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
     configService: ConfigService<ConfigType, true>,
   ) {
     super(configService);
-    this.commandBus = commandBus; // Assign commandBus to class property
+    this.commandBus = commandBus;
     this.usersRepo = usersRepo;
   }
 
@@ -42,7 +44,12 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
     if (!request.headers || !request.headers.authorization) {
       throw new UnauthorizedException([noAuthHeadersError]);
     } else {
-      if (request.headers.authorization !== expectedInputAuthorization) {
+      const actualAuthorization = Buffer.from(request.headers.authorization);
+      const expectedAuthorization = Buffer.from(expectedInputAuthorization);
+      if (
+        actualAuthorization.length !== expectedAuthorization.length ||
+        !timingSafeEqual(actualAuthorization, expectedAuthorization)
+      ) {
         throw new HttpException(
           {
             message: [loginOrPassInvalid],
@@ -51,12 +58,15 @@ export class SaBasicAuthGuard extends SaConfig implements CanActivate {
         );
       }
       const saLogin = await this.getSaValue('SA_LOGIN');
-      const existingSaUser = await this.usersRepo.findSaUserByLoginOrEmail(saLogin);
-      const saUser: UsersEntity =
-        existingSaUser ??
-        (await this.commandBus.execute<CreateSaUserCommand, UsersEntity>(
-          new CreateSaUserCommand(),
-        ));
+      let saUser = await this.usersRepo.findSaUserByLoginOrEmail(saLogin);
+
+      if (!saUser && isLocalRuntime()) {
+        saUser = await this.commandBus.execute(new CreateSaUserCommand());
+      }
+
+      if (!saUser) {
+        throw new ServiceUnavailableException('Administrative account is not initialized.');
+      }
 
       request.user = {
         userId: saUser.userId,

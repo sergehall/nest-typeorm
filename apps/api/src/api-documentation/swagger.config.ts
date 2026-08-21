@@ -4,7 +4,7 @@ export const SWAGGER_PATH = 'api/docs';
 export const SWAGGER_JSON_PATH = '/api/docs/openapi.json';
 export const SWAGGER_YAML_PATH = '/api/docs/openapi.yaml';
 export const API_VERSION = '1.36.0';
-export const API_OPERATION_COUNT = 96;
+export const API_OPERATION_COUNT = 98;
 
 const swaggerTags = [
   ['App', 'Service availability and application information.'],

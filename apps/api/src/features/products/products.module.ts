@@ -15,6 +15,7 @@ import { CreateOrderAndPaymentTransactionsUseCase } from './application/create-o
 import { ParseQueriesService } from '../../common/query/parse-queries.service';
 import { UuidErrorResolver } from '../../common/helpers/uuid-error-resolver';
 import { PaymentTransactionsRepo } from '../../payment/infrastructure/payment-transactions.repo';
+import { ProductionDisabledGuard } from '../../common/guards/production-disabled.guard';
 
 const useCases = [
   CreateRandomProductsUseCase,
@@ -41,6 +42,7 @@ const helpers = [UuidErrorResolver];
     ProductsRepo,
     OrderItemsRepo,
     PaymentTransactionsRepo,
+    ProductionDisabledGuard,
     ...useCases,
     ...services,
     ...helpers,

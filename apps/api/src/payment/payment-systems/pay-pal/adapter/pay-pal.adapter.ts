@@ -6,7 +6,7 @@ import { IntentsEnums } from '../../../enums/intents.enums';
 import { Amount, Item, PayPaPurchaseUnitsType } from '../types/pay-pal-create-order.type';
 import { PaymentService } from '../../../application/payment.service';
 import { ReferenceIdType } from '../../types/reference-id.type';
-import { PayPalUrlsEnum } from '../enums/pay-pal-urls.enum';
+import { getPayPalApiBaseUrl } from '../enums/pay-pal-urls.enum';
 import {
   isPayerActionRequired,
   PayerActionRequiredType,
@@ -56,10 +56,7 @@ export class PayPalAdapter {
   ): Promise<PayerActionRequiredType> {
     if (paymentDto.length === 0) throw new InternalServerErrorException('PaymentDto is empty');
 
-    // const baseUrl = await this.payPalFactory.getPayPalUrl();
-    // const url = baseUrl + '/v1/oauth2/token';
-
-    const baseUrl = PayPalUrlsEnum.BaseSandboxApi;
+    const baseUrl = getPayPalApiBaseUrl();
     const path = '/v2/checkout/orders';
     const url = baseUrl + path;
 

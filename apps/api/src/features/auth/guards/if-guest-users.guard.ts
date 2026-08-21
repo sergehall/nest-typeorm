@@ -4,32 +4,41 @@ import { ValidAccessJwtCommand } from '../application/use-cases/valid-access-jwt
 import { PayloadDto } from '../dto/payload.dto';
 import { InvalidJwtRepo } from '../infrastructure/invalid-jwt-repo';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { GuestUsersRepo } from '../../users/infrastructure/guest-users.repo';
 import { UsersRepo } from '../../users/infrastructure/users-repo';
-import { GuestUsersEntity } from '../../products/entities/unregistered-users.entity';
 
 @Injectable()
 export class IfGuestUsersGuard implements CanActivate {
   constructor(
     private readonly invalidJwtRepo: InvalidJwtRepo,
     private readonly usersRepo: UsersRepo,
-    private readonly guestUsersRepo: GuestUsersRepo,
     private readonly commandBus: CommandBus,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     if (request.headers && request.headers.authorization) {
-      const accessToken = request.headers.authorization.split(' ')[1];
+      const authorization = request.headers.authorization;
+      const match = /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/.exec(authorization);
+      const accessToken = match?.[1];
 
-      const payload: PayloadDto = await this.commandBus.execute(
+      if (!accessToken || accessToken.length > 2_048) {
+        request.user = null;
+        return true;
+      }
+
+      const payload: PayloadDto | null = await this.commandBus.execute(
         new ValidAccessJwtCommand(accessToken),
       );
+
+      if (!payload) {
+        request.user = null;
+        return true;
+      }
 
       const jwtExistInBlackList: boolean =
         await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
 
-      if (payload && !jwtExistInBlackList) {
+      if (!jwtExistInBlackList) {
         const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(payload.userId);
 
         request.user =
@@ -47,14 +56,9 @@ export class IfGuestUsersGuard implements CanActivate {
       }
     }
 
-    const instanceOfGuestUser: GuestUsersEntity =
-      await this.guestUsersRepo.getInstanceOfGuestUser();
-    await this.guestUsersRepo.save(instanceOfGuestUser);
-    request.user = {
-      guestUserId: instanceOfGuestUser.guestUserId,
-      roles: instanceOfGuestUser.roles,
-      isBanned: instanceOfGuestUser.isBanned,
-    };
+    // Guest persistence is intentionally deferred until after request DTO and
+    // product validation, so malformed requests cannot create database rows.
+    request.user = null;
     return true;
   }
 }

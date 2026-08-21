@@ -9,6 +9,8 @@ import { ProcessTelegramWebhookMessagesCommand } from '../application/use-cases/
 import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiProviderWebhook } from '../../../api-documentation/decorators/api-provider-webhook.decorator';
+import { TelegramWebhookGuard } from '../guards/telegram-webhook.guard';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Telegram')
 @ApiControllerDocumentation()
@@ -18,8 +20,13 @@ export class TelegramController {
 
   @Post('webhook')
   @ApiProviderWebhook({ provider: 'Telegram' })
+  @UseGuards(TelegramWebhookGuard)
+  @Throttle({
+    short: { limit: 10, ttl: 1_000 },
+    medium: { limit: 100, ttl: 60_000 },
+    long: { limit: 1_000, ttl: 3_600_000 },
+  })
   async telegramBotWebhook(@Body() payload: PayloadTelegramMessageType) {
-    console.log(payload, 'payload Webhook');
     return await this.commandBus.execute(new ProcessTelegramWebhookMessagesCommand(payload));
   }
 

@@ -9,7 +9,7 @@ import {
 import { ApiControllerDocumentation } from './api-documentation/decorators/api-controller-documentation.decorator';
 import { Response } from 'express';
 import { renderApiDashboard } from './api-dashboard/api-dashboard.renderer';
-import { HealthResponseDto } from './health/dto/health-response.dto';
+import { HealthResponseDto, LivenessResponseDto } from './health/dto/health-response.dto';
 
 @ApiTags('App')
 @ApiControllerDocumentation()
@@ -47,5 +47,27 @@ export class AppController {
     }
 
     return health;
+  }
+
+  @Get('health/live')
+  @ApiOkResponse({
+    description: 'The NestJS process is running. This check does not query PostgreSQL.',
+    type: LivenessResponseDto,
+  })
+  getLiveness(): LivenessResponseDto {
+    return this.appService.getLiveness();
+  }
+
+  @Get('health/ready')
+  @ApiOkResponse({
+    description: 'The API is ready and PostgreSQL accepts validation queries.',
+    type: HealthResponseDto,
+  })
+  @ApiServiceUnavailableResponse({
+    description: 'The process is alive, but PostgreSQL is unavailable.',
+    type: HealthResponseDto,
+  })
+  async getReadiness(@Res({ passthrough: true }) response: Response): Promise<HealthResponseDto> {
+    return this.getHealth(response);
   }
 }

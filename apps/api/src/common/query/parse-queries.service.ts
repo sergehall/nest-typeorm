@@ -7,10 +7,19 @@ import { SortType } from './types/sort.type';
 
 @Injectable()
 export class ParseQueriesService {
+  private static readonly MAX_PAGE_NUMBER = 10_000;
+  private static readonly MAX_PAGE_SIZE = 100;
+  private static readonly MAX_SEARCH_LENGTH = 200;
+  private static readonly MAX_PRODUCTS = 20;
+
   private async parsePageNumber(query: any): Promise<number> {
     const parsedPageNumber = parseInt(query.pageNumber, 10);
 
-    if (!isNaN(parsedPageNumber) && parsedPageNumber > 0) {
+    if (
+      !isNaN(parsedPageNumber) &&
+      parsedPageNumber > 0 &&
+      parsedPageNumber <= ParseQueriesService.MAX_PAGE_NUMBER
+    ) {
       return parsedPageNumber;
     } else {
       return 1; // Default value when parsing fails or the value is not positive.
@@ -20,7 +29,11 @@ export class ParseQueriesService {
   private async parsePageSize(query: any): Promise<number> {
     const parsedPageSize = parseInt(query.pageSize, 10);
 
-    if (!isNaN(parsedPageSize) && parsedPageSize > 0) {
+    if (
+      !isNaN(parsedPageSize) &&
+      parsedPageSize > 0 &&
+      parsedPageSize <= ParseQueriesService.MAX_PAGE_SIZE
+    ) {
       return parsedPageSize;
     } else {
       return 10; // Default value when parsing fails or the value is not positive.
@@ -46,7 +59,7 @@ export class ParseQueriesService {
   }
 
   private async parseSortBy(query: any): Promise<string> {
-    return query?.sortBy?.toString() || '';
+    return (query?.sortBy?.toString() || '').slice(0, 64);
   }
 
   private async parseSort(query: any): Promise<SortType> {
@@ -72,8 +85,12 @@ export class ParseQueriesService {
     }
     const directionValueArr = ['ascending', 'ASCENDING', 'asc', 'ASC', -1];
 
-    sortParams.forEach((param: any) => {
+    sortParams.slice(0, 2).forEach((param: any) => {
       const [property, direction] = param.split(' ');
+
+      if (!['avgScores', 'sumScore'].includes(property)) {
+        return;
+      }
 
       const directionAvgScores = directionValueArr.includes(direction)
         ? SortDirectionEnum.ASC
@@ -92,37 +109,47 @@ export class ParseQueriesService {
   }
 
   private async parseSearchLoginTerm(query: any): Promise<string> {
-    const queryLogin = query.searchLoginTerm?.toString();
+    const queryLogin = query.searchLoginTerm
+      ?.toString()
+      .slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return queryLogin && queryLogin.length !== 0 ? `%${queryLogin.toLowerCase()}%` : '%';
   }
 
   private async parseSearchEmailTerm(query: any): Promise<string> {
-    const queryEmail = query.searchEmailTerm?.toString();
+    const queryEmail = query.searchEmailTerm
+      ?.toString()
+      .slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return queryEmail && queryEmail.length !== 0 ? `%${queryEmail.toLowerCase()}%` : '%';
   }
 
   private async parseBodySearchTerm(query: any): Promise<string> {
-    const queryBody = query.bodySearchTerm?.toString();
+    const queryBody = query.bodySearchTerm
+      ?.toString()
+      .slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return queryBody && queryBody.length !== 0 ? `%${queryBody.toLowerCase()}%` : '%';
   }
 
   private async parseSearchNameTerm(query: any): Promise<string> {
-    const queryName = query.searchNameTerm?.toString();
+    const queryName = query.searchNameTerm
+      ?.toString()
+      .slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return queryName && queryName.length !== 0 ? `%${queryName}%` : '%';
   }
 
   private async parseTitle(query: any): Promise<string> {
-    const title = query.title?.toString();
+    const title = query.title?.toString().slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return title && title.length !== 0 ? `%${title}%` : '%';
   }
 
   private async parseUserName(query: any): Promise<string> {
-    const userName = query.userName?.toString();
+    const userName = query.userName?.toString().slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return userName && userName.length !== 0 ? `%${userName}%` : '%';
   }
 
   private async parseSearchTitle(query: any): Promise<string> {
-    const searchTitle = query.searchTitle?.toString();
+    const searchTitle = query.searchTitle
+      ?.toString()
+      .slice(0, ParseQueriesService.MAX_SEARCH_LENGTH);
     return searchTitle && searchTitle.length !== 0 ? `%${searchTitle}%` : '%';
   }
 
@@ -159,15 +186,19 @@ export class ParseQueriesService {
 
   private async parseProductsString(query: any): Promise<ProductsDto[]> {
     const products = [];
-    const productIdArray = query.productId;
-    const quantityArray = query.quantity;
 
-    if (!productIdArray || !quantityArray) {
+    if (!query.productId || !query.quantity) {
       return [];
     }
+    const productIdArray = Array.isArray(query.productId) ? query.productId : [query.productId];
+    const quantityArray = Array.isArray(query.quantity) ? query.quantity : [query.quantity];
     // Ensure both arrays have the same length
     if (productIdArray.length !== quantityArray.length) {
       throw new Error('productId and quantity arrays must have the same length');
+    }
+
+    if (productIdArray.length > ParseQueriesService.MAX_PRODUCTS) {
+      throw new Error(`A maximum of ${ParseQueriesService.MAX_PRODUCTS} products is allowed`);
     }
 
     for (let i = 0; i < productIdArray.length; i++) {

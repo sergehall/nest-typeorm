@@ -57,6 +57,7 @@ import { ImagesBlogsMainMetadataRepo } from '../blogger-blogs/infrastructure/ima
 import { SaConfig } from '../../config/sa/sa.config';
 import { CreateSaUserUseCase } from './application/use-cases/sa-create-super-admin.use-case';
 import { FilesMetadataService } from '../../adapters/media-services/files/files-metadata.service';
+import { SaUserBootstrapService } from './application/sa-user-bootstrap.service';
 
 const saUseCases = [
   SaFindBlogsUseCase,
@@ -110,6 +111,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     BloggerBlogsService,
     ParseQueriesService,
     FilesMetadataService,
+    SaUserBootstrapService,
     UsersRepo,
     PostsRepo,
     GamePairsRepo,

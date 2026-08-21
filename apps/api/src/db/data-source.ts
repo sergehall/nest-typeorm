@@ -28,17 +28,25 @@ import { PaymentTransactionsEntity } from '../features/products/entities/payment
 import { ProductsDataEntity } from '../features/products/entities/products-data.entity';
 import { ConversationsEntity } from '../features/messages/entities/conversations.entity';
 import { MessagesEntity } from '../features/messages/entities/messages.entity';
+import { createPostgresSslOptions } from './type-orm/options/postgres-connection-security';
+import { isHardenedRuntime } from '../common/environment/runtime-environment';
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl = process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error('DATABASE_URL environment variable is required to initialize TypeORM.');
+  throw new Error(
+    'MIGRATION_DATABASE_URL or DATABASE_URL is required to initialize the migration data source.',
+  );
+}
+
+if (isHardenedRuntime() && !process.env.MIGRATION_DATABASE_URL) {
+  throw new Error('MIGRATION_DATABASE_URL is required for production migrations.');
 }
 
 export default new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  ssl: { rejectUnauthorized: false },
+  ssl: createPostgresSslOptions(databaseUrl),
   migrationsTableName: 'migrationsNest',
   entities: [
     UsersEntity,

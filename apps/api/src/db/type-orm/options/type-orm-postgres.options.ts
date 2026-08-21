@@ -29,18 +29,25 @@ import { PaymentTransactionsEntity } from '../../../features/products/entities/p
 import { ProductsDataEntity } from '../../../features/products/entities/products-data.entity';
 import { MessagesEntity } from '../../../features/messages/entities/messages.entity';
 import { ConversationsEntity } from '../../../features/messages/entities/conversations.entity';
+import { isHardenedRuntime } from '../../../common/environment/runtime-environment';
+import { createPostgresSslOptions } from './postgres-connection-security';
 
 @Injectable()
 export class TypeOrmPostgresOptions extends PostgresConfig implements TypeOrmOptionsFactory {
   async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
     const url = await this.getPostgresConfig('DATABASE_URL');
-    const synchronize = process.env.TYPEORM_SYNCHRONIZE === 'true';
+    const production = isHardenedRuntime();
+    const synchronizeRequested = process.env.TYPEORM_SYNCHRONIZE === 'true';
+
+    if (production && synchronizeRequested) {
+      throw new Error('TYPEORM_SYNCHRONIZE must never be enabled in production.');
+    }
 
     return {
       type: 'postgres',
       url,
       autoLoadEntities: true,
-      ssl: { rejectUnauthorized: false },
+      ssl: createPostgresSslOptions(url),
       entities: [
         UsersEntity,
         GuestUsersEntity,
@@ -71,8 +78,18 @@ export class TypeOrmPostgresOptions extends PostgresConfig implements TypeOrmOpt
         MessagesEntity,
         ConversationsEntity,
       ],
-      synchronize,
+      synchronize: !production && synchronizeRequested,
       logging: false,
+      maxQueryExecutionTime: 2_000,
+      extra: {
+        application_name: 'nestlab-api',
+        max: 10,
+        connectionTimeoutMillis: 5_000,
+        query_timeout: 6_000,
+        statement_timeout: 5_000,
+        lock_timeout: 2_000,
+        idle_in_transaction_session_timeout: 10_000,
+      },
     };
   }
 }

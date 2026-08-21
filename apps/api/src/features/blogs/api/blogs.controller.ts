@@ -15,7 +15,6 @@ import { CheckAbilities } from '../../../ability/abilities.decorator';
 import { Action } from '../../../ability/roles/action.enum';
 import { CurrentUserDto } from '../../users/dto/current-user.dto';
 import { ParseQueriesService } from '../../../common/query/parse-queries.service';
-import { SkipThrottle } from '@nestjs/throttler';
 import { BlogExistValidationPipe } from '../../../common/pipes/blog-exist-validation.pipe';
 import { PaginatorDto } from '../../../common/helpers/paginator.dto';
 import { ParseQueriesDto } from '../../../common/query/dto/parse-queries.dto';
@@ -33,7 +32,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiControllerDocumentation } from '../../../api-documentation/decorators/api-controller-documentation.decorator';
 import { ApiCollectionQuery } from '../../../api-documentation/decorators/api-query-parameters.decorator';
 
-@SkipThrottle()
 @ApiTags('Blogs')
 @ApiControllerDocumentation()
 @Controller('blogs')

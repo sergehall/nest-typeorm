@@ -17,16 +17,28 @@ export class NoneStatusGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     if (request.headers && request.headers.authorization) {
-      const accessToken = request.headers.authorization.split(' ')[1];
+      const authorization = request.headers.authorization;
+      const match = /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/.exec(authorization);
+      const accessToken = match?.[1];
 
-      const payload: PayloadDto = await this.commandBus.execute(
+      if (!accessToken || accessToken.length > 2_048) {
+        request.user = null;
+        return true;
+      }
+
+      const payload: PayloadDto | null = await this.commandBus.execute(
         new ValidAccessJwtCommand(accessToken),
       );
+
+      if (!payload) {
+        request.user = null;
+        return true;
+      }
 
       const jwtExistInBlackList: boolean =
         await this.invalidJwtRepo.jwtExistInBlackList(accessToken);
 
-      if (payload && !jwtExistInBlackList) {
+      if (!jwtExistInBlackList) {
         const user: UsersEntity | null = await this.usersRepo.findNotBannedUserById(payload.userId);
 
         request.user =

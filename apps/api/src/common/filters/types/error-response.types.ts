@@ -1,6 +1,6 @@
 export type ErrorResponseType = {
   statusCode: number;
-  message: string;
+  message: string | readonly string[];
   timestamp: string;
   path: string;
 };

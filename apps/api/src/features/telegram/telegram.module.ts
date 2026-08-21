@@ -26,6 +26,7 @@ import { SendNewBlogPostNotificationsUseCase } from './application/use-cases/sen
 import { BlogsSubscribersRepo } from '../blogger-blogs/infrastructure/blogs-subscribers.repo';
 import { BlogsSubscribersEntity } from '../blogger-blogs/entities/blogs-subscribers.entity';
 import { TelegramAdapter } from '../../adapters/telegram/telegram.adapter';
+import { TelegramWebhookGuard } from './guards/telegram-webhook.guard';
 
 const telegramUseCases = [
   SendOurWebhookToTelegramUseCase,
@@ -57,6 +58,7 @@ const helpers = [KeyResolver, UuidErrorResolver];
     TelegramConfig,
     TelegramService,
     TelegramAdapter,
+    TelegramWebhookGuard,
     UsersRepo,
     GamePairsRepo,
     GameQuestionsRepo,

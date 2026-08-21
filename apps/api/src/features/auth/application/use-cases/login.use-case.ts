@@ -7,6 +7,7 @@ import { Response } from 'express';
 import { SignAccessJwtUseCommand } from './sign-access-jwt.use-case';
 import { AccessTokenDto } from '../../dto/access-token.dto';
 import { AuthService } from '../auth.service';
+import { getRefreshTokenCookieOptions } from '../../cookies/refresh-token-cookie.options';
 
 export class LoginCommand {
   constructor(
@@ -32,10 +33,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
 
     await this.commandBus.execute(new CreateDeviceCommand(payload, ip, userAgent));
 
-    res.cookie('refreshToken', signedToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie('refreshToken', signedToken, getRefreshTokenCookieOptions());
 
     return await this.commandBus.execute(new SignAccessJwtUseCommand(currentUserDto));
   }
